@@ -1,0 +1,36 @@
+{
+  "name": "@starfederation/datastar-sdk",
+  "version": "0.0.1",
+  "description": "Typescript SDK for Datastar",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starfederation/datastar.git"
+  },
+  "author": "Delaney Gillilan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/starfederation/datastar/issues"
+  },
+  "homepage": "https://github.com/starfederation/datastar#readme",
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "fast-check": "^3.23.1",
+    "typescript": "~5.6.2",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4"
+  },
+  "pnpm": 
+    { "overrides": {
+      "vite>rollup": "npm:@rollup/wasm-node"
+    }
+  }
+}
