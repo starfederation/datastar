@@ -10,6 +10,13 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/code/go/cmd/site/main.go"
+        },
+        {
+            "name": "Smoke Test",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/code/go/cmd/sitesmoketests/main.go"
         }
     ]
 }

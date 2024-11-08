@@ -1,8 +1,6 @@
 package site
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type ActiveSearchStore struct {
 	Search string `json:"search"`
@@ -25,9 +23,10 @@ templ ActiveSearchComponent(filteredUsers []*ActiveSearchUser, scores map[string
 			<input
 				class="flex-1 input input-bordered"
 				type="text"
+				data-testid="search"
 				placeholder="Search..."
 				data-model="search"
-				data-on-input.debounce_500ms="$$get('/examples/active_search/data')"
+				data-on-input.debounce_500ms="$$get('/examples/active_search/updates')"
 			/>
 			@icon("svg-spinners:blocks-wave", "class", "text-5xl datastar-indicator")
 		</div>

@@ -9,7 +9,7 @@ This example actively searches a contacts database as the user enters text.
 ## Demo
 
 <div>
-<div id="active_search" data-on-load="$$get('/examples/active_search/data')"></div>
+<div id="active_search" data-on-load="$$get('/examples/active_search/updates')"></div>
 </div>
 
 The interesting part is the input field:

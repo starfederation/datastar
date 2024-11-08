@@ -1,7 +1,6 @@
 package site
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -31,7 +30,7 @@ func setupExamplesClickToLoad(examplesRouter chi.Router) error {
 		} else {
 			sse.RenderFragmentTempl(ClickToLoadMoreButton(store))
 			for i := 0; i < store.Limit; i++ {
-				log.Printf("ClickToLoadAgentRow: %d", store.Offset+i)
+				// log.Printf("ClickToLoadAgentRow: %d", store.Offset+i)
 				sse.RenderFragmentTempl(
 					ClickToLoadAgentRow(store.Offset+i),
 					datastar.WithQuerySelectorID("click_to_load_rows"),

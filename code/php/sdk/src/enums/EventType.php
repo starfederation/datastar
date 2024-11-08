@@ -5,11 +5,11 @@
 
 namespace starfederation\datastar\enums;
 
-class EventType
+enum EventType: string
 {
-    public const FRAGMENT = 'datastar-fragment';
-    public const SIGNAL = 'datastar-signal';
-    public const REMOVE = 'datastar-remove';
-    public const REDIRECT = 'datastar-redirect';
-    public const CONSOLE = 'datastar-console';
+    case Fragment = 'datastar-fragment';
+    case Signal = 'datastar-signal';
+    case Remove = 'datastar-remove';
+    case Redirect = 'datastar-redirect';
+    case Console = 'datastar-console';
 }

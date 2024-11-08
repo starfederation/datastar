@@ -8,10 +8,10 @@ Datastar has had a few helper tools in the past for different languages.  The SD
 
 ### Decision
 
-Provide a SDK in a language agnostic way, to that end
+Provide an SDK in a language agnostic way, to that end
 
 1. Keep SDK as minimal as possible
-2. Allow per language/framework extended features to live in a SDK ***sugar*** version
+2. Allow per language/framework extended features to live in an SDK ***sugar*** version
 
 ### Status
 
@@ -53,7 +53,7 @@ The core mechanics of Datastar's SSE support is
       3. `Content-Type = text/event-stream`
    3. Then the created response ***should*** `flush` immediately to avoid timeouts while 0-♾️ events are created
    4. `ServerSentEventGenerator` ***should*** include an incrementing number to be used as an id for events when one is not provided
-   5. Multiple calls using `ServerSentEventGenerator` should be single threaded to guaruantee order.  The Go implementation use a mutex to facilitate this behavior but might not be need in a some environments
+   5. Multiple calls using `ServerSentEventGenerator` should be single threaded to guarantee order.  The Go implementation use a mutex to facilitate this behavior but might not be need in a some environments
 
 ### `ServerSentEventGenerator.send(eventType: EventType, dataLines: string[], options?: {id?:string, rery?:durationInMilliseconds})`
 
@@ -62,19 +62,19 @@ All top level `ServerSentEventGenerator` ***should*** use a unified sending func
 ####  Args
 
 ##### EventType
-An enum of Datastr supported events.  Will be a string over the wire
+An enum of Datastar supported events.  Will be a string over the wire
 Currently valid values are
 
-| Event | Description |
-| --- | --- |
+| Event             | Description                                    |
+|-------------------|------------------------------------------------|
 | datastar-fragment | A fragment of HTML to be inserted into the DOM |
-| datastar-signal | Effect the data-store in some way |
-| datastar-remove | Remove something from the DOM or data-store |
-| datastar-redirect | Redirect the browser to a new URL |
-| datastar-console | Send a message to the browser console |
+| datastar-signal   | Effect the data-store in some way              |
+| datastar-remove   | Remove something from the DOM or data-store    |
+| datastar-redirect | Redirect the browser to a new URL              |
+| datastar-console  | Send a message to the browser console          |
 
 ##### Options
-* `id` (string) Each event ***may*** include an `id`.  This can be used by the backend to replaye events.  If one is not provided the server ***must*** include an monotonically incrementing id.  This is part of the SSE spec and is used to tell the browser how to handle the event.  For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
+* `id` (string) Each event ***may*** include an `id`.  This can be used by the backend to replay events.  If one is not provided the server ***must*** include a monotonically incrementing id.  This is part of the SSE spec and is used to tell the browser how to handle the event.  For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
 * `retry` (duration) Each event ***may*** include a `retry` value.  If one is not provided the SDK ***must*** default to `1 second`.  This is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost. For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
 
 #### Logic
@@ -93,24 +93,24 @@ When called the function ***must*** write to the response buffer the following i
 
 ##### FragmentMergeMode
 
-An enum of Datastr supported fragment merge modes.  Will be a string over the wire
+An enum of Datastar supported fragment merge modes.  Will be a string over the wire
 Valid values should match the [FragmentMergeMode](#FragmentMergeMode) and currently include
 
-| Mode | Description |
-| --- | --- |
-| morph | Use idiomorph to merge the fragment into the DOM |
-| inner | Replace the innerHTML of the selector with the fragment |
-| outer | Replace the outerHTML of the selector with the fragment |
-| prepend | Prepend the fragment to the selector |
-| append | Append the fragment to the selector |
-| before | Insert the fragment before the selector |
-| after | Insert the fragment after the selector |
+| Mode             | Description                                             |
+|------------------|---------------------------------------------------------|
+| morph            | Use idiomorph to merge the fragment into the DOM        |
+| inner            | Replace the innerHTML of the selector with the fragment |
+| outer            | Replace the outerHTML of the selector with the fragment |
+| prepend          | Prepend the fragment to the selector                    |
+| append           | Append the fragment to the selector                     |
+| before           | Insert the fragment before the selector                 |
+| after            | Insert the fragment after the selector                  |
 | upsertAttributes | Update the attributes of the selector with the fragment |
 
 ##### Options
 * `selector` (string) The CSS selector to use to insert the fragment.  If not provided the fragment ***must*** be inserted at the end of the body.  If the selector is not found Datastar client side ***will** default to using the `id` attribute of the fragment
 * `merge` (FragmentMergeMode) The mode to use when merging the fragment into the DOM.  If not provided the Datastar client side ***will*** default to `morph`
-* If settleDuration is provided the SDK ***should*** wait for the specified duration before sending the event, if not provided the Datastar client side ***will*** default to `300 milliseconds`
+* If `settleDuration` is provided the SDK ***should*** wait for the specified duration before sending the event, if not provided the Datastar client side ***will*** default to `300 milliseconds`
 * If useViewTransition is provided the SDK ***should*** use the provided view transition, if not provided the Datastar client side ***will*** default to `false`
 
 #### Logic
@@ -158,7 +158,7 @@ When called the function ***must*** call `ServerSentEventGenerator.send` with th
 
 #### Args
 
-`paths` is a list of strings that represent the path to the data to be removed from the data-store.  The paths ***must*** be valid `.` delimnated paths within the store.  The Datastar client side will use these paths to remove the data from the data-store.
+`paths` is a list of strings that represent the path to the data to be removed from the data-store.  The paths ***must*** be valid `.` delimited paths within the store.  The Datastar client side will use these paths to remove the data from the data-store.
 
 #### Logic
 When called the function ***must*** call `ServerSentEventGenerator.send` with the `data` and `datastar-remove` event type.
@@ -184,7 +184,7 @@ When called the function ***must*** call `ServerSentEventGenerator.send` with th
 
 ##### ConsoleMode
 
-An enum of Datastr supported console modes.  Will be a string over the wire
+An enum of Datastar supported console modes.  Will be a string over the wire
 Valid values should match the [ConsoleAPI](https://developer.mozilla.org/en-US/docs/Web/API/console) methods and currently include
 
 * assert
@@ -213,12 +213,12 @@ Valid values should match the [ConsoleAPI](https://developer.mozilla.org/en-US/d
 
 #### Args
 
-* `r` (http.Request) The incoming request object from the browser.  This object ***must*** be a valid a valid Request object per the language specifics.
+* `r` (http.Request) The incoming request object from the browser.  This object ***must*** be a valid Request object per the language specifics.
 * `store` (any) The store object that will the incoming data will be unmarshalled into.  The exact function signature will depend on the language specifics.
 
 #### Logic
 
 1. The function ***must*** parse the incoming HTTP request
-   1. if the incoming method is `GET` then the function ***must*** parse the querystring's `datastar` key and treat it as a URL encoded JSON string.
+   1. if the incoming method is `GET` then the function ***must*** parse the query string's `datastar` key and treat it as a URL encoded JSON string.
    2. otherwise the function ***must*** parse the body of the request as a JSON encoded string.
    3. if the incoming data is not valid JSON the function ***must*** return an error.

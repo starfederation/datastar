@@ -76,6 +76,6 @@ func (sse *ServerSentEventGenerator) Consolef(mode ConsoleMode, messageFormat st
 func (sse *ServerSentEventGenerator) Console(mode ConsoleMode, message string) error {
 	return sse.send(
 		EventTypeConsole,
-		[]string{string(mode) + message},
+		[]string{string(mode) + " " + message},
 	)
 }

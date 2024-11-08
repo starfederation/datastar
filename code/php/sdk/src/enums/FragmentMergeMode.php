@@ -5,14 +5,14 @@
 
 namespace starfederation\datastar\enums;
 
-class FragmentMergeMode
+enum FragmentMergeMode: string
 {
-    public const MORPH = 'morph';
-    public const INNER = 'inner';
-    public const OUTER = 'outer';
-    public const PREPEND = 'prepend';
-    public const APPEND = 'append';
-    public const BEFORE = 'before';
-    public const AFTER = 'after';
-    public const UPSERT = 'upsertAttributes';
+    case Morph = 'morph';
+    case Inner = 'inner';
+    case Outer = 'outer';
+    case Prepend = 'prepend';
+    case Append = 'append';
+    case Before = 'before';
+    case After = 'after';
+    case Upsert = 'upsertAttributes';
 }

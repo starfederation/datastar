@@ -6,7 +6,6 @@ import (
 
 var (
 	ErrEventTypeError = errors.New("event type is required")
-	ErrMissingInput   = errors.New("missing datastar input")
 
 	newLineBuf       = []byte("\n")
 	doubleNewLineBuf = []byte("\n\n")

@@ -346,14 +346,27 @@ async function fetcher(
                     );
                     const consoleMessage = consoleRest.join(" ");
                     switch (consoleMode) {
+                        case "assert":
+                        case "clear":
+                        case "count":
+                        case "countReset":
                         case "debug":
+                        case "dir":
+                        case "dirxml":
                         case "error":
-                        case "info":
                         case "group":
+                        case "groupCollapsed":
                         case "groupEnd":
+                        case "info":
                         case "log":
+                        case "table":
+                        case "time":
+                        case "timeEnd":
+                        case "timeLog":
+                        case "trace":
                         case "warn":
-                            console[consoleMode](consoleMessage);
+                            const fn = console[consoleMode] as Function;
+                            fn(consoleMessage);
                             break;
                         default:
                             throw new Error(
@@ -440,7 +453,7 @@ async function fetcher(
 
     if (method === "GET") {
         const queryParams = new URLSearchParams(url.search);
-        queryParams.append("datastar!", storeJSON);
+        queryParams.append("datastar", storeJSON);
         url.search = queryParams.toString();
     } else {
         req.body = storeJSON;

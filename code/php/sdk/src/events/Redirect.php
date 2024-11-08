@@ -19,9 +19,9 @@ class Redirect implements EventInterface
     /**
      * @inerhitdoc
      */
-    public function getEventType(): string
+    public function getEventType(): EventType
     {
-        return EventType::REDIRECT;
+        return EventType::Redirect;
     }
 
     /**

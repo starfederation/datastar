@@ -32,9 +32,9 @@ class Fragment implements EventInterface
     /**
      * @inerhitdoc
      */
-    public function getEventType(): string
+    public function getEventType(): EventType
     {
-        return EventType::FRAGMENT;
+        return EventType::Fragment;
     }
 
     /**
@@ -49,7 +49,7 @@ class Fragment implements EventInterface
             $dataLines[] = 'data: selector ' . $this->selector;
         }
 
-        $dataLines[] = 'data: merge ' . ($this->merge ?? FragmentMergeMode::MORPH);
+        $dataLines[] = 'data: merge ' . ($this->merge ?? FragmentMergeMode::Morph->value);
 
         if ($this->settleDuration !== null && $this->settleDuration !== static::DEFAULT_SETTLE_DURATION) {
             $dataLines[] = 'data: settle ' . $this->settleDuration;

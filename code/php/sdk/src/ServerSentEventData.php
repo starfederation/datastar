@@ -5,15 +5,17 @@
 
 namespace starfederation\datastar;
 
+use starfederation\datastar\enums\EventType;
+
 class ServerSentEventData
 {
-    public string $eventType;
+    public EventType $eventType;
     public ?string $id;
     public array $data;
     public ?int $retry;
 
     public function __construct(
-        string $eventType,
+        EventType $eventType,
         ?string $id = null,
         array $data,
         ?int $retry = null,

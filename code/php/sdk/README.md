@@ -12,7 +12,7 @@ use starfederation\datastar\ServerSentEventGenerator;
 $sseGenerator = new ServerSentEventGenerator();
 
 // Sends an SSE event of the given type.
-$sseGenerator->send(EventType::FRAGMENT, ['<div></div>'], [
+$sseGenerator->send(EventType::Fragment, ['<div></div>'], [
     'id' => '123',
     'retry' => 500,
 ]);
@@ -20,7 +20,7 @@ $sseGenerator->send(EventType::FRAGMENT, ['<div></div>'], [
 // Inserts a fragment into the DOM.
 $sseGenerator->renderFragment('<div></div>', [
     'selector' => '#my-div',
-    'merge' => FragmentMergeMode::APPEND,
+    'merge' => FragmentMergeMode::Append,
     'settleDuration' => 1000,
     'useViewTransition' => true,
 ]);
@@ -38,7 +38,7 @@ $sseGenerator->removeFromStore(['foo', 'bar']);
 $sseGenerator->redirect('/success');
 
 // Sends a message to the browser console.
-$sseGenerator->console(ConsoleMode::LOG, 'Hello, world!');
+$sseGenerator->console(ConsoleMode::Log, 'Hello, world!');
 ```
 
 ```php
