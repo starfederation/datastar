@@ -1,0 +1,60 @@
+{% import "strings" %}
+{% import "fmt" %}
+{%- func pythonConsts(data *ConstTemplateData) -%}
+# {%s data.DoNotEdit %}
+from enum import StrEnum
+
+{%- for _, enum := range data.Enums -%}
+#region {%s= enum.Description %}
+class {%s enum.Name.Pascal %}(StrEnum):
+{%- for _, entry := range enum.Values -%}
+    # {%s= entry.Description %}
+    {%s enum.Name.Pascal %}{%s entry.Name.Pascal %} = "{%s entry.Value %}"
+
+{%- endfor -%}
+#endregion {%s enum.Name.Pascal %}
+
+{%- endfor -%}
+#endregion Enums
+
+DATASTAR_KEY = "{%s data.DatastarKey %}"
+VERSION                   = "{%s data.Version %}"
+VERSION_CLIENT_BYTE_SIZE     = {%d data.VersionClientByteSize %}
+VERSION_CLIENT_BYTE_SIZE_GZIP = {%d data.VersionClientByteSizeGzip %}
+
+#region Default durations
+
+{%- for _, d := range data.DefaultDurations -%}
+# {%s= d.Description %}
+Default{%s d.Name.Pascal %} = {%d durationToMs(d.Duration) %}
+{%- endfor -%}
+
+#endregion Default durations
+
+#region Default strings
+
+{%- for _, s := range data.DefaultStrings -%}
+# {%s= s.Description %}
+Default{%s s.Name.Pascal %} = "{%s s.Value %}"
+{%- endfor -%}
+
+#endregion Default strings
+
+#region Dataline literals
+{%- for _, literal := range data.DatalineLiterals -%}
+{%s literal.Pascal %}DatalineLiteral = "{%s literal.Camel %}"
+{%- endfor -%}
+#endregion Dataline literals
+
+#region Default booleans
+
+{%- for _, b := range data.DefaultBools -%}
+# {%s= b.Description %}
+Default{%s b.Name.Pascal %} = {%s strings.Title(fmt.Sprintf("%v", b.Value)) %}
+
+{%- endfor -%}
+#endregion Default booleans
+
+#region Enums
+
+{%- endfunc -%}
