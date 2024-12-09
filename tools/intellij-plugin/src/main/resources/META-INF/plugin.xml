@@ -1,0 +1,11 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>com.github.starfederation.datastarjetbrainsplugin</id>
+    <name>Datastar support</name>
+    <vendor>starfederation</vendor>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>JavaScript</depends>
+    <extensions defaultExtensionNs="com.intellij">
+        <javascript.webTypes source="datastar-attributes.web-types.json" enableByDefault="true"/>
+    </extensions>
+</idea-plugin>

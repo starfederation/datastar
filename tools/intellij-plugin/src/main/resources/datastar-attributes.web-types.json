@@ -1,0 +1,484 @@
+{
+  "$schema": "../../../../schema.json",
+  "name": "Datastar",
+  "version": "1.0.0",
+  "js-types-syntax": "typescript",
+  "description-markup": "markdown",
+  "default-icon": "datastar-icon.png",
+  "contributions": {
+    "js": {
+      "events": [
+        {
+          "name": "signal-change"
+        },
+        {
+          "name": "raf"
+        }
+      ],
+      "datastar-persist-modifiers": [
+        {
+          "name": "session",
+          "description": "Persists signals values in Session Storage"
+        }
+      ],
+      "datastar-on-modifiers": [
+        {
+          "name": "once",
+          "description": "Only trigger the event listener once"
+        },
+        {
+          "name": "passive",
+          "description": "Do not call `preventDefault` on the event listener"
+        },
+        {
+          "name": "capture",
+          "description": "Use a capture event listener"
+        },
+        {
+          "name": "debounce",
+          "description": "Debounce the event listener"
+        },
+        {
+          "name": "debounce_1000ms",
+          "description": "Debounce for 1000ms"
+        },
+        {
+          "name": "debounce_1s",
+          "description": "Debounce for 1s"
+        },
+        {
+          "name": "debounce_leading",
+          "description": "Debounce with leading edge"
+        },
+        {
+          "name": "debounce_noTrail",
+          "description": "Debounce without trailing edge"
+        },
+        {
+          "name": "throttle",
+          "description": "Throttle the event listener"
+        },
+        {
+          "name": "throttle_1000ms",
+          "description": "Throttle for 1000ms"
+        },
+        {
+          "name": "throttle_1s",
+          "description": "Throttle for 1s"
+        },
+        {
+          "name": "throttle_noLead",
+          "description": "Throttle without leading edge"
+        },
+        {
+          "name": "throttle_noTrail",
+          "description": "Throttle without trailing edge"
+        },
+        {
+          "name": "window",
+          "description": "Attaches the event listener to the `window` element"
+        }
+      ]
+    },
+    "html": {
+      "attributes": [
+        {
+          "name": "data-attributes-*",
+          "virtual": true,
+          "description": "Sets an element’s attribute value based on an expression.",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-attributes",
+          "value": {
+            "kind": "expression",
+            "type": [
+              "string",
+              "object"
+            ],
+            "required": true
+          },
+          "pattern": {
+            "or": [
+              {
+                "items": [
+                  {
+                    "path": "/html/attributes",
+                    "includeVirtual": false
+                  }
+                ],
+                "template": [
+                  "data-attributes-",
+                  "$...",
+                  "#item:event name"
+                ],
+                "priority": "normal"
+              },
+              {
+                "template": [
+                  "data-attributes"
+                ],
+                "priority": "normal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "data-class-*",
+          "virtual": true,
+          "description": "Adds or removes a class from an element based on an expression.",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-class",
+          "value": {
+            "kind": "expression",
+            "type": [
+              "boolean",
+              "object"
+            ],
+            "required": true
+          },
+          "pattern": {
+            "or": [
+              {
+                "items": "/css/classes",
+                "template": [
+                  "data-class-",
+                  "$...",
+                  "#item:event name"
+                ],
+                "priority": "normal"
+              },
+              {
+                "template": [
+                  "data-class"
+                ],
+                "priority": "normal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "data-computed-*",
+          "virtual": true,
+          "description": "Creates a signal that is computed based on an expression.",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-computed",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-computed-",
+              {
+                "regex": "[-a-z0-9]+"
+              }
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-indicator-*",
+          "virtual": true,
+          "description": "Creates a signal to track in-flight backend requests.",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-indicator",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "or": [
+              {
+                "template": [
+                  "data-indicator-",
+                  {
+                    "regex": "[-a-z0-9]+"
+                  }
+                ],
+                "priority": "normal"
+              },
+              {
+                "template": [
+                  "data-indicator"
+                ],
+                "priority": "normal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "data-intersect",
+          "virtual": true,
+          "description": "Executes an expression on intersection with the viewport.",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-intersect",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-intersect"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-on-*",
+          "virtual": true,
+          "description": "Executes an expression whenever an event is triggered on an element.",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-on",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "or": [
+              {
+                "items": "/js/events",
+                "template": [
+                  "data-on-",
+                  "$...",
+                  "#item:event name",
+                  {
+                    "items": "/js/datastar-on-modifiers",
+                    "template": [
+                      ":",
+                      "$...",
+                      "#item:modifier"
+                    ],
+                    "required": false,
+                    "repeat": true
+                  }
+                ],
+                "priority": "normal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "data-persist",
+          "virtual": true,
+          "description": "Persists all signals in local storage.",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-persist",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-persist",
+              {
+                "items": "/js/datastar-persist-modifiers",
+                "template": [
+                  ":",
+                  "$...",
+                  "#item:modifier"
+                ],
+                "required": false,
+                "repeat": true
+              }
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-ref-*",
+          "virtual": true,
+          "description": "Creates a signal whose value references an element.",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-ref",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "or": [
+              {
+                "template": [
+                  "data-ref-",
+                  {
+                    "regex": "[-a-z0-9]+"
+                  }
+                ],
+                "priority": "normal"
+              },
+              {
+                "template": [
+                  "data-ref"
+                ],
+                "priority": "normal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "data-replace-url",
+          "virtual": true,
+          "description": "Replaces the URL in the browser with an evaluated expression.",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-replace-url",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-replace-url"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-signals-*",
+          "virtual": true,
+          "description": "Merges a signal into the existing signals.",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-signals",
+          "value": {
+            "kind": "expression",
+            "type": [
+              "string",
+              "object"
+            ],
+            "required": true
+          },
+          "pattern": {
+            "or": [
+              {
+                "template": [
+                  "data-signals-",
+                  {
+                    "regex": "[-a-z0-9]+"
+                  }
+                ],
+                "priority": "normal"
+              },
+              {
+                "template": [
+                  "data-signals"
+                ],
+                "priority": "normal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "data-scroll-into-view",
+          "virtual": true,
+          "description": "Scrolls the element into view.",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-scroll-into-view",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-scroll-into-view"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-show",
+          "virtual": true,
+          "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
+          "doc-url": "https://data-star.dev/reference/plugins_browser#show",
+          "value": {
+            "kind": "expression",
+            "type": "boolean",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-show"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-text",
+          "virtual": true,
+          "description": "Sets the text content of an element to the evaluated expression.",
+          "doc-url": "https://data-star.dev/reference/plugins_dom#text",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-text"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-view-transition",
+          "virtual": true,
+          "description": "Sets the value of `view-transition-name` for use with the View Transition API.",
+          "doc-url": "https://data-star.dev/reference/plugins_browser#view-transition",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-view-transition"
+            ],
+            "priority": "normal"
+          }
+        }
+      ],
+      "elements": [
+        {
+          "name": "Standard HTML elements extension",
+          "description": "This is a workaround to provide /js/properties on standard HTML elements.",
+          "extension": true,
+          "pattern": {
+            "or": [
+              "input",
+              "textarea",
+              "select",
+              "checkbox",
+              "radio"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "data-bind-*",
+              "virtual": true,
+              "description": "Creates a new signal and enables two-way binding between it and the element.",
+              "doc-url": "https://data-star.dev/guide/getting_started#data-bind",
+              "value": {
+                "kind": "expression",
+                "type": "string",
+                "required": true
+              },
+              "pattern": {
+                "or": [
+                  {
+                    "template": [
+                      "data-bind-",
+                      {
+                        "regex": "[-a-z0-9]+"
+                      }
+                    ],
+                    "priority": "normal",
+                    "required": false
+                  },
+                  {
+                    "template": [
+                      "data-bind"
+                    ],
+                    "priority": "normal"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
