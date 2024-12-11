@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>Datastar</AssemblyName>
-        <Version>0.20.0</Version>
+        <Version>0.21.0</Version>
         <RootNamespace>StarFederation.Datastar</RootNamespace>
+        <Nullable>disabled</Nullable>
 
         <!-- General info -->
         <Description>SDK for ServerSentEvents and convenience methods for Datastar</Description>
@@ -39,7 +40,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="..\..\assets\datastar_icon.png">
+        <None Include="..\assets\datastar_icon.png">
           <Pack>true</Pack>
           <Link>datastar_icon.png</Link>
           <PackagePath>$(PackageIconUrl)</PackagePath>
@@ -52,13 +53,14 @@
         <Compile Include="Utility.fs" />
         <Compile Include="Consts.fs" />
         <Compile Include="ServerSentEvent.fs" />
+        <Compile Include="Signals.fs" />
         <Compile Include="ServerSentEventGenerator.fs" />
         <Compile Include="ServerSentEventHttpHandler.fs" />
+        <Compile Include="Scripts\BrowserConsole.fs" />
+        <Compile Include="Scripts\Redirect.fs" />
         <Compile Include="DependencyInjection\ServerSentEventService.fs" />
-        <Compile Include="DependencyInjection\ServerSentEventServices.fs" />
-        <Compile Include="Scripts\ServerSentEventExtensions.fs" />
-        <Compile Include="Scripts\ServerSentEventGeneratorExtensions.fs" />
-        <Compile Include="Falco\Response.fs" />
+        <Compile Include="DependencyInjection\ServerSentEventServiceProvider.fs" />
+        <Compile Include="DependencyInjection\ServerSentEventScriptExtensions.fs" />
     </ItemGroup>
 
 </Project>

@@ -7,16 +7,18 @@
 </PropertyGroup>
 
 <ItemGroup>
-    <ProjectReference Include="..\..\sdk\src\Datastar.fsproj"/>
-</ItemGroup>
-
-<ItemGroup>
   <PackageReference Include="Falco" Version="4.0.6" />
-  <PackageReference Include="FsCodec.SystemTextJson" Version="3.0.3" />
+  <PackageReference Include="Falco.Markup" Version="1.1.1" />
 </ItemGroup>
 
 <ItemGroup>
-  <Compile Include="Program.fs" />
+  <Compile Include="Example\click_to_edit.fs" />
+  <Compile Include="Examples.fs" />
+  <Compile Include="Program.fs"/>
+</ItemGroup>
+
+<ItemGroup>
+  <ProjectReference Include="..\..\..\sdk\dotnet\Falco.Datastar\src\Falco.Datastar\Falco.Datastar.fsproj" />
 </ItemGroup>
 
 </Project>

@@ -5,11 +5,11 @@ open System.Threading.Tasks
 module ServerSentEventGenerator =
 
     let send env sse =
+        let sendEvent (env:ISendServerEvent) event = env.SendServerEvent(event)
         let serializedEvent = sse |> ServerSentEvent.serialize
-        let sendEvent (env:ISendServerEvent) (event:string) = env.SendServerEvent(event)
         sendEvent env serializedEvent
 
-    let mergeFragmentsWithOptions (options:MergeFragmentsOptions) env (fragment:string) =
+    let mergeFragmentsWithOptions (options:MergeFragmentsOptions) env fragments =
         { EventType = MergeFragments
           Id = options.EventId
           Retry = options.Retry
@@ -18,7 +18,7 @@ module ServerSentEventGenerator =
             if (options.MergeMode <> Consts.DefaultFragmentMergeMode) then $"{Consts.DatastarDatalineMergeMode} {options.MergeMode |> Consts.FragmentMergeMode.toString}"
             if (options.SettleDuration <> Consts.DefaultFragmentsSettleDuration) then $"{Consts.DatastarDatalineSettleDuration} {options.SettleDuration.Milliseconds}"
             if (options.UseViewTransition <> Consts.DefaultFragmentsUseViewTransitions) then $"{Consts.DatastarDatalineUseViewTransition} %A{options.UseViewTransition}"
-            yield! (fragment |> Utility.splitLine |> Seq.map (fun fragmentLine -> $"{Consts.DatastarDatalineFragments} %s{fragmentLine}"))
+            yield! (fragments |> Utility.splitLine |> Seq.map (fun fragmentLine -> $"{Consts.DatastarDatalineFragments} %s{fragmentLine}"))
             |] }
         |> send env
     let mergeFragments env = mergeFragmentsWithOptions MergeFragmentsOptions.defaults env
@@ -35,19 +35,19 @@ module ServerSentEventGenerator =
         |> send env
     let removeFragments env = removeFragmentsWithOptions RemoveFragmentsOptions.defaults env
 
-    let mergeSignalsWithOptions options env onlyIfMissing (mergeSignalData:IDatastarSignals) : Task =
+    let mergeSignalsWithOptions (options:MergeSignalsOptions) env (mergeSignalData:ISignals) : Task =
         { EventType = MergeSignals
           Id = options.EventId
           Retry = options.Retry
           DataLines = [|
-            if (onlyIfMissing <> Consts.DefaultMergeSignalsOnlyIfMissing) then $"{Consts.DatastarDatalineOnlyIfMissing} %A{onlyIfMissing}"
+            if (options.OnlyIfMissing <> Consts.DefaultMergeSignalsOnlyIfMissing) then $"{Consts.DatastarDatalineOnlyIfMissing} %A{options.OnlyIfMissing}"
             yield! (mergeSignalData.Serialize() |> Utility.splitLine |> Seq.map (fun dataLine -> $"{Consts.DatastarDatalineSignals} %s{dataLine}"))
             |] }
        |> send env
-    let mergeSignals env = mergeSignalsWithOptions EventOptions.defaults env
+    let mergeSignals env = mergeSignalsWithOptions MergeSignalsOptions.defaults env
 
     let removeSignalsWithOptions options env paths =
-        let paths' = paths |> Seq.map DataSignalPath.value |> String.concat " "
+        let paths' = paths |> Seq.map SignalsPath.value |> String.concat " "
         { EventType = RemoveSignals
           Id = options.EventId
           Retry = options.Retry

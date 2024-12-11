@@ -10,7 +10,7 @@
 *.userosscache
 *.sln.docstates
 [Ss]amples/[Ss]andbox/
-*.sqlite
+tests/TestResults/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -354,6 +354,3 @@ MigrationBackup/
 
 # Rider (JetBrain's cross-platform .NET IDE) working folder
 .idea/
-
-# Datastar Bundles copied
-**/wwwroot/bundles/

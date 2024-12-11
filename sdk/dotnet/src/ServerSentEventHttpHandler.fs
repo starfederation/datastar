@@ -2,10 +2,43 @@ namespace StarFederation.Datastar
 
 open System.IO
 open System.Text
+open System.Text.Json
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Primitives
 open Microsoft.Net.Http.Headers
+
+module ServerSentEventHttpHandler =
+    let startResponse response = task {
+        let setHeader (response:HttpResponse) (name, content:string) =
+            if response.Headers.ContainsKey(name) |> not then
+                response.Headers.Add(name, StringValues(content))
+        [
+           ("Cache-Control", "no-cache, max-age, must-revalidate, no-store")
+           ("Connection", "keep-alive")
+           (HeaderNames.ContentType, "text/event-stream")
+        ] |> Seq.iter (setHeader response)
+        do! response.StartAsync()
+        do! response.Body.FlushAsync()
+        }
+
+    let readRawSignals (httpRequest:HttpRequest) : ValueTask<string voption> =
+        match httpRequest.Method with
+        | System.Net.WebRequestMethods.Http.Get ->
+            match httpRequest.Query.TryGetValue(Consts.DatastarKey) with
+            | true, json when json.Count > 0 -> ValueSome json[0]
+            | _ -> ValueNone
+            |> ValueTask.FromResult
+        | _ ->
+            task {
+                use readResult = new StreamReader(httpRequest.BodyReader.AsStream())
+                let! str = readResult.ReadToEndAsync()
+                return ValueSome str
+                } |> ValueTask<string voption>
+
+    let sendServerEvent (httpResponse:HttpResponse) (event:string) =
+        let bytes = Encoding.UTF8.GetBytes(event)
+        httpResponse.BodyWriter.WriteAsync(bytes).AsTask()
 
 type IServerSentEventHandler =
     interface
@@ -13,48 +46,18 @@ type IServerSentEventHandler =
         inherit IReadRawSignals
     end
 
-type  ServerSentEventHttpHandler(httpContext:HttpContext) =
+type ServerSentEventHttpHandler(httpContext:HttpContext) =
     do
-        let setHeader (ctx:HttpContext) (name, content:string) =
-            if ctx.Response.Headers.ContainsKey(name) |> not then
-                ctx.Response.Headers.Add(name, StringValues(content))
-        [
-           ("Cache-Control", "no-cache")
-           ("Connection", "keep-alive")
-           (HeaderNames.ContentType, "text/event-stream")
-        ] |> Seq.iter (setHeader httpContext)
-        httpContext.Response.StartAsync().GetAwaiter().GetResult()
-        httpContext.Response.Body.FlushAsync().GetAwaiter().GetResult()
+        let startResponseTask = ServerSentEventHttpHandler.startResponse httpContext.Response
+        startResponseTask.GetAwaiter().GetResult()
 
     member _.HttpContext = httpContext
-
-    static member ReadRawSignals (httpRequest:HttpRequest) : ValueTask<Result<string, exn>> =
-        let retrieveTask =
-            match httpRequest.Method with
-            | System.Net.WebRequestMethods.Http.Get ->
-                match httpRequest.Query.TryGetValue(Consts.DatastarKey) with
-                | true, json when json.Count > 0 -> Ok (json[0])
-                | _ -> Error (exn "datastar key not found in query not found")
-                |> ValueTask.FromResult
-            | System.Net.WebRequestMethods.Http.Post ->
-                task {
-                    try
-                        use readResult = new StreamReader(httpRequest.BodyReader.AsStream())
-                        let! str = readResult.ReadToEndAsync()
-                        return (Ok str)
-                    with ex -> return Error ex
-                    }
-                |> ValueTask<Result<string, exn>>
-            | _ -> (Error (exn $"Unknown HTTP method: {httpRequest.Method}")) |> ValueTask.FromResult
-        retrieveTask
 
     with
     interface IServerSentEventHandler
 
     interface ISendServerEvent with
-        member this.SendServerEvent(event:string) =
-            let bytes = Encoding.UTF8.GetBytes(event)
-            this.HttpContext.Response.BodyWriter.WriteAsync(bytes).AsTask()
+        member this.SendServerEvent (event:string) = ServerSentEventHttpHandler.sendServerEvent this.HttpContext.Response event
 
     interface IReadRawSignals with
-        member this.ReadRawSignals () = ServerSentEventHttpHandler.ReadRawSignals(this.HttpContext.Request)
+        member this.ReadRawSignals () = ServerSentEventHttpHandler.readRawSignals this.HttpContext.Request

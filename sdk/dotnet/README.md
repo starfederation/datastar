@@ -7,19 +7,11 @@ Real-time Hypermedia first Library and Framework for dotnet
 ```html
 <html lang="en">
   <head>
-    <script
-      type="module"
-      defer
-      src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"
-    ></script>
+    <script type="module" defer src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script>
     <title>D* Demo</title>
   </head>
   <body>
-    <main
-      class="container"
-      id="main"
-      data-signals="{'input':'','output':''}"
-    >
+    <main class="container" id="main" data-signals="{'input':'','output':''}">
       <button data-on-click="sse('/displayDate')">Display Date</button>
       <div id="target"></div>
       <input type="text" placeholder="input:" data-bind="input" /><br />
@@ -39,7 +31,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 ...
 // define your signals
-public record DatastarSignals : IDatastarSignals
+public record DatastarSignals : ISignals
 {
     [JsonPropertyName("input")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -54,7 +46,7 @@ public record DatastarSignals : IDatastarSignals
 ...
 // add as an ASP Service
 //  allows injection of IServerSentEventGenerator, to respond to a request with a Datastar friendly ServerSentEvent
-//                  and IDatastarSignals, to read the signals sent by the client
+//                  and ISignals, to read the signals sent by the client
 builder.Services.AddDatastar<DatastarSignals>();
 ...
 app.UseStaticFiles();
@@ -66,9 +58,9 @@ app.MapGet("/displayDate", async (IServerSentEventGenerator sse) =>
     await sse.MergeFragments($"""<div id='target'><span id='date'><b>{today}</b><button data-on-click="sse('/removeDate')">Remove</button></span></div>""");
 });
 app.MapGet("/removeDate", async (IServerSentEventGenerator sse) => { await sse.RemoveFragments("#date"); });
-app.MapPost("/changeOutput", async (IServerSentEventGenerator sse, IDatastarSignals signals) =>
+app.MapPost("/changeOutput", async (IServerSentEventGenerator sse, ISignals signals) =>
 {
-    DatastarSignals signals = (signals as DatastarSignals) ?? throw new InvalidCastException("Unknown IDatastarSignals passed");
+    DatastarSignals signals = (signals as DatastarSignals) ?? throw new InvalidCastException("Unknown ISignals passed");
     DatastarSignals newSignals = new() { Output = $"Your Input: {signals.Input}" };
     await sse.MergeSignals(newSignals);
 });
