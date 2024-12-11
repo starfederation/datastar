@@ -21,6 +21,7 @@ func setupEssays(ctx context.Context, router chi.Router) error {
 		{
 			Label: "2024",
 			Links: []*SidebarLink{
+				{ID: "the_road_to_v1"},
 				{ID: "htmx_sucks"},
 				{ID: "another_dependency"},
 				{ID: "event_streams_all_the_way_down"},
