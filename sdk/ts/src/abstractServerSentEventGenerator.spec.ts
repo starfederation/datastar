@@ -7,7 +7,7 @@ import {
 import {
     FragmentMergeModes
 } from "./consts.ts";
-import { ServerSentEventGenerator }  from "./abstractServerSentEventGenerator.ts";
+import { ServerSentEventGenerator }  from "./serverSentEventGenerator.ts";
 
 class MockedServerSentEventGenerator extends ServerSentEventGenerator {
     public constructor() {
