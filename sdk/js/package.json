@@ -1,0 +1,12 @@
+{
+  "name": "datastar-sdk",
+  "version": "1.0.0",
+  "description": "Datastar SDK",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["datastar", "hypermedia", "sse"],
+  "license": "MIT"
+}
