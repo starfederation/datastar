@@ -1,6 +1,9 @@
 import {
     FragmentMergeModes,
     EventTypes,
+    DatastarDatalineFragments,
+    DatastarDatalinePaths,
+    DatastarDatalineScript,
     DatastarDatalineSelector,
     DatastarDatalineUseViewTransition,
     DatastarDatalineSettleDuration,
@@ -19,10 +22,6 @@ export interface DatastarEventOptions {
     retryDuration?: number;
 };
 
-export interface DatastarEvent {
-    event: EventType;
-};
-
 export interface FragmentOptions extends DatastarEventOptions {
     [DatastarDatalineUseViewTransition]?: boolean;
 }
@@ -33,35 +32,43 @@ export interface MergeFragmentsOptions extends FragmentOptions {
     [DatastarDatalineSelector]?: string;
 };
 
-export interface MergeFragmentsEvent extends DatastarEvent, MergeFragmentsOptions {
+export interface MergeFragmentsEvent {
     event: "datastar-merge-fragments";
+    options: MergeFragmentsOptions;
+    [DatastarDatalineFragments]: string;
 };
 
-export interface RemoveFragmentsEvent extends DatastarEvent, FragmentOptions {
-    [DatastarDatalineSelector]: string;
+export interface RemoveFragmentsEvent {
     event: "datastar-remove-fragments";
+    options: FragmentOptions;
+    [DatastarDatalineSelector]: string;
 };
 
 export interface MergeSignalsOptions extends DatastarEventOptions {
     [DatastarDatalineOnlyIfMissing]?: boolean;
 };
 
-export interface MergeSignalsEvent extends DatastarEvent, MergeSignalsOptions {
+export interface MergeSignalsEvent {
     event: "datastar-merge-signals";
+    options: MergeSignalsOptions;
     [DatastarDatalineSignals]: string;
 };
 
-export interface RemoveSignalsEvent extends DatastarEvent, DatastarEventOptions  {
+export interface RemoveSignalsEvent {
     event: "datastar-remove-signals";
+    options: DatastarEventOptions;
+    [DatastarDatalinePaths]: string;
 }
 
-export interface ExecuteScriptOptions extends DatastarEventOptions  {
+export interface ExecuteScriptOptions extends DatastarEventOptions {
     [DatastarDatalineAutoRemove]?: boolean;
     [DatastarDatalineAttributes]?: string;
 }
 
-export interface ExecuteScriptEvent extends DatastarEvent, ExecuteScriptOptions {
+export interface ExecuteScriptEvent {
     event: "datastar-execute-script";
+    options: ExecuteScriptOptions;
+    [DatastarDatalineScript]: string;
 }
 
 export const sseHeaders = {
@@ -70,4 +77,6 @@ export const sseHeaders = {
     "Content-Type": "text/event-stream"
 } as const;
 
-export type SseHeader = typeof sseHeaders;
+export type MultilineDatalinePrefix = typeof DatastarDatalineScript | typeof DatastarDatalineFragments | typeof DatastarDatalineSignals;
+export type DatastarEventOptionsUnion = MergeFragmentsOptions | FragmentOptions | MergeSignalsOptions | DatastarEventOptions | ExecuteScriptOptions;
+export type DatastarEvent = MergeFragmentsEvent | RemoveFragmentsEvent | MergeSignalsEvent | RemoveSignalsEvent | ExecuteScriptEvent;
