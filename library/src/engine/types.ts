@@ -20,8 +20,6 @@ export interface MacroPlugin extends DatastarPlugin {
   fn: (original: string) => string
 }
 
-export type AllowedModifiers = Set<string>
-
 export enum Requirement {
   Allowed = 0,
   Must = 1,
@@ -34,7 +32,7 @@ export interface AttributePlugin extends DatastarPlugin {
   type: PluginType.Attribute
   onGlobalInit?: (ctx: InitContext) => void // Called once on registration of the plugin
   onLoad: (ctx: RuntimeContext) => OnRemovalFn | void // Return a function to be called on removal
-  mods?: AllowedModifiers // If not provided, all modifiers are allowed
+  tags?: Set<string> // If not provided, all modifiers are allowed
   keyReq?: Requirement // The rules for the key requirements
   valReq?: Requirement // The rules for the value requirements
   removeOnLoad?: boolean // If true, the attribute is removed after onLoad (useful for plugins you don’t want reapplied)
@@ -71,15 +69,15 @@ export type InitContext = {
 }
 
 export type HTMLorSVGElement = Element & (HTMLElement | SVGElement)
-export type Modifiers = Map<string, Set<string>> // name -> tags
+export type Tags = Map<string, Set<string>> // name -> tags
 
 export type RuntimeContext = InitContext & {
   el: HTMLorSVGElement // The element the attribute is on
   rawKey: Readonly<string> // no parsing data-* key
   rawValue: Readonly<string> // no parsing data-* value
   value: Readonly<string> // what the user wrote after any macros run
-  key: Readonly<string> // data-* key without the prefix or modifiers
-  mods: Modifiers // the modifiers and their arguments
+  key: Readonly<string> // data-* key without the prefix or tags
+  tags: Tags // the tags and their arguments
   genRX: () => <T>(...args: any[]) => T // a reactive expression
 }
 

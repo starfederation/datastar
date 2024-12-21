@@ -12,13 +12,13 @@ import {
   type GlobalInitializer,
   type HTMLorSVGElement,
   type MacroPlugin,
-  type Modifiers,
   type OnRemovalFn,
   PluginType,
   type RemovalEntry,
   Requirement,
   type RuntimeContext,
   type RuntimeExpressionFunction,
+  type Tags,
   type WatcherPlugin,
 } from './types'
 
@@ -102,7 +102,7 @@ export class Engine {
 
           // Extract the key and value from the dataset
           const keyRaw = rawKey.slice(p.name.length)
-          let [key, ...rawModifiers] = keyRaw.split(/\_\_+/)
+          let [key, ...rawTags] = keyRaw.split(/\_\_+/)
 
           const hasKey = key.length > 0
           if (hasKey) {
@@ -153,10 +153,10 @@ export class Engine {
 
           // Apply the macros
           appliedMacros.clear()
-          const mods: Modifiers = new Map<string, Set<string>>()
-          for (const m of rawModifiers) {
-            const [label, ...tags] = m.split('.')
-            mods.set(camelize(label), new Set(tags.map((t) => t.toLowerCase())))
+          const tags: Tags = new Map<string, Set<string>>()
+          for (const rawTag of rawTags) {
+            const [label, ...tag] = rawTag.split('.')
+            tags.set(camelize(label), new Set(tag.map((t) => t.toLowerCase())))
           }
           const macros = [
             ...(p.macros?.pre || []),
@@ -185,7 +185,7 @@ export class Engine {
             rawValue,
             key,
             value,
-            mods,
+            tags,
           }
 
           // Load the plugin and store any cleanup functions

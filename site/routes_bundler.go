@@ -309,7 +309,7 @@ func bundlePlugins(tmpDir string, manifest PluginManifest) (results *BundleResul
 	aliasMap["~"] = tmpDir
 
 	buildResult := api.Build(api.BuildOptions{
-		EntryPoints:       []string{bundleOutFile},
+		EntryPoints: []string{bundleOutFile},
 		Banner: map[string]string{
 			"js": "// Datastar v" + manifest.Version,
 		},

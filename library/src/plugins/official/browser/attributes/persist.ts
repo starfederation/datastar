@@ -15,12 +15,12 @@ const SESSION = 'session'
 export const Persist: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'persist',
-  mods: new Set([SESSION]),
-  onLoad: ({ key, value, signals, effect, mods }) => {
+  tags: new Set([SESSION]),
+  onLoad: ({ key, value, signals, effect, tags }) => {
     if (key === '') {
       key = DATASTAR
     }
-    const storage = mods.has(SESSION) ? sessionStorage : localStorage
+    const storage = tags.has(SESSION) ? sessionStorage : localStorage
     const paths = value.split(/\s+/).filter((p) => p !== '')
 
     const storageToSignals = () => {
