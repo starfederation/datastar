@@ -2,9 +2,9 @@ import {
     EventType,
     DatastarEventOptions,
     sseHeaders,
-} from "./types.ts";
+} from "../types";
 
-import { ServerSentEventGenerator as AbstractSSEGenerator } from "./abstractServerSentEventGenerator.ts";
+import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator";
 
 export class ServerSentEventGenerator extends AbstractSSEGenerator {
     protected controller: ReadableStreamDefaultController;
