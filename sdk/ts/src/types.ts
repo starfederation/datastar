@@ -12,7 +12,7 @@ import {
     DatastarDatalineSignals,
     DatastarDatalineAutoRemove,
     DatastarDatalineAttributes
-} from "./consts.ts";
+} from "./consts";
 
 export type FragmentMergeMode = typeof FragmentMergeModes[number];
 export type EventType = typeof EventTypes[number];

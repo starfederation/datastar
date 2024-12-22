@@ -7,7 +7,7 @@ import {
     ExecuteScriptOptions,
     DatastarEventOptionsUnion,
     MultilineDatalinePrefix
-} from "./types.ts";
+} from "./types";
 
 function isRecord(obj: unknown): obj is Record<string, unknown> {
     return typeof obj === 'object' && obj !== null;

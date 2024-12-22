@@ -3,11 +3,11 @@ import fc from 'fast-check';
 import {
     EventType,
     DatastarEventOptions,
-} from "./types.ts";
+} from "./types";
 import {
     FragmentMergeModes
-} from "./consts.ts";
-import { ServerSentEventGenerator }  from "./abstractServerSentEventGenerator.ts";
+} from "./consts";
+import { ServerSentEventGenerator }  from "./abstractServerSentEventGenerator";
 
 class MockedServerSentEventGenerator extends ServerSentEventGenerator {
     public constructor() {
