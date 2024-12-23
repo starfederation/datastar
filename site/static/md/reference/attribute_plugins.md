@@ -348,6 +348,6 @@ Datastar walks the entire DOM and applies plugins to each element it encounters.
 
 ```html
 <div data-star-ignore data-show-thirdpartylib>
-  This element will not be processed by Datastar.
+  This element’s attributes will not be processed by Datastar.
 </div>
 ```
