@@ -94,12 +94,12 @@ export const SSE: ActionPlugin = {
         throw dsErr('NoUrlProvided')
       }
 
-      const initialHeaders = new Headers()
-      initialHeaders.set(DATASTAR_REQUEST, 'true')
+      const initialHeaders: Record<string, any> = {}
+      initialHeaders[DATASTAR_REQUEST] = true
       // We ignore the content-type header if using form data
       // if missing the boundary will be set automatically
       if (contentType === 'json') {
-        initialHeaders.set('Content-Type', 'application/json')
+        initialHeaders['Content-Type'] = 'application/json'
       }
       const headers = Object.assign({}, initialHeaders, userHeaders)
 
@@ -114,7 +114,7 @@ export const SSE: ActionPlugin = {
         signal: abort,
         onopen: async (response: Response) => {
           if (response.status >= 400) {
-            const status = response.status.toString();
+            const status = response.status.toString()
             dispatchSSE(ERROR, { status })
           }
         },
@@ -182,7 +182,8 @@ export const SSE: ActionPlugin = {
         if (el !== formEl) {
           const preventDefault = (evt: Event) => evt.preventDefault()
           formEl.addEventListener('submit', preventDefault)
-          cleanupFn = (): void => formEl.removeEventListener('submit', preventDefault)
+          cleanupFn = (): void =>
+            formEl.removeEventListener('submit', preventDefault)
         }
         if (!formEl.checkValidity()) {
           formEl.reportValidity()

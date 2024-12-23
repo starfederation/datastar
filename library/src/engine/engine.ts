@@ -102,7 +102,7 @@ export class Engine {
 
           // Extract the key and value from the dataset
           const keyRaw = rawKey.slice(p.name.length)
-          let [key, ...rawTags] = keyRaw.split(/\_\_+/)
+          let [key, ...rawModifiers] = keyRaw.split(/\_\_+/)
 
           const hasKey = key.length > 0
           if (hasKey) {
@@ -153,10 +153,10 @@ export class Engine {
 
           // Apply the macros
           appliedMacros.clear()
-          const tags: Modifiers = new Map<string, Set<string>>()
-          for (const rawTag of rawTags) {
-            const [label, ...tag] = rawTag.split('.')
-            tags.set(camelize(label), new Set(tag.map((t) => t.toLowerCase())))
+          const mods: Modifiers = new Map<string, Set<string>>()
+          for (const rawMod of rawModifiers) {
+            const [label, ...mod] = rawMod.split('.')
+            mods.set(camelize(label), new Set(mod.map((t) => t.toLowerCase())))
           }
           const macros = [
             ...(p.macros?.pre || []),
@@ -185,7 +185,7 @@ export class Engine {
             rawValue,
             key,
             value,
-            tags,
+            mods,
           }
 
           // Load the plugin and store any cleanup functions

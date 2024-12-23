@@ -10,13 +10,12 @@ import (
 func TestExampleCloak(t *testing.T) {
 	setupPageTest(t, "examples/cloak", func(runner runnerFn) {
 		runner("cloak", func(t *testing.T, page *rod.Page) {
-			element := page.MustElement("#datastar-2692078454")
+			element := page.MustElement("#cloak")
 			initial, err := element.Attribute("class")
 			if err != nil {
 				t.Fatal("failed to get initial class: %w", err)
 			}
-
-			assert.Equal(t, "", *initial)
+			assert.Nil(t, initial)
 		})
 	})
 }
