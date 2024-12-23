@@ -12,6 +12,7 @@ import {
 import {
   DATASTAR_SSE_EVENT,
   type DatastarSSEEvent,
+  ERROR,
   FINISHED,
   STARTED,
 } from '../shared'
@@ -111,6 +112,12 @@ export const SSE: ActionPlugin = {
         retryMaxWaitMs,
         retryMaxCount,
         signal: abort,
+        onopen: async (response: Response) => {
+          if (response.status >= 400) {
+            const status = response.status.toString();
+            dispatchSSE(ERROR, { status })
+          }
+        },
         onmessage: (evt) => {
           if (!evt.event.startsWith(DATASTAR)) {
             return
