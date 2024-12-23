@@ -41,7 +41,7 @@ Sample output showing all options:
 
 ```
 event: datastar-merge-fragments
-data: selector: #foo
+data: selector #foo
 data: mergeMode append
 data: settleDuration 500
 data: useViewTransition true
