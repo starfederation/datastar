@@ -11,6 +11,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SDK", "SDK", "{6A315935-F223-45BA-A8F2-4DB1F0EC8CCC}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\sdk\dotnet\Build.ps1 = ..\..\sdk\dotnet\Build.ps1
+		..\..\.github\workflows\sdk-dotnet.yml = ..\..\.github\workflows\sdk-dotnet-nuget.yml
 	EndProjectSection
 EndProject
 Global

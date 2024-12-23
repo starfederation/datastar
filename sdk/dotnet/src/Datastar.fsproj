@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <AssemblyName>Datastar</AssemblyName>
-        <Version>0.21.0</Version>
+        <AssemblyName>StarFederation.Datastar</AssemblyName>
+        <Version>0.21.2</Version>
         <RootNamespace>StarFederation.Datastar</RootNamespace>
         <Nullable>disabled</Nullable>
 
@@ -16,10 +16,10 @@
         <OutputType>Library</OutputType>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-        <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <!-- NuGet config -->
-        <PackageId>Datastar</PackageId>
+        <PackageId>StarFederation.Datastar</PackageId>
         <PackageTags>datastar;datastar-sharp;fsharp;functional;asp.net core;asp.net;.net core;routing;web;csharp</PackageTags>
         <PackageProjectUrl>https://github.com/starfederation/datastar</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -45,7 +45,7 @@
           <Link>datastar_icon.png</Link>
           <PackagePath>$(PackageIconUrl)</PackagePath>
         </None>
-        <None Include="..\..\README.md">
+        <None Include="..\README.md">
           <Pack>true</Pack>
           <PackagePath>/</PackagePath>
           <Link>README.md</Link>
