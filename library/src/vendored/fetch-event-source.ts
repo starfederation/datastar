@@ -363,12 +363,12 @@ export function fetchEventSource(
               // we should not retry anymore:
               dispose()
               // Max retries hit, check your server or network connection
-              reject()
+              reject(
+                dsErr('SseMaxRetries', { retryMaxCount }),
+              )
             } else {
               console.error(
-                `Datastar failed to reach ${
-                  rest.method
-                }:${input.toString()} retry in ${interval}ms`,
+                `Datastar failed to reach ${rest.method}: ${input.toString()} retry in ${interval}ms`,
               )
             }
           } catch (innerErr) {
