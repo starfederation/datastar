@@ -12,13 +12,14 @@ export const Signals: AttributePlugin = {
   valReq: Requirement.Must,
   removeOnLoad: true,
   onLoad: (ctx) => {
-    const { key, genRX, signals } = ctx
-    if (key !== '') {
+    const { key, genRX, signals, tags } = ctx
+    const ifMissing = tags.has('ifmissing')
+    if (key !== '' && !ifMissing) {
       signals.setValue(key, genRX()())
     } else {
       const obj = jsStrToObject(ctx.value)
       ctx.value = JSON.stringify(obj)
-      signals.merge(genRX()<NestedValues>())
+      signals.merge(genRX()<NestedValues>(), ifMissing)
     }
   },
 }

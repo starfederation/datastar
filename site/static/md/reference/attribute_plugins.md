@@ -1,5 +1,14 @@
 # Attribute Plugins
 
+Datastar provides the following [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) attributes.
+
+<div class="alert alert-info">
+    <iconify-icon icon="simple-icons:rocket"></iconify-icon>
+    <div>
+        The Datastar <a href="https://marketplace.visualstudio.com/items?itemName=starfederation.datastar-vscode">VSCode extension</a> and <a href="https://plugins.jetbrains.com/plugin/26072-datastar-support">IntelliJ plugin</a> provided autocompletion for all <code>data-*</code> attributes.
+    </div>
+</div>
+
 ## Core Plugins
 
 [Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/core/attributes)
@@ -338,5 +347,7 @@ The signal name can be specified in the key (as above), or in the value (as belo
 Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries.
 
 ```html
-<div data-star-ignore></div>
+<div data-star-ignore data-show-thirdpartylib>
+  This element’s attributes will not be processed by Datastar.
+</div>
 ```

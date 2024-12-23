@@ -30,7 +30,7 @@ export const ScrollIntoView: AttributePlugin = {
   name: 'scrollIntoView',
   keyReq: Requirement.Denied,
   valReq: Requirement.Denied,
-  mods: new Set([
+  tags: new Set([
     SMOOTH,
     INSTANT,
     AUTO,
@@ -45,24 +45,24 @@ export const ScrollIntoView: AttributePlugin = {
     FOCUS,
   ]),
 
-  onLoad: ({ el, mods, rawKey }) => {
+  onLoad: ({ el, tags, rawKey }) => {
     if (!el.tabIndex) el.setAttribute('tabindex', '0')
     const opts: ScrollIntoViewOptions = {
       behavior: SMOOTH,
       block: CENTER,
       inline: CENTER,
     }
-    if (mods.has(SMOOTH)) opts.behavior = SMOOTH
-    if (mods.has(INSTANT)) opts.behavior = INSTANT
-    if (mods.has(AUTO)) opts.behavior = AUTO
-    if (mods.has(HSTART)) opts.inline = START
-    if (mods.has(HCENTER)) opts.inline = CENTER
-    if (mods.has(HEND)) opts.inline = END
-    if (mods.has(HNEAREST)) opts.inline = NEAREST
-    if (mods.has(VSTART)) opts.block = START
-    if (mods.has(VCENTER)) opts.block = CENTER
-    if (mods.has(VEND)) opts.block = END
-    if (mods.has(VNEAREST)) opts.block = NEAREST
+    if (tags.has(SMOOTH)) opts.behavior = SMOOTH
+    if (tags.has(INSTANT)) opts.behavior = INSTANT
+    if (tags.has(AUTO)) opts.behavior = AUTO
+    if (tags.has(HSTART)) opts.inline = START
+    if (tags.has(HCENTER)) opts.inline = CENTER
+    if (tags.has(HEND)) opts.inline = END
+    if (tags.has(HNEAREST)) opts.inline = NEAREST
+    if (tags.has(VSTART)) opts.block = START
+    if (tags.has(VCENTER)) opts.block = CENTER
+    if (tags.has(VEND)) opts.block = END
+    if (tags.has(VNEAREST)) opts.block = NEAREST
 
     if (!(el instanceof HTMLElement || el instanceof SVGElement)) {
       throw dsErr('NotHtmlSvgElement, el')
@@ -72,7 +72,7 @@ export const ScrollIntoView: AttributePlugin = {
     }
 
     el.scrollIntoView(opts)
-    if (mods.has('focus')) {
+    if (tags.has('focus')) {
       el.focus()
     }
 

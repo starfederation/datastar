@@ -49,7 +49,11 @@ function mergeNested(
         if (onlyIfMissing && target[key]) {
           continue
         }
-        target[key] = new Signal(value)
+        if (target[key] instanceof Signal) {
+          target[key].value = value
+        } else {
+          target[key] = new Signal(value)
+        }
       }
     }
   }

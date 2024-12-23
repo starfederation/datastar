@@ -2,6 +2,13 @@
 
 Responses to the [`sse()`](/reference/action_plugins#sse) action must contain zero or more Datastar SSE events.
 
+<div class="alert alert-info">
+    <iconify-icon icon="simple-icons:rocket"></iconify-icon>
+    <div>
+        The helper SDKs (currently available for <a href="https://github.com/starfederation/datastar/tree/main/sdk/go">Go</a>, <a href="https://github.com/starfederation/datastar/tree/main/sdk/php">PHP</a>, <a href="https://github.com/starfederation/datastar/tree/main/sdk/dotnet">dotnet</a>, <a href="https://github.com/starfederation/datastar/tree/main/sdk/java">Java</a>) can handle the formatting of SSE events for you.
+    </div>
+</div>
+
 ## Event Types
 
 ### `datastar-merge-fragments`
@@ -34,7 +41,7 @@ Sample output showing all options:
 
 ```
 event: datastar-merge-fragments
-data: selector: #foo
+data: selector #foo
 data: mergeMode append
 data: settleDuration 500
 data: useViewTransition true

@@ -1,5 +1,7 @@
 # Action Plugins
 
+Datastar provides the following actions, that can be used in Datastar expressions.
+
 ## Backend Plugins
 
 [Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/backend/actions)

@@ -40,21 +40,21 @@ export const On: AttributePlugin = {
       },
     ],
   },
-  onLoad: ({ el, key, genRX, mods, signals, effect }) => {
+  onLoad: ({ el, key, genRX, tags, signals, effect }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
-    if (mods.has('window')) target = window
+    if (tags.has('window')) target = window
 
     let callback = (evt?: Event) => {
       if (evt) {
         // Always prevent default on submit events (because forms)
-        if (mods.has('prevent') || key === 'submit') evt.preventDefault()
-        if (mods.has('stop')) evt.stopPropagation()
+        if (tags.has('prevent') || key === 'submit') evt.preventDefault()
+        if (tags.has('stop')) evt.stopPropagation()
       }
       rx(evt)
     }
 
-    const debounceArgs = mods.get('debounce')
+    const debounceArgs = tags.get('debounce')
     if (debounceArgs) {
       const wait = tagToMs(debounceArgs)
       const leading = tagHas(debounceArgs, 'leading', false)
@@ -62,7 +62,7 @@ export const On: AttributePlugin = {
       callback = debounce(callback, wait, leading, trailing)
     }
 
-    const throttleArgs = mods.get('throttle')
+    const throttleArgs = tags.get('throttle')
     if (throttleArgs) {
       const wait = tagToMs(throttleArgs)
       const leading = !tagHas(throttleArgs, 'noleading', false)
@@ -75,9 +75,9 @@ export const On: AttributePlugin = {
       passive: false,
       once: false,
     }
-    if (!mods.has('capture')) evtListOpts.capture = false
-    if (mods.has('passive')) evtListOpts.passive = true
-    if (mods.has('once')) evtListOpts.once = true
+    if (!tags.has('capture')) evtListOpts.capture = false
+    if (tags.has('passive')) evtListOpts.passive = true
+    if (tags.has('once')) evtListOpts.once = true
 
     const eventName = kebabize(key).toLowerCase()
     switch (eventName) {
@@ -104,7 +104,7 @@ export const On: AttributePlugin = {
           lastSignalsMarshalled.delete(el.id)
         })
         return effect(() => {
-          const onlyRemoteSignals = mods.has('remote')
+          const onlyRemoteSignals = tags.has('remote')
           const current = signals.JSON(false, onlyRemoteSignals)
           const last = lastSignalsMarshalled.get(el.id) || ''
           if (last !== current) {
@@ -114,7 +114,7 @@ export const On: AttributePlugin = {
         })
       }
       default: {
-        const testOutside = mods.has('outside')
+        const testOutside = tags.has('outside')
         if (testOutside) {
           target = document
           const cb = callback
