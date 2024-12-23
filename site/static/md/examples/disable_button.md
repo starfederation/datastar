@@ -21,7 +21,7 @@
   <button
     id="target"
     data-on-click="shouldDisable.value=true ; sse('/examples/disable_button/data')"
-    data-attributes-disabled="shouldDisable.value"
+    data-attr-disabled="shouldDisable.value"
   >Click Me</button>
 </div>
 
@@ -32,7 +32,7 @@
   <button
     id="target"
     data-on-click="shouldDisable.value = true;sse('/examples/disable_button/data')"
-    data-attributes-disabled="shouldDisable.value"
+    data-attr-disabled="shouldDisable.value"
   >
     Click Me
   </button>

@@ -11,7 +11,7 @@ func TestExampleDisableButton(t *testing.T) {
 	setupPageTest(t, "examples/disable_button", func(runner runnerFn) {
 		runner("disabled button click", func(t *testing.T, page *rod.Page) {
 			btn := page.MustElement("#target")
-			initial := btn.MustAttribute("data-attributes-disabled")
+			initial := btn.MustAttribute("data-attr-disabled")
 			assert.Equal(t, "shouldDisable.value", *initial)
 
 			btn.MustClick()
