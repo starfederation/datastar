@@ -12,8 +12,8 @@ export const Signals: AttributePlugin = {
   valReq: Requirement.Must,
   removeOnLoad: true,
   onLoad: (ctx) => {
-    const { key, genRX, signals, tags } = ctx
-    const ifMissing = tags.has('ifmissing')
+    const { key, genRX, signals, mods } = ctx
+    const ifMissing = mods.has('ifmissing')
     if (key !== '' && !ifMissing) {
       signals.setValue(key, genRX()())
     } else {
