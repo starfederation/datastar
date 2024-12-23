@@ -14,18 +14,18 @@ export const Intersects: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'intersects',
   keyReq: Requirement.Denied,
-  tags: new Set([ONCE, HALF, FULL]),
-  onLoad: ({ el, rawKey, tags, genRX }) => {
+  mods: new Set([ONCE, HALF, FULL]),
+  onLoad: ({ el, rawKey, mods, genRX }) => {
     const options = { threshold: 0 }
-    if (tags.has(FULL)) options.threshold = 1
-    else if (tags.has(HALF)) options.threshold = 0.5
+    if (mods.has(FULL)) options.threshold = 1
+    else if (mods.has(HALF)) options.threshold = 0.5
 
     const rx = genRX()
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
           rx()
-          if (tags.has(ONCE)) {
+          if (mods.has(ONCE)) {
             observer.disconnect()
             delete el.dataset[rawKey]
           }

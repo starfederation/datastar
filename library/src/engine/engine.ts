@@ -12,13 +12,13 @@ import {
   type GlobalInitializer,
   type HTMLorSVGElement,
   type MacroPlugin,
+  type Modifiers,
   type OnRemovalFn,
   PluginType,
   type RemovalEntry,
   Requirement,
   type RuntimeContext,
   type RuntimeExpressionFunction,
-  type Tags,
   type WatcherPlugin,
 } from './types'
 
@@ -153,7 +153,7 @@ export class Engine {
 
           // Apply the macros
           appliedMacros.clear()
-          const tags: Tags = new Map<string, Set<string>>()
+          const tags: Modifiers = new Map<string, Set<string>>()
           for (const rawTag of rawTags) {
             const [label, ...tag] = rawTag.split('.')
             tags.set(camelize(label), new Set(tag.map((t) => t.toLowerCase())))
