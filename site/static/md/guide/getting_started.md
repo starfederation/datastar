@@ -357,7 +357,7 @@ With our backend in place, we can now use the `data-on-click` attribute to trigg
     You answered “<span data-text="response.value"></span>”.
     <span data-show="correct.value">That is correct ✅</span>
     <span data-show="!correct.value">
-      The correct answer is “<span data-text="answer2.value"></span>” 🤷
+      The correct answer is “<span data-text="answer.value"></span>” 🤷
     </span>
   </div>
 </div>
