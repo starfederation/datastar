@@ -13,7 +13,7 @@ import { ReplaceUrl } from '~/plugins/official/browser/attributes/replaceUrl'
 import { ScrollIntoView } from '~/plugins/official/browser/attributes/scrollIntoView'
 import { Show } from '~/plugins/official/browser/attributes/show'
 import { ViewTransition } from '~/plugins/official/browser/attributes/viewTransition'
-import { Attributes } from '~/plugins/official/dom/attributes/attributes'
+import { Attr } from '~/plugins/official/dom/attributes/attr'
 import { Bind } from '~/plugins/official/dom/attributes/bind'
 import { Class } from '~/plugins/official/dom/attributes/class'
 import { On } from '~/plugins/official/dom/attributes/on'
@@ -29,7 +29,7 @@ DS.load(
   Indicator,
   Ref,
   // DOM
-  Attributes,
+  Attr,
   Class,
   On,
   Show,
