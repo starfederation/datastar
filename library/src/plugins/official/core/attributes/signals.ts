@@ -13,7 +13,7 @@ export const Signals: AttributePlugin = {
   removeOnLoad: true,
   onLoad: (ctx) => {
     const { key, genRX, signals, tags } = ctx
-    const ifMissing = tags.has('ismissing')
+    const ifMissing = tags.has('ifmissing')
     if (key !== '' && !ifMissing) {
       signals.setValue(key, genRX()())
     } else {
