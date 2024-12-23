@@ -2,7 +2,7 @@ name: Deploy Site
 on:
   push:
     branches:
-      - develop
+      - main
 jobs:
   deploy:
     name: Deploy app
