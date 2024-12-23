@@ -3,7 +3,7 @@
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.
 
 import { DefaultMergeSignalsOnlyIfMissing, EventTypes } from '~/engine/consts'
-import { PluginType, WatcherPlugin } from '~/engine/types'
+import { PluginType, type WatcherPlugin } from '~/engine/types'
 import { isBoolString, jsStrToObject } from '~/utils/text'
 import { datastarSSEEventWatcher } from '../shared'
 

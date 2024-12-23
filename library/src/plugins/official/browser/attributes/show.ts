@@ -3,7 +3,7 @@
 // Slug: Show or hide an element
 // Description: This attribute shows or hides an element based on the value of the expression. If the expression is true, the element is shown. If the expression is false, the element is hidden. The element is hidden by setting the display property to none.
 
-import { AttributePlugin, PluginType, Requirement } from '~/engine/types'
+import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
 
 const NONE = 'none'
 const DISPLAY = 'display'

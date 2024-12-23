@@ -4,12 +4,12 @@
 
 <div>
   <style>
-    .cloak { 
+    .cloak {
         opacity: 0;
-        transition: opacity 2s ease-in; 
+        transition: opacity 2s ease-in;
     }
   </style>
-  <div class="cloak" data-class="{cloak:false}">
+  <div class="cloak" id="cloak" data-class="{cloak:false}">
     Cloaked text
   </div>
 </div>

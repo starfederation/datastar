@@ -1,7 +1,7 @@
 // An named symbol/brand for detecting Signal instances even when they weren't
 
 import { dsErr } from '~/engine/errors'
-import { OnRemovalFn } from '~/engine/types'
+import type { OnRemovalFn } from '~/engine/types'
 
 // created using the same signals library version.
 const BRAND_SYMBOL = Symbol.for('preact-signals')
@@ -178,7 +178,8 @@ function addDependency(signal: Signal): Node | undefined {
       signal._subscribe(node)
     }
     return node
-  } else if (node._version === -1) {
+  }
+  if (node._version === -1) {
     // `signal` is an existing dependency from a previous evaluation. Reuse it.
     node._version = 0
 
@@ -278,6 +279,7 @@ declare class Signal<T = any> {
 //
 // The previously declared class is implemented here with ES5-style protoTYPEOF_
 // This enables better control of the transpiled output size.
+// biome-ignore lint/suspicious/noRedeclare: <explanation>
 function Signal(this: Signal, value?: unknown) {
   this._value = value
   this._version = 0
@@ -287,9 +289,7 @@ function Signal(this: Signal, value?: unknown) {
 
 Signal.prototype.brand = BRAND_SYMBOL
 
-Signal.prototype._refresh = function () {
-  return true
-}
+Signal.prototype._refresh = () => true
 
 Signal.prototype._subscribe = function (node) {
   if (this._targets !== node && node._prevTarget === undefined) {
@@ -339,7 +339,7 @@ Signal.prototype.valueOf = function () {
 }
 
 Signal.prototype.toString = function () {
-  return this.value + ''
+  return `${this.value}`
 }
 
 Signal.prototype.toJSON = function () {
@@ -525,6 +525,7 @@ export declare class Computed<T = any> extends Signal<T> {
   get value(): T
 }
 
+// biome-ignore lint/suspicious/noRedeclare: <explanation>
 export function Computed(this: Computed, fn: () => unknown) {
   Signal.call(this, undefined)
 
@@ -755,6 +756,7 @@ declare class Effect {
   _dispose(): void
 }
 
+// biome-ignore lint/suspicious/noRedeclare: <explanation>
 function Effect(this: Effect, fn: EffectFn) {
   this._fn = fn
   this._cleanup = undefined

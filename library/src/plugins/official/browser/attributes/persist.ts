@@ -4,7 +4,11 @@
 // Description: This plugin allows you to persist data to local storage or session storage.  Once you add this attribute the data will be persisted to local storage or session storage.
 
 import { DATASTAR } from '~/engine/consts'
-import { AttributePlugin, NestedValues, PluginType } from '~/engine/types'
+import {
+  type AttributePlugin,
+  type NestedValues,
+  PluginType,
+} from '~/engine/types'
 
 const SESSION = 'session'
 
@@ -27,7 +31,7 @@ export const Persist: AttributePlugin = {
 
     const signalsToStorage = () => {
       let nv: NestedValues
-      if (!!!paths.length) {
+      if (!paths.length) {
         nv = signals.values()
       } else {
         nv = signals.subset(...paths)

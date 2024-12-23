@@ -44,6 +44,13 @@ At the core of Datastar are [`data-*`](https://developer.mozilla.org/en-US/docs/
 
 Datastar uses signals to manage state. You can think of signals as reactive variables that automatically track and propagate changes in expressions. They can be created and modified using data attributes on the frontend, or events sent from the backend. Don't worry if this sounds complicated; it will become clearer as we look at some examples.
 
+<div class="alert alert-info">
+    <iconify-icon icon="simple-icons:rocket"></iconify-icon>
+    <div>
+        The Datastar <a href="https://marketplace.visualstudio.com/items?itemName=starfederation.datastar-vscode">VSCode extension</a> and <a href="https://plugins.jetbrains.com/plugin/26072-datastar-support">IntelliJ plugin</a> provided autocompletion for all <code>data-*</code> attributes.
+    </div>
+</div>
+
 ### `data-bind`
 
 Datastar provides us with a way to set up two-way data binding on an element using the [`data-bind`](/reference/attribute_plugins#data-bind) attribute, which can be placed on any HTML element on which data be be input or choices selected from (`input`, `textarea`, `select`, `checkbox` and `radio` elements, as well as web components).
@@ -321,7 +328,7 @@ We've just scratched the surface of frontend reactivity. Now let's take a look a
 
 Datastar uses [Server-Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) (SSE) to stream zero or more events from the web server to the browser. There's no special backend plumbing required to use SSE, just some syntax. Fortunately, SSE is straightforward and [provides us with some advantages](/essays/event_streams_all_the_way_down).
 
-First, set up your backend in the language of your choice. Using one of the helper SDKs (available for [Go](https://github.com/starfederation/datastar/tree/main/sdk/go) and [PHP](https://github.com/starfederation/datastar/tree/main/sdk/php), with more on the way) will help you get up and running faster. We're going to use the SDKs in the examples below, which set the appropriate headers and format the events for us, but this is optional.
+First, set up your backend in the language of your choice. Using one of the helper SDKs (currently available for [Go](https://github.com/starfederation/datastar/tree/main/sdk/go), [PHP](https://github.com/starfederation/datastar/tree/main/sdk/php), [dotnet](https://github.com/starfederation/datastar/tree/main/sdk/dotnet), [Java](https://github.com/starfederation/datastar/tree/main/sdk/java)) will help you get up and running faster. We're going to use the SDKs in the examples below, which set the appropriate headers and format the events for us, but this is optional.
 
 The following code would exist in a controller action endpoint in your backend.
 
@@ -350,7 +357,7 @@ With our backend in place, we can now use the `data-on-click` attribute to trigg
     You answered “<span data-text="response.value"></span>”.
     <span data-show="correct.value">That is correct ✅</span>
     <span data-show="!correct.value">
-      The correct answer is “<span data-text="answer2.value"></span>” 🤷
+      The correct answer is “<span data-text="answer.value"></span>” 🤷
     </span>
   </div>
 </div>

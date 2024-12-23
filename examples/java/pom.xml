@@ -10,7 +10,7 @@
 
     <!-- Define necessary properties -->
     <properties>
-        <jetty.version>11.0.15</jetty.version> <!-- Specify Jetty version -->
+        <jetty.version>11.0.24</jetty.version> <!-- Specify Jetty version -->
         <maven.compiler.source>17</maven.compiler.source> <!-- Java source version -->
         <maven.compiler.target>17</maven.compiler.target> <!-- Java target version -->
     </properties>

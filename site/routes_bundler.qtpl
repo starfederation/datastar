@@ -1,13 +1,14 @@
 {% func bundlerContent(manifest PluginManifest) %}
-
-import { Datastar } from "../engine";
+import { Datastar as DS } from "../engine"
 {%- for _, p := range manifest.Plugins -%}
-import { {%s p.Name %} } from "{%s p.Path %}";
+import { {%s p.Name %} } from "{%s p.Path %}"
 {%- endfor -%}
 
-Datastar.load(
+DS.load(
 {%- for _, p := range manifest.Plugins -%}
     {%s p.Name %},
 {%- endfor -%}
-);
+)
+
+export const Datastar = DS
 {% endfunc %}

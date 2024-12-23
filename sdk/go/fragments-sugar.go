@@ -53,7 +53,7 @@ func WithMergeUpsertAttributes() MergeFragmentOption {
 }
 
 func WithSelectorID(id string) MergeFragmentOption {
-	return WithSelectorf("#" + id)
+	return WithSelector("#" + id)
 }
 
 func WithViewTransitions() MergeFragmentOption {

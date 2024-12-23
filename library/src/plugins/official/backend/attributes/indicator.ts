@@ -3,10 +3,10 @@
 // Description: must be a valid signal name
 
 import { DATASTAR } from '~/engine/consts'
-import { AttributePlugin, PluginType, Requirement } from '~/engine/types'
+import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
 import {
   DATASTAR_SSE_EVENT,
-  DatastarSSEEvent,
+  type DatastarSSEEvent,
   FINISHED,
   STARTED,
 } from '../shared'
@@ -20,7 +20,7 @@ export const Indicator: AttributePlugin = {
   keyReq: Requirement.Exclusive,
   valReq: Requirement.Exclusive,
   onLoad: ({ value, signals, el, key }) => {
-    const signalName = !!key ? key : value
+    const signalName = key ? key : value
     const signal = signals.upsert(signalName, false)
     const watcher = (event: CustomEvent<DatastarSSEEvent>) => {
       const {

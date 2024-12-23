@@ -4,7 +4,7 @@
 // Description: This action copies text to the clipboard using the Clipboard API.
 
 import { dsErr } from '~/engine/errors'
-import { ActionPlugin, PluginType } from '~/engine/types'
+import { type ActionPlugin, PluginType } from '~/engine/types'
 
 export const Clipboard: ActionPlugin = {
   type: PluginType.Action,

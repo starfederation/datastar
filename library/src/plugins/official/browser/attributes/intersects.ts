@@ -3,7 +3,7 @@
 // Slug: Run expression when element intersects with viewport
 // Description: An attribute that runs an expression when the element intersects with the viewport.
 
-import { AttributePlugin, PluginType, Requirement } from '~/engine/types'
+import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
 
 const ONCE = 'once'
 const HALF = 'half'
@@ -22,7 +22,7 @@ export const Intersects: AttributePlugin = {
 
     const rx = genRX()
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
+      for (const entry of entries) {
         if (entry.isIntersecting) {
           rx()
           if (mods.has(ONCE)) {
@@ -30,7 +30,7 @@ export const Intersects: AttributePlugin = {
             delete el.dataset[rawKey]
           }
         }
-      })
+      }
     }, options)
 
     observer.observe(el)

@@ -99,6 +99,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "python"},
 				{ID: "quick_primer_go", ShouldIncludeInspector: true},
 				{ID: "templ_counter"},
+				{ID: "form_data"},
 			},
 		},
 	}
@@ -191,6 +192,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 			setupExamplesQuickPrimerGo(examplesRouter),
 			setupExamplesTemplCounter(examplesRouter, signals),
 			setupExamplesToggleVisibility(examplesRouter),
+			setupExamplesForm(examplesRouter),
 		); err != nil {
 			panic(fmt.Sprintf("error setting up examples routes: %s", err))
 		}

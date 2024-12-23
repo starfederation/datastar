@@ -10,16 +10,16 @@ require (
 	github.com/alecthomas/chroma v0.10.0
 	github.com/benbjohnson/hashfs v0.2.2
 	github.com/delaneyj/gostar v0.8.0
-	github.com/delaneyj/toolbelt v0.3.13
+	github.com/delaneyj/toolbelt v0.3.15
 	github.com/drhodes/golorem v0.0.0-20220328165741-da82e5b29246
 	github.com/dustin/go-humanize v1.0.1
 	github.com/evanw/esbuild v0.24.0
-	github.com/go-chi/chi/v5 v5.1.0
+	github.com/go-chi/chi/v5 v5.2.0
 	github.com/go-faker/faker/v4 v4.5.0
 	github.com/go-rod/rod v0.116.2
 	github.com/go-sanitize/sanitize v1.1.0
-	github.com/goccy/go-json v0.10.3
-	github.com/gomarkdown/markdown v0.0.0-20241105142532-d03b89096d81
+	github.com/goccy/go-json v0.10.4
+	github.com/gomarkdown/markdown v0.0.0-20241205020045-f7e15b2f3e62
 	github.com/gorilla/csrf v1.7.2
 	github.com/gorilla/sessions v1.4.0
 	github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc
@@ -28,11 +28,11 @@ require (
 	github.com/klauspost/compress v1.17.11
 	github.com/lithammer/fuzzysearch v1.1.8
 	github.com/microcosm-cc/bluemonday v1.0.27
-	github.com/nats-io/nats-server/v2 v2.10.22
-	github.com/nats-io/nats.go v1.37.0
+	github.com/nats-io/nats-server/v2 v2.10.24
+	github.com/nats-io/nats.go v1.38.0
 	github.com/samber/lo v1.47.0
 	github.com/segmentio/encoding v0.4.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/valyala/bytebufferpool v1.0.0
 	github.com/valyala/quicktemplate v1.8.0
 	github.com/wcharczuk/go-chart/v2 v2.1.2
@@ -58,8 +58,8 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/minio/highwayhash v1.0.3 // indirect
-	github.com/nats-io/jwt/v2 v2.7.2 // indirect
-	github.com/nats-io/nkeys v0.4.7 // indirect
+	github.com/nats-io/jwt/v2 v2.7.3 // indirect
+	github.com/nats-io/nkeys v0.4.9 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
@@ -72,20 +72,20 @@ require (
 	github.com/ysmood/goob v0.4.0 // indirect
 	github.com/ysmood/got v0.40.0 // indirect
 	github.com/ysmood/leakless v0.9.0 // indirect
-	golang.org/x/crypto v0.29.0 // indirect
-	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f // indirect
-	golang.org/x/image v0.22.0 // indirect
-	golang.org/x/net v0.31.0 // indirect
-	golang.org/x/sync v0.9.0 // indirect
-	golang.org/x/sys v0.27.0 // indirect
-	golang.org/x/text v0.20.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
+	golang.org/x/image v0.23.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
-	google.golang.org/protobuf v1.35.2 // indirect
+	google.golang.org/protobuf v1.36.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.61.2 // indirect
+	modernc.org/libc v1.61.4 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
-	modernc.org/sqlite v1.34.1 // indirect
+	modernc.org/sqlite v1.34.3 // indirect
 	zombiezen.com/go/sqlite v1.4.0 // indirect
 )

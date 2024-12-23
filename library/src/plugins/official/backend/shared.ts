@@ -5,6 +5,7 @@ export const SETTLING_CLASS = `${DATASTAR}-settling`
 export const SWAPPING_CLASS = `${DATASTAR}-swapping`
 export const STARTED = 'started'
 export const FINISHED = 'finished'
+export const ERROR = 'error'
 
 export interface DatastarSSEEvent {
   type: string
@@ -42,7 +43,7 @@ export function datastarSSEEventWatcher(
   document.addEventListener(
     DATASTAR_SSE_EVENT,
     (event: CustomEvent<DatastarSSEEvent>) => {
-      if (event.detail.type != eventType) return
+      if (event.detail.type !== eventType) return
       const { argsRaw } = event.detail
       fn(argsRaw)
     },

@@ -1,5 +1,14 @@
 # Attribute Plugins
 
+Datastar provides the following [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) attributes.
+
+<div class="alert alert-info">
+    <iconify-icon icon="simple-icons:rocket"></iconify-icon>
+    <div>
+        The Datastar <a href="https://marketplace.visualstudio.com/items?itemName=starfederation.datastar-vscode">VSCode extension</a> and <a href="https://plugins.jetbrains.com/plugin/26072-datastar-support">IntelliJ plugin</a> provided autocompletion for all <code>data-*</code> attributes.
+    </div>
+</div>
+
 ## Core Plugins
 
 [Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/core/attributes)
@@ -25,6 +34,8 @@ The `data-signals` attribute can also be used to merge multiple signals using a 
 ```html
 <div data-signals="{foo: {bar: 1, baz: 2}}"></div>
 ```
+
+The value above is written in Javascript object notation, but JSON, which is a subset and which most templating languages have built-in support for, is also allowed.
 
 Note that `data-*` attributes are case-insensitive. If you want to use uppercase characters in signal names, you’ll need to kebabize them or use the object syntax. So the signal name `mySignal` must be written as `data-signals-my-signal` or `data-signals="{mySignal: 1}"`.
 
@@ -68,6 +79,10 @@ The signal name can be specified in the key (as above), or in the value (as belo
 ```
 
 The signal value can then be used to reference the element.
+
+```html
+`foo` holds a <span data-text="foo.value.tagName"></span> element.
+```
 
 ## DOM Plugins
 
@@ -138,8 +153,10 @@ An `evt` variable that represents the event object is available in the expressio
 The `data-on` attribute matches DOM events, however there are currently a few special cases for custom events.
 
 1. `data-on-load` is triggered when an element is loaded into the DOM.
-2. `data-on-signals-change` is triggered when any signal changes.
+2. `data-on-signals-change` is triggered when any signals change.
 3. `data-on-raf` is triggered on every `requestAnimationFrame` event.
+
+Note that the `data-on-submit` event listener now prevents the default submission behavior of forms.
 
 #### Modifiers
 
@@ -330,5 +347,7 @@ The signal name can be specified in the key (as above), or in the value (as belo
 Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries.
 
 ```html
-<div data-star-ignore></div>
+<div data-star-ignore data-show-thirdpartylib>
+  This element’s attributes will not be processed by Datastar.
+</div>
 ```

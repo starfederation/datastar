@@ -23,7 +23,7 @@ func setupReferenceRoutes(ctx context.Context, router chi.Router) error {
 				{ID: "attribute_plugins"},
 				{ID: "action_plugins"},
 				{ID: "sse_events"},
-				// {ID: "javascript_api"},
+				{ID: "javascript_api"},
 			},
 		},
 	}

@@ -54,4 +54,4 @@ DS.load(
   ToggleAll,
 )
 
-export const Datastar = DS;
+export const Datastar = DS

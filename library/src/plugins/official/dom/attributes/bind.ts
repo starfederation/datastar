@@ -4,7 +4,7 @@
 // Description: Any attribute can be bound to an expression. The attribute will be updated reactively whenever the expression signal changes.
 
 import { dsErr } from '~/engine/errors'
-import { AttributePlugin, PluginType, Requirement } from '~/engine/types'
+import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
 
 const dataURIRegex = /^data:(?<mime>[^;]+);base64,(?<contents>.*)$/
 const updateEvents = ['change', 'input', 'keydown']
@@ -16,7 +16,7 @@ export const Bind: AttributePlugin = {
   valReq: Requirement.Exclusive,
   onLoad: (ctx) => {
     const { el, value, key, signals, effect } = ctx
-    const signalName = !!key ? key : value
+    const signalName = key ? key : value
 
     let setFromSignal = () => {}
     let el2sig = () => {}
@@ -72,7 +72,7 @@ export const Bind: AttributePlugin = {
       } else if (isSelect) {
         const select = el as HTMLSelectElement
         if (select.multiple) {
-          Array.from(select.options).forEach((opt) => {
+          for (const opt of select.options) {
             if (opt?.disabled) return
             if (Array.isArray(v) || typeof v === 'string') {
               opt.selected = v.includes(opt.value)
@@ -81,7 +81,7 @@ export const Bind: AttributePlugin = {
             } else {
               opt.selected = v as boolean
             }
-          })
+          }
         } else {
           select.value = vStr
         }
@@ -94,10 +94,10 @@ export const Bind: AttributePlugin = {
 
     el2sig = async () => {
       if (isFile) {
-        const files = [...((el as HTMLInputElement)?.files || [])],
-          allContents: string[] = [],
-          allMimes: string[] = [],
-          allNames: string[] = []
+        const files = [...((el as HTMLInputElement)?.files || [])]
+        const allContents: string[] = []
+        const allMimes: string[] = []
+        const allNames: string[] = []
 
         await Promise.all(
           files.map((f) => {
@@ -126,8 +126,8 @@ export const Bind: AttributePlugin = {
         )
 
         signals.setValue(signalName, allContents)
-        const mimeName = `${signalName}Mimes`,
-          nameName = `${signalName}Names`
+        const mimeName = `${signalName}Mimes`
+        const nameName = `${signalName}Names`
         if (mimeName in signals) {
           signals.upsert(mimeName, allMimes)
         }
@@ -176,14 +176,16 @@ export const Bind: AttributePlugin = {
       }
     }
 
-    updateEvents.forEach((event) => el.addEventListener(event, el2sig))
+    for (const event of updateEvents) {
+      el.addEventListener(event, el2sig)
+    }
     const elSigClean = effect(() => setFromSignal())
 
     return () => {
       elSigClean()
-      updateEvents.forEach((event) => {
+      for (const event of updateEvents) {
         el.removeEventListener(event, el2sig)
-      })
+      }
     }
   },
 }

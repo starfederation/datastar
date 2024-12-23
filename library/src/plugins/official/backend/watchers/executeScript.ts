@@ -8,7 +8,7 @@ import {
   EventTypes,
 } from '~/engine/consts'
 import { dsErr } from '~/engine/errors'
-import { PluginType, WatcherPlugin } from '~/engine/types'
+import { PluginType, type WatcherPlugin } from '~/engine/types'
 import { isBoolString } from '~/utils/text'
 import { datastarSSEEventWatcher } from '../shared'
 
@@ -28,12 +28,12 @@ export const ExecuteScript: WatcherPlugin = {
           throw dsErr('NoScriptProvided')
         }
         const scriptEl = document.createElement('script')
-        attributesRaw.split('\n').forEach((attr) => {
+        for (const attr of attributesRaw.split('\n')) {
           const pivot = attr.indexOf(' ')
           const key = pivot ? attr.slice(0, pivot) : attr
           const value = pivot ? attr.slice(pivot) : ''
           scriptEl.setAttribute(key.trim(), value.trim())
-        })
+        }
         scriptEl.text = script
         document.head.appendChild(scriptEl)
         if (autoRemove) {

@@ -1,5 +1,7 @@
 # Action Plugins
 
+Datastar provides the following actions, that can be used in Datastar expressions.
+
 ## Backend Plugins
 
 [Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/backend/actions)
@@ -16,25 +18,30 @@ Sends a `fetch` request to the backend and merges the response with the current 
 <div data-on-click="sse('/endpoint')"></div>
 ```
 
-Every request is sent with a `{datastar: *}` object containing the current signals (except for local signals whose keys begin with an underscore). When using a `get` request, the signals are sent as a query parameter, otherwise they are send as a JSON body.
+By default, all requests are sent with a `{datastar: *}` object containing the current signals (except for local signals whose keys begin with an underscore). When using a `get` request, the signals are sent as a query parameter, otherwise they are send as a JSON body.
+
+It is possible to send form encoded requests by setting the `contentType` option to `form`. This sends GET requests using `application/x-www-form-urlencoded` encoding and non-GET requests using `multipart/form-data` encoding. See the [form data example](/examples/form_data).
 
 #### Options
 
 The `sse()` action takes a second argument of options.
 
-- `method` - The HTTP method to use (defaults to `get`).
-- `includeLocal` - Whether to include local signals (those beggining with an underscore) in the request (defaults to `false`).
+- `method` - The HTTP method to use. Defaults to `get`.
+- `contentType` - The type of content to send. A value of `json` sends all signals in a JSON request. A value of `form` tells the action to look for the closest form to the element on which it is placed (unless a `selector` option is provided), perform validation on the form elements, and send them to the backend using a form request (no signals are sent). Defaults to `json`.
+- `includeLocal` - Whether to include local signals (those beggining with an underscore) in the request. Defaults to `false`.
+- `selector` - Optionally specifies a form to send when the `contentType` option is set to `form`. If the value is `null`, the closest form is used. Defaults to `null`.
 - `headers` - An object containing headers to send with the request.
-- `openWhenHidden` - Whether to keep the connection open with the page is hidden (defaults to `false`). Useful for dashboards but can cause a drain on battery life and other resources.
-- `retryScaler` - A number that scales the retry time (defaults to `2`).
-- `retryMaxWaitMs` - The maximum wait time in milliseconds between retries (defaults to `30000`).
-- `retryMaxCount` - The maximum number of retries (defaults to `10`).
+- `openWhenHidden` - Whether to keep the connection open with the page is hidden. Useful for dashboards but can cause a drain on battery life and other resources when enabled. Defaults to `false`
+- `retryInterval` - The retry interval in milliseconds. Defaults to `1000` (1 second).
+- `retryScaler` - A numeric multiplier applied to scale retry wait times. Defaults to `2`.
+- `retryMaxWaitMs` - The maximum allowable wait time in milliseconds between retries. Defaults to `30000` (30 seconds).
+- `retryMaxCount` - The maximum number of retry attempts. Defaults to `10`.
 - `abort` - An [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) object that can be used to cancel the request.
 
 ```html
 <div data-on-click="sse('/endpoint', {
   method: 'post',
-  onlyRemoteSignals: false,
+  includeLocal: true,
   headers: {
     'X-Csrf-Token': 'JImikTbsoCYQ9oGOcvugov0Awc5LbqFsZW6ObRCxuqFHDdPbuFyc4ksPVVa9+EB4Ag+VU6rpc680edNFswIRwg==',
   },

@@ -4,7 +4,7 @@
 
 import { EventTypes } from '~/engine/consts'
 import { dsErr } from '~/engine/errors'
-import { PluginType, WatcherPlugin } from '~/engine/types'
+import { PluginType, type WatcherPlugin } from '~/engine/types'
 import { datastarSSEEventWatcher } from '../shared'
 
 export const RemoveSignals: WatcherPlugin = {
@@ -15,7 +15,7 @@ export const RemoveSignals: WatcherPlugin = {
       EventTypes.RemoveSignals,
       ({ paths: pathsRaw = '' }) => {
         const paths = pathsRaw.split('\n').map((p) => p.trim())
-        if (!!!paths?.length) {
+        if (!paths?.length) {
           throw dsErr('NoPathsProvided')
         }
         ctx.signals.remove(...paths)

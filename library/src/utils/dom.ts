@@ -7,28 +7,32 @@ export function elUniqId(el: Element) {
     hash = (hash << 5) - hash + n
     return hash & hash
   }
-  const hashUpdateFromStr = (str: string) =>
-    str.split('').forEach((c) => hashUpdate(c.charCodeAt(0)))
-
-  while (el.parentNode) {
-    if (el.id) {
-      hashUpdateFromStr(`${el.id}`)
-      break
-    } else {
-      if (el === el.ownerDocument.documentElement) {
-        hashUpdateFromStr(el.tagName)
-      } else {
-        for (
-          let i = 1, e = el;
-          e.previousElementSibling;
-          e = e.previousElementSibling, i++
-        ) {
-          hashUpdate(i)
-        }
-        el = el.parentNode as Element
-      }
+  const hashUpdateFromStr = (str: string) => {
+    for (const c of str.split('')) {
+      hashUpdate(c.charCodeAt(0))
     }
-    el = el.parentNode as Element
+  }
+
+  let currentEl = el
+  while (currentEl.parentNode) {
+    if (currentEl.id) {
+      hashUpdateFromStr(`${currentEl.id}`)
+      break
+    }
+    if (currentEl === currentEl.ownerDocument.documentElement) {
+      hashUpdateFromStr(currentEl.tagName)
+    } else {
+      for (
+        let i = 1, e = el;
+        e.previousElementSibling;
+        e = e.previousElementSibling, i++
+      ) {
+        hashUpdate(i)
+      }
+      currentEl = currentEl.parentNode as Element
+    }
+
+    currentEl = currentEl.parentNode as Element
   }
   return DATASTAR + hash
 }

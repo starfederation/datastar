@@ -5,6 +5,8 @@ No value was provided to the `data-signals` attribute. The `data-signals` attrib
 Example:
 
 ```html
+<div data-signals-foo="''"></div>
+
 <div data-signals-foo="1"></div>
 
 <div data-signals="{foo: 1}"></div>

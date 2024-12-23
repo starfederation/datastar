@@ -4,14 +4,15 @@
 
 import { DATASTAR, DATASTAR_REQUEST } from '~/engine/consts'
 import { dsErr } from '~/engine/errors'
-import { ActionPlugin, PluginType } from '~/engine/types'
+import { type ActionPlugin, PluginType } from '~/engine/types'
 import {
+  type FetchEventSourceInit,
   fetchEventSource,
-  FetchEventSourceInit,
 } from '~/vendored/fetch-event-source'
 import {
   DATASTAR_SSE_EVENT,
-  DatastarSSEEvent,
+  type DatastarSSEEvent,
+  ERROR,
   FINISHED,
   STARTED,
 } from '../shared'
@@ -26,18 +27,27 @@ function dispatchSSE(type: string, argsRaw: Record<string, string>) {
   )
 }
 
-const isWrongContent = (err: any) => `${err}`.includes(`text/event-stream`)
+const isWrongContent = (err: any) => `${err}`.includes('text/event-stream')
 
 export type SSEArgs = {
   method: METHOD
   headers?: Record<string, string>
-  includeLocal?: boolean
   openWhenHidden?: boolean
+  retryInterval?: number
   retryScaler?: number
   retryMaxWaitMs?: number
   retryMaxCount?: number
   abort?: AbortSignal
-}
+} & (
+  | {
+      contentType: 'json'
+      includeLocal?: boolean
+    }
+  | {
+      contentType: 'form'
+      selector?: string
+    }
+)
 
 export const SSE: ActionPlugin = {
   type: PluginType.Action,
@@ -45,13 +55,17 @@ export const SSE: ActionPlugin = {
   fn: async (ctx, url: string, args: SSEArgs) => {
     const {
       el: { id: elId },
+      el,
       signals,
     } = ctx
     const {
       method: methodAnyCase,
       headers: userHeaders,
+      contentType,
       includeLocal,
+      selector,
       openWhenHidden,
+      retryInterval,
       retryScaler,
       retryMaxWaitMs,
       retryMaxCount,
@@ -60,8 +74,11 @@ export const SSE: ActionPlugin = {
       {
         method: 'GET',
         headers: {},
+        contentType: 'json',
         includeLocal: false,
+        selector: null,
         openWhenHidden: false, // will keep the request open even if the document is hidden.
+        retryInterval: 1_000, // the retry interval in milliseconds
         retryScaler: 2, // the amount to multiply the retry interval by each time
         retryMaxWaitMs: 30_000, // the maximum retry interval in milliseconds
         retryMaxCount: 10, // the maximum number of retries before giving up
@@ -70,28 +87,37 @@ export const SSE: ActionPlugin = {
       args,
     )
     const method = methodAnyCase.toUpperCase()
+    let cleanupFn = (): void => {}
     try {
       dispatchSSE(STARTED, { elId })
-      if (!!!url?.length) {
+      if (!url?.length) {
         throw dsErr('NoUrlProvided')
       }
 
-      const headers = Object.assign(
-        {
-          'Content-Type': 'application/json',
-          [DATASTAR_REQUEST]: true,
-        },
-        userHeaders,
-      )
+      const initialHeaders: Record<string, any> = {}
+      initialHeaders[DATASTAR_REQUEST] = true
+      // We ignore the content-type header if using form data
+      // if missing the boundary will be set automatically
+      if (contentType === 'json') {
+        initialHeaders['Content-Type'] = 'application/json'
+      }
+      const headers = Object.assign({}, initialHeaders, userHeaders)
 
       const req: FetchEventSourceInit = {
         method,
         headers,
         openWhenHidden,
+        retryInterval,
         retryScaler,
         retryMaxWaitMs,
         retryMaxCount,
         signal: abort,
+        onopen: async (response: Response) => {
+          if (response.status >= 400) {
+            const status = response.status.toString()
+            dispatchSSE(ERROR, { status })
+          }
+        },
         onmessage: (evt) => {
           if (!evt.event.startsWith(DATASTAR)) {
             return
@@ -134,14 +160,50 @@ export const SSE: ActionPlugin = {
       }
 
       const urlInstance = new URL(url, window.location.origin)
-      const json = signals.JSON(false, !includeLocal)
-      if (method === 'GET') {
-        const queryParams = new URLSearchParams(urlInstance.search)
-        queryParams.set(DATASTAR, json)
-        urlInstance.search = queryParams.toString()
+      const queryParams = new URLSearchParams(urlInstance.search)
+
+      if (contentType === 'json') {
+        const json = signals.JSON(false, !includeLocal)
+        if (method === 'GET') {
+          queryParams.set(DATASTAR, json)
+        } else {
+          req.body = json
+        }
+      } else if (contentType === 'form') {
+        const formEl = selector
+          ? document.querySelector(selector)
+          : el.closest('form')
+        if (formEl === null) {
+          if (selector) {
+            throw dsErr('SseFormNotFound', { selector })
+          }
+          throw dsErr('SseClosestFormNotFound')
+        }
+        if (el !== formEl) {
+          const preventDefault = (evt: Event) => evt.preventDefault()
+          formEl.addEventListener('submit', preventDefault)
+          cleanupFn = (): void =>
+            formEl.removeEventListener('submit', preventDefault)
+        }
+        if (!formEl.checkValidity()) {
+          formEl.reportValidity()
+          cleanupFn()
+          return
+        }
+        const formData = new FormData(formEl)
+        if (method === 'GET') {
+          const formParams = new URLSearchParams(formData as any)
+          for (const [key, value] of formParams) {
+            queryParams.set(key, value)
+          }
+        } else {
+          req.body = formData
+        }
       } else {
-        req.body = json
+        throw dsErr('SseInvalidContentType', { contentType })
       }
+
+      urlInstance.search = queryParams.toString()
 
       try {
         await fetchEventSource(urlInstance.toString(), req)
@@ -156,6 +218,7 @@ export const SSE: ActionPlugin = {
       }
     } finally {
       dispatchSSE(FINISHED, { elId })
+      cleanupFn()
     }
   },
 }

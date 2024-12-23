@@ -1,0 +1,8 @@
+import (datastar "github.com/starfederation/datastar/sdk/go")
+
+// Creates a new `ServerSentEventGenerator` instance.
+sse := datastar.NewSSE(w,r)
+
+sse.MergeFragments(`<div id="hello">Hello, world!</div>`)
+sse.MergeSignals(`{foo: {bar: 1}}`)
+sse.ExecuteScript(`console.log('Success!')`)

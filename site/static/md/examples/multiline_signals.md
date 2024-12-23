@@ -2,12 +2,15 @@
 
 ## Demo
 
-<div data-signals="{
-    foo:1234,
-    bar:'bar'
-}">
-    <div data-signals-baz="2*foo.value"></div>
+<div
+    data-signals="{
+        foo:1234,
+        bar:'bar'
+    }"
+    data-signals-baz="2*foo.value"
+>
     <input
+        id="a"
         type="number"
         step="1"
         min="0"
@@ -16,11 +19,13 @@
         class="input input-bordered"
     />
     <input
+        id="b"
         type="text"
         data-bind-bar
         class="input input-bordered"
     />
     <input
+        id="c"
         type="text"
         data-bind-baz
         class="input input-bordered"

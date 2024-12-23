@@ -32,7 +32,7 @@ export async function getBytes(
   }
 }
 
-const enum ControlChars {
+enum ControlChars {
   NewLine = 10,
   CarriageReturn = 13,
   Space = 32,
@@ -86,6 +86,7 @@ export function getLines(
             }
             break
           // @ts-ignore:7029 \r case below should fallthrough to \n:
+          // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
           case ControlChars.CarriageReturn:
             discardTrailingNewline = true
           case ControlChars.NewLine:
@@ -151,7 +152,7 @@ export function getMessages(
         case 'data':
           // if this message already has data, append the new value to the old.
           // otherwise, just set to the new value:
-          message.data = message.data ? message.data + '\n' + value : value // otherwise,
+          message.data = message.data ? `${message.data}\n${value}` : value // otherwise,
           break
         case 'event':
           message.event = value
@@ -159,13 +160,14 @@ export function getMessages(
         case 'id':
           onId((message.id = value))
           break
-        case 'retry':
-          const retry = parseInt(value, 10)
-          if (!isNaN(retry)) {
+        case 'retry': {
+          const retry = Number.parseInt(value, 10)
+          if (!Number.isNaN(retry)) {
             // per spec, ignore non-integers
             onRetry((message.retry = retry))
           }
           break
+        }
       }
     }
   }
@@ -193,7 +195,6 @@ function newMessage(): EventSourceMessage {
 
 export const EventStreamContentType = 'text/event-stream'
 
-const DefaultRetryInterval = 1000
 const LastEventId = 'last-event-id'
 
 export interface FetchEventSourceInit extends RequestInit {
@@ -243,6 +244,9 @@ export interface FetchEventSourceInit extends RequestInit {
   /** The Fetch function to use. Defaults to window.fetch */
   fetch?: typeof fetch
 
+  /** The retry interval in milliseconds. Defaults to 1_000 */
+  retryInterval?: number
+
   /** The scaler for the retry interval. Defaults to 2 */
   retryScaler?: number
 
@@ -264,6 +268,7 @@ export function fetchEventSource(
     onerror,
     openWhenHidden,
     fetch: inputFetch,
+    retryInterval = 1_000,
     retryScaler = 2,
     retryMaxWaitMs = 30_000,
     retryMaxCount = 10,
@@ -291,7 +296,6 @@ export function fetchEventSource(
       document.addEventListener('visibilitychange', onVisibilityChange)
     }
 
-    let retryInterval = DefaultRetryInterval
     let retryTimer = 0
     function dispose() {
       document.removeEventListener('visibilitychange', onVisibilityChange)
@@ -360,17 +364,11 @@ export function fetchEventSource(
               dispose()
               // Max retries hit, check your server or network connection
               reject(
-                dsErr('SSE_MAX_RETRIES', {
-                  retryInterval,
-                  retryMaxCount,
-                  ...rest,
-                }),
+                dsErr('SseMaxRetries', { retryMaxCount }),
               )
             } else {
               console.error(
-                `Datastar failed to reach ${
-                  rest.method
-                }:${input.toString()} retry in ${interval}ms`,
+                `Datastar failed to reach ${rest.method}: ${input.toString()} retry in ${interval}ms`,
               )
             }
           } catch (innerErr) {

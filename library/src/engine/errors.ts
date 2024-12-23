@@ -1,4 +1,4 @@
-const url = `https://data-star.dev/errors`
+const url = 'https://data-star.dev/errors'
 
 export const hasValNonExpr = /([\w0-9.]+)\.value/gm
 
