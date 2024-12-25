@@ -9,7 +9,7 @@ import (
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
 
-func setupExamplesForm(examplesRouter chi.Router) error {
+func setupExamplesFormData(examplesRouter chi.Router) error {
 	examplesRouter.Get("/form_data/data", func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {

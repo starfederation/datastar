@@ -239,6 +239,20 @@ Binds the text content of an element to an expression.
 
 Focused on showing and hiding elements based on signals. Most of the time you want to send updates from the server but is useful for things like modals, dropdowns, and other UI elements.
 
+### `data-custom-validity`
+
+Allows you to add custom validity to an element using an expression. The expression must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.
+
+```html
+<form>
+  <input data-bind-foo data-custom-validity="foo.value === bar.value ? '' : 'Field values must be the same.'" name="foo">
+  <input data-bind-bar name="bar">
+  <button>
+      Submit form
+  </button>
+</form>
+```
+
 ### `data-intersects`
 
 Runs an expression when the element intersects with the viewport.
