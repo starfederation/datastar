@@ -90,18 +90,18 @@ The signal value can then be used to reference the element.
 
 Allows the usage of signals and expressions to affect the DOM.
 
-### `data-attributes`
+### `data-attr`
 
 Binds the value of any HTML attribute to an expression.
 
 ```html
-<div data-attributes-title="foo.value"></div>
+<div data-attr-title="foo.value"></div>
 ```
 
-The `data-attributes` attribute can also be used to set the values of multiple attributes on an element using a set of key-value pairs, where the keys represent attribute names and the values represent expressions.
+The `data-attr` attribute can also be used to set the values of multiple attributes on an element using a set of key-value pairs, where the keys represent attribute names and the values represent expressions.
 
 ```html
-<div data-attributes="{title: foo.value, disabled: bar.value}"></div>
+<div data-attr="{title: foo.value, disabled: bar.value}"></div>
 ```
 
 ### `data-bind`
@@ -343,7 +343,7 @@ This can be useful for show a loading spinner, disabling a button, etc.
 <button
   data-on-click="sse('/endpoint')"
   data-indicator-fetching
-  data-attributes-disabled="fetching.value"
+  data-attr-disabled="fetching.value"
 ></button>
 <div data-show="fetching.value">Loading...</div>
 ```

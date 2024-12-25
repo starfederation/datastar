@@ -199,12 +199,12 @@ The `data-class` attribute can also be used to add or remove multiple classes fr
 <button data-class="{hidden: input.value == '', bold: input.value == 1}">Save</button>
 ```
 
-### `data-attributes`
+### `data-attr`
 
-The [`data-attributes`](/reference/attribute_plugins#data-attributes) attribute can be used to bind the value of any HTML attribute to an expression.
+The [`data-attr`](/reference/attribute_plugins#data-attr) attribute can be used to bind the value of any HTML attribute to an expression.
 
 ```html
-<button data-attributes-disabled="input.value == ''">Save</button>
+<button data-attr-disabled="input.value == ''">Save</button>
 ```
 
 This results in a `disabled` attribute being given the value `true` whenever the input is an empty string.
@@ -220,15 +220,15 @@ This results in a `disabled` attribute being given the value `true` whenever the
             <div data-text="input6.value" class="output"></div>
         </div>
     </div>
-    <button data-attributes-disabled="input6.value == ''" class="btn btn-primary">
+    <button data-attr-disabled="input6.value == ''" class="btn btn-primary">
         Save
     </button>
 </div>
 
-The `data-attributes` attribute can also be used to set the values of multiple attributes on an element using a set of key-value pairs, where the keys represent attribute names and the values represent expressions.
+The `data-attr` attribute can also be used to set the values of multiple attributes on an element using a set of key-value pairs, where the keys represent attribute names and the values represent expressions.
 
 ```html
-<button data-attributes="{disabled: input.value == '', title: input.value}">Save</button>
+<button data-attr="{disabled: input.value == '', title: input.value}">Save</button>
 ```
 
 ### `data-signals`
@@ -539,7 +539,7 @@ Using [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_d
 - Create a computed signal: `data-computed-foo="bar.value + 1"`
 - Show or hide an element using an expression: `data-show="foo.value"`
 - Modify the classes on an element: `data-class-bold="foo.value == 1"`
-- Bind an expression to an HTML attribute: `data-attributes-disabled="foo.value == ''"`
+- Bind an expression to an HTML attribute: `data-attr-disabled="foo.value == ''"`
 - Merge signals into the signals: `data-signals-foo=""`
 - Execute an expression on an event: `data-on-click="sse(/endpoint)"`
 - Use signals to track in flight backend requests: `data-indicator-fetching`
