@@ -153,10 +153,10 @@
     "html": {
       "attributes": [
         {
-          "name": "data-attributes-*",
+          "name": "data-attr-*",
           "virtual": true,
           "description": "Sets an element’s attribute value based on an expression.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-attributes",
+          "doc-url": "https://data-star.dev/guide/getting_started#data-attr",
           "value": {
             "kind": "expression",
             "type": [
@@ -175,7 +175,7 @@
                   }
                 ],
                 "template": [
-                  "data-attributes-",
+                  "data-attr-",
                   "$...",
                   "#item:event name"
                 ],
@@ -183,7 +183,7 @@
               },
               {
                 "template": [
-                  "data-attributes"
+                  "data-attr"
                 ],
                 "priority": "normal"
               }

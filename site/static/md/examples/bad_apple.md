@@ -55,6 +55,6 @@ We take the [already converted](https://github.com/trung-kieen/bad-apple-ascii) 
 
 This is using Datastar's ability to patch signal directly. **_No need to generate html fragments, as the contents are already bound to existing elements._**
 
-We could also stream down the raster frames using base64 encoded images and update the src of an image tag. Either way works, you would just have to use `data-attributes-src` on an image tag.
+We could also stream down the raster frames using base64 encoded images and update the src of an image tag. Either way works, you would just have to use `data-attr-src` on an image tag.
 
 Open your DevTool's Elements tab for the contents of the pre tag. You'll see the frames being updated in real-time (in this case 30fps).
