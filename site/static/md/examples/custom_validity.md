@@ -18,7 +18,7 @@
 
 ## Explanation
 
-The expression passed into the `data-custom-validity` attribute is evaluated and the result is used as the custom validity message for the input. The result must be a string. If the result is an empty string, the input is considered valid. If the result is a non-empty string, the input is considered invalid and the string is used as the custom validity message.
+The expression passed into the `data-custom-validity` attribute is evaluated and the result is used as the custom validity message for the input. If the result is an empty string, the input is considered valid. If the result is a non-empty string, the input is considered invalid and the string is used as the custom validity message.
 
 ```html
 <form data-on-submit="sse('/endpoint', {contentType: 'form'})">

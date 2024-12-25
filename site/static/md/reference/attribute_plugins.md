@@ -241,7 +241,7 @@ Focused on showing and hiding elements based on signals. Most of the time you wa
 
 ### `data-custom-validity`
 
-Allows you to add custom validity to an element using an expression. The expression should evaluate to a string that will be set as the custom validity message. This can be used to provide custom error messages for form validation.
+Allows you to add custom validity to an element using an expression. The expression must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.
 
 ```html
 <form>
