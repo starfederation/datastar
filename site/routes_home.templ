@@ -291,7 +291,7 @@ templ TodoInput(i int) {
 			input.value = '';
 		`, i) }
 		if i >= 0 {
-			data-on-click.outside:capture={ datastar.PutSSE("/api/todos/cancel") }
+			data-on-click__outside={ datastar.PutSSE("/api/todos/cancel") }
 		}
 	/>
 }

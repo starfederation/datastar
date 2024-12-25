@@ -176,6 +176,7 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
   - `.noleading` - Throttle without leading edge.
   - `.trail` - Throttle with trailing edge.
 - `__window` - Attaches the event listener to the `window` element.
+- `__outsite` - Triggers when the event is outside the element.
 - `__prevent` - Calls `preventDefault` on the event listener.
 - `__stop` - Calls `stopPropagation` on the event listener.
 

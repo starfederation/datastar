@@ -101,6 +101,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "templ_counter"},
 				{ID: "form_data"},
 				{ID: "custom_validity"},
+				{ID: "click_outside"},
 			},
 		},
 	}
