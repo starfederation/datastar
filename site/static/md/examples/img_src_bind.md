@@ -4,8 +4,8 @@
     id="file_upload"
     data-signals="{id: 237, min: 1, max: 1024}"
 >
-    <img class="rounded ring-4 ring-accent" data-attributes-src="`https://picsum.photos/id/${id.value}/640/320`" />
-    <input class="input input-bordered" type="number" step="1"  data-attributes="{min: min.value, max: max.value}" data-bind-id>
+    <img class="rounded ring-4 ring-accent" data-attr-src="`https://picsum.photos/id/${id.value}/640/320`" />
+    <input class="input input-bordered" type="number" step="1"  data-attr="{min: min.value, max: max.value}" data-bind-id>
     <button class="btn btn-primary" data-on-click="id.value = fit(Math.random(), 0, 1, min.value, max.value, true, true)">Random</button>
 </div>
 
@@ -13,12 +13,12 @@
 
 ```html
 <div id="file_upload" data-signals="{id: 237, min: 1, max: 1024}">
-  <img data-attributes-src="`https://picsum.photos/id/${id.value}/640/320`" />
+  <img data-attr-src="`https://picsum.photos/id/${id.value}/640/320`" />
   <input
     type="number"
     step="1"
     data-on-click="sse('arstasrt', {method: 'post'})"
-    data-attributes="{min: min.value, max: max.value}"
+    data-attr="{min: min.value, max: max.value}"
     data-bind-id
   />
   <button data-on-click="id.value = fit(Math.random(), 0, 1, min.value, max.value, true, true)">

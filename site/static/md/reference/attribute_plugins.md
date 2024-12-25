@@ -90,18 +90,18 @@ The signal value can then be used to reference the element.
 
 Allows the usage of signals and expressions to affect the DOM.
 
-### `data-attributes`
+### `data-attr`
 
 Binds the value of any HTML attribute to an expression.
 
 ```html
-<div data-attributes-title="foo.value"></div>
+<div data-attr-title="foo.value"></div>
 ```
 
-The `data-attributes` attribute can also be used to set the values of multiple attributes on an element using a set of key-value pairs, where the keys represent attribute names and the values represent expressions.
+The `data-attr` attribute can also be used to set the values of multiple attributes on an element using a set of key-value pairs, where the keys represent attribute names and the values represent expressions.
 
 ```html
-<div data-attributes="{title: foo.value, disabled: bar.value}"></div>
+<div data-attr="{title: foo.value, disabled: bar.value}"></div>
 ```
 
 ### `data-bind`
@@ -240,6 +240,20 @@ Binds the text content of an element to an expression.
 
 Focused on showing and hiding elements based on signals. Most of the time you want to send updates from the server but is useful for things like modals, dropdowns, and other UI elements.
 
+### `data-custom-validity`
+
+Allows you to add custom validity to an element using an expression. The expression must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.
+
+```html
+<form>
+  <input data-bind-foo data-custom-validity="foo.value === bar.value ? '' : 'Field values must be the same.'" name="foo">
+  <input data-bind-bar name="bar">
+  <button>
+      Submit form
+  </button>
+</form>
+```
+
 ### `data-intersects`
 
 Runs an expression when the element intersects with the viewport.
@@ -330,7 +344,7 @@ This can be useful for show a loading spinner, disabling a button, etc.
 <button
   data-on-click="sse('/endpoint')"
   data-indicator-fetching
-  data-attributes-disabled="fetching.value"
+  data-attr-disabled="fetching.value"
 ></button>
 <div data-show="fetching.value">Loading...</div>
 ```

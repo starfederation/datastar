@@ -58,7 +58,7 @@ Setting the `contentType` option to `form` tells the `sse()` action to look for 
 In this example, the `sse()` action is placed on the form itself using `data-on-submit`.
 
 ```html
-<form data-on-submit="sse('/examples/form_data/data', {contentType: 'form'})">
+<form data-on-submit="sse('/endpoint', {contentType: 'form'})">
   <input name="bar" placeholder="Type bar contents" required>
   <button>
       Submit form

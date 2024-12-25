@@ -11,9 +11,9 @@ import {
 } from '~/engine/types'
 import { kebabize } from '~/utils/text'
 
-export const Attributes: AttributePlugin = {
+export const Attr: AttributePlugin = {
   type: PluginType.Attribute,
-  name: 'attributes',
+  name: 'attr',
   valReq: Requirement.Must,
   onLoad: ({ el, genRX, key, effect }) => {
     const rx = genRX()
