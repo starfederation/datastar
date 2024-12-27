@@ -31,6 +31,12 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 
 	sidebarGroups := []*SidebarGroup{
 		{
+			Label: "REGEX",
+			Links: []*SidebarLink{
+				{ID: "regex"},
+			},
+		},
+		{
 			Label: "Ported HTMX Examples",
 			Links: []*SidebarLink{
 				{ID: "click_to_edit"},
