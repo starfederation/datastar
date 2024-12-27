@@ -5,7 +5,7 @@
 
 import { dsErr } from '~/engine/errors'
 import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
-import { SignalIgnoreMacros } from '~/plugins/official/core/macros/signals'
+import { IngnoreAnythingMacro } from '~/plugins/official/core/macros/signals'
 
 const dataURIRegex = /^data:(?<mime>[^;]+);base64,(?<contents>.*)$/
 const updateEvents = ['change', 'input', 'keydown']
@@ -15,7 +15,7 @@ export const Bind: AttributePlugin = {
   name: 'bind',
   keyReq: Requirement.Exclusive,
   valReq: Requirement.Exclusive,
-  macros: SignalIgnoreMacros,
+  macros: { pre: [IngnoreAnythingMacro] },
   onLoad: (ctx) => {
     const { el, value, key, signals, effect } = ctx
     const signalName = key ? key : value
