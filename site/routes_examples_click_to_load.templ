@@ -39,7 +39,6 @@ templ ClickToEditAgentsTable(input *ClickToLoadSignals) {
 		class="flex flex-col gap-2"
 		data-signals={ templ.JSONString(input) }
 	>
-		<div data-text="ctx.signals.JSON()">Foo</div>
 		<table class="table table-zebra">
 			<caption>Agents</caption>
 			<thead>

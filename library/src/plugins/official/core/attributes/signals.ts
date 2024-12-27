@@ -21,13 +21,10 @@ export const Signals: AttributePlugin = {
           let revised = original
           for (const quote of ["'", '"', '`']) {
             const keyEscaper = new RegExp(
-              `${quote}([^${quote}:]*)${quote}:`,
+              `${quote}([^${quote}:]*)${quote}\s*:`,
               'gm',
             )
-            revised = revised.replaceAll(
-              keyEscaper,
-              `${quote}${DSP}$1${DSS}${quote}:`,
-            )
+            revised = revised.replaceAll(keyEscaper, `"${DSP}$1${DSS}":`)
           }
           return revised
         },
@@ -38,7 +35,7 @@ export const Signals: AttributePlugin = {
         name: 'ObjectKeyUnescaper',
         type: PluginType.Macro,
         fn: (_, original) => {
-          const keyUnescaper = RegExp(`"${DSP}([\d.\w]+)${DSS}"`, 'gm')
+          const keyUnescaper = RegExp(`(?:"${DSP})([\\w_]+)(?:${DSS}":)`, 'gm')
           const revised = original.replaceAll(keyUnescaper, '"$1":')
           return revised
         },
