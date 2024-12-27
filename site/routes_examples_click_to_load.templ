@@ -25,7 +25,7 @@ templ ClickToLoadMoreButton(input *ClickToLoadSignals) {
 		id="more_btn"
 		class="w-full btn btn-success"
 		data-on-click={ fmt.Sprintf(
-			"console.log('click to load more');offset.value=%d; limit.value=%d; sse('/examples/click_to_load/data', {method:'get',useViewTransitions:false})",
+			"offset=%d; limit=%d; sse('/examples/click_to_load/data')",
 			input.Offset+input.Limit,input.Limit,
 			) }
 	>
@@ -39,6 +39,7 @@ templ ClickToEditAgentsTable(input *ClickToLoadSignals) {
 		class="flex flex-col gap-2"
 		data-signals={ templ.JSONString(input) }
 	>
+		<div data-text="ctx.signals.JSON()">Foo</div>
 		<table class="table table-zebra">
 			<caption>Agents</caption>
 			<thead>

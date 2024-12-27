@@ -4,6 +4,7 @@
 
 ## Demo
 
+<div data-text="ctx.signals.JSON()">Foo</div>
 <div
     id="contact_1"
     data-on-load="sse('/examples/click_to_edit/contact/1')"

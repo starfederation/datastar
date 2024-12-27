@@ -114,8 +114,7 @@ export class Engine {
             }
           }
           const rawValue = `${el.dataset[rawKey]}` || ''
-          let value = rawValue
-          const hasValue = value.length > 0
+          const hasValue = rawValue.length > 0
 
           // Check the requirements
           const keyReq = p.keyReq || Requirement.Allowed
@@ -129,7 +128,7 @@ export class Engine {
           const valReq = p.valReq || Requirement.Allowed
           if (hasValue) {
             if (valReq === Requirement.Denied) {
-              throw dsErr(`${p.name}ValueNotAllowed`, { value })
+              throw dsErr(`${p.name}ValueNotAllowed`, { rawValue })
             }
           } else if (valReq === Requirement.Must) {
             throw dsErr(`${p.name}ValueRequired`)
@@ -151,22 +150,10 @@ export class Engine {
           // Ensure the element has an id
           if (!el.id.length) el.id = elUniqId(el)
 
-          // Apply the macros
-          appliedMacros.clear()
           const mods: Modifiers = new Map<string, Set<string>>()
           for (const rawMod of rawModifiers) {
             const [label, ...mod] = rawMod.split('.')
             mods.set(camelize(label), new Set(mod.map((t) => t.toLowerCase())))
-          }
-          const macros = [
-            ...(p.macros?.pre || []),
-            ...this.#macros,
-            ...(p.macros?.post || []),
-          ]
-          for (const macro of macros) {
-            if (appliedMacros.has(macro)) continue
-            appliedMacros.add(macro)
-            value = macro.fn(value)
           }
 
           // Create the runtime context
@@ -184,8 +171,22 @@ export class Engine {
             rawKey,
             rawValue,
             key,
-            value,
+            value: rawValue,
             mods,
+          }
+
+          // Apply the macros
+          appliedMacros.clear()
+
+          const macros = [
+            ...(p.macros?.pre || []),
+            ...this.#macros,
+            ...(p.macros?.post || []),
+          ]
+          for (const macro of macros) {
+            if (appliedMacros.has(macro)) continue
+            appliedMacros.add(macro)
+            ctx.value = macro.fn(ctx, ctx.value)
           }
 
           // Load the plugin and store any cleanup functions
@@ -231,7 +232,7 @@ export class Engine {
     // Action names
     const an = Object.keys(this.#actions).filter((i) => methodsCalled.has(i))
     // Action lines
-    const al = an.map((a) => `const ${a} = ctx.actions.${a}.fn;`)
+    const al = an.map((a) => `const ${a} = ctx.actions.${a}.fn;\n`)
     const fnContent = `${al.join('\n')}return (()=> {${userExpression}})()`
 
     // Add ctx to action calls

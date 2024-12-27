@@ -3,8 +3,8 @@ package site
 import datastar "github.com/starfederation/datastar/sdk/go"
 
 type DialogBrowserSignals struct {
-	Prompt  string `json:"prompt"`
-	Confirm bool   `json:"confirm"`
+	Prompt  string `json:"p"`
+	Confirm bool   `json:"c"`
 }
 
 templ DialogBrowserView(signals *DialogBrowserSignals) {
@@ -12,7 +12,7 @@ templ DialogBrowserView(signals *DialogBrowserSignals) {
 		id="dialogs"
 		class="flex items-center btn btn-primary"
 		data-signals={ templ.JSONString(signals) }
-		data-on-click="prompt.value = prompt('Enter a string',prompt.value);confirm.value = confirm('Are you sure?');confirm.value && sse('/examples/dialogs_browser/sure')"
+		data-on-click="p = prompt('Enter a string',p);c = confirm('Are you sure?');c && sse('/examples/dialogs_browser/sure')"
 	>
 		Click Me
 		@icon("material-symbols:question-mark")

@@ -24,7 +24,7 @@ export const On: AttributePlugin = {
         // We need to escape the evt in case .value is used
         type: PluginType.Macro,
         name: 'evtEsc',
-        fn: (original) => {
+        fn: (_, original) => {
           return original.replaceAll(/evt.([\w\.]+)value/gm, 'EVT_$1_VALUE')
         },
       },
@@ -34,7 +34,7 @@ export const On: AttributePlugin = {
         // We need to unescape the evt in case .value is used
         type: PluginType.Macro,
         name: 'evtUnesc',
-        fn: (original) => {
+        fn: (_, original) => {
           return original.replaceAll(/EVT_([\w\.]+)_VALUE/gm, 'evt.$1value')
         },
       },

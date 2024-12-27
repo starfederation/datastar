@@ -2,8 +2,8 @@
 
 ## Demo
 
-<div data-signals="{currentTime:Date.now()}" data-on-raf="currentTime.value = Date.now()">
-  <div id="time">Current Time: <span data-text="new Date(currentTime.value).toLocaleString()">will be replaced by current time</span></div>
+<div data-signals="{currentTime:Date.now()}" data-on-raf="currentTime = Date.now()">
+  <div id="time">Current Time: <span data-text="new Date(currentTime).toLocaleString()">will be replaced by current time</span></div>
   <pre data-text="ctx.signals.JSON()"></pre>
 </div>
 
@@ -14,11 +14,11 @@ In the [Title Update Backend](/examples/title_update_backend) example we showed 
 ```html
 <div
   data-signals="{currentTime:Date.now()}"
-  data-on-raf="currentTime.value = Date.now()"
+  data-on-raf="currentTime = Date.now()"
 >
   <div id="time">
     Current Time:
-    <span data-text="new Date(currentTime.value).toLocaleString()"
+    <span data-text="new Date(currentTime).toLocaleString()"
       >will be replaced by current time</span
     >
   </div>

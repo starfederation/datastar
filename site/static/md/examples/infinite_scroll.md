@@ -10,7 +10,7 @@ Let’s focus on the final row (or the last element of your content):
 
 ```html
 <div
-  data-intersects="offset.value=0;limit.value=10;sse('/examples/infinite_scroll/data')"
+  data-intersects="offset=0;limit=10;sse('/examples/infinite_scroll/data')"
   id="more_btn"
 >
   <div>Loading...</div>
@@ -24,7 +24,7 @@ event: datastar-merge-fragments
 data: selector #more_btn
 data: mergeMode morph
 data: settleDuration 500
-data: fragments <div data-intersects="offset.value=10;limit.value=10;sse('/examples/infinite_scroll/data')" id="more_btn"><div>Loading...</div></div>
+data: fragments <div data-intersects="offset=10;limit=10;sse('/examples/infinite_scroll/data')" id="more_btn"><div>Loading...</div></div>
 
 event: datastar-merge-fragments
 data: selector #click_to_load_rows

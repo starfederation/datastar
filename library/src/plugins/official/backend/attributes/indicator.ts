@@ -3,6 +3,7 @@
 // Description: must be a valid signal name
 
 import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
+import { SignalIgnoreMacros } from '../../core/macros/signals'
 import {
   DATASTAR_SSE_EVENT,
   type DatastarSSEEvent,
@@ -15,6 +16,7 @@ export const Indicator: AttributePlugin = {
   name: 'indicator',
   keyReq: Requirement.Exclusive,
   valReq: Requirement.Exclusive,
+  macros: SignalIgnoreMacros,
   onLoad: ({ value, signals, el, key }) => {
     const signalName = key ? key : value
     const signal = signals.upsert(signalName, false)

@@ -15,7 +15,7 @@ Real-time Hypermedia first Library and Framework for dotnet
       <button data-on-click="sse('/displayDate')">Display Date</button>
       <div id="target"></div>
       <input type="text" placeholder="input:" data-bind-input /><br />
-      <span data-text="output.value"></span>
+      <span data-text="output"></span>
       <button data-on-click="sse('/changeOutput',{method:'post'})">Change Output</button>
     </main>
   </body>

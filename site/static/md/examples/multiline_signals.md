@@ -7,7 +7,7 @@
         foo:1234,
         bar:'bar'
     }"
-    data-signals-baz="2*foo.value"
+    data-signals-baz="2*foo"
 >
     <input
         id="a"
@@ -41,7 +41,7 @@
     bar:'bar'
 }"
 >
-  <div data-signals-baz="2*foo.value"></div>
+  <div data-signals-baz="2*foo"></div>
   <input type="number" step="1" min="0" max="10" data-bind-foo />
   <input type="text" data-bind-bar />
   <input type="text" data-bind-baz />

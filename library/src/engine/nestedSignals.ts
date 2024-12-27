@@ -50,8 +50,10 @@ function mergeNested(
           continue
         }
         if (target[key] instanceof Signal) {
+          console.log('Setting signal value', key, value)
           target[key].value = value
         } else {
+          console.log('Setting new signal', key, value)
           target[key] = new Signal(value)
         }
       }

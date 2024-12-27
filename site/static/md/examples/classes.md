@@ -4,11 +4,11 @@
 
 <div
     data-signals="{count:0}"
-    data-on-raf__throttle.500ms="count.value++"
-    data-computed-blinker="count.value % 2 === 0"
+    data-on-raf__throttle.500ms="count++"
+    data-computed-blinker="count % 2 === 0"
 >
-    <div data-text="count.value">Count</div>
-    <div data-class="{'text-primary':blinker.value,'font-bold':blinker.value}">
+    <div data-text="count">Count</div>
+    <div data-class="{'text-primary':blinker,'font-bold':blinker}">
         Remake blink tag
     </div>
 </div>
@@ -18,11 +18,11 @@
 ```html
 <div
     data-signals="{count:0}"
-    data-on-raf__throttle.500ms="count.value++"
-    data-computed-blinker="count.value % 2 === 0"
+    data-on-raf__throttle.500ms="count++"
+    data-computed-blinker="count % 2 === 0"
 >
-    <div data-text="count.value">Count</div>
-    <div data-class="{'text-primary':blinker.value,'font-bold':blinker.value}">
+    <div data-text="count">Count</div>
+    <div data-class="{'text-primary':blinker,'font-bold':blinker}">
         Remake blink tag
     </div>
 </div>

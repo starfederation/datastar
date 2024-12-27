@@ -36,6 +36,7 @@ templ bulkUpdateContacts(signals *BulkUpdateSelectionSignals, contacts []*Contac
 		data-signals={ templ.JSONString(signals) }
 		class="flex flex-col gap-2"
 	>
+		<div data-text="ctx.signals.JSON()">Foo</div>
 		<table class="table table-zebra">
 			<caption class="text-sm text-accent-300">Select Rows And Activate Or Deactivate Below</caption>
 			<thead>
@@ -45,7 +46,7 @@ templ bulkUpdateContacts(signals *BulkUpdateSelectionSignals, contacts []*Contac
 							class="checkbox"
 							type="checkbox"
 							data-bind="selections.all"
-							data-on-change="setAll('selections.contact_', selections.all.value)"
+							data-on-change="setAll('selections.contact_', selections.all)"
 						/>
 					</th>
 					<th>Name</th>
@@ -63,8 +64,8 @@ templ bulkUpdateContacts(signals *BulkUpdateSelectionSignals, contacts []*Contac
 			<button
 				data-on-click="
 					sse('/examples/bulk_update/data/activate', {method:'put'})
-					selections.all.value = false
-					setAll('selections.contact_', selections.all.value)
+					selections.all = false
+					setAll('selections.contact_', selections.all)
 				"
 				class="btn btn-success"
 			>
@@ -74,8 +75,8 @@ templ bulkUpdateContacts(signals *BulkUpdateSelectionSignals, contacts []*Contac
 			<button
 				data-on-click="
 					sse('/examples/bulk_update/data/deactivate', {method:'put'})
-					selections.all.value = false
-					setAll('selections.contact_', selections.all.value)
+					selections.all = false
+					setAll('selections.contact_', selections.all)
 				"
 				class="btn btn-error"
 			>

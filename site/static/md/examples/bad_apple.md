@@ -16,13 +16,13 @@
             data-bind="percentage"
          />
         <div>
-            <span data-text="percentage.value.toFixed(2)"></span>%
+            <span data-text="percentage.toFixed(2)"></span>%
         </div>
     </div>
     <div class="aspect-square font-mono font-bold text-[11px] leading-[0.25rem] flex justify-center items-center">
         <pre
             style="background-color: black"
-            data-text="_contents.value"
+            data-text="_contents"
         ></pre>
     </div>
 </div>
@@ -43,10 +43,10 @@ We take the [already converted](https://github.com/trung-kieen/bad-apple-ascii) 
 >
   <div>
     <input type="range" min="1" max="100" data-bind="percentage" disabled />
-    <div><span data-text="percentage.value.toFixed(2)"></span>%</div>
+    <div><span data-text="percentage.toFixed(2)"></span>%</div>
   </div>
   <div>
-    <pre data-text="_contents.value"></pre>
+    <pre data-text="_contents"></pre>
   </div>
 </div>
 ```

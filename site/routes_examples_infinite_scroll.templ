@@ -16,7 +16,7 @@ templ infiniteScrollMore(signals *infiniteScrollSignals) {
 		id="loading_message"
 		class="alert alert-info"
 		data-intersects={ fmt.Sprintf(
-			"offset.value=%d;limit.value=%d;%s",
+			"offset=%d;limit=%d;%s",
 			signals.Offset+signals.Limit,signals.Limit,
 			datastar.GetSSE("/examples/infinite_scroll/data"),
 		) }

@@ -21,7 +21,7 @@
 >
   <div>
     Should always be 1234:
-    <span data-text="id.value">should be replaced</span>
+    <span data-text="id">should be replaced</span>
   </div>
 </div>
 ```

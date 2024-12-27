@@ -32,7 +32,7 @@ templ FileUploadView(signals *FileUploadSignals) {
 		<button
 			class="btn btn-primary"
 			data-on-click={ datastar.PostSSE("/examples/file_upload/upload") }
-			data-show="!!files.value?.length"
+			data-show="!!files?.length"
 		>
 			Submit
 		</button>

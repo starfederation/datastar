@@ -19,12 +19,12 @@ This example shows how to implement editable rows. First let’s look at the row
   <td>Joe Smith<//td>
   <td>joe@smith.org</td>
   <td>
-    <button data-on-click="editRowIndex.value=0;sse('/examples/edit_row/edit')" >Edit</button>
+    <button data-on-click="editRowIndex=0;sse('/examples/edit_row/edit')" >Edit</button>
   </td>
 </tr>
 ```
 
-This will tell trigger a whole table replacement as we are going to remove the `Edit` buttons from other rows as well as change out to inputs to allow editing. The `data-on-click` attribute sets a variable `editRowIndex.value` to the index of the row that is being edited. This is used to determine which row to edit on the server side. Again we don't need alpine or hyperscript to do this, signals and actions are built-in.
+This will tell trigger a whole table replacement as we are going to remove the `Edit` buttons from other rows as well as change out to inputs to allow editing. The `data-on-click` attribute sets a variable `editRowIndex` to the index of the row that is being edited. This is used to determine which row to edit on the server side. Again we don't need alpine or hyperscript to do this, signals and actions are built-in.
 
 Finally, here is what the row looks like when the data is being edited:
 

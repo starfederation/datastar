@@ -14,10 +14,10 @@ templ QuickPrimerGoView(signals *QuickPrimerGoSignals) {
 	<div id="replaceMe" data-signals={ templ.JSONString(signals) }>
 		<h2>Go Datastar Example</h2>
 		<main id="main" class="container flex flex-col gap-4">
-			<input type="text" class="input input-bordered" placeholder="Type here!" data-bind-input />
-			<div data-text="input.value"></div>
-			<button class="btn btn-accent" data-on-click="show.value = !show.value">Toggle</button>
-			<div data-show="show.value">
+			<input type="text" class="input input-bordered" placeholder="Type here!" data-bind-input/>
+			<div data-text="input"></div>
+			<button class="btn btn-accent" data-on-click="show = !show">Toggle</button>
+			<div data-show="show">
 				<span>Hello from Datastar!</span>
 			</div>
 			<div id="output">#output</div>

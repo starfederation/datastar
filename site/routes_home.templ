@@ -13,7 +13,7 @@ templ Home() {
 	}}
 	{{
 		usageSample := `<input data-bind-title />
-<div data-text="title.value.toUpperCase()"></div>
+<div data-text="title.toUpperCase()"></div>
 <button data-on-click="sse('/endpoint', {method: 'post'})">Save</button>`
 	}}
 	@Page(
@@ -116,7 +116,7 @@ templ Home() {
 					</a>
 				</div>
 				<p>
-					At only 12 KiB, Datastar is smaller than Alpine.js and htmx, yet it provides the functionality of both libraries combined. The package size is not <em>just</em> a vanity metric. By embracing simplicity, and building on first principles, everything becomes cleaner and leaner. But don’t take our word for it – <a href="https://github.com/starfederation/datastar/tree/main/library">explore the source code</a> and see for yourself! 
+					At only 12 KiB, Datastar is smaller than Alpine.js and htmx, yet it provides the functionality of both libraries combined. The package size is not <em>just</em> a vanity metric. By embracing simplicity, and building on first principles, everything becomes cleaner and leaner. But don’t take our word for it – <a href="https://github.com/starfederation/datastar/tree/main/library">explore the source code</a> and see for yourself!
 				</p>
 				<img class="w-full" src="/chart"/>
 				<div
@@ -286,9 +286,9 @@ templ TodoInput(i int) {
 		placeholder="What needs to be done?"
 		data-bind-input
 		data-on-keydown={ fmt.Sprintf(`
-			if (evt.key !== 'Enter' || !input.value.trim().length) return;
+			if (evt.key !== 'Enter' || !input.trim().length) return;
 			sse('/api/todos/%d/edit', {method:'put'});
-			input.value = '';
+			input = '';
 		`, i) }
 		if i >= 0 {
 			data-on-click__outside={ datastar.PutSSE("/api/todos/cancel") }
@@ -335,7 +335,7 @@ templ TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) {
 				data-on-click={ datastar.DeleteSSE("/api/todos/%d", i) }
 				data-testid={ fmt.Sprintf("delete_todo%d", i) }
 				data-indicator={ fetchingSignalName }
-				data-attrs-disabled={ fetchingSignalName + ".value" }
+				data-attrs-disabled={ fetchingSignalName + "" }
 			>
 				@icon("material-symbols:close")
 			</button>

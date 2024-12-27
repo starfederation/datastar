@@ -2,6 +2,9 @@
 
 {%- func datastarClientConsts(data *ConstTemplateData) -%}
 // {%s data.DoNotEdit %}
+const lol = /🖕JS_DS🚀/.source
+export const DSP = lol.slice(0, 5)
+export const DSS = lol.slice(4)
 
 export const DATASTAR = "{%s data.DatastarKey %}";
 export const DATASTAR_EVENT = "{%s data.DatastarKey %}-event";
