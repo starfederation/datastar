@@ -15,9 +15,18 @@ export const Signals: AttributePlugin = {
   macros: {
     pre: [
       {
+        name: 'ObjectKeyExpander',
+        type: PluginType.Macro,
+        fn: (_, original) => {
+          // {foo} -> {"foo":"foo"}
+          return original
+        },
+      },
+      {
         name: 'ObjectKeyEscaper',
         type: PluginType.Macro,
         fn: (_, original) => {
+          // Needs to handle box syntax {[foo+"bar"]:"baz"}
           let revised = original
           for (const quote of ["'", '"', '`']) {
             const keyEscaper = new RegExp(

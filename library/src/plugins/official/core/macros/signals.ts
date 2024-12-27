@@ -9,7 +9,7 @@ export const SignalValueMacro: MacroPlugin = {
     ctx.signals.walk((path) => signalPaths.push(path))
     if (!signalPaths.length) return original
     const signalRegx = new RegExp(
-      `(?!${DSP})(${signalPaths.map((p) => `${p}(?=[\\s.=)}]+)`).join('|')})(?!${DSS})`,
+      `(?!${DSP})(${signalPaths.map((p) => `${p}(?=[\\s.=)}]+|$)`).join('|')})(?!${DSS})`,
       'gm',
     )
     const fixed = original.replaceAll(
@@ -20,8 +20,8 @@ export const SignalValueMacro: MacroPlugin = {
   },
 }
 
-export const SignalIgnoreIngnorerMacro: MacroPlugin = {
-  name: 'SignalEscaper',
+export const IngnoreAnythingMacro: MacroPlugin = {
+  name: 'IngnoreAnything',
   type: PluginType.Macro,
   fn: (_, original) => {
     const keyEscaper = /([\w.]+)/gm
@@ -30,8 +30,8 @@ export const SignalIgnoreIngnorerMacro: MacroPlugin = {
   },
 }
 
-export const SignalIgnoreUnescaperMacro: MacroPlugin = {
-  name: 'SignalUnescaper',
+export const UnignoreAnythingMacro: MacroPlugin = {
+  name: 'UnignoreAnything',
   type: PluginType.Macro,
   fn: (_, original) => {
     const keyUnescaper = new RegExp(`${DSP}(.+)${DSS}`, 'gm')
@@ -41,6 +41,6 @@ export const SignalIgnoreUnescaperMacro: MacroPlugin = {
 }
 
 export const SignalIgnoreMacros: Record<string, MacroPlugin[]> = Object.freeze({
-  pre: [SignalIgnoreIngnorerMacro],
-  post: [SignalIgnoreUnescaperMacro],
+  pre: [IngnoreAnythingMacro],
+  post: [UnignoreAnythingMacro],
 })

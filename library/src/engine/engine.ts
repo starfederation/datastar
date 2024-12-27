@@ -221,7 +221,7 @@ export class Engine {
     if (!last.startsWith('return')) {
       stmts[lastIdx] = `return (${stmts[lastIdx]});`
     }
-    const userExpression = stmts.join('\n')
+    const userExpression = stmts.join(';\n')
 
     const fnCall = /(\w*)\(/gm
     const matches = userExpression.matchAll(fnCall)
@@ -233,7 +233,7 @@ export class Engine {
     const an = Object.keys(this.#actions).filter((i) => methodsCalled.has(i))
     // Action lines
     const al = an.map((a) => `const ${a} = ctx.actions.${a}.fn;\n`)
-    const fnContent = `${al.join('\n')}return (()=> {${userExpression}})()`
+    const fnContent = `${al.join('\n')}return (()=> {\n${userExpression}\n})()`
 
     // Add ctx to action calls
     let fnWithCtx = fnContent.trim()
