@@ -9,7 +9,7 @@ export const SignalValueMacro: MacroPlugin = {
     ctx.signals.walk((path) => signalPaths.push(path))
     if (!signalPaths.length) return original
     const signalRegx = new RegExp(
-      `(?!${DSP})(${signalPaths.map((p) => `${p}(?=[\\s.=)]+)`).join('|')})(?!${DSS})`,
+      `(?!${DSP})(${signalPaths.map((p) => `${p}(?=[\\s.=)}]+)`).join('|')})(?!${DSS})`,
       'gm',
     )
     const fixed = original.replaceAll(
