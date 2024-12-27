@@ -5,11 +5,13 @@ export const SignalValueMacro: MacroPlugin = {
   name: 'signalValue',
   type: PluginType.Macro,
   fn: (ctx, original) => {
+    if (!original.length) return original
+
     const signalPaths = new Array<string>()
     ctx.signals.walk((path) => signalPaths.push(path))
     if (!signalPaths.length) return original
     const signalRegx = new RegExp(
-      `(?!${DSP})(${signalPaths.map((p) => `${p}(?=[\\s.=)}]+|$)`).join('|')})(?!${DSS})`,
+      `(?!(?:${DSP})|\\.)(?<!\\.)(${signalPaths.join('|')})(?=[\\s.=)},]+|$)(?!${DSS})`,
       'gm',
     )
     const fixed = original.replaceAll(
