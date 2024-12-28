@@ -6,7 +6,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#attributes"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-attributes"
       }
     ]
   },
@@ -17,7 +17,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#attributes"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-attributes"
       }
     ]
   },
@@ -28,7 +28,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#bind"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-bind"
       }
     ]
   },
@@ -39,7 +39,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#bind"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-bind"
       }
     ]
   },
@@ -50,7 +50,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#class"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-class"
       }
     ]
   },
@@ -61,7 +61,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#class"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-class"
       }
     ]
   },
@@ -72,7 +72,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_core#computed"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-computed"
       }
     ]
   },
@@ -83,7 +83,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_backend#data-indicator"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-indicator"
       }
     ]
   },
@@ -94,7 +94,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_backend#data-indicator"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-indicator"
       }
     ]
   },
@@ -105,7 +105,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_browser#intersects"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-intersects"
       }
     ]
   },
@@ -116,7 +116,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#on"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
       }
     ]
   },
@@ -127,7 +127,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#on"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
       }
     ]
   },
@@ -138,7 +138,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#on"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
       }
     ]
   },
@@ -149,7 +149,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#on"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
       }
     ]
   },
@@ -160,7 +160,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#on"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
       }
     ]
   },
@@ -171,7 +171,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#on"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
       }
     ]
   },
@@ -182,7 +182,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#persist"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-persist"
       }
     ]
   },
@@ -193,7 +193,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#persist"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-persist"
       }
     ]
   },
@@ -204,7 +204,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_core#ref"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-ref"
       }
     ]
   },
@@ -215,7 +215,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_core#ref"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-ref"
       }
     ]
   },
@@ -226,7 +226,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_backend#data-replace-url"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-replace-url"
       }
     ]
   },
@@ -237,7 +237,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_browser#scroll-into-view"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-scroll-into-view"
       }
     ]
   },
@@ -248,7 +248,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_browser#show"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-show"
       }
     ]
   },
@@ -259,7 +259,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_core#signals"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-signals"
       }
     ]
   },
@@ -270,7 +270,18 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_core#signals"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-signals"
+      }
+    ]
+  },
+  "data-star-ignore": {
+    "prefix": "data-star-ignore",
+    "body": "data-star-ignore",
+    "description": "Ignores an element’s attributes when Datastar applies plugins.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-data-star-ignore"
       }
     ]
   },
@@ -281,7 +292,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_dom#text"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-text"
       }
     ]
   },
@@ -292,7 +303,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/plugins_browser#view-transition"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-view-transition"
       }
     ]
   }
