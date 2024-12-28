@@ -1,7 +1,7 @@
 {
   "data-attr": {
-    "prefix": "data-attr",
-    "body": "data-attr=\"{${1:attributeName}: ${2:expression}}\"",
+    "prefix": "data-attributes",
+    "body": "data-attributes=\"{${1:attributeName}: ${2:expression}}\"",
     "description": "Sets one or more attribute values using a set of key-value pairs that map to the attribute name and expression.",
     "references": [
       {
@@ -11,8 +11,8 @@
     ]
   },
   "data-attr-*": {
-    "prefix": "data-attr-*",
-    "body": "data-attr-${1:name}=\"${2:expression}\"",
+    "prefix": "data-attributes-*",
+    "body": "data-attributes-${1:name}=\"${2:expression}\"",
     "description": "Sets an element’s attribute value based on an expression.",
     "references": [
       {
