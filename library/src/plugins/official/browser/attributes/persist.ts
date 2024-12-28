@@ -9,6 +9,7 @@ import {
   type NestedValues,
   PluginType,
 } from '~/engine/types'
+import { IngnoreAnythingMacro } from '../../core/macros/signals'
 
 const SESSION = 'session'
 
@@ -16,6 +17,7 @@ export const Persist: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'persist',
   mods: new Set([SESSION]),
+  macros: { pre: [IngnoreAnythingMacro] },
   onLoad: ({ key, value, signals, effect, mods }) => {
     if (key === '') {
       key = DATASTAR
