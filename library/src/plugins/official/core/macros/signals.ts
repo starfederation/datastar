@@ -71,7 +71,7 @@ export const UnignoreAnythingMacro: MacroPlugin = {
   name: 'UnignoreAnything',
   type: PluginType.Macro,
   fn: (_, original) => {
-    const keyUnescaper = new RegExp(`${DSP}(.+)${DSS}`, 'gm')
+    const keyUnescaper = new RegExp(`${DSP}(.+?)${DSS}`, 'gm')
     const revised = original.replaceAll(keyUnescaper, '$1')
     return revised
   },
