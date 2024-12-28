@@ -1,10 +1,16 @@
 import { DSP, DSS } from '~/engine/consts'
 import { type MacroPlugin, PluginType } from '~/engine/types'
 
+const tagTemplateRe = /`(.*?)`/gm
 export const TagTemplateEscaperMacro: MacroPlugin = {
   name: 'TagTemplateEscaper',
   type: PluginType.Macro,
   fn: (ctx, original) => {
+    // const tagTemplateLiteralRe= /`(.*?)`/gm
+    const isTagTemplate = tagTemplateRe.test(original)
+    console.log('isTagTemplate', isTagTemplate)
+    if (!isTagTemplate) return original
+
     const signalPaths = new Array<string>()
     ctx.signals.walk((path) => signalPaths.push(path))
     if (!signalPaths.length) return original
@@ -13,24 +19,31 @@ export const TagTemplateEscaperMacro: MacroPlugin = {
       'gm',
     )
 
-    const tagTemplateEscaper =
-      /`(?<preexpr>.*)(?:\$){(?<expr>.*)(?:\})(?<postexpr>.*)`/gm
+    // const tagTemplateEscaper =
+    //   /(?<preexpr>.*?)\${(?<expr>.*?)}(?<postexpr>.*?)/gm
+    const expressionPartsRe = /(?:\${)(?<expr>.*?)(?:})/gm
     const escaped = `${DSP}$1${DSS}`
     const escapeTagTempls = (s: string) => {
-      const matches = [...s.matchAll(tagTemplateEscaper)]
+      const revisedParts = new Array<string>()
+      for (const match of s.matchAll(expressionPartsRe)) {
+        // preexpression
+        const preexpression = s
+          .slice(0, match.index + 2)
+          .replaceAll(signalRe, escaped)
+        revisedParts.push(preexpression)
 
-      let revised = s
-      for (const match of matches) {
-        if (!match.groups) continue
-        const { preexpr, expr, postexpr } = match.groups
+        // expression
+        const expression = match.groups?.expr || ''
+        revisedParts.push(expression)
 
-        const revisedPreExpr = preexpr.replaceAll(signalRe, escaped)
-        const revisedExpr = escapeTagTempls(expr)
-        const revisedPostExpr = postexpr.replaceAll(signalRe, escaped)
-
-        revised = `\`${revisedPreExpr}\${${revisedExpr}}${revisedPostExpr}\``
+        // postexpression
+        const postexpression = s
+          .slice(match[0].length + match.index - 1)
+          .replaceAll(signalRe, escaped)
+        revisedParts.push(postexpression)
       }
-      return revised
+      if (!revisedParts.length) return s
+      return revisedParts.join('')
     }
     return escapeTagTempls(original)
   },

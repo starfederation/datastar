@@ -4,4 +4,5 @@
   <div data-text="foo+bar"></div>
   <div data-text="`${foo}`"></div>
   <div data-text="`${foo} and ${bar}`"></div>
+  <!-- <div data-text="`${`${foo} baz`} and ${bar}`"></div> -->
 </div>
