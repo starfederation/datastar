@@ -1,6 +1,6 @@
 # JavaScript API
 
-Datastar intentionally does not (indecently) expose itself in the global scope – you _should_ be able to do everything you need via [attribute plugins](/reference/attribute_plugins) and the [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE event.
+Datastar is intentional about not (indecently) exposing itself in the global scope – you _should_ be able to do everything you need via Datastar expressions in [attribute plugins](/reference/attribute_plugins) and [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE events.
 
 When troubleshooting an issue, it may be useful to see the current state of the signals. The easiest way to do this is by outputting them in JSON format using `data-text`.
 

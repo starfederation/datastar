@@ -121,7 +121,7 @@ However, the rise of the frontend frameworks and SPAs has led to a lot of confus
 Browsers don't care about your application – they care about rendering hypermedia. For example, if you visit a membership website as a guest, you'll likely see a generic landing page and a login option. Only once you log in will you see links to member-only content. This has huge benefits.
 
 - Each interaction determines the next valid state.
-- When implemented correctly, all logic resides in the backend, eliminating the need for client-side routing, validation, etc.
+- When implemented correctly, all logic resides in the backend, eliminating the need for frontend routing, validation, etc.
 - HTML can be generated from any language.
 
 ## Unlearning
@@ -130,7 +130,7 @@ When approaching Datastar, especially when coming from other frontend frameworks
 
 1. __Overuse of procedural code for DOM manipulation.__ Avoid writing procedural JavaScript to manually update the DOM. Use declarative, HTML-based `data-*` attributes and SSE events instead.
 2. __Putting state and logic in signals.__ Avoid recreating the sins of SPAs by putting state and logic in signals. Signals should only exist for what users can interact with, and for sharing state with the backend.
-3. __Managing state on the frontend.__ Avoid excessive client-side state management. Instead, let the backend drive state by managing data persistence and logic, ensuring a single source of truth. Focus on keeping the frontend lightweight and reactive.
+3. __Managing state on the frontend.__ Avoid excessive frontend state management. Instead, let the backend drive state by managing data persistence and logic, ensuring a single source of truth. Focus on keeping the frontend lightweight and reactive.
 
 We're very confident that Datastar can do _anything_ that React, Vue.js, or Svelte can do, faster and with less code. We'll take on anyone that disagrees!
 
