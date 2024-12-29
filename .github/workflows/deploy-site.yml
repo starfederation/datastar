@@ -2,11 +2,12 @@ name: Deploy Site
 on:
   push:
     branches:
-      - develop
+      - main
+  workflow_dispatch:
 jobs:
   deploy:
     name: Deploy app
-    if: contains(github.event.head_commit.message, '[deploy-site]')
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy-site]')
     runs-on: ubuntu-latest
     concurrency: deploy-group
     steps:
@@ -26,3 +27,4 @@ jobs:
           flyctl deploy --local-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
