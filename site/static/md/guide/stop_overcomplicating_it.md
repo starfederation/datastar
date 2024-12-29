@@ -8,9 +8,9 @@ So how does one use a hypermedia framework?
 
 ## The Datastar Way
 
-Between [attribute plugins](/reference/attribute_plugins) and [action plugins](/reference/action_plugins), Datastar provides you with everything you need to build hypermedia-driven web apps. Using this approach, the backend drives state to the frontend and acts as the single source of truth, determining what actions the user can take next.
+Between [attribute plugins](/reference/attribute_plugins) and [action plugins](/reference/action_plugins), Datastar provides you with everything you need to build hypermedia-driven applications. Using this approach, the backend drives state to the frontend and acts as the single source of truth, determining what actions the user can take next.
 
-Any additional JavaScript functionality you require that does _not_ work via Datastar expressions in [attribute plugins](/reference/attribute_plugins) and [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE events should ideally be extracted out into [external scripts](#external-scripts) or [web components](#web-components). 
+Any additional JavaScript functionality you require that does _not_ work via [`data-*`](/reference/attribute_plugins) attributes and [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE events should ideally be extracted out into [external scripts](#external-scripts) or, better yet, [web components](#web-components). 
 
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
@@ -23,7 +23,7 @@ Any additional JavaScript functionality you require that does _not_ work via Dat
 
 When using external scripts, pass data into functions via arguments and return a result _or_ listen for custom events dispatched from them (_props down, events up_).
 
-In this way, the function is encapsulated – all it knows is that it receives input via an argument, acts on it, and optionally returns a result or dispatches a custom event containing it – and Datastar's `data-*` attributes can be used to drive reactivity.
+In this way, the function is encapsulated – all it knows is that it receives input via an argument, acts on it, and optionally returns a result or dispatches a custom event – and `data-*` attributes can be used to drive reactivity.
 
 ```html
 <div data-signals-result="''">
@@ -70,7 +70,7 @@ async function myfunction(data) {
 
 When using web components, pass data into them via attributes and listen for custom events dispatched from them (_props down, events up_).
 
-In this way, the web component is encapsulated – all it knows is that it receives input via an attribute, acts on it, and optionally dispatches a custom event containing the result – and Datastar's `data-*` attributes can be used to drive reactivity.
+In this way, the web component is encapsulated – all it knows is that it receives input via an attribute, acts on it, and optionally dispatches a custom event containing the result – and `data-*` attributes can be used to drive reactivity.
 
 ```html
 <div data-signals-result="''">
@@ -100,7 +100,7 @@ class MyComponent extends HTMLElement {
 customElements.define('my-component', MyComponent);
 ```
 
-Since the `value` attribute is allowed on web components, it is also possible to use `data-bind` to bind a signal to the web component's value. Note that a `change` event must be dispatched so that the event listener used by `data-bind` registers the value change.
+Since the `value` attribute is allowed on web components, it is also possible to use `data-bind` to bind a signal to the web component's value. Note that a `change` event must be dispatched so that the event listener used by `data-bind` is triggered by the value change.
 
 ```html
 <input data-bind-foo>
