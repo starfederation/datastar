@@ -79,6 +79,31 @@ class MyComponent extends HTMLElement {
 customElements.define('my-component', MyComponent);
 ```
 
+Since the `value` attribute is allowed on web components, it is also possible to use `data-bind` to bind a signal to the web component's value. This can simplify our code and is useful when the web component emits a single value.
+
+```html
+<input data-bind-foo>
+<my-component
+    data-attributes-src="foo.value"
+    data-bind-result
+></my-component>
+<span data-text="result.value"></span>
+```
+
+```js
+class MyComponent extends HTMLElement {
+  static get observedAttributes() {
+    return ['src'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    this.value = `You entered ${newValue}`;
+  }
+}
+
+customElements.define('my-component', MyComponent);
+```
+
 ## Third-Party Libraries
 
 Datastar is a tiny self-contained framework that liberates you from the constraints of dependencies. If, for some peculiar reason, you absolutely _must_ use a third-party library, you should continue using the _props down, events up_ pattern.
