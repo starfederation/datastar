@@ -2,13 +2,13 @@
 
 Most of the time, if you run into issues when using Datastar, **you are probably overcomplicating it™**. 
 
-As explained in [going deeper](/guide/going_deeper), Datastar is a hypermedia framework. As soon as you approach it like a JavaScript framework, you are likely going to run into complications.
+As explained in [going deeper](/guide/going_deeper), Datastar is a _hypermedia_ framework. If you approach it like a _JavaScript_ framework, you are likely to run into complications.
 
 So how does one use a hypermedia framework?
 
 ## The Datastar Way
 
-Between [attribute plugins](/reference/attribute_plugins) and [action plugins](/reference/action_plugins), Datastar provides you with everything you need to build practically anything. Any additional JavaScript you require should ideally be extracted out into encapsulated scripts or, better yet, web components. 
+Between [attribute plugins](/reference/attribute_plugins) and [action plugins](/reference/action_plugins), Datastar provides you with everything you need to build practically anything. Any additional JavaScript you require should ideally be extracted out into [external scripts](#external-scripts) or, better yet, [web components](#web-components). 
 
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
@@ -19,9 +19,26 @@ Between [attribute plugins](/reference/attribute_plugins) and [action plugins](/
 
 ### External Scripts
 
-When using external scripts, pass data into functions via arguments and listen for custom events dispatched from them (_props down, events up_).
+When using external scripts, pass data into functions via arguments and return a result _or_ listen for custom events dispatched from them (_props down, events up_).
 
-In this way, the function is encapsulated – all it knows is that it receives input via an argument, acts on it, and optionally dispatches a custom event containing the result – and Datastar's `data-*` attributes can be used to drive reactivity.
+In this way, the function is encapsulated – all it knows is that it receives input via an argument, acts on it, and optionally returns a result or dispatches a custom event containing it – and Datastar's `data-*` attributes can be used to drive reactivity.
+
+```html
+<div data-signals-result="''">
+  <input data-bind-foo 
+         data-on-input="result.value = myfunction(foo.value)"
+  >
+  <span data-text="result.value"></span>
+</div>
+```
+
+```js
+function myfunction(data) {
+  return `You entered ${data}`;
+}
+```
+
+If your function call is asynchronous then it will need to dispatch a custom event containing the result. While asynchronous code _can_ be executed within Datastar expressions, Datastar will _not_ await it.
 
 ```html
 <div data-signals-result="''"
@@ -35,8 +52,10 @@ In this way, the function is encapsulated – all it knows is that it receives i
 ```
 
 ```js
-function myfunction(data) {
-  const value = `You entered ${data}`;
+async function myfunction(data) {
+  const value = await new Promise((resolve) => {
+    setTimeout(() => resolve(`You entered ${data}`), 1000);
+  });
   window.dispatchEvent(
     new CustomEvent('mycustomevent', {detail: {value}})
   );
@@ -107,6 +126,6 @@ customElements.define('my-component', MyComponent);
 
 ## Third-Party Libraries
 
-Datastar is a tiny self-contained framework that liberates you from the constraints of dependencies. If, for some peculiar reason, you absolutely _must_ use a third-party library, you should continue using the _props down, events up_ pattern.
+Datastar is a tiny self-contained framework that can help liberate you from "dependency hell". If, for some reason, you absolutely _must_ use a third-party library, you should continue using the _props down, events up_ pattern whenever possible.
 
-For edge-cases where you find yourself having to change the DOM without involving Datastar, you can import Datastar and apply it to any part of the DOM. for more details, see the [JavaScript API](/reference/javascript_api).
+For edge-cases in which you find yourself having to change the DOM without involving Datastar, you can import Datastar and apply it to any part of the DOM. for more details, see the [JavaScript API](/reference/javascript_api).
