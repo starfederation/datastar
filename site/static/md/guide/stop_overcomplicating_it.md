@@ -8,7 +8,9 @@ So how does one use a hypermedia framework?
 
 ## The Datastar Way
 
-Between [attribute plugins](/reference/attribute_plugins) and [action plugins](/reference/action_plugins), Datastar provides you with everything you need to build practically anything. Any additional JavaScript you require should ideally be extracted out into [external scripts](#external-scripts) or, better yet, [web components](#web-components). 
+Between [attribute plugins](/reference/attribute_plugins) and [action plugins](/reference/action_plugins), Datastar provides you with everything you need to build hypermedia-driven web apps. Using this approach, the backend drives state to the frontend and acts as the single source of truth, determining what actions the user can take next.
+
+Any additional JavaScript functionality you require that does _not_ work via Datastar expressions in [attribute plugins](/reference/attribute_plugins) and [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE events should ideally be extracted out into [external scripts](#external-scripts) or [web components](#web-components). 
 
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
@@ -38,7 +40,7 @@ function myfunction(data) {
 }
 ```
 
-If your function call is asynchronous then it will need to dispatch a custom event containing the result. While asynchronous code _can_ be executed within Datastar expressions, Datastar will _not_ await it.
+If your function call is asynchronous then it will need to dispatch a custom event containing the result. While asynchronous code _can_ be placed within Datastar expressions, Datastar will _not_ await it.
 
 ```html
 <div data-signals-result="''"
