@@ -79,7 +79,7 @@ class MyComponent extends HTMLElement {
 customElements.define('my-component', MyComponent);
 ```
 
-Since the `value` attribute is allowed on web components, it is also possible to use `data-bind` to bind a signal to the web component's value. This can simplify our code and is useful when the web component emits a single value.
+Since the `value` attribute is allowed on web components, it is also possible to use `data-bind` to bind a signal to the web component's value. Note that a `change` event must be dispatched so that the event listener used by `data-bind` registers the value change.
 
 ```html
 <input data-bind-foo>
@@ -98,6 +98,7 @@ class MyComponent extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     this.value = `You entered ${newValue}`;
+    this.dispatchEvent(new Event('change'));
   }
 }
 
