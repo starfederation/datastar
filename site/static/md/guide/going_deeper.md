@@ -128,9 +128,9 @@ Browsers don't care about your application – they care about rendering hyperme
 
 When approaching Datastar, especially when coming from other frontend frameworks, be prepared to _unlearn_ some bad practices. These may not seem like bad practices initially; they may even feel natural to you. Here are a few things you should look out for.
 
-1. __Overuse of procedural code for DOM manipulation.__ Stop writing procedural JavaScript to manually update the DOM. Use declarative, HTML-based `data-*` attributes and fine-grained reactivity instead.
-2. __Reliance on state management libraries.__ Stop using complex state management tools for tracking global state. Use reactive signals that bind directly to the DOM instead.
-3. __Putting state and logic in signals.__  Stop recreating the sins of SPAs by putting state and logic in signals. Signals should only exist for what users can interact with, and for sharing state with the backend.
+1. __Overuse of procedural code for DOM manipulation.__ Avoid writing procedural JavaScript to manually update the DOM. Use declarative, HTML-based `data-*` attributes and SSE events instead.
+2. __Putting state and logic in signals.__ Avoid recreating the sins of SPAs by putting state and logic in signals. Signals should only exist for what users can interact with, and for sharing state with the backend.
+3. __Managing state on the frontend.__ Avoid excessive client-side state management. Instead, let the backend drive state by managing data persistence and logic, ensuring a single source of truth. Focus on keeping the frontend lightweight and reactive.
 
 We're very confident that Datastar can do _anything_ that React, Vue.js, or Svelte can do, faster and with less code. We'll take on anyone that disagrees!
 

@@ -21,13 +21,15 @@ Between [attribute plugins](/reference/attribute_plugins) and [action plugins](/
 
 When using external scripts, pass data into functions via arguments and listen for custom events dispatched from them (_props down, events up_).
 
-In this way, the function is encapsulated – all it knows is that it receives some data as an argument, acts on it, and optionally dispatches a custom event containing the result – and Datastar's `data-*` attributes can be used to drive reactivity.
+In this way, the function is encapsulated – all it knows is that it receives input via an argument, acts on it, and optionally dispatches a custom event containing the result – and Datastar's `data-*` attributes can be used to drive reactivity.
 
 ```html
 <div data-signals-result="''"
-     data-on-mycustomevent__window="bar.value = evt.detail.value"
+     data-on-mycustomevent__window="result.value = evt.detail.value"
 >
-  <input data-bind-foo data-on-input="myfunction(foo.value)">
+  <input data-bind-foo 
+         data-on-input="myfunction(foo.value)"
+  >
   <span data-text="result.value"></span>
 </div>
 ```
@@ -47,7 +49,7 @@ function myfunction(data) {
 
 When using web components, pass data into them via attributes and listen for custom events dispatched from them (_props down, events up_).
 
-In this way, the web component is encapsulated – all it knows is that it receives some data via an attribute, acts on it, and optionally dispatches a custom event containing the result – and Datastar's `data-*` attributes can be used to drive reactivity.
+In this way, the web component is encapsulated – all it knows is that it receives input via an attribute, acts on it, and optionally dispatches a custom event containing the result – and Datastar's `data-*` attributes can be used to drive reactivity.
 
 ```html
 <div data-signals-result="''">
