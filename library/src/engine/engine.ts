@@ -1,7 +1,7 @@
-import { elUniqId } from '~/utils/dom'
+import { Hash, elUniqId } from '~/utils/dom'
 import { camelize } from '~/utils/text'
 import { effect } from '~/vendored/preact-core'
-import { VERSION } from './consts'
+import { DSP, VERSION } from './consts'
 import { dsErr } from './errors'
 import { SignalsRoot } from './nestedSignals'
 import {
@@ -21,6 +21,8 @@ import {
   type RuntimeExpressionFunction,
   type WatcherPlugin,
 } from './types'
+
+const signalRootPrefix = new Hash('ds').with(DSP).value
 
 export class Engine {
   #signals = new SignalsRoot()
@@ -221,29 +223,103 @@ export class Engine {
     if (!last.startsWith('return')) {
       stmts[lastIdx] = `return (${stmts[lastIdx]});`
     }
-    const userExpression = stmts.join(';\n')
+    let userExpression = stmts.join(';\n').trim()
 
-    const fnCall = /(\w*)\(/gm
+    const fnCall = /@(\w*)\(/gm
     const matches = userExpression.matchAll(fnCall)
     const methodsCalled = new Set<string>()
     for (const match of matches) {
       methodsCalled.add(match[1])
     }
     // Action names
-    const an = Object.keys(this.#actions).filter((i) => methodsCalled.has(i))
+    const actionNames = Object.keys(this.#actions).filter((i) =>
+      methodsCalled.has(i),
+    )
     // Action lines
-    const al = an.map((a) => `const ${a} = ctx.actions.${a}.fn;\n`)
-    const fnContent = `${al.join('\n')}return (()=> {\n${userExpression}\n})()`
+    const actionLines = actionNames.map(
+      (a) => `const action_${a} = ctx.actions.${a}.fn;\n`,
+    )
 
     // Add ctx to action calls
-    let fnWithCtx = fnContent.trim()
-    for (const a of an) {
-      fnWithCtx = fnWithCtx.replaceAll(`${a}(`, `${a}(ctx,`)
+    userExpression = userExpression.replaceAll(fnCall, 'ctx.actions.$1.fn(ctx,')
+
+    // Add used signals
+    type NestedPaths = { [key: string]: NestedPaths | string }
+    const nestedPathToGettersSetters = (
+      np: NestedPaths,
+      indent = 0,
+    ): string => {
+      const indented = (s: string) =>
+        s
+          .trim()
+          .split('\n')
+          .map((l) => ' '.repeat(indent) + l)
+          .join('\n')
+
+      const gettersSetters = Object.entries(np).map(([k, v]) => {
+        if (typeof v === 'string') {
+          return indented(
+            `
+get ${k}() {
+  return ctx.signals.signal('${np[k]}').value
+},
+set ${k}(value) {
+  ctx.signals.signal('${np[k]}').value = value
+}
+          `,
+          )
+        }
+        return indented(`${k}: {
+          ${nestedPathToGettersSetters(np[k] as NestedPaths, indent + 2)}
+        }`)
+      })
+      return gettersSetters.join(',\n')
     }
 
+    const signalPaths: NestedPaths = {}
+
+    ctx.signals.walk((path) => {
+      if (!userExpression.includes(`${path}`)) return
+      userExpression = userExpression.replaceAll(
+        `$${path}`,
+        `${signalRootPrefix}.${path}`,
+      )
+      const parts = path.split('.')
+      const last = parts.pop()!
+      let current = signalPaths
+      if (parts.length) {
+        for (const part of parts) {
+          if (!current[part]) {
+            current[part] = {}
+          }
+          current = current[part] as NestedPaths
+        }
+      }
+      current[last] = path
+    })
+
+    const fnContent = `
+  // actions
+  ${actionLines.join('\n')}
+
+  // signals
+  const ${signalRootPrefix} = {
+${nestedPathToGettersSetters(signalPaths, 4)}
+  }
+
+  // user expression
+  let result = (()=> {
+    ${userExpression}
+  })()
+
+  if (typeof result === 'string') {
+    result = result.replaceAll('${signalRootPrefix}.', '')
+  }
+  return result
+  `.trim()
+
     try {
-      const argumentNames = argNames || []
-      const fn = new Function('ctx', ...argumentNames, fnWithCtx)
+      const fn = new Function('ctx', ...argNames, fnContent)
       return (...args: any[]) => fn(ctx, ...args)
     } catch (error) {
       throw dsErr('GeneratingExpressionFailed', {

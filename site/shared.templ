@@ -262,10 +262,10 @@ templ codeSnippetFragment(block CodeSnippetBlock) {
 					<button
 						class="btn join-item btn-lg flex items-center gap-2"
 						data-class={ fmt.Sprintf(
-							"{'btn-primary btn-outline z-0': language == '%s'}",
+							"{'btn-primary btn-outline z-0': $language == '%s'}",
 							snippet.Extension,
 						) }
-						data-on-click={ fmt.Sprintf("language = '%s'", snippet.Extension) }
+						data-on-click={ fmt.Sprintf("$language = '%s'", snippet.Extension) }
 					>
 						{ toolbelt.Upper( snippet.Extension) }
 						<iconify-icon icon={ snippet.Icon } class="text-4xl" noobserver></iconify-icon>
@@ -274,7 +274,7 @@ templ codeSnippetFragment(block CodeSnippetBlock) {
 			</div>
 		</div>
 		for _, snippet := range block.Snippets {
-			<div data-show={ fmt.Sprintf("language == '%s'", snippet.Extension) }>
+			<div data-show={ fmt.Sprintf("$language == '%s'", snippet.Extension) }>
 				{ snippet.Path.Snake }
 				@templ.Raw(snippet.ContentHighlighted)
 			</div>
@@ -289,5 +289,5 @@ templ templSignalsJSON() {
 }
 
 templ sseIndicator(signalName string) {
-	<div class="loading-dots text-primary" data-class={ fmt.Sprintf("{'loading ml-4': %s}", signalName) }></div>
+	<div class="loading-dots text-primary" data-class={ fmt.Sprintf("{'loading ml-4': $%s}", signalName) }></div>
 }

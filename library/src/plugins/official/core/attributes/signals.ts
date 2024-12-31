@@ -1,4 +1,3 @@
-import { DSP, DSS } from '~/engine/consts'
 import {
   type AttributePlugin,
   type NestedValues,
@@ -12,45 +11,6 @@ export const Signals: AttributePlugin = {
   name: 'signals',
   valReq: Requirement.Must,
   removeOnLoad: true,
-  macros: {
-    pre: [
-      {
-        name: 'ObjectKeyExpander',
-        type: PluginType.Macro,
-        fn: (_, original) => {
-          // {foo} -> {"foo":"foo"}
-          return original
-        },
-      },
-      {
-        name: 'ObjectKeyEscaper',
-        type: PluginType.Macro,
-        fn: (_, original) => {
-          // Needs to handle box syntax {[foo+"bar"]:"baz"}
-          let revised = original
-          for (const quote of ["'", '"', '`']) {
-            const keyEscaper = new RegExp(
-              `${quote}([^${quote}:]*)${quote}\s*:`,
-              'gm',
-            )
-            revised = revised.replaceAll(keyEscaper, `"${DSP}$1${DSS}":`)
-          }
-          return revised
-        },
-      },
-    ],
-    post: [
-      {
-        name: 'ObjectKeyUnescaper',
-        type: PluginType.Macro,
-        fn: (_, original) => {
-          const keyUnescaper = RegExp(`(?:"${DSP})([\\w_]+)(?:${DSS}":)`, 'gm')
-          const revised = original.replaceAll(keyUnescaper, '"$1":')
-          return revised
-        },
-      },
-    ],
-  },
   onLoad: (ctx) => {
     const { key, genRX, signals, mods } = ctx
     const ifMissing = mods.has('ifmissing')
