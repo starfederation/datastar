@@ -63,6 +63,10 @@
           "description": "Only trigger the event listener once"
         },
         {
+          "name": "outside",
+          "description": "Triggers when the event is outside the element"
+        },
+        {
           "name": "passive",
           "description": "Do not call `preventDefault` on the event listener"
         },
