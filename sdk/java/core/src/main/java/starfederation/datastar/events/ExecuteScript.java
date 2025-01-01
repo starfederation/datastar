@@ -13,6 +13,11 @@ public final class ExecuteScript extends AbstractDatastarEvent {
         super(eventType, dataLines);
     }
 
+    @Override
+    public EventType getEventType() {
+        return EventType.ExecuteScript;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -26,8 +31,10 @@ public final class ExecuteScript extends AbstractDatastarEvent {
             if (script == null || script.isBlank()) {
                 throw new IllegalArgumentException("Script cannot be null or empty");
             }
-            this.script = script;
+            this.script = script.trim();
             return this;
+        }
+        private Builder() {
         }
 
         public Builder autoRemove(boolean autoRemove) {
@@ -36,8 +43,8 @@ public final class ExecuteScript extends AbstractDatastarEvent {
         }
 
         public Builder attributes(String attributes) {
-            if (attributes != null && !attributes.trim().isEmpty()) {
-                this.attributes = attributes;
+            if (attributes != null && !attributes.isBlank()) {
+                this.attributes = attributes.trim();
             }
             return this;
         }

@@ -13,6 +13,11 @@ public final class MergeSignals extends AbstractDatastarEvent {
         super(eventType, dataLines);
     }
 
+    @Override
+    public EventType getEventType() {
+        return EventType.MergeSignals;
+    }
+
     public static Builder builder() {
         return new Builder();
     }

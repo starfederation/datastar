@@ -8,7 +8,7 @@ node_modules
 datastar-website
 *_bin
 *.qtpl.go
-*/java/target/
+*/java/*/target/
 *.pyc
 __pycache__
 sdk/test/**/**/testOutput.txt

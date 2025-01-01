@@ -13,12 +13,20 @@ public final class RemoveSignals extends AbstractDatastarEvent {
         super(eventType, dataLines);
     }
 
+    @Override
+    public EventType getEventType() {
+        return EventType.RemoveSignals;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
 
     public static final class Builder extends AbstractBuilder<RemoveSignals> {
         private final List<String> paths = new ArrayList<>();
+
+        private Builder() {
+        }
 
         public Builder addPath(String path) {
             if (path == null || path.isBlank()) {
@@ -34,12 +42,9 @@ public final class RemoveSignals extends AbstractDatastarEvent {
                 throw new IllegalArgumentException("At least one path must be provided");
             }
 
-            List<String> dataLines = new ArrayList<>();
-
-            // Add paths
-            paths.forEach(path -> dataLines.add(PATHS_DATALINE_LITERAL + path));
-
-            return new RemoveSignals(EventType.RemoveSignals, dataLines);
+            return new RemoveSignals(EventType.RemoveSignals, paths.stream()
+                    .map(path -> PATHS_DATALINE_LITERAL + path.trim())
+                    .toList());
         }
     }
 }

@@ -1,10 +1,11 @@
 package starfederation.datastar.unit;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import starfederation.datastar.Consts;
 import starfederation.datastar.adapters.request.RequestAdapter;
 import starfederation.datastar.utils.SignalReader;
 
@@ -18,24 +19,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class SignalReaderTest {
 
     @Mock
     private RequestAdapter mockRequest;
 
-    private ConcurrentMap<String, Object> store;
-    private AutoCloseable closeable;
-
-    @BeforeEach
-    void setUp() {
-        closeable = MockitoAnnotations.openMocks(this);
-        store = new ConcurrentHashMap<>();
-    }
+    private final ConcurrentMap<String, Object> store = new ConcurrentHashMap<>();
 
     @AfterEach
-    void tearDown() throws Exception {
-        closeable.close();
+    void tearDown() {
+        store.clear();
     }
+
     @Test
     void readSignalsShouldParseGetRequest() throws Exception {
         when(mockRequest.getMethod()).thenReturn("GET");
@@ -73,7 +69,7 @@ class SignalReaderTest {
     @Test
     void readSignalsShouldThrowExceptionForMissingQueryParameter() throws Exception {
         when(mockRequest.getMethod()).thenReturn("GET");
-        when(mockRequest.getParameter("datastar")).thenReturn(null);
+        when(mockRequest.getParameter(Consts.DATASTAR_KEY)).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class, () -> SignalReader.readSignals(mockRequest, store));
     }

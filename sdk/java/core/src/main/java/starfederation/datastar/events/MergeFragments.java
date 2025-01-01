@@ -15,6 +15,11 @@ public final class MergeFragments extends AbstractDatastarEvent {
     }
 
 
+    @Override
+    public EventType getEventType() {
+        return EventType.MergeFragments;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -26,6 +31,9 @@ public final class MergeFragments extends AbstractDatastarEvent {
         private int settleDuration = DEFAULT_FRAGMENTS_SETTLE_DURATION; // Default
         private boolean useViewTransition = DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS; // Default
         private String rawData;
+
+        private Builder() {
+        }
 
         public Builder selector(String selector) {
             this.selector = selector;
@@ -54,7 +62,7 @@ public final class MergeFragments extends AbstractDatastarEvent {
 
         @Override
         public MergeFragments build() {
-            if (rawData == null || rawData.trim().isEmpty()) {
+            if (rawData == null || rawData.isBlank()) {
                 throw new IllegalArgumentException("Data cannot be null or empty");
             }
 
@@ -62,7 +70,7 @@ public final class MergeFragments extends AbstractDatastarEvent {
 
             // Add selector
             if (selector != null && !selector.isEmpty()) {
-                dataLines.add(SELECTOR_DATALINE_LITERAL + selector);
+                dataLines.add(SELECTOR_DATALINE_LITERAL + selector.trim());
             }
 
             // Add mergeMode if not default
@@ -82,8 +90,8 @@ public final class MergeFragments extends AbstractDatastarEvent {
 
             // Add raw data as fragments
             rawData.lines()
+                    .filter(line -> !line.isBlank())
                     .map(String::trim)
-                    .filter(line -> !line.isEmpty())
                     .forEach(line -> dataLines.add(FRAGMENTS_DATALINE_LITERAL + line));
 
             return new MergeFragments(EventType.MergeFragments, dataLines);
