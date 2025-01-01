@@ -4,7 +4,6 @@ import { GET } from '~/plugins/official/backend/actions/get'
 import { PATCH } from '~/plugins/official/backend/actions/patch'
 import { POST } from '~/plugins/official/backend/actions/post'
 import { PUT } from '~/plugins/official/backend/actions/put'
-import { SSE } from '~/plugins/official/backend/actions/sse'
 import { Indicator } from '~/plugins/official/backend/attributes/indicator'
 import { ExecuteScript } from '~/plugins/official/backend/watchers/executeScript'
 import { MergeFragments } from '~/plugins/official/backend/watchers/mergeFragments'
@@ -41,7 +40,6 @@ DS.load(
   Show,
   Text,
   // Backend
-  SSE,
   GET,
   POST,
   PUT,
