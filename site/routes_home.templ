@@ -286,10 +286,10 @@ templ TodoInput(i int) {
 		placeholder="What needs to be done?"
 		data-bind-input
 		data-on-keydown={ fmt.Sprintf(`
-			if (evt.key !== 'Enter' || !input.trim().length) return;
-			sse('/api/todos/%d/edit', {method:'put'});
-			input = '';
-		`, i) }
+			if (evt.key !== 'Enter' || !$input.trim().length) return;
+			%s;
+			$input = '';
+		`, datastar.PutSSE("/api/todos/%d/edit",i) ) }
 		if i >= 0 {
 			data-on-click__outside={ datastar.PutSSE("/api/todos/cancel") }
 		}
