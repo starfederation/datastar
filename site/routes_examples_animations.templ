@@ -63,7 +63,7 @@ type AnimationsColor struct {
 }
 
 templ animationsColorThrob(fg, bg AnimationsColor) {
-	{{ styl := fmt.Sprintf("color: #%x; background-color: #%x", $fg, $bg) }}
+	{{ styl := fmt.Sprintf("color: #%x; background-color: #%x", fg.Value, bg.Value) }}
 	<div
 		id="color_throb"
 		class="p-4 text-2xl font-bold text-center uppercase transition-all duration-1000 rounded-box"
