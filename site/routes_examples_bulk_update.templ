@@ -62,7 +62,7 @@ templ bulkUpdateContacts(signals *BulkUpdateSelectionSignals, contacts []*Contac
 		<div class="flex gap-2">
 			<button
 				data-on-click="
-					@sse('/examples/bulk_update/data/activate', {method:'put'})
+					@put('/examples/bulk_update/data/activate')
 					$selections.all = false
 					@setAll('selections.contact_', $selections.all)
 				"
@@ -73,7 +73,7 @@ templ bulkUpdateContacts(signals *BulkUpdateSelectionSignals, contacts []*Contac
 			</button>
 			<button
 				data-on-click="
-					@sse('/examples/bulk_update/data/deactivate', {method:'put'})
+					@put('/examples/bulk_update/data/deactivate')
 					$selections.all = false
 					@setAll('selections.contact_', $selections.all)
 				"

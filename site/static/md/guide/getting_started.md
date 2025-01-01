@@ -346,7 +346,7 @@ With our backend in place, we can now use the `data-on-click` attribute to trigg
   data-computed-correct="response.toLowerCase() == answer"
 >
   <div id="question"></div>
-  <button data-on-click="@sse('/actions/quiz')">Fetch a question</button>
+  <button data-on-click="@get('/actions/quiz')">Fetch a question</button>
   <button
     data-show="answer != ''"
     data-on-click="response = prompt('Answer:') ?? ''"
@@ -375,7 +375,7 @@ Now when the `Fetch a question` button is clicked, the server will respond with 
                 The correct answer is “<span data-text="$answer2"></span>” 🤷
             </span>
         </div>
-        <button data-on-click="@sse('/examples/quiz/data')" class="btn btn-secondary">
+        <button data-on-click="@get('/examples/quiz/data')" class="btn btn-secondary">
             Fetch a question
         </button>
     </div>
@@ -392,7 +392,7 @@ The [`data-indicator`](/reference/attribute_plugins#data-data-indicator) attribu
 <div id="question"></div>
 <div data-class-loading="$fetching" class="indicator"></div>
 <button
-  data-on-click="@sse('/actions/quiz')"
+  data-on-click="@get('/actions/quiz')"
   data-indicator-fetching
 >
   Fetch a question
@@ -410,7 +410,7 @@ The [`data-indicator`](/reference/attribute_plugins#data-data-indicator) attribu
             </span>
         </div>
         <div class="flex items-center gap-2">
-            <button id="fetch-a-question" data-on-click="@sse('/examples/quiz_slow/data')" data-indicator-fetching class="btn btn-secondary">
+            <button id="fetch-a-question" data-on-click="@get('/examples/quiz_slow/data')" data-indicator-fetching class="btn btn-secondary">
                 Fetch a question
             </button>
             <div data-class-loading="$fetching" class="indicator"></div>
@@ -425,7 +425,7 @@ The `data-indicator` attribute can also be written with signal name in the attri
 
 ```html
 <button
-  data-on-click="@sse('/actions/quiz')"
+  data-on-click="@get('/actions/quiz')"
   data-indicator="$fetching"
 >
 ```
@@ -436,6 +436,14 @@ Here's how we could send an answer to the server for processing, using a `POST` 
 
 ```html
 <button data-on-click="@sse('/actions/quiz', {method: 'post'})">
+  Submit answer
+</button>
+```
+
+or just use the `@post()` shortcut action.
+
+```html
+<button data-on-click="@post('/actions/quiz')">
   Submit answer
 </button>
 ```

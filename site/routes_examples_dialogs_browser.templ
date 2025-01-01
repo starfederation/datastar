@@ -12,7 +12,7 @@ templ DialogBrowserView(signals *DialogBrowserSignals) {
 		id="dialogs"
 		class="flex items-center btn btn-primary"
 		data-signals={ templ.JSONString(signals) }
-		data-on-click="$prompt = prompt('Enter a string',$prompt);$confirm = confirm('Are you sure?');$confirm && @sse('/examples/dialogs_browser/sure')"
+		data-on-click="$prompt = prompt('Enter a string',$prompt);$confirm = confirm('Are you sure?');$confirm && @get('/examples/dialogs_browser/sure')"
 	>
 		Click Me
 		@icon("material-symbols:question-mark")

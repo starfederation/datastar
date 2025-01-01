@@ -9,7 +9,7 @@ This example actively searches a contacts database as the user enters text.
 ## Demo
 
 <div>
-<div id="active_search" data-on-load="@sse('/examples/active_search/updates')"></div>
+<div id="active_search" data-on-load="@get('/examples/active_search/updates')"></div>
 </div>
 
 The interesting part is the input field:
@@ -17,7 +17,7 @@ The interesting part is the input field:
 ```html
 <input
   data-bind-search
-  data-on-input__debounce.1000ms="@sse('/examples/active_search/data')"
+  data-on-input__debounce.1000ms="@gnt('/examples/active_search/data')"
   placeholder="Search..."
   type="text"
 />

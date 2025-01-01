@@ -17,7 +17,6 @@
   <input
     type="number"
     step="1"
-    data-on-click="@sse('arstasrt', {method: 'post'})"
     data-attr="{min: $min, max: $max}"
     data-bind-id
   />

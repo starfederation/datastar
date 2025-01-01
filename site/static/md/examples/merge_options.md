@@ -2,7 +2,7 @@
 
 ## Demo
 
-<div id="contents" data-on-load="@sse('/examples/merge_options/reset')"></div>
+<div id="contents" data-on-load="@get('/examples/merge_options/reset')"></div>
 
 ## Explanation
 

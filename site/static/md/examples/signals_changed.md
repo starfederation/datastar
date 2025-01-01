@@ -4,7 +4,7 @@
 
 <div
   data-signals="{clicks:0, _localState: {bar: 1234}, _anotherLocalVar: 'hello'}"
-  data-on-signals-change__remote="@sse('/examples/signals_changed/updates', {method:'post'})"
+  data-on-signals-change__remote="@post('/examples/signals_changed/updates')"
   >
     <div class="flex gap-4">
       <button
@@ -15,7 +15,7 @@
       <button
         id="clear"
         class="btn btn-warning"
-        data-on-click="$clicks=0; @sse('/examples/signals_changed/updates', {method:'delete'})"
+        data-on-click="$clicks=0; @delete('/examples/signals_changed/updates')"
       >Clear Local & Server</button>
       <button
         id="reload"
@@ -32,13 +32,13 @@
 ```html
 <div
   data-signals="{clicks:0, _localState: {bar: 1234}, _anotherLocalVar: 'hello'}"
-  data-on-signals-change__remote="@sse('/examples/signals_changed/updates', {method:'post'})"
+  data-on-signals-change__remote="@post('/examples/signals_changed/updates')"
 >
   <div>
     <button id="increment" data-on-click="$clicks++">Click Me</button>
     <button
       id="clear"
-      data-on-click="$clicks=0; @sse('/examples/signals_changed/updates', {method:'delete'})"
+      data-on-click="$clicks=0; @delete('/examples/signals_changed/updates')"
     >
       Clear Local & Server
     </button>

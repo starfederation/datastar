@@ -13,7 +13,7 @@ tr.datastar-swapping td {
 
 <div
     id="delete_row"
-    data-on-load="@sse('/examples/delete_row/data')"
+    data-on-load="@get('/examples/delete_row/data')"
 >
 </div>
 
@@ -39,7 +39,7 @@ table body:
       <td>Active</td>
       <td>
         <button
-          data-on-click="confirm('Are you sure?') && @sse('/examples/delete_row/data/0', {method: 'delete'})"
+          data-on-click="confirm('Are you sure?') && @delete('/examples/delete_row/data/0')"
         >
           Delete
         </button>

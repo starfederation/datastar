@@ -52,14 +52,14 @@ def page_main(signals):
   return Main(
   Div(
     Input(type="text", placeholder="Send to server...", data_model="input"),
-    Button("Send State Roundtrip", data_on_click='sse("/get")'),
-    Button("Target HTML Element", data_on_click='sse("/target")'),
+    Button("Send State Roundtrip", data_on_click='get("/get")'),
+    Button("Target HTML Element", data_on_click='get("/target")'),
     Button("Toggle Feed", data_on_click="$show=!$show"),
     Div(id="output", data_text="$output"),
     Div(id=f"{target}"),
     Div(
       Span("Feed from server: "),
-      Span(id="feed", **{'data-on-load':"@sse('/feed')"}),
+      Span(id="feed", **{'data-on-load':"@get('/feed')"}),
       **{"data-show__duration.500ms":"$show"},
     ),
   ),
