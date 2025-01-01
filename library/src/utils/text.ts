@@ -16,5 +16,5 @@ export const camelize = (str: string) =>
 export const jsStrToObject = (raw: string) =>
   new Function(`return Object.assign({}, ${raw})`)()
 
-export const stripDollarSignPrefix = (str: string) =>
+export const trimDollarSignPrefix = (str: string) =>
   str.startsWith('$') ? str.slice(1) : str
