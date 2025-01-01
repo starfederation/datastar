@@ -4,11 +4,7 @@
 
 import { DATASTAR, DATASTAR_REQUEST } from '../../../../engine/consts'
 import { dsErr } from '../../../../engine/errors'
-import {
-  type ActionPlugin,
-  PluginType,
-  type RuntimeContext,
-} from '../../../../engine/types'
+import type { RuntimeContext } from '../../../../engine/types'
 import {
   type FetchEventSourceInit,
   fetchEventSource,
@@ -221,10 +217,4 @@ export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
     dispatchSSE(FINISHED, { elId })
     cleanupFn()
   }
-}
-
-export const SSE: ActionPlugin = {
-  type: PluginType.Action,
-  name: 'sse',
-  fn: sse,
 }
