@@ -28,7 +28,7 @@ templ scrollIntoViewView(paragraphs []string, opts []ScrollIntoViewOption, signa
 							class="select select-bordered"
 							data-bind={ o.Label }
 						>
-							for _, v := range $os {
+							for _, v := range o.Values {
 								<option value={ v }>{ v }</option>
 							}
 						</select>

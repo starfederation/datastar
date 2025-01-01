@@ -229,7 +229,7 @@ export class Engine {
     const escaped = new Map<string, string>()
     for (const match of userExpression.matchAll(escapeRe)) {
       const k = match[1]
-      const v = new Hash(`dsEscaped`).with(k).value
+      const v = new Hash('dsEscaped').with(k).value
       escaped.set(v, k)
       userExpression = userExpression.replace(DSP + k + DSS, v)
     }
