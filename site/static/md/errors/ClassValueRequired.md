@@ -5,9 +5,9 @@ No value was provided to the `data-class` attribute. The `data-class` attribute 
 Example:
 
 ```html
-<div data-class-hidden="foo.value"></div>
+<div data-class-hidden="$foo"></div>
 
-<div data-class="{hidden: foo.value}"></div>
+<div data-class="{hidden: foo}"></div>
 ```
 
 See the docs on the [`data-class`](/reference/attribute_plugins#data-class) attribute.

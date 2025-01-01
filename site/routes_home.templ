@@ -13,8 +13,8 @@ templ Home() {
 	}}
 	{{
 		usageSample := `<input data-bind-title />
-<div data-text="title.value.toUpperCase()"></div>
-<button data-on-click="sse('/endpoint', {method: 'post'})">Save</button>`
+<div data-text="$title.toUpperCase()"></div>
+<button data-on-click="@post('/endpoint')">Save</button>`
 	}}
 	@Page(
 		"Datastar - The hypermedia framework.",
@@ -56,7 +56,7 @@ templ Home() {
 				<p>
 					Include Datastar with a single
 					<span class="text-lg font-bold text-primary">
-						{ humanize.CommafWithDigits( datastar.VersionClientByteSizeGzip / 1024.0, 1) }KiB
+						{ humanize.CommafWithDigits( datastar.VersionClientByteSizeGzip / 1024.0, 1) } KiB
 					</span>
 					file and start adding reactivity to your frontend immediately. Write your backend in the language of your choice!  Official SDKs are available to help you get up and running even faster, with more languages on the way.
 					<div class="flex flex-wrap justify-center gap-2">
@@ -79,7 +79,7 @@ templ Home() {
 							</code>
 							<button
 								class="btn btn-primary btn-ghost"
-								data-on-click={ fmt.Sprintf("clipboard('%s')", cdnText) }
+								data-on-click={ fmt.Sprintf("@clipboard('%s')", cdnText) }
 							>
 								@icon("material-symbols:content-copy")
 							</button>
@@ -116,7 +116,7 @@ templ Home() {
 					</a>
 				</div>
 				<p>
-					At only 12 KiB, Datastar is smaller than Alpine.js and htmx, yet it provides the functionality of both libraries combined. The package size is not <em>just</em> a vanity metric. By embracing simplicity, and building on first principles, everything becomes cleaner and leaner. But don’t take our word for it – <a href="https://github.com/starfederation/datastar/tree/main/library">explore the source code</a> and see for yourself! 
+					At only { humanize.CommafWithDigits( datastar.VersionClientByteSizeGzip / 1024.0, 1) } KiB, Datastar is smaller than Alpine.js and htmx, yet it provides the functionality of both libraries combined. The package size is not <em>just</em> a vanity metric. By embracing simplicity, and building on first principles, everything becomes cleaner and leaner. But don’t take our word for it – <a href="https://github.com/starfederation/datastar/tree/main/library">explore the source code</a> and see for yourself!
 				</p>
 				<img class="w-full" src="/chart"/>
 				<div
@@ -199,7 +199,7 @@ templ TodosMVCView(mvc *TodoMVC) {
 										data-on-click={ datastar.PostSSE("/api/todos/-1/toggle") }
 										data-testid="toggle_all_todos"
 										data-indicator="toggleAllFetching"
-										data-attrs-disabled="toggleAllFetching"
+										data-attrs-disabled="$toggleAllFetching"
 									>
 										@icon("material-symbols:checklist")
 									</button>
@@ -286,10 +286,10 @@ templ TodoInput(i int) {
 		placeholder="What needs to be done?"
 		data-bind-input
 		data-on-keydown={ fmt.Sprintf(`
-			if (evt.key !== 'Enter' || !input.value.trim().length) return;
-			sse('/api/todos/%d/edit', {method:'put'});
-			input.value = '';
-		`, i) }
+			if (evt.key !== 'Enter' || !$input.trim().length) return;
+			%s;
+			$input = '';
+		`, datastar.PutSSE("/api/todos/%d/edit",i) ) }
 		if i >= 0 {
 			data-on-click__outside={ datastar.PutSSE("/api/todos/cancel") }
 		}
@@ -335,7 +335,7 @@ templ TodoRow(mode TodoViewMode, todo *Todo, i int, isEditing bool) {
 				data-on-click={ datastar.DeleteSSE("/api/todos/%d", i) }
 				data-testid={ fmt.Sprintf("delete_todo%d", i) }
 				data-indicator={ fetchingSignalName }
-				data-attrs-disabled={ fetchingSignalName + ".value" }
+				data-attrs-disabled={ fetchingSignalName + "" }
 			>
 				@icon("material-symbols:close")
 			</button>

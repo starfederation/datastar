@@ -58,14 +58,14 @@ type DsAction =
     | Script of string
     static member AsString action =
         match action with
-        | Get url -> $"sse('{url}', {{method:'get'}})"
-        | Post url -> $"sse('{url}', {{method:'post'}})"
-        | Put url -> $"sse('{url}', {{method:'put'}})"
-        | Patch url -> $"sse('{url}', {{method:'patch'}})"
-        | Delete url -> $"sse('{url}', {{method:'delete'}})"
-        | SetAll(pathPrefix, value) -> $"setAll('{pathPrefix}', {value})"
-        | ToggleAll pathPrefix -> $"toggleAll('{pathPrefix}')"
-        | Clipboard text -> $"clipboard('{text}')"
+        | Get url -> $"@sse('{url}', {{method:'get'}})"
+        | Post url -> $"@sse('{url}', {{method:'post'}})"
+        | Put url -> $"@sse('{url}', {{method:'put'}})"
+        | Patch url -> $"@sse('{url}', {{method:'patch'}})"
+        | Delete url -> $"@sse('{url}', {{method:'delete'}})"
+        | SetAll(pathPrefix, value) -> $"@setAll('{pathPrefix}', {value})"
+        | ToggleAll pathPrefix -> $"@toggleAll('{pathPrefix}')"
+        | Clipboard text -> $"@clipboard('{text}')"
         | Script script -> script
 
 type IntersectsModifier =

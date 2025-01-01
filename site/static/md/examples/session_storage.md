@@ -2,7 +2,7 @@
 
 ## Demo
 
-<div data-signals="{sessionId:1234, count:0}" data-persist__session data-on-raf="count.value++">Look at your DevTools session storage!</div>
+<div data-signals="{sessionId:1234, count:0}" data-persist__session data-on-raf="$count++">Look at your DevTools session storage!</div>
 
 ## Explanation
 
@@ -10,7 +10,7 @@
 <div
   data-signals="{sessionId:1234, count:0}"
   data-persist__session
-  data-on-raf="count.value++"
+  data-on-raf="$count++"
 ></div>
 ```
 

@@ -4,7 +4,7 @@
 
 ## Demo
 
-<div id="container" data-on-load="sse('/examples/templ_counter/data')">
+<div id="container" data-on-load="@get('/examples/templ_counter/data')">
 </div>
 
 ## Explanation

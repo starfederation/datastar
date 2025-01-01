@@ -18,7 +18,7 @@ type runnerFn func(name string, fn func(t *testing.T, page *rod.Page))
 func setupPageTest(t *testing.T, subURL string, gen func(runner runnerFn)) {
 	t.Parallel()
 	browser := rod.New().MustConnect()
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	port, err := toolbelt.FreePort()

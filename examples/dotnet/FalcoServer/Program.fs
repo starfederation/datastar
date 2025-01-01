@@ -62,7 +62,7 @@ let main args =
                 })
             get "/target" (fun ctx ->
                 let today = DateTime.Now.ToString("%y-%M-%d %h:%m:%s");
-                Response.ofMergePlainText $"""<div id='target'><span class="mr-2" id='date'><b>{today}</b><button class="btn" data-on-click="sse('/removeDate')">Remove</button></span></div>""" ctx
+                Response.ofMergePlainText $"""<div id='target'><span class="mr-2" id='date'><b>{today}</b><button class="btn" data-on-click="@sse('/removeDate')">Remove</button></span></div>""" ctx
                 )
             get "/removeDate" (Response.ofRemoveFragments ("#date" |> Selector.create))
             get "/feed" (fun ctx -> task {

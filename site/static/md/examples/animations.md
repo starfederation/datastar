@@ -8,7 +8,7 @@ Datastar is designed to allow you to use CSS transitions to add smooth animation
 
 Datastar also allows you to use the new View Transitions API for creating animations.
 
-<div id="animations" data-on-load="sse('/examples/animations/data')"></div>
+<div id="animations" data-on-load="@get('/examples/animations/data')"></div>
 
 ## Basic CSS Animations
 
@@ -67,10 +67,10 @@ Building on the last example, we can fade in the new content the same way, start
 One of the nice features for reactivity is to show a spinner when a request is in flight. On any element that is using backend actions you can add a `data-indicator` attribute to show a spinner when the request is in flight. This can be done like so:
 
 ```html
-<div data-show="fetching.value">Spinner</div>
+<div data-show="$fetching">Spinner</div>
 <button
   id="submit_request_in_flight"
-  data-on-click="sse('/examples/animations/data/request_in_flight', {method:'post'})"
+  data-on-click="@post('/examples/animations/data/request_in_flight')"
   data-indicator-fetching
 >
   Submit

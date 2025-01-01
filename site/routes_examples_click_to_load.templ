@@ -25,7 +25,7 @@ templ ClickToLoadMoreButton(input *ClickToLoadSignals) {
 		id="more_btn"
 		class="w-full btn btn-success"
 		data-on-click={ fmt.Sprintf(
-			"console.log('click to load more');offset.value=%d; limit.value=%d; sse('/examples/click_to_load/data', {method:'get',useViewTransitions:false})",
+			"console.log('click to load more');$offset=%d; $limit=%d; @get('/examples/click_to_load/data')",
 			input.Offset+input.Limit,input.Limit,
 			) }
 	>

@@ -43,7 +43,7 @@ func RunBlocking(port int, readyCh chan struct{}) toolbelt.CtxErrFunc {
 
 		router := chi.NewRouter()
 
-		router.Use(middleware.Recoverer)
+		router.Use(middleware.Recoverer, middleware.Logger)
 
 		if err := setupRoutes(ctx, router); err != nil {
 			return fmt.Errorf("error setting up routes: %w", err)

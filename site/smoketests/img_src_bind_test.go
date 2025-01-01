@@ -2,6 +2,7 @@ package smoketests
 
 import (
 	"testing"
+	"time"
 
 	"github.com/go-rod/rod"
 	"github.com/stretchr/testify/assert"
@@ -15,6 +16,8 @@ func TestExampleImgSrcBind(t *testing.T) {
 
 			page.MustElement("#file_upload > button").MustClick()
 			page.MustWaitIdle()
+
+			time.Sleep(100 * time.Millisecond)
 			result := page.MustElement("#file_upload > img").MustProperty("src").Str()
 
 			assert.NotEqual(t, initial, result)
