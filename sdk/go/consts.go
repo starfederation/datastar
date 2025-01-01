@@ -7,8 +7,8 @@ import "time"
 const (
     DatastarKey = "datastar"
     Version                   = "0.22.0"
-    VersionClientByteSize     = 35276
-    VersionClientByteSizeGzip = 12920
+    VersionClientByteSize     = 35348
+    VersionClientByteSizeGzip = 12946
 
     //region Default durations
 

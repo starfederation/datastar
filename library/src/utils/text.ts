@@ -13,6 +13,8 @@ export const camelize = (str: string) =>
     )
     .replace(/\s+/g, '')
 
-export const jsStrToObject = (raw: string) => {
-  return new Function(`return Object.assign({}, ${raw})`)()
-}
+export const jsStrToObject = (raw: string) =>
+  new Function(`return Object.assign({}, ${raw})`)()
+
+export const trimDollarSignPrefix = (str: string) =>
+  str.startsWith('$') ? str.slice(1) : str
