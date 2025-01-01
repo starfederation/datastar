@@ -1,4 +1,4 @@
-import { DATASTAR } from '~/engine/consts'
+import { DATASTAR } from '../engine/consts'
 
 export class Hash {
   #value = 0

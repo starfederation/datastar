@@ -3,8 +3,12 @@
 // Slug: Bind attributes to expressions
 // Description: Any attribute can be bound to an expression. The attribute will be updated reactively whenever the expression signal changes.
 
-import { dsErr } from '~/engine/errors'
-import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
+import { dsErr } from '../../../../engine/errors'
+import {
+  type AttributePlugin,
+  PluginType,
+  Requirement,
+} from '../../../../engine/types'
 
 const dataURIRegex = /^data:(?<mime>[^;]+);base64,(?<contents>.*)$/
 const updateEvents = ['change', 'input', 'keydown']
@@ -52,7 +56,7 @@ export const Bind: AttributePlugin = {
       }
     }
 
-    signals.upsert(signalName, signalDefault)
+    signals.upsertIfMissing(signalName, signalDefault)
 
     setFromSignal = () => {
       const hasValue = 'value' in el
@@ -126,14 +130,9 @@ export const Bind: AttributePlugin = {
         )
 
         signals.setValue(signalName, allContents)
-        const mimeName = `${signalName}Mimes`
-        const nameName = `${signalName}Names`
-        if (signals.exists(mimeName)) {
-          signals.upsert(mimeName, allMimes)
-        }
-        if (signals.exists(nameName)) {
-          signals.upsert(nameName, allNames)
-        }
+        signals.setValue(`${signalName}Mimes`, allMimes)
+        signals.setValue(`${signalName}Names`, allNames)
+
         return
       }
 

@@ -1,12 +1,12 @@
-// Icon: ic:baseline-get-app
-// Slug: Use a GET request to fetch data from a server using Server-Sent Events matching the Datastar SDK interface
+// Icon: material-symbols:delete-outline
+// Slug: Use a DELETE request to fetch data from a server using Server-Sent Events matching the Datastar SDK interface
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.
 
 import {
   type ActionPlugin,
   PluginType,
   type RuntimeContext,
-} from '~/engine/types'
+} from '../../../../engine/types'
 import { type SSEArgs, sse } from './sse'
 
 export const DELETE: ActionPlugin = {

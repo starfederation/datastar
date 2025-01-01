@@ -6,7 +6,7 @@ import {
   type ActionPlugin,
   PluginType,
   type RuntimeContext,
-} from '~/engine/types'
+} from '../../../../engine/types'
 import { type SSEArgs, sse } from './sse'
 
 export const GET: ActionPlugin = {

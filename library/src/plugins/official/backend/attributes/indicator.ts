@@ -2,7 +2,11 @@
 // Slug: Sets the indicator signal used when fetching data via SSE
 // Description: must be a valid signal name
 
-import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
+import {
+  type AttributePlugin,
+  PluginType,
+  Requirement,
+} from '../../../../engine/types'
 import {
   DATASTAR_SSE_EVENT,
   type DatastarSSEEvent,
@@ -17,7 +21,7 @@ export const Indicator: AttributePlugin = {
   valReq: Requirement.Exclusive,
   onLoad: ({ value, signals, el, key }) => {
     const signalName = key ? key : value
-    const signal = signals.upsert(signalName, false)
+    const signal = signals.upsertIfMissing(signalName, false)
     const watcher = (event: CustomEvent<DatastarSSEEvent>) => {
       const {
         type,

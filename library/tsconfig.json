@@ -17,10 +17,6 @@
     "noFallthroughCasesInSwitch": true,
     "declaration": true,
     "outDir": "dist",
-    "baseUrl": "./",
-    "paths": {
-      "~/*": ["./src/*"]
-    }
   },
   "include": ["src/**/*.ts"]
 }
