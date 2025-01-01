@@ -128,10 +128,10 @@ export const Bind: AttributePlugin = {
         signals.setValue(signalName, allContents)
         const mimeName = `${signalName}Mimes`
         const nameName = `${signalName}Names`
-        if (mimeName in signals) {
+        if (signals.exists(mimeName)) {
           signals.upsert(mimeName, allMimes)
         }
-        if (nameName in signals) {
+        if (signals.exists(nameName)) {
           signals.upsert(nameName, allNames)
         }
         return
