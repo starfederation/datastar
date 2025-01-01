@@ -5,7 +5,7 @@ An invalid option value `contentType: '{ contentType }'` was passed into the `ss
 Example:
 
 ```html
-<button data-on-click="sse('/endpoint', {contentType: 'form'})"></div>
+<button data-on-click="@sse('/endpoint', {contentType: 'form'})"></div>
 ```
 
 See the docs on the [`sse()`](/reference/action_plugins#sse) action.

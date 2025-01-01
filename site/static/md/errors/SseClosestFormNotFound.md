@@ -6,14 +6,14 @@ Example using a wrapping form:
 
 ```html
 <form>
-    <button data-on-click="sse('/endpoint', {contentType: 'form'})"></div>
+    <button data-on-click="@sse('/endpoint', {contentType: 'form'})"></div>
 </form>
 ```
 
 Example using a selector:
 
 ```html
-<button data-on-click="sse('/endpoint', {contentType: 'form', selector: '#myform'})"></div>
+<button data-on-click="@sse('/endpoint', {contentType: 'form', selector: '#myform'})"></div>
 ```
 
 See the docs on the [`sse()`](/reference/action_plugins#sse) action.

@@ -6,7 +6,7 @@
 
 <div
     id="edit_row"
-    data-on-load="sse('/examples/edit_row/data')"
+    data-on-load="@sse('/examples/edit_row/data')"
 >
 </div>
 
@@ -19,7 +19,7 @@ This example shows how to implement editable rows. First let’s look at the row
   <td>Joe Smith<//td>
   <td>joe@smith.org</td>
   <td>
-    <button data-on-click="$editRowIndex=0;sse('/examples/edit_row/edit')" >Edit</button>
+    <button data-on-click="$editRowIndex=0;@sse('/examples/edit_row/edit')" >Edit</button>
   </td>
 </tr>
 ```
@@ -37,8 +37,8 @@ Finally, here is what the row looks like when the data is being edited:
     <input data-bind-email type="text" />
   </td>
   <td>
-    <button data-on-click="sse('/examples/edit_row/data')">Cancel</button>
-    <button data-on-click="sse('/examples/edit_row/edit',{method:'patch'})">Save</button>
+    <button data-on-click="@sse('/examples/edit_row/data')">Cancel</button>
+    <button data-on-click="@sse('/examples/edit_row/edit',{method:'patch'})">Save</button>
   </td>
 </tr>
 ```

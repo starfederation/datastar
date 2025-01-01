@@ -333,7 +333,7 @@ Creates a signal and sets its value to `true` while an SSE request request is in
 
 ```html
 <button
-  data-on-click="sse('/endpoint')"
+  data-on-click="@sse('/endpoint')"
   data-indicator-fetching
 ></button>
 ```
@@ -342,7 +342,7 @@ This can be useful for show a loading spinner, disabling a button, etc.
 
 ```html
 <button
-  data-on-click="sse('/endpoint')"
+  data-on-click="@sse('/endpoint')"
   data-indicator-fetching
   data-attr-disabled="fetching"
 ></button>

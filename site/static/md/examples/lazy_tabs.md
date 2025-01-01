@@ -6,7 +6,7 @@
 
 <div
     id="lazy_tabs"
-    data-on-load="sse('/examples/lazy_tabs/data')"
+    data-on-load="@sse('/examples/lazy_tabs/data')"
 >
 </div>
 

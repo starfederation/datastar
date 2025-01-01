@@ -70,7 +70,7 @@ The beauty of this is that you don't need to write a bunch of code to set up and
 Actions are helper functions that can be used in Datastar expressions. They allow you to perform logical operations without having to write procedural JavaScript.
 
 ```html
-<button data-on-click="setAll('foo.', mysignal.toUpperCase()"></button>
+<button data-on-click="@setAll('foo.', mysignal.toUpperCase()"></button>
 ```
 
 ### Backend Actions
@@ -78,7 +78,7 @@ Actions are helper functions that can be used in Datastar expressions. They allo
 The [`sse()`](/reference/action_plugins#sse) action sends a `fetch` request to the backend, and expects an event stream response containing zero or more [Datastar SSE events](/reference/sse_events).
 
 ```html
-<button data-on-click="sse('/endpoint')"></button>
+<button data-on-click="@sse('/endpoint')"></button>
 ```
 
 An event stream response is nothing more than a response containing a `Content-Type: text/event-stream` header.

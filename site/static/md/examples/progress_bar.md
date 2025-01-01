@@ -6,7 +6,7 @@
 
 <div
     id="progress_bar"
-    data-on-load="sse('/examples/progress_bar/data',{openWhenHidden:true})"
+    data-on-load="@sse('/examples/progress_bar/data',{openWhenHidden:true})"
 >
 </div>
 
@@ -15,7 +15,7 @@
 ```html
 <div
     id="progress_bar"
-    data-on-load="sse('/examples/progress_bar/data',{openWhenHidden:true})"
+    data-on-load="@sse('/examples/progress_bar/data',{openWhenHidden:true})"
 >
 </div>
 

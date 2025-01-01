@@ -11,7 +11,7 @@ templ CSRFDemo(csrf string) {
 		<button
 			class="btn btn-primary"
 			data-on-click={ fmt.Sprintf(
-				"sse('/examples/csrf/data', {method: 'post', headers: {'X-CSRF-Token':'%s'}})",
+				"@sse('/examples/csrf/data', {method: 'post', headers: {'X-CSRF-Token':'%s'}})",
 				csrf,
 			) }
 		>Send update</button>

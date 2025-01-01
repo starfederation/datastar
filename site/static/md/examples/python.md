@@ -21,14 +21,14 @@ def send_index():
     <h2>Python/Starlette + Datastar Example</h2>
     <main class="container" id="main" data-signals=\'{json.dumps(signals)}\'>
         <input type="text" placeholder="Send to server..." data-bind="input"/>
-        <button data-on-click="sse('/get')">Send State Roundtrip</button>
-        <button data-on-click="sse('/target')">Target HTML Element</button>
+        <button data-on-click="@sse('/get')">Send State Roundtrip</button>
+        <button data-on-click="@sse('/target')">Target HTML Element</button>
         <button data-on-click="$show=!$show">Toggle Feed</button>
         <div id="output" data-text="$output"></div>
         <div id="{target}"></div>
         <div data-show="$show">
             <span>Feed from server: </span>
-            <span id="feed" data-on-load="sse('/feed')"></span>
+            <span id="feed" data-on-load="@sse('/feed')"></span>
         </div></main></body></html>
 '''
     return HTMLResponse(index_page)

@@ -5,7 +5,7 @@ No form with the selector `{ selector }` could be found in the DOM. When specify
 Example:
 
 ```html
-<button data-on-click="sse('/endpoint', {contentType: 'form', selector: '#myform'})"></div>
+<button data-on-click="@sse('/endpoint', {contentType: 'form', selector: '#myform'})"></div>
 ```
 
 See the docs on the [`sse()`](/reference/action_plugins#sse) action.

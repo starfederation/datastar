@@ -6,7 +6,7 @@
     id="contents"
     class="flex flex-col gap-4 p-4 w-full"
     data-signals="{_contents: 'bad apple frames go here', percentage: 0}"
-    data-on-load="sse('/examples/bad_apple/updates')"
+    data-on-load="@sse('/examples/bad_apple/updates')"
 >
     <div class="flex gap-4 items-center font-mono">
         <input
@@ -39,7 +39,7 @@ We take the [already converted](https://github.com/trung-kieen/bad-apple-ascii) 
 <div
   id="contents"
   data-signals="{_contents: 'bad apple frames go here', percentage: 0}"
-  data-on-load="sse('/examples/bad_apple/updates')"
+  data-on-load="@sse('/examples/bad_apple/updates')"
 >
   <div>
     <input type="range" min="1" max="100" data-bind="percentage" disabled />

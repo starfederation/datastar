@@ -2,7 +2,7 @@
 
 ## Demo
 
-<div data-on-load="sse('/examples/dispatch_custom_event/events')">
+<div data-on-load="@sse('/examples/dispatch_custom_event/events')">
     <div>Custom event "example-event-from-server" detail from server:</div>
     <pre class="mockup-code" id="container"></pre>
 </div>

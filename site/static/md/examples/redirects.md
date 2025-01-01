@@ -2,7 +2,7 @@
 
 ## Demo
 
-<div id="update" data-on-load="sse('/examples/redirects/data')">
+<div id="update" data-on-load="@sse('/examples/redirects/data')">
 </div>
 
 ## Explanation

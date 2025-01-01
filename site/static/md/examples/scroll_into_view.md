@@ -14,5 +14,5 @@ We are highlighting the middle paragraph of the page to make it easier to see th
 
 <div
   id="replaceMe"
-  data-on-load="sse('/examples/scroll_into_view/data')"
+  data-on-load="@sse('/examples/scroll_into_view/data')"
   >No session data</div>

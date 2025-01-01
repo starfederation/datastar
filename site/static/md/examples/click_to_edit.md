@@ -6,7 +6,7 @@
 
 <div
     id="contact_1"
-    data-on-load="sse('/examples/click_to_edit/contact/1')"
+    data-on-load="@sse('/examples/click_to_edit/contact/1')"
 >
 
 </div>
@@ -22,10 +22,10 @@ The click to edit pattern provides a way to offer inline editing of all or part 
   <label>Last Name: Doe</label>
   <label>Email: joe@blow.com</label>
   <div>
-    <button data-on-click="sse('/examples/click_to_edit/contact/1/edit')">
+    <button data-on-click="@sse('/examples/click_to_edit/contact/1/edit')">
       Edit
     </button>
-    <button data-on-click="sse('/examples/click_to_edit/contact/1/reset')">
+    <button data-on-click="@sse('/examples/click_to_edit/contact/1/reset')">
       Reset
     </button>
   </div>
@@ -58,10 +58,10 @@ This returns a form that can be used to edit the contact
     <input type="text" data-bind="email" />
   </div>
   <div>
-    <button data-on-click="sse('/examples/click_to_edit/contact/1',{method:'put'})">
+    <button data-on-click="@sse('/examples/click_to_edit/contact/1',{method:'put'})">
       Save
     </button>
-    <button data-on-click="sse('/examples/click_to_edit/contact/1')">
+    <button data-on-click="@sse('/examples/click_to_edit/contact/1')">
       Cancel
     </button>
   </div>

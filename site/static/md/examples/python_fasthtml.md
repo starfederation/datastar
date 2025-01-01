@@ -59,7 +59,7 @@ def page_main(signals):
     Div(id=f"{target}"),
     Div(
       Span("Feed from server: "),
-      Span(id="feed", **{'data-on-load':"sse('/feed')"}),
+      Span(id="feed", **{'data-on-load':"@sse('/feed')"}),
       **{"data-show__duration.500ms":"$show"},
     ),
   ),

@@ -18,7 +18,7 @@ transition: all 1.2s;
 
 <div
     id="bulk_update"
-    data-on-load="sse('/examples/bulk_update/data')"
+    data-on-load="@sse('/examples/bulk_update/data')"
 >
 </div>
 

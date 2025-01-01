@@ -5,7 +5,7 @@
 <div
      data-signals='{"existingSignals":"this will persist in the signals even without network"}'
      data-persist
-     data-on-online__window="console.log('online, syncing'); sse('/examples/offline_sync/sync', {method: 'put'})"
+     data-on-online__window="console.log('online, syncing'); @sse('/examples/offline_sync/sync', {method: 'put'})"
      data-on-offline__window="console.log('offline')"
 >
      <div id="results">Go offline, then online to see the signals sync</div>
@@ -17,7 +17,7 @@
 <div
   data-signals='{"existingSignals":"this will persist in the signals even without network"}'
   data-persist
-  data-on-online__window="console.log('online, syncing'); sse('/examples/offline_sync/sync', {method: 'put'})"
+  data-on-online__window="console.log('online, syncing'); @sse('/examples/offline_sync/sync', {method: 'put'})"
   data-on-offline__window="console.log('offline')"
 >
   <div id="results"></div>

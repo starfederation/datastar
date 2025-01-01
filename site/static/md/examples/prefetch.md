@@ -2,14 +2,14 @@
 
 ## Demo
 
-<div id="carousel" data-on-load="sse('/examples/prefetch/load')"></div>
+<div id="carousel" data-on-load="@sse('/examples/prefetch/load')"></div>
 
 ## Explanation
 
 We are loading Pokemon images in a carousel.  Know how much people love Pokemon, we are prefetching the images before they are needed.  This way, the images are already in the browser cache when they are needed.
 
 ```html
-<div id="carousel" data-on-load="sse('/examples/prefetch/load')">
+<div id="carousel" data-on-load="@sse('/examples/prefetch/load')">
 ```
 
 Since we have SSE we can easily load the initial page content then prefetch the images after

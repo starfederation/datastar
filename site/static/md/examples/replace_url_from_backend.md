@@ -3,7 +3,7 @@
 ## Demo
 
 <div
-    data-on-load="sse('/examples/replace_url_from_backend/updates')"
+    data-on-load="@sse('/examples/replace_url_from_backend/updates')"
 ></div>
 
 ## Explanation
