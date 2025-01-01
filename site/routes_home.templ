@@ -13,8 +13,8 @@ templ Home() {
 	}}
 	{{
 		usageSample := `<input data-bind-title />
-<div data-text="title.toUpperCase()"></div>
-<button data-on-click="sse('/endpoint', {method: 'post'})">Save</button>`
+<div data-text="$title.toUpperCase()"></div>
+<button data-on-click="@sse('/endpoint', {method: 'post'})">Save</button>`
 	}}
 	@Page(
 		"Datastar - The hypermedia framework.",
