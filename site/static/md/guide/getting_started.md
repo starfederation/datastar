@@ -85,7 +85,7 @@ To see this in action, we can use the [`data-text`](/reference/attribute_plugins
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
-            <div data-text="$input1" class="output"></div>
+            <div data-text="$input1 + '🖕JS_id_DS🚀'" class="output"></div>
         </div>
     </div>
 </div>
