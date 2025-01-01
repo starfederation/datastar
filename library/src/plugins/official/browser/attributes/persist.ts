@@ -9,6 +9,7 @@ import {
   type NestedValues,
   PluginType,
 } from '../../../../engine/types'
+import { stripDollarSignPrefix } from '../../../../utils/text'
 
 const SESSION = 'session'
 
@@ -21,7 +22,8 @@ export const Persist: AttributePlugin = {
       key = DATASTAR
     }
     const storage = mods.has(SESSION) ? sessionStorage : localStorage
-    const paths = value.split(/\s+/).filter((p) => p !== '')
+    let paths = value.split(/\s+/).filter((p) => p !== '')
+    paths = paths.map((p) => stripDollarSignPrefix(p))
 
     const storageToSignals = () => {
       const data = storage.getItem(key) || '{}'

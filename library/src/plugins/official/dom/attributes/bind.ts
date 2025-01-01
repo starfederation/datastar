@@ -9,6 +9,7 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
+import { stripDollarSignPrefix } from '../../../../utils/text'
 
 const dataURIRegex = /^data:(?<mime>[^;]+);base64,(?<contents>.*)$/
 const updateEvents = ['change', 'input', 'keydown']
@@ -20,7 +21,7 @@ export const Bind: AttributePlugin = {
   valReq: Requirement.Exclusive,
   onLoad: (ctx) => {
     const { el, value, key, signals, effect } = ctx
-    const signalName = key ? key : value
+    const signalName = key ? key : stripDollarSignPrefix(value)
 
     let setFromSignal = () => {}
     let el2sig = () => {}

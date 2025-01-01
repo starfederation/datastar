@@ -8,6 +8,7 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
+import { stripDollarSignPrefix } from '../../../../utils/text'
 
 // Sets the value of the element
 export const Ref: AttributePlugin = {
@@ -16,7 +17,7 @@ export const Ref: AttributePlugin = {
   keyReq: Requirement.Exclusive,
   valReq: Requirement.Exclusive,
   onLoad: ({ el, key, value, signals }) => {
-    const signalName = key ? key : value
+    const signalName = key ? key : stripDollarSignPrefix(value)
     signals.setValue(signalName, el)
     return () => signals.setValue(signalName, null)
   },
