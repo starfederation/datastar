@@ -3,7 +3,7 @@
 ## Demo
 
 <div
-     data-signals='{"existingSignals":"this already exists"}'
+     data-signals='{"existingSignals": "this already exists"}'
 >
      <button
           class="btn btn-success"

@@ -197,13 +197,13 @@ Persists signals in Local Storage. This is useful for storing values between pag
 If one or more space-separated values are provided as a string, only those signals are persisted.
 
 ```html
-<div data-persist="'foo bar'"></div>
+<div data-persist="foo bar"></div>
 ```
 
 If a key is provided, it will be used as the key when saving in storage, otherwise `datastar` will be used.
 
 ```html
-<div data-persist-mykey="'foo bar'"></div>
+<div data-persist-mykey="foo bar"></div>
 ```
 
 #### Modifiers
