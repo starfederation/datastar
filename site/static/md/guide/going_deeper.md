@@ -22,7 +22,7 @@ else {
 Datastar allows us to write this logic declaratively while embracing locality-of-behavior, by placing it directly on the element we want to affect.
 
 ```html
-<div data-class-bold="foo == 1"></div>
+<div data-class-bold="$foo == 1"></div>
 ```
 
 ### 2. Signals
@@ -32,15 +32,15 @@ Datastar uses signals, provided by [Preact Signals](https://preactjs.com/guide/v
 Signals can be created and modified using `data-*` attributes on the frontend, or events sent from the backend. They can also be used in Datastar expressions (expressions evaluated by Datastar attributes and actions).
 
 ```html
-<div data-signals-foo="fizz"></div>
-<div data-text="foo"></div>
-<button data-on-click="foo = ''"></button>
+<div data-signals-foo="hello"></div>
+<div data-text="$foo"></div>
+<button data-on-click="$foo = ''"></button>
 ```
 
-Behind the scenes, Datastar converts `foo` to `ctx.signals.foo`, and then evaluates the expression in a sandboxed context. This means that JavaScript can be used in Datastar expressions.
+Behind the scenes, Datastar converts `$foo` to `ctx.signals.signal('foo').value`, and then evaluates the expression in a sandboxed context. This means that JavaScript can be used in Datastar expressions.
 
 ```html
-<button data-on-click="foo = foo.toUpperCase()"></button>
+<button data-on-click="$foo = $foo.toUpperCase()"></button>
 ```
 
 ### 3. Nestable Signals
@@ -70,12 +70,12 @@ The beauty of this is that you don't need to write a bunch of code to set up and
 Actions are helper functions that can be used in Datastar expressions. They allow you to perform logical operations without having to write procedural JavaScript.
 
 ```html
-<button data-on-click="@setAll('foo.', mysignal.toUpperCase()"></button>
+<button data-on-click="@setAll('foo.', $mysignal.toUpperCase()"></button>
 ```
 
 ### Backend Actions
 
-The [`sse()`](/reference/action_plugins#sse) action sends a `fetch` request to the backend, and expects an event stream response containing zero or more [Datastar SSE events](/reference/sse_events).
+The [`@sse()`](/reference/action_plugins#sse) action sends a `fetch` request to the backend, and expects an event stream response containing zero or more [Datastar SSE events](/reference/sse_events).
 
 ```html
 <button data-on-click="@sse('/endpoint')"></button>

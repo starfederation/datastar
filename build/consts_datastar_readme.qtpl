@@ -22,8 +22,8 @@ Then start adding frontend reactivity using declarative <code>data-*</code> attr
 
 ```html
 <input data-bind-title type="text">
-<div data-text="title.value.toUpperCase()"></div>
-<button data-on-click="sse('/endpoint', {method: 'post'})">Save</button>
+<div data-text="@title.toUpperCase()"></div>
+<button data-on-click="@post('/endpoint')">Save</button>
 ```
 
 Visit the [Datastar Website »](https://data-star.dev/)

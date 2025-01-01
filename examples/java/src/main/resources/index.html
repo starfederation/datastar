@@ -23,7 +23,7 @@
         <!-- Rocket Section -->
         <div class="col-span-1 lg:col-span-2 bg-white p-4 rounded shadow flex flex-col items-center">
             <div class="mb-4">This will use <b>executeScript</b> if you open the dev tools console and click the rocket.</div>
-            <div data-show="show.value">
+            <div data-show="$show">
                 <span data-on-click="sse('/executeScript', {method: 'get'})" class="text-[9rem] cursor-pointer">&#x1F680;</span>
                 <hr class="my-4 border-gray-300">
                 <span class="font-mono text-lg">
@@ -32,7 +32,7 @@
             </div>
             <!-- Toggle Rocket Button -->
             <div class="bg-gray-100 p-4 rounded">
-                <button class="w-full p-3 bg-purple-700 text-white font-semibold rounded hover:opacity-80 transition" data-on-click="show.value=!show.value">Toggle Rocket</button>
+                <button class="w-full p-3 bg-purple-700 text-white font-semibold rounded hover:opacity-80 transition" data-on-click="$show=!$show">Toggle Rocket</button>
             </div>
         </div>
 
@@ -51,7 +51,7 @@
                 <label for="input">Enter text:</label>
                 <input id=input type="text" placeholder="input:" data-bind="input" class="w-full p-2 border rounded" />
                 <button class="w-full p-3 bg-purple-700 text-white font-semibold rounded hover:opacity-80 transition" data-on-click="sse('/patch', {method: 'get'})">Merge Signal</button>
-                <div class="text-sm mt-2">Output Signal State: <span data-text="output.value" class="mt-4"></span></div>
+                <div class="text-sm mt-2">Output Signal State: <span data-text="$output" class="mt-4"></span></div>
             </div>
 
             <!-- Remove User Signal Button -->

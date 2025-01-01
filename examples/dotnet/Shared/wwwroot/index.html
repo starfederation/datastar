@@ -15,7 +15,7 @@
 
         <div class="flex">
             <div class="flex-initial mh-5">
-                <div data-show="show_rocket.value" class="place-content-center">
+                <div data-show="$show_rocket" class="place-content-center">
                     <span class="text-9xl mx-5">
                        &#x1F680;
                     </span>
@@ -29,10 +29,10 @@
             <div class="flex-initial mx-5">
                 <input type="text" class="ring-2 ring-white rounded-md bg-transparent pl-2" placeholder="input:" data-bind="input"/><br>
                 <br>
-                <button class="btn btn-primary m-1" data-on-click="sse('/patch')">Patch State</button><br>
-                <button class="btn btn-primary m-1" data-on-click="sse('/target')">Target HTML Element</button><br>
-                <button class="btn btn-primary m-1" data-on-click="show_rocket.value = !show_rocket.value">Toggle Rocket</button><br>
-                <button class="btn btn-primary m-1" data-on-click="sse('/goto_more_examples')" data-show="more_examples.value">More Examples</button>
+                <button class="btn btn-primary m-1" data-on-click="@get('/patch')">Patch State</button><br>
+                <button class="btn btn-primary m-1" data-on-click="@get('/target')">Target HTML Element</button><br>
+                <button class="btn btn-primary m-1" data-on-click="$show_rocket = !$show_rocket">Toggle Rocket</button><br>
+                <button class="btn btn-primary m-1" data-on-click="@get('/goto_more_examples')" data-show="$more_examples">More Examples</button>
             </div>
             <div class="flex-1">
                 <pre data-text="JSON.stringify(ctx.signals,null,2)"></pre>

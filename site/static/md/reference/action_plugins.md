@@ -8,9 +8,9 @@ Datastar provides the following actions, that can be used in Datastar expression
 
 Allow for the integration of any backend service that supports SSE.
 
-### `sse()`
+### `@sse()`
 
-Arguments: `sse(url: string, options={})`
+Arguments: `@sse(url: string, options={})`
 
 Sends a `fetch` request to the backend and merges the response with the current DOM and signals. The URL can be any valid URL and the response must contain zero or more [Datastar SSE events](/reference/sse_events).
 
@@ -24,7 +24,7 @@ It is possible to send form encoded requests by setting the `contentType` option
 
 #### Options
 
-The `sse()` action takes a second argument of options.
+The `@sse()` action takes a second argument of options.
 
 - `method` - The HTTP method to use. Defaults to `get`.
 - `contentType` - The type of content to send. A value of `json` sends all signals in a JSON request. A value of `form` tells the action to look for the closest form to the element on which it is placed (unless a `selector` option is provided), perform validation on the form elements, and send them to the backend using a form request (no signals are sent). Defaults to `json`.
@@ -49,15 +49,28 @@ The `sse()` action takes a second argument of options.
 })"></div>
 ```
 
+#### Aliases
+
+The following action aliases are available for each of the methods: `@get()`, `@post()`, `@put()`, `@patch()` and `@delete()`.
+
+```html
+<button data-on-click="@get('/actions/quiz')">
+  Get question
+</button>
+<button data-on-click="@post('/actions/quiz')">
+  Submit answer
+</button>
+```
+
 ## Logic Plugins
 
 [Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/logic/actions)
 
 Provides actions for performing logic operations.
 
-### `setAll()`
+### `@setAll()`
 
-Arguments: `setAll(pathPrefix: string, value: any)`
+Arguments: `@setAll(pathPrefix: string, value: any)`
 
 Sets all the signals that start with the prefix to the expression provided in the second argument. This is useful for setting all the values of a nested signal at once.
 
@@ -65,9 +78,9 @@ Sets all the signals that start with the prefix to the expression provided in th
 <div data-on-change="@setAll('foo.', true)"></div>
 ```
 
-### `toggleAll()`
+### `@toggleAll()`
 
-Arguments: `toggleAll(pathPrefix: string)`
+Arguments: `@toggleAll(pathPrefix: string)`
 
 Toggles all the signals that start with the prefix. This is useful for toggling all the values of a nested signal at once.
 
