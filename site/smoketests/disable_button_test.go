@@ -15,7 +15,7 @@ func TestExampleDisableButton(t *testing.T) {
 			btn := page.MustElement("#target")
 			initial := btn.MustAttribute("data-attr-disabled")
 			assert.NotNil(t, initial)
-			assert.Equal(t, "shouldDisable", *initial)
+			assert.Equal(t, "$shouldDisable", *initial)
 
 			btn.MustClick()
 			result := btn.MustAttribute("disabled")

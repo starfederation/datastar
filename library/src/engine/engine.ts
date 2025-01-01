@@ -269,7 +269,7 @@ export class Engine {
       userExpression = userExpression.replace(k, v)
     }
 
-    const fnContent = `return (()=> { ${userExpression} })()` // Wrap in IIFE
+    const fnContent = `return (()=> {\n${userExpression}\n})()` // Wrap in IIFE
 
     try {
       const fn = new Function('ctx', ...argNames, fnContent)
