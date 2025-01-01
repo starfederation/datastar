@@ -2,13 +2,13 @@
 // Slug: Use a GET request to fetch data from a server using Server-Sent Events matching the Datastar SDK interface
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.
 
-import { DATASTAR, DATASTAR_REQUEST } from '~/engine/consts'
-import { dsErr } from '~/engine/errors'
-import type { RuntimeContext } from '~/engine/types'
+import { DATASTAR, DATASTAR_REQUEST } from '../../../../engine/consts'
+import { dsErr } from '../../../../engine/errors'
+import type { RuntimeContext } from '../../../../engine/types'
 import {
   type FetchEventSourceInit,
   fetchEventSource,
-} from '~/vendored/fetch-event-source'
+} from '../../../../vendored/fetch-event-source'
 import {
   DATASTAR_SSE_EVENT,
   type DatastarSSEEvent,

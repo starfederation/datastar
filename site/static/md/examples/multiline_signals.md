@@ -4,13 +4,13 @@
 
 <div
     data-signals="{
-        foo: 1,
+        foo: 1234,
         bar: 'bar'
     }"
     data-computed-baz="$foo * 2"
 >
     <input
-        id="a"
+        id="foo"
         type="number"
         step="1"
         min="0"
@@ -19,13 +19,14 @@
     />
     <br>
     <input
+        id="baz"
         type="text"
         data-bind-baz
         class="input input-bordered"
     />
     <br>
     <input
-        id="b"
+        id="bar"
         type="text"
         data-bind-bar
         class="input input-bordered"

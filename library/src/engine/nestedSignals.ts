@@ -1,4 +1,4 @@
-import { type Computed, Signal, computed } from '~/vendored/preact-core'
+import { type Computed, Signal, computed } from '../vendored/preact-core'
 import { dsErr } from './errors'
 import type { NestedSignal, NestedValues } from './types'
 
@@ -51,6 +51,11 @@ function mergeNested(
           if (onlyIfMissing) continue
           const t = target[key]
           if (t instanceof Signal) {
+            if (t.value !== value) {
+              console.log(
+                `Signat ${key} value changed from ${t.value} to ${value}`,
+              )
+            }
             t.value = value
             continue
           }
@@ -170,11 +175,11 @@ export class SignalsRoot {
   }
 
   setValue<T>(dotDelimitedPath: string, value: T) {
-    const s = this.upsert(dotDelimitedPath, value)
+    const s = this.upsertIfMissing(dotDelimitedPath, value)
     s.value = value
   }
 
-  upsert<T>(dotDelimitedPath: string, value: T) {
+  upsertIfMissing<T>(dotDelimitedPath: string, defaultValue: T) {
     const parts = dotDelimitedPath.split('.')
     let subSignals = this.#signals
     for (let i = 0; i < parts.length - 1; i++) {
@@ -187,12 +192,11 @@ export class SignalsRoot {
     const last = parts[parts.length - 1]
 
     const current = subSignals[last]
-    if (current) {
-      current.value = value
+    if (current instanceof Signal) {
       return current as Signal<T>
     }
 
-    const signal = new Signal(value)
+    const signal = new Signal(defaultValue)
     subSignals[last] = signal
 
     return signal

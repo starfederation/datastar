@@ -4,12 +4,6 @@
 
 <div>
      <div data-ref="foo">I'm a div that is getting referenced</div>
-     <pre
-          class="code"
-          data-text="ctx.signals.JSON()"
-     >
-          Stuff in signals
-     </pre>
      <div class="card bg-primary text-primary-content">
           <div class="card-body">
                <div class="card-title" data-text="`I'm using content of '${$foo.innerHTML}'`">

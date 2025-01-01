@@ -8,8 +8,8 @@ import {
   type NestedValues,
   PluginType,
   Requirement,
-} from '~/engine/types'
-import { kebabize } from '~/utils/text'
+} from '../../../../engine/types'
+import { kebabize } from '../../../../utils/text'
 
 export const Attr: AttributePlugin = {
   type: PluginType.Attribute,

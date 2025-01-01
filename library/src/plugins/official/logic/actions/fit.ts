@@ -7,7 +7,7 @@ import {
   type ActionPlugin,
   PluginType,
   type RuntimeContext,
-} from '~/engine/types'
+} from '../../../../engine/types'
 
 const { round, max, min } = Math
 export const Fit: ActionPlugin = {

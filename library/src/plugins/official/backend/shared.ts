@@ -1,4 +1,4 @@
-import { DATASTAR } from '~/engine/consts'
+import { DATASTAR } from '../../../engine/consts'
 
 export const DATASTAR_SSE_EVENT = `${DATASTAR}-sse`
 export const SETTLING_CLASS = `${DATASTAR}-settling`

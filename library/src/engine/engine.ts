@@ -1,6 +1,6 @@
-import { Hash, elUniqId } from '~/utils/dom'
-import { camelize } from '~/utils/text'
-import { effect } from '~/vendored/preact-core'
+import { Hash, elUniqId } from '../utils/dom'
+import { camelize } from '../utils/text'
+import { effect } from '../vendored/preact-core'
 import { DSP, DSS, VERSION } from './consts'
 import { dsErr } from './errors'
 import { SignalsRoot } from './nestedSignals'
@@ -90,13 +90,10 @@ export class Engine {
   // Apply all plugins to the element and its children
   public apply(rootElement: Element) {
     const appliedMacros = new Set<MacroPlugin>()
-    this.#plugins.forEach((p, pi) => {
+    for (const p of this.#plugins) {
       this.#walkDownDOM(rootElement, (el) => {
         // Ignore this element if `data-star-ignore` exists on it
         if ('starIgnore' in el.dataset) return
-
-        // Cleanup if not first plugin
-        if (!pi) this.#cleanup(el)
 
         for (const rawKey in el.dataset) {
           // Check if the key is relevant to the plugin
@@ -207,7 +204,7 @@ export class Engine {
           if (p?.removeOnLoad) delete el.dataset[rawKey]
         }
       })
-    })
+    }
   }
 
   #genRX(

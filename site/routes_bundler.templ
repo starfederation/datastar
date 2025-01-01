@@ -26,9 +26,9 @@ templ PageBundler(r *http.Request, manifest PluginManifest, signals *BundlerSign
 				<div class="flex justify-between items-center">
 					<div class="font-bold text-3xl">Plugins</div>
 					<div class="flex gap-2">
-						<button class="btn" data-on-click="@toggleAll('static_library_source_plugins_')">Toggle</button>
-						<button class="btn" data-on-click="@setAll('static_library_source_plugins_',true)">All</button>
-						<button class="btn" data-on-click="@setAll('static_library_source_plugins_',false)">None</button>
+						<button class="btn" data-on-click="@toggleAll('includedPlugins.static_library_source_plugins_')">Toggle</button>
+						<button class="btn" data-on-click="@setAll('includedPlugins.static_library_source_plugins_',true)">All</button>
+						<button class="btn" data-on-click="@setAll('includedPlugins.static_library_source_plugins_',false)">None</button>
 					</div>
 				</div>
 				<div class="flex flex-wrap gap-2 justify-around">

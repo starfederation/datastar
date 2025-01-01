@@ -1,7 +1,8 @@
-import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
-
-// @ts-ignore
-const _ = /🖕JS_DS🚀/.source // This is to force first in the compiled code
+import {
+  type AttributePlugin,
+  PluginType,
+  Requirement,
+} from '../../../../engine/types'
 
 const name = 'computed'
 export const Computed: AttributePlugin = {

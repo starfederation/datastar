@@ -1,4 +1,4 @@
-import type { EffectFn, Signal } from '~/vendored/preact-core'
+import type { EffectFn, Signal } from '../vendored/preact-core'
 import type { SignalsRoot } from './nestedSignals'
 
 export type OnRemovalFn = () => void
