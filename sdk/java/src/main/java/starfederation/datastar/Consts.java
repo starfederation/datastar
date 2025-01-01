@@ -1,6 +1,5 @@
 package starfederation.datastar;
 
-
 import starfederation.datastar.enums.FragmentMergeMode;
 
 /**
