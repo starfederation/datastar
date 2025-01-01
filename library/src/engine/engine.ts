@@ -1,7 +1,7 @@
-import { elUniqId } from '~/utils/dom'
+import { Hash, elUniqId } from '~/utils/dom'
 import { camelize } from '~/utils/text'
 import { effect } from '~/vendored/preact-core'
-import { VERSION } from './consts'
+import { DSP, DSS, VERSION } from './consts'
 import { dsErr } from './errors'
 import { SignalsRoot } from './nestedSignals'
 import {
@@ -21,6 +21,8 @@ import {
   type RuntimeExpressionFunction,
   type WatcherPlugin,
 } from './types'
+
+const escapeRe = new RegExp(`(?:${DSP})(.*?)(?:${DSS})`, 'gm')
 
 export class Engine {
   #signals = new SignalsRoot()
@@ -114,8 +116,7 @@ export class Engine {
             }
           }
           const rawValue = `${el.dataset[rawKey]}` || ''
-          let value = rawValue
-          const hasValue = value.length > 0
+          const hasValue = rawValue.length > 0
 
           // Check the requirements
           const keyReq = p.keyReq || Requirement.Allowed
@@ -129,7 +130,7 @@ export class Engine {
           const valReq = p.valReq || Requirement.Allowed
           if (hasValue) {
             if (valReq === Requirement.Denied) {
-              throw dsErr(`${p.name}ValueNotAllowed`, { value })
+              throw dsErr(`${p.name}ValueNotAllowed`, { rawValue })
             }
           } else if (valReq === Requirement.Must) {
             throw dsErr(`${p.name}ValueRequired`)
@@ -151,22 +152,10 @@ export class Engine {
           // Ensure the element has an id
           if (!el.id.length) el.id = elUniqId(el)
 
-          // Apply the macros
-          appliedMacros.clear()
           const mods: Modifiers = new Map<string, Set<string>>()
           for (const rawMod of rawModifiers) {
             const [label, ...mod] = rawMod.split('.')
             mods.set(camelize(label), new Set(mod.map((t) => t.toLowerCase())))
-          }
-          const macros = [
-            ...(p.macros?.pre || []),
-            ...this.#macros,
-            ...(p.macros?.post || []),
-          ]
-          for (const macro of macros) {
-            if (appliedMacros.has(macro)) continue
-            appliedMacros.add(macro)
-            value = macro.fn(value)
           }
 
           // Create the runtime context
@@ -184,8 +173,22 @@ export class Engine {
             rawKey,
             rawValue,
             key,
-            value,
+            value: rawValue,
             mods,
+          }
+
+          // Apply the macros
+          appliedMacros.clear()
+
+          const macros = [
+            ...(p.macros?.pre || []),
+            ...this.#macros,
+            ...(p.macros?.post || []),
+          ]
+          for (const macro of macros) {
+            if (appliedMacros.has(macro)) continue
+            appliedMacros.add(macro)
+            ctx.value = macro.fn(ctx, ctx.value)
           }
 
           // Load the plugin and store any cleanup functions
@@ -220,29 +223,56 @@ export class Engine {
     if (!last.startsWith('return')) {
       stmts[lastIdx] = `return (${stmts[lastIdx]});`
     }
-    const userExpression = stmts.join('\n')
+    let userExpression = stmts.join(';\n').trim()
 
-    const fnCall = /(\w*)\(/gm
+    // Ingore any escaped values
+    const escaped = new Map<string, string>()
+    for (const match of userExpression.matchAll(escapeRe)) {
+      const k = match[1]
+      const v = new Hash('dsEscaped').with(k).value
+      escaped.set(v, k)
+      userExpression = userExpression.replace(DSP + k + DSS, v)
+    }
+
+    const fnCall = /@(\w*)\(/gm
     const matches = userExpression.matchAll(fnCall)
     const methodsCalled = new Set<string>()
     for (const match of matches) {
       methodsCalled.add(match[1])
     }
-    // Action names
-    const an = Object.keys(this.#actions).filter((i) => methodsCalled.has(i))
-    // Action lines
-    const al = an.map((a) => `const ${a} = ctx.actions.${a}.fn;`)
-    const fnContent = `${al.join('\n')}return (()=> {${userExpression}})()`
+
+    // Replace any action calls
+    const actionsRe = new RegExp(
+      `@(${Object.keys(this.#actions).join('|')})\\(`,
+      'gm',
+    )
 
     // Add ctx to action calls
-    let fnWithCtx = fnContent.trim()
-    for (const a of an) {
-      fnWithCtx = fnWithCtx.replaceAll(`${a}(`, `${a}(ctx,`)
+    userExpression = userExpression.replaceAll(
+      actionsRe,
+      'ctx.actions.$1.fn(ctx,',
+    )
+
+    // Replace any signal calls
+    const signalNames = new Array<string>()
+    ctx.signals.walk((path) => signalNames.push(path))
+    if (signalNames.length) {
+      const signalsRe = new RegExp(`\\$(${signalNames.join('|')})`, 'gm')
+      userExpression = userExpression.replaceAll(
+        signalsRe,
+        `ctx.signals.signal('$1').value`,
+      )
     }
 
+    // Replace any escaped values
+    for (const [k, v] of escaped) {
+      userExpression = userExpression.replace(k, v)
+    }
+
+    const fnContent = `return (()=> {\n${userExpression}\n})()` // Wrap in IIFE
+
     try {
-      const argumentNames = argNames || []
-      const fn = new Function('ctx', ...argumentNames, fnWithCtx)
+      const fn = new Function('ctx', ...argNames, fnContent)
       return (...args: any[]) => fn(ctx, ...args)
     } catch (error) {
       throw dsErr('GeneratingExpressionFailed', {

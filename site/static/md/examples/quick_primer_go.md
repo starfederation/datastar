@@ -2,7 +2,7 @@
 
 ## Demo
 
-<div id="replaceMe" data-on-load="sse('/examples/quick_primer_go/data/replace')">
+<div id="replaceMe" data-on-load="@get('/examples/quick_primer_go/data/replace')">
 
 ## Explanation
 

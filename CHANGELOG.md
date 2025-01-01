@@ -1,19 +1,24 @@
 # WIP Release Notes for Datastar
 
-## v0.21.4
+## v1.0.0-beta.1
+
+Happy new 2025! We’ve tied up loose ends, made all final breaking changes to the API, and after a grueling couple of months we’re delighted to release Datastar v1.0.0-beta.1 🚀
+
+After stabilising how nested signals work and living with the signal suffix `.value` for a while, we realised that it wasn’t as ergonomic as we wanted. So, honing our regex fu, we managed to switch (back) to a `$` prefix for signals and a `@` prefix for actions.
+
+The symbols add Datastar specific namespacing – `$` for a $ignal, `@` for an @ction – so it’s immediately obvious what you’re working with, and you end up with much fewer characters to read and write!!
 
 ### Added
 
-- Added a `contentType` option to the `sse()` action that, when set to `form`, submits the closest form element, or one specified using the `selector` option ([#400](https://github.com/starfederation/datastar/issues/400)).
-- Added a `retryInterval` option to the `sse()` action, defaulting to 1 second ([#393](https://github.com/starfederation/datastar/issues/393)).
-- Added the version number in a comment at the top of bundled files ([#401](https://github.com/starfederation/datastar/issues/401)).
+- Added the `data-custom-validity` attribute ([#410](https://github.com/starfederation/datastar/issues/410)).
 
 ### Changed
 
-- The `data-on-submit` event listener now prevents the default submission behavior of forms.
+- Signals now have a `$` prefix (again) instead of a `.value` suffix (the regex search and replace from `(\w+(\.\w+)*\.value)` to `$$$1` may be helpful when updating your code).
+- Actions now have a `@` prefix (again) instead of no suffix.
+- Changed the `data-attributes` attribute to `data-attr` ([#422](https://github.com/starfederation/datastar/issues/422)).
+- Changed TypeScript import paths back to relative paths, so that no config is required in the build step.
 
 ### Fixed
 
-- Fixed a bug in which local signals were being unintentionally sent with requests ([#387](https://github.com/starfederation/datastar/issues/387)).
-- Fixed a bug in which the bundler was not exporting Datastar ([#403](https://github.com/starfederation/datastar/issues/403)).
-- Fixed a bug in which the persist plugin was not maintain values if the values were signals ([#403](https://github.com/starfederation/datastar/issues/413)).
+- Fixed the `__outside` modifier so that elements contained within it are ignored ([#425](https://github.com/starfederation/datastar/issues/425)).

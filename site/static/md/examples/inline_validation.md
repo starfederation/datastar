@@ -8,7 +8,7 @@ The only email that will be accepted is test@test.com.
 
 <div
     id="inline_validation"
-    data-on-load="sse('/examples/inline_validation/data')"
+    data-on-load="@get('/examples/inline_validation/data')"
 >
 </div>
 

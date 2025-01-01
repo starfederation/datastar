@@ -46,14 +46,16 @@ function mergeNested(
           onlyIfMissing,
         )
       } else {
-        if (onlyIfMissing && target[key]) {
-          continue
+        const hasKey = Object.hasOwn(target, key)
+        if (hasKey) {
+          if (onlyIfMissing) continue
+          const t = target[key]
+          if (t instanceof Signal) {
+            t.value = value
+            continue
+          }
         }
-        if (target[key] instanceof Signal) {
-          target[key].value = value
-        } else {
-          target[key] = new Signal(value)
-        }
+        target[key] = new Signal(value)
       }
     }
   }

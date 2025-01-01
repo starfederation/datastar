@@ -9,3 +9,4 @@ datastar-website
 *_bin
 .DS_Store
 *.qtpl.go
+*/java/target/

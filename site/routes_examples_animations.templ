@@ -37,7 +37,7 @@ templ animationsFadeOutSwap(shouldHide bool) {
 			"btn btn-error",
 			templ.KV("transition-all duration-1000 opacity-0", shouldHide),
 		}
-		data-on-click="sse('/examples/animations/data', {method:'delete'})"
+		data-on-click="@delete('/examples/animations/data')"
 	>
 		@icon("material-symbols:delete")
 		Fade out then delete on click

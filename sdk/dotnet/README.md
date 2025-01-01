@@ -12,11 +12,11 @@ Real-time Hypermedia first Library and Framework for dotnet
   </head>
   <body>
     <main class="container" id="main" data-signals="{'input':'','output':''}">
-      <button data-on-click="sse('/displayDate')">Display Date</button>
+      <button data-on-click="@sse('/displayDate')">Display Date</button>
       <div id="target"></div>
-      <input type="text" placeholder="input:" data-bind="input" /><br />
-      <span data-bind="output"></span>
-      <button data-on-click="sse('/changeOutput',{method:'post'})">Change Output</button>
+      <input type="text" placeholder="input:" data-bind-input /><br />
+      <span data-text="output"></span>
+      <button data-on-click="@sse('/changeOutput',{method:'post'})">Change Output</button>
     </main>
   </body>
 </html>
@@ -45,23 +45,23 @@ public record DatastarSignals : ISignals
 }
 ...
 // add as an ASP Service
-//  allows injection of IServerSentEventGenerator, to respond to a request with a Datastar friendly ServerSentEvent
+//  allows injection of IServerSentEventService, to respond to a request with a Datastar friendly ServerSentEvent
 //                  and ISignals, to read the signals sent by the client
 builder.Services.AddDatastar<DatastarSignals>();
 ...
 app.UseStaticFiles();
 
 // add endpoints
-app.MapGet("/displayDate", async (IServerSentEventGenerator sse) =>
+app.MapGet("/displayDate", async (IServerSentEventService sse) =>
 {
     string today = DateTime.Now.ToString("%y-%M-%d %h:%m:%s");
-    await sse.MergeFragments($"""<div id='target'><span id='date'><b>{today}</b><button data-on-click="sse('/removeDate')">Remove</button></span></div>""");
+    await sse.MergeFragments($"""<div id='target'><span id='date'><b>{today}</b><button data-on-click="@sse('/removeDate')">Remove</button></span></div>""");
 });
-app.MapGet("/removeDate", async (IServerSentEventGenerator sse) => { await sse.RemoveFragments("#date"); });
-app.MapPost("/changeOutput", async (IServerSentEventGenerator sse, ISignals signals) =>
+app.MapGet("/removeDate", async (IServerSentEventService sse) => { await sse.RemoveFragments("#date"); });
+app.MapPost("/changeOutput", async (IServerSentEventService sse, ISignals signals) =>
 {
-    DatastarSignals signals = (signals as DatastarSignals) ?? throw new InvalidCastException("Unknown ISignals passed");
-    DatastarSignals newSignals = new() { Output = $"Your Input: {signals.Input}" };
+    DatastarSignals dsSignals = (signals as DatastarSignals) ?? throw new InvalidCastException("Unknown ISignals passed");
+    DatastarSignals newSignals = new() { Output = $"Your Input: {dsSignals.Input}" };
     await sse.MergeSignals(newSignals);
 });
 ```

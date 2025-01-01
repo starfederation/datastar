@@ -18,28 +18,6 @@ export const On: AttributePlugin = {
   keyReq: Requirement.Must,
   valReq: Requirement.Must,
   argNames: [EVT],
-  macros: {
-    pre: [
-      {
-        // We need to escape the evt in case .value is used
-        type: PluginType.Macro,
-        name: 'evtEsc',
-        fn: (original) => {
-          return original.replaceAll(/evt.([\w\.]+)value/gm, 'EVT_$1_VALUE')
-        },
-      },
-    ],
-    post: [
-      {
-        // We need to unescape the evt in case .value is used
-        type: PluginType.Macro,
-        name: 'evtUnesc',
-        fn: (original) => {
-          return original.replaceAll(/EVT_([\w\.]+)_VALUE/gm, 'evt.$1value')
-        },
-      },
-    ],
-  },
   onLoad: ({ el, key, genRX, mods, signals, effect }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
@@ -118,17 +96,10 @@ export const On: AttributePlugin = {
         if (testOutside) {
           target = document
           const cb = callback
-          let called = false
           const targetOutsideCallback = (e?: Event) => {
             const targetHTML = e?.target as HTMLElement
-            if (!targetHTML) return
-            const isEl = el.id === targetHTML.id
-            if (isEl && called) {
-              called = false
-            }
-            if (!isEl && !called) {
+            if (!el.contains(targetHTML)) {
               cb(e)
-              called = true
             }
           }
           callback = targetOutsideCallback

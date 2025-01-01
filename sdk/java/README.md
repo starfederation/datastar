@@ -34,13 +34,7 @@ Install using Maven by adding the following to your `pom.xml`:
 ### Import Statements
 
 ```java
-import StarFederation.Datastar.enums.FragmentMergeMode;
-import StarFederation.Datastar.events.MergeFragments;
-import StarFederation.Datastar.events.MergeFragmentsOptions;
-import StarFederation.Datastar.events.ExecuteScript;
-import StarFederation.Datastar.events.MergeSignals;
-import StarFederation.Datastar.events.MergeSignalsOptions;
-import StarFederation.Datastar.events.RemoveSignals;
+
 import StarFederation.Datastar.ServerSentEventGenerator;
 ```
 

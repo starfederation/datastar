@@ -3,7 +3,7 @@
 ## Demo
 
 <div
-  data-on-load="sse('/examples/signals_ifmissing/updates')"
+  data-on-load="@get('/examples/signals_ifmissing/updates')"
 >
   <div>
     Should always be 1234:
@@ -17,11 +17,11 @@
 <div
   id="demo"
   data-signals="{id: 1234}"
-  data-on-load="sse('/examples/signals_ifmissing/updates')"
+  data-on-load="@get('/examples/signals_ifmissing/updates')"
 >
   <div>
     Should always be 1234:
-    <span data-text="id.value">should be replaced</span>
+    <span data-text="$id">should be replaced</span>
   </div>
 </div>
 ```

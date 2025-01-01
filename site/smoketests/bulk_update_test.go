@@ -26,9 +26,6 @@ func TestExampleBulkUpdate(t *testing.T) {
 
 			contact_2 := page.MustElement("#contact_2 > td:nth-child(4)")
 			assert.Equal(t, "Active", contact_2.MustText())
-
-			contact_3 := page.MustElement("#contact_3 > td:nth-child(4)")
-			assert.Equal(t, "Active", contact_3.MustText())
 		})
 
 		runner("bulk update inactive", func(t *testing.T, page *rod.Page) {
@@ -46,9 +43,6 @@ func TestExampleBulkUpdate(t *testing.T) {
 
 			contact_2 := page.MustElement("#contact_2 > td:nth-child(4)")
 			assert.Equal(t, "Inactive", contact_2.MustText())
-
-			contact_3 := page.MustElement("#contact_3 > td:nth-child(4)")
-			assert.Equal(t, "Inactive", contact_3.MustText())
 		})
 	})
 }

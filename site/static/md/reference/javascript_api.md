@@ -1,6 +1,6 @@
 # JavaScript API
 
-Datastar intentionally does not (indecently) expose itself in the global scope – you _should_ be able to do everything you need via `data-*` attributes.
+Datastar is intentional about not (indecently) exposing itself in the global scope – you _should_ be able to do everything you need via Datastar expressions in [attribute plugins](/reference/attribute_plugins) and [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE events.
 
 When troubleshooting an issue, it may be useful to see the current state of the signals. The easiest way to do this is by outputting them in JSON format using `data-text`.
 
@@ -8,7 +8,7 @@ When troubleshooting an issue, it may be useful to see the current state of the 
 <div data-text="ctx.signals.JSON()"></div>
 ```
 
-For edge-cases where you find yourself having to change the DOM without involving Datastar, you can import Datastar and apply it to any element and its children.
+For edge-cases in which you find yourself having to change the DOM without involving Datastar, you can import Datastar and apply it to any element and its children.
 
 ```html
 <script type="module">

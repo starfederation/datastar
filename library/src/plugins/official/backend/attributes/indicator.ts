@@ -2,7 +2,6 @@
 // Slug: Sets the indicator signal used when fetching data via SSE
 // Description: must be a valid signal name
 
-import { DATASTAR } from '~/engine/consts'
 import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
 import {
   DATASTAR_SSE_EVENT,
@@ -10,9 +9,6 @@ import {
   FINISHED,
   STARTED,
 } from '../shared'
-
-export const INDICATOR_CLASS = `${DATASTAR}-indicator`
-export const INDICATOR_LOADING_CLASS = `${INDICATOR_CLASS}-loading`
 
 export const Indicator: AttributePlugin = {
   type: PluginType.Attribute,

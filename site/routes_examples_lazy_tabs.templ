@@ -27,7 +27,7 @@ templ setupExamplesLazyTabsComponent(tabCount int, contents templ.Component, sig
 					role="tab"
 					class={ "tab", templ.KV("tab-active", i == signals.TabID) }
 					data-on-click={ fmt.Sprintf(
-						"tabId.value=%d;%s", i,
+						"$tabId=%d;%s", i,
 						datastar.GetSSE("/examples/lazy_tabs/data"),
 					) }
 					data-testid={ fmt.Sprintf("tab_%d", i) }
