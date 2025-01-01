@@ -7,7 +7,7 @@
 
 ## Explanation
 
-As part of SSE updates you may want to redirect the user to a different page. The `datastar-execute-script` event can be used to execute JavaScript on the client.
+As part of SSE updates you may want to redirect the user to a different page. The [`datastar-execute-script`](/reference/attribute_plugins#data-datastar-execute-script) SSE event can be used to execute JavaScript on the client.
 
 ```html
 event: datastar-execute-script

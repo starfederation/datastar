@@ -54,13 +54,13 @@ def page_main(signals):
     Input(type="text", placeholder="Send to server...", data_model="input"),
     Button("Send State Roundtrip", data_on_click='sse("/get")'),
     Button("Target HTML Element", data_on_click='sse("/target")'),
-    Button("Toggle Feed", data_on_click="show.value=!show.value"),
-    Div(id="output", data_text="output.value"),
+    Button("Toggle Feed", data_on_click="$show=!$show"),
+    Div(id="output", data_text="$output"),
     Div(id=f"{target}"),
     Div(
       Span("Feed from server: "),
       Span(id="feed", **{'data-on-load':"sse('/feed')"}),
-      **{"data-show__duration.500ms":"show.value"},
+      **{"data-show__duration.500ms":"$show"},
     ),
   ),
   id="main",
@@ -111,7 +111,7 @@ class DatastarEventMessage:
       data_lines.append(f"selector {query_selector}")
 
     if merge:
-      data_lines.append(f"mergeMode {merge.value}")
+      data_lines.append(f"mergeMode {$merge}")
 
     if settle_duration:
       data_lines.append(f"settleDuration {settle_duration}")

@@ -25,8 +25,8 @@ function indexPage() {
         <div id="output"></div>
         <button data-on-click="sse('/get')">Get Backend State</button>
         <div id="output2"></div>
-        <button data-on-click="show.value=!show.value">Toggle</button>
-        <div data-show="show.value">
+        <button data-on-click="$show=!$show">Toggle</button>
+        <div data-show="$show">
           <span>Hello From Datastar!</span>
         </div>
         <div>
@@ -53,9 +53,9 @@ function setHeaders(res) {
 
 function sendSSE({ res, frag, selector, merge, mergeType, end }) {
   res.write("event: datastar-merge-fragments\n");
-  if (selector) res.write(`data: selector {selector.value}\n`);
-  if (merge) res.write(`data: mergeMode {mergeType.value}\n`);
-  res.write(`data: fragments {frag.value}\n\n`);
+  if (selector) res.write(`data: selector {$selector}\n`);
+  if (merge) res.write(`data: mergeMode {$mergeType}\n`);
+  res.write(`data: fragments {$frag}\n\n`);
   if (end) res.end();
 }
 
@@ -63,8 +63,8 @@ app.put("/put", (req, res) => {
   setHeaders(res);
   const { input } = req.body;
   backendData.input = input;
-  const output = `Your input: {input.value}, is {input.value.length} long.`;
-  let frag = `<div id="output">{.valueoutput}</div>`;
+  const output = `Your input: {$input}, is {$input.length} long.`;
+  let frag = `<div id="output">{$output}</div>`;
   sendSSE({
     res,
     frag,
@@ -78,8 +78,8 @@ app.put("/put", (req, res) => {
 app.get("/get", (req, res) => {
   setHeaders(res);
 
-  const output = `Backend State: {JSON.value.stringify(backendData)}.`;
-  let frag = `<div id="output2">{.valueoutput}</div>`;
+  const output = `Backend State: {$JSON.stringify(backendData)}.`;
+  let frag = `<div id="output2">{$output}</div>`;
 
   sendSSE({
     res,
@@ -104,7 +104,7 @@ app.get("/feed", async (req, res) => {
   setHeaders(res);
   while (res.writable) {
     const rand = randomBytes(8).toString("hex");
-    const frag = `<span id="feed">{.valuerand}</span>`;
+    const frag = `<span id="feed">{$rand}</span>`;
     sendSSE({
       res,
       frag,
@@ -120,6 +120,6 @@ app.get("/feed", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:{.valuePORT}`);
+  console.log(`Server is running on http://localhost:{$PORT}`);
 });
 ```

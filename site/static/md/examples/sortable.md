@@ -5,9 +5,9 @@
 ## Demo
 
 <div class="flex flex-col gap-8" data-signals="{orderInfo:''}">
-  <div class="text-lg">Order Info: <span class="font-bold" data-text="orderInfo">Order Info</span></div>
+  <div class="text-lg">Order Info: <span class="font-bold" data-text="$orderInfo">Order Info</span></div>
   <div>Open your console to see an event results</div>
-  <div id="sortContainer" data-on-orderinfo="orderInfo = event.detail.orderInfo; console.log(`You could send this to the server! ${orderInfo}`)" class="flex flex-col gap-4">
+  <div id="sortContainer" data-on-orderinfo="$orderInfo = event.detail.orderInfo; console.log(`You could send this to the server! ${$orderInfo}`)" class="flex flex-col gap-4">
     <div class="bg-primary text-primary-content p-4 rounded-box">Item 1</div>
     <div class="bg-primary text-primary-content p-4 rounded-box">Item 2</div>
     <div class="bg-primary text-primary-content p-4 rounded-box">Item 3</div>
@@ -23,9 +23,9 @@ In the original example you had to hook into HTMX's events.  With Datastar, you 
 
 ```html
 <div data-signals="{orderInfo:''}">
-  <div>OrderInfo: <span data-text="orderInfo">Order Info</span></div>
+  <div>OrderInfo: <span data-text="$orderInfo">Order Info</span></div>
   <div id="sortContainer"
-    data-on-reordered="orderInfo = event.detail.orderInfo; console.log(`You could send this to the server! ${orderInfo}`)"
+    data-on-reordered="$orderInfo = event.detail.orderInfo; console.log(`You could send this to the server! ${$orderInfo}`)"
   >
     <div>Item 1</div>
     <div>Item 2</div>
