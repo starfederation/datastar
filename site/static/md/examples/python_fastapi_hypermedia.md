@@ -69,7 +69,7 @@ class DatastarEventMessage:
       data_lines.append(f"selector {query_selector}")
 
     if merge:
-      data_lines.append(f"mergeMode {merge.value}")
+      data_lines.append(f"mergeMode {$merge}")
 
     if settle_duration:
       data_lines.append(f"settleDuration {settle_duration}")
@@ -153,13 +153,13 @@ def render_main_partial(signals):
       Input(type="text", placeholder="Send to server...", **{"data-bind":"input"}),
       Button("Send State Roundtrip", **{"data-on-click":'sse("/get")'}),
       Button("Target HTML Element", **{"data-on-click":'sse("/target")'}),
-      Button("Toggle Feed", **{"data-on-click":'show.value=!show.value'}),
-      Div(id="output", **{"data-text":"output.value"}),
+      Button("Toggle Feed", **{"data-on-click":'$show=!$show'}),
+      Div(id="output", **{"data-text":"$output"}),
       Div(id=f"{target}"),
       Div(
         Span("Feed from server: "),
         Span(id="feed", **{"data-on-load":'sse("/feed")'}),
-        **{"data.value-show__duration.500ms":"show.value"}
+        **{"$data-show__duration.500ms":"$show"}
         ),
     ),
     id="main",

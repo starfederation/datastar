@@ -69,7 +69,7 @@ templ EditRowContact(contacts []*ContactEdit, i int, isEditingRow, isEditingAnyR
 				<button
 					class="btn btn-sm btn-accent"
 					data-on-click={ fmt.Sprintf(
-						"editRowIndex = %d; %s", i,
+						"$editRowIndex = %d; %s", i,
 						datastar.GetSSE("/examples/edit_row/edit"),
 					) }
 					data-testid={ contactKeyPrefix + "_edit" }

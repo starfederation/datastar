@@ -4,7 +4,7 @@
 
 <form data-on-submit="sse('/examples/custom_validity/data', {contentType: 'form'})" class="space-y-8">
   <label class="flex items-center gap-2 input input-bordered">
-    <input data-bind-foo data-custom-validity="foo === bar ? '' : 'Field values must be the same.'" name="foo" class="grow" placeholder="Type foo contents"/>
+    <input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo" class="grow" placeholder="Type foo contents"/>
   </label>
   <label class="flex items-center gap-2 input input-bordered">
     <input data-bind-bar name="bar" class="grow" placeholder="Type bar contents"/>
@@ -22,7 +22,7 @@ The expression passed into the `data-custom-validity` attribute is evaluated and
 
 ```html
 <form data-on-submit="sse('/endpoint', {contentType: 'form'})">
-  <input data-bind-foo data-custom-validity="foo === bar ? '' : 'Field values must be the same.'" name="foo">
+  <input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo">
   <input data-bind-bar name="bar">
   <button>
       Submit form

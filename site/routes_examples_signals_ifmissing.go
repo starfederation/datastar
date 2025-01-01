@@ -32,12 +32,12 @@ func setupExamplesSignalsIfMissing(examplesRouter chi.Router) error {
 <div
 	id="placeholder"
 	data-signals__ifmissing=%q
-	data-text="id"
+	data-text="id.value"
 ></div>
 					`, signals))
 					sse.MergeFragments(fragment, datastar.WithMergeUpsertAttributes())
 				case 1:
-					sse.MergeSignalsIfMissingRaw(signals)
+					sse.MarshalAndMergeSignalsIfMissing(signals)
 				}
 				i++
 			}

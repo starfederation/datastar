@@ -4,8 +4,8 @@
 
 <div
     data-signals="{page: 0}"
-    data-on-raf__throttle.1s="page++"
-    data-replace-url="`/examples/replace_url_from_signals?page=${page}`"
+    data-on-raf__throttle.1s="$page++"
+    data-replace-url="`/examples/replace_url_from_signals?page=${$page}`"
 >
 </div>
 
@@ -16,8 +16,8 @@
 ```html
 <div
     data-signals="{page: 0}"
-    data-on-raf__throttle.1s="page++"
-    data-replace-url="`/examples/replace_url_from_signals?page=${page}`"
+    data-on-raf__throttle.1s="$page++"
+    data-replace-url="`/examples/replace_url_from_signals?page=${$page}`"
 >
 </div>
 ```

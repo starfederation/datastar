@@ -4,16 +4,16 @@ Debouncing and throttling are two techniques to limit the number of times a func
 
 ## Throttling
 
-<div class="bg-secondary text-secondary-content p-8 rounded-box font-bold font-mono text-6xl" data-signals="{tick:0}" data-on-raf__throttle.500ms="tick = (new Date()).getTime()">
-<div data-text="tick">Text</div>
+<div class="bg-secondary text-secondary-content p-8 rounded-box font-bold font-mono text-6xl" data-signals="{tick:0}" data-on-raf__throttle.500ms="$tick = (new Date()).getTime()">
+<div data-text="$tick">Text</div>
 </div>
 
 ```html
 <div
     data-signals="{tick:0}"
-    data-on-raf__throttle.500ms="tick = (new Date()).getTime()"
+    data-on-raf__throttle.500ms="$tick = (new Date()).getTime()"
 >
-    <div data-text="tick"></div>
+    <div data-text="$tick"></div>
 </div>
 ```
 
@@ -21,16 +21,16 @@ In the example above, the `data-on-raf__throttle.500ms` directive ensures that t
 
 ### Debouncing
 
-<button class="btn btn-primary btn-lg" data-signals="{clicks:0}" data-on-click__debounce.500ms="clicks++">Debounced button clicked<span data-text="clicks"> times</span>
+<button class="btn btn-primary btn-lg" data-signals="{clicks:0}" data-on-click__debounce.500ms="$clicks++">Debounced button clicked<span data-text="$clicks"> times</span>
 </button>
 
 ```html
 <button
     data-signals="{clicks:0}"
-    data-on-click__debounce.500ms="clicks++"
+    data-on-click__debounce.500ms="$clicks++"
 >
     Debounced button clicked
-    <span data-text="clicks"></span>
+    <span data-text="$clicks"></span>
     times
 </button>
 ```

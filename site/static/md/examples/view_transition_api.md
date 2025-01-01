@@ -37,12 +37,12 @@ animation-duration: 0.5s;
 ## Demo
 
 <div class="flex flex-col gap-4" data-signals="{supportsViewTransitionAPI:!!document.startViewTransition, useSlide: false}">
-<div data-text="`View Transition API supported in browser? ${supportsViewTransitionAPI}`"></div>
+<div data-text="`View Transition API supported in browser? ${$supportsViewTransitionAPI}`"></div>
 <div id="stuff" class="flex gap-4">
-<button class="btn btn-accent" data-show="supportsViewTransitionAPI" data-on-click="sse('/examples/view_transition_api/watch')">
+<button class="btn btn-accent" data-show="$supportsViewTransitionAPI" data-on-click="sse('/examples/view_transition_api/watch')">
     Fade transition
 </button>
-<button class="btn btn-accent" data-show="supportsViewTransitionAPI" data-on-click="useSlide = true; sse('/examples/view_transition_api/watch')">
+<button class="btn btn-accent" data-show="$supportsViewTransitionAPI" data-on-click="$useSlide = true; sse('/examples/view_transition_api/watch')">
     Slide transition
 </button>
 </div>
