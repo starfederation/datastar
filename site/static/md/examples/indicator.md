@@ -5,7 +5,7 @@
 <div class="flex flex-col gap-4">
   <div class="flex gap-2">
     <div class="loading-dots text-primary" data-class="{'loading ml-4': $fetching}"></div>
-    <button class="flex-1 btn btn-primary" data-on-click="@get('/examples/fetch_indicator/greet')" data-indicator="fetching"   data-attr-disabled="$fetching" >
+    <button class="flex-1 btn btn-primary" data-on-click="@get('/examples/fetch_indicator/greet')" data-indicator="fetching" data-attr-disabled="$fetching" >
       Click me for a greeting
     </button>
   </div>

@@ -10,6 +10,7 @@
     data-computed-baz="$foo * 2"
 >
     <input
+        id="a"
         type="number"
         step="1"
         min="0"
@@ -24,6 +25,7 @@
     />
     <br>
     <input
+        id="b"
         type="text"
         data-bind-bar
         class="input input-bordered"
