@@ -17,6 +17,7 @@ The symbols add Datastar specific namespacing – `$` for a $ignal, `@` for an @
 - Signals now have a `$` prefix (again) instead of a `.value` suffix (the regex search and replace from `(\w+(\.\w+)*\.value)` to `$$$1` may be helpful when updating your code).
 - Actions now have a `@` prefix (again) instead of no suffix.
 - Changed the `data-attributes` attribute to `data-attr` ([#422](https://github.com/starfederation/datastar/issues/422)).
+- Changed TypeScript import paths back to relative paths, so that no config is required in the build step.
 
 ### Fixed
 
