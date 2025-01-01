@@ -5,7 +5,7 @@ No value was provided to the `data-text` attribute. The `data-text` attribute _m
 Example:
 
 ```html
-<div data-text="foo"></div>
+<div data-text="$foo"></div>
 ```
 
 See the docs on the [`data-text`](/reference/attribute_plugins#data-text) attribute.

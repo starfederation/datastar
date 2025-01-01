@@ -5,7 +5,7 @@ No value was provided to the `data-class` attribute. The `data-class` attribute 
 Example:
 
 ```html
-<div data-class-hidden="foo"></div>
+<div data-class-hidden="$foo"></div>
 
 <div data-class="{hidden: foo}"></div>
 ```

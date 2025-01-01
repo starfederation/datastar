@@ -6,7 +6,7 @@ Example:
 
 ```html
 <form>
-  <input data-bind-foo data-custom-validity="foo === bar ? '' : 'Field values must be the same.'" name="foo">
+  <input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo">
   <input data-bind-bar name="bar">
   <button>
       Submit form

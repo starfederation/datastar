@@ -5,7 +5,7 @@ No value was provided to the `data-show` attribute. The `data-show` attribute _m
 Example:
 
 ```html
-<div data-show="foo"></div>
+<div data-show="$foo"></div>
 ```
 
 See the docs on the [`data-show`](/reference/attribute_plugins#data-show) attribute.

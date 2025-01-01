@@ -10,7 +10,7 @@
 <main class="grid grid-cols-2 px-5" id="main" data-signals="{'input':'','output':'','show_rocket':true,'more_examples':false}">
     <div>
         <div class="grid place-content-center min-h-24">
-            <h1><span id="title" data-on-load="sse('/title/D* Example'); sse('/check_more_examples')">___ + D* Example</span></h1>
+            <h1><span id="title" data-on-load="@sse('/title/D* Example'); sse('/check_more_examples')">___ + D* Example</span></h1>
         </div>
 
         <div class="flex">
@@ -21,7 +21,7 @@
                     </span>
                     <hr>
                     <span style="font-family: 'Courier',serif">
-                        <span id="feed" data-on-load="sse('/feed')">5999999999999999999</span>
+                        <span id="feed" data-on-load="@sse('/feed')">5999999999999999999</span>
                     </span>
                 </div>
             </div>

@@ -5,7 +5,7 @@ No value was provided to the `data-attr` attribute. The `data-attr` attribute _m
 Example:
 
 ```html
-<div data-attr-disabled="foo"></div>
+<div data-attr-disabled="$foo"></div>
 
 <div data-attr="{disabled: foo}"></div>
 ```

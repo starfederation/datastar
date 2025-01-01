@@ -54,14 +54,14 @@ Modifiers allow you to modify behavior when merging signals.
 Creates a signal that is computed based on an expression. The computed signal is read-only, and its value is automatically updated when any signals in the expression are updated.
 
 ```html
-<div data-computed-foo="bar + baz"></div>
+<div data-computed-foo="$bar + $baz"></div>
 ```
 
 Computed signals are useful for memoizing expressions containing other signals. Their values can be used in other expressions.
 
 ```html
-<div data-computed-foo="bar + baz"></div>
-<div data-text="foo"></div>
+<div data-computed-foo="$bar + $baz"></div>
+<div data-text="$foo"></div>
 ```
 
 ### `data-ref`
@@ -81,7 +81,7 @@ The signal name can be specified in the key (as above), or in the value (as belo
 The signal value can then be used to reference the element.
 
 ```html
-`foo` holds a <span data-text="foo.tagName"></span> element.
+`foo` holds a <span data-text="$foo.tagName"></span> element.
 ```
 
 ## DOM Plugins
@@ -95,7 +95,7 @@ Allows the usage of signals and expressions to affect the DOM.
 Binds the value of any HTML attribute to an expression.
 
 ```html
-<div data-attr-title="foo"></div>
+<div data-attr-title="$foo"></div>
 ```
 
 The `data-attr` attribute can also be used to set the values of multiple attributes on an element using a set of key-value pairs, where the keys represent attribute names and the values represent expressions.
@@ -125,7 +125,7 @@ The signal name can be specified in the key (as above), or in the value (as belo
 Adds or removes a class to or from an element based on an expression.
 
 ```html
-<div data-class-hidden="foo"></div>
+<div data-class-hidden="$foo"></div>
 ```
 
 If the expression evaluates to `true`, the `hidden` class is added to the element; otherwise, it is removed.
@@ -141,13 +141,13 @@ The `data-class` attribute can also be used to add or remove multiple classes fr
 Attaches an event listener to an element, executing an expression whenever the event is triggered.
 
 ```html
-<button data-on-click="foo = ''">Reset</button>
+<button data-on-click="$foo = ''">Reset</button>
 ```
 
 An `evt` variable that represents the event object is available in the expression.
 
 ```html
-<div data-on-myevent="foo = evt.detail"></div>
+<div data-on-myevent="$foo = evt.detail"></div>
 ```
 
 The `data-on` attribute matches DOM events, however there are currently a few special cases for custom events.
@@ -183,7 +183,7 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 \* Only works on native events.
 
 ```html
-<div data-on-click__window__debounce.500ms.leading="foo = ''"></div>
+<div data-on-click__window__debounce.500ms.leading="$foo = ''"></div>
 ```
 
 ### `data-persist`
@@ -231,7 +231,7 @@ Replaces the URL in the browser without reloading the page. The value can be a r
 Binds the text content of an element to an expression.
 
 ```html
-<div data-text="foo"></div>
+<div data-text="$foo"></div>
 ```
 
 ## Browser Plugins
@@ -246,7 +246,7 @@ Allows you to add custom validity to an element using an expression. The express
 
 ```html
 <form>
-  <input data-bind-foo data-custom-validity="foo === bar ? '' : 'Field values must be the same.'" name="foo">
+  <input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo">
   <input data-bind-bar name="bar">
   <button>
       Submit form
@@ -259,7 +259,7 @@ Allows you to add custom validity to an element using an expression. The express
 Runs an expression when the element intersects with the viewport.
 
 ```html
-<div data-intersects="intersected = true"></div>
+<div data-intersects="$intersected = true"></div>
 ```
 
 #### Modifiers
@@ -271,7 +271,7 @@ Modifiers allow you to modify the element intersection behavior.
 - `__full` - Triggers when the full element is visible.
 
 ```html
-<div data-intersects__once="intersected = true"></div>
+<div data-intersects__once="$intersected = true"></div>
 ```
 
 ### `data-scroll-into-view`
@@ -308,7 +308,7 @@ Modifiers allow you to modify scrolling behavior.
 Show or hides an element based on whether an expression evaluates to `true` or `false`. For anything with custom requirements, use [`data-class`](#data-class) instead.
 
 ```html
-<div data-show="foo"></div>
+<div data-show="$foo"></div>
 ```
 
 ### `data-view-transition`
@@ -316,7 +316,7 @@ Show or hides an element based on whether an expression evaluates to `true` or `
 Sets the `view-transition-name` style attribute explicitly.
 
 ```html
-<div data-view-transition="foo"></div>
+<div data-view-transition="$foo"></div>
 ```
 
 Page level transitions are automatically handled by an injected meta tag. Inter-page elements are automatically transitioned if the [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API) is available in the browser and `useViewTransitions` is `true`.
@@ -344,15 +344,15 @@ This can be useful for show a loading spinner, disabling a button, etc.
 <button
   data-on-click="@get('/endpoint')"
   data-indicator-fetching
-  data-attr-disabled="fetching"
+  data-attr-disabled="$fetching"
 ></button>
-<div data-show="fetching">Loading...</div>
+<div data-show="$fetching">Loading...</div>
 ```
 
 The signal name can be specified in the key (as above), or in the value (as below). This can be useful depending on the templating language you are using.
 
 ```html
-<button data-indicator="fetching"></button>
+<button data-indicator="$fetching"></button>
 ```
 
 ## Ignoring Elements

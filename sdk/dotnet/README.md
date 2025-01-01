@@ -12,11 +12,11 @@ Real-time Hypermedia first Library and Framework for dotnet
   </head>
   <body>
     <main class="container" id="main" data-signals="{'input':'','output':''}">
-      <button data-on-click="sse('/displayDate')">Display Date</button>
+      <button data-on-click="@sse('/displayDate')">Display Date</button>
       <div id="target"></div>
       <input type="text" placeholder="input:" data-bind-input /><br />
       <span data-text="output"></span>
-      <button data-on-click="sse('/changeOutput',{method:'post'})">Change Output</button>
+      <button data-on-click="@sse('/changeOutput',{method:'post'})">Change Output</button>
     </main>
   </body>
 </html>
@@ -55,7 +55,7 @@ app.UseStaticFiles();
 app.MapGet("/displayDate", async (IServerSentEventService sse) =>
 {
     string today = DateTime.Now.ToString("%y-%M-%d %h:%m:%s");
-    await sse.MergeFragments($"""<div id='target'><span id='date'><b>{today}</b><button data-on-click="sse('/removeDate')">Remove</button></span></div>""");
+    await sse.MergeFragments($"""<div id='target'><span id='date'><b>{today}</b><button data-on-click="@sse('/removeDate')">Remove</button></span></div>""");
 });
 app.MapGet("/removeDate", async (IServerSentEventService sse) => { await sse.RemoveFragments("#date"); });
 app.MapPost("/changeOutput", async (IServerSentEventService sse, ISignals signals) =>

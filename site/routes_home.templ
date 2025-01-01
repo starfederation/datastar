@@ -79,7 +79,7 @@ templ Home() {
 							</code>
 							<button
 								class="btn btn-primary btn-ghost"
-								data-on-click={ fmt.Sprintf("clipboard('%s')", cdnText) }
+								data-on-click={ fmt.Sprintf("@clipboard('%s')", cdnText) }
 							>
 								@icon("material-symbols:content-copy")
 							</button>
@@ -199,7 +199,7 @@ templ TodosMVCView(mvc *TodoMVC) {
 										data-on-click={ datastar.PostSSE("/api/todos/-1/toggle") }
 										data-testid="toggle_all_todos"
 										data-indicator="toggleAllFetching"
-										data-attrs-disabled="toggleAllFetching"
+										data-attrs-disabled="$toggleAllFetching"
 									>
 										@icon("material-symbols:checklist")
 									</button>

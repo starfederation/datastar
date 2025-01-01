@@ -5,7 +5,7 @@ No value was provided to the `data-computed` attribute. The `data-computed` attr
 Example:
 
 ```html
-<div data-computed-blinker="count % 2 === 0"></div>
+<div data-computed-blinker="$count % 2 === 0"></div>
 ```
 
 See the docs on the [`data-computed`](/reference/attribute_plugins#data-computed) attribute.

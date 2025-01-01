@@ -549,7 +549,7 @@ Using [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_d
 - Modify the classes on an element: `data-class-bold="$foo == 1"`
 - Bind an expression to an HTML attribute: `data-attr-disabled="$foo == ''"`
 - Merge signals into the signals: `data-signals-foo=""`
-- Execute an expression on an event: `data-on-click="sse(/endpoint)"`
+- Execute an expression on an event: `data-on-click="@sse(/endpoint)"`
 - Use signals to track in flight backend requests: `data-indicator-fetching`
 - Replace the URL: `data-replace-url="'/page1'"`
 - Persist all signals in local storage: `data-persist`

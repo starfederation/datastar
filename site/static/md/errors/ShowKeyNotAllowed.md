@@ -5,7 +5,7 @@ The key `{ key }` was provided to the `data-show` attribute. The `data-show` att
 Example:
 
 ```html
-<div data-show="foo"></div>
+<div data-show="$foo"></div>
 ```
 
 See the docs on the [`data-show`](/reference/attribute_plugins#data-show) attribute.
