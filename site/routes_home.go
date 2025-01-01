@@ -94,6 +94,10 @@ func setupHome(router chi.Router, signals sessions.Store, ns *embeddednats.Serve
 	})
 
 	chartWidth := 475
+	alpineJS := 15.3 * 1024
+	htmx := 17.4 * 1024
+	hyperscript := 26.8 * 1024
+
 	graph := chart.BarChart{
 		Title:  "File Size Comparison",
 		Width:  chartWidth,
@@ -129,13 +133,14 @@ func setupHome(router chi.Router, signals sessions.Store, ns *embeddednats.Serve
 		// https://bundlephobia.com/package/htmx.org
 		// https://bundlephobia.com/package/alpinejs
 		// https://bundlephobia.com/package/hyperscript.org
+
 		Bars: []chart.Value{
-			{Label: "HTMX+\nhyperscript", Value: 39900},
-			{Label: "HTMX+\nAlpine.js", Value: 30500},
-			{Label: "HTMX", Value: 15200},
-			{Label: "Alpine.js", Value: 15300},
-			{Label: "Datastar+\nPlugins", Value: float64(datastar.VersionClientByteSizeGzip)},
-			{Label: "Datastar Core", Value: 4200},
+			{Label: "HTMX+\nhyperscript", Value: hyperscript + htmx},
+			{Label: "HTMX+\nAlpine.js", Value: alpineJS + htmx},
+			{Label: "HTMX", Value: htmx},
+			{Label: "Alpine.js", Value: alpineJS},
+			{Label: "Datastar+\nAll Plugins", Value: float64(datastar.VersionClientByteSizeGzip)},
+			{Label: "Datastar Core", Value: 4.3 * 1024},
 		},
 	}
 
