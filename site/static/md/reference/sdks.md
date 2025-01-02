@@ -60,3 +60,8 @@ Examples:
 
 [Zig SDK](https://github.com/starfederation/datastar/tree/main/sdk/zig)  
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_
+
+## Clojure
+
+[Clojure SDK](https://github.com/starfederation/datastar/tree/main/sdk/clojure)  
+_Author: [Jeremy Schoffen](https://github.com/JeremS)_

@@ -143,12 +143,14 @@ func writeOutConsts(version string) error {
 		"sdk/java/core/src/main/java/starfederation/datastar/Consts.java":                  javaConsts,
 		"sdk/java/core/src/main/java/starfederation/datastar/enums/EventType.java":         javaEventType,
 		"sdk/java/core/src/main/java/starfederation/datastar/enums/FragmentMergeMode.java": javaFragmentMergeMode,
-		"sdk/python/src/datastar_py/consts.py":    pythonConsts,
-		"sdk/typescript/src/consts.ts":            typescriptConsts,
-		"sdk/rust/src/consts.rs":                  rustConsts,
-		"sdk/zig/src/consts.zig":                  zigConsts,
-		"examples/go/hello-world/hello-world.html": helloWorldGo,
-		"examples/php/hello-world/public/hello-world.html": helloWorldPHP,
+		"sdk/python/src/datastar_py/consts.py":                                             pythonConsts,
+		"sdk/typescript/src/consts.ts":                                                     typescriptConsts,
+		"sdk/rust/src/consts.rs":                                                           rustConsts,
+		"sdk/zig/src/consts.zig":                                                           zigConsts,
+		"sdk/clojure/sdk/src/main/starfederation/datastar/clojure/consts.clj":              clojureConsts,
+		"examples/go/hello-world/hello-world.html":                                         helloWorldGo,
+		"examples/php/hello-world/public/hello-world.html":                                 helloWorldPHP,
+		"examples/clojure/hello-world/resources/public/hello-world.html":                   helloWorldClojure,
 	}
 
 	for path, tmplFn := range templates {
