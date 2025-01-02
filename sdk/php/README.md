@@ -28,6 +28,10 @@ use starfederation\datastar\ServerSentEventGenerator;
 // Creates a new `ServerSentEventGenerator` instance.
 $sse = new ServerSentEventGenerator();
 
+// Sends the response headers. 
+// If your framework has its own way of sending response headers, send `ServerSentEventGenerator::headers` manually instead.
+$sse->sendHeaders();
+
 // Merges HTML fragments into the DOM.
 $sse->mergeFragments('<div></div>', [
     'selector' => '#my-div',

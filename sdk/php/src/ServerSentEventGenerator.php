@@ -17,6 +17,18 @@ use starfederation\datastar\events\RemoveSignals;
 class ServerSentEventGenerator
 {
     /**
+     * The response headers that should be sent.
+     */
+    const array $headers = [
+        'Content-Type' => 'text/event-stream',
+        'Cache-Control' => 'no-cache',
+        'Connection' => 'keep-alive',
+        // Disable buffering for Nginx.
+        // https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering
+        'X-Accel-Buffering' => 'no',
+    ];
+
+    /**
      * Returns the signals sent in the incoming request.
      */
     public static function readSignals(): array
@@ -27,11 +39,17 @@ class ServerSentEventGenerator
     }
 
     /**
-     * Sends headers when the class is instantiated.
+     * Sends the response headers, if not already sent.
      */
-    public function __construct()
+    public function sendHeaders(): void
     {
-        $this->sendHeaders();
+        if (headers_sent()) {
+            return;
+        }
+
+        foreach (self::$headers as $name => $value) {
+            header("$name: $value");
+        }
     }
 
     /**
@@ -86,24 +104,6 @@ class ServerSentEventGenerator
     public function executeScript(string $script, array $options = []): void
     {
         $this->sendEvent(new ExecuteScript($script, $options));
-    }
-
-    /**
-     * Sends the response headers, if not already sent.
-     */
-    protected function sendHeaders(): void
-    {
-        if (headers_sent()) {
-            return;
-        }
-
-        header('Content-Type: text/event-stream');
-        header('Cache-Control: no-cache');
-        header('Connection: keep-alive');
-
-        // Disable buffering for Nginx
-        // https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering
-        header('X-Accel-Buffering: no');
     }
 
     /**
