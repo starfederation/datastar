@@ -19,7 +19,7 @@ class ServerSentEventGenerator
     /**
      * The response headers that should be sent.
      */
-    const array $headers = [
+    const HEADERS = [
         'Content-Type' => 'text/event-stream',
         'Cache-Control' => 'no-cache',
         'Connection' => 'keep-alive',
@@ -47,7 +47,7 @@ class ServerSentEventGenerator
             return;
         }
 
-        foreach (self::$headers as $name => $value) {
+        foreach (self::HEADERS as $name => $value) {
             header("$name: $value");
         }
     }
