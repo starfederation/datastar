@@ -13,6 +13,6 @@ export const PUT: ActionPlugin = {
   type: PluginType.Action,
   name: 'put',
   fn: async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
-    return sse(ctx, url, { ...args, method: 'PUT' })
+    return sse(ctx, 'PUT', url, { ...args })
   },
 }
