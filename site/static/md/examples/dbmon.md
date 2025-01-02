@@ -12,6 +12,6 @@ Also of note if you open your Network tab in DevTools we are leveraging ZSTD com
 
 <div
     id="contents"
-    data-on-load="sse('/examples/dbmon/contents')"
+    data-on-load="@get('/examples/dbmon/contents')"
 >
 </div>

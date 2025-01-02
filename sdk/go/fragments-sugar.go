@@ -97,21 +97,21 @@ func (sse *ServerSentEventGenerator) MergeFragmentGostar(child elements.ElementR
 }
 
 func GetSSE(urlFormat string, args ...any) string {
-	return fmt.Sprintf(`sse('%s',{method:'get'})`, fmt.Sprintf(urlFormat, args...))
+	return fmt.Sprintf(`@get('%s')`, fmt.Sprintf(urlFormat, args...))
 }
 
 func PostSSE(urlFormat string, args ...any) string {
-	return fmt.Sprintf(`sse('%s',{method:'post'})`, fmt.Sprintf(urlFormat, args...))
+	return fmt.Sprintf(`@post('%s')`, fmt.Sprintf(urlFormat, args...))
 }
 
 func PutSSE(urlFormat string, args ...any) string {
-	return fmt.Sprintf(`sse('%s',{method:'put'})`, fmt.Sprintf(urlFormat, args...))
+	return fmt.Sprintf(`@put('%s')`, fmt.Sprintf(urlFormat, args...))
 }
 
 func PatchSSE(urlFormat string, args ...any) string {
-	return fmt.Sprintf(`sse('%s',{method:'patch'})`, fmt.Sprintf(urlFormat, args...))
+	return fmt.Sprintf(`@patch('%s')`, fmt.Sprintf(urlFormat, args...))
 }
 
 func DeleteSSE(urlFormat string, args ...any) string {
-	return fmt.Sprintf(`sse('%s',{method:'delete'})`, fmt.Sprintf(urlFormat, args...))
+	return fmt.Sprintf(`@delete('%s')`, fmt.Sprintf(urlFormat, args...))
 }

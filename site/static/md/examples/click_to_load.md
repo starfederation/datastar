@@ -6,7 +6,7 @@
 
 <div
     id="click_to_load"
-    data-on-load="sse('/examples/click_to_load/data')"
+    data-on-load="@get('/examples/click_to_load/data')"
 >
 </div>
 
@@ -17,7 +17,7 @@ This example shows how to implement click-to-load the next page in a table of da
 ```html
 <button
   id="more_btn"
-  data-on-click="offset.value=30; limit.value=10; sse('/examples/click_to_load/data')"
+  data-on-click="$offset=30; $limit=10; @get('/examples/click_to_load/data')"
 >
   Load More
 </button>
@@ -31,7 +31,7 @@ event: datastar-merge-fragments id: 129804115990544446 data: mergeMode morph dat
 settleDuration 500 data: fragment
 <button
   id="more_btn"
-  data-on-click="offset.value=20; limit.value=10; sse('/examples/click_to_load/data')"
+  data-on-click="$offset=20; $limit=10; @get('/examples/click_to_load/data')"
 >
   Load More
 </button>

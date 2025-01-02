@@ -28,9 +28,9 @@ In this way, the function is encapsulated – all it knows is that it receives i
 ```html
 <div data-signals-result="''">
   <input data-bind-foo 
-         data-on-input="result.value = myfunction(foo.value)"
+         data-on-input="$result = myfunction($foo)"
   >
-  <span data-text="result.value"></span>
+  <span data-text="$result"></span>
 </div>
 ```
 
@@ -44,12 +44,12 @@ If your function call is asynchronous then it will need to dispatch a custom eve
 
 ```html
 <div data-signals-result="''"
-     data-on-mycustomevent__window="result.value = evt.detail.value"
+     data-on-mycustomevent__window="$result = evt.detail.value"
 >
   <input data-bind-foo 
-         data-on-input="myfunction(foo.value)"
+         data-on-input="myfunction($foo)"
   >
-  <span data-text="result.value"></span>
+  <span data-text="$result"></span>
 </div>
 ```
 
@@ -76,10 +76,10 @@ In this way, the web component is encapsulated – all it knows is that it recei
 <div data-signals-result="''">
   <input data-bind-foo>
   <my-component
-      data-attributes-src="foo.value"
-      data-on-mycustomevent="result.value = evt.detail.value"
+      data-attr-src="$foo"
+      data-on-mycustomevent="$result = evt.detail.value"
   ></my-component>
-  <span data-text="result.value"></span>
+  <span data-text="$result"></span>
 </div>
 ```
 
@@ -105,10 +105,10 @@ Since the `value` attribute is allowed on web components, it is also possible to
 ```html
 <input data-bind-foo>
 <my-component
-    data-attributes-src="foo.value"
+    data-attr-src="$foo"
     data-bind-result
 ></my-component>
-<span data-text="result.value"></span>
+<span data-text="$result"></span>
 ```
 
 ```js

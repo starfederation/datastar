@@ -3,9 +3,9 @@
 ## Demo
 
 <div data-signals="{eventCount:0,eventDetails:''}">
-     <div id="foo" data-on-myevent="eventDetails.value=evt.detail;eventCount.value++">
-          <div>Event count: <span id="eventCount" data-text="eventCount.value">EventCount</span></div>
-          <div>Last Event Details: <span data-text="eventDetails.value">EventTime</span></div>
+     <div id="foo" data-on-myevent="$eventDetails=evt.detail;$eventCount++">
+          <div>Event count: <span id="eventCount" data-text="$eventCount">EventCount</span></div>
+          <div>Last Event Details: <span data-text="$eventDetails">EventTime</span></div>
      </div>
      <script>
           const foo = document.getElementById('foo');
@@ -23,10 +23,10 @@
 
 ```html
 <div data-signals="{eventCount:0,eventDetails:''}">
-  <div id="foo" data-on-myevent="eventCount.value++; eventDetails.value=evt.detail">
-    <div>Event count: <span data-text="eventCount.value">EventCount</span></div>
+  <div id="foo" data-on-myevent="$eventCount++; $eventDetails=evt.detail">
+    <div>Event count: <span data-text="$eventCount">EventCount</span></div>
     <div>
-      Last Event Details: <span data-text="eventDetails.value">EventTime</span>
+      Last Event Details: <span data-text="$eventDetails">EventTime</span>
     </div>
   </div>
   <script>

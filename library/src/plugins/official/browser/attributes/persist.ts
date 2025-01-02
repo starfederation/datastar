@@ -3,12 +3,13 @@
 // Slug: Persist data to local storage or session storage
 // Description: This plugin allows you to persist data to local storage or session storage.  Once you add this attribute the data will be persisted to local storage or session storage.
 
-import { DATASTAR } from '~/engine/consts'
+import { DATASTAR } from '../../../../engine/consts'
 import {
   type AttributePlugin,
   type NestedValues,
   PluginType,
-} from '~/engine/types'
+} from '../../../../engine/types'
+import { trimDollarSignPrefix } from '../../../../utils/text'
 
 const SESSION = 'session'
 
@@ -21,7 +22,8 @@ export const Persist: AttributePlugin = {
       key = DATASTAR
     }
     const storage = mods.has(SESSION) ? sessionStorage : localStorage
-    const paths = value.split(/\s+/).filter((p) => p !== '')
+    let paths = value.split(/\s+/).filter((p) => p !== '')
+    paths = paths.map((p) => trimDollarSignPrefix(p))
 
     const storageToSignals = () => {
       const data = storage.getItem(key) || '{}'

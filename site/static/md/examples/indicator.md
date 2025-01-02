@@ -4,8 +4,8 @@
 
 <div class="flex flex-col gap-4">
   <div class="flex gap-2">
-    <div class="loading-dots text-primary" data-class="{'loading ml-4': fetching.value}"></div>
-    <button class="flex-1 btn btn-primary" data-on-click="sse('/examples/fetch_indicator/greet')" data-indicator="fetching"   data-attributes-disabled="fetching.value" >
+    <div class="loading-dots text-primary" data-class="{'loading ml-4': $fetching}"></div>
+    <button class="flex-1 btn btn-primary" data-on-click="@get('/examples/fetch_indicator/greet')" data-indicator="fetching" data-attr-disabled="$fetching" >
       Click me for a greeting
     </button>
   </div>
@@ -27,15 +27,15 @@
 </style>
 <div
   class="indicator"
-  data-class="{loading: fetching.value}"
+  data-class="{loading: $fetching}"
 >
     Loading Indicator
 </div>
 <button
   id="greetingBtn"
-  data-on-click="sse('/examples/fetch_indicator/greet')"
+  data-on-click="@get('/examples/fetch_indicator/greet')"
   data-indicator-fetching
-  data-attributes-disabled="fetching.value"
+  data-attr-disabled="$fetching"
 >
   Click me for a greeting
 </button>

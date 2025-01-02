@@ -8,19 +8,19 @@ import {
   DefaultFragmentsUseViewTransitions,
   EventTypes,
   FragmentMergeModes,
-} from '~/engine/consts'
-import { dsErr } from '~/engine/errors'
+} from '../../../../engine/consts'
+import { dsErr } from '../../../../engine/errors'
 import {
   type InitContext,
   PluginType,
   type WatcherPlugin,
-} from '~/engine/types'
-import { isBoolString } from '~/utils/text'
+} from '../../../../engine/types'
+import { isBoolString } from '../../../../utils/text'
 import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
-} from '~/utils/view-transtions'
-import { idiomorph } from '~/vendored/idiomorph'
+} from '../../../../utils/view-transtions'
+import { idiomorph } from '../../../../vendored/idiomorph'
 import {
   SETTLING_CLASS,
   SWAPPING_CLASS,

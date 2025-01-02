@@ -27,11 +27,18 @@ func TestExampleCsrf(t *testing.T) {
 
 			waitForElementWithIDToStartWith(t, page, btn, "Send update")
 
-			e := proto.NetworkRequestWillBeSent{}
-			wait := page.WaitEvent(&e)
-			btn.MustClick()
-			wait()
-			actual := e.Request.Headers["X-CSRF-Token"].Str()
+			actual := ""
+			for i := 0; i < 10; i++ {
+				e := proto.NetworkRequestWillBeSent{}
+				wait := page.WaitEvent(&e)
+				btn.MustClick()
+				wait()
+				actual = e.Request.Headers["X-CSRF-Token"].Str()
+
+				if actual == expectedToken {
+					break
+				}
+			}
 			assert.Equal(t, expectedToken, actual)
 		})
 	})

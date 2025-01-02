@@ -1,5 +1,5 @@
-import { FragmentMergeModes } from '~/engine/consts'
-import { dsErr } from '~/engine/errors'
+import { FragmentMergeModes } from '../engine/consts'
+import { dsErr } from '../engine/errors'
 
 const generatedByIdiomorphId = new WeakSet()
 

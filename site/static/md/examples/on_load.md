@@ -5,14 +5,14 @@
 <div>
 <div
   id="replaceMe"
-  data-on-load="sse('/examples/on_load/data', {method:'post'})"
+  data-on-load="@post('/examples/on_load/data')"
   >No session data</div>
 </div>
 
 ## Explanation
 
 ```html
-<div id="replaceMe" data-on-load="sse('/examples/on_load/data', {method:'post'})">
+<div id="replaceMe" data-on-load="@post('/examples/on_load/data')">
   No session data
 </div>
 ```

@@ -3,8 +3,13 @@
 // Slug: Bind attributes to expressions
 // Description: Any attribute can be bound to an expression. The attribute will be updated reactively whenever the expression signal changes.
 
-import { dsErr } from '~/engine/errors'
-import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
+import { dsErr } from '../../../../engine/errors'
+import {
+  type AttributePlugin,
+  PluginType,
+  Requirement,
+} from '../../../../engine/types'
+import { trimDollarSignPrefix } from '../../../../utils/text'
 
 const dataURIRegex = /^data:(?<mime>[^;]+);base64,(?<contents>.*)$/
 const updateEvents = ['change', 'input', 'keydown']
@@ -16,7 +21,7 @@ export const Bind: AttributePlugin = {
   valReq: Requirement.Exclusive,
   onLoad: (ctx) => {
     const { el, value, key, signals, effect } = ctx
-    const signalName = key ? key : value
+    const signalName = key ? key : trimDollarSignPrefix(value)
 
     let setFromSignal = () => {}
     let el2sig = () => {}
@@ -52,7 +57,7 @@ export const Bind: AttributePlugin = {
       }
     }
 
-    signals.upsert(signalName, signalDefault)
+    signals.upsertIfMissing(signalName, signalDefault)
 
     setFromSignal = () => {
       const hasValue = 'value' in el
@@ -126,14 +131,9 @@ export const Bind: AttributePlugin = {
         )
 
         signals.setValue(signalName, allContents)
-        const mimeName = `${signalName}Mimes`
-        const nameName = `${signalName}Names`
-        if (mimeName in signals) {
-          signals.upsert(mimeName, allMimes)
-        }
-        if (nameName in signals) {
-          signals.upsert(nameName, allNames)
-        }
+        signals.setValue(`${signalName}Mimes`, allMimes)
+        signals.setValue(`${signalName}Names`, allNames)
+
         return
       }
 

@@ -1,46 +1,55 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <title>dotnet Example</title>
     <script type="module" defer src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script>
     <link href="style.css" rel="stylesheet">
 </head>
-<body class="text-white bg-[#1d1d1d]" data-on-pageshow.window="evt?.persisted && window.location.reload()"> <!-- https://stackoverflow.com/questions/8788802/prevent-safari-loading-from-cache-when-back-button-is-clicked -->
 
-<main class="grid grid-cols-2 px-5" id="main" data-signals="{'input':'','output':'','show_rocket':true,'more_examples':false}">
-    <div>
-        <div class="grid place-content-center min-h-24">
-            <h1><span id="title" data-on-load="sse('/title/D* Example'); sse('/check_more_examples')">___ + D* Example</span></h1>
-        </div>
+<body class="text-white bg-[#1d1d1d]" data-on-pageshow.window="evt?.persisted && window.location.reload()">
+    <!-- https://stackoverflow.com/questions/8788802/prevent-safari-loading-from-cache-when-back-button-is-clicked -->
 
-        <div class="flex">
-            <div class="flex-initial mh-5">
-                <div data-show="show_rocket.value" class="place-content-center">
-                    <span class="text-9xl mx-5">
-                       &#x1F680;
-                    </span>
-                    <hr>
-                    <span style="font-family: 'Courier',serif">
-                        <span id="feed" data-on-load="sse('/feed')">5999999999999999999</span>
-                    </span>
+    <main class="grid grid-cols-2 px-5" id="main"
+        data-signals="{'input':'','output':'','show_rocket':true,'more_examples':false}">
+        <div>
+            <div class="grid place-content-center min-h-24">
+                <h1><span id="title" data-on-load="@get('/title/D* Example'); @get('/check_more_examples')">___ + D*
+                        Example</span></h1>
+            </div>
+
+            <div class="flex">
+                <div class="flex-initial mh-5">
+                    <div data-show="$show_rocket" class="place-content-center">
+                        <span class="text-9xl mx-5">
+                            &#x1F680;
+                        </span>
+                        <hr>
+                        <span style="font-family: 'Courier',serif">
+                            <span id="feed" data-on-load="@get('/feed')">5999999999999999999</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex-initial mx-5">
+                    <input type="text" class="ring-2 ring-white rounded-md bg-transparent pl-2" placeholder="input:"
+                        data-bind="input" /><br>
+                    <br>
+                    <button class="btn btn-primary m-1" data-on-click="@get('/patch')">Patch State</button><br>
+                    <button class="btn btn-primary m-1" data-on-click="@get('/target')">Target HTML Element</button><br>
+                    <button class="btn btn-primary m-1" data-on-click="$show_rocket = !$show_rocket">Toggle
+                        Rocket</button><br>
+                    <button class="btn btn-primary m-1" data-on-click="@get('/goto_more_examples')"
+                        data-show="$more_examples">More Examples</button>
+                </div>
+                <div class="flex-1">
+                    <pre data-text="JSON.stringify(ctx.signals,null,2)"></pre>
+                    <br>
+                    <div id="target"></div>
                 </div>
             </div>
-
-            <div class="flex-initial mx-5">
-                <input type="text" class="ring-2 ring-white rounded-md bg-transparent pl-2" placeholder="input:" data-bind="input"/><br>
-                <br>
-                <button class="btn btn-primary m-1" data-on-click="sse('/patch')">Patch State</button><br>
-                <button class="btn btn-primary m-1" data-on-click="sse('/target')">Target HTML Element</button><br>
-                <button class="btn btn-primary m-1" data-on-click="show_rocket.value = !show_rocket.value">Toggle Rocket</button><br>
-                <button class="btn btn-primary m-1" data-on-click="sse('/goto_more_examples')" data-show="more_examples.value">More Examples</button>
-            </div>
-            <div class="flex-1">
-                <pre data-text="JSON.stringify(ctx.signals,null,2)"></pre>
-                <br>
-                <div id="target"></div>
-            </div>
         </div>
-    </div>
-</main>
+    </main>
 </body>
+
 </html>

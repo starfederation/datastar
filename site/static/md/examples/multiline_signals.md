@@ -4,30 +4,31 @@
 
 <div
     data-signals="{
-        foo:1234,
-        bar:'bar'
+        foo: 1234,
+        bar: 'bar'
     }"
-    data-signals-baz="2*foo.value"
+    data-computed-baz="$foo * 2"
 >
     <input
-        id="a"
+        id="foo"
         type="number"
         step="1"
         min="0"
-        max="10"
         data-bind-foo
         class="input input-bordered"
     />
+    <br>
     <input
-        id="b"
-        type="text"
-        data-bind-bar
-        class="input input-bordered"
-    />
-    <input
-        id="c"
+        id="baz"
         type="text"
         data-bind-baz
+        class="input input-bordered"
+    />
+    <br>
+    <input
+        id="bar"
+        type="text"
+        data-bind-bar
         class="input input-bordered"
     />
 </div>
@@ -37,17 +38,13 @@
 ```html
 <div
   data-signals="{
-    foo:1234,
-    bar:'bar'
+    foo: 1234,
+    bar: 'bar'
 }"
 >
-  <div data-signals-baz="2*foo.value"></div>
-  <input type="number" step="1" min="0" max="10" data-bind-foo />
-  <input type="text" data-bind-bar />
+  <div data-computed-baz="$foo * 2"></div>
+  <input type="number" step="1" min="0" data-bind-foo />
   <input type="text" data-bind-baz />
+  <input type="text" data-bind-bar />
 </div>
 ```
-
-The `data-signals` attribute is used to define a signals object. The signals object is a JS object.
-
-Also you'll see we have a `data-signals-baz` attribute. This is a signal that is dependent on the `foo` signal. The `foo` signal is defined in the signals object.  Since this isn't a computed signal, it will only use the initial value of `foo` to calculate the value of `baz`.

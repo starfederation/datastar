@@ -1,8 +1,7 @@
+import { dsErr } from '../engine/errors'
+import type { OnRemovalFn } from '../engine/types'
+
 // An named symbol/brand for detecting Signal instances even when they weren't
-
-import { dsErr } from '~/engine/errors'
-import type { OnRemovalFn } from '~/engine/types'
-
 // created using the same signals library version.
 const BRAND_SYMBOL = Symbol.for('preact-signals')
 
