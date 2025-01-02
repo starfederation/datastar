@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Click to Edit</title>
@@ -7,17 +8,19 @@
     <link href="style.css" rel="stylesheet" type="text/css">
     <meta name="view-transition" content="same-origin">
 </head>
+
 <body class="text-white bg-[#1d1d1d]">
 
-<div class="grid gap-4 p-2">
-<div class="flex flex-row">
-    <div class="basis-8 p-2">
-        <div id="example_list" data-on-load="@sse('/example_list')"></div>
+    <div class="grid gap-4 p-2">
+        <div class="flex flex-row">
+            <div class="basis-8 p-2">
+                <div id="example_list" data-on-load="@get('/example_list')"></div>
+            </div>
+            <div class="basis-full p-4">
+                <div id="example"></div>
+            </div>
+        </div>
     </div>
-    <div class="basis-full p-4">
-        <div id="example"></div>
-    </div>
-</div>
-</div>
 </body>
+
 </html>

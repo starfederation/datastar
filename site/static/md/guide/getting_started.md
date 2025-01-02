@@ -338,7 +338,7 @@ The `mergeFragments()` method merges the provided HTML fragment into the DOM, re
 
 The `mergeSignals()` method merges the `response` and `answer` signals into the frontend signals.
 
-With our backend in place, we can now use the `data-on-click` attribute to trigger the [`@sse()`](/reference/action_plugins#sse) action, which sends a `GET` request to the `/actions/quiz` endpoint on the server when a button is clicked.
+With our backend in place, we can now use the `data-on-click` attribute to trigger the [`@get()`](/reference/action_plugins#get) action, which sends a `GET` request to the `/actions/quiz` endpoint on the server when a button is clicked.
 
 ```html
 <div
@@ -346,7 +346,7 @@ With our backend in place, we can now use the `data-on-click` attribute to trigg
   data-computed-correct="$response.toLowerCase() == answer"
 >
   <div id="question"></div>
-  <button data-on-click="@sse('/actions/quiz')">Fetch a question</button>
+  <button data-on-click="@get('/actions/quiz')">Fetch a question</button>
   <button
     data-show="answer != ''"
     data-on-click="$response = prompt('Answer:') ?? ''"
@@ -375,7 +375,7 @@ Now when the `Fetch a question` button is clicked, the server will respond with 
                 The correct answer is “<span data-text="$answer2"></span>” 🤷
             </span>
         </div>
-        <button data-on-click="@sse('/examples/quiz/data')" class="btn btn-secondary">
+        <button data-on-click="@get('/examples/quiz/data')" class="btn btn-secondary">
             Fetch a question
         </button>
     </div>
@@ -392,7 +392,7 @@ The [`data-indicator`](/reference/attribute_plugins#data-data-indicator) attribu
 <div id="question"></div>
 <div data-class-loading="$fetching" class="indicator"></div>
 <button
-  data-on-click="@sse('/actions/quiz')"
+  data-on-click="@get('/actions/quiz')"
   data-indicator-fetching
 >
   Fetch a question
@@ -410,7 +410,7 @@ The [`data-indicator`](/reference/attribute_plugins#data-data-indicator) attribu
             </span>
         </div>
         <div class="flex items-center gap-2">
-            <button id="fetch-a-question" data-on-click="@sse('/examples/quiz_slow/data')" data-indicator-fetching class="btn btn-secondary">
+            <button id="fetch-a-question" data-on-click="@get('/examples/quiz_slow/data')" data-indicator-fetching class="btn btn-secondary">
                 Fetch a question
             </button>
             <div data-class-loading="$fetching" class="indicator"></div>
@@ -425,22 +425,14 @@ The `data-indicator` attribute can also be written with signal name in the attri
 
 ```html
 <button
-  data-on-click="@sse('/actions/quiz')"
+  data-on-click="@get('/actions/quiz')"
   data-indicator="fetching"
 >
 ```
 
-We're not limited to just `GET` requests. We can send `GET`, `POST`, `PUT`, `PATCH` and `DELETE` requests, using the `method` [option](/reference/action_plugins#options)  of the `@sse()` action.
+We're not limited to just `GET` requests. Datastar provides [backend plugin actions](/reference/action_plugins#backend-plugins) for each of the methods available: `@get()`, `@post()`, `@put()`, `@patch()` and `@delete()`.
 
 Here's how we could send an answer to the server for processing, using a `POST` request.
-
-```html
-<button data-on-click="@sse('/actions/quiz', {method: 'post'})">
-  Submit answer
-</button>
-```
-
-Datastar also provides action [aliases](/reference/action_plugins#aliases) for each of the methods available: `@get()`, `@post()`, `@put()`, `@patch()` and `@delete()`.
 
 ```html
 <button data-on-click="@post('/actions/quiz')">
@@ -454,7 +446,7 @@ One of the benefits of using SSE is that we can send multiple events (HTML fragm
 
 ## Actions
 
-Actions in Datastar are helper functions that are available in `data-*` attributes and have the syntax `@actionName()`. We already saw the `@sse()` action above. Here are a few other common actions.
+Actions in Datastar are helper functions that are available in `data-*` attributes and have the syntax `@actionName()`. We already saw the backend plugin actions above. Here are a few other common actions.
 
 ### `@setAll()`
 
@@ -549,7 +541,7 @@ Using [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_d
 - Modify the classes on an element: `data-class-bold="$foo == 1"`
 - Bind an expression to an HTML attribute: `data-attr-disabled="$foo == ''"`
 - Merge signals into the signals: `data-signals-foo=""`
-- Execute an expression on an event: `data-on-click="@sse(/endpoint)"`
+- Execute an expression on an event: `data-on-click="@get(/endpoint)"`
 - Use signals to track in flight backend requests: `data-indicator-fetching`
 - Replace the URL: `data-replace-url="'/page1'"`
 - Persist all signals in local storage: `data-persist`

@@ -1,6 +1,6 @@
 # SSE Events
 
-Responses to the [`@sse()`](/reference/action_plugins#sse) action must contain zero or more Datastar SSE events.
+Responses to [backend plugin](/reference/action_plugins#backend-plugin) actions must contain zero or more Datastar SSE events.
 
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>

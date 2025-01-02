@@ -75,10 +75,10 @@ Actions are helper functions that can be used in Datastar expressions. They allo
 
 ### Backend Actions
 
-The [`@sse()`](/reference/action_plugins#sse) action sends a `fetch` request to the backend, and expects an event stream response containing zero or more [Datastar SSE events](/reference/sse_events).
+The [`@get()`](/reference/action_plugins#get) action sends a `GET` request to the backend using `fetch`, and expects an event stream response containing zero or more [Datastar SSE events](/reference/sse_events).
 
 ```html
-<button data-on-click="@sse('/endpoint')"></button>
+<button data-on-click="@get('/endpoint')"></button>
 ```
 
 An event stream response is nothing more than a response containing a `Content-Type: text/event-stream` header.
@@ -106,11 +106,11 @@ Every request is sent with a `{datastar: *}` object that includes all existing s
 
 ## Embracing Simplicity
 
-At only 12 KiB, Datastar is smaller than Alpine.js and htmx, yet it provides the functionality of both libraries combined.
+Datastar is smaller than Alpine.js and htmx, yet it provides the functionality of both libraries combined.
 
 The package size is not _just_ a vanity metric. By embracing simplicity, and building on first principles, everything becomes cleaner and leaner. But don't take our word for it – [explore the source code](https://github.com/starfederation/datastar/tree/main/library) and see for yourself!
 
-Datastar is both a core library (4 KiB) and a “batteries included” framework (12 KiB), allowing you to create [custom bundles](/bundler) and write your own plugins.
+Datastar is both a core library (4 KiB) and a “batteries included” framework (~12 KiB), allowing you to create [custom bundles](/bundler) and write your own plugins.
 
 ## Hypermedia First
 

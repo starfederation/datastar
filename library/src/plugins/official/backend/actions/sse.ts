@@ -84,11 +84,12 @@ export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
     args,
   )
   const method = methodAnyCase.toUpperCase()
+  const action = methodAnyCase.toLowerCase()
   let cleanupFn = (): void => {}
   try {
     dispatchSSE(STARTED, { elId })
     if (!url?.length) {
-      throw dsErr('NoUrlProvided')
+      throw dsErr('SseNoUrlProvided', { action })
     }
 
     const initialHeaders: Record<string, any> = {}
@@ -172,9 +173,9 @@ export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
         : el.closest('form')
       if (formEl === null) {
         if (selector) {
-          throw dsErr('SseFormNotFound', { selector })
+          throw dsErr('SseFormNotFound', { action, selector })
         }
-        throw dsErr('SseClosestFormNotFound')
+        throw dsErr('SseClosestFormNotFound', { action })
       }
       if (el !== formEl) {
         const preventDefault = (evt: Event) => evt.preventDefault()
@@ -197,7 +198,7 @@ export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
         req.body = formData
       }
     } else {
-      throw dsErr('SseInvalidContentType', { contentType })
+      throw dsErr('SseInvalidContentType', { action, contentType })
     }
 
     urlInstance.search = queryParams.toString()
