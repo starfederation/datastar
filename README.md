@@ -19,7 +19,7 @@ Getting started is as easy as adding a single 12.6 KiB script tag to your HTML.
 Then start adding frontend reactivity using declarative <code>data-*</code> attributes.
 
 ```html
-<input data-bind-title type="text">
+<input data-bind-title />
 <div data-text="$title.toUpperCase()"></div>
 <button data-on-click="@post('/endpoint')">Save</button>
 ```

@@ -23,7 +23,7 @@ Getting started is as easy as adding a single {%s humanize.CommafWithDigits( flo
 Then start adding frontend reactivity using declarative <code>data-*</code> attributes.
 
 ```html
-<input data-bind-title type="text">
+<input data-bind-title />
 <div data-text="$title.toUpperCase()"></div>
 <button data-on-click="@post('/endpoint')">Save</button>
 ```
