@@ -257,10 +257,11 @@ export class Engine {
     const signalNames = new Array<string>()
     ctx.signals.walk((path) => signalNames.push(path))
     if (signalNames.length) {
-      const signalsRe = new RegExp(`\\$(${signalNames.join('|')})`, 'gm')
+      // Match any valid `$signalName` followed by a non-word character or end of string
+      const signalsRe = new RegExp(`\\$(${signalNames.join('|')})(\\W|$)`, 'gm')
       userExpression = userExpression.replaceAll(
         signalsRe,
-        `ctx.signals.signal('$1').value`,
+        `ctx.signals.signal('$1').value$2`,
       )
     }
 
