@@ -51,11 +51,6 @@ function mergeNested(
           if (onlyIfMissing) continue
           const t = target[key]
           if (t instanceof Signal) {
-            if (t.value !== value) {
-              console.log(
-                `Signat ${key} value changed from ${t.value} to ${value}`,
-              )
-            }
             t.value = value
             continue
           }

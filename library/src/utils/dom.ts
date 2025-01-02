@@ -54,7 +54,7 @@ export function elUniqId(el: Element) {
 
     currentEl = currentEl.parentNode as Element
   }
-  return DATASTAR + hash.value
+  return hash.value
 }
 
 export function onElementRemoved(element: Element, callback: () => void) {

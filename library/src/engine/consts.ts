@@ -6,7 +6,7 @@ export const DSS = lol.slice(4)
 export const DATASTAR = "datastar";
 export const DATASTAR_EVENT = "datastar-event";
 export const DATASTAR_REQUEST = "Datastar-Request";
-export const VERSION = "0.22.0";
+export const VERSION = "1.0.0-beta1";
 
 // #region Defaults
 

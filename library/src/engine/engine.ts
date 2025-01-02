@@ -90,10 +90,13 @@ export class Engine {
   // Apply all plugins to the element and its children
   public apply(rootElement: Element) {
     const appliedMacros = new Set<MacroPlugin>()
-    for (const p of this.#plugins) {
+    this.#plugins.forEach((p, pi) => {
       this.#walkDownDOM(rootElement, (el) => {
         // Ignore this element if `data-star-ignore` exists on it
         if ('starIgnore' in el.dataset) return
+
+        // Cleanup if not first plugin
+        if (!pi) this.#cleanup(el)
 
         for (const rawKey in el.dataset) {
           // Check if the key is relevant to the plugin
@@ -204,7 +207,7 @@ export class Engine {
           if (p?.removeOnLoad) delete el.dataset[rawKey]
         }
       })
-    }
+    })
   }
 
   #genRX(
