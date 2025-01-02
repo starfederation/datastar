@@ -22,8 +22,6 @@ import {
   type WatcherPlugin,
 } from './types'
 
-const escapeRe = new RegExp(`(?:${DSP})(.*?)(?:${DSS})`, 'gm')
-
 export class Engine {
   #signals = new SignalsRoot()
   #plugins: AttributePlugin[] = []
@@ -227,6 +225,7 @@ export class Engine {
 
     // Ingore any escaped values
     const escaped = new Map<string, string>()
+    const escapeRe = new RegExp(`(?:${DSP})(.*?)(?:${DSS})`, 'gm')
     for (const match of userExpression.matchAll(escapeRe)) {
       const k = match[1]
       const v = new Hash('dsEscaped').with(k).value
