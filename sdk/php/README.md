@@ -29,7 +29,7 @@ use starfederation\datastar\ServerSentEventGenerator;
 $sse = new ServerSentEventGenerator();
 
 // Sends the response headers. 
-// If your framework has its own way of sending response headers, send `ServerSentEventGenerator::headers` manually instead.
+// If your framework has its own way of sending response headers, send `ServerSentEventGenerator::HEADERS` manually instead.
 $sse->sendHeaders();
 
 // Merges HTML fragments into the DOM.
