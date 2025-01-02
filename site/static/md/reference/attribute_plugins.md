@@ -325,7 +325,7 @@ Page level transitions are automatically handled by an injected meta tag. Inter-
 
 [Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/backend/attributes)
 
-Adds integrations with [backend plugin](/reference/action_plugins#backend-plugin) actions.
+Adds integrations with [backend plugin actions](/reference/action_plugins#backend-plugins).
 
 ### `data-indicator`
 
