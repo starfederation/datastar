@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,6 +15,7 @@ import (
 
 var (
 	ErrNoPathsProvided = errors.New("no paths provided")
+	ErrDataTooLarge    = errors.New("data exceeded maximum size allowed")
 )
 
 type MergeSignalsOptions struct {
@@ -23,6 +25,8 @@ type MergeSignalsOptions struct {
 }
 
 type MergeSignalsOption func(*MergeSignalsOptions)
+
+const MaxSignalsSizeDefault = 4 * 1024 * 1024
 
 func WithMergeSignalsEventID(id string) MergeSignalsOption {
 	return func(o *MergeSignalsOptions) {
@@ -99,6 +103,10 @@ func (sse *ServerSentEventGenerator) RemoveSignals(paths ...string) error {
 }
 
 func ReadSignals(r *http.Request, signals any) error {
+	return ReadSignalsWithLimit(r, signals, MaxSignalsSizeDefault)
+}
+
+func ReadSignalsWithLimit(r *http.Request, signals any, limit int64) error {
 	var dsInput []byte
 
 	isDatastarRequest := r.Header.Get("datastar-request") == "true"
@@ -116,7 +124,12 @@ func ReadSignals(r *http.Request, signals any) error {
 	} else {
 		buf := bytebufferpool.Get()
 		defer bytebufferpool.Put(buf)
-		if _, err := buf.ReadFrom(r.Body); err != nil {
+		if limit <= 0 {
+			limit = MaxSignalsSizeDefault
+		}
+		limitedReader := io.LimitReader(r.Body, limit)
+
+		if _, err := buf.ReadFrom(limitedReader); err != nil {
 			if err == http.ErrBodyReadAfterClose {
 				return fmt.Errorf("body already closed, are you sure you created the SSE ***AFTER*** the ReadSignals? %w", err)
 			}
@@ -126,6 +139,12 @@ func ReadSignals(r *http.Request, signals any) error {
 	}
 
 	if err := json.Unmarshal(dsInput, signals); err != nil {
+		_, ok := err.(*json.SyntaxError)
+		if ok {
+			if int64(len(dsInput)) == limit {
+				return ErrDataTooLarge
+			}
+		}
 		return fmt.Errorf("failed to unmarshal: %w", err)
 	}
 	return nil
