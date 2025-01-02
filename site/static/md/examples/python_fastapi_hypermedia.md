@@ -151,14 +151,14 @@ def render_main_partial(signals):
   return Div(
     Div(
       Input(type="text", placeholder="Send to server...", **{"data-bind":"input"}),
-      Button("Send State Roundtrip", **{"data-on-click":'sse("/get")'}),
-      Button("Target HTML Element", **{"data-on-click":'sse("/target")'}),
+      Button("Send State Roundtrip", **{"data-on-click":'@get("/get")'}),
+      Button("Target HTML Element", **{"data-on-click":'@get("/target")'}),
       Button("Toggle Feed", **{"data-on-click":'$show=!$show'}),
       Div(id="output", **{"data-text":"$output"}),
       Div(id=f"{target}"),
       Div(
         Span("Feed from server: "),
-        Span(id="feed", **{"data-on-load":'sse("/feed")'}),
+        Span(id="feed", **{"data-on-load":'@get("/feed")'}),
         **{"$data-show__duration.500ms":"$show"}
         ),
     ),
