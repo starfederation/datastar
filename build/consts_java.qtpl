@@ -59,8 +59,9 @@ public enum EventType {
     EventType(String value) {
         this.value = value;
     }
-
-    public String getValue() {
+    
+    @Override
+    public String toString() {
         return value;
     }
     {%- endif -%}
@@ -92,8 +93,9 @@ public enum FragmentMergeMode {
     FragmentMergeMode(String value) {
         this.value = value;
     }
-
-    public String getValue() {
+    
+    @Override
+    public String toString() {
         return value;
     }
     {%- endif -%}

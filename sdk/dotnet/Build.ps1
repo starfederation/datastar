@@ -19,7 +19,7 @@ function RunCommand {
     Invoke-Expression $CommandExpr
 }
 
-$rootDir = Join-Path -Path $PSScriptRoot -ChildPath 'sdk'
+$rootDir = $PSScriptRoot
 $srcDir = Join-Path -Path $rootDir -ChildPath 'src'
 # $testDir = Join-Path -Path $rootDir -ChildPath 'test'
 

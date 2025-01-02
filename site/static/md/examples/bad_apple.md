@@ -6,7 +6,7 @@
     id="contents"
     class="flex flex-col gap-4 p-4 w-full"
     data-signals="{_contents: 'bad apple frames go here', percentage: 0}"
-    data-on-load="sse('/examples/bad_apple/updates')"
+    data-on-load="@get('/examples/bad_apple/updates')"
 >
     <div class="flex gap-4 items-center font-mono">
         <input
@@ -16,13 +16,13 @@
             data-bind="percentage"
          />
         <div>
-            <span data-text="percentage.value.toFixed(2)"></span>%
+            <span data-text="$percentage.toFixed(2)"></span>%
         </div>
     </div>
     <div class="aspect-square font-mono font-bold text-[11px] leading-[0.25rem] flex justify-center items-center">
         <pre
             style="background-color: black"
-            data-text="_contents.value"
+            data-text="$_contents"
         ></pre>
     </div>
 </div>
@@ -39,14 +39,14 @@ We take the [already converted](https://github.com/trung-kieen/bad-apple-ascii) 
 <div
   id="contents"
   data-signals="{_contents: 'bad apple frames go here', percentage: 0}"
-  data-on-load="sse('/examples/bad_apple/updates')"
+  data-on-load="@get('/examples/bad_apple/updates')"
 >
   <div>
     <input type="range" min="1" max="100" data-bind="percentage" disabled />
-    <div><span data-text="percentage.value.toFixed(2)"></span>%</div>
+    <div><span data-text="$percentage.toFixed(2)"></span>%</div>
   </div>
   <div>
-    <pre data-text="_contents.value"></pre>
+    <pre data-text="$_contents"></pre>
   </div>
 </div>
 ```
@@ -55,6 +55,6 @@ We take the [already converted](https://github.com/trung-kieen/bad-apple-ascii) 
 
 This is using Datastar's ability to patch signal directly. **_No need to generate html fragments, as the contents are already bound to existing elements._**
 
-We could also stream down the raster frames using base64 encoded images and update the src of an image tag. Either way works, you would just have to use `data-attributes-src` on an image tag.
+We could also stream down the raster frames using base64 encoded images and update the src of an image tag. Either way works, you would just have to use `data-attr-src` on an image tag.
 
 Open your DevTool's Elements tab for the contents of the pre tag. You'll see the frames being updated in real-time (in this case 30fps).

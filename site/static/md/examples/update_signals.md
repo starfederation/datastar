@@ -3,17 +3,17 @@
 ## Demo
 
 <div
-     data-signals='{"existingSignals":"this already exists"}'
+     data-signals='{"existingSignals": "this already exists"}'
 >
      <button
           class="btn btn-success"
-          data-on-click="sse('/examples/update_signals/data', {method:'post'})"
+          data-on-click="@post('/examples/update_signals/data')"
      >
           Apply random signals
      </button>
      <button
           class="btn btn-error"
-          data-on-click="sse('/examples/update_signals/data', {method:'delete'})"
+          data-on-click="@delete('/examples/update_signals/data')"
      >
           Remove 2 random signals
      </button>

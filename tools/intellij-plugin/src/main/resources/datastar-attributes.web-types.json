@@ -63,6 +63,10 @@
           "description": "Only trigger the event listener once"
         },
         {
+          "name": "outside",
+          "description": "Triggers when the event is outside the element"
+        },
+        {
           "name": "passive",
           "description": "Do not call `preventDefault` on the event listener"
         },
@@ -153,10 +157,10 @@
     "html": {
       "attributes": [
         {
-          "name": "data-attributes-*",
+          "name": "data-attr-*",
           "virtual": true,
           "description": "Sets an element’s attribute value based on an expression.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-attributes",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-attr",
           "value": {
             "kind": "expression",
             "type": [
@@ -175,7 +179,7 @@
                   }
                 ],
                 "template": [
-                  "data-attributes-",
+                  "data-attr-",
                   "$...",
                   "#item:event name"
                 ],
@@ -183,7 +187,7 @@
               },
               {
                 "template": [
-                  "data-attributes"
+                  "data-attr"
                 ],
                 "priority": "normal"
               }
@@ -194,7 +198,7 @@
           "name": "data-class-*",
           "virtual": true,
           "description": "Adds or removes a class from an element based on an expression.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-class",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-class",
           "value": {
             "kind": "expression",
             "type": [
@@ -227,7 +231,7 @@
           "name": "data-computed-*",
           "virtual": true,
           "description": "Creates a signal that is computed based on an expression.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-computed",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-computed",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -247,7 +251,7 @@
           "name": "data-indicator-*",
           "virtual": true,
           "description": "Creates a signal to track in-flight backend requests.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-indicator",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-indicator",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -277,7 +281,7 @@
           "name": "data-intersect",
           "virtual": true,
           "description": "Executes an expression on intersection with the viewport.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-intersect",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-intersect",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -304,7 +308,7 @@
           "name": "data-on-*",
           "virtual": true,
           "description": "Executes an expression whenever an event is triggered on an element.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-on",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -338,7 +342,7 @@
           "name": "data-persist",
           "virtual": true,
           "description": "Persists all signals in local storage.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-persist",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-persist",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -365,7 +369,7 @@
           "name": "data-ref-*",
           "virtual": true,
           "description": "Creates a signal whose value references an element.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-ref",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-ref",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -395,7 +399,7 @@
           "name": "data-replace-url",
           "virtual": true,
           "description": "Replaces the URL in the browser with an evaluated expression.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-replace-url",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-replace-url",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -412,7 +416,7 @@
           "name": "data-signals-*",
           "virtual": true,
           "description": "Merges a signal into the existing signals.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-signals",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-signals",
           "value": {
             "kind": "expression",
             "type": [
@@ -465,7 +469,7 @@
           "name": "data-scroll-into-view",
           "virtual": true,
           "description": "Scrolls the element into view.",
-          "doc-url": "https://data-star.dev/guide/getting_started#data-scroll-into-view",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-scroll-into-view",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -492,7 +496,7 @@
           "name": "data-show",
           "virtual": true,
           "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
-          "doc-url": "https://data-star.dev/reference/plugins_browser#show",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-show",
           "value": {
             "kind": "expression",
             "type": "boolean",
@@ -506,10 +510,27 @@
           }
         },
         {
+          "name": "data-star-ignore",
+          "virtual": true,
+          "description": "Ignores an element’s attributes when Datastar applies plugins.",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-star-ignore",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-star-ignore"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
           "name": "data-text",
           "virtual": true,
           "description": "Sets the text content of an element to the evaluated expression.",
-          "doc-url": "https://data-star.dev/reference/plugins_dom#text",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-text",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -526,7 +547,7 @@
           "name": "data-view-transition",
           "virtual": true,
           "description": "Sets the value of `view-transition-name` for use with the View Transition API.",
-          "doc-url": "https://data-star.dev/reference/plugins_browser#view-transition",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-view-transition",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -559,7 +580,7 @@
               "name": "data-bind-*",
               "virtual": true,
               "description": "Creates a new signal and enables two-way binding between it and the element.",
-              "doc-url": "https://data-star.dev/guide/getting_started#data-bind",
+              "doc-url": "https://data-star.dev/reference/attribute_plugins#data-bind",
               "value": {
                 "kind": "expression",
                 "type": "string",

@@ -15,7 +15,7 @@ templ pageDBmon(dbs []*DbmonDatabase, mutationRate float64, renderTime time.Dura
 	>
 		@dbmonFPS(renderTime)
 		<div style="display: flex;">
-			<label>mutations: <span data-text="mutationRate.value"></span>%</label>
+			<label>mutations: <span data-text="$mutationRate"></span>%</label>
 			<input
 				class="range"
 				type="range"

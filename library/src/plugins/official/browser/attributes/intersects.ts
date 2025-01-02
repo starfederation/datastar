@@ -3,7 +3,11 @@
 // Slug: Run expression when element intersects with viewport
 // Description: An attribute that runs an expression when the element intersects with the viewport.
 
-import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
+import {
+  type AttributePlugin,
+  PluginType,
+  Requirement,
+} from '../../../../engine/types'
 
 const ONCE = 'once'
 const HALF = 'half'

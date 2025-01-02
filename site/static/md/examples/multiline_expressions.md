@@ -6,12 +6,12 @@
 	data-signals="{duration:0, lastRenderTime:Date.now()}"
   data-on-raf="
     const now = Date.now()
-	const delta = now - lastRenderTime.value
-	duration.value += delta / 1000
-	lastRenderTime.value = now
+	const delta = now - $lastRenderTime
+	$duration += delta / 1000
+	$lastRenderTime = now
   "
 >
-	<div data-text="`Demo started ${Math.round(duration.value)} seconds ago`"></div>
+	<div data-text="`Demo started ${Math.round($duration)} seconds ago`"></div>
 </div>
 
 ## Explanation
@@ -21,12 +21,12 @@
   data-signals="{duration:0, lastRenderTime:Date.now()}"
   data-on-raf="
     const now = Date.now()
-    const delta = now - lastRenderTime.value
-    duration.value += delta / 1000
-    lastRenderTime.value = now
+    const delta = now - $lastRenderTime
+    $duration += delta / 1000
+    $lastRenderTime = now
   "
 >
-  <div data-text="`Demo started ${Math.round(duration.value)} seconds ago`"></div>
+  <div data-text="`Demo started ${Math.round($duration)} seconds ago`"></div>
 </div>
 ```
 

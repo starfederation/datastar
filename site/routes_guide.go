@@ -22,6 +22,7 @@ func setupGuide(ctx context.Context, router chi.Router) error {
 			Links: []*SidebarLink{
 				{ID: "getting_started"},
 				{ID: "going_deeper"},
+				{ID: "stop_overcomplicating_it"},
 			},
 		},
 	}

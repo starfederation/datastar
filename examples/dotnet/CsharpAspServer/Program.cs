@@ -57,7 +57,7 @@ public static class Program
         {
             string today = DateTime.Now.ToString("%y-%M-%d %h:%m:%s");
             await sseService.MergeFragments(
-                $"""<div id='target'><span id='date'><b>{today}</b><button class="btn mx-2" data-on-click="sse('/removeDate')">Remove</button></span></div>""");
+                $"""<div id='target'><span id='date'><b>{today}</b><button class="btn mx-2" data-on-click="@get('/removeDate')">Remove</button></span></div>""");
         });
         app.MapGet("/removeDate", (IServerSentEventService sseService) => sseService.RemoveFragments("#date"));
         app.MapGet("/feed", async (IServerSentEventService sseService, CancellationToken ct) =>

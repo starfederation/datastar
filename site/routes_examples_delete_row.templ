@@ -19,7 +19,7 @@ templ deleteRowContact(cs *ContactActive) {
 		<td class="flex justify-end">
 			<button
 				class="btn btn-error"
-				data-on-click={ fmt.Sprintf(`confirm('Are you sure?') && sse("/examples/delete_row/data/%d", {method:'delete'})`, cs.ID) }
+				data-on-click={ `confirm('Are you sure?') && ` + datastar.DeleteSSE("/examples/delete_row/data/%d", cs.ID) }
 			>
 				@icon("material-symbols:delete")
 				Delete

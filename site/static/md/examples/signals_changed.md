@@ -4,18 +4,18 @@
 
 <div
   data-signals="{clicks:0, _localState: {bar: 1234}, _anotherLocalVar: 'hello'}"
-  data-on-signals-change__remote="sse('/examples/signals_changed/updates', {method:'post'})"
+  data-on-signals-change__remote="@post('/examples/signals_changed/updates')"
   >
     <div class="flex gap-4">
       <button
         id="increment"
         class="btn btn-success"
-        data-on-click="clicks.value++"
+        data-on-click="$clicks++"
         >Click Me</button>
       <button
         id="clear"
         class="btn btn-warning"
-        data-on-click="clicks.value=0; sse('/examples/signals_changed/updates', {method:'delete'})"
+        data-on-click="$clicks=0; @delete('/examples/signals_changed/updates')"
       >Clear Local & Server</button>
       <button
         id="reload"
@@ -23,7 +23,7 @@
         data-on-click="window.location.reload()"
       >Reload Page</button>
     </div>
-    <div id="local_clicks">Local Clicks: <span data-text="clicks.value"></span></div>
+    <div id="local_clicks">Local Clicks: <span data-text="$clicks"></span></div>
     <div id="from_server"></div>
 </div>
 
@@ -32,13 +32,13 @@
 ```html
 <div
   data-signals="{clicks:0, _localState: {bar: 1234}, _anotherLocalVar: 'hello'}"
-  data-on-signals-change__remote="sse('/examples/signals_changed/updates', {method:'post'})"
+  data-on-signals-change__remote="@post('/examples/signals_changed/updates')"
 >
   <div>
-    <button id="increment" data-on-click="clicks.value++">Click Me</button>
+    <button id="increment" data-on-click="$clicks++">Click Me</button>
     <button
       id="clear"
-      data-on-click="clicks.value=0; sse('/examples/signals_changed/updates', {method:'delete'})"
+      data-on-click="$clicks=0; @delete('/examples/signals_changed/updates')"
     >
       Clear Local & Server
     </button>
@@ -46,14 +46,14 @@
       Reload Page
     </button>
   </div>
-  <div>Local Clicks: <span data-text="clicks.value"></span></div>
+  <div>Local Clicks: <span data-text="$clicks"></span></div>
   <div id="from_server"></div>
 </div>
 ```
 
 `data-on-signals-change` is a special event that is triggered when the signals changes. This is useful for updating the UI when the signals changes. In this example we update the `clicks` signals with a new value. This triggers a re-render of the `clicks` span element. You can still use the `__throttle` and `__debounce` modifiers to control the rate of updates even further. In this case we are sending the signals changes to the server to update the lifetime total clicks the server has seen.
 
-**Note**: The `__remote` modifier is used to trigger this event only when remotely viewable signals are updated. This is useful for not sending data that is not needed to the server. To look at the details run `console.log(JSON.stringify(ds.signals.value,null,2))` in the browser console. You should see something like
+**Note**: The `__remote` modifier is used to trigger this event only when remotely viewable signals are updated. This is useful for not sending data that is not needed to the server. To look at the details run `console.log(JSON.stringify(ds.$signals,null,2))` in the browser console. You should see something like
 
 ```json
 {

@@ -5,7 +5,7 @@ No value was provided to the `data-view-transition` attribute. The `data-view-tr
 Example:
 
 ```html
-<div data-view-transition="foo"></div>
+<div data-view-transition="$foo"></div>
 ```
 
 See the docs on the [`data-view-transition`](/reference/attribute_plugins#data-view-transition) attribute.

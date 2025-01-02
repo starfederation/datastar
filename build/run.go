@@ -140,9 +140,9 @@ func writeOutConsts(version string) error {
 		"sdk/php/src/Consts.php":                  phpConsts,
 		"sdk/php/src/enums/EventType.php":         phpEventType,
 		"sdk/php/src/enums/FragmentMergeMode.php": phpFragmentMergeMode,
-		"sdk/java/src/main/java/StarFederation/Datastar/Consts.java":                  javaConsts,
-		"sdk/java/src/main/java/StarFederation/Datastar/enums/EventType.java":         javaEventType,
-		"sdk/java/src/main/java/StarFederation/Datastar/enums/FragmentMergeMode.java": javaFragmentMergeMode,
+		"sdk/java/src/main/java/starfederation/datastar/Consts.java":                  javaConsts,
+		"sdk/java/src/main/java/starfederation/datastar/enums/EventType.java":         javaEventType,
+		"sdk/java/src/main/java/starfederation/datastar/enums/FragmentMergeMode.java": javaFragmentMergeMode,
 	}
 
 	for path, tmplFn := range templates {

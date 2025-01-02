@@ -4,8 +4,8 @@
 
 <div data-signals="{shouldRemove:true}">
     <div>Open the console to see the output</div>
-    <button class="btn btn-success" data-on-click="sse('/examples/execute_script/log')">Console log, auto remove</button>
-    <button class="btn btn-error" data-on-click="sse('/examples/execute_script/error')">Console Error, leave scripts in head</button>
+    <button class="btn btn-success" data-on-click="@get('/examples/execute_script/log')">Console log, auto remove</button>
+    <button class="btn btn-error" data-on-click="@get('/examples/execute_script/error')">Console Error, leave scripts in head</button>
 </div>
 
 ## Explanation

@@ -4,7 +4,7 @@
 
 Look at the title change in the browser tab!
 
-<div data-on-load="sse('/examples/title_update_backend/updates')"></div>
+<div data-on-load="@get('/examples/title_update_backend/updates')"></div>
 
 ## Explanation
 

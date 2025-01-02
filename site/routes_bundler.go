@@ -114,7 +114,7 @@ func setupBundler(router chi.Router) error {
 		name := match[1]
 		path := match[2]
 
-		if !strings.HasPrefix(path, "~/plugins") {
+		if !strings.HasPrefix(path, "../plugins") {
 			continue
 		}
 
@@ -305,9 +305,6 @@ func bundlePlugins(tmpDir string, manifest PluginManifest) (results *BundleResul
 		return nil, fmt.Errorf("error writing bundle file: %w", err)
 	}
 
-	aliasMap := make(map[string]string, 1)
-	aliasMap["~"] = tmpDir
-
 	buildResult := api.Build(api.BuildOptions{
 		EntryPoints: []string{bundleOutFile},
 		Banner: map[string]string{
@@ -323,7 +320,6 @@ func bundlePlugins(tmpDir string, manifest PluginManifest) (results *BundleResul
 		Format:            api.FormatESModule,
 		Sourcemap:         api.SourceMapLinked,
 		Target:            api.ES2023,
-		Alias:             aliasMap,
 	})
 
 	if len(buildResult.Errors) > 0 {

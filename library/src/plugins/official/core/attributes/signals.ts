@@ -3,8 +3,8 @@ import {
   type NestedValues,
   PluginType,
   Requirement,
-} from '~/engine/types'
-import { jsStrToObject } from '~/utils/text'
+} from '../../../../engine/types'
+import { jsStrToObject } from '../../../../utils/text'
 
 export const Signals: AttributePlugin = {
   type: PluginType.Attribute,
@@ -19,7 +19,9 @@ export const Signals: AttributePlugin = {
     } else {
       const obj = jsStrToObject(ctx.value)
       ctx.value = JSON.stringify(obj)
-      signals.merge(genRX()<NestedValues>(), ifMissing)
+      const rx = genRX()
+      const nv = rx<NestedValues>()
+      signals.merge(nv, ifMissing)
     }
   },
 }

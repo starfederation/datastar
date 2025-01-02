@@ -1,4 +1,8 @@
-import { type AttributePlugin, PluginType, Requirement } from '~/engine/types'
+import {
+  type AttributePlugin,
+  PluginType,
+  Requirement,
+} from '../../../../engine/types'
 
 const name = 'computed'
 export const Computed: AttributePlugin = {

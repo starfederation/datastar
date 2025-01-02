@@ -2,7 +2,7 @@
 
 ## Demo
 
-<div id="container" data-on-load="sse('/examples/model_binding/data')"></div>
+<div id="container" data-on-load="@get('/examples/model_binding/data')"></div>
 
 ## Explanation
 

@@ -20,9 +20,11 @@ func TestExamplePersist(t *testing.T) {
 				marshalled := fromLocalStorage.String()
 				c, err := gabs.ParseJSON([]byte(marshalled))
 				assert.NoError(t, err)
-				actual := c.Path("nested.test1").Data().(string)
+				actual, ok := c.Path("nested.test1").Data().(string)
+				assert.True(t, ok)
 				return actual
 			}
+
 			assert.Equal(t, expected, checkLocalStorage())
 
 			page.MustWaitIdle()

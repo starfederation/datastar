@@ -6,10 +6,10 @@ import {
   DefaultExecuteScriptAttributes,
   DefaultExecuteScriptAutoRemove,
   EventTypes,
-} from '~/engine/consts'
-import { dsErr } from '~/engine/errors'
-import { PluginType, type WatcherPlugin } from '~/engine/types'
-import { isBoolString } from '~/utils/text'
+} from '../../../../engine/consts'
+import { dsErr } from '../../../../engine/errors'
+import { PluginType, type WatcherPlugin } from '../../../../engine/types'
+import { isBoolString } from '../../../../utils/text'
 import { datastarSSEEventWatcher } from '../shared'
 
 export const ExecuteScript: WatcherPlugin = {
