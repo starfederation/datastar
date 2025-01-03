@@ -61,17 +61,7 @@ Works the same as `@get()` but sends a `POST` request to the backend.
 
 Arguments: `@put(url: string, options={})`
 
-Works the same as `@put()` but sends a `PUT` request to the backend.
-
-```html
-<button data-on-click="@put('/endpoint')"></button>
-```
-
-### `@put()`
-
-Arguments: `@put(url: string, options={})`
-
-Works the same as `@put()` but sends a `PUT` request to the backend.
+Works the same as `@get()` but sends a `PUT` request to the backend.
 
 ```html
 <button data-on-click="@put('/endpoint')"></button>
@@ -81,7 +71,7 @@ Works the same as `@put()` but sends a `PUT` request to the backend.
 
 Arguments: `@patch(url: string, options={})`
 
-Works the same as `@patch()` but sends a `PATCH` request to the backend.
+Works the same as `@get()` but sends a `PATCH` request to the backend.
 
 ```html
 <button data-on-click="@patch('/endpoint')"></button>
@@ -91,7 +81,7 @@ Works the same as `@patch()` but sends a `PATCH` request to the backend.
 
 Arguments: `@delete(url: string, options={})`
 
-Works the same as `@delete()` but sends a `DELETE` request to the backend.
+Works the same as `@get()` but sends a `DELETE` request to the backend.
 
 ```html
 <button data-on-click="@delete('/endpoint')"></button>
