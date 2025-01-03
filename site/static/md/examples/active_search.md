@@ -17,7 +17,7 @@ The interesting part is the input field:
 ```html
 <input
   data-bind-search
-  data-on-input__debounce.1000ms="@gnt('/examples/active_search/data')"
+  data-on-input__debounce.1000ms="@get('/examples/active_search/data')"
   placeholder="Search..."
   type="text"
 />
