@@ -113,8 +113,8 @@ Toggles all the signals that start with the prefix. This is useful for toggling 
 <div data-on-click="@toggleAll('foo.')"></div>
 ```
 
-### `@fit(')`
+### `@fit()`
 
-Arguments: `@fit('v: number, oldMin:number, oldMax:number, newMin, newMax, shouldClamp=false, shouldRound=false)`
+Arguments: `@fit(v: number, oldMin: number, oldMax: number, newMin: number, newMax: number, shouldClamp=false, shouldRound=false)`
 
 Make a value linear interpolate from an original range to new one.
