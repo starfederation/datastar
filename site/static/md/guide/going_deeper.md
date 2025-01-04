@@ -54,16 +54,18 @@ Signals in Datastar have a superpower: they are nestable. This allows you to sco
 Or, using object syntax:
 
 ```html
-<div data-signals="{foo: {bar: {baz: 1}}}"></div>
+<div data-signals="{foo: {bar: 1}}"></div>
 ```
 
 Or, using two-way binding:
 
 ```html
-<input data-bind-foo.bar.baz />
+<input data-bind-foo.bar />
 ```
 
 The beauty of this is that you don't need to write a bunch of code to set up and maintain state. You just use `data-*` attributes and think declaratively!
+
+Note when working with nested signals that only the leaf nodes are actually signals. So in the example above, only `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
 
 ## Datastar Actions
 
