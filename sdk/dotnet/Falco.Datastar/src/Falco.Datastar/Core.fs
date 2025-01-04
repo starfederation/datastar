@@ -3,7 +3,7 @@ namespace Falco.Datastar
 open Falco.Markup
 
 module DatastarScript =
-    let cdnSrc = "https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"
+    let cdnSrc = "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.1/bundles/datastar.js"
     let cdn = [ Attr.type' "module"; Attr.defer; Attr.src cdnSrc ]
 
 type DebounceTime =

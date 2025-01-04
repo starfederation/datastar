@@ -16,7 +16,7 @@ function indexPage() {
     <!doctype html><html>
       <head>
         <title>Node/Express + Datastar Example</title>
-        <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script></head>
+        <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.1/bundles/datastar.js"></script></head>
       <body>
         <h2>Node/Express + Datastar Example</h2>
         <main class="container" id="main" data-signals='{ input: "", show: false }'>
