@@ -13,6 +13,6 @@ export const POST: ActionPlugin = {
   type: PluginType.Action,
   name: 'post',
   fn: async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
-    return sse(ctx, url, { ...args, method: 'POST' })
+    return sse(ctx, 'POST', url, { ...args })
   },
 }

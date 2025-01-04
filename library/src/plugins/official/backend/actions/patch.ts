@@ -13,6 +13,6 @@ export const PATCH: ActionPlugin = {
   type: PluginType.Action,
   name: 'patch',
   fn: async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
-    return sse(ctx, url, { ...args, method: 'PATCH' })
+    return sse(ctx, 'PATCH', url, { ...args })
   },
 }
