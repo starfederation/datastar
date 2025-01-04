@@ -119,7 +119,7 @@ def real_base() -> Element:
           Meta(charset="UTF-8"),
           Meta(name="viewport", content="width=device-width, initial-scale=1.0"),
           Link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"),
-          Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"),
+          Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.1/bundles/datastar.js"),
           slot="head",
         ),
         Body(slot="body"),
