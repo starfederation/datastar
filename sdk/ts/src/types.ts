@@ -18,16 +18,16 @@ export type FragmentMergeMode = typeof FragmentMergeModes[number];
 export type EventType = typeof EventTypes[number];
 
 export interface DatastarEventOptions {
-    id?: string;
+    eventId?: string;
     retryDuration?: number;
 };
 
 export interface FragmentOptions extends DatastarEventOptions {
     [DatastarDatalineUseViewTransition]?: boolean;
+    [DatastarDatalineSettleDuration]?: number;
 }
 
 export interface MergeFragmentsOptions extends FragmentOptions {
-    [DatastarDatalineSettleDuration]?: number;
     [DatastarDatalineMergeMode]?: FragmentMergeMode;
     [DatastarDatalineSelector]?: string;
 };
@@ -51,18 +51,43 @@ export interface MergeSignalsOptions extends DatastarEventOptions {
 export interface MergeSignalsEvent {
     event: "datastar-merge-signals";
     options: MergeSignalsOptions;
-    [DatastarDatalineSignals]: string;
+    [DatastarDatalineSignals]: Record<string, any>;
 };
 
 export interface RemoveSignalsEvent {
     event: "datastar-remove-signals";
     options: DatastarEventOptions;
-    [DatastarDatalinePaths]: string;
+    [DatastarDatalinePaths]: string[];
+}
+type ScriptAttributes = {
+    type?: "module" | "importmap" | "speculationrules" | "text/javascript";
+    refererpolicy: "no-referrer"
+        | "no-referrer-when-downgrade"
+        | "origin"
+        | "origin-when-cross-origin"
+        | "same-origin"
+        | "strict-origin"
+        | "strict-origin-when-cross-origin"
+        | "unsafe-url";
+    nonce?: string;
+    nomodule?: boolean;
+    integrity?: string;
+    fetchpriority?: "high" | "low" | "auto";
+    crossorigin?: "anonymous" | "use-credentials";
+    blocking?: boolean;
+    attributionsrc?: boolean | string;
+    src?: string;
+} & {
+    src: string;
+    defer: true;
+} & {
+    src: string;
+    async: true;
 }
 
 export interface ExecuteScriptOptions extends DatastarEventOptions {
     [DatastarDatalineAutoRemove]?: boolean;
-    [DatastarDatalineAttributes]?: string;
+    [DatastarDatalineAttributes]?: ScriptAttributes;
 }
 
 export interface ExecuteScriptEvent {

@@ -5,13 +5,11 @@ import {
     MergeFragmentsOptions,
     MergeSignalsOptions,
     ExecuteScriptOptions,
-    DatastarEventOptionsUnion,
-    MultilineDatalinePrefix
 } from "./types";
 
-function isRecord(obj: unknown): obj is Record<string, unknown> {
-    return typeof obj === 'object' && obj !== null;
-}
+import {
+    DefaultSseRetryDurationMs
+} from "./consts";
 
 export abstract class ServerSentEventGenerator {
     // runtimes should override this method to create an sse stream
@@ -23,11 +21,11 @@ export abstract class ServerSentEventGenerator {
          dataLines: string[],
          options: DatastarEventOptions
     ): string[] {
-        const { id, retryDuration } = options || {};
+        const { eventId, retryDuration } = options || {};
 
         const typeLine = [`event: ${event}\n`];
-        const idLine = id ? [`id: ${id}\n`] : [];
-        const retryLine = retryDuration ? [`retry: ${retryDuration}\n`] : [];
+        const idLine = eventId ? [`id: ${eventId}\n`] : [];
+        const retryLine = [`retry: ${retryDuration ?? DefaultSseRetryDurationMs}\n`];
 
         return typeLine.concat(
             idLine,
@@ -39,82 +37,69 @@ export abstract class ServerSentEventGenerator {
         );
     }
 
-    private eachNewlineIsADataLine(prefix: MultilineDatalinePrefix, data: string) {
-        const [ head, ...tail] = data.split('\n');
-
-        return [ `${prefix} ${head}`].concat(tail);
+    private eachNewlineIsADataLine(prefix: string, data: string) {
+       return data.split('\n').map((line) => {
+           return `${prefix} ${line}`;
+       });
     }
 
-    private eachOptionIsADataLine(options: DatastarEventOptionsUnion): string[] {
-        return Object.keys(options).map((key) => {
-            return `${key} ${options}`;
+    private eachOptionIsADataLine(options: Record<string, any>): string[] {
+        return Object.keys(options).flatMap((key) => {
+            return this.eachNewlineIsADataLine(key, options[key as keyof typeof options]!.toString());
         });
     }
 
     public mergeFragments(data: string, options?: MergeFragmentsOptions): ReturnType<typeof this.send> {
-        const { id, retryDuration, ...renderOptions } = options || {} as Partial<MergeFragmentsOptions>;
+        const { eventId, retryDuration, ...renderOptions } = options || {} as Partial<MergeFragmentsOptions>;
         const dataLines = this.eachOptionIsADataLine(renderOptions)
             .concat(this.eachNewlineIsADataLine('fragments', data));
 
-        return this.send('datastar-merge-fragments', dataLines, { id, retryDuration });
+        return this.send('datastar-merge-fragments', dataLines, { eventId, retryDuration });
     }
 
     public removeFragments(selector: string, options?: FragmentOptions): ReturnType<typeof this.send> {
-        const { id, retryDuration, ...eventOptions } = options || {} as Partial<FragmentOptions>;
+        const { eventId, retryDuration, ...eventOptions } = options || {} as Partial<FragmentOptions>;
         const dataLines = this.eachOptionIsADataLine(eventOptions)
-            .concat([`selector ${selector}`]);
+            .concat(this.eachNewlineIsADataLine("selector", selector));
 
-        return this.send('datastar-remove-fragments', dataLines, { id, retryDuration });
+        return this.send('datastar-remove-fragments', dataLines, { eventId, retryDuration });
     }
 
     public mergeSignals(data: Record<string, any>, options?: MergeSignalsOptions): ReturnType<typeof this.send> {
-        const { id, retryDuration, ...eventOptions } = options || {} as Partial<MergeSignalsOptions>;
+        const { eventId, retryDuration, ...eventOptions } = options || {} as Partial<MergeSignalsOptions>;
         const dataLines = this.eachOptionIsADataLine(eventOptions)
             .concat(this.eachNewlineIsADataLine('signals', JSON.stringify(data)));
 
-        return this.send('datastar-merge-signals', dataLines, { id, retryDuration });
+        return this.send('datastar-merge-signals', dataLines, { eventId, retryDuration });
     }
 
     public removeSignals(paths: string[], options?: DatastarEventOptions): ReturnType<typeof this.send> {
         const eventOptions = options || {} as DatastarEventOptions;
-        const dataLines = [`paths ${paths.join(' ')}`];
+        const dataLines = paths.flatMap((path) => path.split(' ')).map((path) => `paths ${path}`);
 
         return this.send('datastar-remove-signals', dataLines, eventOptions);
     }
 
     public executeScript(script: string, options?: ExecuteScriptOptions): ReturnType<typeof this.send> {
-        const { id, retryDuration, ...eventOptions } = options || {} as Partial<ExecuteScriptOptions>;
-        const dataLines = this.eachOptionIsADataLine(eventOptions)
-            .concat(this.eachNewlineIsADataLine('script', script));
+        const {
+            eventId,
+            retryDuration,
+            attributes,
+            ...eventOptions
+        } = options || {} as Partial<ExecuteScriptOptions>;
 
-        return this.send('datastar-execute-script', dataLines, { id, retryDuration });
+        const attributesDataLines = this.eachOptionIsADataLine(attributes ?? {})
+            .map((line) => `attributes ${line}`);
+
+        const dataLines = attributesDataLines.concat(
+            this.eachOptionIsADataLine(eventOptions),
+            this.eachNewlineIsADataLine('script', script));
+
+        return this.send('datastar-execute-script', dataLines, { eventId, retryDuration });
     }
 
-    static async readSignals(request: Request) : Promise<
+    abstract readSignals(request: any): Promise<
         { success: true, signals: Record<string, unknown> }
         | { success: false, error: string }
-    > {
-        if (request.method === "GET") {
-            const url = new URL(request.url);
-            const params = url.searchParams;
-
-             try {
-                 if (params.has('datastar')) {
-                     const signals = JSON.parse(params.get('datastar')!);
-                     return { success: true, signals };
-                 } else throw new Error("No datastar object in requestuest");
-             } catch(e: unknown) {
-                 if (isRecord(e) && 'message' in e && typeof e.message === 'string') {
-                      return { success: false, error: e.message }
-                 }
-                 else return { success: false, error: "unknown error when parsing requestuest" }
-            }
-        }
-
-        const body = await request.json();
-
-        if ('datastar' in body && isRecord(body.datastar)) {
-            return { success: true, signals: body.datastar };
-        } else return { success: false, error: "No datastar object in requestuest" };
-    }
+    >
 }

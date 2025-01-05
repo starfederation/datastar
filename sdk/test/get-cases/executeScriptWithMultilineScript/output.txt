@@ -1,0 +1,7 @@
+event: datastar-execute-script
+retry: 1000
+data: script if (true) {
+data: script   console.log('hello');
+data: script }
+
+

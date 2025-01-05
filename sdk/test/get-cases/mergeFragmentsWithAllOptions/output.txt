@@ -1,0 +1,10 @@
+event: datastar-merge-fragments
+id: 1
+retry: 2000
+data: selector div
+data: mergeMode append
+data: settleDuration 1000
+data: useViewTransition false
+data: fragments <div>Merge</div>
+
+
