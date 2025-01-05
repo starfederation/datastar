@@ -35,13 +35,14 @@ The following expression, for example, is _not_ valid because it evaluates to `1
 ```
 
 The following is also _not_ valid, because `$foo` is not signal – only the leaf nodes in nested signals are actually signals.
+
 ```html
 <div data-signals-foo.bar="1">
   <div data-text="$foo"></div>
 </div>
 ```
 
-The following _is_ valid, because `$foo.bar` is a signal.
+The following is valid, because `$foo.bar` _is a signal.
 
 ```html
 <div data-signals-foo.bar="1">
