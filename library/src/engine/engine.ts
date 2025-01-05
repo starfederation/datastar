@@ -106,8 +106,8 @@ export class Engine {
 
           const hasKey = key.length > 0
           if (hasKey) {
-            // Keys starting with an underscore are not converted to camel case in the dataset
-            if (key.startsWith('-_')) {
+            // Keys starting with a dash are not converted to camel case in the dataset
+            if (key.startsWith('-')) {
               key = key.slice(1)
             } else {
               key = key[0].toLowerCase() + key.slice(1)
