@@ -17,8 +17,6 @@ import {
   STARTED,
 } from '../shared'
 
-type METHOD = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
-
 function dispatchSSE(type: string, argsRaw: Record<string, string>) {
   document.dispatchEvent(
     new CustomEvent<DatastarSSEEvent>(DATASTAR_SSE_EVENT, {
@@ -30,7 +28,6 @@ function dispatchSSE(type: string, argsRaw: Record<string, string>) {
 const isWrongContent = (err: any) => `${err}`.includes('text/event-stream')
 
 export type SSEArgs = {
-  method: METHOD
   headers?: Record<string, string>
   openWhenHidden?: boolean
   retryInterval?: number
@@ -49,14 +46,13 @@ export type SSEArgs = {
     }
 )
 
-export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
+export const sse = async (ctx: RuntimeContext, method: string, url: string, args: SSEArgs) => {
   const {
     el: { id: elId },
     el,
     signals,
   } = ctx
   const {
-    method: methodAnyCase,
     headers: userHeaders,
     contentType,
     includeLocal,
@@ -69,7 +65,6 @@ export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
     abort,
   } = Object.assign(
     {
-      method: 'GET',
       headers: {},
       contentType: 'json',
       includeLocal: false,
@@ -83,8 +78,7 @@ export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
     },
     args,
   )
-  const method = methodAnyCase.toUpperCase()
-  const action = methodAnyCase.toLowerCase()
+  const action = method.toLowerCase()
   let cleanupFn = (): void => {}
   try {
     dispatchSSE(STARTED, { elId })
