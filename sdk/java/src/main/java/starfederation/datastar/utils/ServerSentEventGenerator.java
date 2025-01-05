@@ -7,6 +7,8 @@ import java.io.Closeable;
 import java.io.PrintWriter;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static starfederation.datastar.Consts.DEFAULT_SSE_RETRY_DURATION;;
+
 public class ServerSentEventGenerator implements Closeable {
 
     private final PrintWriter writer;
@@ -40,9 +42,9 @@ public class ServerSentEventGenerator implements Closeable {
      * Sends a Datastar event to the client.
      *
      * @param event the event to send
-     * @param id the event id
+     * @param id    the event id
      */
-    public synchronized void send(AbstractDatastarEvent event, String id) {
+    public synchronized void send(AbstractDatastarEvent event, String id, int retry) {
         if (event == null) {
             throw new IllegalArgumentException("Event cannot be null.");
         }
@@ -52,6 +54,7 @@ public class ServerSentEventGenerator implements Closeable {
         // Write the event type
         output.append("event: ").append(event.getEventType()).append("\n");
         output.append("id: ").append(id).append("\n");
+        output.append("retry: ").append(retry).append("\n");
 
         // Write the data lines
         for (String line : event.getDataLines()) {
@@ -67,12 +70,35 @@ public class ServerSentEventGenerator implements Closeable {
     }
 
     /**
-     * Sends a Datastar event to the client with a monotonically increasing long ID.
+     * Sends a Datastar event to the client with a monotonically increasing long ID
+     * and default retry duration.
      *
      * @param event the event to send
      */
     public synchronized void send(AbstractDatastarEvent event) {
-        send(event, String.valueOf(counter.incrementAndGet()));
+        send(event, String.valueOf(counter.incrementAndGet()), DEFAULT_SSE_RETRY_DURATION);
+    }
+
+    /**
+     * Sends a Datastar event to the client with a specified ID and default retry
+     * duration.
+     *
+     * @param event the event to send
+     * @param id    the event id
+     */
+    public synchronized void send(AbstractDatastarEvent event, string id) {
+        send(event, id, DEFAULT_SSE_RETRY_DURATION);
+    }
+
+    /**
+     * Sends a Datastar event to the client with a monotonically increasing long ID
+     * and specified retry duration.
+     *
+     * @param event the event to send
+     * @param retry the retry duration
+     */
+    public synchronized void send(AbstractDatastarEvent event, int retry) {
+        send(event, String.valueOf(counter.incrementAndGet()), retry);
     }
 
     /**
