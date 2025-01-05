@@ -42,7 +42,7 @@ The following is also _not_ valid, because `$foo` is not signal – only the lea
 </div>
 ```
 
-The following is valid, because `$foo.bar` _is a signal.
+The following is valid, because `$foo.bar` _is_ a signal in this case.
 
 ```html
 <div data-signals-foo.bar="1">
