@@ -80,7 +80,7 @@ generator.send(event, "custom-id", 2000);
 
 There are a few different event types in Datastar and each come with their own options. You can check out the [SDK Guide](https://github.com/rphumulock/datastar/blob/develop/sdk/README.md) for a review of all of them.
 
-Here's a quick review of some of the options.
+#### Example: Merging Fragments into the DOM
 
 ##### Options
 
@@ -88,11 +88,6 @@ Here's a quick review of some of the options.
 - `mergeMode` (FragmentMergeMode) The mode to use when merging the fragment into the DOM. If not provided the Datastar client side **_will_** default to `morph`.
 - `settleDuration` is used to control the amount of time that a fragment should take before removing any CSS related to settling. It is used to allow for animations in the browser via the Datastar client. If provided the value **_must_** be a positive integer of the number of milliseconds to allow for settling. If none is provided, the default value of `300` milliseconds will be used.
 - `useViewTransition` Whether to use view transitions, if not provided the Datastar client side **_will_** default to `false`.
-- `onlyIfMissing` (boolean) Whether to merge the signal only if it does not already exist. If not provided, the Datastar client side will default to false, which will cause the data to be merged into the signals.
-- `autoRemove` Whether to remove the script after execution, if not provided the Datastar client side will default to true.
-- `attributes` A line separated list of attributes to add to the script element, if not provided the Datastar client side will default to type module. Each item in the array should be a string in the format key value.
-
-#### Example: Merging Fragments into the DOM
 
 ```java
 MergeFragments event = MergeFragments.builder()
@@ -106,6 +101,12 @@ MergeFragments event = MergeFragments.builder()
 
 #### Example: Removing HTML Fragments from the DOM
 
+##### Options
+
+- `selector` (string) The CSS selector to use to insert the fragments. If not provided or empty, Datastar **will** default to using the `id` attribute of the fragment.
+- `settleDuration` is used to control the amount of time that a fragment should take before removing any CSS related to settling. It is used to allow for animations in the browser via the Datastar client. If provided the value **_must_** be a positive integer of the number of milliseconds to allow for settling. If none is provided, the default value of `300` milliseconds will be used.
+- `useViewTransition` Whether to use view transitions, if not provided the Datastar client side **_will_** default to `false`.
+
 ```java
 RemoveFragments event = RemoveFragments.builder()
         .selector("#feed")
@@ -115,6 +116,10 @@ RemoveFragments event = RemoveFragments.builder()
 ```
 
 #### Example: Merging Signals
+
+###### Options
+
+- `onlyIfMissing` (boolean) Whether to merge the signal only if it does not already exist. If not provided, the Datastar client side will default to false, which will cause the data to be merged into the signals.
 
 ```java
 MergeSignals event = MergeSignals.builder()
@@ -133,6 +138,11 @@ RemoveSignals event = RemoveSignals.builder()
 ```
 
 #### Example: Executing Scripts
+
+###### Options
+
+- `autoRemove` Whether to remove the script after execution, if not provided the Datastar client side will default to true.
+- `attributes` A line separated list of attributes to add to the script element, if not provided the Datastar client side will default to type module. Each item in the array should be a string in the format key value.
 
 ```java
 ExecuteScript event = ExecuteScript.builder()

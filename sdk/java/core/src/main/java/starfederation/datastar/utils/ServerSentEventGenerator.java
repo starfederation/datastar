@@ -86,7 +86,7 @@ public class ServerSentEventGenerator implements Closeable {
      * @param event the event to send
      * @param id    the event id
      */
-    public synchronized void send(AbstractDatastarEvent event, string id) {
+    public synchronized void send(AbstractDatastarEvent event, String id) {
         send(event, id, DEFAULT_SSE_RETRY_DURATION);
     }
 
