@@ -4,7 +4,7 @@ Thanks for thinking about contributing to Datastar 🚀
 
 ## Before You Contribute
 
-Before you contribute, please consider that Datastar is a lightweight JavaScript framework that aims to simplify real-time, interactive web apps by using a minimalist, attribute-based approach for state management and event handling directly in HTML.
+Before you contribute, please consider that Datastar is a lightweight JavaScript framework that aims to simplify reactive web apps by using a minimalist, attribute-based approach for state management and event handling directly in HTML.
 
 Anything outside of this scope may not be accepted. If you have a need for a feature that is not within the scope of Datastar, consider using a Web Component or writing your own Datastar plugin.
 
@@ -18,7 +18,7 @@ Datastar’s documentation is under active development. All the markdown files l
 
 ## Pull Requests
 
-If you’re unsure about whether a pull request is within the scope of Datastar, please open an issue to discuss your idea first. Pull requests should have a descriptive title and clearly describe the problem and solution. If the pull request adds or changes behaviour, documentation and examples should be updated accordingly.
+Always open an issue to discuss your idea _before_ submitting a pull request. Pull requests must have a descriptive title and clearly describe the problem and solution. If the pull request adds or changes behaviour, documentation and examples should be updated accordingly.
 
 ## Building
 

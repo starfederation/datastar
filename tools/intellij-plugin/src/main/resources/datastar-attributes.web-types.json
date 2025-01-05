@@ -248,6 +248,23 @@
           }
         },
         {
+          "name": "data-custom-validity",
+          "virtual": true,
+          "description": "Adds custom validity to an element using an expression.",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-custom-validity",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-custom-validity"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
           "name": "data-indicator-*",
           "virtual": true,
           "description": "Creates a signal to track in-flight backend requests.",

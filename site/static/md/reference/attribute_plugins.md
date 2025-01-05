@@ -29,6 +29,8 @@ Signals are nestable using dot-notation, which can be useful for namespacing.
 <div data-signals-foo.bar="1"></div>
 ```
 
+Note when working with nested signals that only the leaf nodes are actually signals. So in the example above, only `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
+
 The `data-signals` attribute can also be used to merge multiple signals using a set of key-value pairs, where the keys represent signal names and the values represent expressions.
 
 ```html
