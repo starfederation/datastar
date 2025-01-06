@@ -254,7 +254,6 @@ export class Engine {
     )
 
     // Replace any signal calls
-    let origUserExpression = userExpression;
     const signalNames = new Array<string>()
     ctx.signals.walk((path) => signalNames.push(path))
     if (signalNames.length) {
@@ -266,11 +265,12 @@ export class Engine {
       )
     }
 
-    // Check for errors only if no signals were parsed and the expression has a signal in it
-    if (userExpression == origUserExpression && userExpression.includes('$')) {
+    // Check for errors after signals have been replaced, only if the expression still has a `$` in it
+    if (userExpression.includes('$')) {
       const rootProps = ctx.signals.rootProps()
       const rootPropsRe = new RegExp(`\\$(${rootProps.join('|')})(.?((\\w+).)*(\\w+)|$)`, 'gm')
       const found = userExpression.match(rootPropsRe);
+
       if (found) throw dsErr(`SignalNotFound`, { path: trimDollarSignPrefix(found[0]) })
     }
     // Replace any escaped values
