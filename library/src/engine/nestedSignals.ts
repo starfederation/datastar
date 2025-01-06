@@ -230,14 +230,9 @@ export class SignalsRoot {
   }
 
   rootProps(onlyPublic = false): Array<string> {
-    const props: Array<string> = []
-    for (const key in this.#signals) {
-      if (Object.hasOwn(this.#signals, key)) {
-        if (onlyPublic && key.startsWith('_')) {
-          continue
-        }
-        props.push(key)
-      }
+    const props: Array<string> = Object.keys(this.#signals)
+    if (onlyPublic) {
+      return props.filter((prop) => !prop.startsWith("_"))
     }
     return props
   }
