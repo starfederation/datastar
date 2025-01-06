@@ -204,11 +204,11 @@ templ TodosMVCView(mvc *TodoMVC) {
 										@icon("material-symbols:checklist")
 									</button>
 								</div>
+								@sseIndicator("toggleAllFetching")
 							}
 							if mvc.EditingIdx <0 {
 								@TodoInput(-1)
 							}
-							@sseIndicator("toggleAllFetching")
 						</div>
 					</header>
 					if hasTodos {
