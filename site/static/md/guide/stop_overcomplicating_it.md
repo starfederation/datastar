@@ -40,7 +40,7 @@ function myfunction(data) {
 }
 ```
 
-If your function call is asynchronous then it will need to dispatch a custom event containing the result. While asynchronous code _can_ be placed within Datastar expressions, Datastar will _not_ await it.
+If your function call is asynchronous then it will need to dispatch a custom event containing the result. While asynchronous code _can_ be placed within [Datastar expressions](/guide/datastar_expressions), Datastar will _not_ await it.
 
 ```html
 <div data-signals-result="''"
