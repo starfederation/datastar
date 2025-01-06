@@ -22,6 +22,10 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
         const stream = new ReadableStream({
             start(controller) {
                  streamFunc(new ServerSentEventGenerator(controller));
+                 controller.close();
+            },
+            cancel() {
+                 controller.close();
             }
         });
 
