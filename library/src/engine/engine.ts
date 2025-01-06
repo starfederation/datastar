@@ -270,7 +270,6 @@ export class Engine {
       const rootProps = ctx.signals.rootProps()
       const rootPropsRe = new RegExp(`\\$(${rootProps.join('|')})(.?((\\w+).)*(\\w+)|$)`, 'gm')
       const found = userExpression.match(rootPropsRe);
-
       if (found) throw dsErr(`SignalNotFound`, { path: trimDollarSignPrefix(found[0]) })
     }
     // Replace any escaped values
