@@ -229,6 +229,19 @@ export class SignalsRoot {
     return nestedValues(this.#signals, onlyPublic)
   }
 
+  rootProps(onlyPublic = false): Array<string> {
+    const props: Array<string> = []
+    for (const key in this.#signals) {
+      if (Object.hasOwn(this.#signals, key)) {
+        if (onlyPublic && key.startsWith('_')) {
+          continue
+        }
+        props.push(key)
+      }
+    }
+    return props
+  }
+
   JSON(shouldIndent = true, onlyPublic = false) {
     const values = this.values(onlyPublic)
     if (!shouldIndent) {
