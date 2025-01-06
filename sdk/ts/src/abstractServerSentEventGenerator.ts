@@ -11,12 +11,28 @@ import {
     DefaultSseRetryDurationMs
 } from "./consts";
 
+/**
+ * Abstract ServerSentEventGenerator class, responsible for initializing and handling
+ * server-sent events (SSE) as well as reading signals sent by the client.
+ *
+ * The concrete implementation must override the send and constructor methods as well
+ * as implement readSignals and stream static methods.
+ */
 export abstract class ServerSentEventGenerator {
-    // runtimes should override this method to create an sse stream
     protected constructor() {}
 
-    // runtimes should override this method and use it's output to send an event
-    protected send(
+      /**
+       * Sends a server-sent event (SSE) to the client.
+       *
+       * Runtimes should override this method by calling the parent function
+       *  with `super.send(event, dataLines, options)`. That will return all the
+       * datalines as an array of strings that should be streamed to the client.
+       *
+       * @param eventType - The type of the event.
+       * @param dataLines - Lines of data to send.
+       * @param [sendOptions] - Additional options for sending events.
+       */
+       protected send(
          event: EventType,
          dataLines: string[],
          options: DatastarEventOptions
@@ -49,6 +65,12 @@ export abstract class ServerSentEventGenerator {
         });
     }
 
+      /**
+       * Sends a merge fragments event.
+       *
+       * @param fragments - HTML fragments that will be merged.
+       * @param [options] - Additional options for merging.
+       */
     public mergeFragments(data: string, options?: MergeFragmentsOptions): ReturnType<typeof this.send> {
         const { eventId, retryDuration, ...renderOptions } = options || {} as Partial<MergeFragmentsOptions>;
         const dataLines = this.eachOptionIsADataLine(renderOptions)
@@ -57,7 +79,13 @@ export abstract class ServerSentEventGenerator {
         return this.send('datastar-merge-fragments', dataLines, { eventId, retryDuration });
     }
 
-    public removeFragments(selector: string, options?: FragmentOptions): ReturnType<typeof this.send> {
+     /**
+       * Sends a remove fragments event.
+       *
+       * @param selector - CSS selector of fragments to remove.
+       * @param [options] - Additional options for removing.
+       */
+    public removeFragments(selector: string, options?: FragmentOptions) {
         const { eventId, retryDuration, ...eventOptions } = options || {} as Partial<FragmentOptions>;
         const dataLines = this.eachOptionIsADataLine(eventOptions)
             .concat(this.eachNewlineIsADataLine("selector", selector));
@@ -65,6 +93,12 @@ export abstract class ServerSentEventGenerator {
         return this.send('datastar-remove-fragments', dataLines, { eventId, retryDuration });
     }
 
+      /**
+       * Sends a merge signals event.
+       *
+       * @param data - Data object that will be merged into the client's signals.
+       * @param options - Additional options for merging.
+       */
     public mergeSignals(data: Record<string, any>, options?: MergeSignalsOptions): ReturnType<typeof this.send> {
         const { eventId, retryDuration, ...eventOptions } = options || {} as Partial<MergeSignalsOptions>;
         const dataLines = this.eachOptionIsADataLine(eventOptions)
@@ -73,6 +107,12 @@ export abstract class ServerSentEventGenerator {
         return this.send('datastar-merge-signals', dataLines, { eventId, retryDuration });
     }
 
+      /**
+       * Sends a remove signals event.
+       *
+       * @param paths - Array of paths to remove from the client's signals
+       * @param options - Additional options for removing signals.
+       */
     public removeSignals(paths: string[], options?: DatastarEventOptions): ReturnType<typeof this.send> {
         const eventOptions = options || {} as DatastarEventOptions;
         const dataLines = paths.flatMap((path) => path.split(' ')).map((path) => `paths ${path}`);
@@ -80,6 +120,12 @@ export abstract class ServerSentEventGenerator {
         return this.send('datastar-remove-signals', dataLines, eventOptions);
     }
 
+      /**
+       * Executes a script on the client-side.
+       *
+       * @param script - Script code to execute.
+       * @param options - Additional options for execution.
+       */
     public executeScript(script: string, options?: ExecuteScriptOptions): ReturnType<typeof this.send> {
         const {
             eventId,
@@ -97,9 +143,4 @@ export abstract class ServerSentEventGenerator {
 
         return this.send('datastar-execute-script', dataLines, { eventId, retryDuration });
     }
-
-    abstract readSignals(request: any): Promise<
-        { success: true, signals: Record<string, unknown> }
-        | { success: false, error: string }
-    >
 }
