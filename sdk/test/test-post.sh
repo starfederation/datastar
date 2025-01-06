@@ -3,8 +3,6 @@
 [ ! -f "$1/input.json" ] && echo "case $1 does not have input.json" && return 1
 [ ! -f "$1/output.txt" ] && echo "case $1 does not have output.txt" && return 1
 
-echo "starting post test for $1 on $2"
-
 input=$(cat "$1/input.json")
 curl -sN --json  "$input"  "$2/test" -o "$1/testOutput.txt"
 
