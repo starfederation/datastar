@@ -26,15 +26,9 @@ return (()=> {
 })()
 ```
 
-This should help clarify what Datastar is doing behind the scenes, how signals are evaluated in expressions, and also why expressions are limited in what they can do. 
+This should help clarify what Datastar is doing behind the scenes, how signals are evaluated in expressions, and also why expressions are limited in scope. 
 
-The following expression, for example, is _not_ valid because it evaluates to `1.bar`.
-
-```html
-<div data-text="$foo.bar"></div>
-```
-
-The following is also _not_ valid, because `$foo` is not signal – only the leaf nodes in nested signals are actually signals.
+The following example is invalid because `$foo` is _not_ a signal – only the leaf nodes in nested signals are actually signals.
 
 ```html
 <div data-signals-foo.bar="1">
@@ -42,11 +36,12 @@ The following is also _not_ valid, because `$foo` is not signal – only the lea
 </div>
 ```
 
-The following is valid, because `$foo.bar` _is_ a signal in this case.
+The following example is valid because both `$foo.bar` and `$baz` are signals.
 
 ```html
-<div data-signals-foo.bar="1">
+<div data-signals-foo.bar="1" data-signals-baz="1">
   <div data-text="$foo.bar"></div>
+  <div data-text="$baz"></div>
 </div>
 ```
 
