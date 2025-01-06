@@ -4,6 +4,7 @@ import { effect } from '../vendored/preact-core'
 import { DSP, DSS, VERSION } from './consts'
 import { dsErr } from './errors'
 import { SignalsRoot } from './nestedSignals'
+import { trimDollarSignPrefix } from '../utils/text'
 import {
   type ActionPlugin,
   type ActionPlugins,
@@ -270,7 +271,7 @@ export class Engine {
       const rootProps = ctx.signals.rootProps()
       const rootPropsRe = new RegExp(`\\$(${rootProps.join('|')})(.?((\\w+).)*(\\w+)|$)`, 'gm')
       const found = userExpression.match(rootPropsRe);
-      if (found) throw dsErr(`SignalNotFound: ${found[0]}`, { path: found[0] })
+      if (found) throw dsErr(`SignalNotFound`, { path: trimDollarSignPrefix(found[0]) })
     }
     // Replace any escaped values
     for (const [k, v] of escaped) {
