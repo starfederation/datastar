@@ -2,7 +2,7 @@
 
 Datastar expressions are strings that are evaluated by Datastar attributes and actions. 
 
-The following example outputs `1` not because `$foo` is defined in the global scope, but because we've defined `foo` as a signal with the initial value `1`, and are using `$foo` in a `data-*` attribute.
+The following example outputs `1` not because `$foo` is defined in the global scope (it doesn't), but because we've defined `foo` as a signal with the initial value `1`, and are using `$foo` in a `data-*` attribute.
 
 ```html
 <div data-signals-foo="1">
