@@ -12,28 +12,39 @@ const server = createServer(async (req, res) => {
         res.end(`<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script></head><body><div id="toMerge" data-on-load="sse('/merge', {method: 'get'})">Not merged</div></body></html>`);
     }
     else if (req.url?.includes("/merge")) {
-        ServerSentEventGenerator.stream(req, res, (stream) => {
+        ServerSentEventGenerator.stream(req, res, async (stream) => {
             stream.mergeFragments('<div id="toMerge">Merged</div>');
         });
-    } else {
+    } else if (req.url?.includes("/test")) {
         const reader = await ServerSentEventGenerator.readSignals(req);
         if (reader.success === true) {
             const events = reader.signals.events;
             if (isEventArray(events)) {
-                ServerSentEventGenerator.stream(req, res, (stream) => {
+                ServerSentEventGenerator.stream(req, res, async (stream) => {
                     testEvents(stream, events);
                 });
-                res.end();
             }
         } else {
             res.end(reader.error);
         }
+    } else if (req.url?.includes('/await')) {
+         ServerSentEventGenerator.stream(req, res, async (stream) => {
+            stream.mergeFragments('<div id="toMerge">Merged</div>');
+            await delay(5000);
+            stream.mergeFragments('<div id="toMerge">After 10 seconds</div>');
+        });
     }
 });
 
 server.listen(port, hostname, () => {
 	console.log(`Server running at http://${hostname}:${port}/`);
 });
+
+function delay(milliseconds: number) {
+    return new Promise(resolve => {
+        setTimeout(resolve, milliseconds);
+    });
+}
 
 function isEventArray(events: unknown): events is (Record<string, unknown> & { type: string })[] {
     return events instanceof Array && events.every(event => {

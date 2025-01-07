@@ -39,8 +39,9 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
    * @param res - The NodeJS response object.
    * @param streamFunc - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
    */
-    static stream(req: IncomingMessage, res: ServerResponse, streamFunc: (stream: ServerSentEventGenerator) => void): void {
-        streamFunc(new ServerSentEventGenerator(req, res));
+    static stream(req: IncomingMessage, res: ServerResponse, streamFunc: (stream: ServerSentEventGenerator) => Promise<void>): void {
+        await streamFunc(new ServerSentEventGenerator(req, res));
+        res.end();
     }
 
     protected send(

@@ -28,7 +28,7 @@ const server = createServer(async (req, res) => {
         });
     }
 
-    res.end();
+    res.end('Path not found');
 });
 
 server.listen(port, hostname, () => {
