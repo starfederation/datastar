@@ -225,6 +225,12 @@ export class SignalsRoot {
     walkNestedSignal(this.#signals, cb)
   }
 
+  paths() {
+    const signalNames = new Array<string>()
+    this.walk((path) => signalNames.push(path))
+    return signalNames
+  }
+
   values(onlyPublic = false): NestedValues {
     return nestedValues(this.#signals, onlyPublic)
   }

@@ -253,8 +253,7 @@ export class Engine {
     )
 
     // Replace any signal calls
-    const signalNames = new Array<string>()
-    ctx.signals.walk((path) => signalNames.push(path))
+    const signalNames = ctx.signals.paths()
     if (signalNames.length) {
       // Match any valid `$signalName` followed by a non-word character or end of string
       const signalsRe = new RegExp(`\\$(${signalNames.join('|')})(\\W|$)`, 'gm')
@@ -273,12 +272,18 @@ export class Engine {
 
     try {
       const fn = new Function('ctx', ...argNames, fnContent)
-      return (...args: any[]) => fn(ctx, ...args)
+      return (...args: any[]) => {
+        try {
+          return fn(ctx, ...args)
+        } catch (e: any) {
+          throw dsErr('InvalidExpression', {
+            error: e.message,
+            validSignalNames: this.signals.paths(),
+          })
+        }
+      }
     } catch (error) {
-      throw dsErr('GeneratingExpressionFailed', {
-        error,
-        fnContent,
-      })
+      throw dsErr('GeneratingExpressionFailed', { error, fnContent })
     }
   }
 

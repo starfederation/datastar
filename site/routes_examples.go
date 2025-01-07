@@ -72,6 +72,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "raf_update"},
 				{ID: "update_signals"},
 				{ID: "signals_ifmissing"},
+				{ID: "bad_signals"},
 				{ID: "offline_sync"},
 				{ID: "session_storage"},
 				{ID: "refs"},
