@@ -12,7 +12,7 @@ serve(async (req: Request) => {
          });
     }
     else if (url.pathname.includes('/merge')) {
-        return ServerSentEventGenerator.stream((stream) => {
+        return ServerSentEventGenerator.stream(async (stream) => {
             stream.mergeFragments('<div id="toMerge">Merged</div>');
         });
     }
@@ -21,17 +21,30 @@ serve(async (req: Request) => {
         if (reader.success === true) {
            const events = reader.signals.events;
             if (isEventArray(events)) {
-                return ServerSentEventGenerator.stream((stream) => {
+                return ServerSentEventGenerator.stream(async (stream) => {
                     testEvents(stream, events);
                 });
             }
         }
-
-        return new Response(`Path not found: ${req.url}`, {
-            headers: { 'Content-Type': 'text/html' }
+    }
+    else if (url.pathname.includes('await')) {
+        return ServerSentEventGenerator.stream(async (stream) => {
+            stream.mergeFragments('<div id="toMerge">Merged</div>');
+            await delay(10000);
+            stream.mergeFragments('<div id="toMerge">After 10 seconds</div>');
         });
     }
+
+    return new Response(`Path not found: ${req.url}`, {
+        headers: { 'Content-Type': 'text/html' }
+    });
 });
+
+function delay(milliseconds){
+    return new Promise(resolve => {
+        setTimeout(resolve, milliseconds);
+    });
+}
 
 function isEventArray(events: unknown): events is (Record<string, unknown> & { type: string })[] {
     return events instanceof Array && events.every(event => {

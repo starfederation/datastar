@@ -57,7 +57,7 @@ serve(async (req: Request) => {
          });
     }
     else if (url.pathname.includes('/merge')) {
-        return ServerSentEventGenerator.stream((stream) => {
+        return ServerSentEventGenerator.stream(async (stream) => {
             stream.mergeFragments('<div id="toMerge">Merged</div>');
         });
     }

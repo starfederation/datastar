@@ -29,10 +29,10 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
    * @param streamFunc - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
    * @returns an HTTP Response
    */
-    static stream(streamFunc: (stream: ServerSentEventGenerator) => void): Response {
+    static stream(streamFunc: (stream: ServerSentEventGenerator) => Promise<void>): Response {
         const stream = new ReadableStream({
-            start(controller) {
-                 streamFunc(new ServerSentEventGenerator(controller));
+            async start(controller) {
+                 await streamFunc(new ServerSentEventGenerator(controller));
                  controller.close();
             }
         });
