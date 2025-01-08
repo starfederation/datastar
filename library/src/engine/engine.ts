@@ -275,15 +275,18 @@ export class Engine {
       return (...args: any[]) => {
         try {
           return fn(ctx, ...args)
-        } catch (e: any) {
-          throw dsErr('InvalidExpression', {
-            error: e.message,
-            validSignalNames: this.signals.paths(),
-          })
+        } catch (error: any) {
+          const validSignalNames = signalNames.map((s) => `$${s}`).join(', ')
+          const match = error.message.match(/(\$\S*) is not defined/)
+          if (match) {
+            const signalName = match[1]
+            throw dsErr('InvalidSignal', { signalName, validSignalNames })
+          }
+          throw dsErr('InvalidExpressionExecution', { error })
         }
       }
     } catch (error) {
-      throw dsErr('GeneratingExpressionFailed', { error, fnContent })
+      throw dsErr('GeneratingExpressionFailed', { fnContent, error })
     }
   }
 
