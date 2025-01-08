@@ -1,3 +1,6 @@
+[![Stable Version](https://img.shields.io/packagist/v/starfederation/datastar-php?label=stable)]((https://packagist.org/packages/starfederation/datastar-php))
+[![Total Downloads](https://img.shields.io/packagist/dt/starfederation/datastar-php)](https://packagist.org/packages/starfederation/datastar-php)
+
 # Datastar PHP SDK
 
 This package provides a PHP SDK for working with [Datastar](https://data-star.dev/).
