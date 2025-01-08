@@ -19,14 +19,24 @@ class ServerSentEventGenerator
     /**
      * The response headers that should be sent.
      */
-    const HEADERS = [
-        'Content-Type' => 'text/event-stream',
-        'Cache-Control' => 'no-cache',
-        'Connection' => 'keep-alive',
-        // Disable buffering for Nginx.
-        // https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering
-        'X-Accel-Buffering' => 'no',
-    ];
+    public static function headers(): array
+    {
+        $headers = [
+            'Cache-Control' => 'no-cache',
+            'Content-Type' => 'text/event-stream',
+            // Disable buffering for Nginx.
+            // https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering
+            'X-Accel-Buffering' => 'no',
+        ];
+
+        // Connection-specific headers are only allowed in HTTP/1.1.
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Connection
+        if ($_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.1') {
+            $headers['Connection'] = 'keep-alive';
+        }
+
+        return $headers;
+    }
 
     /**
      * Returns the signals sent in the incoming request.
@@ -47,7 +57,7 @@ class ServerSentEventGenerator
             return;
         }
 
-        foreach (self::HEADERS as $name => $value) {
+        foreach (self::headers() as $name => $value) {
             header("$name: $value");
         }
     }

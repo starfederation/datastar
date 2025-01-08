@@ -44,8 +44,8 @@ The core mechanics of Datastar's SSE support is
    1. ***There must*** be a way to create a new instance of this object based on the incoming `HTTP` Request and Response objects.
    2. The `ServerSentEventGenerator` ***must*** use a response controller that has the following response headers set by default
       1. `Cache-Control = nocache`
-      2. `Connection = keep-alive`
-      3. `Content-Type = text/event-stream`
+      2. `Content-Type = text/event-stream`
+      3. `Connection = keep-alive` ***only*** if a HTTP/1.1 connection is used (see [spec](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Connection))
    3. Then the created response ***should*** `flush` immediately to avoid timeouts while 0-♾️ events are created
    4. Multiple calls using `ServerSentEventGenerator` should be single threaded to guarantee order.  The Go implementation use a mutex to facilitate this behavior but might not be need in a some environments
 
