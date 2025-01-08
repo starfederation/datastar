@@ -95,9 +95,9 @@ Provides actions for performing browser operations.
 
 ### `@copy()`
 
-Arguments: `@copy(value: string)`
+Arguments: `@copy(expression: string)`
 
-Copies the provided value to the clipboard.
+Copies the provided evaluated expression to the clipboard.
 
 ```html
 <div data-on-click="@copy('Hello, world!')"></div>
