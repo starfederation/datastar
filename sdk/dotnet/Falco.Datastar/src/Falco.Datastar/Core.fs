@@ -54,7 +54,7 @@ type DsAction =
     | Delete of url:string
     | SetAll of pathPrefix:string * value:string
     | ToggleAll of PathPrefix:string
-    | Clipboard of text:string
+    | Copy of text:string
     | Script of string
     static member AsString action =
         match action with
@@ -65,7 +65,7 @@ type DsAction =
         | Delete url -> $"@delete('{url}')"
         | SetAll(pathPrefix, value) -> $"@setAll('{pathPrefix}', {value})"
         | ToggleAll pathPrefix -> $"@toggleAll('{pathPrefix}')"
-        | Clipboard text -> $"@clipboard('{text}')"
+        | Copy text -> $"@copy('{text}')"
         | Script script -> script
 
 type IntersectsModifier =

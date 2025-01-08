@@ -6,9 +6,9 @@
 import { dsErr } from '../../../../engine/errors'
 import { type ActionPlugin, PluginType } from '../../../../engine/types'
 
-export const Clipboard: ActionPlugin = {
+export const Copy: ActionPlugin = {
   type: PluginType.Action,
-  name: 'clipboard',
+  name: 'copy',
   fn: (_, text) => {
     if (!navigator.clipboard) {
       throw dsErr('ClipboardNotAvailable')

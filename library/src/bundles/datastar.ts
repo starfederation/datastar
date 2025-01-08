@@ -10,7 +10,7 @@ import { MergeFragments } from '../plugins/official/backend/watchers/mergeFragme
 import { MergeSignals } from '../plugins/official/backend/watchers/mergeSignals'
 import { RemoveFragments } from '../plugins/official/backend/watchers/removeFragments'
 import { RemoveSignals } from '../plugins/official/backend/watchers/removeSignals'
-import { Clipboard } from '../plugins/official/browser/actions/clipboard'
+import { Copy } from '../plugins/official/browser/actions/copy'
 import { CustomValidity } from '../plugins/official/browser/attributes/customValidity'
 import { Intersects } from '../plugins/official/browser/attributes/intersects'
 import { Persist } from '../plugins/official/browser/attributes/persist'
@@ -51,7 +51,7 @@ DS.load(
   RemoveSignals,
   ExecuteScript,
   // Browser
-  Clipboard,
+  Copy,
   CustomValidity,
   Intersects,
   Persist,

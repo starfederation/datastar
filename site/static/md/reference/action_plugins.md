@@ -87,6 +87,22 @@ Works the same as `@get()` but sends a `DELETE` request to the backend.
 <button data-on-click="@delete('/endpoint')"></button>
 ```
 
+## Browser Plugins
+
+[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/browser/actions)
+
+Provides actions for performing browser operations.
+
+### `@copy()`
+
+Arguments: `@copy(value: string)`
+
+Copies the provided value to the clipboard.
+
+```html
+<div data-on-click="@copy('Hello, world!')"></div>
+```
+
 ## Logic Plugins
 
 [Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/logic/actions)

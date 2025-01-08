@@ -79,7 +79,7 @@ templ Home() {
 							</code>
 							<button
 								class="btn btn-primary btn-ghost"
-								data-on-click={ fmt.Sprintf("@clipboard('%s')", cdnText) }
+								data-on-click={ fmt.Sprintf("@copy('%s')", cdnText) }
 							>
 								@icon("material-symbols:content-copy")
 							</button>
