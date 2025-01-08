@@ -63,16 +63,16 @@ Or, using two-way binding:
 <input data-bind-foo.bar />
 ```
 
-Note only the leaf nodes are actually signals. So in the example above, only `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
+Note that only the leaf nodes are actually signals. So in the example above, `bar` is a signal but `foo` is not, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
 
-This can be useful for namespacing signals. A more practical use-case might be when you have repetition of state on a page. 
+Nestable signals can be particularly useful for namespacing. A practical use-case might be when you have repetition of state on a page. 
 
-The following example shows how to toggle the value of all signals starting with `menu.open.` at once.
+The following example shows how to toggle the value of all signals starting with `menu.open.` at once when a button is clicked.
 
 ```html
-<div data-signals-menu.open.desktop="false"></div>
-<div data-signals-menu.open.mobile="false"></div>
-<button data-on-click="@toggleAll('menu.open.')"></button>
+<div data-signals-menu.isopen.desktop="false"></div>
+<div data-signals-menu.isopen.mobile="false"></div>
+<button data-on-click="@toggleAll('menu.isopen.')"></button>
 ```
 
 The beauty of this is that you don't need to write a bunch of code to set up and maintain state. You just use `data-*` attributes and think declaratively!
