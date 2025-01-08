@@ -61,6 +61,10 @@ func setupErrors(ctx context.Context, router chi.Router) error {
 			http.Redirect(w, r, string(sidebarGroups[0].Links[0].URL), http.StatusFound)
 		})
 
+		errorsRouter.Get("/exec", func(w http.ResponseWriter, r *http.Request) {
+			ErrorsPage(r).Render(r.Context(), w)
+		})
+
 		errorsRouter.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
 			id := chi.URLParam(r, "id")
 			mdData, ok := mdDataset[id]

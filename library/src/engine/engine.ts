@@ -89,6 +89,7 @@ export class Engine {
   public apply(rootElement: Element) {
     const appliedMacros = new Set<MacroPlugin>()
     this.#plugins.forEach((p, pi) => {
+      const pluginName = p.name
       this.#walkDownDOM(rootElement, (el) => {
         // Ignore this element if `data-star-ignore` exists on it
         if ('starIgnore' in el.dataset) return
@@ -167,6 +168,7 @@ export class Engine {
             cleanup: that.#cleanup.bind(that),
             actions: that.#actions,
             genRX: () => this.#genRX(ctx, ...(p.argNames || [])),
+            pluginName,
             el,
             rawKey,
             rawValue,
@@ -276,13 +278,21 @@ export class Engine {
         try {
           return fn(ctx, ...args)
         } catch (error: any) {
+          const { pluginName, el, rawKey, rawValue, key, value } = ctx
+          const elementId = el.id
           const validSignalNames = signalNames.map((s) => `$${s}`).join(', ')
-          const match = error.message.match(/(\$\S*) is not defined/)
-          if (match) {
-            const signalName = match[1]
-            throw dsErr('InvalidSignal', { signalName, validSignalNames })
-          }
-          throw dsErr('InvalidExpressionExecution', { error })
+          throw dsErr('exec', {
+            pluginName,
+            elementId,
+            error,
+            validSignalNames,
+            rawKey,
+            rawValue,
+            fnContent,
+            mods: JSON.parse(JSON.stringify([...ctx.mods])),
+            key,
+            value,
+          })
         }
       }
     } catch (error) {
