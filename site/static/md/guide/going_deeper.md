@@ -45,10 +45,10 @@ Behind the scenes, Datastar converts `$foo` to `ctx.signals.signal('foo').value`
 
 ### 3. Nestable Signals
 
-Signals in Datastar have a superpower: they are nestable. This allows you to scope state as deeply as you like.
+Signals in Datastar have a trick up their sleeve: they are nestable. 
 
 ```html
-<div data-signals-foo.bar.baz="1"></div>
+<div data-signals-foo.bar="1"></div>
 ```
 
 Or, using object syntax:
@@ -63,16 +63,26 @@ Or, using two-way binding:
 <input data-bind-foo.bar />
 ```
 
-The beauty of this is that you don't need to write a bunch of code to set up and maintain state. You just use `data-*` attributes and think declaratively!
+Note only the leaf nodes are actually signals. So in the example above, only `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
 
-Note when working with nested signals that only the leaf nodes are actually signals. So in the example above, only `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
+This can be useful for namespacing signals. A more practical use-case might be when you have repetition of state on a page. 
+
+The following example shows how to toggle the value of all signals starting with `menu.open.` at once.
+
+```html
+<div data-signals-menu.open.desktop="false"></div>
+<div data-signals-menu.open.mobile="false"></div>
+<button data-on-click="@toggleAll('menu.open.')"></button>
+```
+
+The beauty of this is that you don't need to write a bunch of code to set up and maintain state. You just use `data-*` attributes and think declaratively!
 
 ## Datastar Actions
 
 Actions are helper functions that can be used in [Datastar expressions](/guide/datastar_expressions). They allow you to perform logical operations without having to write procedural JavaScript.
 
 ```html
-<button data-on-click="@setAll('foo.', $mysignal.toUpperCase()"></button>
+<button data-on-click="@setAll('foo.', $mysignal.toUpperCase())"></button>
 ```
 
 ### Backend Actions
