@@ -3,7 +3,7 @@
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.
 
 import { DATASTAR, DATASTAR_REQUEST } from '../../../../engine/consts'
-import { dsErr } from '../../../../engine/errors'
+import { runtimeErr } from '../../../../engine/errors'
 import type { RuntimeContext } from '../../../../engine/types'
 import {
   type FetchEventSourceInit,
@@ -46,7 +46,12 @@ export type SSEArgs = {
     }
 )
 
-export const sse = async (ctx: RuntimeContext, method: string, url: string, args: SSEArgs) => {
+export const sse = async (
+  ctx: RuntimeContext,
+  method: string,
+  url: string,
+  args: SSEArgs,
+) => {
   const {
     el: { id: elId },
     el,
@@ -83,7 +88,7 @@ export const sse = async (ctx: RuntimeContext, method: string, url: string, args
   try {
     dispatchSSE(STARTED, { elId })
     if (!url?.length) {
-      throw dsErr('SseNoUrlProvided', { action })
+      throw runtimeErr('SseNoUrlProvided', ctx, { action })
     }
 
     const initialHeaders: Record<string, any> = {}
@@ -142,7 +147,7 @@ export const sse = async (ctx: RuntimeContext, method: string, url: string, args
       onerror: (error) => {
         if (isWrongContent(error)) {
           // don't retry if the content-type is wrong
-          throw dsErr('InvalidContentType', { url, error })
+          throw runtimeErr('InvalidContentType', ctx, { url, error })
         }
         // do nothing and it will retry
         if (error) {
@@ -167,9 +172,9 @@ export const sse = async (ctx: RuntimeContext, method: string, url: string, args
         : el.closest('form')
       if (formEl === null) {
         if (selector) {
-          throw dsErr('SseFormNotFound', { action, selector })
+          throw runtimeErr('SseFormNotFound', ctx, { action, selector })
         }
-        throw dsErr('SseClosestFormNotFound', { action })
+        throw runtimeErr('SseClosestFormNotFound', ctx, { action })
       }
       if (el !== formEl) {
         const preventDefault = (evt: Event) => evt.preventDefault()
@@ -192,16 +197,16 @@ export const sse = async (ctx: RuntimeContext, method: string, url: string, args
         req.body = formData
       }
     } else {
-      throw dsErr('SseInvalidContentType', { action, contentType })
+      throw runtimeErr('SseInvalidContentType', ctx, { action, contentType })
     }
 
     urlInstance.search = queryParams.toString()
 
     try {
-      await fetchEventSource(urlInstance.toString(), req)
+      await fetchEventSource(ctx, urlInstance.toString(), req)
     } catch (error) {
       if (!isWrongContent(error)) {
-        throw dsErr('SseFetchFailed', { method, url, error })
+        throw runtimeErr('SseFetchFailed', ctx, { method, url, error })
       }
       // exit gracefully and do nothing if the content-type is wrong
       // this can happen if the client is sending a request

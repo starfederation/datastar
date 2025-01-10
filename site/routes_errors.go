@@ -1,28 +1,68 @@
 package site
 
 import (
-	"context"
+	"fmt"
 	"net/http"
-	"net/url"
 	"slices"
 	"strings"
 
 	"github.com/a-h/templ"
+	"github.com/delaneyj/toolbelt"
 	"github.com/go-chi/chi/v5"
-	"github.com/microcosm-cc/bluemonday"
+	"github.com/goccy/go-json"
+	"github.com/grafana/regexp"
 	"github.com/samber/lo"
+	"github.com/valyala/bytebufferpool"
 )
 
-func setupErrors(ctx context.Context, router chi.Router) error {
-	santizePolicy := bluemonday.UGCPolicy()
+type RuntimeErrorInfo struct {
+	Plugin struct {
+		Name string `json:"name"`
+		Type string `json:"type"`
+	} `json:"plugin"`
+	Element struct {
+		ID  string `json:"id"`
+		Tag string `json:"tag"`
+	} `json:"element"`
+	Raw struct {
+		Key   string `json:"key"`
+		Value string `json:"value"`
+	} `json:"raw"`
+	Expression struct {
+		Key              string   `json:"key"`
+		Value            string   `json:"value"`
+		ValidSignalNames []string `json:"validSignalNames"`
+		FnContent        string   `json:"fnContent"`
+	} `json:"expression"`
+	Error string `json:"error"`
+}
 
-	mdDataset, err := markdownRenders(ctx, "errors")
-	if err != nil {
-		return err
+var isSignalRe = regexp.MustCompile("(\\$\\S*) is not defined")
+
+func setupErrors(router chi.Router) error {
+
+	type runtimeComponentFn func(params *RuntimeErrorInfo) templ.Component
+	type anyComponentFn func(params any) templ.Component
+	type componentGenerator struct {
+		ComponentFn anyComponentFn
+		Type        string
 	}
 
-	sidebarLinks := make([]*SidebarLink, 0, len(mdDataset))
-	for id := range mdDataset {
+	runtimeFn := func(fn runtimeComponentFn) componentGenerator {
+		return componentGenerator{
+			Type: "runtime",
+			ComponentFn: func(params any) templ.Component {
+				return fn(params.(*RuntimeErrorInfo))
+			},
+		}
+	}
+
+	reasonComponents := map[string]componentGenerator{
+		"runtime_expression_failed": runtimeFn(ErrViewRuntimeExpression),
+	}
+
+	sidebarLinks := make([]*SidebarLink, 0, len(reasonComponents))
+	for id := range reasonComponents {
 		sidebarLinks = append(sidebarLinks, &SidebarLink{ID: id})
 	}
 	slices.SortFunc(sidebarLinks, func(a, b *SidebarLink) int {
@@ -37,8 +77,9 @@ func setupErrors(ctx context.Context, router chi.Router) error {
 	}
 	lo.ForEach(sidebarGroups, func(group *SidebarGroup, grpIdx int) {
 		lo.ForEach(group.Links, func(link *SidebarLink, linkIdx int) {
-			link.URL = templ.SafeURL("/errors/" + link.ID)
-			link.Label = link.ID
+			typ := reasonComponents[link.ID].Type
+			link.URL = templ.SafeURL(fmt.Sprintf("/errors/%s/%s", typ, link.ID))
+			link.Label = toolbelt.Pascal(link.ID)
 
 			if linkIdx > 0 {
 				link.Prev = group.Links[linkIdx-1]
@@ -61,41 +102,53 @@ func setupErrors(ctx context.Context, router chi.Router) error {
 			http.Redirect(w, r, string(sidebarGroups[0].Links[0].URL), http.StatusFound)
 		})
 
-		errorsRouter.Get("/exec", func(w http.ResponseWriter, r *http.Request) {
-			ErrorsPage(r).Render(r.Context(), w)
-		})
-
-		errorsRouter.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
-			id := chi.URLParam(r, "id")
-			mdData, ok := mdDataset[id]
-			if !ok {
-				http.Error(w, "not found", http.StatusNotFound)
-				return
-			}
+		errorsRouter.Get("/{type}/{reason}", func(w http.ResponseWriter, r *http.Request) {
+			typ := chi.URLParam(r, "type")
+			reason := chi.URLParam(r, "reason")
 
 			var currentLink *SidebarLink
 			for _, group := range sidebarGroups {
 				for _, link := range group.Links {
-					if link.ID == id {
+					if link.ID == reason {
 						currentLink = link
 						break
 					}
 				}
 			}
 
-			params, err := url.ParseQuery(r.URL.RawQuery)
-			if err != nil {
-				http.Error(w, "bad request", http.StatusBadRequest)
+			metadataJSON := r.URL.Query().Get("metadata")
+			if metadataJSON == "" {
+				metadataJSON = "{}"
+			}
+
+			var params any
+			switch typ {
+			case "runtime":
+				params = &RuntimeErrorInfo{}
+			default:
+				http.Error(w, fmt.Sprintf("unknown error type %q", typ), http.StatusBadRequest)
 				return
 			}
 
-			contents := mdData.Contents
-			for key, values := range params {
-				contents = strings.ReplaceAll(contents, "{ "+key+" }", strings.Join(values, ","))
-				contents = santizePolicy.Sanitize(contents)
+			if err := json.Unmarshal([]byte(metadataJSON), params); err != nil {
+				http.Error(w, fmt.Sprintf("failed to unmarshal metadata: %v", err), http.StatusBadRequest)
+				return
 			}
+			compGen, ok := reasonComponents[reason]
+			if !ok {
+				http.Error(w, "not found", http.StatusNotFound)
+				return
+			}
+			buf := bytebufferpool.Get()
+			defer bytebufferpool.Put(buf)
 
-			SidebarPage(r, sidebarGroups, currentLink, mdData.Title, mdData.Description, contents).Render(r.Context(), w)
+			ctx := r.Context()
+			if err := compGen.ComponentFn(params).Render(ctx, buf); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			contents := buf.String()
+			SidebarPage(r, sidebarGroups, currentLink, "Errors", "Error details", contents).Render(ctx, w)
 		})
 	})
 

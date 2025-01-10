@@ -1,66 +1,55 @@
 package site
 
-import (
-	"net/http"
-	"regexp"
-	"slices"
-	"strings"
-)
+import "strings"
 
-templ ErrorsPage(r *http.Request) {
-	{{
-	type entry struct {
-		key    string
-		values string
-	}
-	q := r.URL.Query()
-	entries := make([]entry, 0, len(q))
-	for key, values := range r.URL.Query() {
-		entries = append(entries, entry{key, strings.Join(values, ",")})
-	}
-	slices.SortFunc(entries, func(a, b entry) int {
-		return strings.Compare(a.key, b.key)
-	})
-
-	isSignalRe := regexp.MustCompile("(\\$\\S*) is not defined")
-	isSignalMatches := isSignalRe.FindAllStringSubmatch(q.Get("error"), -1)
-	}}
-	@Page("Errors", "Clent side errors", r.URL.Path) {
-		@header(r)
-		<div class="p-8 flex flex-wrap gap-8">
-			<div class="prose prose-lg flex-1">
-				<h1>Explaination</h1>
-				if len(isSignalMatches) > 0 {
+templ RuntimeErrorView(rei *RuntimeErrorInfo) {
+	<div class="p-8 flex flex-wrap gap-8">
+		<div class="card bg-base-300">
+			<div class="card-body">
+				<h2 class="card-title">Runtime Error</h2>
+				<div>
+					{ rei.Plugin.Type } plugin data-{ rei.Plugin.Name } on
+					<span class="font-mono font-bold text-accent">&lt;{ rei.Element.Tag } id="{ rei.Element.ID }"/{ rei.Element.Tag }&gt;</span>
+				</div>
+				<div>
+					<h3>Expression</h3>
+					<pre>
+						{ rei.Expression.FnContent }
+					</pre>
+				</div>
+				if rei.Error != "" {
 					<div>
-						<h2>InvalidSignal</h2>
-						<p>The signal  <span class="text-primary">{ isSignalMatches[0][1] }</span> is not defined</p>
-						<p>We should probably say more here</p>
+						<h3>Error</h3>
+						<pre>
+							{ rei.Error }
+						</pre>
 					</div>
-				} else {
-					<div class="text-sm">No explaination for this error</div>
 				}
 			</div>
-			<div class="card bg-base-300">
-				<div class="card-body">
-					<h2 class="card-title">Parameters</h2>
-					<table class="table w-full">
-						<thead>
-							<tr>
-								<th>Key</th>
-								<th>Value</th>
-							</tr>
-						</thead>
-						<tbody>
-							for _,e := range  entries {
-								<tr class="hover">
-									<td class="border-r border-neutral">{ e.key }</td>
-									<td><pre class="font-mono text-sm">{ e.values }</pre></td>
-								</tr>
-							}
-						</tbody>
-					</table>
-				</div>
-			</div>
 		</div>
+		<div class="prose prose-lg flex-1">
+			<h1>Explaination</h1>
+			{ children... }
+		</div>
+	</div>
+}
+
+templ ErrViewRuntimeExpression(rei *RuntimeErrorInfo) {
+	{{
+		isSignalMatches := isSignalRe.FindAllStringSubmatch(rei.Error, -1)
+	}}
+	@RuntimeErrorView(rei) {
+		if len(isSignalMatches) > 0 {
+			<div>
+				<h2>InvalidSignal</h2>
+				<p>The signal  <span class="text-primary">{ isSignalMatches[0][1] }</span> is not defined</p>
+				<div>
+					Current valid signals: <span class="font-bold">{ strings.Join(rei.Expression.ValidSignalNames, ", ") }</span>
+				</div>
+				<p>We should probably say more here</p>
+			</div>
+		} else {
+			<div class="text-sm">No explaination for this error</div>
+		}
 	}
 }

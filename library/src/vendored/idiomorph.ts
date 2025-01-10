@@ -1,5 +1,5 @@
 import { FragmentMergeModes } from '../engine/consts'
-import { dsErr } from '../engine/errors'
+import { internalErr } from '../engine/errors'
 
 const generatedByIdiomorphId = new WeakSet()
 
@@ -65,7 +65,7 @@ function morphNormalizedContent(
     // into either side of the best match
     const bestMatch = findBestNodeMatch(normalizedNewContent, oldNode, ctx)
     if (!bestMatch) {
-      throw dsErr('NoBestMatchFound', {
+      throw internalErr('NoBestMatchFound', {
         old: oldNode,
         new: normalizedNewContent,
       })
@@ -87,7 +87,7 @@ function morphNormalizedContent(
     // otherwise nothing was added to the DOM
     return []
   }
-  throw dsErr('InvalidMorphStyle', { style: ctx.morphStyle })
+  throw internalErr('InvalidMorphStyle', { style: ctx.morphStyle })
 }
 
 /**
@@ -110,7 +110,7 @@ function morphOldNodeTo(oldNode: Element, newContent: Element, ctx: any) {
     if (ctx.callbacks.beforeNodeAdded(newContent) === false) return
 
     if (!oldNode.parentElement) {
-      throw dsErr('NoParentElementFound', { oldNode })
+      throw internalErr('NoParentElementFound', { oldNode })
     }
     oldNode.parentElement.replaceChild(newContent, oldNode)
     ctx.callbacks.afterNodeAdded(newContent)
@@ -381,7 +381,7 @@ function handleHeadElement(
       .createRange()
       .createContextualFragment(newNode.outerHTML).firstChild as Element | null
     if (!newElt) {
-      throw dsErr('NewElementCouldNotBeCreated', { newNode })
+      throw internalErr('NewElementCouldNotBeCreated', { newNode })
     }
     if (ctx.callbacks.beforeNodeAdded(newElt)) {
       if (newElt.hasAttribute('href') || newElt.hasAttribute('src')) {
@@ -487,7 +487,10 @@ function removeNodesBetween(
     const tempNode = startInclusive
     startInclusive = startInclusive?.nextSibling as Element
     if (!tempNode) {
-      throw dsErr('NoTemporaryNodeFound', { startInclusive, endExclusive })
+      throw internalErr('NoTemporaryNodeFound', {
+        startInclusive,
+        endExclusive,
+      })
     }
     removeNode(tempNode, ctx)
   }
@@ -631,7 +634,7 @@ function parseContent(newContent: string) {
   )
   const content = responseDoc.body.querySelector('template')?.content
   if (!content) {
-    throw dsErr('NoContentFound', { newContent })
+    throw internalErr('NoContentFound', { newContent })
   }
   generatedByIdiomorphId.add(content)
   return content
