@@ -10,7 +10,7 @@ templ RuntimeErrorRunExpr(name string, info *RuntimeErrorInfo) {
 		if len(isSignalMatches) > 0 {
 			<p>The signal  <span class="text-primary">{ isSignalMatches[0][1] }</span> is not defined</p>
 			<div>
-				Current valid signals: <span class="font-bold">{ strings.Join(info.Expression.ValidSignalNames, ", ") }</span>
+				Current valid signals: <span class="font-bold">{ strings.Join(info.Expression.ValidSignals, ", ") }</span>
 			</div>
 			<p>We should probably say more here</p>
 		} else {
