@@ -9,7 +9,7 @@ export const hasValNonExpr = /([\w0-9.]+)\.value/gm
 
 function dserr(type: string, reason: string, metadata = {}) {
   const e = new Error()
-  e.name = `${DATASTAR}-${type}-error`
+  e.name = `${DATASTAR} ${type} error ${reason}`
   const r = kebabize(reason).replaceAll('-', '_')
   const q = new URLSearchParams({
     metadata: JSON.stringify(metadata),
@@ -49,7 +49,7 @@ export function runtimeErr(reason: string, ctx: RuntimeContext, metadata = {}) {
     expression: {
       key: ctx.key,
       value: ctx.value,
-      validSignalNames: ctx.signals.paths().map((s) => `$${s}`),
+      validSignals: ctx.signals.paths(),
       fnContent: ctx.fnContent,
     },
   }

@@ -29,10 +29,10 @@ type RuntimeErrorInfo struct {
 		Value string `json:"value"`
 	} `json:"raw"`
 	Expression struct {
-		Key              string   `json:"key"`
-		Value            string   `json:"value"`
-		ValidSignalNames []string `json:"validSignalNames"`
-		FnContent        string   `json:"fnContent"`
+		Key          string   `json:"key"`
+		Value        string   `json:"value"`
+		ValidSignals []string `json:"validSignals"`
+		FnContent    string   `json:"fnContent"`
 	} `json:"expression"`
 	Error string `json:"error"`
 }
@@ -153,4 +153,12 @@ func setupErrors(router chi.Router) error {
 	})
 
 	return nil
+}
+
+func getValidSignalNames(signals []string) string {
+	signalNames := make([]string, len(signals))
+	for i, s := range signals {
+		signalNames[i] = "$" + s
+	}
+	return strings.Join(signalNames, ", ")
 }

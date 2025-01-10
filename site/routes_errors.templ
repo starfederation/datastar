@@ -3,18 +3,17 @@ package site
 import "strings"
 
 templ RuntimeErrorView(rei *RuntimeErrorInfo) {
-	<div class="p-8 flex flex-wrap gap-8">
+	<div class="flex flex-wrap gap-8">
 		<div class="card bg-base-300">
 			<div class="card-body">
 				<h2 class="card-title">Runtime Error</h2>
 				<div>
-					{ rei.Plugin.Type } plugin data-{ rei.Plugin.Name } on
-					<span class="font-mono font-bold text-accent">&lt;{ rei.Element.Tag } id="{ rei.Element.ID }"/{ rei.Element.Tag }&gt;</span>
+					A runtime error was encountered while executing an expression in a <code>data-{ rei.Plugin.Name }</code> { strings.ToLower(rei.Plugin.Type) }.
 				</div>
 				<div>
-					<h3>Expression</h3>
+					<h3>Element</h3>
 					<pre>
-						{ rei.Expression.FnContent }
+						&lt;{ strings.ToLower(rei.Element.Tag) } id="{ rei.Element.ID }" data-{ rei.Plugin.Name }="{ rei.Raw.Value }"&gt;&lt;/{ strings.ToLower(rei.Element.Tag) }&gt;
 					</pre>
 				</div>
 				if rei.Error != "" {
@@ -25,10 +24,16 @@ templ RuntimeErrorView(rei *RuntimeErrorInfo) {
 						</pre>
 					</div>
 				}
+				<div>
+					<h3>Expression</h3>
+					<pre>
+						{ rei.Expression.FnContent }
+					</pre>
+				</div>
 			</div>
 		</div>
 		<div class="prose prose-lg flex-1">
-			<h1>Explaination</h1>
+			<h1>Explanation</h1>
 			{ children... }
 		</div>
 	</div>
@@ -44,12 +49,10 @@ templ ErrViewRuntimeExpression(rei *RuntimeErrorInfo) {
 				<h2>InvalidSignal</h2>
 				<p>The signal  <span class="text-primary">{ isSignalMatches[0][1] }</span> is not defined</p>
 				<div>
-					Current valid signals: <span class="font-bold">{ strings.Join(rei.Expression.ValidSignalNames, ", ") }</span>
+					Current valid signals: <span class="font-bold">{ getValidSignalNames(rei.Expression.ValidSignals) }</span>
 				</div>
 				<p>We should probably say more here</p>
 			</div>
-		} else {
-			<div class="text-sm">No explaination for this error</div>
 		}
 	}
 }
