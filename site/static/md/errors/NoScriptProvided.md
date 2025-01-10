@@ -9,4 +9,4 @@ event: datastar-execute-script
 data: script console.log('Hello, world!')
 ```
 
-See the docs on the [`datastar-execute-script`](/reference/attribute_plugins#data-datastar-execute-script) SSE event.
+See the docs on the [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE event.
