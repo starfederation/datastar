@@ -280,13 +280,13 @@ export class Engine {
         try {
           return fn(ctx, ...args)
         } catch (error: any) {
-          throw runtimeErr('RuntimeExpressionFailed', ctx, {
+          throw runtimeErr('RunExpr', ctx, {
             error: error.message,
           })
         }
       }
     } catch (error: any) {
-      throw runtimeErr('GeneratingExpressionFailed', ctx, {
+      throw runtimeErr('GenExpr', ctx, {
         error: error.message,
       })
     }

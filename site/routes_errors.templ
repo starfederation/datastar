@@ -1,30 +1,12 @@
 package site
 
-import "strings"
-
-templ RuntimeErrorView(rei *RuntimeErrorInfo) {
-	<div class="p-8 flex flex-wrap gap-8">
+templ ErrorView(typ, name string, args templ.Component) {
+	<div class="p-8 flex flex-col gap-8">
+		<h1>{ name }</h1>
 		<div class="card bg-base-300">
 			<div class="card-body">
-				<h2 class="card-title">Runtime Error</h2>
-				<div>
-					{ rei.Plugin.Type } plugin data-{ rei.Plugin.Name } on
-					<span class="font-mono font-bold text-accent">&lt;{ rei.Element.Tag } id="{ rei.Element.ID }"/{ rei.Element.Tag }&gt;</span>
-				</div>
-				<div>
-					<h3>Expression</h3>
-					<pre>
-						{ rei.Expression.FnContent }
-					</pre>
-				</div>
-				if rei.Error != "" {
-					<div>
-						<h3>Error</h3>
-						<pre>
-							{ rei.Error }
-						</pre>
-					</div>
-				}
+				<div class="card-title">Error Type: { typ }</div>
+				@args
 			</div>
 		</div>
 		<div class="prose prose-lg flex-1">
@@ -34,22 +16,58 @@ templ RuntimeErrorView(rei *RuntimeErrorInfo) {
 	</div>
 }
 
-templ ErrViewRuntimeExpression(rei *RuntimeErrorInfo) {
-	{{
-		isSignalMatches := isSignalRe.FindAllStringSubmatch(rei.Error, -1)
-	}}
-	@RuntimeErrorView(rei) {
-		if len(isSignalMatches) > 0 {
-			<div>
-				<h2>InvalidSignal</h2>
-				<p>The signal  <span class="text-primary">{ isSignalMatches[0][1] }</span> is not defined</p>
-				<div>
-					Current valid signals: <span class="font-bold">{ strings.Join(rei.Expression.ValidSignalNames, ", ") }</span>
-				</div>
-				<p>We should probably say more here</p>
-			</div>
-		} else {
-			<div class="text-sm">No explaination for this error</div>
-		}
+templ runtimeArgs(info *RuntimeErrorInfo) {
+	<div>
+		{ info.Plugin.Type } plugin data-{ info.Plugin.Name } on
+		<span class="font-mono font-bold text-accent">&lt;{ info.Element.Tag } id="{ info.Element.ID }"/{ info.Element.Tag }&gt;</span>
+	</div>
+	<div>
+		<h3>Expression</h3>
+		<pre>
+			{ info.Expression.FnContent }
+		</pre>
+	</div>
+	if info.Error != "" {
+		<div>
+			<h3>Error</h3>
+			<pre>
+				{ info.Error }
+			</pre>
+		</div>
+	}
+}
+
+templ RuntimeErrorView(name string, info *RuntimeErrorInfo) {
+	@ErrorView("Runtime", name, runtimeArgs(info)) {
+		{ children... }
+	}
+}
+
+templ initArgs(info *InitErrorInfo) {
+	if info.Plugin.Type != "" {
+		<div>
+			Initializing { info.Plugin.Type } plugin data-{ info.Plugin.Name }
+		</div>
+	}
+}
+
+templ InitErrorView(name string, info *InitErrorInfo) {
+	@ErrorView("Init", name, initArgs(info)) {
+		{ children... }
+	}
+}
+
+templ internalArgs(info InternalErrorInfo) {
+	<div>
+		<h3>Internal Error</h3>
+		<pre>
+			{ templ.JSONString(info) }
+		</pre>
+	</div>
+}
+
+templ InternalErrorView(name string, info InternalErrorInfo) {
+	@ErrorView("Internal", name, internalArgs(info)) {
+		{ children... }
 	}
 }

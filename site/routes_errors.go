@@ -15,6 +15,10 @@ import (
 	"github.com/valyala/bytebufferpool"
 )
 
+type ErrorInfo interface {
+	isErrorInfo()
+}
+
 type RuntimeErrorInfo struct {
 	Plugin struct {
 		Name string `json:"name"`
@@ -37,28 +41,67 @@ type RuntimeErrorInfo struct {
 	Error string `json:"error"`
 }
 
+func (RuntimeErrorInfo) isErrorInfo() {}
+
+type InitErrorInfo struct {
+	Plugin struct {
+		Name string `json:"name"`
+		Type string `json:"type"`
+	} `json:"plugin"`
+}
+
+func (InitErrorInfo) isErrorInfo() {}
+
+type InternalErrorInfo map[string]any
+
+func (InternalErrorInfo) isErrorInfo() {}
+
 var isSignalRe = regexp.MustCompile("(\\$\\S*) is not defined")
 
 func setupErrors(router chi.Router) error {
 
-	type runtimeComponentFn func(params *RuntimeErrorInfo) templ.Component
-	type anyComponentFn func(params any) templ.Component
+	type initComponentFn func(name string, params *InitErrorInfo) templ.Component
+	type internalComponentFn func(name string, params InternalErrorInfo) templ.Component
+	type runtimeComponentFn func(name string, params *RuntimeErrorInfo) templ.Component
+
+	type anyComponentFn func(name string, params ErrorInfo) templ.Component
 	type componentGenerator struct {
 		ComponentFn anyComponentFn
 		Type        string
 	}
 
+	initFn := func(fn initComponentFn) componentGenerator {
+		return componentGenerator{
+			Type: "init",
+			ComponentFn: func(name string, params ErrorInfo) templ.Component {
+				return fn(name, params.(*InitErrorInfo))
+			},
+		}
+	}
+
+	internalFn := func(fn internalComponentFn) componentGenerator {
+		return componentGenerator{
+			Type: "internal",
+			ComponentFn: func(name string, params ErrorInfo) templ.Component {
+				return fn(name, params.(InternalErrorInfo))
+			},
+		}
+	}
+
 	runtimeFn := func(fn runtimeComponentFn) componentGenerator {
 		return componentGenerator{
 			Type: "runtime",
-			ComponentFn: func(params any) templ.Component {
-				return fn(params.(*RuntimeErrorInfo))
+			ComponentFn: func(name string, params ErrorInfo) templ.Component {
+				return fn(name, params.(*RuntimeErrorInfo))
 			},
 		}
 	}
 
 	reasonComponents := map[string]componentGenerator{
-		"runtime_expression_failed": runtimeFn(ErrViewRuntimeExpression),
+		"run_expr":            runtimeFn(RuntimeErrorRunExpr),
+		"gen_expr":            runtimeFn(RuntimeErrorGenExpr),
+		"no_script_provided":  initFn(InitErrorNoScriptProvided),
+		"no_best_match_found": internalFn(InternalErrorNoBestMatchFound),
 	}
 
 	sidebarLinks := make([]*SidebarLink, 0, len(reasonComponents))
@@ -121,10 +164,14 @@ func setupErrors(router chi.Router) error {
 				metadataJSON = "{}"
 			}
 
-			var params any
+			var params ErrorInfo
 			switch typ {
 			case "runtime":
 				params = &RuntimeErrorInfo{}
+			case "init":
+				params = &InitErrorInfo{}
+			case "internal":
+				params = InternalErrorInfo{}
 			default:
 				http.Error(w, fmt.Sprintf("unknown error type %q", typ), http.StatusBadRequest)
 				return
@@ -143,7 +190,7 @@ func setupErrors(router chi.Router) error {
 			defer bytebufferpool.Put(buf)
 
 			ctx := r.Context()
-			if err := compGen.ComponentFn(params).Render(ctx, buf); err != nil {
+			if err := compGen.ComponentFn(currentLink.Label, params).Render(ctx, buf); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}

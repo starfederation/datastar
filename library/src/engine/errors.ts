@@ -3,7 +3,7 @@ import { DATASTAR } from './consts'
 import { type InitContext, PluginType, type RuntimeContext } from './types'
 
 // const url = 'https://data-star.dev/errors'
-const url = 'http://localhost:8080/errors'
+const url = `${window.location.origin}/errors`
 
 export const hasValNonExpr = /([\w0-9.]+)\.value/gm
 
