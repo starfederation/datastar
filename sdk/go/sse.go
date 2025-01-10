@@ -25,8 +25,10 @@ func NewSSE(w http.ResponseWriter, r *http.Request) *ServerSentEventGenerator {
 	rc := http.NewResponseController(w)
 
 	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Content-Type", "text/event-stream")
+	if r.ProtoMajor == 1 {
+		w.Header().Set("Connection", "keep-alive")
+	}
 
 	// flush headers
 	if err := rc.Flush(); err != nil {
