@@ -113,7 +113,7 @@ Provides actions for performing logic operations.
 
 Arguments: `@setAll(pathPrefix: string, value: any)`
 
-Sets all the signals that start with the prefix to the expression provided in the second argument. This is useful for setting all the values of a nested signal at once.
+Sets all the signals that start with the prefix to the expression provided in the second argument. This is useful for setting all the values of a signal namespace at once.
 
 ```html
 <div data-on-change="@setAll('foo.', true)"></div>
@@ -123,7 +123,7 @@ Sets all the signals that start with the prefix to the expression provided in th
 
 Arguments: `@toggleAll(pathPrefix: string)`
 
-Toggles all the signals that start with the prefix. This is useful for toggling all the values of a nested signal at once.
+Toggles all the signals that start with the prefix. This is useful for toggling all the values of a signal namespace at once.
 
 ```html
 <div data-on-click="@toggleAll('foo.')"></div>

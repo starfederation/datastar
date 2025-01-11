@@ -72,4 +72,4 @@ Whereas if you look at the Network tab in the browser you should see the followi
 { "clicks": 0 }
 ```
 
-Any signal (or nested set of signals) starting with an underscore `_` is considered local and will not be sent to the server. In this example `_localState` and `_anotherLocalVar` are local only.
+Any signal (or namespaced set of signals) starting with an underscore `_` is considered local and will not be sent to the server. In this example `_localState` and `_anotherLocalVar` are local only.

@@ -243,7 +243,7 @@ We can also create signals using the [`data-signals`](/reference/attribute_plugi
 
 Using `data-signals` _merges_ one or more signals into the existing signals. Values defined later in the DOM tree override those defined earlier.
 
-Signals are nestable using dot-notation, which can be useful for namespacing.
+Signals can be namespaced using dot-notation.
 
 ```html
 <div data-signals-form.input="2"></div>
@@ -456,7 +456,7 @@ The `@setAll()` action sets the values of multiple signals at once. It takes a p
 <button data-on-click="@setAll('form.', true)"></button>
 ```
 
-This sets the values of all signals nested under the `form` signal to `true`, which could be useful for enabling input fields in a form.
+This sets the values of all signals namespaced under the `form` signal to `true`, which could be useful for enabling input fields in a form.
 
 ```html
 <input type="checkbox" data-bind-checkboxes.checkbox1 /> Checkbox 1
