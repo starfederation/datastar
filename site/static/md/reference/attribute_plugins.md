@@ -29,7 +29,7 @@ Signals can be namespaced using dot-notation.
 <div data-signals-foo.bar="1"></div>
 ```
 
-Note when working with signal namespace that only the leaf nodes are actually signals. So in the example above, only `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` (the namespace) is not.
+Note when working with namespaced signals that only the leaf nodes are actually signals. So in the example above, only `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` (the namespace) is not.
 
 The `data-signals` attribute can also be used to merge multiple signals using a set of key-value pairs, where the keys represent signal names and the values represent expressions.
 
