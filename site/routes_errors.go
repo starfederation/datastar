@@ -98,10 +98,20 @@ func setupErrors(router chi.Router) error {
 	}
 
 	reasonComponents := map[string]componentGenerator{
-		"run_expr":            runtimeFn(RuntimeErrorRunExpr),
-		"gen_expr":            runtimeFn(RuntimeErrorGenExpr),
-		"no_script_provided":  initFn(InitErrorNoScriptProvided),
-		"no_best_match_found": internalFn(InternalErrorNoBestMatchFound),
+		"attr_value_required": runtimeFn(AttrValueRequired),
+        "bind_key_and_value_provided": runtimeFn(BindKeyAndValueProvided),
+        "bind_key_or_value_required": runtimeFn(BindKeyOrValueRequired),
+        "class_value_required": runtimeFn(ClassValueRequired),
+        "cleanup_effect_error": internalFn(CleanupEffectError),
+        "clipboard_not_available": runtimeFn(ClipboardNotAvailable),
+        "computed_key_required": runtimeFn(ComputedKeyRequired),
+        "computed_value_required": runtimeFn(ComputedValueRequired),
+        "custom_validity_invalid_element": runtimeFn(CustomValidityInvalidElement),
+        "custom_validity_invalid_expression": runtimeFn(CustomValidityInvalidExpression),
+        "execute_expression":  runtimeFn(ExecuteExpression),
+        "generate_expression": runtimeFn(GenerateExpression),
+        "no_best_match_found": internalFn(NoBestMatchFound),
+        "no_script_provided":  initFn(NoScriptProvided),
 	}
 
 	sidebarLinks := make([]*SidebarLink, 0, len(reasonComponents))
@@ -200,12 +210,4 @@ func setupErrors(router chi.Router) error {
 	})
 
 	return nil
-}
-
-func getValidSignalNames(signals []string) string {
-	signalNames := make([]string, len(signals))
-	for i, s := range signals {
-		signalNames[i] = "$" + s
-	}
-	return strings.Join(signalNames, ", ")
 }

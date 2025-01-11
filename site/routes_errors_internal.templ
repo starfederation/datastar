@@ -1,6 +1,18 @@
 package site
 
-templ InternalErrorNoBestMatchFound(name string, info InternalErrorInfo) {
+templ BatchError(name string, info InternalErrorInfo) {
+	@InternalErrorView(name, info) {
+		<p>Batch error encountered by Preact Core.</p>
+	}
+}
+
+templ CleanupEffectError(name string, info InternalErrorInfo) {
+	@InternalErrorView(name, info) {
+		<p>Cleanup effect error encountered by Preact Core.</p>
+	}
+}
+
+templ NoBestMatchFound(name string, info InternalErrorInfo) {
 	@InternalErrorView(name, info) {
 		<p>Idiomorph condition</p>
 	}

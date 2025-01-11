@@ -5,10 +5,9 @@ import { type InitContext, PluginType, type RuntimeContext } from './types'
 // const url = 'https://data-star.dev/errors'
 const url = `${window.location.origin}/errors`
 
-export const hasValNonExpr = /([\w0-9.]+)\.value/gm
-
 function dserr(type: string, reason: string, metadata = {}) {
   const e = new Error()
+  reason = reason[0].toUpperCase() + reason.slice(1)
   e.name = `${DATASTAR} ${type} error ${reason}`
   const r = kebabize(reason).replaceAll('-', '_')
   const q = new URLSearchParams({

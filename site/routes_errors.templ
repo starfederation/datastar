@@ -1,39 +1,60 @@
 package site
 
+import (
+	"github.com/delaneyj/toolbelt"
+	"strings"
+)
+
 templ ErrorView(typ, name string, args templ.Component) {
-	<div class="p-8 flex flex-col gap-8">
-		<h1>{ name }</h1>
-		<div class="card bg-base-300">
-			<div class="card-body">
-				<div class="card-title">Error Type: { typ }</div>
-				@args
-			</div>
-		</div>
+	<div class="flex flex-col gap-8">
 		<div class="prose prose-lg flex-1">
-			<h1>Explanation</h1>
+			<h1>{ name }</h1>
+			<div class="card bg-base-300">
+				<div class="card-body">
+					<div class="card-title -mt-8">
+						<h3>{ typ } Error</h3>
+					</div>
+					@args
+				</div>
+			</div>
+			<h2>Explanation</h2>
 			{ children... }
 		</div>
 	</div>
 }
 
 templ runtimeArgs(info *RuntimeErrorInfo) {
-	<div>
-		{ info.Plugin.Type } plugin data-{ info.Plugin.Name } on
-		<span class="font-mono font-bold text-accent">&lt;{ info.Element.Tag } id="{ info.Element.ID }"/{ info.Element.Tag }&gt;</span>
-	</div>
-	<div>
-		<h3>Expression</h3>
-		<pre>
-			{ info.Expression.FnContent }
-		</pre>
-	</div>
-	if info.Error != "" {
+	{{
+		pluginName := toolbelt.Kebab(info.Plugin.Name)
+		pluginType := strings.ToLower(info.Plugin.Type)
+		elementTag := strings.ToLower(info.Element.Tag)
+		key := toolbelt.Kebab(info.Raw.Key)
+	}}
+	if pluginName != "" {
 		<div>
-			<h3>Error</h3>
+			A runtime error was encountered in a <code>data-{ pluginName }</code> { pluginType }.
+		</div>
+		if info.Error != "" {
+			<div>
+				<pre>
+					{ info.Error }
+				</pre>
+			</div>
+		}
+		<div>
+			<h3>Element</h3>
 			<pre>
-				{ info.Error }
+				&lt;{ elementTag } id="{ info.Element.ID }" data-{ key }="{ info.Raw.Value }"&gt;&lt;/{ elementTag }&gt;
 			</pre>
 		</div>
+		if info.Expression.FnContent != "" {
+			<div>
+				<h3>Expression</h3>
+				<pre>
+					{ info.Expression.FnContent }
+				</pre>
+			</div>
+		}
 	}
 }
 

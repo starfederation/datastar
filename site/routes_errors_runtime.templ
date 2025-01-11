@@ -1,26 +1,185 @@
 package site
 
-import "strings"
-
-templ RuntimeErrorRunExpr(name string, info *RuntimeErrorInfo) {
+templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 	{{
 		isSignalMatches := isSignalRe.FindAllStringSubmatch(info.Error, -1)
 	}}
 	@RuntimeErrorView(name, info) {
 		if len(isSignalMatches) > 0 {
-			<p>The signal  <span class="text-primary">{ isSignalMatches[0][1] }</span> is not defined</p>
+			<p>The signal <code class="text-primary">{ isSignalMatches[0][1] }</code> is not valid.</p>
+			<p>Ensure that the signal has been defined and that you only access leaf nodes when using nested signals.</p>
 			<div>
-				Current valid signals: <span class="font-bold">{ strings.Join(info.Expression.ValidSignals, ", ") }</span>
+				Current valid signals: 
+				@signalNames(info.Expression.ValidSignals...)
 			</div>
-			<p>We should probably say more here</p>
-		} else {
-			<div class="text-sm">No explaination for this error</div>
+			<p>Example:</p>
+			<p>In the following example, <code>$foo</code> is <em>not</em> a valid signal, since only the leaf nodes in nested signals are actually signals.</p>
+			<pre>
+				<code>
+					{ `<div data-signals="{foo: {bar: 1, baz: 2}}">
+	<div data-text="$foo.woof"></div>
+</div>` }
+				</code>
+			</pre>
 		}
 	}
 }
 
-templ RuntimeErrorGenExpr(name string, info *RuntimeErrorInfo) {
+templ GenerateExpression(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>Wasn't able to create a valid expression</p>
+		<p>A valid expression could not be generated.</p>
+	}
+}
+
+templ AttrValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("attr")
+		@attrError()
+	}
+}
+
+templ BindKeyAndValueProvided(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyAndValueProvided("bind")
+		@bindError()
+	}
+}
+
+templ BindKeyOrValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyOrValueRequired("bind")
+		@bindError()
+	}
+}
+
+templ ClassValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("class")
+		@classError()
+	}
+}
+
+templ ClipboardNotAvailable(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The Clipboard API is not available in this browser.</p>
+	}
+}
+
+templ ComputedKeyRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyRequired("computed")
+		@computedError()
+	}
+}
+
+templ ComputedValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("computed")
+		@computedError()
+	}
+}
+
+templ CustomValidityInvalidElement(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The <code>data-custom-validity</code> attribute was used on an element that is not a <code>HTMLInputElement</code>. The <code>data-custom-validity</code> attribute can only be used on form elements.</p>
+		@customValidityError()
+	}
+}
+
+templ CustomValidityInvalidExpression(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>An invalid expression was provided to the <code>data-custom-validity</code> attribute. The expression must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.</p>
+		@customValidityError()
+	}
+}
+
+templ attrError() {
+	{{
+		example := `<div data-attr-disabled="$foo"></div>`
+		alternative := `<div data-attr="{disabled: foo}"></div>`
+	}}
+	<p>The <code>data-attr</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are attribute names and the values are expressions.</p>
+	@sampleCode(example, alternative)
+	@docs("data-attr", "attribute")
+}
+
+templ bindError() {
+	{{
+		example := `<input data-bind-signalname>`
+		alternative := `<input data-bind="signalname">`
+	}}
+	<p>The <code>data-bind</code> attribute must have either a key <em>or</em> a value, representing the signal name to create and enable two-way binding with the element’s value.</p>
+	@sampleCode(example, alternative)
+	@docs("data-bind", "attribute")
+}
+
+templ classError() {
+	{{
+		example := `<div data-class-hidden="$foo"></div>`
+		alternative := `<div data-class="{hidden: foo}"></div>`
+	}}
+	<p>The <code>data-class</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are class names and the values are expressions.</p>
+	@sampleCode(example, alternative)
+	@docs("data-attr", "attribute")
+}
+
+templ computedError() {
+	{{
+		example := `<div data-computed-blinker="count % 2 === 0"></div>`
+	}}
+	<p>The <code>data-computed</code> attribute <em>must</em> have both a key, representing the signal name to create, and a value, representing the expression to assign to the signal.</p>
+	@sampleCode(example, "")
+	@docs("data-computed", "attribute")
+}
+
+templ customValidityError() {
+	{{
+		example := `<form>
+  <input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo">
+  <input data-bind-bar name="bar">
+  <button>
+      Submit form
+  </button>
+</form>`
+	}}
+	@sampleCode(example, "")
+	@docs("data-computed", "attribute")
+}
+
+templ keyRequired(pluginName string) {
+	<p>No key was provided to the <code>data-{ pluginName }</code> attribute.</p>
+}
+
+templ valueRequired(pluginName string) {
+	<p>No value was provided to the <code>data-{ pluginName }</code> attribute.</p>
+}
+
+templ keyAndValueProvided(pluginName string) {
+	<p>Both a key and a value were provided to the <code>data-{ pluginName }</code> attribute.</p>
+}
+
+templ keyOrValueRequired(pluginName string) {
+	<p>No key or value was provided to the <code>data-{ pluginName }</code> attribute.</p>
+}
+
+templ sampleCode(example string, alternative string) {
+	<p>Example:</p>
+	<pre><code>{ example }</code></pre>
+	if (alternative != "") {
+		<p>Alternative syntax:</p>
+		<pre><code>{ alternative }</code></pre>
+	}
+}
+
+templ docs(pluginName string, pluginType string) {
+	<p>See the docs on the <a href="/reference/{ pluginType }_plugins#{ pluginName }"><code>{ pluginName }</code></a> { pluginType }.</p>
+}
+
+templ signalNames(signals ...string) {
+	for i, s := range signals {
+		<code>${ s }</code>
+		if i < len(signals) - 1 {
+			, 
+		}
 	}
 }

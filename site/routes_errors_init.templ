@@ -1,6 +1,6 @@
 package site
 
-templ InitErrorNoScriptProvided(name string, info *InitErrorInfo) {
+templ NoScriptProvided(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
 		<p>Wasn't able to create a valid expression</p>
 	}
