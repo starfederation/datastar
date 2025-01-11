@@ -82,9 +82,3 @@ async def feed(request):
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=int(os.environ.get('PORT', 3000)))
 ```
-
-```html
-<div class="container">
-  <img src="foo.img" />
-</div>
-```
