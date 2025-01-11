@@ -23,13 +23,13 @@ Merges one or more signals into the existing signals. Values defined later in th
 <div data-signals-foo="1"></div>
 ```
 
-Signals are nestable using dot-notation, which can be useful for namespacing.
+Signals can be namespaced using dot-notation.
 
 ```html
 <div data-signals-foo.bar="1"></div>
 ```
 
-Note when working with nested signals that only the leaf nodes are actually signals. So in the example above, only `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
+Note when working with signal namespace that only the leaf nodes are actually signals. So in the example above, only `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` (the namespace) is not.
 
 The `data-signals` attribute can also be used to merge multiple signals using a set of key-value pairs, where the keys represent signal names and the values represent expressions.
 

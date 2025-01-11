@@ -2,7 +2,7 @@
 
 Datastar's philosophy is: let the browser do what it does best—render HTML—while enabling declarative reactivity.
 
-At its core, Datastar makes __nestable signals declarative__. Let's unpack that.
+At its core, Datastar makes __namespaced signals declarative__. Let's unpack that.
 
 ### 1. Declarative
 
@@ -43,9 +43,9 @@ Behind the scenes, Datastar converts `$foo` to `ctx.signals.signal('foo').value`
 <button data-on-click="$foo = $foo.toUpperCase()"></button>
 ```
 
-### 3. Nestable Signals
+### 3. Namespaced Signals
 
-Signals in Datastar have a trick up their sleeve: they are nestable. 
+Signals in Datastar have a trick up their sleeve: they can be namespaced. 
 
 ```html
 <div data-signals-foo.bar="1"></div>
@@ -63,9 +63,9 @@ Or, using two-way binding:
 <input data-bind-foo.bar />
 ```
 
-Note that only the leaf nodes are actually signals. So in the example above, `bar` is a signal but `foo` is not, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
+Note that only the leaf nodes are actually signals. So in the example above, `bar` is a signal but `foo`(the namespace) is not, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
 
-Nestable signals can be particularly useful for namespacing. A practical use-case might be when you have repetition of state on a page. 
+A practical use-case might be when you have repetition of state on a page. 
 
 The following example shows how to toggle the value of all signals starting with `menu.open.` at once when a button is clicked.
 
