@@ -40,7 +40,9 @@ Signals can be created and modified using `data-*` attributes on the frontend, o
 Behind the scenes, Datastar converts `$foo` to `ctx.signals.signal('foo').value`, and then evaluates the expression in a sandboxed context. This means that JavaScript can be used in Datastar expressions.
 
 ```html
-<button data-on-click="$foo = $foo.toUpperCase()"></button>
+<button data-on-click="$foo = $foo.toUpperCase()">
+  Convert to uppercase
+</button>
 ```
 
 ### 3. Namespaced Signals
@@ -65,14 +67,18 @@ Or, using two-way binding:
 
 Note that only the leaf nodes are actually signals. So in the example above, `bar` is a signal but `foo`(the namespace) is not, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
 
-A practical use-case might be when you have repetition of state on a page. 
+Namespaced signals can be useful for targetting signals in a more granular way on the backend.
+
+Another practical use-case might be when you have repetition of state on a page. 
 
 The following example shows how to toggle the value of all signals starting with `menu.open.` at once when a button is clicked.
 
 ```html
 <div data-signals-menu.isopen.desktop="false"></div>
 <div data-signals-menu.isopen.mobile="false"></div>
-<button data-on-click="@toggleAll('menu.isopen.')"></button>
+<button data-on-click="@toggleAll('menu.isopen.')">
+  Open/close menu
+</button>
 ```
 
 The beauty of this is that you don't need to write a bunch of code to set up and maintain state. You just use `data-*` attributes and think declaratively!
@@ -82,7 +88,9 @@ The beauty of this is that you don't need to write a bunch of code to set up and
 Actions are helper functions that can be used in [Datastar expressions](/guide/datastar_expressions). They allow you to perform logical operations without having to write procedural JavaScript.
 
 ```html
-<button data-on-click="@setAll('foo.', $mysignal.toUpperCase())"></button>
+<button data-on-click="@setAll('foo.', $mysignal.toUpperCase())">
+  Convert all to uppercase
+</button>
 ```
 
 ### Backend Actions
