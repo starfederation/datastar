@@ -178,7 +178,7 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
   - `.noleading` - Throttle without leading edge.
   - `.trail` - Throttle with trailing edge.
 - `__window` - Attaches the event listener to the `window` element.
-- `__outsite` - Triggers when the event is outside the element.
+- `__outside` - Triggers when the event is outside the element.
 - `__prevent` - Calls `preventDefault` on the event listener.
 - `__stop` - Calls `stopPropagation` on the event listener.
 
@@ -223,9 +223,7 @@ Modifiers allow you to modify the storage target.
 Replaces the URL in the browser without reloading the page. The value can be a relative or absolute URL, and is an evaluated expression.
 
 ```html
-<div
-  data-replace-url="`/page${page}`">
-</div>
+<div data-replace-url="`/page${page}`"></div>
 ```
 
 ### `data-text`
@@ -248,11 +246,13 @@ Allows you to add custom validity to an element using an expression. The express
 
 ```html
 <form>
-  <input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo">
-  <input data-bind-bar name="bar">
-  <button>
-      Submit form
-  </button>
+  <input
+    data-bind-foo
+    data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'"
+    name="foo"
+  />
+  <input data-bind-bar name="bar" />
+  <button>Submit form</button>
 </form>
 ```
 
@@ -334,10 +334,7 @@ Adds integrations with [backend plugin actions](/reference/action_plugins#backen
 Creates a signal and sets its value to `true` while an SSE request request is in flight, otherwise `false`. The signal can be used to show a loading indicator.
 
 ```html
-<button
-  data-on-click="@get('/endpoint')"
-  data-indicator-fetching
-></button>
+<button data-on-click="@get('/endpoint')" data-indicator-fetching></button>
 ```
 
 This can be useful for show a loading spinner, disabling a button, etc.
