@@ -15,7 +15,7 @@
 
 ## Explanation
 
-The `__outsite` modifier is used to listen to clicks outside the element.
+The `__outside` modifier is used to listen to clicks outside the element.
 
 ```html
 <div data-signals-open="false" data-on-click__outside="$open ? $open = false : null" >
