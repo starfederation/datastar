@@ -74,11 +74,11 @@ Another practical use-case might be when you have repetition of state on a page.
 The following example shows how to toggle the value of all signals starting with `menu.open.` at once when a button is clicked.
 
 ```html
-<div data-signals-menu.isopen.desktop="false"></div>
-<div data-signals-menu.isopen.mobile="false"></div>
-<button data-on-click="@toggleAll('menu.isopen.')">
-  Open/close menu
-</button>
+<div data-signals="{menu: {isopen: {desktop: false, mobile: false}}}">
+  <button data-on-click="@toggleAll('menu.isopen.')">
+    Open/close menu
+  </button>
+</div>
 ```
 
 The beauty of this is that you don't need to write a bunch of code to set up and maintain state. You just use `data-*` attributes and think declaratively!
