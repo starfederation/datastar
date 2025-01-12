@@ -111,7 +111,7 @@ export const Bind: AttributePlugin = {
               reader.onload = () => {
                 if (typeof reader.result !== 'string') {
                   throw runtimeErr('InvalidFileResultType', ctx, {
-                    type: typeof reader.result,
+                    resultType: typeof reader.result,
                   })
                 }
                 const match = reader.result.match(dataURIRegex)
@@ -170,8 +170,8 @@ export const Bind: AttributePlugin = {
           signals.setValue(signalName, v)
         }
       } else {
-        throw runtimeErr('UnsupportedSignalType', ctx, {
-          current: typeof current,
+        throw runtimeErr('BindUnsupportedSignalType', ctx, {
+          signalType: typeof current,
         })
       }
     }

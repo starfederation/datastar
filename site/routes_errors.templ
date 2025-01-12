@@ -78,15 +78,8 @@ templ InitErrorView(name string, info *InitErrorInfo) {
 	}
 }
 
-templ sampleCode() {
-	<p>Example:</p>
-	@code() {
-		{ children... }
-	}
-}
-
-templ samepleCodeAlternative() {
-	<p>Alternative syntax:</p>
+templ sampleCode(heading string) {     
+	<p>{ heading }:</p>
 	@code() {
 		{ children... }
 	}
@@ -100,12 +93,30 @@ templ code() {
 	</pre>
 }
 
-templ docs(pluginName string, pluginType string) {
+templ attributeDocs(pluginName string) {
 	<p>
-		See the docs on the
-		<a href="/reference/{ pluginType }_plugins#{ pluginName }">
-			<code>{ pluginName }</code>
-		</a> { pluginType }.
+		See the docs for the
+		<a href="/reference/attribute_plugins#data-{ pluginName }">
+			<code>data-{ pluginName }</code>
+		</a> attribute.
+	</p>
+}
+
+templ actionDocs(pluginName string) {
+	<p>
+		See the docs for the
+		<a href="/reference/action_plugins#{ pluginName }">
+			<code>\@{ pluginName }</code>
+		</a> action.
+	</p>
+}
+
+templ eventDocs(eventName string) {
+	<p>
+		See the docs for the 
+		<a href="/reference/sse_events#datastar-{ eventName }">
+			<code>datastar-{ eventName }</code>
+		</a> event.
 	</p>
 }
 

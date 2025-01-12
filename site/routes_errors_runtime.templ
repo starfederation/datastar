@@ -1,37 +1,5 @@
 package site
 
-templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
-	{{
-		isSignalMatches := isSignalRe.FindAllStringSubmatch(info.Error, -1)
-	}}
-	@RuntimeErrorView(name, info) {
-		if len(isSignalMatches) > 0 {
-			<p>The signal <code class="text-primary">{ isSignalMatches[0][1] }</code> is not valid.</p>
-			<p>Ensure that the signal has been defined and that you only access leaf nodes when using nested signals.</p>
-			<div>
-				Current valid signals:
-				@signalNames(info.Expression.ValidSignals...)
-			</div>
-			<p>Example:</p>
-			<p>In the following example, <code>$foo</code> is <em>not</em> a valid signal, since only the leaf nodes in nested signals are actually signals.</p>
-			<pre>
-				<code>
-					{ `<div data-signals="{foo: {bar: 1, baz: 2}}">
-	<div data-text="$foo.woof"></div>
-</div>` }
-				</code>
-			</pre>
-			<p>See the docs on <a href="/guide/datastar_expressions">DataStar expressions</a> for more information.</p>
-		}
-	}
-}
-
-templ GenerateExpression(name string, info *RuntimeErrorInfo) {
-	@RuntimeErrorView(name, info) {
-		<p>A valid expression could not be generated.</p>
-	}
-}
-
 templ AttrValueRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@valueRequired("attr")
@@ -53,6 +21,11 @@ templ BindKeyOrValueRequired(name string, info *RuntimeErrorInfo) {
 	}
 }
 
+templ BindUnsupportedSignalType(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@attributeDocs("bind")
+	}
+}
 templ ClassValueRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@valueRequired("class")
@@ -94,49 +67,173 @@ templ CustomValidityInvalidExpression(name string, info *RuntimeErrorInfo) {
 	}
 }
 
+templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
+	{{
+		isSignalMatches := isSignalRe.FindAllStringSubmatch(info.Error, -1)
+	}}
+	@RuntimeErrorView(name, info) {
+		if len(isSignalMatches) > 0 {
+			<p>The signal <code class="text-primary">{ isSignalMatches[0][1] }</code> is not valid.</p>
+			<p>Ensure that the signal has been defined and that you only access leaf nodes when using nested signals.</p>
+			<div>
+				Current valid signals:
+				@signalNames(info.Expression.ValidSignals...)
+			</div>
+			<p>Example:</p>
+			<p>In the following example, <code>$foo</code> is <em>not</em> a valid signal, since only the leaf nodes in nested signals are actually signals.</p>
+			@code() {
+				{
+					`<div data-signals="{foo: {bar: 1, baz: 2}}">
+	<div data-text="$foo.woof"></div>
+</div>`
+				}
+			}
+			<p>See the docs on <a href="/guide/datastar_expressions">DataStar expressions</a> for more information.</p>
+		}
+	}
+}
+
+templ GenerateExpression(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>A valid expression could not be generated.</p>
+	}
+}
+
+templ InvalidContentType(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The content type of the response received from <code>{ info.URL }</code> was <code>{ info.Error }</code>. It must be <code>text/event-stream</code>.</p>
+	}
+}
+
+templ InvalidDataURI(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>Reading the file data URI failed.</p>
+	}
+}
+
+templ InvalidFileResultType(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>Reading the file contents of type <code>{ info.ResultType }</code> failed.</p>
+	}
+}
+
+templ ScrollIntoViewInvalidElement(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The <code>data-scroll-into-view</code> attribute was placed on an invalid element. It may only be placed on an HTML element.</p>
+		@sampleCode("Example") {
+			<div data-scroll-into-view></div>
+		}
+		@attributeDocs("scroll-into-view")
+	}
+}
+
+templ SSEClosestFormNotFound(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>No closest form could be found in the DOM. When setting the <code>contentType</code> option to <code>form</code> in the <code>\@{ info.Plugin.Name }()</code> action, the element must have a wrapping form, otherwise a <code>selector</code> must be provided to a form that exists in the DOM.</p>
+		@sampleCode("Example using a wrapping form") {
+			<form>
+				<button data-on-click="@{ action }('/endpoint', {contentType: 'form'})"></button>
+			</form>
+		}
+		@sampleCode("Example using a selector") {
+			<button data-on-click="@{ action }('/endpoint', {contentType: 'form', selector: '#myform'})"></button>
+		}
+		@actionDocs("get")
+	}
+}
+
+templ SSEFetchFailed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The following error was encountered when sending a <code>{ info.Method }</code> request to <code>{ info.URL }</code>.</p>
+		@code() {
+			{ info.Error }
+		}
+	}
+}
+
+templ SSEFormNotFound(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>No form with the selector <code>{ info.Selector }</code> could be found in the DOM. When specifying a form selector using the <code>selector</code> option in the <code>\@{ info.Plugin.Name }()</code> action, the form must already exist in the DOM.</p>
+		@sampleCode("Example") {
+			<button data-on-click="@{ action }('/endpoint', {contentType: 'form', selector: '#myform'})"></button>
+		}
+		@actionDocs("get")
+	}
+}
+
+templ SSEInvalidContentType(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>An invalid content type <code>{ info.ContentType }</code> was provided to the <code>\@{ info.Plugin.Name }()</code> action. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
+		@sampleCode("Example") {
+			<button data-on-click="@{ action }('/endpoint', {contentType: 'form'})"></button>
+		}
+		@actionDocs("get")
+	}
+}
+
+templ SSENoURLProvided(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>No URL was provided to the <code>\@{ info.Plugin.Name }()</code> action. A valid URL must be provided as the first argument.</p>
+		@sampleCode("Example") {
+			<button data-on-click="@{ action }('/endpoint')"></button>
+		}
+		@actionDocs("get")
+	}
+}
+
+templ TextInvalidElement(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The <code>data-text</code> attribute was placed on an invalid element. It may only be placed on an HTML element.</p>
+		@sampleCode("Example") {
+			<div data-text="$foo"></div>
+		}
+		@attributeDocs("text")
+	}
+}
+
 templ attrError() {
 	<p>The <code>data-attr</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are attribute names and the values are expressions.</p>
-	@sampleCode() {
+	@sampleCode("Example") {
 		<div data-attr-disabled="$foo"></div>
 	}
-	@samepleCodeAlternative() {
+	@sampleCode("Alternative syntax") {
 		<div data-attr="{disabled: foo}"></div>
 	}
-	@docs("data-attr", "attribute")
+	@attributeDocs("attr")
 }
 
 templ bindError() {
 	<p>The <code>data-bind</code> attribute must have either a key <em>or</em> a value, representing the signal name to create and enable two-way binding with the element’s value.</p>
-	@sampleCode() {
+	@sampleCode("Example") {
 		<input data-bind-signalname/>
 	}
-	@samepleCodeAlternative() {
+	@sampleCode("Alternative syntax") {
 		<input data-bind="signalname"/>
 	}
-	@docs("data-bind", "attribute")
+	@attributeDocs("bind")
 }
 
 templ classError() {
 	<p>The <code>data-class</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are class names and the values are expressions.</p>
-	@sampleCode() {
+	@sampleCode("Example") {
 		<div data-class-hidden="$foo"></div>
 	}
-	@samepleCodeAlternative() {
+	@sampleCode("Alternative syntax") {
 		<div data-class="{hidden: foo}"></div>
 	}
-	@docs("data-attr", "attribute")
+	@attributeDocs("attr")
 }
 
 templ computedError() {
 	<p>The <code>data-computed</code> attribute <em>must</em> have both a key, representing the signal name to create, and a value, representing the expression to assign to the signal.</p>
-	@sampleCode() {
+	@sampleCode("Example") {
 		<div data-computed-blinker="count % 2 === 0"></div>
 	}
-	@docs("data-computed", "attribute")
+	@attributeDocs("computed")
 }
 
 templ customValidityError() {
-	@sampleCode() {
+	@sampleCode("Example") {
 		<form>
 			<input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo"/>
 			<input data-bind-bar name="bar"/>
@@ -145,7 +242,7 @@ templ customValidityError() {
 			</button>
 		</form>
 	}
-	@docs("data-computed", "attribute")
+	@attributeDocs("computed")
 }
 
 templ keyRequired(pluginName string) {

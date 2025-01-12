@@ -39,6 +39,11 @@ type RuntimeErrorInfo struct {
 		FnContent    string   `json:"fnContent"`
 	} `json:"expression"`
 	Error string `json:"error"`
+	ContentType string `json:"contentType"`
+	Method string `json:"method"`
+	ResultType string `json:"resultType"`
+	Selector string `json:"selector"`
+	URL string `json:"url"`
 }
 
 func (RuntimeErrorInfo) isErrorInfo() {}
@@ -48,6 +53,9 @@ type InitErrorInfo struct {
 		Name string `json:"name"`
 		Type string `json:"type"`
 	} `json:"plugin"`
+	MergeMode string `json:"mergeMode"`
+	PluginType string `json:"pluginType"`
+	SelectorOrID string `json:"selectorOrID"`
 }
 
 func (InitErrorInfo) isErrorInfo() {}
@@ -100,41 +108,31 @@ func setupErrors(router chi.Router) error {
 	sharedInternalErrFn := internalFn(InternalErrorView)
 
 	reasonComponents := map[string]componentGenerator{
-		// BEN here is your list
-		// "invalid_content_type": runtimeFn(InvalidContentType),
-		// "invalid_data_uri": runtimeFn(InvalidDataURI),
-		// "invalid_file_result_type": runtimeFn(InvalidFileResultType),
-		// "invalid_merge_mode": runtimeFn(InvalidMergeMode),
-		// "invalid_plugin_type": runtimeFn(InvalidPluginType),
-		// "morph_failed": runtimeFn(MorphFailed),
-		// "no_fragments_found": runtimeFn(NoFragmentsFound),
-		// "no_paths_provided": runtimeFn(NoPathsProvided),
-		// "no_selector_provided": runtimeFn(NoSelectorProvided),
-		// "no_targets_found": runtimeFn(NoTargetsFound),
-		// "not_html_element": runtimeFn(NotHTMLElement),
-		// "not_html_svg_element": runtimeFn(NotHTMLSVGElement),
-		// "sse_closest_form_not_found": runtimeFn(SSEClosestFormNotFound),
-		// "sse_fetch_failed": runtimeFn(SSEFetchFailed),
-		// "sse_form_not_found": runtimeFn(SSEFormNotFound),
-		// "sse_invalid_content_type": runtimeFn(SSEInvalidContentType),
-		// "sse_no_url_provided": runtimeFn(SSENoURLProvided),
-		// "unsupported_signal_type": runtimeFn(UnsupportedSignalType),
-		"invalid_signal_key":                 sharedInternalErrFn,
-		"signal_not_found":                   sharedInternalErrFn,
-		"no_best_match_found":                sharedInternalErrFn,
-		"invalid_morph_style":                sharedInternalErrFn,
-		"no_parent_element_found":            sharedInternalErrFn,
-		"new_element_could_not_be_created":   sharedInternalErrFn,
-		"no_temporary_element_found":         sharedInternalErrFn,
-		"no_content_found":                   sharedInternalErrFn,
 		"batch_error":                        sharedInternalErrFn,
-		"signal_cycle_detected":              sharedInternalErrFn,
-		"get_computed_error":                 sharedInternalErrFn,
 		"cleanup_effect_error":               sharedInternalErrFn,
 		"end_effect_error":                   sharedInternalErrFn,
+		"get_computed_error":                 sharedInternalErrFn,
+		"invalid_morph_style":                sharedInternalErrFn,
+		"invalid_signal_key":                 sharedInternalErrFn,
+		"new_element_could_not_be_created":   sharedInternalErrFn,
+		"no_best_match_found":                sharedInternalErrFn,
+		"no_content_found":                   sharedInternalErrFn,
+		"no_parent_element_found":            sharedInternalErrFn,
+		"no_temporary_element_found":         sharedInternalErrFn,
+		"signal_cycle_detected":              sharedInternalErrFn,
+		"signal_not_found":                   sharedInternalErrFn,
+		"invalid_merge_mode":				  initFn(InvalidMergeMode),
+		"invalid_plugin_type": 				  initFn(InvalidPluginType),
+		"morph_failed": 					  initFn(MorphFailed),
+		"no_fragments_found": 				  initFn(NoFragmentsFound),
+		"no_paths_provided": 				  initFn(NoPathsProvided),
+		"no_selector_provided": 			  initFn(NoSelectorProvided),
+		"no_script_provided":                 initFn(NoScriptProvided),
+		"no_targets_found": 				  initFn(NoTargetsFound),
 		"attr_value_required":                runtimeFn(AttrValueRequired),
 		"bind_key_and_value_provided":        runtimeFn(BindKeyAndValueProvided),
 		"bind_key_or_value_required":         runtimeFn(BindKeyOrValueRequired),
+		"bind_unsupported_signal_type": 	  runtimeFn(BindUnsupportedSignalType),
 		"class_value_required":               runtimeFn(ClassValueRequired),
 		"clipboard_not_available":            runtimeFn(ClipboardNotAvailable),
 		"computed_key_required":              runtimeFn(ComputedKeyRequired),
@@ -143,7 +141,16 @@ func setupErrors(router chi.Router) error {
 		"custom_validity_invalid_expression": runtimeFn(CustomValidityInvalidExpression),
 		"execute_expression":                 runtimeFn(ExecuteExpression),
 		"generate_expression":                runtimeFn(GenerateExpression),
-		"no_script_provided":                 initFn(NoScriptProvided),
+		"invalid_content_type": 			  runtimeFn(InvalidContentType),
+		"invalid_data_uri": 				  runtimeFn(InvalidDataURI),
+		"invalid_file_result_type":  		  runtimeFn(InvalidFileResultType),
+		"scroll_into_view_invalid_element":	  runtimeFn(ScrollIntoViewInvalidElement),
+		"sse_closest_form_not_found": 		  runtimeFn(SSEClosestFormNotFound),
+		"sse_fetch_failed": 				  runtimeFn(SSEFetchFailed),
+		"sse_form_not_found": 				  runtimeFn(SSEFormNotFound),
+		"sse_invalid_content_type": 		  runtimeFn(SSEInvalidContentType),
+		"sse_no_url_provided": 				  runtimeFn(SSENoURLProvided),
+		"text_invalid_element": 			  runtimeFn(TextInvalidElement),
 	}
 
 	sidebarLinks := make([]*SidebarLink, 0, len(reasonComponents))

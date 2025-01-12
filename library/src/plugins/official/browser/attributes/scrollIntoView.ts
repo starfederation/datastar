@@ -70,7 +70,7 @@ export const ScrollIntoView: AttributePlugin = {
     if (mods.has(VNEAREST)) opts.block = NEAREST
 
     if (!(el instanceof HTMLElement || el instanceof SVGElement)) {
-      throw runtimeErr('NotHtmlSvgElement', ctx)
+      throw runtimeErr('ScrollIntoViewInvalidElement', ctx)
     }
     if (!el.tabIndex) {
       el.setAttribute('tabindex', '0')

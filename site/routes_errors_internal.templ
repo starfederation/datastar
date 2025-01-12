@@ -2,7 +2,6 @@ package site
 
 templ internalArgs(info *InternalErrorInfo) {
 	<div>
-		<h3>Internal Error</h3>
 		<pre>
 			{ templ.JSONString(info) }
 		</pre>
@@ -11,6 +10,6 @@ templ internalArgs(info *InternalErrorInfo) {
 
 templ InternalErrorView(name string, info *InternalErrorInfo) {
 	@ErrorView("Internal", name, internalArgs(info)) {
-		<h1>If you are seeing this please file an issue on Github or better yet discuss on the Discord server</h1>
+		<p>Internal errors should never occur. If you are seeing this please open a <a href="https://github.com/starfederation/datastar/issues">GitHub issue</a> providing and explanation of how the error occurred and the details above.</p>
 	}
 }

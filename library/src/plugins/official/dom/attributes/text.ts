@@ -19,7 +19,7 @@ export const Text: AttributePlugin = {
     const { el, genRX, effect } = ctx
     const rx = genRX()
     if (!(el instanceof HTMLElement)) {
-      runtimeErr('NotHtmlElement', ctx)
+      runtimeErr('TextInvalidElement', ctx)
     }
     return effect(() => {
       const res = rx(ctx)
