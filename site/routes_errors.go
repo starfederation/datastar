@@ -61,7 +61,7 @@ var isSignalRe = regexp.MustCompile("(\\$\\S*) is not defined")
 func setupErrors(router chi.Router) error {
 
 	type initComponentFn func(name string, params *InitErrorInfo) templ.Component
-	type internalComponentFn func(name string, params InternalErrorInfo) templ.Component
+	type internalComponentFn func(name string, params *InternalErrorInfo) templ.Component
 	type runtimeComponentFn func(name string, params *RuntimeErrorInfo) templ.Component
 
 	type anyComponentFn func(name string, params ErrorInfo) templ.Component
@@ -79,14 +79,14 @@ func setupErrors(router chi.Router) error {
 		}
 	}
 
-	// internalFn := func(fn internalComponentFn) componentGenerator {
-	// 	return componentGenerator{
-	// 		Type: "internal",
-	// 		ComponentFn: func(name string, params ErrorInfo) templ.Component {
-	// 			return fn(name, params.(InternalErrorInfo))
-	// 		},
-	// 	}
-	// }
+	internalFn := func(fn internalComponentFn) componentGenerator {
+		return componentGenerator{
+			Type: "internal",
+			ComponentFn: func(name string, params ErrorInfo) templ.Component {
+				return fn(name, params.(*InternalErrorInfo))
+			},
+		}
+	}
 
 	runtimeFn := func(fn runtimeComponentFn) componentGenerator {
 		return componentGenerator{
@@ -96,6 +96,8 @@ func setupErrors(router chi.Router) error {
 			},
 		}
 	}
+
+	sharedInternalErrFn := internalFn(InternalErrorView)
 
 	reasonComponents := map[string]componentGenerator{
 		// BEN here is your list
@@ -117,7 +119,19 @@ func setupErrors(router chi.Router) error {
 		// "sse_invalid_content_type": runtimeFn(SSEInvalidContentType),
 		// "sse_no_url_provided": runtimeFn(SSENoURLProvided),
 		// "unsupported_signal_type": runtimeFn(UnsupportedSignalType),
-
+		"invalid_signal_key":                 sharedInternalErrFn,
+		"signal_not_found":                   sharedInternalErrFn,
+		"no_best_match_found":                sharedInternalErrFn,
+		"invalid_morph_style":                sharedInternalErrFn,
+		"no_parent_element_found":            sharedInternalErrFn,
+		"new_element_could_not_be_created":   sharedInternalErrFn,
+		"no_temporary_element_found":         sharedInternalErrFn,
+		"no_content_found":                   sharedInternalErrFn,
+		"batch_error":                        sharedInternalErrFn,
+		"signal_cycle_detected":              sharedInternalErrFn,
+		"get_computed_error":                 sharedInternalErrFn,
+		"cleanup_effect_error":               sharedInternalErrFn,
+		"end_effect_error":                   sharedInternalErrFn,
 		"attr_value_required":                runtimeFn(AttrValueRequired),
 		"bind_key_and_value_provided":        runtimeFn(BindKeyAndValueProvided),
 		"bind_key_or_value_required":         runtimeFn(BindKeyOrValueRequired),
@@ -199,7 +213,7 @@ func setupErrors(router chi.Router) error {
 			case "init":
 				params = &InitErrorInfo{}
 			case "internal":
-				params = InternalErrorInfo{}
+				params = &InternalErrorInfo{}
 			default:
 				http.Error(w, fmt.Sprintf("unknown error type %q", typ), http.StatusBadRequest)
 				return
@@ -209,16 +223,28 @@ func setupErrors(router chi.Router) error {
 				http.Error(w, fmt.Sprintf("failed to unmarshal metadata: %v", err), http.StatusBadRequest)
 				return
 			}
-			compGen, ok := reasonComponents[reason]
-			if !ok {
-				http.Error(w, "not found", http.StatusNotFound)
-				return
-			}
+
 			buf := bytebufferpool.Get()
 			defer bytebufferpool.Put(buf)
 
+			var (
+				c templ.Component
+			)
+			compGen, ok := reasonComponents[reason]
+			if ok {
+				c = compGen.ComponentFn(currentLink.Label, params)
+			} else {
+				if typ == "internal" {
+					p := params.(*InternalErrorInfo)
+					c = InternalErrorView(reason, p)
+				} else {
+					http.Error(w, "not found", http.StatusNotFound)
+					return
+				}
+			}
+
 			ctx := r.Context()
-			if err := compGen.ComponentFn(currentLink.Label, params).Render(ctx, buf); err != nil {
+			if err := c.Render(ctx, buf); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
