@@ -79,14 +79,14 @@ func setupErrors(router chi.Router) error {
 		}
 	}
 
-	internalFn := func(fn internalComponentFn) componentGenerator {
-		return componentGenerator{
-			Type: "internal",
-			ComponentFn: func(name string, params ErrorInfo) templ.Component {
-				return fn(name, params.(InternalErrorInfo))
-			},
-		}
-	}
+	// internalFn := func(fn internalComponentFn) componentGenerator {
+	// 	return componentGenerator{
+	// 		Type: "internal",
+	// 		ComponentFn: func(name string, params ErrorInfo) templ.Component {
+	// 			return fn(name, params.(InternalErrorInfo))
+	// 		},
+	// 	}
+	// }
 
 	runtimeFn := func(fn runtimeComponentFn) componentGenerator {
 		return componentGenerator{
@@ -98,20 +98,38 @@ func setupErrors(router chi.Router) error {
 	}
 
 	reasonComponents := map[string]componentGenerator{
-		"attr_value_required": runtimeFn(AttrValueRequired),
-        "bind_key_and_value_provided": runtimeFn(BindKeyAndValueProvided),
-        "bind_key_or_value_required": runtimeFn(BindKeyOrValueRequired),
-        "class_value_required": runtimeFn(ClassValueRequired),
-        "cleanup_effect_error": internalFn(CleanupEffectError),
-        "clipboard_not_available": runtimeFn(ClipboardNotAvailable),
-        "computed_key_required": runtimeFn(ComputedKeyRequired),
-        "computed_value_required": runtimeFn(ComputedValueRequired),
-        "custom_validity_invalid_element": runtimeFn(CustomValidityInvalidElement),
-        "custom_validity_invalid_expression": runtimeFn(CustomValidityInvalidExpression),
-        "execute_expression":  runtimeFn(ExecuteExpression),
-        "generate_expression": runtimeFn(GenerateExpression),
-        "no_best_match_found": internalFn(NoBestMatchFound),
-        "no_script_provided":  initFn(NoScriptProvided),
+		// BEN here is your list
+		// "invalid_content_type": runtimeFn(InvalidContentType),
+		// "invalid_data_uri": runtimeFn(InvalidDataURI),
+		// "invalid_file_result_type": runtimeFn(InvalidFileResultType),
+		// "invalid_merge_mode": runtimeFn(InvalidMergeMode),
+		// "invalid_plugin_type": runtimeFn(InvalidPluginType),
+		// "morph_failed": runtimeFn(MorphFailed),
+		// "no_fragments_found": runtimeFn(NoFragmentsFound),
+		// "no_paths_provided": runtimeFn(NoPathsProvided),
+		// "no_selector_provided": runtimeFn(NoSelectorProvided),
+		// "no_targets_found": runtimeFn(NoTargetsFound),
+		// "not_html_element": runtimeFn(NotHTMLElement),
+		// "not_html_svg_element": runtimeFn(NotHTMLSVGElement),
+		// "sse_closest_form_not_found": runtimeFn(SSEClosestFormNotFound),
+		// "sse_fetch_failed": runtimeFn(SSEFetchFailed),
+		// "sse_form_not_found": runtimeFn(SSEFormNotFound),
+		// "sse_invalid_content_type": runtimeFn(SSEInvalidContentType),
+		// "sse_no_url_provided": runtimeFn(SSENoURLProvided),
+		// "unsupported_signal_type": runtimeFn(UnsupportedSignalType),
+
+		"attr_value_required":                runtimeFn(AttrValueRequired),
+		"bind_key_and_value_provided":        runtimeFn(BindKeyAndValueProvided),
+		"bind_key_or_value_required":         runtimeFn(BindKeyOrValueRequired),
+		"class_value_required":               runtimeFn(ClassValueRequired),
+		"clipboard_not_available":            runtimeFn(ClipboardNotAvailable),
+		"computed_key_required":              runtimeFn(ComputedKeyRequired),
+		"computed_value_required":            runtimeFn(ComputedValueRequired),
+		"custom_validity_invalid_element":    runtimeFn(CustomValidityInvalidElement),
+		"custom_validity_invalid_expression": runtimeFn(CustomValidityInvalidExpression),
+		"execute_expression":                 runtimeFn(ExecuteExpression),
+		"generate_expression":                runtimeFn(GenerateExpression),
+		"no_script_provided":                 initFn(NoScriptProvided),
 	}
 
 	sidebarLinks := make([]*SidebarLink, 0, len(reasonComponents))

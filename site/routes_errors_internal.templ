@@ -1,19 +1,16 @@
 package site
 
-templ BatchError(name string, info InternalErrorInfo) {
-	@InternalErrorView(name, info) {
-		<p>Batch error encountered by Preact Core.</p>
-	}
+templ internalArgs(info InternalErrorInfo) {
+	<div>
+		<h3>Internal Error</h3>
+		<pre>
+			{ templ.JSONString(info) }
+		</pre>
+	</div>
 }
 
-templ CleanupEffectError(name string, info InternalErrorInfo) {
-	@InternalErrorView(name, info) {
-		<p>Cleanup effect error encountered by Preact Core.</p>
-	}
-}
-
-templ NoBestMatchFound(name string, info InternalErrorInfo) {
-	@InternalErrorView(name, info) {
-		<p>Idiomorph condition</p>
+templ InternalErrorView(name string, info InternalErrorInfo) {
+	@ErrorView("Internal", name, internalArgs(info)) {
+		<h1>If you are seeing this please file an issue on Github or better yet discuss on the Discord server</h1>
 	}
 }

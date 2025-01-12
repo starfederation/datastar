@@ -2,6 +2,8 @@ import { type Computed, Signal, computed } from '../vendored/preact-core'
 import { internalErr } from './errors'
 import type { NestedSignal, NestedValues } from './types'
 
+const from = 'namespacedSignals'
+
 // If onlyPublic is true, only signals not starting with an underscore are included
 function nestedValues(
   signal: NestedSignal,
@@ -32,7 +34,7 @@ function mergeNested(
   for (const key in values) {
     if (Object.hasOwn(values, key)) {
       if (key.match(/\_\_+/)) {
-        throw internalErr('InvalidSignalKey', { key })
+        throw internalErr(from, 'InvalidSignalKey', { key })
       }
 
       const value = values[key]
@@ -141,7 +143,8 @@ export class SignalsRoot {
     }
     const last = parts[parts.length - 1]
     const signal = subSignals[last]
-    if (!signal) throw internalErr('SignalNotFound', { path: dotDelimitedPath })
+    if (!signal)
+      throw internalErr(from, 'SignalNotFound', { path: dotDelimitedPath })
     return signal as Signal<T>
   }
 

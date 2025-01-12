@@ -78,17 +78,43 @@ templ InitErrorView(name string, info *InitErrorInfo) {
 	}
 }
 
-templ internalArgs(info InternalErrorInfo) {
-	<div>
-		<h3>Internal Error</h3>
-		<pre>
-			{ templ.JSONString(info) }
-		</pre>
-	</div>
-}
-
-templ InternalErrorView(name string, info InternalErrorInfo) {
-	@ErrorView("Internal", name, internalArgs(info)) {
+templ sampleCode() {
+	<p>Example:</p>
+	@code() {
 		{ children... }
 	}
+}
+
+templ samepleCodeAlternative() {
+	<p>Alternative syntax:</p>
+	@code() {
+		{ children... }
+	}
+}
+
+templ code() {
+	<pre>
+		<code>
+			{ children... }
+		</code>
+	</pre>
+}
+
+templ docs(pluginName string, pluginType string) {
+	<p>
+		See the docs on the
+		<a href="/reference/{ pluginType }_plugins#{ pluginName }">
+			<code>{ pluginName }</code>
+		</a> { pluginType }.
+	</p>
+}
+
+templ signalNames(signals ...string) {
+	{{
+		prefixedNames := make([]string, len(signals))
+		for i, s := range signals {
+			prefixedNames[i] = "$" + s
+		}
+	}}
+	<code>{ strings.Join( prefixedNames, ",") }</code>
 }

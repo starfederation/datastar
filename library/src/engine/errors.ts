@@ -17,8 +17,8 @@ function dserr(type: string, reason: string, metadata = {}) {
   return e
 }
 
-export function internalErr(reason: string, args = {}) {
-  return dserr('internal', reason, args)
+export function internalErr(from: string, reason: string, args = {}) {
+  return dserr('internal', reason, Object.assign({ from }, args))
 }
 
 export function initErr(reason: string, ctx: InitContext, metadata = {}) {

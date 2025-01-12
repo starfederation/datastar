@@ -9,7 +9,7 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 			<p>The signal <code class="text-primary">{ isSignalMatches[0][1] }</code> is not valid.</p>
 			<p>Ensure that the signal has been defined and that you only access leaf nodes when using nested signals.</p>
 			<div>
-				Current valid signals: 
+				Current valid signals:
 				@signalNames(info.Expression.ValidSignals...)
 			</div>
 			<p>Example:</p>
@@ -21,6 +21,7 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 </div>` }
 				</code>
 			</pre>
+			<p>See the docs on <a href="/guide/datastar_expressions">DataStar expressions</a> for more information.</p>
 		}
 	}
 }
@@ -94,55 +95,56 @@ templ CustomValidityInvalidExpression(name string, info *RuntimeErrorInfo) {
 }
 
 templ attrError() {
-	{{
-		example := `<div data-attr-disabled="$foo"></div>`
-		alternative := `<div data-attr="{disabled: foo}"></div>`
-	}}
 	<p>The <code>data-attr</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are attribute names and the values are expressions.</p>
-	@sampleCode(example, alternative)
+	@sampleCode() {
+		<div data-attr-disabled="$foo"></div>
+	}
+	@samepleCodeAlternative() {
+		<div data-attr="{disabled: foo}"></div>
+	}
 	@docs("data-attr", "attribute")
 }
 
 templ bindError() {
-	{{
-		example := `<input data-bind-signalname>`
-		alternative := `<input data-bind="signalname">`
-	}}
 	<p>The <code>data-bind</code> attribute must have either a key <em>or</em> a value, representing the signal name to create and enable two-way binding with the element’s value.</p>
-	@sampleCode(example, alternative)
+	@sampleCode() {
+		<input data-bind-signalname/>
+	}
+	@samepleCodeAlternative() {
+		<input data-bind="signalname"/>
+	}
 	@docs("data-bind", "attribute")
 }
 
 templ classError() {
-	{{
-		example := `<div data-class-hidden="$foo"></div>`
-		alternative := `<div data-class="{hidden: foo}"></div>`
-	}}
 	<p>The <code>data-class</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are class names and the values are expressions.</p>
-	@sampleCode(example, alternative)
+	@sampleCode() {
+		<div data-class-hidden="$foo"></div>
+	}
+	@samepleCodeAlternative() {
+		<div data-class="{hidden: foo}"></div>
+	}
 	@docs("data-attr", "attribute")
 }
 
 templ computedError() {
-	{{
-		example := `<div data-computed-blinker="count % 2 === 0"></div>`
-	}}
 	<p>The <code>data-computed</code> attribute <em>must</em> have both a key, representing the signal name to create, and a value, representing the expression to assign to the signal.</p>
-	@sampleCode(example, "")
+	@sampleCode() {
+		<div data-computed-blinker="count % 2 === 0"></div>
+	}
 	@docs("data-computed", "attribute")
 }
 
 templ customValidityError() {
-	{{
-		example := `<form>
-  <input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo">
-  <input data-bind-bar name="bar">
-  <button>
-      Submit form
-  </button>
-</form>`
-	}}
-	@sampleCode(example, "")
+	@sampleCode() {
+		<form>
+			<input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo"/>
+			<input data-bind-bar name="bar"/>
+			<button>
+				Submit form
+			</button>
+		</form>
+	}
 	@docs("data-computed", "attribute")
 }
 
@@ -160,26 +162,4 @@ templ keyAndValueProvided(pluginName string) {
 
 templ keyOrValueRequired(pluginName string) {
 	<p>No key or value was provided to the <code>data-{ pluginName }</code> attribute.</p>
-}
-
-templ sampleCode(example string, alternative string) {
-	<p>Example:</p>
-	<pre><code>{ example }</code></pre>
-	if (alternative != "") {
-		<p>Alternative syntax:</p>
-		<pre><code>{ alternative }</code></pre>
-	}
-}
-
-templ docs(pluginName string, pluginType string) {
-	<p>See the docs on the <a href="/reference/{ pluginType }_plugins#{ pluginName }"><code>{ pluginName }</code></a> { pluginType }.</p>
-}
-
-templ signalNames(signals ...string) {
-	for i, s := range signals {
-		<code>${ s }</code>
-		if i < len(signals) - 1 {
-			, 
-		}
-	}
 }
