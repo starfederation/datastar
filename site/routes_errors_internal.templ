@@ -10,6 +10,6 @@ templ internalArgs(info *InternalErrorInfo) {
 
 templ InternalErrorView(name string, info *InternalErrorInfo) {
 	@ErrorView("Internal", name, internalArgs(info)) {
-		<p>Internal errors should never occur. If you are seeing this please open a <a href="https://github.com/starfederation/datastar/issues">GitHub issue</a> providing and explanation of how the error occurred and the details above.</p>
+		<p>Internal errors should never occur. If you are seeing this error, please open a <a href="https://github.com/starfederation/datastar/issues">GitHub issue</a> providing and explanation of how it occurred and the details above.</p>
 	}
 }

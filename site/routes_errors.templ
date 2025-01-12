@@ -112,6 +112,15 @@ templ eventDocs(eventName string) {
 	</p>
 }
 
+templ expressionDocs() {
+	<p>
+		See the docs on
+		<a href="/guide/datastar_expressions">
+			Datastar expressions
+		</a>.
+	</p>
+}
+
 templ signalNames(signals ...string) {
 	{{
 		prefixedNames := make([]string, len(signals))

@@ -79,8 +79,7 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 			{{
 				signalMatch := isSignalMatches[0][1][1:]
 			}}
-			<p>The signal <code class="text-primary">${ signalMatch }</code> is not valid.</p>
-			<p>Ensure that the signal has been defined and that you only access leaf nodes when using nested signals.</p>
+			<p>The signal <code class="text-primary">${ signalMatch }</code> is not valid. Ensure that the signal has been defined and that you only access leaf nodes when using nested signals.</p>
 			if (len(info.Expression.ValidSignals) > 0) {
 				{{
 					suggestedSignals := []string{}
@@ -100,6 +99,8 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 					All current valid signals:
 					@signalNames(info.Expression.ValidSignals...)
 				</div>
+			} else {
+				<p>No valid signals exist.</p>
 			}
 			<p>In the following example, <code>$foo</code> is <em>not</em> a valid signal, since only the leaf nodes in nested signals are actually signals.</p>
 			@code(`text/html`, `
@@ -108,13 +109,17 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 </div>
 	`)
 			<p>See the docs on <a href="/guide/datastar_expressions">DataStar expressions</a> for more information.</p>
+		} else {
+			<p>An unknown error occurred while executing an expression.</p>
 		}
+		@expressionDocs()
 	}
 }
 
 templ GenerateExpression(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		<p>A valid expression could not be generated.</p>
+		@expressionDocs()
 	}
 }
 
