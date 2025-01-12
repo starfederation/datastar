@@ -78,19 +78,11 @@ templ InitErrorView(name string, info *InitErrorInfo) {
 	}
 }
 
-templ sampleCode(heading string) {
+templ sampleHtmlCode(heading string) {
 	<p>{ heading }:</p>
-	@code() {
+	@htmlSource() {
 		{ children... }
 	}
-}
-
-templ code() {
-	<pre>
-		<code>
-			{ children... }
-		</code>
-	</pre>
 }
 
 templ attributeDocs(pluginName string) {
@@ -113,7 +105,7 @@ templ actionDocs(pluginName string) {
 
 templ eventDocs(eventName string) {
 	<p>
-		See the docs for the 
+		See the docs for the
 		<a href="/reference/sse_events#datastar-{ eventName }">
 			<code>datastar-{ eventName }</code>
 		</a> event.

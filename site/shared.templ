@@ -155,6 +155,7 @@ templ SidebarPage(
 	title, description, contents string,
 ) {
 	@Page(title, description, r.URL.String()) {
+		@header(r)
 		@highlightCSS
 		<div class="drawer">
 			<input id="sidebar-drawer" type="checkbox" class="drawer-toggle"/>
