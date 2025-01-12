@@ -23,9 +23,7 @@
 
 ## Explanation
 
-Setting the `contentType` option to `form` tells the `@get()` action to look for the closest form, perform validation on
-it, and send all form elements within it to the backend. A `selector` option can be provided to specify a form element.
-No signals are sent to the backend in this type of request.
+Setting the `contentType` option to `form` tells the `@get()` action to look for the closest form, perform validation on it, and send all form elements within it to the backend. A `selector` option can be provided to specify a form element. No signals are sent to the backend in this type of request.
 
 ```html
 <form>

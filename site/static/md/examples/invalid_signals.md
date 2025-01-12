@@ -1,7 +1,5 @@
 ## Invalid Signals
 
-## Demo
-
 <div data-signals="{foo: {bar: 1, baz: 2}}">
     <div data-text="$foo.woof"></div>
 </div>
