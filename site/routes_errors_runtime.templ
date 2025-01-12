@@ -1,5 +1,7 @@
 package site
 
+import "strings"
+
 templ AttrValueRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@valueRequired("attr")
@@ -73,13 +75,31 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 	}}
 	@RuntimeErrorView(name, info) {
 		if len(isSignalMatches) > 0 {
-			<p>The signal <code class="text-primary">{ isSignalMatches[0][1] }</code> is not valid.</p>
+			{{
+				signalMatch := isSignalMatches[0][1][1:]
+			}}
+			<p>The signal <code class="text-primary">${ signalMatch }</code> is not valid.</p>
 			<p>Ensure that the signal has been defined and that you only access leaf nodes when using nested signals.</p>
-			<div>
-				Current valid signals:
-				@signalNames(info.Expression.ValidSignals...)
-			</div>
-			<p>Example:</p>
+			if (len(info.Expression.ValidSignals) > 0) {
+				{{
+					suggestedSignals := []string{}
+					for _, signal := range info.Expression.ValidSignals {
+						if strings.HasPrefix(signal, signalMatch) {
+							suggestedSignals = append(suggestedSignals, signal)
+						}
+					}
+				}}
+				if len(suggestedSignals) > 0 {
+					<div>
+						The following valid signals match <code class="text-primary">${ signalMatch }</code>:
+						@signalNames(suggestedSignals...)
+					</div>
+				}
+				<div>
+					All current valid signals:
+					@signalNames(info.Expression.ValidSignals...)
+				</div>
+			}
 			<p>In the following example, <code>$foo</code> is <em>not</em> a valid signal, since only the leaf nodes in nested signals are actually signals.</p>
 			@code() {
 				{

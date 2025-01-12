@@ -52,7 +52,7 @@ func setupExamplesQuiz(examplesRouter chi.Router, signals sessions.Store) error 
 		sse := datastar.NewSSE(w, r)
 		questionID := randomQuestionId(lastQuestionId)
 		QA := qaList[questionID]
-		sse.MergeFragments(fmt.Sprintf(`<div id="questionxxx2">%s</div>`, QA.Question))
+		sse.MergeFragments(fmt.Sprintf(`<div id="question2">%s</div>`, QA.Question))
 		sse.MarshalAndMergeSignals(map[string]any{
 			"response2":       "",
 			"answer2":         QA.Answer,
