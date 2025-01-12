@@ -112,7 +112,7 @@ Datastar is smaller than Alpine.js and htmx, yet it provides the functionality o
 
 The package size is not _just_ a vanity metric. By embracing simplicity, and building on first principles, everything becomes cleaner and leaner. But don't take our word for it – [explore the source code](https://github.com/starfederation/datastar/tree/main/library) and see for yourself!
 
-Datastar is both a core library (4 KiB) and a “batteries included” framework (~12 KiB), allowing you to create [custom bundles](/bundler) and write your own plugins.
+Datastar is both a core library (~5 KiB) and a “batteries included” framework (~13 KiB), allowing you to create [custom bundles](/bundler) and write your own plugins.
 
 ## Hypermedia First
 
