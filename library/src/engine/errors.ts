@@ -28,7 +28,7 @@ export function initErr(reason: string, ctx: InitContext, metadata = {}) {
       type: PluginType[ctx.plugin.type],
     },
   }
-  return dserr('init', reason, Object.assign(errCtx, { metadata }))
+  return dserr('init', reason, Object.assign(errCtx, metadata))
 }
 
 export function runtimeErr(reason: string, ctx: RuntimeContext, metadata = {}) {

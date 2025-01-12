@@ -32,7 +32,7 @@ templ runtimeArgs(info *RuntimeErrorInfo) {
 	}}
 	if pluginName != "" {
 		<div>
-			A runtime error was encountered in a <code>data-{ pluginName }</code> { pluginType }.
+			A runtime error was encountered in the <code>data-{ pluginName }</code> { pluginType }.
 		</div>
 		if info.Error != "" {
 			<div>
@@ -65,9 +65,13 @@ templ RuntimeErrorView(name string, info *RuntimeErrorInfo) {
 }
 
 templ initArgs(info *InitErrorInfo) {
-	if info.Plugin.Type != "" {
+	{{
+		pluginName := toolbelt.Kebab(info.Plugin.Name)
+		pluginType := strings.ToLower(info.Plugin.Type)
+	}}
+	if pluginName != "" {
 		<div>
-			Initializing { info.Plugin.Type } plugin data-{ info.Plugin.Name }
+			An initializion error was encountered in the <code>{ pluginName }</code> { pluginType } plugin.
 		</div>
 	}
 }
@@ -78,7 +82,7 @@ templ InitErrorView(name string, info *InitErrorInfo) {
 	}
 }
 
-templ sampleCode(heading string) {     
+templ sampleCode(heading string) {
 	<p>{ heading }:</p>
 	@code() {
 		{ children... }

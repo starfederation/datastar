@@ -24,8 +24,10 @@ templ NoFragmentsFound(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
 		<p>No fragments were found in the <code>datastar-merge-fragments</code> SSE event. At least one fragment to merge must be provided.</p>
 		@sampleCode("Example") {
-			event: datastar-merge-fragments
-			data: fragments <div id="swap"></div>
+			{
+				`event: datastar-merge-fragments
+data: fragments <div id="swap"></div>`
+			}
 		}
 		@eventDocs("merge-fragments")
 	}
@@ -35,8 +37,10 @@ templ NoPathsProvided(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
 		<p>No paths were provided to the <code>datastar-remove-signals</code> SSE event. At least one path must be provided.</p>
 		@sampleCode("Example") {
-			event: datastar-remove-signals
-			data: paths foo.bar abc
+			{
+				`event: datastar-remove-signals
+data: paths foo.bar abc`
+			}
 		}
 		@eventDocs("remove-signals")
 	}
@@ -46,8 +50,10 @@ templ NoScriptProvided(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
 		<p>No script was provided to the <code>datastar-execute-script</code> SSE event. A script to execute must be provided.</p>
 		@sampleCode("Example") {
-			event: datastar-execute-script
-			data: script console.log('Hello, world!')
+			{
+				`event: datastar-execute-script
+data: script console.log('Hello, world!')`
+			}
 		}
 		@eventDocs("execute-scripts")
 	}
@@ -57,8 +63,10 @@ templ NoSelectorProvided(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
 		<p>No selector was provided to the <code>datastar-remove-fragments</code> SSE event. A selector must be provided.</p>
 		@sampleCode("Example") {
-			event: datastar-remove-fragments
-			data: selector #foo
+			{
+				`event: datastar-remove-fragments
+data: selector #foo`
+			}
 		}
 		@eventDocs("remove-fragments")
 	}
@@ -66,15 +74,19 @@ templ NoSelectorProvided(name string, info *InitErrorInfo) {
 
 templ NoTargetsFound(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
-		<p>No targets were found for a fragment with the ID or selector <code>{ info.SelectorOrID }</code> in the <code>datastar-merge-fragments</code> SSE event . Each fragment must target an element that already exists in the DOM, via an ID or selector.</p>
+		<p>No targets were found for a fragment with the selector or ID <code>{ info.SelectorOrID }</code> in the <code>datastar-merge-fragments</code> SSE event . Each fragment must target an element that already exists in the DOM, via a selector or ID.</p>
 		@sampleCode("Example using an ID") {
-			event: datastar-merge-fragments
-			data: fragments <div id="foo"></div>
+			{
+				`event: datastar-merge-fragments
+data: fragments <div id="foo"></div>`
+			}
 		}
 		@sampleCode("Example using a selector") {
-			event: datastar-merge-fragments
-			data: selector #foo
-			data: fragments <div></div>
+			{
+				`event: datastar-merge-fragments
+data: selector #foo
+data: fragments <div></div>`
+			}
 		}
 		@eventDocs("merge-fragments")
 	}
