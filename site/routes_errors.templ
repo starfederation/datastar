@@ -32,7 +32,7 @@ templ runtimeArgs(info *RuntimeErrorInfo) {
 	}}
 	if pluginName != "" {
 		<div>
-			A runtime error was encountered in the <code>data-{ pluginName }</code> { pluginType }.
+			A runtime error was encountered in the <code>data-{ pluginName }</code> { pluginType } plugin.
 		</div>
 		if info.Error != "" {
 			<div>
@@ -131,5 +131,5 @@ templ signalNames(signals ...string) {
 			prefixedNames[i] = "$" + s
 		}
 	}}
-	<code>{ strings.Join( prefixedNames, ",") }</code>
+	<code>{ strings.Join( prefixedNames, ", ") }</code>
 }
