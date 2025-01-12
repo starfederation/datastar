@@ -88,7 +88,7 @@ templ sampleHtmlCode(heading string) {
 templ attributeDocs(pluginName string) {
 	<p>
 		See the docs for the
-		<a href="/reference/attribute_plugins#data-{ pluginName }">
+		<a href={ templ.SafeURL("/reference/attribute_plugins#" + pluginName) }>
 			<code>data-{ pluginName }</code>
 		</a> attribute.
 	</p>
@@ -97,16 +97,16 @@ templ attributeDocs(pluginName string) {
 templ actionDocs(pluginName string) {
 	<p>
 		See the docs for the
-		<a href="/reference/action_plugins#{ pluginName }">
-			<code>\@{ pluginName }</code>
+		<a href={ templ.SafeURL("/reference/action_plugins#" + pluginName) }>
+			<code>{ "@" + pluginName }()</code>
 		</a> action.
 	</p>
 }
 
 templ eventDocs(eventName string) {
 	<p>
-		See the docs for the
-		<a href="/reference/sse_events#datastar-{ eventName }">
+		See the docs for the 
+		<a href={ templ.SafeURL("/reference/sse_events#datastar-" + eventName) }>
 			<code>datastar-{ eventName }</code>
 		</a> event.
 	</p>

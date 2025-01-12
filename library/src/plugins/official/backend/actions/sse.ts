@@ -88,7 +88,7 @@ export const sse = async (
   try {
     dispatchSSE(STARTED, { elId })
     if (!url?.length) {
-      throw runtimeErr('SseNoUrlProvided', ctx, { action })
+      throw runtimeErr('SSENoUrlProvided', ctx, { action })
     }
 
     const initialHeaders: Record<string, any> = {}
@@ -172,9 +172,9 @@ export const sse = async (
         : el.closest('form')
       if (formEl === null) {
         if (selector) {
-          throw runtimeErr('SseFormNotFound', ctx, { action, selector })
+          throw runtimeErr('SSEFormNotFound', ctx, { action, selector })
         }
-        throw runtimeErr('SseClosestFormNotFound', ctx, { action })
+        throw runtimeErr('SSEClosestFormNotFound', ctx, { action })
       }
       if (el !== formEl) {
         const preventDefault = (evt: Event) => evt.preventDefault()
@@ -197,7 +197,7 @@ export const sse = async (
         req.body = formData
       }
     } else {
-      throw runtimeErr('SseInvalidContentType', ctx, { action, contentType })
+      throw runtimeErr('SSEInvalidContentType', ctx, { action, contentType })
     }
 
     urlInstance.search = queryParams.toString()
@@ -206,7 +206,7 @@ export const sse = async (
       await fetchEventSource(ctx, urlInstance.toString(), req)
     } catch (error) {
       if (!isWrongContent(error)) {
-        throw runtimeErr('SseFetchFailed', ctx, { method, url, error })
+        throw runtimeErr('SSEFetchFailed', ctx, { method, url, error })
       }
       // exit gracefully and do nothing if the content-type is wrong
       // this can happen if the client is sending a request
