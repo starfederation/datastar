@@ -248,8 +248,8 @@ Allows you to add custom validity to an element using an expression. The express
 
 ```html
 <form>
-  <input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo">
-  <input data-bind-bar name="bar">
+  <input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo" />
+  <input data-bind-bar name="bar" />
   <button>
       Submit form
   </button>

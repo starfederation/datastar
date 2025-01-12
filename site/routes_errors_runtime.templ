@@ -225,10 +225,10 @@ templ attrError() {
 templ bindError() {
 	<p>The <code>data-bind</code> attribute must have either a key <em>or</em> a value, representing the signal name to create and enable two-way binding with the element’s value.</p>
 	@sampleCode("Example") {
-		<input data-bind-signalname/>
+		<input data-bind-signalname />
 	}
 	@sampleCode("Alternative syntax") {
-		<input data-bind="signalname"/>
+		<input data-bind="signalname" />
 	}
 	@attributeDocs("bind")
 }
@@ -255,8 +255,8 @@ templ computedError() {
 templ customValidityError() {
 	@sampleCode("Example") {
 		<form>
-			<input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo"/>
-			<input data-bind-bar name="bar"/>
+			<input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo" />
+			<input data-bind-bar name="bar" />
 			<button>
 				Submit form
 			</button>

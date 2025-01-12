@@ -81,7 +81,7 @@ To see this in action, we can use the [`data-text`](/reference/attribute_plugins
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input1 class="input input-bordered">
+            <input data-bind-input1 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -104,7 +104,7 @@ The value of the `data-text` attribute is a [Datastar expression](/guide/datasta
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input2 class="input input-bordered">
+            <input data-bind-input2 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -132,7 +132,7 @@ This results in the `$repeated` signal's value always being equal to the value o
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input3 class="input input-bordered">
+            <input data-bind-input3 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -155,7 +155,7 @@ This results in the button being visible only when the input is _not_ an empty s
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input4 class="input input-bordered">
+            <input data-bind-input4 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -181,7 +181,7 @@ If the expression evaluates to `true`, the `hidden` class is added to the elemen
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input5 class="input input-bordered">
+            <input data-bind-input5 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -213,7 +213,7 @@ This results in a `disabled` attribute being given the value `true` whenever the
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input6 class="input input-bordered">
+            <input data-bind-input6 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -269,7 +269,7 @@ This results in the `$input` signal's value being set to an empty string wheneve
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input7 class="input input-bordered">
+            <input data-bind-input7 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>

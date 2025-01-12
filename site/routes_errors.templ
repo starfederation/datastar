@@ -9,13 +9,9 @@ templ ErrorView(typ, name string, args templ.Component) {
 	<div class="flex flex-col gap-8">
 		<div class="prose prose-lg flex-1">
 			<h1>{ name }</h1>
-			<div class="card bg-base-300">
-				<div class="card-body">
-					<div class="card-title -mt-8">
-						<h3>{ typ } Error</h3>
-					</div>
-					@args
-				</div>
+			<div class="alert block p-8 pt-4">
+				<h3>{ typ } Error</h3>
+				@args
 			</div>
 			<h2>Explanation</h2>
 			{ children... }
