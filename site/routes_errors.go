@@ -40,8 +40,9 @@ type RuntimeErrorInfo struct {
 		ValidSignals []string `json:"validSignals"`
 		FnContent    string   `json:"fnContent"`
 	} `json:"expression"`
-	Error       string `json:"error"`
+	Action      string `json:"action"`
 	ContentType string `json:"contentType"`
+	Error       string `json:"error"`
 	Method      string `json:"method"`
 	ResultType  string `json:"resultType"`
 	Selector    string `json:"selector"`
@@ -144,14 +145,14 @@ func setupErrors(router chi.Router) error {
 		"execute_expression":                 runtimeFn(ExecuteExpression),
 		"generate_expression":                runtimeFn(GenerateExpression),
 		"invalid_content_type": 			  runtimeFn(InvalidContentType),
-		"invalid_data_uri": 				  runtimeFn(InvalidDataURI),
+		"invalid_data_uri": 				  runtimeFn(InvalidDataUri),
 		"invalid_file_result_type":  		  runtimeFn(InvalidFileResultType),
 		"scroll_into_view_invalid_element":	  runtimeFn(ScrollIntoViewInvalidElement),
-		"sse_closest_form_not_found": 		  runtimeFn(SSEClosestFormNotFound),
-		"sse_fetch_failed": 				  runtimeFn(SSEFetchFailed),
-		"sse_form_not_found": 				  runtimeFn(SSEFormNotFound),
-		"sse_invalid_content_type": 		  runtimeFn(SSEInvalidContentType),
-		"sse_no_url_provided": 				  runtimeFn(SSENoURLProvided),
+		"sse_closest_form_not_found": 		  runtimeFn(SseClosestFormNotFound),
+		"sse_fetch_failed": 				  runtimeFn(SseFetchFailed),
+		"sse_form_not_found": 				  runtimeFn(SseFormNotFound),
+		"sse_invalid_content_type": 		  runtimeFn(SseInvalidContentType),
+		"sse_no_url_provided": 				  runtimeFn(SseNoUrlProvided),
 		"text_invalid_element": 			  runtimeFn(TextInvalidElement),
 	}
 

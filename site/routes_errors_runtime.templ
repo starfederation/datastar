@@ -124,7 +124,7 @@ templ InvalidContentType(name string, info *RuntimeErrorInfo) {
 	}
 }
 
-templ InvalidDataURI(name string, info *RuntimeErrorInfo) {
+templ InvalidDataUri(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		<p>Reading the file data URI failed.</p>
 	}
@@ -146,55 +146,55 @@ templ ScrollIntoViewInvalidElement(name string, info *RuntimeErrorInfo) {
 	}
 }
 
-templ SSEClosestFormNotFound(name string, info *RuntimeErrorInfo) {
+templ SseClosestFormNotFound(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>No closest form could be found in the DOM. When setting the <code>contentType</code> option to <code>form</code> in the <code>\@{ info.Plugin.Name }()</code> action, the element must have a wrapping form, otherwise a <code>selector</code> must be provided to a form that exists in the DOM.</p>
+		<p>No closest form could be found in the DOM. When setting the <code>contentType</code> option to <code>form</code> in the <code>{ "@" + info.Action }()</code> action, the element must have a wrapping form, otherwise a <code>selector</code> must be provided to a form that exists in the DOM.</p>
 		@sampleHtmlCode("Example using a wrapping form") {
 			<form>
-				<button data-on-click="@{ action }('/endpoint', {contentType: 'form'})"></button>
+				<button data-on-click={ "@" + info.Action + "('/endpoint', {contentType: 'form'})" }></button>
 			</form>
 		}
 		@sampleHtmlCode("Example using a selector") {
-			<button data-on-click="@{ action }('/endpoint', {contentType: 'form', selector: '#myform'})"></button>
+			<button data-on-click={ "@" + info.Action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>
 		}
-		@actionDocs("get")
+		@actionDocs(info.Action)
 	}
 }
 
-templ SSEFetchFailed(name string, info *RuntimeErrorInfo) {
+templ SseFetchFailed(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		<p>The following error was encountered when sending a <code>{ info.Method }</code> request to <code>{ info.URL }</code>.</p>
 		@code(`text`, info.Error)
 	}
 }
 
-templ SSEFormNotFound(name string, info *RuntimeErrorInfo) {
+templ SseFormNotFound(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>No form with the selector <code>{ info.Selector }</code> could be found in the DOM. When specifying a form selector using the <code>selector</code> option in the <code>\@{ info.Plugin.Name }()</code> action, the form must already exist in the DOM.</p>
+		<p>No form with the selector <code>{ info.Selector }</code> could be found in the DOM. When specifying a form selector using the <code>selector</code> option in the <code>{ "@" + info.Action }()</code> action, the form must already exist in the DOM.</p>
 		@sampleHtmlCode("Example") {
-			<button data-on-click="@{ action }('/endpoint', {contentType: 'form', selector: '#myform'})"></button>
+			<button data-on-click={ "@" + info.Action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>
 		}
-		@actionDocs("get")
+		@actionDocs(info.Action)
 	}
 }
 
-templ SSEInvalidContentType(name string, info *RuntimeErrorInfo) {
+templ SseInvalidContentType(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>An invalid content type <code>{ info.ContentType }</code> was provided to the <code>\@{ info.Plugin.Name }()</code> action. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
+		<p>An invalid content type <code>{ info.ContentType }</code> was provided to the <code>{ "@" + info.Action }()</code> action. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
 		@sampleHtmlCode("Example") {
-			<button data-on-click="@{ action }('/endpoint', {contentType: 'form'})"></button>
+			<button data-on-click={ "@" + info.Action + "('/endpoint', {contentType: 'form'})" }></button>
 		}
-		@actionDocs("get")
+		@actionDocs(info.Action)
 	}
 }
 
-templ SSENoURLProvided(name string, info *RuntimeErrorInfo) {
+templ SseNoUrlProvided(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>No URL was provided to the <code>\@{ info.Plugin.Name }()</code> action. A valid URL must be provided as the first argument.</p>
+		<p>No URL was provided to the <code>{ "@" + info.Action }()</code> action. A valid URL must be provided as the first argument.</p>
 		@sampleHtmlCode("Example") {
-			<button data-on-click="@{ action }('/endpoint')"></button>
+			<button data-on-click={ "@" + info.Action + "('/endpoint')" }></button>
 		}
-		@actionDocs("get")
+		@actionDocs(info.Action)
 	}
 }
 

@@ -116,7 +116,7 @@ export const Bind: AttributePlugin = {
                 }
                 const match = reader.result.match(dataURIRegex)
                 if (!match?.groups) {
-                  throw runtimeErr('InvalidDataURI', ctx, {
+                  throw runtimeErr('InvalidDataUri', ctx, {
                     result: reader.result,
                   })
                 }
