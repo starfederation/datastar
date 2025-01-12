@@ -185,11 +185,16 @@ templ SseFormNotFound(name string, info *RuntimeErrorInfo) {
 
 templ SseInvalidContentType(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>An invalid content type <code>{ info.ContentType }</code> was provided to the <code>{ "@" + info.Action }()</code> action. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
-		@sampleHtmlCode("Example") {
-			<button data-on-click={ "@" + info.Action + "('/endpoint', {contentType: 'form'})" }></button>
+		// BEN!
+		if info.ContentType == "" || info.Action == "" {
+			<p>Sorry don't have enough to go on to explain your issue</p>
+		} else {
+			<p>An invalid content type <code>{ info.ContentType }</code> was provided to the <code>{ "@" + info.Action }()</code> action. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
+			@sampleHtmlCode("Example") {
+				<button data-on-click={ "@" + info.Action + "('/endpoint', {contentType: 'form'})" }></button>
+			}
+			@actionDocs(info.Action)
 		}
-		@actionDocs(info.Action)
 	}
 }
 
