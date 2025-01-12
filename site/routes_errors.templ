@@ -85,6 +85,11 @@ templ sampleHtmlCode(heading string) {
 	}
 }
 
+templ sampleCode(heading, lang, source string) {
+	<p>{ heading }:</p>
+	@code(lang, source)
+}
+
 templ attributeDocs(pluginName string) {
 	<p>
 		See the docs for the
@@ -105,7 +110,7 @@ templ actionDocs(pluginName string) {
 
 templ eventDocs(eventName string) {
 	<p>
-		See the docs for the 
+		See the docs for the
 		<a href={ templ.SafeURL("/reference/sse_events#datastar-" + eventName) }>
 			<code>datastar-{ eventName }</code>
 		</a> event.

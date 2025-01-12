@@ -3,6 +3,7 @@ package site
 import (
 	"context"
 	"fmt"
+	"html"
 	"io"
 	"net/http"
 	"slices"
@@ -144,16 +145,16 @@ func setupErrors(router chi.Router) error {
 		"custom_validity_invalid_expression": runtimeFn(CustomValidityInvalidExpression),
 		"execute_expression":                 runtimeFn(ExecuteExpression),
 		"generate_expression":                runtimeFn(GenerateExpression),
-		"invalid_content_type": 			  runtimeFn(InvalidContentType),
-		"invalid_data_uri": 				  runtimeFn(InvalidDataUri),
-		"invalid_file_result_type":  		  runtimeFn(InvalidFileResultType),
-		"scroll_into_view_invalid_element":	  runtimeFn(ScrollIntoViewInvalidElement),
-		"sse_closest_form_not_found": 		  runtimeFn(SseClosestFormNotFound),
-		"sse_fetch_failed": 				  runtimeFn(SseFetchFailed),
-		"sse_form_not_found": 				  runtimeFn(SseFormNotFound),
-		"sse_invalid_content_type": 		  runtimeFn(SseInvalidContentType),
-		"sse_no_url_provided": 				  runtimeFn(SseNoUrlProvided),
-		"text_invalid_element": 			  runtimeFn(TextInvalidElement),
+		"invalid_content_type":               runtimeFn(InvalidContentType),
+		"invalid_data_uri":                   runtimeFn(InvalidDataUri),
+		"invalid_file_result_type":           runtimeFn(InvalidFileResultType),
+		"scroll_into_view_invalid_element":   runtimeFn(ScrollIntoViewInvalidElement),
+		"sse_closest_form_not_found":         runtimeFn(SseClosestFormNotFound),
+		"sse_fetch_failed":                   runtimeFn(SseFetchFailed),
+		"sse_form_not_found":                 runtimeFn(SseFormNotFound),
+		"sse_invalid_content_type":           runtimeFn(SseInvalidContentType),
+		"sse_no_url_provided":                runtimeFn(SseNoUrlProvided),
+		"text_invalid_element":               runtimeFn(TextInvalidElement),
 	}
 
 	sidebarLinks := make([]*SidebarLink, 0, len(reasonComponents))
@@ -267,22 +268,22 @@ func setupErrors(router chi.Router) error {
 }
 
 func code(lang, source string) templ.Component {
-	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
-		return htmlHighlight(w, strings.TrimSpace(source), lang, "html")
-	})
+	buf := bytebufferpool.Get()
+	defer bytebufferpool.Put(buf)
+	unescapedSource := html.UnescapeString(source)
+	err := htmlHighlight(buf, unescapedSource, lang, "")
+	contents := buf.String()
+	return templ.Raw(contents, err)
 }
 
 func htmlSource() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
-
 		children := templ.GetChildren(ctx)
 		buf := bytebufferpool.Get()
 		defer bytebufferpool.Put(buf)
-
 		if err := children.Render(ctx, buf); err != nil {
 			return err
 		}
-
 		return code("html", buf.String()).Render(ctx, w)
 	})
 }
