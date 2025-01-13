@@ -9,7 +9,7 @@ import {
   EventTypes,
   FragmentMergeModes,
 } from '../../../../engine/consts'
-import { dsErr } from '../../../../engine/errors'
+import { initErr } from '../../../../engine/errors'
 import {
   type InitContext,
   PluginType,
@@ -50,13 +50,13 @@ export const MergeFragments: WatcherPlugin = {
         const fragments = [...fragmentContainer.content.children]
         for (const fragment of fragments) {
           if (!(fragment instanceof Element)) {
-            throw dsErr('NoFragmentsFound')
+            throw initErr('NoFragmentsFound', ctx)
           }
 
           const selectorOrID = selector || `#${fragment.getAttribute('id')}`
           const targets = [...(document.querySelectorAll(selectorOrID) || [])]
           if (!targets.length) {
-            throw dsErr('NoTargetsFound', { selectorOrID })
+            throw initErr('NoTargetsFound', ctx, { selectorOrID })
           }
 
           if (supportsViewTransitions && useViewTransition) {
@@ -94,7 +94,7 @@ function applyToTargets(
           },
         })
         if (!result?.length) {
-          throw dsErr('MorphFailed')
+          throw initErr('MorphFailed', ctx)
         }
         modifiedTarget = result[0] as Element
         break
@@ -131,7 +131,7 @@ function applyToTargets(
         }
         break
       default:
-        throw dsErr('InvalidMergeMode', { mergeMode })
+        throw initErr('InvalidMergeMode', ctx, { mergeMode })
     }
     ctx.cleanup(modifiedTarget)
 

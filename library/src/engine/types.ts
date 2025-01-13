@@ -61,6 +61,7 @@ export type GlobalInitializer = (ctx: InitContext) => void
 export type RemovalEntry = { id: string; set: Set<OnRemovalFn> }
 
 export type InitContext = {
+  plugin: DatastarPlugin
   signals: SignalsRoot
   effect: (fn: EffectFn) => OnRemovalFn
   actions: Readonly<ActionPlugins>
@@ -72,6 +73,7 @@ export type HTMLorSVGElement = Element & (HTMLElement | SVGElement)
 export type Modifiers = Map<string, Set<string>> // mod name -> tags
 
 export type RuntimeContext = InitContext & {
+  plugin: DatastarPlugin // The name of the plugin
   el: HTMLorSVGElement // The element the attribute is on
   rawKey: Readonly<string> // no parsing data-* key
   rawValue: Readonly<string> // no parsing data-* value
@@ -79,6 +81,7 @@ export type RuntimeContext = InitContext & {
   key: Readonly<string> // data-* key without the prefix or tags
   mods: Modifiers // the tags and their arguments
   genRX: () => <T>(...args: any[]) => T // a reactive expression
+  fnContent?: string // the content of the function
 }
 
 export type NestedValues = { [key: string]: NestedValues | any }

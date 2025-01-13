@@ -1,12 +1,56 @@
-const url = 'https://data-star.dev/errors'
+import { kebabize } from '../utils/text'
+import { DATASTAR } from './consts'
+import { type InitContext, PluginType, type RuntimeContext } from './types'
 
-export const hasValNonExpr = /([\w0-9.]+)\.value/gm
+// const url = 'https://data-star.dev/errors'
+const url = `${window.location.origin}/errors`
 
-export const dsErr = (code: string, args?: any) => {
+function dserr(type: string, reason: string, metadata = {}) {
   const e = new Error()
-  code = code.charAt(0).toUpperCase() + code.slice(1)
-  e.name = `error ${code}`
-  const fullURL = `${url}/${code}?${new URLSearchParams(args)}`
-  e.message = `for more info see ${fullURL}`
+  reason = reason[0].toUpperCase() + reason.slice(1)
+  e.name = `${DATASTAR} ${type} error ${reason}`
+  const r = kebabize(reason).replaceAll('-', '_')
+  const q = new URLSearchParams({
+    metadata: JSON.stringify(metadata),
+  }).toString()
+  e.message = `for more info see ${url}/${type}/${r}?${q}`
   return e
+}
+
+export function internalErr(from: string, reason: string, args = {}) {
+  return dserr('internal', reason, Object.assign({ from }, args))
+}
+
+export function initErr(reason: string, ctx: InitContext, metadata = {}) {
+  const errCtx = {
+    plugin: {
+      name: ctx.plugin.name,
+      type: PluginType[ctx.plugin.type],
+    },
+  }
+  return dserr('init', reason, Object.assign(errCtx, metadata))
+}
+
+export function runtimeErr(reason: string, ctx: RuntimeContext, metadata = {}) {
+  const errCtx = {
+    plugin: {
+      name: ctx.plugin.name,
+      type: PluginType[ctx.plugin.type],
+    },
+    element: {
+      id: ctx.el.id,
+      tag: ctx.el.tagName,
+    },
+    raw: {
+      key: ctx.rawKey,
+      value: ctx.rawValue,
+    },
+    expression: {
+      key: ctx.key,
+      value: ctx.value,
+      validSignals: ctx.signals.paths(),
+      fnContent: ctx.fnContent,
+    },
+  }
+  return dserr('runtime', reason, Object.assign(errCtx, metadata))
 }

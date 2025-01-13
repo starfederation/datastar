@@ -52,8 +52,8 @@ class EventType(StrEnum):
 
 DATASTAR_KEY = "datastar"
 VERSION                   = "1.0.0-beta.1"
-VERSION_CLIENT_BYTE_SIZE     = 35295
-VERSION_CLIENT_BYTE_SIZE_GZIP = 12940
+VERSION_CLIENT_BYTE_SIZE     = 36235
+VERSION_CLIENT_BYTE_SIZE_GZIP = 13244
 
 #region Default durations
 

@@ -59,7 +59,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "classes"},
 				{ID: "scroll_into_view"},
 				{ID: "on_load"},
-				{ID: "model_binding", ShouldIncludeInspector: true},
+				{ID: "model_binding"},
 				{ID: "disable_button"},
 				{ID: "merge_options"},
 				{ID: "redirects"},
@@ -72,6 +72,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "raf_update"},
 				{ID: "update_signals"},
 				{ID: "signals_ifmissing"},
+				{ID: "invalid_signals"},
 				{ID: "offline_sync"},
 				{ID: "session_storage"},
 				{ID: "refs"},
@@ -95,7 +96,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 		{
 			Label: "Backend Examples",
 			Links: []*SidebarLink{
-				{ID: "quick_primer_go", ShouldIncludeInspector: true},
+				{ID: "quick_primer_go"},
 				{ID: "templ_counter"},
 				{ID: "form_data"},
 				{ID: "custom_validity"},

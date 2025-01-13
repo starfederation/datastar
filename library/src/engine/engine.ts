@@ -2,7 +2,7 @@ import { Hash, elUniqId } from '../utils/dom'
 import { camelize } from '../utils/text'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS, VERSION } from './consts'
-import { dsErr } from './errors'
+import { initErr, runtimeErr } from './errors'
 import { SignalsRoot } from './nestedSignals'
 import {
   type ActionPlugin,
@@ -11,8 +11,8 @@ import {
   type DatastarPlugin,
   type GlobalInitializer,
   type HTMLorSVGElement,
+  type InitContext,
   type MacroPlugin,
-  type Modifiers,
   type OnRemovalFn,
   PluginType,
   type RemovalEntry,
@@ -40,6 +40,18 @@ export class Engine {
 
   public load(...pluginsToLoad: DatastarPlugin[]) {
     for (const plugin of pluginsToLoad) {
+      const that = this // I hate javascript
+      const ctx: InitContext = {
+        get signals() {
+          return that.#signals
+        },
+        effect: (cb: () => void): OnRemovalFn => effect(cb),
+        actions: this.#actions,
+        apply: this.apply.bind(this),
+        cleanup: this.#cleanup.bind(this),
+        plugin,
+      }
+
       let globalInitializer: GlobalInitializer | undefined
       switch (plugin.type) {
         case PluginType.Macro: {
@@ -63,23 +75,11 @@ export class Engine {
           break
         }
         default: {
-          throw dsErr('InvalidPluginType', {
-            name: plugin.name,
-            type: plugin.type,
-          })
+          throw initErr('InvalidPluginType', ctx)
         }
       }
       if (globalInitializer) {
-        const that = this // I hate javascript
-        globalInitializer({
-          get signals() {
-            return that.#signals
-          },
-          effect: (cb: () => void): OnRemovalFn => effect(cb),
-          actions: this.#actions,
-          apply: this.apply.bind(this),
-          cleanup: this.#cleanup.bind(this),
-        })
+        globalInitializer(ctx)
       }
     }
     this.apply(document.body)
@@ -88,7 +88,7 @@ export class Engine {
   // Apply all plugins to the element and its children
   public apply(rootElement: Element) {
     const appliedMacros = new Set<MacroPlugin>()
-    this.#plugins.forEach((p, pi) => {
+    this.#plugins.forEach((plugin, pi) => {
       this.#walkDownDOM(rootElement, (el) => {
         // Ignore this element if `data-star-ignore` exists on it
         if ('starIgnore' in el.dataset) return
@@ -98,10 +98,10 @@ export class Engine {
 
         for (const rawKey in el.dataset) {
           // Check if the key is relevant to the plugin
-          if (!rawKey.startsWith(p.name)) continue
+          if (!rawKey.startsWith(plugin.name)) continue
 
           // Extract the key and value from the dataset
-          const keyRaw = rawKey.slice(p.name.length)
+          const keyRaw = rawKey.slice(plugin.name.length)
           let [key, ...rawModifiers] = keyRaw.split(/\_\_+/)
 
           const hasKey = key.length > 0
@@ -116,22 +116,42 @@ export class Engine {
           const rawValue = `${el.dataset[rawKey]}` || ''
           const hasValue = rawValue.length > 0
 
+          // Create the runtime context
+          const that = this // I hate javascript
+          const ctx: RuntimeContext = {
+            get signals() {
+              return that.#signals
+            },
+            effect: (cb: () => void): OnRemovalFn => effect(cb),
+            apply: that.apply.bind(that),
+            cleanup: that.#cleanup.bind(that),
+            actions: that.#actions,
+            genRX: () => this.#genRX(ctx, ...(plugin.argNames || [])),
+            plugin,
+            el,
+            rawKey,
+            rawValue,
+            key,
+            value: rawValue,
+            mods: new Map(),
+          }
+
           // Check the requirements
-          const keyReq = p.keyReq || Requirement.Allowed
+          const keyReq = plugin.keyReq || Requirement.Allowed
           if (hasKey) {
             if (keyReq === Requirement.Denied) {
-              throw dsErr(`${p.name}KeyNotAllowed`, { key })
+              throw runtimeErr(`${plugin.name}KeyNotAllowed`, ctx)
             }
           } else if (keyReq === Requirement.Must) {
-            throw dsErr(`${p.name}KeyRequired`)
+            throw runtimeErr(`${plugin.name}KeyRequired`, ctx)
           }
-          const valReq = p.valReq || Requirement.Allowed
+          const valReq = plugin.valReq || Requirement.Allowed
           if (hasValue) {
             if (valReq === Requirement.Denied) {
-              throw dsErr(`${p.name}ValueNotAllowed`, { rawValue })
+              throw runtimeErr(`${plugin.name}ValueNotAllowed`, ctx)
             }
           } else if (valReq === Requirement.Must) {
-            throw dsErr(`${p.name}ValueRequired`)
+            throw runtimeErr(`${plugin.name}ValueRequired`, ctx)
           }
 
           // Check for exclusive requirements
@@ -140,48 +160,31 @@ export class Engine {
             valReq === Requirement.Exclusive
           ) {
             if (hasKey && hasValue) {
-              throw dsErr(`${p.name}KeyAndValueProvided`)
+              throw runtimeErr(`${plugin.name}KeyAndValueProvided`, ctx)
             }
             if (!hasKey && !hasValue) {
-              throw dsErr(`${p.name}KeyOrValueRequired`)
+              throw runtimeErr(`${plugin.name}KeyOrValueRequired`, ctx)
             }
           }
 
           // Ensure the element has an id
           if (!el.id.length) el.id = elUniqId(el)
 
-          const mods: Modifiers = new Map<string, Set<string>>()
           for (const rawMod of rawModifiers) {
             const [label, ...mod] = rawMod.split('.')
-            mods.set(camelize(label), new Set(mod.map((t) => t.toLowerCase())))
-          }
-
-          // Create the runtime context
-          const that = this // I hate javascript
-          const ctx = {
-            get signals() {
-              return that.#signals
-            },
-            effect: (cb: () => void): OnRemovalFn => effect(cb),
-            apply: that.apply.bind(that),
-            cleanup: that.#cleanup.bind(that),
-            actions: that.#actions,
-            genRX: () => this.#genRX(ctx, ...(p.argNames || [])),
-            el,
-            rawKey,
-            rawValue,
-            key,
-            value: rawValue,
-            mods,
+            ctx.mods.set(
+              camelize(label),
+              new Set(mod.map((t) => t.toLowerCase())),
+            )
           }
 
           // Apply the macros
           appliedMacros.clear()
 
           const macros = [
-            ...(p.macros?.pre || []),
+            ...(plugin.macros?.pre || []),
             ...this.#macros,
-            ...(p.macros?.post || []),
+            ...(plugin.macros?.post || []),
           ]
           for (const macro of macros) {
             if (appliedMacros.has(macro)) continue
@@ -190,7 +193,7 @@ export class Engine {
           }
 
           // Load the plugin and store any cleanup functions
-          const removal = p.onLoad(ctx)
+          const removal = plugin.onLoad(ctx)
           if (removal) {
             if (!this.#removals.has(el)) {
               this.#removals.set(el, {
@@ -202,7 +205,7 @@ export class Engine {
           }
 
           // Remove the attribute if required
-          if (p?.removeOnLoad) delete el.dataset[rawKey]
+          if (plugin?.removeOnLoad) delete el.dataset[rawKey]
         }
       })
     })
@@ -253,8 +256,7 @@ export class Engine {
     )
 
     // Replace any signal calls
-    const signalNames = new Array<string>()
-    ctx.signals.walk((path) => signalNames.push(path))
+    const signalNames = ctx.signals.paths()
     if (signalNames.length) {
       // Match any valid `$signalName` followed by a non-word character or end of string
       const signalsRe = new RegExp(`\\$(${signalNames.join('|')})(\\W|$)`, 'gm')
@@ -270,14 +272,22 @@ export class Engine {
     }
 
     const fnContent = `return (()=> {\n${userExpression}\n})()` // Wrap in IIFE
+    ctx.fnContent = fnContent
 
     try {
       const fn = new Function('ctx', ...argNames, fnContent)
-      return (...args: any[]) => fn(ctx, ...args)
-    } catch (error) {
-      throw dsErr('GeneratingExpressionFailed', {
-        error,
-        fnContent,
+      return (...args: any[]) => {
+        try {
+          return fn(ctx, ...args)
+        } catch (error: any) {
+          throw runtimeErr('ExecuteExpression', ctx, {
+            error: error.message,
+          })
+        }
+      }
+    } catch (error: any) {
+      throw runtimeErr('GenerateExpression', ctx, {
+        error: error.message,
       })
     }
   }
