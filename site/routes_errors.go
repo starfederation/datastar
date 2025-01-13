@@ -288,9 +288,9 @@ func htmlSource() templ.Component {
 	})
 }
 
-func getAction(action string) string {
-	if action == "" {
-		return "get"
+func getValue(value string, defaultValue string) string {
+	if value == "" {
+		return defaultValue
 	}
-	return action
+	return value
 }

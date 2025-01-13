@@ -162,9 +162,9 @@ templ ScrollIntoViewInvalidElement(name string, info *RuntimeErrorInfo) {
 templ SseClosestFormNotFound(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		{{
-			action := getAction(info.Action)
+			action := getValue(info.Action, "get")
 		}}
-		<p>No closest form could be found in the DOM. When setting the <code>contentType</code> option to <code>form</code> in the <code>{ "@" + action }()</code> action, the element must have a wrapping form, otherwise a <code>selector</code> must be provided to a form that exists in the DOM.</p>
+		<p>No closest form could be found in the DOM. When setting the <code>contentType</code> option to <code>form</code>, the element must have a wrapping form, otherwise a <code>selector</code> must be provided to a form that exists in the DOM.</p>
 		@sampleHtmlCode("Example using a wrapping form") {
 			<form>
 				<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form'})" }></button>
@@ -191,7 +191,7 @@ templ SseFetchFailed(name string, info *RuntimeErrorInfo) {
 templ SseFormNotFound(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		{{
-			action := getAction(info.Action)
+			action := getValue(info.Action, "get")
 		}}
 		if info.Selector == "" {
 			<p>No form with the provided selector could be found in the DOM. When specifying a form selector using the <code>selector</code> option in the <code>{ "@" + action }()</code> action, the form must already exist in the DOM.</p>
@@ -208,7 +208,7 @@ templ SseFormNotFound(name string, info *RuntimeErrorInfo) {
 templ SseInvalidContentType(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		{{
-			action := getAction(info.Action)
+			action := getValue(info.Action, "get")
 		}}
 		if info.ContentType == "" {
 			<p>An invalid content type was provided. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
@@ -225,7 +225,7 @@ templ SseInvalidContentType(name string, info *RuntimeErrorInfo) {
 templ SseNoUrlProvided(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		{{
-			action := getAction(info.Action)
+			action := getValue(info.Action, "get")
 		}}
 		<p>No URL was provided to the <code>{ "@" + action }()</code> action. A valid URL must be provided as the first argument.</p>
 		@sampleHtmlCode("Example") {
