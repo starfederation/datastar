@@ -89,7 +89,7 @@ Then run the test suite
 
 ```
 $ cd ../test
-$ ./test/test-all.sh http://127.0.0.1:3000
+$ ./test-all.sh http://127.0.0.1:3000
 Running tests with argument: http://127.0.0.1:3000
 Processing GET cases...
 Processing POST cases...
