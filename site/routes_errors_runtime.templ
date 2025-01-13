@@ -125,7 +125,11 @@ templ GenerateExpression(name string, info *RuntimeErrorInfo) {
 
 templ InvalidContentType(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>The content type of the response received from <code>{ info.URL }</code> was <code>{ info.Error }</code>. It must be <code>text/event-stream</code>.</p>
+		if info.URL == "" {
+			<p>An invalid content type was provided in the response. The content type must be <code>text/event-stream</code>.</p>
+		} else {
+			<p>An invalid content type was provided in the response from <code>{ info.URL }</code>. The content type must be <code>text/event-stream</code>.</p>
+		}
 	}
 }
 
@@ -137,7 +141,11 @@ templ InvalidDataUri(name string, info *RuntimeErrorInfo) {
 
 templ InvalidFileResultType(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>Reading the file contents of type <code>{ info.ResultType }</code> failed.</p>
+		if info.ResultType == "" {
+			<p>Reading the file contents failed.</p>
+		} else {
+			<p>Reading the file contents of type <code>{ info.ResultType }</code> failed.</p>
+		}
 	}
 }
 
@@ -153,58 +161,77 @@ templ ScrollIntoViewInvalidElement(name string, info *RuntimeErrorInfo) {
 
 templ SseClosestFormNotFound(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>No closest form could be found in the DOM. When setting the <code>contentType</code> option to <code>form</code> in the <code>{ "@" + info.Action }()</code> action, the element must have a wrapping form, otherwise a <code>selector</code> must be provided to a form that exists in the DOM.</p>
+		{{
+			action := getAction(info.Action)
+		}}
+		<p>No closest form could be found in the DOM. When setting the <code>contentType</code> option to <code>form</code> in the <code>{ "@" + action }()</code> action, the element must have a wrapping form, otherwise a <code>selector</code> must be provided to a form that exists in the DOM.</p>
 		@sampleHtmlCode("Example using a wrapping form") {
 			<form>
-				<button data-on-click={ "@" + info.Action + "('/endpoint', {contentType: 'form'})" }></button>
+				<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form'})" }></button>
 			</form>
 		}
 		@sampleHtmlCode("Example using a selector") {
-			<button data-on-click={ "@" + info.Action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>
+			<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>
 		}
-		@actionDocs(info.Action)
+		@actionDocs(action)
 	}
 }
 
 templ SseFetchFailed(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>The following error was encountered when sending a <code>{ info.Method }</code> request to <code>{ info.URL }</code>.</p>
-		@code(`text`, info.Error)
+		if info.Method == "" || info.URL == "" {
+			<p>An error was encountered when sending a request.</p>
+		} else {
+			<p>The following error was encountered when sending a <code>{ info.Method }</code> request to <code>{ info.URL }</code>.</p>
+			@code(`text`, info.Error)
+		}
 	}
 }
 
 templ SseFormNotFound(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>No form with the selector <code>{ info.Selector }</code> could be found in the DOM. When specifying a form selector using the <code>selector</code> option in the <code>{ "@" + info.Action }()</code> action, the form must already exist in the DOM.</p>
-		@sampleHtmlCode("Example") {
-			<button data-on-click={ "@" + info.Action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>
+		{{
+			action := getAction(info.Action)
+		}}
+		if info.Selector == "" {
+			<p>No form with the provided selector could be found in the DOM. When specifying a form selector using the <code>selector</code> option in the <code>{ "@" + action }()</code> action, the form must already exist in the DOM.</p>
+		} else {
+			<p>No form with the selector <code>{ info.Selector }</code> could be found in the DOM. When specifying a form selector using the <code>selector</code> option in the <code>{ "@" + action }()</code> action, the form must already exist in the DOM.</p>
 		}
-		@actionDocs(info.Action)
+		@sampleHtmlCode("Example") {
+			<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>
+		}
+		@actionDocs(action)
 	}
 }
 
 templ SseInvalidContentType(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		// BEN!
-		if info.ContentType == "" || info.Action == "" {
-			<p>Sorry don't have enough to go on to explain your issue</p>
+		{{
+			action := getAction(info.Action)
+		}}
+		if info.ContentType == "" {
+			<p>An invalid content type was provided. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
 		} else {
-			<p>An invalid content type <code>{ info.ContentType }</code> was provided to the <code>{ "@" + info.Action }()</code> action. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
-			@sampleHtmlCode("Example") {
-				<button data-on-click={ "@" + info.Action + "('/endpoint', {contentType: 'form'})" }></button>
-			}
-			@actionDocs(info.Action)
+			<p>An invalid content type <code>{ info.ContentType }</code> was provided to the <code>{ "@" + action }()</code> action. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
 		}
+		@sampleHtmlCode("Example") {
+			<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form'})" }></button>
+		}
+		@actionDocs(action)
 	}
 }
 
 templ SseNoUrlProvided(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>No URL was provided to the <code>{ "@" + info.Action }()</code> action. A valid URL must be provided as the first argument.</p>
+		{{
+			action := getAction(info.Action)
+		}}
+		<p>No URL was provided to the <code>{ "@" + action }()</code> action. A valid URL must be provided as the first argument.</p>
 		@sampleHtmlCode("Example") {
-			<button data-on-click={ "@" + info.Action + "('/endpoint')" }></button>
+			<button data-on-click={ "@" + action + "('/endpoint')" }></button>
 		}
-		@actionDocs(info.Action)
+		@actionDocs(action)
 	}
 }
 

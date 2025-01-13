@@ -2,14 +2,22 @@ package site
 
 templ InvalidMergeMode(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
-		<p>An invalid merge mode <code>{ info.MergeMode }</code> was provided to the <code>datastar-merge-fragments</code> SSE event. The merge mode must be one of the following: <code>replace</code>, <code>append</code>, <code>prepend</code>, <code>before</code>, or <code>after</code>.</p>
+		if info.MergeMode == "" {
+			<p>An invalid merge mode was provided to the <code>datastar-merge-fragments</code> SSE event. The merge mode must be one of the following: <code>replace</code>, <code>append</code>, <code>prepend</code>, <code>before</code>, or <code>after</code>.</p>
+		} else {
+			<p>An invalid merge mode <code>{ info.MergeMode }</code> was provided to the <code>datastar-merge-fragments</code> SSE event. The merge mode must be one of the following: <code>replace</code>, <code>append</code>, <code>prepend</code>, <code>before</code>, or <code>after</code>.</p>
+		}
 		@eventDocs("merge-fragments")
 	}
 }
 
 templ InvalidPluginType(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
-		<p>The { info.Plugin.Name } plugin has an invalid type <code>{ info.PluginType }</code>. Plugin types must be one of the following: <code>Macro</code>, <code>Attribute</code>, <code>Watcher</code>, <code>Action</code>.</p>
+		if info.Plugin.Name == "" || info.Plugin.Type == "" {
+			<p>An invalid plugin type was provided. Plugin types must be one of the following: <code>Macro</code>, <code>Attribute</code>, <code>Watcher</code>, <code>Action</code>.</p>
+		} else {
+			<p>The { info.Plugin.Name } plugin has an invalid type <code>{ info.PluginType }</code>. Plugin types must be one of the following: <code>Macro</code>, <code>Attribute</code>, <code>Watcher</code>, <code>Action</code>.</p>
+		}
 	}
 }
 
@@ -23,11 +31,8 @@ templ MorphFailed(name string, info *InitErrorInfo) {
 templ NoFragmentsFound(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
 		<p>No fragments were found in the <code>datastar-merge-fragments</code> SSE event. At least one fragment to merge must be provided.</p>
-		@sampleCode("Example", "html", `
-event: datastar-merge-fragments
-data: fragments
-<div id="swap"></div>
-		`)
+		@sampleCode("Example", "html", `event: datastar-merge-fragments
+data: fragments <div id="swap"></div>`)
 		@eventDocs("merge-fragments")
 	}
 }
@@ -35,10 +40,8 @@ data: fragments
 templ NoPathsProvided(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
 		<p>No paths were provided to the <code>datastar-remove-signals</code> SSE event. At least one path must be provided.</p>
-		@sampleCode("Example", "html", `
-event: datastar-remove-signals
-data: paths foo.bar abc
-		`)
+		@sampleCode("Example", "html", `event: datastar-remove-signals
+data: paths foo.bar abc`)
 		@eventDocs("remove-signals")
 	}
 }
@@ -46,10 +49,8 @@ data: paths foo.bar abc
 templ NoScriptProvided(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
 		<p>No script was provided to the <code>datastar-execute-script</code> SSE event. A script to execute must be provided.</p>
-		@sampleCode("Example", "html", `
-event: datastar-execute-script
-data: script console.log('Hello, world!')
-		`)
+		@sampleCode("Example", "html", `event: datastar-execute-script
+data: script console.log('Hello, world!')`)
 		@eventDocs("execute-scripts")
 	}
 }
@@ -57,28 +58,24 @@ data: script console.log('Hello, world!')
 templ NoSelectorProvided(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
 		<p>No selector was provided to the <code>datastar-remove-fragments</code> SSE event. A selector must be provided.</p>
-		@sampleCode("Example", "html", `
-event: datastar-remove-fragments
-data: selector #foo
-		`)
+		@sampleCode("Example", "html", `event: datastar-remove-fragments
+data: selector #foo`)
 		@eventDocs("remove-fragments")
 	}
 }
 
 templ NoTargetsFound(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
-		<p>No targets were found for a fragment with the selector or ID <code>{ info.SelectorOrID }</code> in the <code>datastar-merge-fragments</code> SSE event . Each fragment must target an element that already exists in the DOM, via a selector or ID.</p>
-		@sampleCode("Example using an ID", "html", `
-event: datastar-merge-fragments
-data: fragments
-<div id="foo"></div>
-		`)
-		@sampleCode("Example using a selector", "html", `
-event: datastar-merge-fragments
+		if info.SelectorOrID == "" {
+			<p>No targets were found for a fragment in the <code>datastar-merge-fragments</code> SSE event. Each fragment must target an element that exists in the DOM, via a selector or ID.</p>
+		} else {
+			<p>No targets were found for a fragment with the selector or ID <code>{ info.SelectorOrID }</code> in the <code>datastar-merge-fragments</code> SSE event. Each fragment must target an element that exists in the DOM, via a selector or ID.</p>
+		}
+		@sampleCode("Example using an ID", "html", `event: datastar-merge-fragments
+data: fragments <div id="foo"></div>`)
+		@sampleCode("Example using a selector", "html", `event: datastar-merge-fragments
 data: selector #foo
-data: fragments
-<div></div>
-		`)
+data: fragments <div></div>`)
 		@eventDocs("merge-fragments")
 	}
 }

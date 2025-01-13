@@ -287,3 +287,10 @@ func htmlSource() templ.Component {
 		return code("html", buf.String()).Render(ctx, w)
 	})
 }
+
+func getAction(action string) string {
+	if action == "" {
+		return "get"
+	}
+	return action
+}

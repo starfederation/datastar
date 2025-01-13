@@ -147,7 +147,7 @@ export const sse = async (
       onerror: (error) => {
         if (isWrongContent(error)) {
           // don't retry if the content-type is wrong
-          throw runtimeErr('InvalidContentType', ctx, { url, error })
+          throw runtimeErr('InvalidContentType', ctx, { url })
         }
         // do nothing and it will retry
         if (error) {
