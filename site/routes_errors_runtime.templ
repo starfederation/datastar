@@ -79,7 +79,7 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 			{{
 				signalMatch := isSignalMatches[0][1][1:]
 			}}
-			<p>The signal <code class="text-primary">${ signalMatch }</code> is not valid. Ensure that the signal has been defined and that you only access leaf nodes when using nested signals.</p>
+			<p>The signal <code class="text-primary">${ signalMatch }</code> is not valid. Ensure that the signal has been defined and that you only access leaf nodes when using namespaced signals.</p>
 			if (len(info.Expression.ValidSignals) > 0) {
 				{{
 					suggestedSignals := []string{}
@@ -91,7 +91,7 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 				}}
 				if len(suggestedSignals) > 0 {
 					<div>
-						The following valid signals match <code class="text-primary">${ signalMatch }</code>:
+						The following valid signals match the <code class="text-primary">${ signalMatch }</code> namespace:
 						@signalNames(suggestedSignals...)
 					</div>
 				}
@@ -103,12 +103,11 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 				<p>No valid signals exist.</p>
 			}
 			<p>In the following example, <code>$foo</code> is <em>not</em> a valid signal, since only the leaf nodes in nested signals are actually signals.</p>
-			@code(`text/html`, `
-<div data-signals="{foo: {bar: 1, baz: 2}}">
-	<div data-text="$foo.woof"></div>
-</div>
-	`)
-			<p>See the docs on <a href="/guide/datastar_expressions">DataStar expressions</a> for more information.</p>
+			@sampleHtmlCode("Example") {
+				<div data-signals="{foo: {bar: 1, baz: 2}}">
+					<div data-text="$foo.woof"></div>
+				</div>
+			}
 		} else {
 			<p>An unknown error occurred while executing an expression.</p>
 		}
