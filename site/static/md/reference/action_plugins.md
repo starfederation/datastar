@@ -87,6 +87,22 @@ Works the same as `@get()` but sends a `DELETE` request to the backend.
 <button data-on-click="@delete('/endpoint')"></button>
 ```
 
+## Browser Plugins
+
+[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/browser/actions)
+
+Provides actions for performing browser operations.
+
+### `@clipboard()`
+
+Arguments: `@clipboard(expression: string)`
+
+Copies the provided evaluated expression to the clipboard.
+
+```html
+<div data-on-click="@clipboard('Hello, world!')"></div>
+```
+
 ## Logic Plugins
 
 [Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/logic/actions)
@@ -97,7 +113,7 @@ Provides actions for performing logic operations.
 
 Arguments: `@setAll(pathPrefix: string, value: any)`
 
-Sets all the signals that start with the prefix to the expression provided in the second argument. This is useful for setting all the values of a nested signal at once.
+Sets all the signals that start with the prefix to the expression provided in the second argument. This is useful for setting all the values of a signal namespace at once.
 
 ```html
 <div data-on-change="@setAll('foo.', true)"></div>
@@ -107,7 +123,7 @@ Sets all the signals that start with the prefix to the expression provided in th
 
 Arguments: `@toggleAll(pathPrefix: string)`
 
-Toggles all the signals that start with the prefix. This is useful for toggling all the values of a nested signal at once.
+Toggles all the signals that start with the prefix. This is useful for toggling all the values of a signal namespace at once.
 
 ```html
 <div data-on-click="@toggleAll('foo.')"></div>

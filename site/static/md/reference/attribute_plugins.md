@@ -23,13 +23,13 @@ Merges one or more signals into the existing signals. Values defined later in th
 <div data-signals-foo="1"></div>
 ```
 
-Signals are nestable using dot-notation, which can be useful for namespacing.
+Signals can be namespaced using dot-notation.
 
 ```html
 <div data-signals-foo.bar="1"></div>
 ```
 
-Note when working with nested signals that only the leaf nodes are actually signals. So in the example above, only `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
+Note when working with namespaced signals that only the leaf nodes are actually signals. So in the example above, only `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` (the namespace) is not.
 
 The `data-signals` attribute can also be used to merge multiple signals using a set of key-value pairs, where the keys represent signal names and the values represent expressions.
 
@@ -178,7 +178,7 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
   - `.noleading` - Throttle without leading edge.
   - `.trail` - Throttle with trailing edge.
 - `__window` - Attaches the event listener to the `window` element.
-- `__outsite` - Triggers when the event is outside the element.
+- `__outside` - Triggers when the event is outside the element.
 - `__prevent` - Calls `preventDefault` on the event listener.
 - `__stop` - Calls `stopPropagation` on the event listener.
 
@@ -223,9 +223,7 @@ Modifiers allow you to modify the storage target.
 Replaces the URL in the browser without reloading the page. The value can be a relative or absolute URL, and is an evaluated expression.
 
 ```html
-<div
-  data-replace-url="`/page${page}`">
-</div>
+<div data-replace-url="`/page${page}`"></div>
 ```
 
 ### `data-text`
@@ -248,11 +246,13 @@ Allows you to add custom validity to an element using an expression. The express
 
 ```html
 <form>
-  <input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo" />
+  <input
+    data-bind-foo
+    data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'"
+    name="foo"
+  />
   <input data-bind-bar name="bar" />
-  <button>
-      Submit form
-  </button>
+  <button>Submit form</button>
 </form>
 ```
 
@@ -334,10 +334,7 @@ Adds integrations with [backend plugin actions](/reference/action_plugins#backen
 Creates a signal and sets its value to `true` while an SSE request request is in flight, otherwise `false`. The signal can be used to show a loading indicator.
 
 ```html
-<button
-  data-on-click="@get('/endpoint')"
-  data-indicator-fetching
-></button>
+<button data-on-click="@get('/endpoint')" data-indicator-fetching></button>
 ```
 
 This can be useful for show a loading spinner, disabling a button, etc.

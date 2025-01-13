@@ -243,7 +243,7 @@ We can also create signals using the [`data-signals`](/reference/attribute_plugi
 
 Using `data-signals` _merges_ one or more signals into the existing signals. Values defined later in the DOM tree override those defined earlier.
 
-Signals are nestable using dot-notation, which can be useful for namespacing.
+Signals can be namespaced using dot-notation.
 
 ```html
 <div data-signals-form.input="2"></div>
@@ -328,7 +328,7 @@ We've just scratched the surface of frontend reactivity. Now let's take a look a
 
 Datastar uses [Server-Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) (SSE) to stream zero or more events from the web server to the browser. There's no special backend plumbing required to use SSE, just some syntax. Fortunately, SSE is straightforward and [provides us with some advantages](/essays/event_streams_all_the_way_down).
 
-First, set up your backend in the language of your choice. Using one of the helper SDKs (currently available for [Go](https://github.com/starfederation/datastar/tree/main/sdk/go), [PHP](https://github.com/starfederation/datastar/tree/main/sdk/php), [dotnet](https://github.com/starfederation/datastar/tree/main/sdk/dotnet), [Java](https://github.com/starfederation/datastar/tree/main/sdk/java)) will help you get up and running faster. We're going to use the SDKs in the examples below, which set the appropriate headers and format the events for us, but this is optional.
+First, set up your backend in the language of your choice. Using one of the helper SDKs (currently available for [Go](https://github.com/starfederation/datastar/tree/main/sdk/go), [PHP](https://github.com/starfederation/datastar/tree/main/sdk/php), [dotnet](https://github.com/starfederation/datastar/tree/main/sdk/dotnet) and [Java](https://github.com/starfederation/datastar/tree/main/sdk/java)) will help you get up and running faster. We're going to use the SDKs in the examples below, which set the appropriate headers and format the events for us, but this is optional.
 
 The following code would exist in a controller action endpoint in your backend.
 
@@ -456,7 +456,7 @@ The `@setAll()` action sets the values of multiple signals at once. It takes a p
 <button data-on-click="@setAll('form.', true)"></button>
 ```
 
-This sets the values of all signals nested under the `form` signal to `true`, which could be useful for enabling input fields in a form.
+This sets the values of all signals namespaced under the `form` signal to `true`, which could be useful for enabling input fields in a form.
 
 ```html
 <input type="checkbox" data-bind-checkboxes.checkbox1 /> Checkbox 1

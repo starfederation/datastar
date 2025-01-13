@@ -28,7 +28,7 @@ return (()=> {
 
 This should help clarify what Datastar is doing behind the scenes, how signals are evaluated in expressions, and also why expressions are limited in scope. 
 
-The following example is invalid because `$foo` is _not_ a signal – only the leaf nodes in nested signals are actually signals.
+The following example is invalid because the namespace `$foo` is _not_ a signal – only the leaf nodes are signals.
 
 ```html
 <div data-signals-foo.bar="1">
