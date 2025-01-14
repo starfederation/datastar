@@ -3,7 +3,7 @@ import { camelize } from '../utils/text'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS, VERSION } from './consts'
 import { initErr, runtimeErr } from './errors'
-import { SignalsRoot } from './nestedSignals'
+import { SignalsRoot } from './signals'
 import {
   type ActionPlugin,
   type ActionPlugins,
