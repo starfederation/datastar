@@ -1,31 +1,29 @@
 # SDKs
 
-Datastar provides backend SDKs that simplify the process of generating Datastar-specific [SSE events](/reference/sse_events).
+Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specifically for Datastar.
 
 ## Go
 
-A [Go package](https://github.com/starfederation/datastar/tree/main/sdk/go) for working with Datastar.
+[Go package](https://github.com/starfederation/datastar/tree/main/sdk/go) for working with Datastar.
 
-Credit: Delaney Gillilan
+_Author: Delaney Gillilan_
 
 ## PHP
 
-A [PHP package](https://github.com/starfederation/datastar/tree/main/sdk/php) for working with Datastar.
+[PHP package](https://github.com/starfederation/datastar/tree/main/sdk/php) for working with Datastar.
 
-See [installation and usage instructions](https://github.com/starfederation/datastar/tree/main/sdk/php).
-
-Credit: Ben Croker ([PutYourLightsOn](https://putyourlightson.com/))
+_Author: Ben Croker ([PutYourLightsOn](https://putyourlightson.com/))_
 
 ### Laravel
 
-A [Laravel package](https://github.com/putyourlightson/laravel-datastar) for working with Datastar.
+[Laravel package](https://github.com/putyourlightson/laravel-datastar) for working with Datastar.
 
 ### Craft CMS
 
-A [Craft CMS plugin](https://putyourlightson.com/plugins/datastar) for working with Datastar.
+[Craft CMS plugin](https://putyourlightson.com/plugins/datastar) for working with Datastar.
 
 ## dotnet
 
-A [dotnet package](https://github.com/starfederation/datastar/tree/main/sdk/dotnet) for working with Datastar.
+[dotnet package](https://github.com/starfederation/datastar/tree/main/sdk/dotnet) for working with Datastar.
 
-Credit: Greg
+_Author: Greg_
