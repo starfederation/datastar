@@ -39,10 +39,11 @@ serve(async (req: Request) => {
       }
     }
   } else if (url.pathname.includes("await")) {
+    const delaySeconds = 5;
     return ServerSentEventGenerator.stream(async (stream) => {
       stream.mergeFragments('<div id="toMerge">Merged</div>');
-      await delay(10000);
-      stream.mergeFragments('<div id="toMerge">After 10 seconds</div>');
+      await delay(delaySeconds * 1000);
+      stream.mergeFragments(`<div id="toMerge">After ${delaySeconds} seconds</div>`);
     });
   }
 
