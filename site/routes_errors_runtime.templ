@@ -1,0 +1,286 @@
+package site
+
+import "strings"
+
+templ AttrValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("attr")
+		@attrError()
+	}
+}
+
+templ BindKeyAndValueProvided(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyAndValueProvided("bind")
+		@bindError()
+	}
+}
+
+templ BindKeyOrValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyOrValueRequired("bind")
+		@bindError()
+	}
+}
+
+templ BindUnsupportedSignalType(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@attributeDocs("bind")
+	}
+}
+
+templ ClassValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("class")
+		@classError()
+	}
+}
+
+templ ClipboardNotAvailable(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The Clipboard API is not available in this browser.</p>
+	}
+}
+
+templ ComputedKeyRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyRequired("computed")
+		@computedError()
+	}
+}
+
+templ ComputedValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("computed")
+		@computedError()
+	}
+}
+
+templ CustomValidityInvalidElement(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The <code>data-custom-validity</code> attribute was used on an element that is not a <code>HTMLInputElement</code>. The <code>data-custom-validity</code> attribute can only be used on form elements.</p>
+		@customValidityError()
+	}
+}
+
+templ CustomValidityInvalidExpression(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>An invalid expression was provided to the <code>data-custom-validity</code> attribute. The expression must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.</p>
+		@customValidityError()
+	}
+}
+
+templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
+	{{
+		isSignalMatches := isSignalRe.FindAllStringSubmatch(info.Error, -1)
+	}}
+	@RuntimeErrorView(name, info) {
+		if len(isSignalMatches) > 0 {
+			{{
+				signalMatch := isSignalMatches[0][1][1:]
+			}}
+			<p>The signal <code class="text-primary">${ signalMatch }</code> is not valid. Ensure that the signal has been defined and that you only access leaf nodes when using namespaced signals.</p>
+			if (len(info.Expression.ValidSignals) > 0) {
+				{{
+					suggestedSignals := []string{}
+					for _, signal := range info.Expression.ValidSignals {
+						if strings.HasPrefix(signal, signalMatch) {
+							suggestedSignals = append(suggestedSignals, signal)
+						}
+					}
+				}}
+				if len(suggestedSignals) > 0 {
+					<div>
+						The following valid signals match the <code class="text-primary">${ signalMatch }</code> namespace:
+						@signalNames(suggestedSignals...)
+					</div>
+				}
+				<div>
+					All current valid signals:
+					@signalNames(info.Expression.ValidSignals...)
+				</div>
+			} else {
+				<p>No valid signals exist.</p>
+			}
+			<p>In the following example, <code>$foo</code> is <em>not</em> a valid signal, since only the leaf nodes in nested signals are actually signals.</p>
+			@sampleCode("Example", "html", `<div data-signals="{foo: {bar: 1, baz: 2}}">
+	<div data-text="$foo.woof"></div>
+</div>`)
+		} else {
+			<p>An unknown error occurred while executing an expression.</p>
+		}
+		@expressionDocs()
+	}
+}
+
+templ GenerateExpression(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>A valid expression could not be generated.</p>
+		@expressionDocs()
+	}
+}
+
+templ InvalidContentType(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		if info.URL == "" {
+			<p>An invalid content type was provided in the response. The content type must be <code>text/event-stream</code>.</p>
+		} else {
+			<p>An invalid content type was provided in the response from <code>{ info.URL }</code>. The content type must be <code>text/event-stream</code>.</p>
+		}
+	}
+}
+
+templ InvalidDataUri(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>Reading the file data URI failed.</p>
+	}
+}
+
+templ InvalidFileResultType(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		if info.ResultType == "" {
+			<p>Reading the file contents failed.</p>
+		} else {
+			<p>Reading the file contents of type <code>{ info.ResultType }</code> failed.</p>
+		}
+	}
+}
+
+templ ScrollIntoViewInvalidElement(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The <code>data-scroll-into-view</code> attribute was placed on an invalid element. It may only be placed on an HTML element.</p>
+		@sampleCode("Example", "html", `<div data-scroll-into-view></div>`)
+		@attributeDocs("scroll-into-view")
+	}
+}
+
+templ SseClosestFormNotFound(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		{{
+			action := getValue(info.Action, "get")
+		}}
+		<p>No closest form could be found in the DOM. When setting the <code>contentType</code> option to <code>form</code>, the element must have a wrapping form, otherwise a <code>selector</code> must be provided to a form that exists in the DOM.</p>
+		@sampleCode("Example using a wrapping form", "html", `<form>
+	<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form'})" }></button>
+</form>`)
+		@sampleCode("Example using a selector", "html", `<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>`)
+		@actionDocs(action)
+	}
+}
+
+templ SseFetchFailed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		if info.Method == "" || info.URL == "" {
+			<p>An error was encountered when sending a request.</p>
+		} else {
+			<p>The following error was encountered when sending a <code>{ info.Method }</code> request to <code>{ info.URL }</code>.</p>
+			@code(`text`, info.Error)
+		}
+	}
+}
+
+templ SseFormNotFound(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		{{
+			action := getValue(info.Action, "get")
+		}}
+		if info.Selector == "" {
+			<p>No form with the provided selector could be found in the DOM. When specifying a form selector using the <code>selector</code> option in the <code>{ "@" + action }()</code> action, the form must already exist in the DOM.</p>
+		} else {
+			<p>No form with the selector <code>{ info.Selector }</code> could be found in the DOM. When specifying a form selector using the <code>selector</code> option in the <code>{ "@" + action }()</code> action, the form must already exist in the DOM.</p>
+		}
+		@sampleCode("Example", "html", `<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>`)
+		@actionDocs(action)
+	}
+}
+
+templ SseInvalidContentType(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		{{
+			action := getValue(info.Action, "get")
+		}}
+		if info.ContentType == "" {
+			<p>An invalid content type was provided. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
+		} else {
+			<p>An invalid content type <code>{ info.ContentType }</code> was provided to the <code>{ "@" + action }()</code> action. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
+		}
+		@sampleCode("Example", "html", `<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form'})" }></button>`)
+		@actionDocs(action)
+	}
+}
+
+templ SseNoUrlProvided(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		{{
+			action := getValue(info.Action, "get")
+		}}
+		<p>No URL was provided to the <code>{ "@" + action }()</code> action. A valid URL must be provided as the first argument.</p>
+		@sampleCode("Example", "html", `<button data-on-click={ "@" + action + "('/endpoint')" }></button>`)
+		@actionDocs(action)
+	}
+}
+
+templ TextInvalidElement(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The <code>data-text</code> attribute was placed on an invalid element. It may only be placed on an HTML element.</p>
+		@sampleCode("Example", "html", `<div data-text="$foo"></div>`)
+		@attributeDocs("text")
+	}
+}
+
+templ attrError() {
+	<p>The <code>data-attr</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are attribute names and the values are expressions.</p>
+	@sampleCode("Example", "html", `<div data-attr-disabled="$foo"></div>`)
+	@sampleCode("Alternative syntax", "html", `<div data-attr="{disabled: foo}"></div>`)
+	@attributeDocs("attr")
+}
+
+templ bindError() {
+	<p>The <code>data-bind</code> attribute must have either a key <em>or</em> a value, representing the signal name to create and enable two-way binding with the element’s value.</p>
+	@sampleCode("Example", "html", `<input data-bind-signalname/>`)
+	@sampleCode("Alternative syntax", "html", `<input data-bind="signalname" />`)
+	@attributeDocs("bind")
+}
+
+templ classError() {
+	<p>The <code>data-class</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are class names and the values are expressions.</p>
+	@sampleCode("Example", "html", `<div data-class-hidden="$foo"></div>`)
+	@sampleCode("Alternative syntax", "html", `<div data-class="{hidden: foo}"></div>`)
+	@attributeDocs("class")
+}
+
+templ computedError() {
+	<p>The <code>data-computed</code> attribute <em>must</em> have both a key, representing the signal name to create, and a value, representing the expression to assign to the signal.</p>
+	@sampleCode("Example", "html", `<div data-computed-blinker="count % 2 === 0"></div>`)
+	@attributeDocs("computed")
+}
+
+templ customValidityError() {
+	@sampleCode("Example", "html", `<form>
+	<input data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" 
+		   data-bind-foo
+		   name="foo" 
+	/>
+	<input data-bind-bar name="bar" />
+	<button>
+		Submit form
+	</button>
+</form>`)
+	@attributeDocs("custom-validity")
+}
+
+templ keyRequired(pluginName string) {
+	<p>No key was provided to the <code>data-{ pluginName }</code> attribute.</p>
+}
+
+templ valueRequired(pluginName string) {
+	<p>No value was provided to the <code>data-{ pluginName }</code> attribute.</p>
+}
+
+templ keyAndValueProvided(pluginName string) {
+	<p>Both a key and a value were provided to the <code>data-{ pluginName }</code> attribute.</p>
+}
+
+templ keyOrValueRequired(pluginName string) {
+	<p>No key or value was provided to the <code>data-{ pluginName }</code> attribute.</p>
+}

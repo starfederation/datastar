@@ -3,7 +3,7 @@
 // Slug: Scroll an element into view
 // Description: This attribute scrolls the element into view.
 
-import { dsErr } from '../../../../engine/errors'
+import { runtimeErr } from '../../../../engine/errors'
 import {
   type AttributePlugin,
   PluginType,
@@ -49,7 +49,8 @@ export const ScrollIntoView: AttributePlugin = {
     FOCUS,
   ]),
 
-  onLoad: ({ el, mods, rawKey }) => {
+  onLoad: (ctx) => {
+    const { el, mods, rawKey } = ctx
     if (!el.tabIndex) el.setAttribute('tabindex', '0')
     const opts: ScrollIntoViewOptions = {
       behavior: SMOOTH,
@@ -69,7 +70,7 @@ export const ScrollIntoView: AttributePlugin = {
     if (mods.has(VNEAREST)) opts.block = NEAREST
 
     if (!(el instanceof HTMLElement || el instanceof SVGElement)) {
-      throw dsErr('NotHtmlSvgElement, el')
+      throw runtimeErr('ScrollIntoViewInvalidElement', ctx)
     }
     if (!el.tabIndex) {
       el.setAttribute('tabindex', '0')

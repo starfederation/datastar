@@ -61,17 +61,7 @@ Works the same as `@get()` but sends a `POST` request to the backend.
 
 Arguments: `@put(url: string, options={})`
 
-Works the same as `@put()` but sends a `PUT` request to the backend.
-
-```html
-<button data-on-click="@put('/endpoint')"></button>
-```
-
-### `@put()`
-
-Arguments: `@put(url: string, options={})`
-
-Works the same as `@put()` but sends a `PUT` request to the backend.
+Works the same as `@get()` but sends a `PUT` request to the backend.
 
 ```html
 <button data-on-click="@put('/endpoint')"></button>
@@ -81,7 +71,7 @@ Works the same as `@put()` but sends a `PUT` request to the backend.
 
 Arguments: `@patch(url: string, options={})`
 
-Works the same as `@patch()` but sends a `PATCH` request to the backend.
+Works the same as `@get()` but sends a `PATCH` request to the backend.
 
 ```html
 <button data-on-click="@patch('/endpoint')"></button>
@@ -91,10 +81,26 @@ Works the same as `@patch()` but sends a `PATCH` request to the backend.
 
 Arguments: `@delete(url: string, options={})`
 
-Works the same as `@delete()` but sends a `DELETE` request to the backend.
+Works the same as `@get()` but sends a `DELETE` request to the backend.
 
 ```html
 <button data-on-click="@delete('/endpoint')"></button>
+```
+
+## Browser Plugins
+
+[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/browser/actions)
+
+Provides actions for performing browser operations.
+
+### `@clipboard()`
+
+Arguments: `@clipboard(expression: string)`
+
+Copies the provided evaluated expression to the clipboard.
+
+```html
+<div data-on-click="@clipboard('Hello, world!')"></div>
 ```
 
 ## Logic Plugins
@@ -107,7 +113,7 @@ Provides actions for performing logic operations.
 
 Arguments: `@setAll(pathPrefix: string, value: any)`
 
-Sets all the signals that start with the prefix to the expression provided in the second argument. This is useful for setting all the values of a nested signal at once.
+Sets all the signals that start with the prefix to the expression provided in the second argument. This is useful for setting all the values of a signal namespace at once.
 
 ```html
 <div data-on-change="@setAll('foo.', true)"></div>
@@ -117,14 +123,14 @@ Sets all the signals that start with the prefix to the expression provided in th
 
 Arguments: `@toggleAll(pathPrefix: string)`
 
-Toggles all the signals that start with the prefix. This is useful for toggling all the values of a nested signal at once.
+Toggles all the signals that start with the prefix. This is useful for toggling all the values of a signal namespace at once.
 
 ```html
 <div data-on-click="@toggleAll('foo.')"></div>
 ```
 
-### `@fit(')`
+### `@fit()`
 
-Arguments: `@fit('v: number, oldMin:number, oldMax:number, newMin, newMax, shouldClamp=false, shouldRound=false)`
+Arguments: `@fit(v: number, oldMin: number, oldMax: number, newMin: number, newMax: number, shouldClamp=false, shouldRound=false)`
 
 Make a value linear interpolate from an original range to new one.

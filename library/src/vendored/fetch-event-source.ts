@@ -1,4 +1,5 @@
-import { dsErr } from '../engine/errors'
+import { runtimeErr } from '../engine/errors'
+import type { RuntimeContext } from '../engine/types'
 
 /**
  * Represents a message sent in an event stream
@@ -258,6 +259,7 @@ export interface FetchEventSourceInit extends RequestInit {
 }
 
 export function fetchEventSource(
+  ctx: RuntimeContext,
   input: RequestInfo,
   {
     signal: inputSignal,
@@ -363,7 +365,7 @@ export function fetchEventSource(
               // we should not retry anymore:
               dispose()
               // Max retries hit, check your server or network connection
-              reject(dsErr('SseMaxRetries', { retryMaxCount }))
+              reject(runtimeErr('SseMaxRetries', ctx, { retryMaxCount }))
             } else {
               console.error(
                 `Datastar failed to reach ${rest.method}: ${input.toString()} retry in ${interval}ms`,

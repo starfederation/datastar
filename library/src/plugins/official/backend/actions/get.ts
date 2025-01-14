@@ -13,6 +13,6 @@ export const GET: ActionPlugin = {
   type: PluginType.Action,
   name: 'get',
   fn: async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
-    return sse(ctx, url, { ...args, method: 'GET' })
+    return sse(ctx, 'GET', url, { ...args })
   },
 }

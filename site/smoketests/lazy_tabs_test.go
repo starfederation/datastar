@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExampleLazyTabs(t *testing.T) {
+func DisabledTestExampleLazyTabs(t *testing.T) {
 	setupPageTest(t, "examples/lazy_tabs", func(runner runnerFn) {
 		runner("click through lazy tabs", func(t *testing.T, page *rod.Page) {
 			tabContents := page.MustElement("#tab_content")

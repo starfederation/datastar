@@ -1,3 +1,8 @@
+[![Stable Version](https://img.shields.io/packagist/v/starfederation/datastar-php?label=stable)]((https://packagist.org/packages/starfederation/datastar-php))
+[![Total Downloads](https://img.shields.io/packagist/dt/starfederation/datastar-php)](https://packagist.org/packages/starfederation/datastar-php)
+
+<p align="center"><img width="150" src="https://putyourlightson.com/assets/logos/datastar.svg"></p>
+
 # Datastar PHP SDK
 
 This package provides a PHP SDK for working with [Datastar](https://data-star.dev/).
@@ -29,7 +34,7 @@ use starfederation\datastar\ServerSentEventGenerator;
 $sse = new ServerSentEventGenerator();
 
 // Sends the response headers. 
-// If your framework has its own way of sending response headers, send `ServerSentEventGenerator::headers` manually instead.
+// If your framework has its own way of sending response headers, manually send the headers returned by `ServerSentEventGenerator::headers()` instead.
 $sse->sendHeaders();
 
 // Merges HTML fragments into the DOM.

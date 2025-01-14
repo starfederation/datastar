@@ -21,7 +21,7 @@ With Datastar, you can build any UI that a full-stack framework like React, Vue.
 The quickest way to use Datastar is to include it in your HTML using a script tag hosted on a CDN.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script>
 ```
 
 If you prefer to host the file yourself, download your own bundle using the [bundler](/bundler), then include it from the appropriate path.
@@ -42,7 +42,7 @@ npm install @starfederation/datastar
 
 At the core of Datastar are [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) attributes (hence the name). They allow you to add reactivity to your frontend in a declarative way, and to interact with your backend.
 
-Datastar uses signals to manage state. You can think of signals as reactive variables that automatically track and propagate changes in expressions. They can be created and modified using data attributes on the frontend, or events sent from the backend. Don't worry if this sounds complicated; it will become clearer as we look at some examples.
+Datastar uses signals to manage state. You can think of signals as reactive variables that automatically track and propagate changes in [expressions](/guide/datastar_expressions). They can be created and modified using data attributes on the frontend, or events sent from the backend. Don't worry if this sounds complicated; it will become clearer as we look at some examples.
 
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
@@ -81,7 +81,7 @@ To see this in action, we can use the [`data-text`](/reference/attribute_plugins
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input1 class="input input-bordered">
+            <input data-bind-input1 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -92,7 +92,7 @@ To see this in action, we can use the [`data-text`](/reference/attribute_plugins
 
 This sets the text content of an element to the value of the signal `$input`. The `$` prefix is required to denote a signal.
 
-The value of the `data-text` attribute is an expression that is evaluated, meaning that we can use JavaScript in it.
+The value of the `data-text` attribute is a [Datastar expression](/guide/datastar_expressions) that is evaluated, meaning that we can use JavaScript in it.
 
 ```html
 <div data-text="$input.toUpperCase()">
@@ -104,7 +104,7 @@ The value of the `data-text` attribute is an expression that is evaluated, meani
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input2 class="input input-bordered">
+            <input data-bind-input2 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -132,7 +132,7 @@ This results in the `$repeated` signal's value always being equal to the value o
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input3 class="input input-bordered">
+            <input data-bind-input3 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -155,7 +155,7 @@ This results in the button being visible only when the input is _not_ an empty s
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input4 class="input input-bordered">
+            <input data-bind-input4 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -181,7 +181,7 @@ If the expression evaluates to `true`, the `hidden` class is added to the elemen
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input5 class="input input-bordered">
+            <input data-bind-input5 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -213,7 +213,7 @@ This results in a `disabled` attribute being given the value `true` whenever the
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input6 class="input input-bordered">
+            <input data-bind-input6 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -243,7 +243,7 @@ We can also create signals using the [`data-signals`](/reference/attribute_plugi
 
 Using `data-signals` _merges_ one or more signals into the existing signals. Values defined later in the DOM tree override those defined earlier.
 
-Signals are nestable using dot-notation, which can be useful for namespacing.
+Signals can be namespaced using dot-notation.
 
 ```html
 <div data-signals-form.input="2"></div>
@@ -269,7 +269,7 @@ This results in the `$input` signal's value being set to an empty string wheneve
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
-            <input data-bind-input7 class="input input-bordered">
+            <input data-bind-input7 class="input input-bordered" />
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
@@ -328,7 +328,7 @@ We've just scratched the surface of frontend reactivity. Now let's take a look a
 
 Datastar uses [Server-Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) (SSE) to stream zero or more events from the web server to the browser. There's no special backend plumbing required to use SSE, just some syntax. Fortunately, SSE is straightforward and [provides us with some advantages](/essays/event_streams_all_the_way_down).
 
-First, set up your backend in the language of your choice. Using one of the helper SDKs (currently available for [Go](https://github.com/starfederation/datastar/tree/main/sdk/go), [PHP](https://github.com/starfederation/datastar/tree/main/sdk/php), [dotnet](https://github.com/starfederation/datastar/tree/main/sdk/dotnet), [Java](https://github.com/starfederation/datastar/tree/main/sdk/java)) will help you get up and running faster. We're going to use the SDKs in the examples below, which set the appropriate headers and format the events for us, but this is optional.
+First, set up your backend in the language of your choice. Using one of the helper SDKs (currently available for [Go](https://github.com/starfederation/datastar/tree/main/sdk/go), [PHP](https://github.com/starfederation/datastar/tree/main/sdk/php), [dotnet](https://github.com/starfederation/datastar/tree/main/sdk/dotnet) and [Java](https://github.com/starfederation/datastar/tree/main/sdk/java)) will help you get up and running faster. We're going to use the SDKs in the examples below, which set the appropriate headers and format the events for us, but this is optional.
 
 The following code would exist in a controller action endpoint in your backend.
 
@@ -456,7 +456,7 @@ The `@setAll()` action sets the values of multiple signals at once. It takes a p
 <button data-on-click="@setAll('form.', true)"></button>
 ```
 
-This sets the values of all signals nested under the `form` signal to `true`, which could be useful for enabling input fields in a form.
+This sets the values of all signals namespaced under the `form` signal to `true`, which could be useful for enabling input fields in a form.
 
 ```html
 <input type="checkbox" data-bind-checkboxes.checkbox1 /> Checkbox 1

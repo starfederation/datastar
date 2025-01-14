@@ -7,7 +7,7 @@ import {
   DefaultExecuteScriptAutoRemove,
   EventTypes,
 } from '../../../../engine/consts'
-import { dsErr } from '../../../../engine/errors'
+import { initErr } from '../../../../engine/errors'
 import { PluginType, type WatcherPlugin } from '../../../../engine/types'
 import { isBoolString } from '../../../../utils/text'
 import { datastarSSEEventWatcher } from '../shared'
@@ -15,7 +15,7 @@ import { datastarSSEEventWatcher } from '../shared'
 export const ExecuteScript: WatcherPlugin = {
   type: PluginType.Watcher,
   name: EventTypes.ExecuteScript,
-  onGlobalInit: async () => {
+  onGlobalInit: async (ctx) => {
     datastarSSEEventWatcher(
       EventTypes.ExecuteScript,
       ({
@@ -25,7 +25,7 @@ export const ExecuteScript: WatcherPlugin = {
       }) => {
         const autoRemove = isBoolString(autoRemoveRaw)
         if (!script?.length) {
-          throw dsErr('NoScriptProvided')
+          throw initErr('NoScriptProvided', ctx)
         }
         const scriptEl = document.createElement('script')
         for (const attr of attributesRaw.split('\n')) {

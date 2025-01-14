@@ -18,7 +18,7 @@ Datastar also allows you to use the new View Transitions API for creating animat
 <div id="color_throb">Color Throb Demo</div>
 </div>
 
-The simplest animation technique in Datastar is to keep the id of an element stable across a content swap. If the id of an element is kept stable, htmx will swap it in such a way that CSS transitions can be written between the old version of the element and the new one.
+The simplest animation technique in Datastar is to keep the id of an element stable across a content swap. If the id of an element is kept stable, Datastar will swap it in such a way that CSS transitions can be written between the old version of the element and the new one.
 
 Consider this div:
 

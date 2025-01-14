@@ -2,7 +2,7 @@
 
 Datastar's philosophy is: let the browser do what it does best—render HTML—while enabling declarative reactivity.
 
-At its core, Datastar makes __nestable signals declarative__. Let's unpack that.
+At its core, Datastar makes __namespaced signals declarative__. Let's unpack that.
 
 ### 1. Declarative
 
@@ -29,7 +29,7 @@ Datastar allows us to write this logic declaratively while embracing locality-of
 
 Datastar uses signals, provided by [Preact Signals](https://preactjs.com/guide/v10/signals/), to manage state. You can think of signals as reactive variables that automatically track and propagate changes in expressions.
 
-Signals can be created and modified using `data-*` attributes on the frontend, or events sent from the backend. They can also be used in Datastar expressions (expressions evaluated by Datastar attributes and actions).
+Signals can be created and modified using `data-*` attributes on the frontend, or events sent from the backend. They can also be used in [Datastar expressions](/guide/datastar_expressions).
 
 ```html
 <div data-signals-foo="hello"></div>
@@ -40,37 +40,57 @@ Signals can be created and modified using `data-*` attributes on the frontend, o
 Behind the scenes, Datastar converts `$foo` to `ctx.signals.signal('foo').value`, and then evaluates the expression in a sandboxed context. This means that JavaScript can be used in Datastar expressions.
 
 ```html
-<button data-on-click="$foo = $foo.toUpperCase()"></button>
+<button data-on-click="$foo = $foo.toUpperCase()">
+  Convert to uppercase
+</button>
 ```
 
-### 3. Nestable Signals
+### 3. Namespaced Signals
 
-Signals in Datastar have a superpower: they are nestable. This allows you to scope state as deeply as you like.
+Signals in Datastar have a trick up their sleeve: they can be namespaced. 
 
 ```html
-<div data-signals-foo.bar.baz="1"></div>
+<div data-signals-foo.bar="1"></div>
 ```
 
 Or, using object syntax:
 
 ```html
-<div data-signals="{foo: {bar: {baz: 1}}}"></div>
+<div data-signals="{foo: {bar: 1}}"></div>
 ```
 
 Or, using two-way binding:
 
 ```html
-<input data-bind-foo.bar.baz />
+<input data-bind-foo.bar />
+```
+
+Note that only the leaf nodes are actually signals. So in the example above, `bar` is a signal but `foo`(the namespace) is not, meaning that while using `$foo.bar` in an expression is possible, using `$foo` is not.
+
+Namespaced signals can be useful for targetting signals in a more granular way on the backend.
+
+Another practical use-case might be when you have repetition of state on a page. 
+
+The following example shows how to toggle the value of all signals starting with `menu.open.` at once when a button is clicked.
+
+```html
+<div data-signals="{menu: {isopen: {desktop: false, mobile: false}}}">
+  <button data-on-click="@toggleAll('menu.isopen.')">
+    Open/close menu
+  </button>
+</div>
 ```
 
 The beauty of this is that you don't need to write a bunch of code to set up and maintain state. You just use `data-*` attributes and think declaratively!
 
 ## Datastar Actions
 
-Actions are helper functions that can be used in Datastar expressions. They allow you to perform logical operations without having to write procedural JavaScript.
+Actions are helper functions that can be used in [Datastar expressions](/guide/datastar_expressions). They allow you to perform logical operations without having to write procedural JavaScript.
 
 ```html
-<button data-on-click="@setAll('foo.', $mysignal.toUpperCase()"></button>
+<button data-on-click="@setAll('foo.', $mysignal.toUpperCase())">
+  Convert all to uppercase
+</button>
 ```
 
 ### Backend Actions
@@ -96,7 +116,7 @@ event: datastar-execute-script
 data: script console.log('Success!')
 ```
 
-Using one of the helper SDKs (currently available for [dotnet](https://github.com/starfederation/datastar/tree/main/sdk/dotnet), [Go](https://github.com/starfederation/datastar/tree/main/sdk/go), [PHP](https://github.com/starfederation/datastar/tree/main/sdk/php)) will help you get up and running faster.
+Using one of the helper SDKs (currently available for [Go](https://github.com/starfederation/datastar/tree/main/sdk/go), [PHP](https://github.com/starfederation/datastar/tree/main/sdk/php), [dotnet](https://github.com/starfederation/datastar/tree/main/sdk/dotnet) and [Java](https://github.com/starfederation/datastar/tree/main/sdk/java)) will help you get up and running faster.
 
 Here is all of the backend code required to produce the events above in each of the SDKs.
 
@@ -110,7 +130,7 @@ Datastar is smaller than Alpine.js and htmx, yet it provides the functionality o
 
 The package size is not _just_ a vanity metric. By embracing simplicity, and building on first principles, everything becomes cleaner and leaner. But don't take our word for it – [explore the source code](https://github.com/starfederation/datastar/tree/main/library) and see for yourself!
 
-Datastar is both a core library (4 KiB) and a “batteries included” framework (~12 KiB), allowing you to create [custom bundles](/bundler) and write your own plugins.
+Datastar is both a core library (~5 KiB) and a “batteries included” framework (~13 KiB), allowing you to create [custom bundles](/bundler) and write your own plugins.
 
 ## Hypermedia First
 

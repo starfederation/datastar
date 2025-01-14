@@ -40,7 +40,7 @@ function myfunction(data) {
 }
 ```
 
-If your function call is asynchronous then it will need to dispatch a custom event containing the result. While asynchronous code _can_ be placed within Datastar expressions, Datastar will _not_ await it.
+If your function call is asynchronous then it will need to dispatch a custom event containing the result. While asynchronous code _can_ be placed within [Datastar expressions](/guide/datastar_expressions), Datastar will _not_ await it.
 
 ```html
 <div data-signals-result="''"
@@ -74,7 +74,7 @@ In this way, the web component is encapsulated – all it knows is that it recei
 
 ```html
 <div data-signals-result="''">
-  <input data-bind-foo>
+  <input data-bind-foo />
   <my-component
       data-attr-src="$foo"
       data-on-mycustomevent="$result = evt.detail.value"
@@ -103,7 +103,7 @@ customElements.define('my-component', MyComponent);
 Since the `value` attribute is allowed on web components, it is also possible to use `data-bind` to bind a signal to the web component's value. Note that a `change` event must be dispatched so that the event listener used by `data-bind` is triggered by the value change.
 
 ```html
-<input data-bind-foo>
+<input data-bind-foo />
 <my-component
     data-attr-src="$foo"
     data-bind-result

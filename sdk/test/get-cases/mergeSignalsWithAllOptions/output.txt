@@ -1,0 +1,7 @@
+event: datastar-merge-signals
+id: 1
+retry: 2000
+data: onlyIfMissing false
+data: signals {"one":1,"two":2}
+
+

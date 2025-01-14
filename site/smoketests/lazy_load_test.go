@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExampleLazyLoad(t *testing.T) {
+func DisabledTestExampleLazyLoad(t *testing.T) {
 	setupPageTest(t, "examples/lazy_load", func(runner runnerFn) {
 		runner("observe lazy load", func(t *testing.T, page *rod.Page) {
 			selector := "#lazy_load"

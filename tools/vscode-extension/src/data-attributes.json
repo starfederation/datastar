@@ -76,6 +76,17 @@
       }
     ]
   },
+  "data-custom-validity": {
+    "prefix": "data-custom-validity",
+    "body": "data-custom-validity=\"${1:expression}\"",
+    "description": "Adds custom validity to an element using an expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-custom-validity"
+      }
+    ]
+  },
   "data-indicator": {
     "prefix": "data-indicator",
     "body": "data-indicator=\"${1:signalName}\"",

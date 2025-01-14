@@ -9,7 +9,7 @@ import (
 
 templ Home() {
 	{{
-		cdnText := `<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script>`
+		cdnText := `<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script>`
 	}}
 	{{
 		usageSample := `<input data-bind-title />
@@ -204,11 +204,11 @@ templ TodosMVCView(mvc *TodoMVC) {
 										@icon("material-symbols:checklist")
 									</button>
 								</div>
+								@sseIndicator("toggleAllFetching")
 							}
 							if mvc.EditingIdx <0 {
 								@TodoInput(-1)
 							}
-							@sseIndicator("toggleAllFetching")
 						</div>
 					</header>
 					if hasTodos {
@@ -284,6 +284,7 @@ templ TodoInput(i int) {
 		data-testid="todos_input"
 		class="flex-1 w-full italic input input-bordered input-lg"
 		placeholder="What needs to be done?"
+		enterkeyhint="enter"
 		data-bind-input
 		data-on-keydown={ fmt.Sprintf(`
 			if (evt.key !== 'Enter' || !$input.trim().length) return;

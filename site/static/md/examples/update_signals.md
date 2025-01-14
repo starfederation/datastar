@@ -43,4 +43,4 @@ event: datastar-remove-signals,
 data: paths 12768 existingSignals
 ```
 
-Where the paths are `.` delimited paths.  For nested signals it might look like `foo.bar.baz`.  Using the Go helpers for example this looks like `datastar.RemoveSignals(sse, keysToRemove...)`
+Where the paths are `.` delimited paths.  For namespaced signals it might look like `foo.bar.baz`.  Using the Go helpers for example this looks like `datastar.RemoveSignals(sse, keysToRemove...)`

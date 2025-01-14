@@ -3,7 +3,7 @@
 ## Demo
 
 <div data-signals="{name:'',reversed:''}" class="flex flex-col gap-4">
-    <input data-bind-name class="flex items-center input input-bordered">
+    <input data-bind-name class="flex items-center input input-bordered" />
     <div class="h-16 alert">
         <span data-text="$reversed"></span>
     </div>
