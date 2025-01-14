@@ -26,12 +26,19 @@ const server = createServer(async (req, res) => {
     if (req.url === "/") {
         const headers = new Headers({ 'Content-Type': 'text/html' });
         res.setHeaders(headers);
-        res.end(`<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script></head><body><div id="toMerge" data-on-load="sse('/merge', {method: 'get'})">Not merged</div></body></html>`);
+        res.end(`<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`);
     }
     else if (req.url?.includes("/merge")) {
-        ServerSentEventGenerator.stream(req, res, (stream) => {
-            stream.mergeFragments('<div id="toMerge">Merged</div>');
-        });
+        const readSignals = await ServerSentEventGenerator.readSignals(req);
+
+        if (readSignals.success) {
+            ServerSentEventGenerator.stream(req, res, (stream) => {
+                stream.mergeFragments(`<div id="toMerge">Hello ${readSignals.signals.foo}</div>`);
+            });
+        }
+
+        console.error('Error while reading signals', readSignals.error);
+        res.end('Error while reading signals`);
     }
 
     res.end('Path not found');
@@ -53,19 +60,31 @@ Here's an example using Deno:
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
 import { ServerSentEventGenerator } from "./serverSentEventGenerator.ts";
 
-serve(async (req: Request) => {
+serve((req: Request) => {
     const url = new URL(req.url);
 
     if (url.pathname === '/') {
         return new Response(
-            `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script></head><body><div id="toMerge" data-on-load="sse('/merge', {method: 'get'})">Not merged</div></body></html>`
+      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
             , {
                 headers: { 'Content-Type': 'text/html' }
          });
     }
     else if (url.pathname.includes('/merge')) {
-        return ServerSentEventGenerator.stream((stream) => {
-            stream.mergeFragments('<div id="toMerge">Merged</div>');
+        const readSignals = await ServerSentEventGenerator.readSignals(req);
+
+        if (readSignals.success) {
+            return ServerSentEventGenerator.stream((stream) => {
+                stream.mergeFragments(
+                    `<div id="toMerge">Hello ${readSignals.signals.foo}</div>`,
+                );
+            });
+        }
+
+        console.error("Error while reading signals", readSignals.error);
+
+        return new Response(`Error reading signals`, {
+            headers: { "Content-Type": "text/html" },
         });
     }
 
