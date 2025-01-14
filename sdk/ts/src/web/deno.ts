@@ -43,7 +43,9 @@ serve(async (req: Request) => {
     return ServerSentEventGenerator.stream(async (stream) => {
       stream.mergeFragments('<div id="toMerge">Merged</div>');
       await delay(delaySeconds * 1000);
-      stream.mergeFragments(`<div id="toMerge">After ${delaySeconds} seconds</div>`);
+      stream.mergeFragments(
+        `<div id="toMerge">After ${delaySeconds} seconds</div>`,
+      );
     });
   }
 
