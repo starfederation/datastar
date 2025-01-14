@@ -90,43 +90,6 @@ func createBundles(version string) error {
 	return nil
 }
 
-func createTsSdk() error {
-	log.Print("Creating Node SDK...")
-	defer log.Print("Node SDK created!")
-
-	outDir := "./bundles"
-
-	result := api.Build(api.BuildOptions{
-		EntryPoints: []string{
-			"sdk/ts/src/abstractServerSentEventGenerator.ts",
-			"sdk/ts/src/node/serverSentEventGenerator.ts",
-			"sdk/ts/src/web/serverSentEventGenerator.ts",
-			"sdk/ts/src/node/node.ts",
-		},
-		Outdir:            outDir,
-		Bundle:            true,
-		Write:             true,
-		LogLevel:          api.LogLevelInfo,
-		MinifyWhitespace:  true,
-		MinifyIdentifiers: true,
-		MinifySyntax:      true,
-		Format:            api.FormatESModule,
-		Sourcemap:         api.SourceMapLinked,
-		Target:            api.ES2023,
-		Platform: api.PlatformNode,
-	})
-
-	if len(result.Errors) > 0 {
-		errs := make([]error, len(result.Errors))
-		for i, err := range result.Errors {
-			errs[i] = errors.New(err.Text)
-		}
-		return errors.Join(errs...)
-	}
-
-	return nil
-}
-
 func writeOutConsts(version string) error {
 	log.Print("Extracting version...")
 
