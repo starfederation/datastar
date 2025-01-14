@@ -9,7 +9,7 @@ import {
 
 import { DefaultSseRetryDurationMs } from "./consts.ts";
 
-import { Jsonifiable } from "type-fest";
+import type { Jsonifiable } from "npm:type-fest";
 
 /**
  * Abstract ServerSentEventGenerator class, responsible for initializing and handling

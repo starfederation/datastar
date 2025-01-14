@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
 import { ServerSentEventGenerator } from "./serverSentEventGenerator.ts";
-import { Jsonifiable } from "type-fest";
+import type { Jsonifiable } from "npm:type-fest";
 
 serve(async (req: Request) => {
   const url = new URL(req.url);
