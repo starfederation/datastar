@@ -68,22 +68,30 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
         { success: true, signals: Record<string, unknown> }
         | { success: false, error: string }
     > {
-        if (request.method === "GET") {
-            const url = new URL(request.url);
-            const params = url.searchParams;
-             try {
-                 if (params.has('datastar')) {
-                     const signals = JSON.parse(params.get('datastar')!);
-                     return { success: true, signals };
-                 } else throw new Error("No datastar object in request");
-             } catch(e: unknown) {
-                 if (isRecord(e) && 'message' in e && typeof e.message === 'string') {
-                      return { success: false, error: e.message }
-                 }
-                 else return { success: false, error: "unknown error when parsing requestuest" }
+        try {
+            if (request.method === "GET") {
+                const url = new URL(request.url);
+                const params = url.searchParams;
+                     if (params.has('datastar')) {
+                         const signals = JSON.parse(params.get('datastar')!);
+                         return { success: true, signals };
+                     } else throw new Error("No datastar object in request");
             }
-        }
 
-        return { success: true, signals: await request.json() };
+            const signals = await request.json();
+
+            if (isRecord(signals)) {
+                return { success: true, signals };
+            }
+
+            throw new Error("Parsed JSON body is not of type record");
+
+       } catch(e: unknown) {
+             if (isRecord(e) && 'message' in e && typeof e.message === 'string') {
+                 return { success: false, error: e.message }
+            }
+
+            return { success: false, error: "unknown error when parsing request" }
+       }
     }
 }
