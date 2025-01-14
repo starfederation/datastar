@@ -1,0 +1,1 @@
+{"events": [ { "type": "mergeFragments", "fragments": "<div>Merge</div>", "eventId": 1, "retryDuration": 2000,  "selector": "div", "mergeMode": "append", "settleDuration": 1000, "useViewTransition": false}]}

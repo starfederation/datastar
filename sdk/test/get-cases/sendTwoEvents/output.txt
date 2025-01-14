@@ -1,0 +1,10 @@
+event: datastar-merge-fragments
+retry: 1000
+data: fragments <div>Merge</div>
+
+
+event: datastar-merge-fragments
+retry: 1000
+data: fragments <div>Merge 2</div>
+
+

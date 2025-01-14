@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@deno/dnt": "jsr:@deno/dnt@^0.41.3"
+  }
+}

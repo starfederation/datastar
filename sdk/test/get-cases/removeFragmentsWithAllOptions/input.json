@@ -1,0 +1,1 @@
+{"events": [ { "type": "removeFragments", "selector": "#target", "eventId": 1, "retryDuration": 2000, "settleDuration": 1000, "useViewTransition": false}]}

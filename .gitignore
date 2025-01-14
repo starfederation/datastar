@@ -11,3 +11,4 @@ datastar-website
 */java/target/
 *.pyc
 __pycache__
+sdk/test/**/**/testOutput.txt
