@@ -35,10 +35,10 @@ const server = createServer(async (req, res) => {
             ServerSentEventGenerator.stream(req, res, (stream) => {
                 stream.mergeFragments(`<div id="toMerge">Hello ${readSignals.signals.foo}</div>`);
             });
+        } else {
+            console.error('Error while reading signals', readSignals.error);
+            res.end('Error while reading signals`);
         }
-
-        console.error('Error while reading signals', readSignals.error);
-        res.end('Error while reading signals`);
     }
 
     res.end('Path not found');
