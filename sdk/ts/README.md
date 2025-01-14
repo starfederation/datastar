@@ -3,9 +3,10 @@
 Implements `../README.md` and exposes a ServerSentEventGenerator class that can
 be used to send datastar events to the client.
 
-Deno is used for building the npm package.
+Currently it only exposes an http1 server, if you want http2 I recommend you use
+a reverse proxy until http2 support is added.
 
-`deno run -A build.ts VERSION`
+Deno is used for building the npm package: `deno run -A build.ts VERSION`
 
 ## NodeJS
 
