@@ -16,9 +16,8 @@
   },
   "homepage": "https://github.com/starfederation/datastar#readme",
   "dependencies": {
-    "@cowwoc/requirements": "4.0.8",
-    "@starfederation/datastar": "workspace:../library",
-    "@types/node": "^22.10.2"
+    "@types/node": "^22.10.2",
+    "type-fest": "^4.32.0"
   },
   "devDependencies": {
     "typescript": "~5.6.2"

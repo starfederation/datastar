@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
 import { ServerSentEventGenerator } from "./serverSentEventGenerator";
+import { Jsonifiable } from "type-fest";
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -12,7 +13,7 @@ const server = createServer(async (req, res) => {
         res.end(`<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script></head><body><div id="toMerge" data-on-load="sse('/merge', {method: 'get'})">Not merged</div></body></html>`);
     }
     else if (req.url?.includes("/merge")) {
-        ServerSentEventGenerator.stream(req, res, async (stream) => {
+        ServerSentEventGenerator.stream(req, res, (stream) => {
             stream.mergeFragments('<div id="toMerge">Merged</div>');
         });
     } else if (req.url?.includes("/test")) {
@@ -20,7 +21,7 @@ const server = createServer(async (req, res) => {
         if (reader.success === true) {
             const events = reader.signals.events;
             if (isEventArray(events)) {
-                ServerSentEventGenerator.stream(req, res, async (stream) => {
+                ServerSentEventGenerator.stream(req, res, (stream) => {
                     testEvents(stream, events);
                 });
             }
@@ -46,13 +47,13 @@ function delay(milliseconds: number) {
     });
 }
 
-function isEventArray(events: unknown): events is (Record<string, unknown> & { type: string })[] {
+function isEventArray(events: unknown): events is (Record<string, Jsonifiable> & { type: string })[] {
     return events instanceof Array && events.every(event => {
         return  typeof event === 'object' && event !== null  && typeof event.type === 'string';
     });
 }
 
-function testEvents(stream: ServerSentEventGenerator, events: Record<string, unknown>[]) {
+function testEvents(stream: ServerSentEventGenerator, events: Record<string, Jsonifiable>[]) {
     events.forEach(event => {
         const { type, ...e } = event;
         switch (type) {
@@ -71,7 +72,7 @@ function testEvents(stream: ServerSentEventGenerator, events: Record<string, unk
             case "mergeSignals":
                 if (e !== null && typeof e === 'object' &&  "signals" in e) {
                     const { signals, ...options } = e;
-                    stream.mergeSignals(signals as Record<string, any>, options || undefined);
+                    stream.mergeSignals(signals as Record<string, Jsonifiable>, options || undefined);
                 }
                 break;
             case "removeSignals":

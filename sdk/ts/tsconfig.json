@@ -1,26 +1,24 @@
 {
   "compilerOptions": {
-    "target": "ES2023",
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false,
-    "module": "ESNext",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    /* Bundler mode */
-    "moduleResolution": "node",
+    "target": "es2022",
     "resolveJsonModule": true,
+    "moduleDetection": "force",
     "isolatedModules": true,
-    /* Linting */
+    "allowImportingTsExtensions": true,
+
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "declaration": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    "module": "commonjs",
     "outDir": "dist",
-    "baseUrl": "./",
-    "paths": {
-      "~/*": ["./src/*"]
-    }
+    "sourceMap": true,
+
+    "declaration": true,
+    "lib": ["es2022"]
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/web/deno.ts"]
 }

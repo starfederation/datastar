@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
 import { ServerSentEventGenerator } from "./serverSentEventGenerator.ts";
+import { Jsonifiable } from "type-fest";
 
 serve(async (req: Request) => {
     const url = new URL(req.url);
@@ -12,7 +13,7 @@ serve(async (req: Request) => {
          });
     }
     else if (url.pathname.includes('/merge')) {
-        return ServerSentEventGenerator.stream(async (stream) => {
+        return ServerSentEventGenerator.stream((stream) => {
             stream.mergeFragments('<div id="toMerge">Merged</div>');
         });
     }
@@ -21,7 +22,7 @@ serve(async (req: Request) => {
         if (reader.success === true) {
            const events = reader.signals.events;
             if (isEventArray(events)) {
-                return ServerSentEventGenerator.stream(async (stream) => {
+                return ServerSentEventGenerator.stream((stream) => {
                     testEvents(stream, events);
                 });
             }
@@ -40,19 +41,19 @@ serve(async (req: Request) => {
     });
 });
 
-function delay(milliseconds){
+function delay(milliseconds: number){
     return new Promise(resolve => {
         setTimeout(resolve, milliseconds);
     });
 }
 
-function isEventArray(events: unknown): events is (Record<string, unknown> & { type: string })[] {
+function isEventArray(events: unknown): events is (Record<string, Jsonifiable> & { type: string })[] {
     return events instanceof Array && events.every(event => {
         return  typeof event === 'object' && event !== null  && typeof event.type === 'string';
     });
 }
 
-function testEvents(stream: ServerSentEventGenerator, events: Record<string, unknown>[]) {
+function testEvents(stream: ServerSentEventGenerator, events: Record<string, Jsonifiable>[]) {
     events.forEach(event => {
         const { type, ...e } = event;
         switch (type) {
@@ -71,7 +72,7 @@ function testEvents(stream: ServerSentEventGenerator, events: Record<string, unk
             case "mergeSignals":
                 if (e !== null && typeof e === 'object' &&  "signals" in e) {
                     const { signals, ...options } = e;
-                    stream.mergeSignals(signals as Record<string, any>, options || undefined);
+                    stream.mergeSignals(signals as Record<string, Jsonifiable>, options || undefined);
                 }
                 break;
             case "removeSignals":

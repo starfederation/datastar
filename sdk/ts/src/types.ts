@@ -13,6 +13,7 @@ import {
     DatastarDatalineAutoRemove,
     DatastarDatalineAttributes
 } from "./consts";
+import { Jsonifiable } from "type-fest";
 
 export type FragmentMergeMode = typeof FragmentMergeModes[number];
 export type EventType = typeof EventTypes[number];
@@ -51,7 +52,7 @@ export interface MergeSignalsOptions extends DatastarEventOptions {
 export interface MergeSignalsEvent {
     event: "datastar-merge-signals";
     options: MergeSignalsOptions;
-    [DatastarDatalineSignals]: Record<string, any>;
+    [DatastarDatalineSignals]: Record<string, Jsonifiable>;
 };
 
 export interface RemoveSignalsEvent {

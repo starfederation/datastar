@@ -7,6 +7,7 @@ import {
 import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator";
 
 import { IncomingMessage, ServerResponse } from "node:http";
+import process from "node:process";
 
 function isRecord(obj: unknown): obj is Record<string, unknown> {
     return typeof obj === 'object' && obj !== null;
@@ -39,12 +40,19 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
    * @param res - The NodeJS response object.
    * @param streamFunc - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
    */
-    static stream(req: IncomingMessage, res: ServerResponse, streamFunc: (stream: ServerSentEventGenerator) => Promise<void>): void {
-        await streamFunc(new ServerSentEventGenerator(req, res));
+    static async stream(
+        req: IncomingMessage,
+        res: ServerResponse,
+        streamFunc: (stream: ServerSentEventGenerator) => Promise<void> | void)
+    : Promise<void>  {
+
+        const stream = streamFunc(new ServerSentEventGenerator(req, res));
+        if (stream instanceof Promise) await stream;
+
         res.end();
     }
 
-    protected send(
+    protected override send(
          event: EventType,
          dataLines: string[],
          options: DatastarEventOptions

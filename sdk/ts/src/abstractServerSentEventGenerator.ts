@@ -11,6 +11,8 @@ import {
     DefaultSseRetryDurationMs
 } from "./consts";
 
+import { Jsonifiable } from "type-fest";
+
 /**
  * Abstract ServerSentEventGenerator class, responsible for initializing and handling
  * server-sent events (SSE) as well as reading signals sent by the client.
@@ -59,7 +61,7 @@ export abstract class ServerSentEventGenerator {
        });
     }
 
-    private eachOptionIsADataLine(options: Record<string, any>): string[] {
+    private eachOptionIsADataLine(options: Record<string, Jsonifiable>): string[] {
         return Object.keys(options).flatMap((key) => {
             return this.eachNewlineIsADataLine(key, options[key as keyof typeof options]!.toString());
         });
@@ -99,7 +101,7 @@ export abstract class ServerSentEventGenerator {
        * @param data - Data object that will be merged into the client's signals.
        * @param options - Additional options for merging.
        */
-    public mergeSignals(data: Record<string, any>, options?: MergeSignalsOptions): ReturnType<typeof this.send> {
+    public mergeSignals(data: Record<string, Jsonifiable>, options?: MergeSignalsOptions): ReturnType<typeof this.send> {
         const { eventId, retryDuration, ...eventOptions } = options || {} as Partial<MergeSignalsOptions>;
         const dataLines = this.eachOptionIsADataLine(eventOptions)
             .concat(this.eachNewlineIsADataLine('signals', JSON.stringify(data)));
