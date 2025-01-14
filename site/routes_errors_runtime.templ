@@ -246,7 +246,7 @@ templ classError() {
 	<p>The <code>data-class</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are class names and the values are expressions.</p>
 	@sampleCode("Example", "html", `<div data-class-hidden="$foo"></div>`)
 	@sampleCode("Alternative syntax", "html", `<div data-class="{hidden: foo}"></div>`)
-	@attributeDocs("attr")
+	@attributeDocs("class")
 }
 
 templ computedError() {
@@ -266,7 +266,7 @@ templ customValidityError() {
 		Submit form
 	</button>
 </form>`)
-	@attributeDocs("computed")
+	@attributeDocs("custom-validity")
 }
 
 templ keyRequired(pluginName string) {
