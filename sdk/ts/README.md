@@ -1,7 +1,7 @@
 # Typescript SDK for Datastar
 
-Implements `../README.md` and exposes a ServerSentEventGenerator class that can be used to
-send datastar events to the client.
+Implements `../README.md` and exposes a ServerSentEventGenerator class that can
+be used to send datastar events to the client.
 
 Deno is used for building the npm package.
 
@@ -9,7 +9,8 @@ Deno is used for building the npm package.
 
 ## NodeJS
 
-Code running on NodeJS should use the `./src/node/serverSentEventGenerator.ts` class.
+Code running on NodeJS should use the `./src/node/serverSentEventGenerator.ts`
+class.
 
 Here's a simple example:
 
@@ -42,7 +43,8 @@ server.listen(port, hostname, () => {
 
 ## Web Standard runtimes
 
-Code running on platforms that implement web standards (like Deno), should use the `./src/web/serverSentEventGenerator.ts` class.
+Code running on platforms that implement web standards (like Deno), should use
+the `./src/web/serverSentEventGenerator.ts` class.
 
 Here's an example using Deno:
 
@@ -74,11 +76,15 @@ serve(async (req: Request) => {
 
 ## Frameworks / Alternate runtimes
 
-If you cant simply use the node / web versions, then you can extend the abstract class in `./src/abstractServerSentEventGenerator.ts`. You will need to provide implementations of the `constructor`, `readSignals`, `stream` and `send` methods.
+If you cant simply use the node / web versions, then you can extend the abstract
+class in `./src/abstractServerSentEventGenerator.ts`. You will need to provide
+implementations of the `constructor`, `readSignals`, `stream` and `send`
+methods.
 
 ## Testing
 
-A shell based testing suite is provided; see `../test/README.md` for more information.
+A shell based testing suite is provided; see `../test/README.md` for more
+information.
 
 ### Testing node
 

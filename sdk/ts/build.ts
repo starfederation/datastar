@@ -8,7 +8,7 @@ await build({
   outDir: "./npm",
   shims: {
     // see JS docs for overview and more options
-    deno: true
+    deno: true,
   },
   package: {
     // package.json properties
@@ -29,5 +29,5 @@ await build({
     //Deno.copyFileSync("LICENSE", "npm/LICENSE");
     Deno.copyFileSync("README.md", "npm/README.md");
   },
-  rootTestDir: './src',
+  rootTestDir: "./src",
 });
