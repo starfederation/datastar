@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { ServerSentEventGenerator } from "./serverSentEventGenerator.ts";
-import { Jsonifiable } from "type-fest";
+import type { Jsonifiable } from "npm:type-fest";
 
 const hostname = "127.0.0.1";
 const port = 3000;
