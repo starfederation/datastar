@@ -5,11 +5,11 @@ import {
     MergeFragmentsOptions,
     MergeSignalsOptions,
     ExecuteScriptOptions,
-} from "./types";
+} from "./types.ts";
 
 import {
     DefaultSseRetryDurationMs
-} from "./consts";
+} from "./consts.ts";
 
 import { Jsonifiable } from "type-fest";
 

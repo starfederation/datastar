@@ -2,9 +2,9 @@ import {
     EventType,
     DatastarEventOptions,
     sseHeaders,
-} from "../types";
+} from "../types.ts";
 
-import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator";
+import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator.ts";
 
 import { IncomingMessage, ServerResponse } from "node:http";
 import process from "node:process";

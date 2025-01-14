@@ -12,7 +12,7 @@ import {
     DatastarDatalineSignals,
     DatastarDatalineAutoRemove,
     DatastarDatalineAttributes
-} from "./consts";
+} from "./consts.ts";
 import { Jsonifiable } from "type-fest";
 
 export type FragmentMergeMode = typeof FragmentMergeModes[number];

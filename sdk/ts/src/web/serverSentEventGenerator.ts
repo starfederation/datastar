@@ -2,9 +2,9 @@ import {
     EventType,
     DatastarEventOptions,
     sseHeaders,
-} from "../types";
+} from "../types.ts";
 
-import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator";
+import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator.ts";
 
 function isRecord(obj: unknown): obj is Record<string, unknown> {
     return typeof obj === 'object' && obj !== null;

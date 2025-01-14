@@ -3,6 +3,10 @@
 Implements `../README.md` and exposes a ServerSentEventGenerator class that can be used to
 send datastar events to the client.
 
+Deno is used for building the npm package.
+
+`deno run -A build.ts VERSION`
+
 ## NodeJS
 
 Code running on NodeJS should use the `./src/node/serverSentEventGenerator.ts` class.
@@ -81,8 +85,8 @@ A shell based testing suite is provided; see `../test/README.md` for more inform
 Start by building and running the node server
 
 ```
-$ task -f build
-$ node ../../bundles/node/node.js
+$ deno run -A build.ts xxx
+$ node ./npm/esm/node/node.js
 ```
 
 Then run the test suite
