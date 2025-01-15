@@ -1,98 +1,43 @@
 # Typescript SDK for Datastar
 
-Implements `../README.md` and exposes a ServerSentEventGenerator class that can
-be used to send datastar events to the client.
+Implements the [SDK spec](../README.md) and exposes an abstract
+ServerSentEventGenerator class that can be used to implement runtime specific
+classes. NodeJS and web standard runtimes are currently implemented.
 
 Currently it only exposes an http1 server, if you want http2 I recommend you use
 a reverse proxy until http2 support is added.
 
 Deno is used for building the npm package: `deno run -A build.ts VERSION`
 
-## NodeJS
-
-Code running on NodeJS should use the `./src/node/serverSentEventGenerator.ts`
-class.
-
-Here's a simple example:
+Usage is straightforward:
 
 ```
-import { createServer } from "node:http";
-import { ServerSentEventGenerator } from "./serverSentEventGenerator";
+// this example is for node
+const reader = await ServerSentEventGenerator.readSignals(req);
 
-const hostname = '127.0.0.1';
-const port = 3000;
+if (!reader.success) {
+    console.error('Error while reading signals', reader.error);
+    res.end('Error while reading signals`);
+    return;
+}
 
-const server = createServer(async (req, res) => {
-    if (req.url === "/") {
-        const headers = new Headers({ 'Content-Type': 'text/html' });
-        res.setHeaders(headers);
-        res.end(`<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`);
-    }
-    else if (req.url?.includes("/merge")) {
-        const readSignals = await ServerSentEventGenerator.readSignals(req);
+if (!('foo' in reader.signals)) {
+    console.error('The foo signal is not present');
+    res.end('The foo signal is not present');
+    return;
+}
 
-        if (readSignals.success) {
-            ServerSentEventGenerator.stream(req, res, (stream) => {
-                stream.mergeFragments(`<div id="toMerge">Hello ${readSignals.signals.foo}</div>`);
-            });
-        } else {
-            console.error('Error while reading signals', readSignals.error);
-            res.end('Error while reading signals`);
-        }
-    }
-
-    res.end('Path not found');
-});
-
-server.listen(port, hostname, () => {
-	console.log(`Server running at http://${hostname}:${port}/`);
+ServerSentEventGenerator.stream(req, res, (stream) => {
+     stream.mergeFragments(`<div id="toMerge">Hello ${reader.signals.foo}</div>`);
 });
 ```
 
-## Web Standard runtimes
+## Examples
 
-Code running on platforms that implement web standards (like Deno), should use
-the `./src/web/serverSentEventGenerator.ts` class.
+Follow the links for more complete (and executable) examples
 
-Here's an example using Deno:
-
-```
-import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
-import { ServerSentEventGenerator } from "./serverSentEventGenerator.ts";
-
-serve((req: Request) => {
-    const url = new URL(req.url);
-
-    if (url.pathname === '/') {
-        return new Response(
-      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
-            , {
-                headers: { 'Content-Type': 'text/html' }
-         });
-    }
-    else if (url.pathname.includes('/merge')) {
-        const readSignals = await ServerSentEventGenerator.readSignals(req);
-
-        if (readSignals.success) {
-            return ServerSentEventGenerator.stream((stream) => {
-                stream.mergeFragments(
-                    `<div id="toMerge">Hello ${readSignals.signals.foo}</div>`,
-                );
-            });
-        }
-
-        console.error("Error while reading signals", readSignals.error);
-
-        return new Response(`Error reading signals`, {
-            headers: { "Content-Type": "text/html" },
-        });
-    }
-
-    return new Response(`Path not found: ${req.url}`, {
-        headers: { 'Content-Type': 'text/html' }
-    });
-});
-```
+- [NodeJS](./examples/node.ts)
+- [Deno](./examples/deno.ts)
 
 ## Frameworks / Alternate runtimes
 
@@ -103,8 +48,8 @@ methods.
 
 ## Testing
 
-A shell based testing suite is provided; see `../test/README.md` for more
-information.
+A shell based testing suite is provided; see the [readme](../test/README.md) for
+more information.
 
 ### Testing node
 
