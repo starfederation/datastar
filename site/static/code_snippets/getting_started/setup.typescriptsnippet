@@ -1,10 +1,20 @@
+// Parse the signals
 const reader = await ServerSentEventGenerator.readSignals(req);
 
+// Check that there werent any parsing errors
 if (!reader.success) {
     res.end('Error while reading signals`);
     return;
 }
 
+console.log(reader.signals.response);
+
+// Creates a new `ServerSentEventGenerator` instance (this also sends required headers)
 ServerSentEventGenerator.stream(req, res, (stream) => {
-     stream.mergeFragments(`<div id="toMerge">Hello ${reader.signals.foo}</div>`);
+      // Merges HTML fragments into the DOM.
+     stream.mergeFragments(`<div id="question">What do you put in a toaster?</div>`);
+
+     // Merges signals into the signals.
+     stream.mergeSignals({'response',  '', 'answer' => 'bread'});
 });
+
