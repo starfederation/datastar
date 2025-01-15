@@ -71,10 +71,6 @@ export function createRouter() {
                 Bulk Fragment
             </button>
         </div>
-
-        <hr>
-        <h3>Original Demo</h3>
-        <div id="toMerge" data-on-load="@get('/merge')">Not merged</div>
                 
         <script>
             if ('serviceWorker' in navigator) {
@@ -155,20 +151,6 @@ export function createRouter() {
           await delay(15);
         }
       }
-    });
-  });
-
-  app.get("/merge", async (c) => {
-    return ServerSentEventGenerator.stream(async (stream) => {
-      stream.mergeFragments(`<div id="toMerge">Merged (from ${source})</div>`);
-    });
-  });
-
-  app.get("/await", async (c) => {
-    return ServerSentEventGenerator.stream(async (stream) => {
-      stream.mergeFragments('<div id="toMerge">Merged</div>');
-      await delay(10000);
-      stream.mergeFragments('<div id="toMerge">After 10 seconds</div>');
     });
   });
 
