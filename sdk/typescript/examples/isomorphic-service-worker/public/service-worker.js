@@ -2095,8 +2095,10 @@ var ServerSentEventGenerator = class {
 `];
     const idLine = eventId ? [`id: ${eventId}
 `] : [];
-    const retryLine = [`retry: ${retryDuration ?? DefaultSseRetryDurationMs}
-`];
+    const retryLine = [
+      `retry: ${retryDuration ?? DefaultSseRetryDurationMs}
+`
+    ];
     return typeLine.concat(
       idLine,
       retryLine,
@@ -2114,7 +2116,10 @@ var ServerSentEventGenerator = class {
   }
   eachOptionIsADataLine(options) {
     return Object.keys(options).flatMap((key) => {
-      return this.eachNewlineIsADataLine(key, options[key].toString());
+      return this.eachNewlineIsADataLine(
+        key,
+        options[key].toString()
+      );
     });
   }
   /**
@@ -2126,18 +2131,24 @@ var ServerSentEventGenerator = class {
   mergeFragments(data, options) {
     const { eventId, retryDuration, ...renderOptions } = options || {};
     const dataLines = this.eachOptionIsADataLine(renderOptions).concat(this.eachNewlineIsADataLine("fragments", data));
-    return this.send("datastar-merge-fragments", dataLines, { eventId, retryDuration });
+    return this.send("datastar-merge-fragments", dataLines, {
+      eventId,
+      retryDuration
+    });
   }
   /**
-    * Sends a remove fragments event.
-    *
-    * @param selector - CSS selector of fragments to remove.
-    * @param [options] - Additional options for removing.
-    */
+   * Sends a remove fragments event.
+   *
+   * @param selector - CSS selector of fragments to remove.
+   * @param [options] - Additional options for removing.
+   */
   removeFragments(selector, options) {
     const { eventId, retryDuration, ...eventOptions } = options || {};
     const dataLines = this.eachOptionIsADataLine(eventOptions).concat(this.eachNewlineIsADataLine("selector", selector));
-    return this.send("datastar-remove-fragments", dataLines, { eventId, retryDuration });
+    return this.send("datastar-remove-fragments", dataLines, {
+      eventId,
+      retryDuration
+    });
   }
   /**
    * Sends a merge signals event.
@@ -2148,7 +2159,10 @@ var ServerSentEventGenerator = class {
   mergeSignals(data, options) {
     const { eventId, retryDuration, ...eventOptions } = options || {};
     const dataLines = this.eachOptionIsADataLine(eventOptions).concat(this.eachNewlineIsADataLine("signals", JSON.stringify(data)));
-    return this.send("datastar-merge-signals", dataLines, { eventId, retryDuration });
+    return this.send("datastar-merge-signals", dataLines, {
+      eventId,
+      retryDuration
+    });
   }
   /**
    * Sends a remove signals event.
@@ -2158,7 +2172,9 @@ var ServerSentEventGenerator = class {
    */
   removeSignals(paths, options) {
     const eventOptions = options || {};
-    const dataLines = paths.flatMap((path) => path.split(" ")).map((path) => `paths ${path}`);
+    const dataLines = paths.flatMap((path) => path.split(" ")).map(
+      (path) => `paths ${path}`
+    );
     return this.send("datastar-remove-signals", dataLines, eventOptions);
   }
   /**
@@ -2179,7 +2195,10 @@ var ServerSentEventGenerator = class {
       this.eachOptionIsADataLine(eventOptions),
       this.eachNewlineIsADataLine("script", script)
     );
-    return this.send("datastar-execute-script", dataLines, { eventId, retryDuration });
+    return this.send("datastar-execute-script", dataLines, {
+      eventId,
+      retryDuration
+    });
   }
 };
 
@@ -2202,7 +2221,8 @@ var ServerSentEventGenerator2 = class _ServerSentEventGenerator extends ServerSe
   static stream(streamFunc) {
     const stream = new ReadableStream({
       async start(controller) {
-        await streamFunc(new _ServerSentEventGenerator(controller));
+        const stream2 = streamFunc(new _ServerSentEventGenerator(controller));
+        if (stream2 instanceof Promise) await stream2;
         controller.close();
       }
     });
@@ -2225,26 +2245,28 @@ var ServerSentEventGenerator2 = class _ServerSentEventGenerator extends ServerSe
    * @returns An object containing a success boolean and either the client's signals or an error message.
    */
   static async readSignals(request) {
-    if (request.method === "GET") {
-      const url = new URL(request.url);
-      const params = url.searchParams;
-      try {
+    try {
+      if (request.method === "GET") {
+        const url = new URL(request.url);
+        const params = url.searchParams;
         if (params.has("datastar")) {
-          const signals = JSON.parse(params.get("datastar"));
-          return { success: true, signals };
+          const signals2 = JSON.parse(params.get("datastar"));
+          if (isRecord(signals2)) {
+            return { success: true, signals: signals2 };
+          } else throw new Error("Datastar param is not a record");
         } else throw new Error("No datastar object in request");
-      } catch (e) {
-        if (isRecord(e) && "message" in e && typeof e.message === "string") {
-          return { success: false, error: e.message };
-        } else {
-          return {
-            success: false,
-            error: "unknown error when parsing requestuest"
-          };
-        }
       }
+      const signals = await request.json();
+      if (isRecord(signals)) {
+        return { success: true, signals };
+      }
+      throw new Error("Parsed JSON body is not of type record");
+    } catch (e) {
+      if (isRecord(e) && "message" in e && typeof e.message === "string") {
+        return { success: false, error: e.message };
+      }
+      return { success: false, error: "unknown error when parsing request" };
     }
-    return { success: true, signals: await request.json() };
   }
 };
 
@@ -2299,6 +2321,7 @@ function createRouter() {
         
         <div id="largeContent">
             <div class="progress">Content will stream here... (0 items received)</div>
+            <div id="largeContentItems"></div>
         </div>
         
         <div class="compression-options">
@@ -2362,7 +2385,7 @@ function createRouter() {
     const bulk = c.req.query("bulk") === "true";
     return ServerSentEventGenerator2.stream(async (stream) => {
       stream.mergeFragments(
-        `<div id="largeContent">
+        `<div id="largeContentItems">
               <h1> ${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>
               <div id="items"></div>
           </div>`

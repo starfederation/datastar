@@ -56,6 +56,7 @@ export function createRouter() {
         
         <div id="largeContent">
             <div class="progress">Content will stream here... (0 items received)</div>
+            <div id="largeContentItems"></div>
         </div>
         
         <div class="compression-options">
@@ -127,7 +128,7 @@ export function createRouter() {
     return ServerSentEventGenerator.stream(async (stream) => {
       // Send initial container
       stream.mergeFragments(
-        `<div id="largeContent">
+        `<div id="largeContentItems">
               <h1> ${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>
               <div id="items"></div>
           </div>`,
