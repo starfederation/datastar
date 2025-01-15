@@ -75,7 +75,7 @@ Processing POST cases...
 Start by running the deno server
 
 ```
-$ deno --unstable-sloppy-imports --allow-net  ./src/web/deno.ts
+$ deno --allow-net  ./src/web/deno.ts
 ```
 
 Then run the test suite
