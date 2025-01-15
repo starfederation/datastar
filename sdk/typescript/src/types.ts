@@ -13,7 +13,7 @@ import {
   EventTypes,
   FragmentMergeModes,
 } from "./consts.ts";
-import { Jsonifiable } from "type-fest";
+import type { Jsonifiable } from "npm:type-fest";
 
 export type FragmentMergeMode = typeof FragmentMergeModes[number];
 export type EventType = typeof EventTypes[number];
