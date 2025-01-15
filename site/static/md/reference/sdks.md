@@ -39,8 +39,12 @@ Examples:
 
 ## TypeScript
 
-[TypeScript package](https://github.com/starfederation/datastar/tree/develop/sdk/ts) for working with Datastar, including support for NodeJS and Deno.  
+[TypeScript package](https://github.com/starfederation/datastar/tree/develop/sdk/typescript) for working with Datastar, including support for NodeJS and Web standard runtimes (Deno, Bun, etc.).  
 _Author: [Patrick Marchand](https://github.com/Superpat)_
+Examples:
+
+ - [NodeJS example](htttps://github.com/starfederation/datastar/tree/develop/sdk/typescript/examples/node.ts)
+ - [Deno example](htttps://github.com/starfederation/datastar/tree/develop/sdk/typescript/examples/deno.ts)
 
 ## dotnet
 
