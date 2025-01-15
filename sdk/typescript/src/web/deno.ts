@@ -1,21 +1,17 @@
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
 import { ServerSentEventGenerator } from "./serverSentEventGenerator.ts";
-import { Jsonifiable } from "type-fest";
+import type { Jsonifiable } from "npm:type-fest";
 
 serve(async (req: Request) => {
   const url = new URL(req.url);
 
   if (url.pathname === "/") {
     return new Response(
-      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script></head><body><div id="toMerge" data-on-load="sse('/merge', {method: 'get'})">Not merged</div></body></html>`,
+      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
       {
         headers: { "Content-Type": "text/html" },
       },
     );
-  } else if (url.pathname.includes("/merge")) {
-    return ServerSentEventGenerator.stream((stream) => {
-      stream.mergeFragments('<div id="toMerge">Merged</div>');
-    });
   } else if (url.pathname.includes("/test")) {
     const reader = await ServerSentEventGenerator.readSignals(req);
     if (reader.success === true) {
