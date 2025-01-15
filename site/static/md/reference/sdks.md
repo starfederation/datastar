@@ -10,7 +10,7 @@ _Author: Delaney Gillilan_
 
 ## PHP
 
-[PHP package](https://github.com/starfederation/datastar/tree/main/sdk/php) for working with Datastar.
+[PHP package](https://github.com/starfederation/datastar-php) for working with Datastar.
 
 _Author: Ben Croker ([PutYourLightsOn](https://putyourlightson.com/))_
 
