@@ -1,12 +1,11 @@
 # SDKs
 
-Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specifically for Datastar.
+Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specific to Datastar.
 
 ## Go
 
-[Go SDK](https://github.com/starfederation/datastar/tree/develop/sdk/go) for working with Datastar.
-
-_Author: Delaney Gillilan_
+[Go package](https://github.com/starfederation/datastar/tree/develop/sdk/go) for working with Datastar.  
+_Author: [Delaney Gillilan](https://github.com/delaneyj)_
 
 Examples:
 
@@ -14,9 +13,8 @@ Examples:
 
 ## PHP
 
-[PHP package](https://github.com/starfederation/datastar-php) for working with Datastar.
-
-_Author: Ben Croker ([PutYourLightsOn](https://putyourlightson.com/))_
+[PHP package](https://github.com/starfederation/datastar-php) for working with Datastar.  
+_Author: [Ben Croker](https://github.com/bencroker) ([PutYourLightsOn](https://putyourlightson.com/))_
 
 ### Laravel
 
@@ -32,7 +30,8 @@ Examples:
 
 ## Python
 
-[Python package](https://github.com/starfederation/datastar/tree/develop/sdk/python) for working with Datastar, including support for Sanic, Django, Quart and FastAPI.
+[Python package](https://github.com/starfederation/datastar/tree/develop/sdk/python) for working with Datastar, including support for Sanic, Django, Quart and FastAPI.  
+_Author: [Felix Ingram](https://github.com/lllama)_
 
 Examples:
 
@@ -40,15 +39,13 @@ Examples:
 
 ## TypeScript
 
-[TypeScript package](https://github.com/starfederation/datastar/tree/develop/sdk/ts) for working with Datastar, including support for NodeJS and Deno.
-
-_Author: Patrick_
+[TypeScript package](https://github.com/starfederation/datastar/tree/develop/sdk/ts) for working with Datastar, including support for NodeJS and Deno.  
+_Author: [Patrick Marchand](https://github.com/Superpat)_
 
 ## dotnet
 
-[dotnet package](https://github.com/starfederation/datastar/tree/develop/sdk/dotnet) for working with Datastar, including support for C#.
-
-_Author: Greg_
+[dotnet package](https://github.com/starfederation/datastar/tree/develop/sdk/dotnet) for working with Datastar, including support for C#.  
+_Author: [Greg H](https://github.com/SpiralOSS)_
 
 Examples:
 
@@ -56,4 +53,5 @@ Examples:
 
 ## Java
 
-[Java package](https://github.com/starfederation/datastar/blob/develop/sdk/java) for working with Datastar.
+[Java package](https://github.com/starfederation/datastar/blob/develop/sdk/java) for working with Datastar.  
+_Author: [Peter Humulock](https://github.com/rphumulock)_
