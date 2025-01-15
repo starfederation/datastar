@@ -25,7 +25,6 @@ func Build() error {
 		// createPluginManifest(),
 		createBundles(version),
 		writeOutConsts(version),
-		createTsSdk(),
 	); err != nil {
 		return fmt.Errorf("error creating bundles: %w", err)
 	}
