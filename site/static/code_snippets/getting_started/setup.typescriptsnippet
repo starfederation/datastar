@@ -1,14 +1,7 @@
 const reader = await ServerSentEventGenerator.readSignals(req);
 
 if (!reader.success) {
-    console.error('Error while reading signals', reader.error);
     res.end('Error while reading signals`);
-    return;
-}
-
-if (!('foo' in reader.signals)) {
-    console.error('The foo signal is not present');
-    res.end('The foo signal is not present');
     return;
 }
 
