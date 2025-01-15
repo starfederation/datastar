@@ -1,0 +1,14 @@
+{
+    auto_https off
+    http_port 3000
+    admin localhost:2019
+}
+
+:3000 {
+	encode zstd gzip
+    reverse_proxy localhost:8000
+    log {
+        format console
+        level INFO
+    }
+}

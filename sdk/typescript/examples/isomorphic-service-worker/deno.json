@@ -1,0 +1,18 @@
+{
+  "imports": {
+    "@hono/hono": "jsr:@hono/hono@^4.6.16",
+    "@luca/esbuild-deno-loader": "jsr:@luca/esbuild-deno-loader@^0.9.0"
+  },
+  "tasks": {
+    "build:sw": "deno run -A --unstable-sloppy-imports build.js",
+    "build:sw:min": "MINIFY=true deno run -A --unstable-sloppy-imports build.js",
+    "watch:sw": "deno run -A --unstable-sloppy-imports build.js --watch",
+    "watch:sw:min": "MINIFY=true deno run -A --unstable-sloppy-imports build.js --watch",
+    "serve": "deno run -A --unstable-sloppy-imports deno.ts",
+    "serve:dev": "deno run -A --unstable-sloppy-imports --watch deno.ts",
+    "dev": "deno task watch:sw & deno task serve:dev",
+    "dev:min": "deno task watch:sw:min & deno task serve:dev",
+    "start": "deno task build:sw && deno task serve",
+    "start:min": "deno task build:sw:min && deno task serve"
+  }
+}
