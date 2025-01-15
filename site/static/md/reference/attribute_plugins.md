@@ -103,7 +103,7 @@ Binds the value of any HTML attribute to an expression.
 The `data-attr` attribute can also be used to set the values of multiple attributes on an element using a set of key-value pairs, where the keys represent attribute names and the values represent expressions.
 
 ```html
-<div data-attr="{title: foo, disabled: bar}"></div>
+<div data-attr="{title: $foo, disabled: $bar}"></div>
 ```
 
 ### `data-bind`
@@ -135,7 +135,7 @@ If the expression evaluates to `true`, the `hidden` class is added to the elemen
 The `data-class` attribute can also be used to add or remove multiple classes from an element using a set of key-value pairs, where the keys represent class names and the values represent expressions.
 
 ```html
-<div data-class="{hidden: foo, bold: bar}"></div>
+<div data-class="{hidden: $foo, bold: $bar}"></div>
 ```
 
 ### `data-on`
