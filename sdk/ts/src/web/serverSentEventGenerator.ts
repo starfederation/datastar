@@ -2,7 +2,9 @@ import { DatastarEventOptions, EventType, sseHeaders } from "../types.ts";
 
 import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator.ts";
 
-function isRecord(obj: unknown): obj is Record<string, unknown> {
+import type { Jsonifiable } from "npm:type-fest";
+
+function isRecord(obj: unknown): obj is Record<string, Jsonifiable> {
   return typeof obj === "object" && obj !== null;
 }
 
@@ -72,14 +74,17 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
         const params = url.searchParams;
         if (params.has("datastar")) {
           const signals = JSON.parse(params.get("datastar")!);
-          return { success: true, signals };
+
+          if (isRecord(signals)) {
+            return { success: true, signals };
+          } else throw new Error("Datastar param is not a record");
         } else throw new Error("No datastar object in request");
       }
 
       const signals = await request.json();
 
       if (isRecord(signals)) {
-        return { success: true, signals };
+        return { success: true, signals: signals };
       }
 
       throw new Error("Parsed JSON body is not of type record");

@@ -6,7 +6,7 @@ import { IncomingMessage, ServerResponse } from "node:http";
 import process from "node:process";
 import type { Jsonifiable } from "npm:type-fest";
 
-function isRecord(obj: unknown): obj is Record<string, unknown> {
+function isRecord(obj: unknown): obj is Record<string, Jsonifiable> {
   return typeof obj === "object" && obj !== null;
 }
 
@@ -82,7 +82,9 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
       try {
         if (params.has("datastar")) {
           const signals = JSON.parse(params.get("datastar")!);
-          return { success: true, signals };
+          if (isRecord(signals)) {
+            return { success: true, signals };
+          } else throw new Error("Datastar param is not a record");
         } else throw new Error("No datastar object in request");
       } catch (e: unknown) {
         if (isRecord(e) && "message" in e && typeof e.message === "string") {
