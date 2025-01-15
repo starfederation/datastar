@@ -4,6 +4,7 @@ import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractSer
 
 import { IncomingMessage, ServerResponse } from "node:http";
 import process from "node:process";
+import type { Jsonifiable } from "npm:type-fest";
 
 function isRecord(obj: unknown): obj is Record<string, unknown> {
   return typeof obj === "object" && obj !== null;
@@ -69,7 +70,7 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
    * @returns An object containing a success boolean and either the client's signals or an error message.
    */
   static async readSignals(request: IncomingMessage): Promise<
-    | { success: true; signals: Record<string, unknown> }
+    | { success: true; signals: Record<string, Jsonifiable> }
     | { success: false; error: string }
   > {
     if (request.method === "GET") {

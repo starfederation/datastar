@@ -1,0 +1,5 @@
+ServerSentEventGenerator.stream(req, res, (stream) => {
+    stream.mergeFragments('<div id="hello">Hello, world!</div>');
+    stream.mergeSignals({'foo': {'bar': 1}});
+    stream.executeScript('console.log("Success!")');
+});
