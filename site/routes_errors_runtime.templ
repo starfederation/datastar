@@ -103,11 +103,9 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 				<p>No valid signals exist.</p>
 			}
 			<p>In the following example, <code>$foo</code> is <em>not</em> a valid signal, since only the leaf nodes in nested signals are actually signals.</p>
-			@sampleHtmlCode("Example") {
-				<div data-signals="{foo: {bar: 1, baz: 2}}">
-					<div data-text="$foo.woof"></div>
-				</div>
-			}
+			@sampleCode("Example", "html", `<div data-signals="{foo: {bar: 1, baz: 2}}">
+	<div data-text="$foo.woof"></div>
+</div>`)
 		} else {
 			<p>An unknown error occurred while executing an expression.</p>
 		}
@@ -151,9 +149,7 @@ templ InvalidFileResultType(name string, info *RuntimeErrorInfo) {
 templ ScrollIntoViewInvalidElement(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		<p>The <code>data-scroll-into-view</code> attribute was placed on an invalid element. It may only be placed on an HTML element.</p>
-		@sampleHtmlCode("Example") {
-			<div data-scroll-into-view></div>
-		}
+		@sampleCode("Example", "html", `<div data-scroll-into-view></div>`)
 		@attributeDocs("scroll-into-view")
 	}
 }
@@ -164,14 +160,10 @@ templ SseClosestFormNotFound(name string, info *RuntimeErrorInfo) {
 			action := getValue(info.Action, "get")
 		}}
 		<p>No closest form could be found in the DOM. When setting the <code>contentType</code> option to <code>form</code>, the element must have a wrapping form, otherwise a <code>selector</code> must be provided to a form that exists in the DOM.</p>
-		@sampleHtmlCode("Example using a wrapping form") {
-			<form>
-				<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form'})" }></button>
-			</form>
-		}
-		@sampleHtmlCode("Example using a selector") {
-			<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>
-		}
+		@sampleCode("Example using a wrapping form", "html", `<form>
+	<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form'})" }></button>
+</form>`)
+		@sampleCode("Example using a selector", "html", `<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>`)
 		@actionDocs(action)
 	}
 }
@@ -197,9 +189,7 @@ templ SseFormNotFound(name string, info *RuntimeErrorInfo) {
 		} else {
 			<p>No form with the selector <code>{ info.Selector }</code> could be found in the DOM. When specifying a form selector using the <code>selector</code> option in the <code>{ "@" + action }()</code> action, the form must already exist in the DOM.</p>
 		}
-		@sampleHtmlCode("Example") {
-			<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>
-		}
+		@sampleCode("Example", "html", `<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form', selector: '#myform'})" }></button>`)
 		@actionDocs(action)
 	}
 }
@@ -214,9 +204,7 @@ templ SseInvalidContentType(name string, info *RuntimeErrorInfo) {
 		} else {
 			<p>An invalid content type <code>{ info.ContentType }</code> was provided to the <code>{ "@" + action }()</code> action. The content type must be either <code>json</code> (the default) or <code>form</code>.</p>
 		}
-		@sampleHtmlCode("Example") {
-			<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form'})" }></button>
-		}
+		@sampleCode("Example", "html", `<button data-on-click={ "@" + action + "('/endpoint', {contentType: 'form'})" }></button>`)
 		@actionDocs(action)
 	}
 }
@@ -227,9 +215,7 @@ templ SseNoUrlProvided(name string, info *RuntimeErrorInfo) {
 			action := getValue(info.Action, "get")
 		}}
 		<p>No URL was provided to the <code>{ "@" + action }()</code> action. A valid URL must be provided as the first argument.</p>
-		@sampleHtmlCode("Example") {
-			<button data-on-click={ "@" + action + "('/endpoint')" }></button>
-		}
+		@sampleCode("Example", "html", `<button data-on-click={ "@" + action + "('/endpoint')" }></button>`)
 		@actionDocs(action)
 	}
 }
@@ -237,65 +223,50 @@ templ SseNoUrlProvided(name string, info *RuntimeErrorInfo) {
 templ TextInvalidElement(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		<p>The <code>data-text</code> attribute was placed on an invalid element. It may only be placed on an HTML element.</p>
-		@sampleHtmlCode("Example") {
-			<div data-text="$foo"></div>
-		}
+		@sampleCode("Example", "html", `<div data-text="$foo"></div>`)
 		@attributeDocs("text")
 	}
 }
 
 templ attrError() {
 	<p>The <code>data-attr</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are attribute names and the values are expressions.</p>
-	@sampleHtmlCode("Example") {
-		<div data-attr-disabled="$foo"></div>
-	}
-	@sampleHtmlCode("Alternative syntax") {
-		<div data-attr="{disabled: foo}"></div>
-	}
+	@sampleCode("Example", "html", `<div data-attr-disabled="$foo"></div>`)
+	@sampleCode("Alternative syntax", "html", `<div data-attr="{disabled: foo}"></div>`)
 	@attributeDocs("attr")
 }
 
 templ bindError() {
 	<p>The <code>data-bind</code> attribute must have either a key <em>or</em> a value, representing the signal name to create and enable two-way binding with the element’s value.</p>
-	@sampleHtmlCode("Example") {
-		<input data-bind-signalname/>
-	}
-	@sampleHtmlCode("Alternative syntax") {
-		<input data-bind="signalname"/>
-	}
+	@sampleCode("Example", "html", `<input data-bind-signalname/>`)
+	@sampleCode("Alternative syntax", "html", `<input data-bind="signalname" />`)
 	@attributeDocs("bind")
 }
 
 templ classError() {
 	<p>The <code>data-class</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are class names and the values are expressions.</p>
-	@sampleHtmlCode("Example") {
-		<div data-class-hidden="$foo"></div>
-	}
-	@sampleHtmlCode("Alternative syntax") {
-		<div data-class="{hidden: foo}"></div>
-	}
-	@attributeDocs("attr")
+	@sampleCode("Example", "html", `<div data-class-hidden="$foo"></div>`)
+	@sampleCode("Alternative syntax", "html", `<div data-class="{hidden: foo}"></div>`)
+	@attributeDocs("class")
 }
 
 templ computedError() {
 	<p>The <code>data-computed</code> attribute <em>must</em> have both a key, representing the signal name to create, and a value, representing the expression to assign to the signal.</p>
-	@sampleHtmlCode("Example") {
-		<div data-computed-blinker="count % 2 === 0"></div>
-	}
+	@sampleCode("Example", "html", `<div data-computed-blinker="count % 2 === 0"></div>`)
 	@attributeDocs("computed")
 }
 
 templ customValidityError() {
-	@sampleHtmlCode("Example") {
-		<form>
-			<input data-bind-foo data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" name="foo"/>
-			<input data-bind-bar name="bar"/>
-			<button>
-				Submit form
-			</button>
-		</form>
-	}
-	@attributeDocs("computed")
+	@sampleCode("Example", "html", `<form>
+	<input data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" 
+		   data-bind-foo
+		   name="foo" 
+	/>
+	<input data-bind-bar name="bar" />
+	<button>
+		Submit form
+	</button>
+</form>`)
+	@attributeDocs("custom-validity")
 }
 
 templ keyRequired(pluginName string) {

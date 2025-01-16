@@ -93,7 +93,7 @@ templ sampleCode(heading, lang, source string) {
 templ attributeDocs(pluginName string) {
 	<p>
 		See the docs for the
-		<a href={ templ.SafeURL("/reference/attribute_plugins#" + pluginName) }>
+		<a href={ templ.SafeURL("/reference/attribute_plugins#data-" + pluginName) }>
 			<code>data-{ pluginName }</code>
 		</a> attribute.
 	</p>
