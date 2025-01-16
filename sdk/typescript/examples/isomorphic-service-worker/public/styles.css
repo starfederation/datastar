@@ -1,0 +1,83 @@
+.offlineNotice {
+    display: block;
+    color: red;
+}
+
+#ds-content {
+    height: 450px;
+    overflow: auto;
+    border: 1px solid #ccc;
+}
+
+.progress {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.progress-bar {
+    width: 100%;
+    background: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 20px;
+    background: #76c7c0;
+    width: 0;
+    transition: width 0.25s;
+}
+
+.item {
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #eee;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.demo-controls {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.button-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.description {
+    color: #666;
+    font-size: 1.1em;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.description ul {
+    text-align: left;
+    margin: 15px auto;
+}
+
+.description li {
+    margin: 10px 0;
+}
+
+.items-counter {
+    margin-top: 5px;
+    font-size: 0.9em;
+}
