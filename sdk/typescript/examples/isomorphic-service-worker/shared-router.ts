@@ -97,13 +97,13 @@ export function createRouter() {
         </style>
         </head><body>
         
-<div
-  class="offlineNotice"
-  data-signals="{offlineSig:false}"
-  data-show="$offlineSig"
-  data-on-offline__window="$offlineSig=true"
-  data-on-online__window="$offlineSig=false"
->⚠️ You are offline - using service worker</div>
+        <div
+          class="offlineNotice"
+          data-signals="{offlineSig:false}"
+          data-show="$offlineSig"
+          data-on-offline__window="$offlineSig=true"
+          data-on-online__window="$offlineSig=false"
+        >⚠️ You are offline - using service worker</div>
 
         <div class="progress">
                 <div class="progress-bar">
@@ -115,7 +115,6 @@ export function createRouter() {
                 </div>
             </div>
         <div id="ds-content">
-          
           
         </div>
         <div class="demo-controls">
@@ -137,18 +136,17 @@ export function createRouter() {
                     Bulk Content
                 </button>
             </div>
-        </div>
-        
-        <div class="stats">
                         
             <h3>Content Delivery Modes:</h3>
-            <ul class="description">
-                <li><strong>Streaming Mode:</strong> Content streams in chunks, updating progressively</li>
-                <li><strong>Bulk Mode:</strong> All content arrives in a single response</li>
-            </ul>
-            <p>Inspect each mode's transfer size and speed in your browser Dev Tools' network tab. <br> You'll notice an even larger difference if you implement a compression middleware (either in your Deno app or in a reverse proxy like Caddy) </p>
+            <div class="description">
+              <ul >
+                  <li><strong>Streaming Mode:</strong> Content streams in chunks, updating progressively</li>
+                  <li><strong>Bulk Mode:</strong> All content arrives in a single response</li>
+              </ul>
+              <p>Inspect each mode's transfer size and speed in your browser Dev Tools' network tab. <br> You'll notice an even larger difference if you implement a compression middleware (either in your Deno app or in a reverse proxy like Caddy) </p>
+            </div>
         </div>
-  
+
         <script>
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/service-worker.js')
