@@ -2332,6 +2332,14 @@ function createRouter(offline2) {
         
         
         <div class="offlineNotice" data-on-load="$offlineSig=false" data-show="$offlineSig">\u26A0\uFE0F You are offline - using service worker</div>
+        <div class="progress">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-bar-fill" ds-attr-style=$width></div>
+                </div>
+                <div style="margin-top: 5px; font-size: 0.9em;">
+                    Items: <span data-text="$numItems"></span>
+                </div>
+            </div>
         <div id="ds-content">
           
           
@@ -2375,15 +2383,7 @@ function createRouter(offline2) {
       const numItems = Math.floor(Math.random() * 50) + 50;
       stream.mergeFragments(
         `<div id="ds-content">
-          <h1>${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>
-            <div class="progress">
-                <div class="progress-bar">
-                    <div id="progress-fill" class="progress-bar-fill" style="width: 0%"></div>
-                </div>
-                <div style="margin-top: 5px; font-size: 0.9em;">
-                    Items: <span data-text="$numItems"></span> / ${numItems}
-                </div>
-            </div>
+          <h1>${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>            
             <div id="items"></div>
         </div>`
       );
@@ -2403,7 +2403,7 @@ function createRouter(offline2) {
           `<div id="progress-fill" class="progress-bar-fill" style="width: 100%"></div>`
         );
         stream.mergeSignals(
-          { numItems }
+          { numItems, width: `width: 100%` }
         );
       } else {
         for (let i = 0; i < numItems; i++) {
@@ -2419,9 +2419,9 @@ function createRouter(offline2) {
             `<div id="progress-fill" class="progress-bar-fill" style="width: ${progress}%"></div>`
           );
           stream.mergeSignals(
-            { numItems: i + 1 }
+            { numItems: i + 1, width: `width: ${progress}%` }
           );
-          await delay(15);
+          await delay(10);
         }
       }
     });
