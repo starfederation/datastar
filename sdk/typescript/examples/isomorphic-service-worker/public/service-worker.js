@@ -2300,6 +2300,19 @@ function createRouter(offline2) {
                 padding: 10px;
                 border-bottom: 1px solid #ccc;
             }
+            .progress-bar {
+                width: 100%;
+                background: #e0e0e0;
+                border-radius: 5px;
+                overflow: hidden;
+            }
+            .progress-bar-fill {
+                height: 20px;
+                background: #76c7c0;
+                width: 0;
+                transition: width 0.25s;
+                color: green;
+            }
             .item {
                 padding: 10px;
                 margin: 5px 0;
@@ -2317,7 +2330,7 @@ function createRouter(offline2) {
         Check the Network tab in DevTools to compare transfer sizes and times.<br>
         </div>
         
-        <div class="progress">Content will stream here... (0 items received)</div>
+        
         <div class="offlineNotice" data-on-load="$offlineSig=false" data-show="$offlineSig">\u26A0\uFE0F You are offline - using service worker</div>
         <div id="ds-content">
           
@@ -2342,19 +2355,6 @@ function createRouter(offline2) {
                     .catch(error => console.log('Service Worker registration failed:', error));
             }
             
-            // Update progress counter
-            const observer = new MutationObserver((mutations) => {
-                const items = document.querySelectorAll('.item').length;
-                const progress = document.querySelector('.progress');
-                if (progress) {
-                    progress.textContent = 'Streaming content..... (' + items + ' items received)';
-                }
-            });
-
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
         <\/script>
         </body></html>
     `);
@@ -2366,21 +2366,32 @@ function createRouter(offline2) {
       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
   </div>
 `;
-  const allItemsContent = Array.from({ length: 100 }, (_, i) => itemTemplate(i)).join("\n");
   app.get("/large-data", async (c) => {
     const bulk = c.req.query("bulk") === "true";
     return ServerSentEventGenerator2.stream(async (stream) => {
-      console.log(`Offline value is ${offline2?.value ? "true" : "false"}`);
       stream.mergeSignals(
         { offlineSig: offline2?.value }
       );
+      const numItems = Math.floor(Math.random() * 50) + 50;
       stream.mergeFragments(
         `<div id="ds-content">
-            <h1>${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>
+          <h1>${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>
+            <div class="progress">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-bar-fill" style="width: 0%"></div>
+                </div>
+                <div style="margin-top: 5px; font-size: 0.9em;">
+                    Items: <span data-text="$numItems"></span> / ${numItems}
+                </div>
+            </div>
             <div id="items"></div>
         </div>`
       );
       if (bulk) {
+        const allItemsContent = Array.from(
+          { length: numItems },
+          (_, i) => itemTemplate(i)
+        ).join("\n");
         stream.mergeFragments(
           allItemsContent,
           {
@@ -2388,14 +2399,27 @@ function createRouter(offline2) {
             mergeMode: "append"
           }
         );
+        stream.mergeFragments(
+          `<div id="progress-fill" class="progress-bar-fill" style="width: 100%"></div>`
+        );
+        stream.mergeSignals(
+          { numItems }
+        );
       } else {
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < numItems; i++) {
           stream.mergeFragments(
             itemTemplate(i),
             {
               selector: "#items",
               mergeMode: "append"
             }
+          );
+          const progress = (i + 1) / numItems * 100;
+          stream.mergeFragments(
+            `<div id="progress-fill" class="progress-bar-fill" style="width: ${progress}%"></div>`
+          );
+          stream.mergeSignals(
+            { numItems: i + 1 }
           );
           await delay(15);
         }

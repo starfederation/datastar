@@ -24,4 +24,10 @@ const offline = { value: false }; // Remove export, just keep it local
 // Mount the shared router
 app.route("/", createRouter(offline));
 
-Deno.serve(app.fetch);
+Deno.serve({
+  port: 8000,
+  hostname: "localhost",
+  onListen({ hostname, port }) {
+    console.log(`Listening on http://localhost:${port}`);
+  },
+}, app.fetch);
