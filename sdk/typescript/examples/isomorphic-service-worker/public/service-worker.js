@@ -2287,10 +2287,10 @@ function createRouter(offline2) {
         <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.1/bundles/datastar.js"><\/script>
         <style>
             .offlineNotice { display: block; color: red;}
-            #ds-content { 
-                height: 450px; 
-                overflow: auto; 
-                border: 1px solid #ccc; 
+            #ds-content {
+                height: 450px;
+                overflow: auto;
+                border: 1px solid #ccc;
             }
             .stats { margin: 20px 0; padding: 10px; background: #f0f0f0; }
             .progress {
@@ -2334,7 +2334,7 @@ function createRouter(offline2) {
         <div class="offlineNotice" data-on-load="$offlineSig=false" data-show="$offlineSig">\u26A0\uFE0F You are offline - using service worker</div>
         <div class="progress">
                 <div class="progress-bar">
-                    <div id="progress-fill" class="progress-bar-fill" ds-attr-style=$width></div>
+                    <div id="progress-fill" class="progress-bar-fill" data-attr-style="$width"></div>
                 </div>
                 <div style="margin-top: 5px; font-size: 0.9em;">
                     Items: <span data-text="$numItems"></span>
@@ -2383,7 +2383,7 @@ function createRouter(offline2) {
       const numItems = Math.floor(Math.random() * 50) + 50;
       stream.mergeFragments(
         `<div id="ds-content">
-          <h1>${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>            
+          <h1>${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>
             <div id="items"></div>
         </div>`
       );
@@ -2399,11 +2399,8 @@ function createRouter(offline2) {
             mergeMode: "append"
           }
         );
-        stream.mergeFragments(
-          `<div id="progress-fill" class="progress-bar-fill" style="width: 100%"></div>`
-        );
         stream.mergeSignals(
-          { numItems, width: `width: 100%` }
+          { numItems, width: `width: 50%` }
         );
       } else {
         for (let i = 0; i < numItems; i++) {
@@ -2415,9 +2412,6 @@ function createRouter(offline2) {
             }
           );
           const progress = (i + 1) / numItems * 100;
-          stream.mergeFragments(
-            `<div id="progress-fill" class="progress-bar-fill" style="width: ${progress}%"></div>`
-          );
           stream.mergeSignals(
             { numItems: i + 1, width: `width: ${progress}%` }
           );
