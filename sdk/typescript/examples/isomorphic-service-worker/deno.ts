@@ -19,10 +19,8 @@ const swPath = minify
 // Serve the correct version of the service worker
 app.get("/service-worker.js", serveStatic({ path: swPath }));
 
-const offline = { value: false }; // Remove export, just keep it local
-
 // Mount the shared router
-app.route("/", createRouter(offline));
+app.route("/", createRouter());
 
 Deno.serve({
   port: 8000,

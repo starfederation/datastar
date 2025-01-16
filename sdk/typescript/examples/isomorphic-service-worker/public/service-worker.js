@@ -2398,8 +2398,9 @@ var isServiceWorker = () => {
 };
 var source = isServiceWorker() ? "Service Worker" : "Deno Server";
 var _a;
-function createRouter(offline2) {
+function createRouter() {
   const app = new Hono2();
+  app.offline = false;
   app.get("/", (c) => {
     return c.html(html2(_a || (_a = __template([`
         <html><head>
@@ -2543,7 +2544,7 @@ function createRouter(offline2) {
   app.get("/large-data", async (c) => {
     const bulk = c.req.query("bulk") === "true";
     return ServerSentEventGenerator2.stream(async (stream) => {
-      stream.mergeSignals({ offlineSig: offline2?.value });
+      stream.mergeSignals({ offlineSig: app.offline });
       const numItems = Math.floor(Math.random() * 50) + 50;
       stream.mergeFragments(
         html2`<div id="ds-content">
@@ -2598,8 +2599,7 @@ function delay(milliseconds) {
 }
 
 // service-worker.ts
-var offline = { value: false };
-var router = createRouter(offline);
+var router = createRouter();
 self.addEventListener("fetch", (event) => {
   if (event.request.url.includes("/service-worker.js")) {
     return;
@@ -2608,14 +2608,12 @@ self.addEventListener("fetch", (event) => {
     (async () => {
       try {
         const networkResponse = await fetch(event.request);
-        offline.value = false;
+        router.offline = false;
         return networkResponse;
       } catch (error) {
         console.log("Network request failed, using service worker response.");
-        offline.value = true;
-        return router.fetch(event.request, {
-          headers: event.request.headers
-        });
+        router.offline = true;
+        return router.fetch(event.request);
       }
     })()
   );

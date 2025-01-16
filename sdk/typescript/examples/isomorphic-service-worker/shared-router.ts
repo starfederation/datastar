@@ -2,6 +2,11 @@ import { Hono } from "jsr:@hono/hono";
 import { html as honoHtml } from "jsr:@hono/hono/html";
 import { ServerSentEventGenerator } from "../../src/web/serverSentEventGenerator.ts";
 
+// Extend Hono type with our offline property
+interface RouterApp extends Hono {
+  offline: boolean; // Simpler - offline is now just a boolean
+}
+
 // Wrap Hono's html to automatically convert to string, which is required by d* mergeFragments, handling both sync and async cases
 // Hono html function is used because it can escape values and also allows for syntax highlighting in your IDE if you have an appropriate extension installed (e.g. https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin)
 const html = (strings: TemplateStringsArray, ...values: unknown[]) => {
@@ -19,10 +24,10 @@ const isServiceWorker = () => {
 
 const source = isServiceWorker() ? "Service Worker" : "Deno Server";
 
-type OfflineState = { value: boolean };
-
-export function createRouter(offline?: OfflineState) {
-  const app = new Hono();
+// Move offline state inside the router
+export function createRouter() {
+  const app = new Hono() as RouterApp;
+  app.offline = false; // Simpler assignment
 
   // Add main page route
   app.get("/", (c) => {
@@ -172,7 +177,7 @@ export function createRouter(offline?: OfflineState) {
   app.get("/large-data", async (c) => {
     const bulk = c.req.query("bulk") === "true";
     return ServerSentEventGenerator.stream(async (stream) => {
-      stream.mergeSignals({ offlineSig: offline?.value });
+      stream.mergeSignals({ offlineSig: app.offline });
       const numItems = Math.floor(Math.random() * 50) + 50;
 
       stream.mergeFragments(
