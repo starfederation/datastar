@@ -1,8 +1,9 @@
 import { createRouter } from "./shared-router.ts";
 
 declare const self: ServiceWorkerGlobalScope;
+const offline = { value: false }; // Remove export, just keep it local
 
-const router = createRouter();
+const router = createRouter(offline); // Pass the offline state to router
 
 self.addEventListener("fetch", (event) => {
   if (event.request.url.includes("/service-worker.js")) {
@@ -14,10 +15,12 @@ self.addEventListener("fetch", (event) => {
       try {
         // Try network first
         const networkResponse = await fetch(event.request);
+        offline.value = false; // Reset when network is available
         return networkResponse;
       } catch (error) {
         // If network fails, handle with service worker
         console.log("Network request failed, using service worker response.");
+        offline.value = true; // Set when network fails
         return router.fetch(event.request, {
           headers: event.request.headers,
         });

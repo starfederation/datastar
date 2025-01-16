@@ -12,7 +12,9 @@ const isServiceWorker = () => {
 
 const source = isServiceWorker() ? "Service Worker" : "Deno Server";
 
-export function createRouter() {
+type OfflineState = { value: boolean };
+
+export function createRouter(offline?: OfflineState) {
   const app = new Hono();
 
   // Add main page route
@@ -21,9 +23,8 @@ export function createRouter() {
         <html><head>
         <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.1/bundles/datastar.js"></script>
         <style>
-            .offline-notice { display: none; color: red; }
-            .offline .offline-notice { display: block; }
-            #largeContent { 
+            .offlineNotice { display: block; color: red;}
+            #ds-content { 
                 height: 450px; 
                 overflow: auto; 
                 border: 1px solid #ccc; 
@@ -48,17 +49,17 @@ export function createRouter() {
             }
         </style>
         </head><body>
-        <div class="offline-notice">⚠️ You are offline - using service worker</div>
         
         <div class="stats">
-            Check the Network tab in DevTools to compare transfer sizes and times.<br>
+        Check the Network tab in DevTools to compare transfer sizes and times.<br>
         </div>
         
-        <div id="largeContent">
-            <div class="progress">Content will stream here... (0 items received)</div>
-            <div id="largeContentItems"></div>
+        <div class="progress">Content will stream here... (0 items received)</div>
+        <div class="offlineNotice" data-on-load="$offlineSig=false" data-show="$offlineSig">⚠️ You are offline - using service worker</div>
+        <div id="ds-content">
+          
+          
         </div>
-        
         <div class="compression-options">
             <h4>Streaming Data</h4>
                         
@@ -71,7 +72,6 @@ export function createRouter() {
                 Bulk Fragment
             </button>
         </div>
-                
         <script>
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/service-worker.js')
@@ -79,14 +79,6 @@ export function createRouter() {
                     .catch(error => console.log('Service Worker registration failed:', error));
             }
             
-            // Update UI based on online/offline status
-            function updateOnlineStatus() {
-                document.body.classList.toggle('offline', !navigator.onLine);
-            }
-            window.addEventListener('online', updateOnlineStatus);
-            window.addEventListener('offline', updateOnlineStatus);
-            updateOnlineStatus();
-
             // Update progress counter
             const observer = new MutationObserver((mutations) => {
                 const items = document.querySelectorAll('.item').length;
@@ -122,12 +114,18 @@ export function createRouter() {
   app.get("/large-data", async (c) => {
     const bulk = c.req.query("bulk") === "true";
     return ServerSentEventGenerator.stream(async (stream) => {
-      // Send initial container
+      //log value of offline with string description
+      console.log(`Offline value is ${offline?.value ? "true" : "false"}`);
+
+      stream.mergeSignals(
+        { offlineSig: offline?.value },
+      );
+
       stream.mergeFragments(
-        `<div id="largeContentItems">
-              <h1> ${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>
-              <div id="items"></div>
-          </div>`,
+        `<div id="ds-content">
+            <h1>${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>
+            <div id="items"></div>
+        </div>`,
       );
 
       if (bulk) {
