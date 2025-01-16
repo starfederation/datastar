@@ -37,8 +37,14 @@ function mergeNested(
         throw internalErr(from, 'InvalidSignalKey', { key })
       }
 
-      const value = values[key]
-      if (value instanceof Object && !Array.isArray(value)) {
+      let value = values[key]
+      if (value instanceof Object) {
+        if (Array.isArray(value)) {
+          value = value.reduce((acc, v, i) => {
+            acc[i.toString()] = v
+            return acc
+          }, {} as NestedValues)
+        }
         if (!target[key]) {
           target[key] = {}
         }
