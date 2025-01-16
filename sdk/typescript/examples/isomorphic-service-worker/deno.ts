@@ -19,7 +19,7 @@ const swPath = minify
 // Serve static files from public directory
 app.use("/*", serveStatic({ root: "./public" }));
 
-// Serve the correct version of the service worker
+// Serve the service worker
 app.get("/service-worker.js", serveStatic({ path: swPath }));
 
 // Mount the shared router

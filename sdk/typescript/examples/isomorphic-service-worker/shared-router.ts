@@ -24,6 +24,23 @@ const isServiceWorker = () => {
 
 const source = isServiceWorker() ? "Service Worker" : "Deno Server";
 
+// Static file extensions that should be cached when offline
+const STATIC_EXTENSIONS = [
+  ".css",
+  ".js",
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".gif",
+  ".svg",
+  ".woff",
+  ".woff2",
+];
+
+const isStaticFile = (url: string) => {
+  return STATIC_EXTENSIONS.some((ext) => url.endsWith(ext));
+};
+
 // Move offline state inside the router
 export function createRouter() {
   const app = new Hono() as RouterApp;
@@ -157,9 +174,27 @@ export function createRouter() {
   // Catch-all route with context-aware handling
   app.all("*", async (c) => {
     if (isServiceWorker()) {
-      // In service worker, pass through to network
-      const response = await fetch(c.req.raw);
-      return response;
+      try {
+        const response = await fetch(c.req.raw);
+        // Cache successful static file responses
+        const url = new URL(c.req.url);
+        if (response.ok && isStaticFile(url.pathname)) {
+          const cache = await caches.open("static-v1");
+          await cache.put(url.pathname, response.clone());
+        }
+        return response;
+      } catch (error) {
+        // Check cache for static files
+        const url = new URL(c.req.url);
+        if (isStaticFile(url.pathname)) {
+          const cache = await caches.open("static-v1");
+          const cachedResponse = await cache.match(url.pathname);
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+        }
+        return c.text("Resource not available offline", 404);
+      }
     }
     // In Deno server, return 404
     return c.text(`Path not found: ${c.req.url}`, 404);

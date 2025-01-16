@@ -24,7 +24,13 @@ self.addEventListener("fetch", (event) => {
 });
 
 self.addEventListener("install", (event) => {
-  self.skipWaiting();
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open("static-v1");
+      await cache.add("/styles.css");
+      self.skipWaiting();
+    })(),
+  );
 });
 
 self.addEventListener("activate", (event) => {

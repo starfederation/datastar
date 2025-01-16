@@ -58,6 +58,43 @@
     gap: 20px;
     justify-content: center;
     margin: 15px 0;
+    flex-wrap: wrap;
+    /* Allow buttons to wrap on small screens */
+    padding: 0 10px;
+    /* Add some padding for small screens */
+}
+
+.button-group button {
+    min-width: 160px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border: none;
+    background: #76c7c0;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.button-group button:hover {
+    background: #5fb5ae;
+}
+
+.button-group button:active {
+    transform: scale(0.98);
+}
+
+/* Make buttons more touch-friendly on small screens */
+@media (max-width: 600px) {
+    .button-group {
+        gap: 10px;
+    }
+
+    .button-group button {
+        width: 100%;
+        padding: 16px 24px;
+        font-size: 1.1rem;
+    }
 }
 
 .description {
