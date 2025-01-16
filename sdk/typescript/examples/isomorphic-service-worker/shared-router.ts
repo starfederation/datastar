@@ -1,5 +1,12 @@
 import { Hono } from "jsr:@hono/hono";
+import { html as honoHtml } from "jsr:@hono/hono/html";
 import { ServerSentEventGenerator } from "../../src/web/serverSentEventGenerator.ts";
+
+// Wrap Hono's html to automatically convert to string, which is required by d* mergeFragments, handling both sync and async cases
+// Hono html function is used because it can escape values and also allows for syntax highlighting in your IDE if you have an appropriate extension installed (e.g. https://marketplace.visualstudio.com/items?itemName=runem.lit-plugin)
+const html = (strings: TemplateStringsArray, ...values: unknown[]) => {
+  return honoHtml(strings, ...values).toString();
+};
 
 // Helper to detect if we're in a service worker context
 const isServiceWorker = () => {
@@ -19,17 +26,16 @@ export function createRouter(offline?: OfflineState) {
 
   // Add main page route
   app.get("/", (c) => {
-    return c.html(`
+    return c.html(html`
         <html><head>
         <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.1/bundles/datastar.js"></script>
         <style>
-            .offlineNotice { display: block; color: red;}
+            .offlineNotice { display: block; color: red; }
             #ds-content {
                 height: 450px;
                 overflow: auto;
                 border: 1px solid #ccc;
             }
-            .stats { margin: 20px 0; padding: 10px; background: #f0f0f0; }
             .progress {
                 position: sticky;
                 top: 0;
@@ -48,7 +54,6 @@ export function createRouter(offline?: OfflineState) {
                 background: #76c7c0;
                 width: 0;
                 transition: width 0.25s;
-                color: green;
             }
             .item {
                 padding: 10px;
@@ -60,53 +65,103 @@ export function createRouter(offline?: OfflineState) {
                 from { opacity: 0; }
                 to { opacity: 1; }
             }
+            .demo-controls {
+                margin: 20px 0;
+                text-align: center;
+            }
+            .button-group {
+                display: flex;
+                gap: 20px;
+                justify-content: center;
+                margin: 15px 0;
+            }
+            .description {
+                color: #666;
+                font-size: 1.1em;
+                max-width: 600px;
+                margin: 0 auto;
+                line-height: 1.6;
+            }
+            .description ul {
+                text-align: left;
+                margin: 15px auto;
+            }
+            .description li {
+                margin: 10px 0;
+            }
         </style>
         </head><body>
         
-        <div class="stats">
-        Check the Network tab in DevTools to compare transfer sizes and times.<br>
-        </div>
-        
-        
-        <div class="offlineNotice" data-on-load="$offlineSig=false" data-show="$offlineSig">⚠️ You are offline - using service worker</div>
+<div
+  class="offlineNotice"
+  data-signals="{offlineSig:false}"
+  data-show="$offlineSig"
+  data-on-offline__window="$offlineSig=true"
+  data-on-online__window="$offlineSig=false"
+>⚠️ You are offline - using service worker</div>
+
         <div class="progress">
                 <div class="progress-bar">
                     <div id="progress-fill" class="progress-bar-fill" data-attr-style="$width"></div>
                 </div>
                 <div style="margin-top: 5px; font-size: 0.9em;">
-                    Items: <span data-text="$numItems"></span>
+                    Items: <span data-signals="{itemsReceived:0}"
+                    data-text="$itemsReceived"></span>
                 </div>
             </div>
         <div id="ds-content">
           
           
         </div>
-        <div class="compression-options">
-            <h4>Streaming Data</h4>
-                        
-            <button data-on-click="@get('/large-data')">
-                Streamed Fragments
-            </button>
+        <div class="demo-controls">
+            <h2>Isomorphic Server/Service Worker Demo</h2>
+            <div class="description">
+                <p>This demo shows how the same routing and rendering code runs in both:</p>
+                <ul>
+                    <li><strong>Deno Server</strong> - When online, content is served from the backend</li>
+                    <li><strong>Service Worker</strong> - When offline, the same code generates content locally</li>
+                </ul>
+            </div>
+            
+            <div class="button-group">
+                <button data-on-click="@get('/large-data')">
+                    Streamed Content
+                </button>
 
-            <h4>Bulk Data</h4>
-            <button data-on-click="@get('/large-data?bulk=true')">
-                Bulk Fragment
-            </button>
+                <button data-on-click="@get('/large-data?bulk=true')">
+                    Bulk Content
+                </button>
+            </div>
         </div>
+        
+        <div class="stats">
+                        
+            <h3>Content Delivery Modes:</h3>
+            <ul class="description">
+                <li><strong>Streaming Mode:</strong> Content streams in chunks, updating progressively</li>
+                <li><strong>Bulk Mode:</strong> All content arrives in a single response</li>
+            </ul>
+            <p>Inspect each mode's transfer size and speed in your browser Dev Tools' network tab. <br> You'll notice an even larger difference if you implement a compression middleware (either in your Deno app or in a reverse proxy like Caddy) </p>
+        </div>
+  
         <script>
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => console.log('Service Worker registered:', registration.scope))
                     .catch(error => console.log('Service Worker registration failed:', error));
             }
-            
+                    
+          window.addEventListener('offline', () => {
+            console.log('You are offline');
+          });
         </script>
         </body></html>
     `);
   });
 
   // Single item template
-  const itemTemplate = (index: number) => `
+  const itemTemplate = (index: number) =>
+    html`
   <div class="item">
       <h2>Sample Content #${index + 1}</h2>
       <p>This is a longer piece of content that will be repeated many times to demonstrate compression effectiveness.</p>
@@ -114,46 +169,34 @@ export function createRouter(offline?: OfflineState) {
   </div>
 `;
 
-  // Combined endpoint for both compressed and uncompressed data
   app.get("/large-data", async (c) => {
     const bulk = c.req.query("bulk") === "true";
     return ServerSentEventGenerator.stream(async (stream) => {
-      stream.mergeSignals(
-        { offlineSig: offline?.value },
-      );
-      // set number of items to random between 50 and 100
+      stream.mergeSignals({ offlineSig: offline?.value });
       const numItems = Math.floor(Math.random() * 50) + 50;
 
       stream.mergeFragments(
-        `<div id="ds-content">
+        html`<div id="ds-content">
           <h1>${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>
-            <div id="items"></div>
+          <div id="items"></div>
         </div>`,
       );
 
       if (bulk) {
-        // Generate all items at once
-        const allItemsContent = Array.from(
-          { length: numItems },
-          (_, i) => itemTemplate(i),
-        )
-          .join("\n");
-
         stream.mergeFragments(
-          allItemsContent,
+          Array.from({ length: numItems }, (_, i) => itemTemplate(i)).join(
+            "\n",
+          ),
           {
             selector: "#items",
             mergeMode: "append",
           },
         );
-        // stream.mergeFragments(
-        //   `<div id="progress-fill" class="progress-bar-fill" style="width: 100%"></div>`,
-        // );
+
         stream.mergeSignals(
-          { numItems: numItems, width: `width: 50%` },
+          { itemsReceived: numItems, width: `width: 100%` },
         );
       } else {
-        // Stream items one by one
         for (let i = 0; i < numItems; i++) {
           stream.mergeFragments(
             itemTemplate(i),
@@ -163,11 +206,8 @@ export function createRouter(offline?: OfflineState) {
             },
           );
           const progress = ((i + 1) / numItems) * 100;
-          // stream.mergeFragments(
-          //   `<div id="progress-fill" class="progress-bar-fill" style="width: ${progress}%"></div>`,
-          // );
           stream.mergeSignals(
-            { numItems: i + 1, width: `width: ${progress}%` },
+            { itemsReceived: i + 1, width: `width: ${progress}%` },
           );
           await delay(10);
         }

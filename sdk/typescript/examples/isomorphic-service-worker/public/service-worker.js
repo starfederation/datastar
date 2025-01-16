@@ -1,3 +1,7 @@
+var __freeze = Object.freeze;
+var __defProp = Object.defineProperty;
+var __template = (cooked, raw2) => __freeze(__defProp(cooked, "raw", { value: __freeze(raw2 || cooked.slice()) }));
+
 // https://jsr.io/@hono/hono/4.6.16/src/utils/body.ts
 var parseBody = async (request, options = /* @__PURE__ */ Object.create(null)) => {
   const { all = false, dot = false } = options;
@@ -546,6 +550,80 @@ var raw = (value, callbacks) => {
   escapedString.callbacks = callbacks;
   return escapedString;
 };
+var escapeRe = /[&<>'"]/;
+var stringBufferToString = async (buffer, callbacks) => {
+  let str = "";
+  callbacks ||= [];
+  const resolvedBuffer = await Promise.all(buffer);
+  for (let i = resolvedBuffer.length - 1; ; i--) {
+    str += resolvedBuffer[i];
+    i--;
+    if (i < 0) {
+      break;
+    }
+    let r = resolvedBuffer[i];
+    if (typeof r === "object") {
+      callbacks.push(...r.callbacks || []);
+    }
+    const isEscaped = r.isEscaped;
+    r = await (typeof r === "object" ? r.toString() : r);
+    if (typeof r === "object") {
+      callbacks.push(...r.callbacks || []);
+    }
+    if (r.isEscaped ?? isEscaped) {
+      str += r;
+    } else {
+      const buf = [str];
+      escapeToBuffer(r, buf);
+      str = buf[0];
+    }
+  }
+  return raw(str, callbacks);
+};
+var escapeToBuffer = (str, buffer) => {
+  const match = str.search(escapeRe);
+  if (match === -1) {
+    buffer[0] += str;
+    return;
+  }
+  let escape;
+  let index;
+  let lastIndex = 0;
+  for (index = match; index < str.length; index++) {
+    switch (str.charCodeAt(index)) {
+      case 34:
+        escape = "&quot;";
+        break;
+      case 39:
+        escape = "&#39;";
+        break;
+      case 38:
+        escape = "&amp;";
+        break;
+      case 60:
+        escape = "&lt;";
+        break;
+      case 62:
+        escape = "&gt;";
+        break;
+      default:
+        continue;
+    }
+    buffer[0] += str.substring(lastIndex, index) + escape;
+    lastIndex = index + 1;
+  }
+  buffer[0] += str.substring(lastIndex, index);
+};
+var resolveCallbackSync = (str) => {
+  const callbacks = str.callbacks;
+  if (!callbacks?.length) {
+    return str;
+  }
+  const buffer = [str];
+  const context = {};
+  callbacks.forEach((c) => c({ phase: HtmlEscapedCallbackPhase.Stringify, buffer, context }));
+  return buffer[0];
+};
 var resolveCallback = async (str, phase, preserveCallbacks, context, buffer) => {
   if (typeof str === "object" && !(str instanceof String)) {
     if (!(str instanceof Promise)) {
@@ -1004,15 +1082,15 @@ var Context = class {
     this.#preparedHeaders["content-type"] = "application/json";
     return typeof arg === "number" ? this.#newResponse(body, arg, headers) : this.#newResponse(body, arg);
   };
-  html = (html, arg, headers) => {
+  html = (html3, arg, headers) => {
     this.#preparedHeaders ??= {};
     this.#preparedHeaders["content-type"] = "text/html; charset=UTF-8";
-    if (typeof html === "object") {
-      return resolveCallback(html, HtmlEscapedCallbackPhase.Stringify, false, {}).then((html2) => {
-        return typeof arg === "number" ? this.#newResponse(html2, arg, headers) : this.#newResponse(html2, arg);
+    if (typeof html3 === "object") {
+      return resolveCallback(html3, HtmlEscapedCallbackPhase.Stringify, false, {}).then((html4) => {
+        return typeof arg === "number" ? this.#newResponse(html4, arg, headers) : this.#newResponse(html4, arg);
       });
     }
-    return typeof arg === "number" ? this.#newResponse(html, arg, headers) : this.#newResponse(html, arg);
+    return typeof arg === "number" ? this.#newResponse(html3, arg, headers) : this.#newResponse(html3, arg);
   };
   /**
    * `.redirect()` can Redirect, default status code is 302.
@@ -2064,6 +2142,43 @@ var Hono2 = class extends Hono {
   }
 };
 
+// https://jsr.io/@hono/hono/4.6.16/src/helper/html/index.ts
+var html = (strings, ...values) => {
+  const buffer = [""];
+  for (let i = 0, len = strings.length - 1; i < len; i++) {
+    buffer[0] += strings[i];
+    const children = Array.isArray(values[i]) ? values[i].flat(Infinity) : [values[i]];
+    for (let i2 = 0, len2 = children.length; i2 < len2; i2++) {
+      const child = children[i2];
+      if (typeof child === "string") {
+        escapeToBuffer(child, buffer);
+      } else if (typeof child === "number") {
+        ;
+        buffer[0] += child;
+      } else if (typeof child === "boolean" || child === null || child === void 0) {
+        continue;
+      } else if (typeof child === "object" && child.isEscaped) {
+        if (child.callbacks) {
+          buffer.unshift("", child);
+        } else {
+          const tmp = child.toString();
+          if (tmp instanceof Promise) {
+            buffer.unshift("", tmp);
+          } else {
+            buffer[0] += tmp;
+          }
+        }
+      } else if (child instanceof Promise) {
+        buffer.unshift("", child);
+      } else {
+        escapeToBuffer(child.toString(), buffer);
+      }
+    }
+  }
+  buffer[0] += strings.at(-1);
+  return buffer.length === 1 ? "callbacks" in buffer ? raw(resolveCallbackSync(raw(buffer[0], buffer.callbacks))) : raw(buffer[0]) : stringBufferToString(buffer, buffer.callbacks);
+};
+
 // ../../src/types.ts
 var sseHeaders = {
   "Cache-Control": "no-cache",
@@ -2271,6 +2386,9 @@ var ServerSentEventGenerator2 = class _ServerSentEventGenerator extends ServerSe
 };
 
 // shared-router.ts
+var html2 = (strings, ...values) => {
+  return html(strings, ...values).toString();
+};
 var isServiceWorker = () => {
   try {
     return self instanceof ServiceWorkerGlobalScope;
@@ -2279,20 +2397,20 @@ var isServiceWorker = () => {
   }
 };
 var source = isServiceWorker() ? "Service Worker" : "Deno Server";
+var _a;
 function createRouter(offline2) {
   const app = new Hono2();
   app.get("/", (c) => {
-    return c.html(`
+    return c.html(html2(_a || (_a = __template([`
         <html><head>
         <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.1/bundles/datastar.js"><\/script>
         <style>
-            .offlineNotice { display: block; color: red;}
+            .offlineNotice { display: block; color: red; }
             #ds-content {
                 height: 450px;
                 overflow: auto;
                 border: 1px solid #ccc;
             }
-            .stats { margin: 20px 0; padding: 10px; background: #f0f0f0; }
             .progress {
                 position: sticky;
                 top: 0;
@@ -2311,7 +2429,6 @@ function createRouter(offline2) {
                 background: #76c7c0;
                 width: 0;
                 transition: width 0.25s;
-                color: green;
             }
             .item {
                 padding: 10px;
@@ -2323,51 +2440,100 @@ function createRouter(offline2) {
                 from { opacity: 0; }
                 to { opacity: 1; }
             }
+            .demo-controls {
+                margin: 20px 0;
+                text-align: center;
+            }
+            .button-group {
+                display: flex;
+                gap: 20px;
+                justify-content: center;
+                margin: 15px 0;
+            }
+            .description {
+                color: #666;
+                font-size: 1.1em;
+                max-width: 600px;
+                margin: 0 auto;
+                line-height: 1.6;
+            }
+            .description ul {
+                text-align: left;
+                margin: 15px auto;
+            }
+            .description li {
+                margin: 10px 0;
+            }
         </style>
         </head><body>
         
-        <div class="stats">
-        Check the Network tab in DevTools to compare transfer sizes and times.<br>
-        </div>
-        
-        
-        <div class="offlineNotice" data-on-load="$offlineSig=false" data-show="$offlineSig">\u26A0\uFE0F You are offline - using service worker</div>
+<div
+  class="offlineNotice"
+  data-signals="{offlineSig:false}"
+  data-show="$offlineSig"
+  data-on-offline__window="$offlineSig=true"
+  data-on-online__window="$offlineSig=false"
+>\u26A0\uFE0F You are offline - using service worker</div>
+
         <div class="progress">
                 <div class="progress-bar">
                     <div id="progress-fill" class="progress-bar-fill" data-attr-style="$width"></div>
                 </div>
                 <div style="margin-top: 5px; font-size: 0.9em;">
-                    Items: <span data-text="$numItems"></span>
+                    Items: <span data-signals="{itemsReceived:0}"
+                    data-text="$itemsReceived"></span>
                 </div>
             </div>
         <div id="ds-content">
           
           
         </div>
-        <div class="compression-options">
-            <h4>Streaming Data</h4>
-                        
-            <button data-on-click="@get('/large-data')">
-                Streamed Fragments
-            </button>
+        <div class="demo-controls">
+            <h2>Isomorphic Server/Service Worker Demo</h2>
+            <div class="description">
+                <p>This demo shows how the same routing and rendering code runs in both:</p>
+                <ul>
+                    <li><strong>Deno Server</strong> - When online, content is served from the backend</li>
+                    <li><strong>Service Worker</strong> - When offline, the same code generates content locally</li>
+                </ul>
+            </div>
+            
+            <div class="button-group">
+                <button data-on-click="@get('/large-data')">
+                    Streamed Content
+                </button>
 
-            <h4>Bulk Data</h4>
-            <button data-on-click="@get('/large-data?bulk=true')">
-                Bulk Fragment
-            </button>
+                <button data-on-click="@get('/large-data?bulk=true')">
+                    Bulk Content
+                </button>
+            </div>
         </div>
+        
+        <div class="stats">
+                        
+            <h3>Content Delivery Modes:</h3>
+            <ul class="description">
+                <li><strong>Streaming Mode:</strong> Content streams in chunks, updating progressively</li>
+                <li><strong>Bulk Mode:</strong> All content arrives in a single response</li>
+            </ul>
+            <p>Inspect each mode's transfer size and speed in your browser Dev Tools' network tab. <br> You'll notice an even larger difference if you implement a compression middleware (either in your Deno app or in a reverse proxy like Caddy) </p>
+        </div>
+  
         <script>
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => console.log('Service Worker registered:', registration.scope))
                     .catch(error => console.log('Service Worker registration failed:', error));
             }
-            
+                    
+          window.addEventListener('offline', () => {
+            console.log('You are offline');
+          });
         <\/script>
         </body></html>
-    `);
+    `]))));
   });
-  const itemTemplate = (index) => `
+  const itemTemplate = (index) => html2`
   <div class="item">
       <h2>Sample Content #${index + 1}</h2>
       <p>This is a longer piece of content that will be repeated many times to demonstrate compression effectiveness.</p>
@@ -2377,30 +2543,26 @@ function createRouter(offline2) {
   app.get("/large-data", async (c) => {
     const bulk = c.req.query("bulk") === "true";
     return ServerSentEventGenerator2.stream(async (stream) => {
-      stream.mergeSignals(
-        { offlineSig: offline2?.value }
-      );
+      stream.mergeSignals({ offlineSig: offline2?.value });
       const numItems = Math.floor(Math.random() * 50) + 50;
       stream.mergeFragments(
-        `<div id="ds-content">
+        html2`<div id="ds-content">
           <h1>${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>
-            <div id="items"></div>
+          <div id="items"></div>
         </div>`
       );
       if (bulk) {
-        const allItemsContent = Array.from(
-          { length: numItems },
-          (_, i) => itemTemplate(i)
-        ).join("\n");
         stream.mergeFragments(
-          allItemsContent,
+          Array.from({ length: numItems }, (_, i) => itemTemplate(i)).join(
+            "\n"
+          ),
           {
             selector: "#items",
             mergeMode: "append"
           }
         );
         stream.mergeSignals(
-          { numItems, width: `width: 50%` }
+          { itemsReceived: numItems, width: `width: 100%` }
         );
       } else {
         for (let i = 0; i < numItems; i++) {
@@ -2413,7 +2575,7 @@ function createRouter(offline2) {
           );
           const progress = (i + 1) / numItems * 100;
           stream.mergeSignals(
-            { numItems: i + 1, width: `width: ${progress}%` }
+            { itemsReceived: i + 1, width: `width: ${progress}%` }
           );
           await delay(10);
         }
