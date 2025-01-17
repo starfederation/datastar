@@ -21,9 +21,9 @@ By removing the `cloak` class on initialisation, there will never be any flicker
 
 ```html
 <style>
-  cloak {
-    opacity: 0;
-    transition: opacity 1s;
+  .cloak {
+      opacity: 0;
+      transition: opacity 2s ease-in;
   }
 </style>
 
