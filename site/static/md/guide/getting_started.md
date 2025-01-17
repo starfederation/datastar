@@ -288,7 +288,7 @@ See if you can follow the code below based on what you've learned so far, _befor
 ```html
 <div
   data-signals="{response: '', answer: 'bread'}"
-  data-computed-correct="$response.toLowerCase() == answer"
+  data-computed-correct="$response.toLowerCase() == $answer"
 >
   <div id="question">What do you put in a toaster?</div>
   <button data-on-click="$response = prompt('Answer:') ?? ''">BUZZ</button>
