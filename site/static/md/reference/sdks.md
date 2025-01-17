@@ -30,7 +30,7 @@ Examples:
 
 ## Python
 
-[Python package](https://github.com/starfederation/datastar/tree/develop/sdk/python) for working with Datastar, including support for Sanic, Django, Quart and FastAPI.  
+[Python package](https://github.com/starfederation/datastar/tree/develop/sdk/python) and [PyPI package](https://pypi.org/project/datastar-py/) for working with Datastar, including support for Sanic, Django, Quart and FastAPI.  
 _Author: [Felix Ingram](https://github.com/lllama)_
 
 Examples:
