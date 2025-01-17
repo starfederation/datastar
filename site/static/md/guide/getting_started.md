@@ -118,7 +118,7 @@ The value of the `data-text` attribute is a [Datastar expression](/guide/datasta
 The [`data-computed`](/reference/attribute_plugins#data-computed) attribute creates a new signal that is computed based on an expression. The computed signal is read-only, and its value is automatically updated when any signals in the expression are updated.
 
 ```html
-<div data-computed-repeated="$input.repeat(2)">
+<div data-signals-input="''" data-computed-repeated="$input.repeat(2)">
   <input data-bind-input />
   <div data-text="$repeated">
     Will be replaced with the contents of the repeated signal
