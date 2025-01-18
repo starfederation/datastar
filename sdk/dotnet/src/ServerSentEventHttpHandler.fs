@@ -5,19 +5,22 @@ open System.Text
 open System.Text.Json
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
+open Microsoft.AspNetCore.Server.Kestrel.Core
 open Microsoft.Extensions.Primitives
 open Microsoft.Net.Http.Headers
 
 module ServerSentEventHttpHandler =
-    let startResponse response = task {
+    let startResponse (response:HttpResponse) = task {
         let setHeader (response:HttpResponse) (name, content:string) =
             if response.Headers.ContainsKey(name) |> not then
                 response.Headers.Add(name, StringValues(content))
-        [
-           ("Cache-Control", "no-cache, max-age, must-revalidate, no-store")
-           ("Connection", "keep-alive")
-           (HeaderNames.ContentType, "text/event-stream")
-        ] |> Seq.iter (setHeader response)
+
+        seq {
+            ("Cache-Control", "no-cache, max-age, must-revalidate, no-store")
+            (HeaderNames.ContentType, "text/event-stream")
+            if (response.HttpContext.Request.Protocol = HttpProtocol.Http11) then
+                ("Connection", "keep-alive")
+        } |> Seq.iter (setHeader response)
         do! response.StartAsync()
         do! response.Body.FlushAsync()
         }
