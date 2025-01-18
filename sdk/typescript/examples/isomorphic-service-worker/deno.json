@@ -11,8 +11,8 @@
     "serve": "deno run -A --unstable-sloppy-imports deno.ts",
     "serve:dev": "deno run -A --unstable-sloppy-imports --watch deno.ts",
     "dev": "deno task watch:sw & deno task serve:dev",
-    "dev:min": "deno task watch:sw:min & deno task serve:dev",
+    "dev:min": "MINIFY=true deno task watch:sw:min & MINIFY=true deno task serve:dev",
     "start": "deno task build:sw && deno task serve",
-    "start:min": "deno task build:sw:min && deno task serve"
+    "start:min": "MINIFY=true deno task build:sw:min && MINIFY=true deno task serve"
   }
 }

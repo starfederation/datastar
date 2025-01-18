@@ -4,7 +4,7 @@ declare const self: ServiceWorkerGlobalScope;
 const router = createRouter();
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.url.includes("/service-worker.js")) {
+  if (event.request.url.includes("service-worker")) {
     return;
   }
 

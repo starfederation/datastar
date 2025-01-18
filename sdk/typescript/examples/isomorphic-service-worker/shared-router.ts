@@ -64,12 +64,13 @@ const progressTemplate = (progress: number, itemCount: number) => html`
   </div>
 `;
 
-export function createRouter() {
+export function createRouter(options: { serviceWorkerPath?: string } = {}) {
   const app = new Hono() as RouterApp;
   app.offline = false; // Simpler assignment
 
   // Add main page route
   app.get("/", (c) => {
+    const swPath = options.serviceWorkerPath || '/service-worker.js';
     return c.html(html`
       <html><head>
       <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.1/bundles/datastar.js"></script>
@@ -120,7 +121,7 @@ export function createRouter() {
 
       <script>
           if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.register('/service-worker.js')
+              navigator.serviceWorker.register('${swPath}')
                   .then(registration => console.log('Service Worker registered:', registration.scope))
                   .catch(error => console.log('Service Worker registration failed:', error));
           }

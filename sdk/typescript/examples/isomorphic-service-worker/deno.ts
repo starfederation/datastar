@@ -13,17 +13,17 @@ await buildProcess.output();
 // Now start the server
 const app = new Hono();
 const swPath = minify
-  ? "./public/service-worker.min.js"
-  : "./public/service-worker.js";
+  ? "/service-worker.min.js"
+  : "/service-worker.js";
 
 // Serve static files from public directory
 app.use("/*", serveStatic({ root: "./public" }));
 
-// Serve the service worker
-app.get("/service-worker.js", serveStatic({ path: swPath }));
+// Simple direct path serving for service worker
+app.get(swPath, serveStatic({ path: `./public${swPath}` }));
 
-// Mount the shared router
-app.route("/", createRouter());
+// Mount the shared router with the correct service worker path
+app.route("/", createRouter({ serviceWorkerPath: swPath }));
 
 Deno.serve({
   port: 8000,
