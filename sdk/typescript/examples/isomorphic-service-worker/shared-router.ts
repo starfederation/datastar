@@ -1,4 +1,4 @@
-import { Hono } from "jsr:@hono/hono";
+import { Hono } from "jsr:@hono/hono/tiny";
 import { html } from "jsr:@hono/hono/html";
 import type { HtmlEscapedString } from "jsr:@hono/hono/utils/html"; // Add this import
 import { ServerSentEventGenerator } from "../../src/web/serverSentEventGenerator.ts";
