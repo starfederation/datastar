@@ -13,7 +13,6 @@ import (
 	"github.com/delaneyj/toolbelt"
 	"github.com/go-chi/chi/v5"
 	"github.com/goccy/go-json"
-	"github.com/grafana/regexp"
 	"github.com/samber/lo"
 	"github.com/valyala/bytebufferpool"
 )
@@ -67,8 +66,6 @@ func (InitErrorInfo) isErrorInfo() {}
 type InternalErrorInfo map[string]any
 
 func (InternalErrorInfo) isErrorInfo() {}
-
-var isSignalRe = regexp.MustCompile("(\\$\\S*) is not defined")
 
 func setupErrors(router chi.Router) error {
 

@@ -1,6 +1,6 @@
 {% import "github.com/delaneyj/toolbelt" %}
 
-{%- func datastarTsConsts(data *ConstTemplateData) -%}
+{%- func typescriptConsts(data *ConstTemplateData) -%}
 // {%s data.DoNotEdit %}
 
 export const DATASTAR = "{%s data.DatastarKey %}" as const;

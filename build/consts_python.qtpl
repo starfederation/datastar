@@ -19,8 +19,6 @@ class {%s enum.Name.Pascal %}(StrEnum):
 
 DATASTAR_KEY = "{%s data.DatastarKey %}"
 VERSION                   = "{%s data.Version %}"
-VERSION_CLIENT_BYTE_SIZE     = {%d data.VersionClientByteSize %}
-VERSION_CLIENT_BYTE_SIZE_GZIP = {%d data.VersionClientByteSizeGzip %}
 
 #region Default durations
 
