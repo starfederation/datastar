@@ -1,5 +1,6 @@
 import * as esbuild from "https://deno.land/x/esbuild/mod.js";
 import { denoPlugins } from "jsr:@luca/esbuild-deno-loader";
+import { minifyTemplates, writeFiles } from 'npm:esbuild-minify-templates';
 
 const minify = Deno.env.get("MINIFY") === "true";
 const outfile = minify
@@ -9,8 +10,10 @@ const outfile = minify
 // Build with configuration based on MINIFY env var
 await esbuild.build({
   plugins: [
-    ...denoPlugins(),
+    minifyTemplates(), writeFiles(),
+    ...denoPlugins()
   ],
+  write: false,
   entryPoints: ["./service-worker.ts"],
   outfile,
   bundle: true,
