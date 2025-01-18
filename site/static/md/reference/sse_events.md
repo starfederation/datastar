@@ -5,7 +5,7 @@ Responses to [backend plugin actions](/reference/action_plugins#backend-plugins)
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
     <div>
-        The helper SDKs (currently available for <a href="https://github.com/starfederation/datastar/tree/main/sdk/go">Go</a>, <a href="https://github.com/starfederation/datastar/tree/main/sdk/php">PHP</a>, <a href="https://github.com/starfederation/datastar/tree/main/sdk/dotnet">dotnet</a>, <a href="https://github.com/starfederation/datastar/tree/main/sdk/java">Java</a>) can handle the formatting of SSE events for you.
+        The backend <a href="/reference/sdks">SDKs</a> can handle the formatting of SSE events for you.
     </div>
 </div>
 
