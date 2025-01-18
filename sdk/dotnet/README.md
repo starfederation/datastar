@@ -29,7 +29,7 @@ using StarFederation.Datastar;
 using StarFederation.Datastar.DependencyInjection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-...
+
 // define your signals
 public record DatastarSignals : ISignals
 {
@@ -43,21 +43,23 @@ public record DatastarSignals : ISignals
 
     public string Serialize() => JsonSerializer.Serialize(this);
 }
-...
+
 // add as an ASP Service
 //  allows injection of IServerSentEventService, to respond to a request with a Datastar friendly ServerSentEvent
-//                  and ISignals, to read the signals sent by the client
+//  and ISignals, to read the signals sent by the client
 builder.Services.AddDatastar<DatastarSignals>();
-...
-app.UseStaticFiles();
 
-// add endpoints
+// displayDate - merging a fragment
 app.MapGet("/displayDate", async (IServerSentEventService sse) =>
 {
     string today = DateTime.Now.ToString("%y-%M-%d %h:%m:%s");
     await sse.MergeFragments($"""<div id='target'><span id='date'><b>{today}</b><button data-on-click="@get('/removeDate')">Remove</button></span></div>""");
 });
+
+// removeDate - removing a fragment
 app.MapGet("/removeDate", async (IServerSentEventService sse) => { await sse.RemoveFragments("#date"); });
+
+// changeOutput - reads the signals, update the Output, and merge back
 app.MapPost("/changeOutput", async (IServerSentEventService sse, ISignals signals) =>
 {
     DatastarSignals dsSignals = (signals as DatastarSignals) ?? throw new InvalidCastException("Unknown ISignals passed");
