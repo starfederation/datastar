@@ -116,7 +116,7 @@ event: datastar-execute-script
 data: script console.log('Success!')
 ```
 
-Using one of the helper SDKs (currently available for [Go](https://github.com/starfederation/datastar/tree/main/sdk/go), [PHP](https://github.com/starfederation/datastar/tree/main/sdk/php), [dotnet](https://github.com/starfederation/datastar/tree/main/sdk/dotnet) and [Java](https://github.com/starfederation/datastar/tree/main/sdk/java)) will help you get up and running faster.
+Using one of the backend [SDKs](/reference/sdks) will help you get up and running faster.
 
 Here is all of the backend code required to produce the events above in each of the SDKs.
 
