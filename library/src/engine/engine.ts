@@ -216,7 +216,8 @@ export class Engine {
     ...argNames: string[]
   ): RuntimeExpressionFunction {
     const stmts = ctx.value
-      .split(/;|\n/)
+       // split on ; or \n but not if they are within a regex
+      .split(/(?:;|\n)(?=(?:[^\/]*\/[^\/]*\/)*[^\/]*$)/)
       .map((s) => s.trim())
       .filter((s) => s !== '')
     const lastIdx = stmts.length - 1
