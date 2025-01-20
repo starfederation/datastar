@@ -42,7 +42,7 @@ npm install @starfederation/datastar
 
 At the core of Datastar are [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) attributes (hence the name). They allow you to add reactivity to your frontend in a declarative way, and to interact with your backend.
 
-Datastar uses signals to manage frontent state. You can think of signals as reactive variables that automatically track and propagate changes in [expressions](/guide/datastar_expressions). They can be created and modified using data attributes on the frontend, or events sent from the backend. Don't worry if this sounds complicated; it will become clearer as we look at some examples.
+Datastar uses signals to manage state. You can think of signals as reactive variables that automatically track and propagate changes in [expressions](/guide/datastar_expressions). They can be created and modified using data attributes on the frontend, or events sent from the backend. Don't worry if this sounds complicated; it will become clearer as we look at some examples.
 
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
