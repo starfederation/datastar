@@ -118,17 +118,17 @@ The value of the `data-text` attribute is a [Datastar expression](/guide/datasta
 The [`data-computed`](/reference/attribute_plugins#data-computed) attribute creates a new signal that is computed based on an expression. The computed signal is read-only, and its value is automatically updated when any signals in the expression are updated.
 
 ```html
-<div data-signals-input="''" data-computed-repeated="$input.repeat(2)">
-  <input data-bind-input />
-  <div data-text="$repeated">
-    Will be replaced with the contents of the repeated signal
-  </div>
-</div>
+<input data-bind-input />
+<div data-computed-repeated="$input.repeat(2)">
+    <div data-text="$repeated">
+        Will be replaced with the contents of the repeated signal
+    </div>
+</div>>
 ```
 
 This results in the `$repeated` signal's value always being equal to the value of the `$input` signal repeated twice. Computed signals are useful for memoizing expressions containing other signals.
 
-<div data-signals-input3="''" data-computed-repeated="$input3.repeat(2)" class="flex items-start justify-between p-8 alert">
+<div class="flex items-start justify-between p-8 alert">
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
@@ -136,7 +136,7 @@ This results in the `$repeated` signal's value always being equal to the value o
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
-            <div data-text="$repeated" class="output"></div>
+            <div data-computed-repeated="$input3.repeat(2)" data-text="$repeated" class="output"></div>
         </div>
     </div>
 </div>
