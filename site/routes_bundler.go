@@ -142,7 +142,7 @@ func setupBundler(router chi.Router) error {
 		}
 
 		switch details.Type {
-		case "ACTION", "MACRO":
+		case "ACTION":
 			for _, match := range nameRegexp.FindAllStringSubmatch(contents, 1) {
 				details.Label = match[1]
 			}

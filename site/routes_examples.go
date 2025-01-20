@@ -55,6 +55,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 		{
 			Label: "Reactive Examples",
 			Links: []*SidebarLink{
+				{ID: "plugin_order"},
 				{ID: "bind_keys"},
 				{ID: "classes"},
 				{ID: "scroll_into_view"},
