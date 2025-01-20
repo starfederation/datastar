@@ -8,7 +8,6 @@ import (
 )
 
 func TestExampleAnimations(t *testing.T) {
-	t.Skip("animations test is flaky")
 	setupPageTest(t, "examples/animations", func(runner runnerFn) {
 		runner("click and fade out", func(t *testing.T, page *rod.Page) {
 			selector := "#fade_out_swap"
