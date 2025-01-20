@@ -5,6 +5,7 @@
 ### Added
 
 - Added the ability to use an empty value when using the `data-signals-*` syntax, which sets the value to an empty string.
+- Added the entire context to error messages.
 
 ### Changed
 
