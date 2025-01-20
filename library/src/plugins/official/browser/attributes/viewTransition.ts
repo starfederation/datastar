@@ -14,7 +14,7 @@ const VIEW_TRANSITION = 'view-transition'
 
 export const ViewTransition: AttributePlugin = {
   type: PluginType.Attribute,
-  name: VIEW_TRANSITION,
+  name: 'viewTransition',
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
   onGlobalInit() {

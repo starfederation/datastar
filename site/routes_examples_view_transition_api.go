@@ -12,22 +12,20 @@ func setupExamplesViewTransitionAPI(examplesRouter chi.Router) error {
 
 	examplesRouter.Get("/view_transition_api/watch", func(w http.ResponseWriter, r *http.Request) {
 		// You can comment out the below block and still persist the session
+		transition := r.URL.Query().Get("transition")
+		useSlide := transition == "slide"
 
-		signals := &viewTransitionAPISignals{}
-		if err := datastar.ReadSignals(r, signals); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
+		vt := datastar.WithUseViewTransitions(true)
 		sse := datastar.NewSSE(w, r)
-		sse.MergeFragmentTempl(viewTransitionAPIUpdate(signals.UseSlide))
+		sse.MergeFragmentTempl(viewTransitionAPIUpdate(useSlide), vt)
+
 		t := time.NewTicker(time.Second)
 		for {
 			select {
 			case <-r.Context().Done():
 				return
 			case <-t.C:
-				sse.MergeFragmentTempl(viewTransitionAPIUpdate(signals.UseSlide))
+				sse.MergeFragmentTempl(viewTransitionAPIUpdate(useSlide), vt)
 			}
 		}
 	})
