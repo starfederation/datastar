@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Changed the order in which plugins are applied to elements to be depth-first per element, then per `data` attribute ([#495](https://github.com/starfederation/datastar/issues/495)).
 - Improved the handling of invalid expressions and signals, and made error handling generally more granular ([#452](https://github.com/starfederation/datastar/issues/452)).
 
 ### Fixed
