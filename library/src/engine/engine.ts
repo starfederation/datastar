@@ -215,16 +215,9 @@ export class Engine {
     ctx: RuntimeContext,
     ...argNames: string[]
   ): RuntimeExpressionFunction {
-    const stmts = ctx.value
-      .split(/;|\n/)
-      .map((s) => s.trim())
-      .filter((s) => s !== '')
-    const lastIdx = stmts.length - 1
-    const last = stmts[lastIdx]
-    if (!last.startsWith('return')) {
-      stmts[lastIdx] = `return (${stmts[lastIdx]});`
-    }
-    let userExpression = stmts.join(';\n').trim()
+  
+    // Make last statement in an expression a return
+    let userExpression = ctx.value.replace(/([^;\n]*$)/, 'return ($1);')
 
     // Ingore any escaped values
     const escaped = new Map<string, string>()
