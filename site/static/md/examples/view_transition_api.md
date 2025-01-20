@@ -36,16 +36,16 @@ animation-duration: 0.5s;
 
 ## Demo
 
-<div class="flex flex-col gap-4" data-signals="{supportsViewTransitionAPI:!!document.startViewTransition, useSlide: false}">
-<div data-text="`View Transition API supported in browser? ${$supportsViewTransitionAPI}`"></div>
-<div id="stuff" class="flex gap-4">
-<button class="btn btn-accent" data-show="$supportsViewTransitionAPI" data-on-click="@get('/examples/view_transition_api/watch')">
-    Fade transition
-</button>
-<button class="btn btn-accent" data-show="$supportsViewTransitionAPI" data-on-click="$useSlide = true; @get('/examples/view_transition_api/watch')">
-    Slide transition
-</button>
-</div>
+<div class="flex flex-col gap-4" data-signals="{supportsViewTransitionAPI:!!document.startViewTransition}">
+  <div data-text="`View Transition API supported in browser? ${$supportsViewTransitionAPI}`"></div>
+  <div id="stuff" class="flex gap-4" data-show="$supportsViewTransitionAPI">
+    <button class="btn btn-accent" data-on-click="@get('/examples/view_transition_api/watch')">
+      Fade transition
+    </button>
+    <button class="btn btn-accent" data-on-click="@get('/examples/view_transition_api/watch?transition=slide')">
+      Slide transition
+    </button>
+  </div>
 </div>
 
 ## Explanation
@@ -58,7 +58,7 @@ Datastar automatically adds the proper `<meta/>` tags to properly transition ful
 
 ## Inter-page transitions
 
-By default, if `docuument.startViewTransition` exists each SSE fragment update will be wrapped in a `startViewTransition` async call. This will automatically fade in/out. If you want custom animation, such as
+By default, if `docuument.startViewTransition` exists and incoming SSE fragment has [data: useViewTransition true](https://data-star.dev/reference/sse_events#event-types) update will be wrapped in a `startViewTransition` async call. This will automatically fade in/out. If you want custom animation, such as
 
 ```html
 <style>
