@@ -90,4 +90,4 @@ func main() {
 
 ## Examples
 
-The [Datastar website](https://data-star.dev) acts as a [set of examples](https://github.com/starfederation/datastar/tree/e99c9e065467a9b590a9abaf8439c1de5666c67f/site) for how to use the SDK.
+The [Datastar website](https://data-star.dev) acts as a [set of examples](https://github.com/starfederation/datastar/tree/develop/site) for how to use the SDK.
