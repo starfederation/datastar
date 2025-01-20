@@ -25,10 +25,8 @@ In this example we show how to create a file upload form that will be submitted 
       <span class="label-text">Pick anything reasonably sized</span>
     </label>
     <input type="file" data-bind="files" multiple />
-    <button
-      data-on-click="@post('/upload')"
+    <button data-on-click="@post('/upload')">
       Submit
-    >
     </button>
   </div>
 </div>
