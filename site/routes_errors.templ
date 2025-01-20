@@ -24,7 +24,8 @@ templ runtimeArgs(info *RuntimeErrorInfo) {
 		pluginName := toolbelt.Kebab(info.Plugin.Name)
 		pluginType := strings.ToLower(info.Plugin.Type)
 		elementTag := strings.ToLower(info.Element.Tag)
-		key := toolbelt.Kebab(info.Raw.Key)
+		rawKey := toolbelt.Kebab(info.Expression.RawKey)
+		dataAttribute := "data-" + rawKey + "=\"" + info.Expression.Value + "\""
 	}}
 	if pluginName != "" {
 		<div>
@@ -40,7 +41,7 @@ templ runtimeArgs(info *RuntimeErrorInfo) {
 		<div>
 			<h3>Element</h3>
 			<pre>
-				&lt;{ elementTag } id="{ info.Element.ID }" data-{ key }="{ info.Raw.Value }"&gt;&lt;/{ elementTag }&gt;
+				&lt;{ elementTag } id="{ info.Element.ID }" { dataAttribute }&gt;&lt;/{ elementTag }&gt;
 			</pre>
 		</div>
 		if info.Expression.FnContent != "" {
