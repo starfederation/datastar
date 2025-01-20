@@ -61,7 +61,7 @@ Datastar provides us with a way to set up two-way data binding on an element usi
 
 This creates a new signal called `input`, and binds it to the element's value. If either is changed, the other automatically updates.
 
-An alternative syntax exists for `data-bind`, in which the value is used as the signal name. This can be useful depending on the templating language you are using.
+An alternative syntax, in which the value is used as the signal name, is also available. This can be useful depending on the templating language you are using.
 
 ```html
 <input data-bind="input" />
@@ -92,6 +92,8 @@ To see this in action, we can use the [`data-text`](/reference/attribute_plugins
 
 This sets the text content of an element to the value of the signal `$input`. The `$` prefix is required to denote a signal.
 
+Note that `data-*`  attributes are evaluated in the order they appear in the DOM, so the `data-text` attribute must come _after_ the `data-bind` attribute. See the [attribute plugins reference](/reference/attribute_plugins) for more information.
+
 The value of the `data-text` attribute is a [Datastar expression](/guide/datastar_expressions) that is evaluated, meaning that we can use JavaScript in it.
 
 ```html
@@ -118,17 +120,17 @@ The value of the `data-text` attribute is a [Datastar expression](/guide/datasta
 The [`data-computed`](/reference/attribute_plugins#data-computed) attribute creates a new signal that is computed based on an expression. The computed signal is read-only, and its value is automatically updated when any signals in the expression are updated.
 
 ```html
-<div data-signals-input="''" data-computed-repeated="$input.repeat(2)">
-  <input data-bind-input />
-  <div data-text="$repeated">
-    Will be replaced with the contents of the repeated signal
-  </div>
-</div>
+<input data-bind-input />
+<div data-computed-repeated="$input.repeat(2)">
+    <div data-text="$repeated">
+        Will be replaced with the contents of the repeated signal
+    </div>
+</div>>
 ```
 
 This results in the `$repeated` signal's value always being equal to the value of the `$input` signal repeated twice. Computed signals are useful for memoizing expressions containing other signals.
 
-<div data-signals-input3="''" data-computed-repeated="$input3.repeat(2)" class="flex items-start justify-between p-8 alert">
+<div class="flex items-start justify-between p-8 alert">
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
@@ -136,7 +138,7 @@ This results in the `$repeated` signal's value always being equal to the value o
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
-            <div data-text="$repeated" class="output"></div>
+            <div data-computed-repeated="$input3.repeat(2)" data-text="$repeated" class="output"></div>
         </div>
     </div>
 </div>

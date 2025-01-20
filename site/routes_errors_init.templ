@@ -14,9 +14,9 @@ templ InvalidMergeMode(name string, info *InitErrorInfo) {
 templ InvalidPluginType(name string, info *InitErrorInfo) {
 	@InitErrorView(name, info) {
 		if info.Plugin.Name == "" || info.Plugin.Type == "" {
-			<p>An invalid plugin type was provided. Plugin types must be one of the following: <code>Macro</code>, <code>Attribute</code>, <code>Watcher</code>, <code>Action</code>.</p>
+			<p>An invalid plugin type was provided. Plugin types must be one of the following: <code>Attribute</code>, <code>Watcher</code>, <code>Action</code>.</p>
 		} else {
-			<p>The { info.Plugin.Name } plugin has an invalid type <code>{ info.PluginType }</code>. Plugin types must be one of the following: <code>Macro</code>, <code>Attribute</code>, <code>Watcher</code>, <code>Action</code>.</p>
+			<p>The { info.Plugin.Name } plugin has an invalid type <code>{ info.PluginType }</code>. Plugin types must be one of the following: <code>Attribute</code>, <code>Watcher</code>, <code>Action</code>.</p>
 		}
 	}
 }

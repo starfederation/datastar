@@ -9,6 +9,31 @@ Datastar provides the following [`data-*`](https://developer.mozilla.org/en-US/d
     </div>
 </div>
 
+### Attribute Order
+
+Note that `data-*` attributes are evaluated in the order they appear in the DOM. Elements are evaluated by walking the DOM in a depth-first manner, and attributes are processed in the order they appear in the element. This means that if you use a signal in a [Datastar expression](/guide/datastar_expressions), it must be defined _before_ it is used.
+
+```html
+<!-- This works: -->
+<div data-signals-foo="1" data-text="$foo"></div>
+
+<!-- This works: -->
+<div data-signals-foo="1"></div>
+<div data-text="$foo"></div>
+
+<!-- This works: -->
+<div data-signals-foo="1">
+  <div data-text="$foo"></div>
+</div>
+
+<!-- This does NOT work: -->
+<div data-text="$foo" data-signals-foo="1"></div>
+
+<!-- This does NOT work: -->
+<div data-text="$foo"></div>
+<div data-signals-foo="1"></div>
+```
+
 ## Core Plugins
 
 [Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/core/attributes)

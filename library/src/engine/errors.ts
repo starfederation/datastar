@@ -41,11 +41,8 @@ export function runtimeErr(reason: string, ctx: RuntimeContext, metadata = {}) {
       id: ctx.el.id,
       tag: ctx.el.tagName,
     },
-    raw: {
-      key: ctx.rawKey,
-      value: ctx.rawValue,
-    },
     expression: {
+      rawKey: ctx.rawKey,
       key: ctx.key,
       value: ctx.value,
       validSignals: ctx.signals.paths(),
