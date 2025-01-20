@@ -18,3 +18,4 @@
 ### Removed
 
 - Removed the now redundant `method` option from backend plugin actions ([#443](https://github.com/starfederation/datastar/issues/443)).
+- Removed the concept of macro plugins.
