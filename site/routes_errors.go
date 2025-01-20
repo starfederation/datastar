@@ -30,11 +30,8 @@ type RuntimeErrorInfo struct {
 		ID  string `json:"id"`
 		Tag string `json:"tag"`
 	} `json:"element"`
-	Raw struct {
-		Key   string `json:"key"`
-		Value string `json:"value"`
-	} `json:"raw"`
 	Expression struct {
+		RawKey   	 string   `json:"rawKey"`
 		Key          string   `json:"key"`
 		Value        string   `json:"value"`
 		ValidSignals []string `json:"validSignals"`
