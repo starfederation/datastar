@@ -45,7 +45,7 @@ The following example is valid because both `$foo.bar` and `$baz` are signals.
 </div>
 ```
 
-Note that data attributes are evaluated in the order they appear in the DOM, so the `data-text` attributes _must_ come after the `data-signals-*` attributes in the example above. See the [attribute plugins reference](/reference/attribute_plugins) for more information.
+Note that `data-*` attributes are evaluated in the order they appear in the DOM, so the `data-text` attributes must come _after_ the `data-signals-*` attributes in the example above. See the [attribute plugins reference](/reference/attribute_plugins) for more information.
 
 ### Security
 

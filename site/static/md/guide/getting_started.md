@@ -92,7 +92,7 @@ To see this in action, we can use the [`data-text`](/reference/attribute_plugins
 
 This sets the text content of an element to the value of the signal `$input`. The `$` prefix is required to denote a signal.
 
-Note that data attributes are evaluated in the order they appear in the DOM, so the `data-text` attribute _must_ come after the `data-bind` attribute. See the [attribute plugins reference](/reference/attribute_plugins) for more information.
+Note that `data-*`  attributes are evaluated in the order they appear in the DOM, so the `data-text` attribute must come _after_ the `data-bind` attribute. See the [attribute plugins reference](/reference/attribute_plugins) for more information.
 
 The value of the `data-text` attribute is a [Datastar expression](/guide/datastar_expressions) that is evaluated, meaning that we can use JavaScript in it.
 
