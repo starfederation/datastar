@@ -42,7 +42,7 @@ npm install @starfederation/datastar
 
 At the core of Datastar are [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) attributes (hence the name). They allow you to add reactivity to your frontend in a declarative way, and to interact with your backend.
 
-Datastar uses signals to manage state. You can think of signals as reactive variables that automatically track and propagate changes in [expressions](/guide/datastar_expressions). They can be created and modified using data attributes on the frontend, or events sent from the backend. Don't worry if this sounds complicated; it will become clearer as we look at some examples.
+Datastar uses signals to manage frontent state. You can think of signals as reactive variables that automatically track and propagate changes in [expressions](/guide/datastar_expressions). They can be created and modified using data attributes on the frontend, or events sent from the backend. Don't worry if this sounds complicated; it will become clearer as we look at some examples.
 
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
@@ -61,7 +61,7 @@ Datastar provides us with a way to set up two-way data binding on an element usi
 
 This creates a new signal called `input`, and binds it to the element's value. If either is changed, the other automatically updates.
 
-An alternative syntax exists for `data-bind`, in which the value is used as the signal name. This can be useful depending on the templating language you are using.
+An alternative syntax, in which the value is used as the signal name, is also available. This can be useful depending on the templating language you are using.
 
 ```html
 <input data-bind="input" />
@@ -91,6 +91,8 @@ To see this in action, we can use the [`data-text`](/reference/attribute_plugins
 </div>
 
 This sets the text content of an element to the value of the signal `$input`. The `$` prefix is required to denote a signal.
+
+Note that data attributes are evaluated in the order they appear in the DOM, so the `data-text` attribute _must_ come after the `data-bind` attribute. See the [attribute plugins reference](/reference/attribute_plugins) for more information.
 
 The value of the `data-text` attribute is a [Datastar expression](/guide/datastar_expressions) that is evaluated, meaning that we can use JavaScript in it.
 
