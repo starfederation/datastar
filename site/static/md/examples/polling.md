@@ -21,4 +21,4 @@
 </div>
 ```
 
-You can use the `data-on-interval` attribute to execute an expression at a regular interval. In this example, we are incrementing the `count` signal every 1 second.
+You can use the [`data-on-interval`](/reference/attribute_plugins#data-on) attribute to execute an expression at a regular interval. In this example, we are incrementing the `count` signal every 1 second.

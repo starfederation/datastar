@@ -180,8 +180,8 @@ An `evt` variable that represents the event object is available in the expressio
 The `data-on` attribute matches DOM events, however there are currently a few special cases for custom events.
 
 1. `data-on-load` is triggered when an element is loaded into the DOM.
-2. `data-on-interval` is triggered at a regular interval. Defaults to 1s and the interval can be modified using the `__delay` modifier.
-3. `data-on-raf` is triggered on every `requestAnimationFrame` event.
+2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__delay` modifier.
+3. `data-on-raf` is triggered on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.
 4. `data-on-signals-change` is triggered when any signals change.
 
 Note that the `data-on-submit` event listener prevents the default submission behavior of forms.
