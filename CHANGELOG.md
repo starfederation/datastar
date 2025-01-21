@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added the `data-on-interval` attribute.
+- Added the `__delay` modifier for `data-on-*` attributes.
 - Added the entire context to error messages output in the browser console.
 - Added the ability to use an empty value when using the `data-signals-*` syntax, which sets the value to an empty string.
 
