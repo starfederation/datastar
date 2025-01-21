@@ -11,7 +11,7 @@ import {
 import { onElementRemoved } from '../../../../utils/dom'
 import { tagHas, tagToMs } from '../../../../utils/tags'
 import { kebabize } from '../../../../utils/text'
-import { debounce, throttle } from '../../../../utils/timing'
+import { debounce, delay, throttle } from '../../../../utils/timing'
 
 const lastSignalsMarshalled = new Map<string, any>()
 
@@ -34,6 +34,12 @@ export const On: AttributePlugin = {
         if (mods.has('stop')) evt.stopPropagation()
       }
       rx(evt)
+    }
+
+    const delayArgs = mods.get('delay')
+    if (delayArgs) {
+      const wait = tagToMs(delayArgs)
+      callback = delay(callback, wait)
     }
 
     const debounceArgs = mods.get('debounce')
@@ -68,6 +74,21 @@ export const On: AttributePlugin = {
         delete el.dataset.onLoad
         return () => {}
       }
+
+      case 'interval': {
+        let delay = 1000
+        if (delayArgs) {
+          delay = tagToMs(delayArgs)
+          // Run the callback now to counter the setTimeout delay already added to `callback`
+          callback()
+        }
+        const intervalId = setInterval(callback, delay)
+
+        return () => {
+          clearInterval(intervalId)
+        }
+      }
+
       case 'raf': {
         let rafId: number | undefined
         const raf = () => {
@@ -95,6 +116,7 @@ export const On: AttributePlugin = {
           }
         })
       }
+
       default: {
         const testOutside = mods.has('outside')
         if (testOutside) {

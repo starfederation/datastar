@@ -1,5 +1,16 @@
 export type TimerHandler = (...args: any[]) => void
 
+export function delay(
+  callback: TimerHandler,
+  wait: number,
+): TimerHandler {
+  return function wrapper(...args: any[]) {
+    setTimeout(() => {
+      callback(...args)
+    }, wait)
+  }
+}
+
 export function debounce(
   callback: TimerHandler,
   wait: number,
