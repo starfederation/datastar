@@ -196,6 +196,7 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 - `__delay` - Delay the event listener.
   - `.500ms` - Delay for 500 milliseconds.
   - `.1s` - Delay for 1 second.
+  - `.leading` - Delay with leading edge. Nullifies the delay but can be used to execute the expression immediately when using `data-on-interval`.
 - `__debounce` - Debounce the event listener.
   - `.500ms` - Debounce for 500 milliseconds.
   - `.1s` - Debounce for 1 second.

@@ -39,7 +39,8 @@ export const On: AttributePlugin = {
     const delayArgs = mods.get('delay')
     if (delayArgs) {
       const wait = tagToMs(delayArgs)
-      callback = delay(callback, wait)
+      const leading = tagHas(delayArgs, 'leading', false)
+      callback = delay(callback, wait, leading)
     }
 
     const debounceArgs = mods.get('debounce')
