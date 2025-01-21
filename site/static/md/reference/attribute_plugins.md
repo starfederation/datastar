@@ -180,10 +180,11 @@ An `evt` variable that represents the event object is available in the expressio
 The `data-on` attribute matches DOM events, however there are currently a few special cases for custom events.
 
 1. `data-on-load` is triggered when an element is loaded into the DOM.
-2. `data-on-signals-change` is triggered when any signals change.
-3. `data-on-raf` is triggered on every `requestAnimationFrame` event.
+2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__delay` modifier.
+3. `data-on-raf` is triggered on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.
+4. `data-on-signals-change` is triggered when any signals change.
 
-Note that the `data-on-submit` event listener now prevents the default submission behavior of forms.
+Note that the `data-on-submit` event listener prevents the default submission behavior of forms.
 
 #### Modifiers
 
@@ -192,6 +193,10 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 - `__once` \* - Only trigger the event listener once.
 - `__passive` \* - Do not call `preventDefault` on the event listener.
 - `__capture` \* - Use a capture event listener.
+- `__delay` - Delay the event listener.
+  - `.500ms` - Delay for 500 milliseconds.
+  - `.1s` - Delay for 1 second.
+  - `.leading` - Delay with leading edge. Nullifies the delay but can be used to execute the expression immediately when using `data-on-interval`.
 - `__debounce` - Debounce the event listener.
   - `.500ms` - Debounce for 500 milliseconds.
   - `.1s` - Debounce for 1 second.
