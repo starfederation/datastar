@@ -203,10 +203,39 @@ export class Engine {
     ctx: RuntimeContext,
     ...argNames: string[]
   ): RuntimeExpressionFunction {
-    const stmts = ctx.value
-      .split(/;|\n/)
+    // This regex allows Datastar expressions to support nested
+    // regex and strings that contain ; and/or \n without breaking.
+    //
+    // Full regex for testing on regex101.com
+    // ((?:\/(?:\\\/|[^\/])*\/|"(?:\\"|[^\"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|[^;\n])*)([;\n]+)
+    // Only valid ; and \n should be in the second capture group.
+    //
+    // Each of these regex ignore a block type:
+    //
+    // regex            \/(?:\\\/|[^\/])*\/
+    // double quotes     "(?:\\"|[^\"])*"
+    // single quotes     '(?:\\'|[^'])*'
+    // ticks             `(?:\\`|[^`])*`
+    //
+    // We want to ignore the non delimiter part of statements too:
+    //
+    // [^;\n]
+    //
+    // Once all the blocks we want to ignore are captured we then find
+    // the statement delimiters in the second capture group:
+    //
+    // ([;\n]+)
+    //
+    // Note: the reason why this regex isn't broken down into strings is
+    // that doing so adds an extra layer of escapes which makes it
+    // even harder to reason about, harder to check in external regex apps
+    // and leads to worse compression.
+    //
+    const statementSplitRe = /((?:\/(?:\\\/|[^\/])*\/|"(?:\\"|[^\"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|[^;\n])*)([;\n]+)/gm
+
+    const stmts = ctx.value.split(statementSplitRe)
       .map((s) => s.trim())
-      .filter((s) => s !== '')
+      .filter((s) => s !== '' && s !== ';')
     const lastIdx = stmts.length - 1
     const last = stmts[lastIdx]
     if (!last.startsWith('return')) {
