@@ -91,9 +91,6 @@ export class Engine {
       // Cleanup any previous plugins
       this.#cleanup(el)
 
-      // Skip elements with empty dataset or marked to be ignored
-      if (!el.dataset || 'starIgnore' in el.dataset) return
-
       // Apply the plugins to the element in order of application
       // since DOMStringMap is ordered, we can be deterministic
       for (const rawKey of Object.keys(el.dataset)) {
@@ -287,9 +284,16 @@ export class Engine {
     if (
       !element ||
       !(element instanceof HTMLElement || element instanceof SVGElement)
-    )
+    ) {
       return null
-    callback(element)
+    }
+    const dataset = element.dataset
+    if ('starIgnore' in dataset) {
+      return null
+    }
+    if (!('starIgnore__self' in dataset)) {
+      callback(element)
+    }
     let el = element.firstElementChild
     while (el) {
       this.#walkDownDOM(el, callback)
