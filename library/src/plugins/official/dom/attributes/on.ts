@@ -79,7 +79,7 @@ export const On: AttributePlugin = {
         let delay = 1000
         if (delayArgs) {
           delay = tagToMs(delayArgs)
-          // Run the callback now to counter the setTimeout delay already added to `callback`
+          // Run the callback now to counter the `delay` timing function wrapping the `callback` with the `setTimeout` function
           callback()
         }
         const intervalId = setInterval(callback, delay)
