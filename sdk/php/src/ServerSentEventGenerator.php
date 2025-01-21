@@ -57,7 +57,7 @@ class ServerSentEventGenerator
             return;
         }
 
-        foreach (self::headers() as $name => $value) {
+        foreach (static::headers() as $name => $value) {
             header("$name: $value");
         }
     }

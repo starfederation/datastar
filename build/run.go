@@ -44,7 +44,7 @@ func extractVersion() (string, error) {
 	// Write out the version to the version file.
 	versionPath := "library/src/engine/version.ts"
 	versionContents := fmt.Sprintf("export const VERSION = '%s';\n", version)
-	if err := os.WriteFile(versionPath, []byte(versionContents), 0644); err != nil {
+	if err := os.WriteFile(versionPath, []byte(versionContents), 0o644); err != nil {
 		return "", fmt.Errorf("error writing version file: %w", err)
 	}
 
@@ -140,15 +140,17 @@ func writeOutConsts(version string) error {
 		"sdk/php/src/Consts.php":                  phpConsts,
 		"sdk/php/src/enums/EventType.php":         phpEventType,
 		"sdk/php/src/enums/FragmentMergeMode.php": phpFragmentMergeMode,
-		"sdk/java/src/main/java/starfederation/datastar/Consts.java":                  javaConsts,
-		"sdk/java/src/main/java/starfederation/datastar/enums/EventType.java":         javaEventType,
-		"sdk/java/src/main/java/starfederation/datastar/enums/FragmentMergeMode.java": javaFragmentMergeMode,
+		"sdk/java/core/src/main/java/starfederation/datastar/Consts.java":                  javaConsts,
+		"sdk/java/core/src/main/java/starfederation/datastar/enums/EventType.java":         javaEventType,
+		"sdk/java/core/src/main/java/starfederation/datastar/enums/FragmentMergeMode.java": javaFragmentMergeMode,
+		"sdk/python/src/datastar_py/consts.py":    pythonConsts,
+		"sdk/typescript/src/consts.ts":            typescriptConsts,
 	}
 
 	for path, tmplFn := range templates {
 		log.Printf("Writing %s...", path)
 		contents := strings.TrimSpace(tmplFn(Consts))
-		if err := os.WriteFile(path, []byte(contents), 0644); err != nil {
+		if err := os.WriteFile(path, []byte(contents), 0o644); err != nil {
 			return fmt.Errorf("error writing version file: %w", err)
 		}
 	}

@@ -2,10 +2,6 @@ package site
 
 import "time"
 
-type viewTransitionAPISignals struct {
-	UseSlide bool `json:"useSlide"`
-}
-
 templ viewTransitionAPIUpdate(useSlide bool) {
 	<div
 		id="stuff"

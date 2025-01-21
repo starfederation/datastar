@@ -3,7 +3,7 @@
 // Slug: Bind attributes to expressions
 // Description: Any attribute can be bound to an expression. The attribute will be updated reactively whenever the expression signal changes.
 
-import { dsErr } from '../../../../engine/errors'
+import { runtimeErr } from '../../../../engine/errors'
 import {
   type AttributePlugin,
   PluginType,
@@ -25,11 +25,6 @@ export const Bind: AttributePlugin = {
 
     let setFromSignal = () => {}
     let el2sig = () => {}
-
-    // I better be tied to a signal
-    if (typeof signalName !== 'string') {
-      throw dsErr('InvalidExpression')
-    }
 
     const tnl = el.tagName.toLowerCase()
     let signalDefault: string | boolean | number | File = ''
@@ -110,13 +105,13 @@ export const Bind: AttributePlugin = {
               const reader = new FileReader()
               reader.onload = () => {
                 if (typeof reader.result !== 'string') {
-                  throw dsErr('InvalidFileResultType', {
-                    type: typeof reader.result,
+                  throw runtimeErr('InvalidFileResultType', ctx, {
+                    resultType: typeof reader.result,
                   })
                 }
                 const match = reader.result.match(dataURIRegex)
                 if (!match?.groups) {
-                  throw dsErr('InvalidDataUri', {
+                  throw runtimeErr('InvalidDataUri', ctx, {
                     result: reader.result,
                   })
                 }
@@ -170,8 +165,8 @@ export const Bind: AttributePlugin = {
           signals.setValue(signalName, v)
         }
       } else {
-        throw dsErr('UnsupportedSignalType', {
-          current: typeof current,
+        throw runtimeErr('BindUnsupportedSignalType', ctx, {
+          signalType: typeof current,
         })
       }
     }

@@ -19,7 +19,7 @@ Provide an SDK in a language agnostic way, to that end
   - [ ] JS/TS
   - [x] PHP
   - [x] .NET
-  - [ ] Python
+  - [x] Python
   - [x] Java
   - [ ] Haskell?
 

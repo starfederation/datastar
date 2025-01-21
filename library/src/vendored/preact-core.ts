@@ -1,5 +1,7 @@
-import { dsErr } from '../engine/errors'
+import { internalErr } from '../engine/errors'
 import type { OnRemovalFn } from '../engine/types'
+
+const from = 'preact-signals'
 
 // An named symbol/brand for detecting Signal instances even when they weren't
 // created using the same signals library version.
@@ -78,7 +80,7 @@ function endBatch() {
   batchDepth--
 
   if (hasError) {
-    throw dsErr('BatchError, error', { error })
+    throw internalErr(from, 'BatchError, error', { error })
   }
 }
 
@@ -366,7 +368,7 @@ Object.defineProperty(Signal.prototype, 'value', {
   set(this: Signal, value) {
     if (value !== this._value) {
       if (batchIteration > 100) {
-        throw dsErr('SignalCycleDetected')
+        throw internalErr(from, 'SignalCycleDetected')
       }
 
       this._value = value
@@ -645,7 +647,7 @@ Object.defineProperty(Computed.prototype, 'value', {
   get(this: Computed) {
     if (this._flags & RUNNING) {
       // Cycle detected
-      throw dsErr('SignalCycleDetected')
+      throw internalErr(from, 'SignalCycleDetected')
     }
     const node = addDependency(this)
     this._refresh()
@@ -653,7 +655,7 @@ Object.defineProperty(Computed.prototype, 'value', {
       node._version = this._version
     }
     if (this._flags & HAS_ERROR) {
-      throw dsErr('GetComputedError', { value: this._value })
+      throw internalErr(from, 'GetComputedError', { value: this._value })
     }
     return this._value
   },
@@ -702,7 +704,7 @@ function cleanupEffect(effect: Effect) {
       effect._flags &= ~RUNNING
       effect._flags |= DISPOSED
       disposeEffect(effect)
-      throw dsErr('CleanupEffectError', { error })
+      throw internalErr(from, 'CleanupEffectError', { error })
     } finally {
       evalContext = prevContext
       endBatch()
@@ -726,7 +728,7 @@ function disposeEffect(effect: Effect) {
 
 function endEffect(this: Effect, prevContext?: Computed | Effect) {
   if (evalContext !== this) {
-    throw dsErr('EndEffectError')
+    throw internalErr(from, 'EndEffectError')
   }
   cleanupSources(this)
   evalContext = prevContext
@@ -781,7 +783,7 @@ Effect.prototype._callback = function () {
 
 Effect.prototype._start = function () {
   if (this._flags & RUNNING) {
-    throw dsErr('SignalCycleDetected')
+    throw internalErr(from, 'SignalCycleDetected')
   }
   this._flags |= RUNNING
   this._flags &= ~DISPOSED

@@ -1,10 +1,9 @@
 import type { EffectFn, Signal } from '../vendored/preact-core'
-import type { SignalsRoot } from './nestedSignals'
+import type { SignalsRoot } from './signals'
 
 export type OnRemovalFn = () => void
 
 export enum PluginType {
-  Macro = 0,
   Attribute = 1,
   Watcher = 2,
   Action = 3,
@@ -13,11 +12,6 @@ export enum PluginType {
 export interface DatastarPlugin {
   type: PluginType // The type of plugin
   name: string // The name of the plugin
-}
-
-export interface MacroPlugin extends DatastarPlugin {
-  type: PluginType.Macro
-  fn: (ctx: RuntimeContext, original: string) => string
 }
 
 export enum Requirement {
@@ -36,10 +30,6 @@ export interface AttributePlugin extends DatastarPlugin {
   keyReq?: Requirement // The rules for the key requirements
   valReq?: Requirement // The rules for the value requirements
   removeOnLoad?: boolean // If true, the attribute is removed after onLoad (useful for plugins you don’t want reapplied)
-  macros?: {
-    pre?: MacroPlugin[]
-    post?: MacroPlugin[]
-  }
   argNames?: string[] // argument names for the reactive expression
 }
 
@@ -58,9 +48,10 @@ export interface ActionPlugin extends DatastarPlugin {
 }
 
 export type GlobalInitializer = (ctx: InitContext) => void
-export type RemovalEntry = { id: string; set: Set<OnRemovalFn> }
+export type RemovalEntry = { id: string; fns: Array<OnRemovalFn> }
 
 export type InitContext = {
+  plugin: DatastarPlugin
   signals: SignalsRoot
   effect: (fn: EffectFn) => OnRemovalFn
   actions: Readonly<ActionPlugins>
@@ -72,13 +63,14 @@ export type HTMLorSVGElement = Element & (HTMLElement | SVGElement)
 export type Modifiers = Map<string, Set<string>> // mod name -> tags
 
 export type RuntimeContext = InitContext & {
+  plugin: DatastarPlugin // The name of the plugin
   el: HTMLorSVGElement // The element the attribute is on
   rawKey: Readonly<string> // no parsing data-* key
-  rawValue: Readonly<string> // no parsing data-* value
-  value: Readonly<string> // what the user wrote after any macros run
   key: Readonly<string> // data-* key without the prefix or tags
+  value: Readonly<string> // value of data-* attribute
   mods: Modifiers // the tags and their arguments
   genRX: () => <T>(...args: any[]) => T // a reactive expression
+  fnContent?: string // the content of the function
 }
 
 export type NestedValues = { [key: string]: NestedValues | any }

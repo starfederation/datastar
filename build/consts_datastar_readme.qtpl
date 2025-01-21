@@ -56,8 +56,9 @@ You can manually add your own plugins to the core:
     import { Datastar } from 'datastar'
 
     Datastar.load(
-        // I can make my own plugins!
+        // Look ma’, I made a plugin!
     )
+    Datastar.apply(document.body)
     </script>
 ```
 

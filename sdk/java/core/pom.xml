@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://www.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.starfederation</groupId>
+        <artifactId>datastar-java-sdk-suite</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>datastar-java-sdk-core</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Datastar Java SDK Core</name>
+    <description>The core library for the Datastar Java SDK suite</description>
+
+
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://github.com/starfederation/datastar</url>
+        </repository>
+    </distributionManagement>
+
+    <dependencies>
+        <!-- Jackson for JSON processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.databind.version}</version>
+        </dependency>
+    </dependencies>
+
+
+</project>

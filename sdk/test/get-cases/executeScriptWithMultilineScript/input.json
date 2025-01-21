@@ -1,0 +1,1 @@
+{"events": [ { "type": "executeScript", "script": "if (true) {\n  console.log('hello');\n}" }]}

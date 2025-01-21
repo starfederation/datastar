@@ -13,6 +13,6 @@ export const DELETE: ActionPlugin = {
   type: PluginType.Action,
   name: 'delete',
   fn: async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
-    return sse(ctx, url, { ...args, method: 'DELETE' })
+    return sse(ctx, 'DELETE', url, { ...args })
   },
 }

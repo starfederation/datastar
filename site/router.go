@@ -105,7 +105,7 @@ func setupRoutes(ctx context.Context, router chi.Router) (err error) {
 		setupReferenceRoutes(ctx, router),
 		setupExamples(ctx, router, sessionSignals),
 		setupEssays(ctx, router),
-		setupErrors(ctx, router),
+		setupErrors(router),
 		setupMemes(router),
 		setupBundler(router),
 	); err != nil {

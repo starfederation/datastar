@@ -3,7 +3,7 @@
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.
 
 import { DATASTAR, DATASTAR_REQUEST } from '../../../../engine/consts'
-import { dsErr } from '../../../../engine/errors'
+import { runtimeErr } from '../../../../engine/errors'
 import type { RuntimeContext } from '../../../../engine/types'
 import {
   type FetchEventSourceInit,
@@ -17,8 +17,6 @@ import {
   STARTED,
 } from '../shared'
 
-type METHOD = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
-
 function dispatchSSE(type: string, argsRaw: Record<string, string>) {
   document.dispatchEvent(
     new CustomEvent<DatastarSSEEvent>(DATASTAR_SSE_EVENT, {
@@ -30,7 +28,6 @@ function dispatchSSE(type: string, argsRaw: Record<string, string>) {
 const isWrongContent = (err: any) => `${err}`.includes('text/event-stream')
 
 export type SSEArgs = {
-  method: METHOD
   headers?: Record<string, string>
   openWhenHidden?: boolean
   retryInterval?: number
@@ -49,14 +46,18 @@ export type SSEArgs = {
     }
 )
 
-export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
+export const sse = async (
+  ctx: RuntimeContext,
+  method: string,
+  url: string,
+  args: SSEArgs,
+) => {
   const {
     el: { id: elId },
     el,
     signals,
   } = ctx
   const {
-    method: methodAnyCase,
     headers: userHeaders,
     contentType,
     includeLocal,
@@ -69,7 +70,6 @@ export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
     abort,
   } = Object.assign(
     {
-      method: 'GET',
       headers: {},
       contentType: 'json',
       includeLocal: false,
@@ -83,13 +83,12 @@ export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
     },
     args,
   )
-  const method = methodAnyCase.toUpperCase()
-  const action = methodAnyCase.toLowerCase()
+  const action = method.toLowerCase()
   let cleanupFn = (): void => {}
   try {
     dispatchSSE(STARTED, { elId })
     if (!url?.length) {
-      throw dsErr('SseNoUrlProvided', { action })
+      throw runtimeErr('SseNoUrlProvided', ctx, { action })
     }
 
     const initialHeaders: Record<string, any> = {}
@@ -148,7 +147,7 @@ export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
       onerror: (error) => {
         if (isWrongContent(error)) {
           // don't retry if the content-type is wrong
-          throw dsErr('InvalidContentType', { url, error })
+          throw runtimeErr('InvalidContentType', ctx, { url })
         }
         // do nothing and it will retry
         if (error) {
@@ -173,9 +172,9 @@ export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
         : el.closest('form')
       if (formEl === null) {
         if (selector) {
-          throw dsErr('SseFormNotFound', { action, selector })
+          throw runtimeErr('SseFormNotFound', ctx, { action, selector })
         }
-        throw dsErr('SseClosestFormNotFound', { action })
+        throw runtimeErr('SseClosestFormNotFound', ctx, { action })
       }
       if (el !== formEl) {
         const preventDefault = (evt: Event) => evt.preventDefault()
@@ -198,16 +197,16 @@ export const sse = async (ctx: RuntimeContext, url: string, args: SSEArgs) => {
         req.body = formData
       }
     } else {
-      throw dsErr('SseInvalidContentType', { action, contentType })
+      throw runtimeErr('SseInvalidContentType', ctx, { action, contentType })
     }
 
     urlInstance.search = queryParams.toString()
 
     try {
-      await fetchEventSource(urlInstance.toString(), req)
+      await fetchEventSource(ctx, urlInstance.toString(), req)
     } catch (error) {
       if (!isWrongContent(error)) {
-        throw dsErr('SseFetchFailed', { method, url, error })
+        throw runtimeErr('SseFetchFailed', ctx, { method, url, error })
       }
       // exit gracefully and do nothing if the content-type is wrong
       // this can happen if the client is sending a request

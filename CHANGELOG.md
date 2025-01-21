@@ -1,24 +1,24 @@
 # WIP Release Notes for Datastar
 
-## v1.0.0-beta.1
-
-Happy new 2025! We’ve tied up loose ends, made all final breaking changes to the API, and after a grueling couple of months we’re delighted to release Datastar v1.0.0-beta.1 🚀
-
-After stabilising how nested signals work and living with the signal suffix `.value` for a while, we realised that it wasn’t as ergonomic as we wanted. So, honing our regex fu, we managed to switch (back) to a `$` prefix for signals and a `@` prefix for actions.
-
-The symbols add Datastar specific namespacing – `$` for a $ignal, `@` for an @ction – so it’s immediately obvious what you’re working with, and you end up with much fewer characters to read and write!!
+## v1.0.0-beta.2
 
 ### Added
 
-- Added the `data-custom-validity` attribute ([#410](https://github.com/starfederation/datastar/issues/410)).
+- Added the `data-on-interval` attribute.
+- Added the `__delay` modifier for `data-on-*` attributes.
+- Added the entire context to error messages output in the browser console.
+- Added the ability to use an empty value when using the `data-signals-*` syntax, which sets the value to an empty string.
 
 ### Changed
 
-- Signals now have a `$` prefix (again) instead of a `.value` suffix (the regex search and replace from `(\w+(\.\w+)*)\.value` to `\$$1` may be helpful when updating your code).
-- Actions now have a `@` prefix (again) instead of no suffix.
-- Changed the `data-attributes` attribute to `data-attr` ([#422](https://github.com/starfederation/datastar/issues/422)).
-- Changed TypeScript import paths back to relative paths, so that no config is required in the build step.
+- Changed the order in which plugins are applied to elements to be depth-first per element, then per `data` attribute ([#495](https://github.com/starfederation/datastar/issues/495)).
+- Improved the handling of invalid expressions and signals, and made error handling generally more granular ([#452](https://github.com/starfederation/datastar/issues/452)).
 
 ### Fixed
 
-- Fixed the `__outside` modifier so that elements contained within it are ignored ([#425](https://github.com/starfederation/datastar/issues/425)).
+- Fixed dashes not being trimmed from keys when double dashes were used ([#450](https://github.com/starfederation/datastar/issues/450)).
+
+### Removed
+
+- Removed the now redundant `method` option from backend plugin actions ([#443](https://github.com/starfederation/datastar/issues/443)).
+- Removed the concept of macro plugins.

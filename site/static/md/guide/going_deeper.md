@@ -116,7 +116,7 @@ event: datastar-execute-script
 data: script console.log('Success!')
 ```
 
-Using one of the helper SDKs (currently available for [Go](https://github.com/starfederation/datastar/tree/main/sdk/go), [PHP](https://github.com/starfederation/datastar/tree/main/sdk/php), [dotnet](https://github.com/starfederation/datastar/tree/main/sdk/dotnet) and [Java](https://github.com/starfederation/datastar/tree/main/sdk/java)) will help you get up and running faster.
+Using one of the backend [SDKs](/reference/sdks) will help you get up and running faster.
 
 Here is all of the backend code required to produce the events above in each of the SDKs.
 
@@ -130,7 +130,7 @@ Datastar is smaller than Alpine.js and htmx, yet it provides the functionality o
 
 The package size is not _just_ a vanity metric. By embracing simplicity, and building on first principles, everything becomes cleaner and leaner. But don't take our word for it – [explore the source code](https://github.com/starfederation/datastar/tree/main/library) and see for yourself!
 
-Datastar is both a core library (4 KiB) and a “batteries included” framework (~12 KiB), allowing you to create [custom bundles](/bundler) and write your own plugins.
+Datastar is both a core library (~5 KiB) and a “batteries included” framework (~13 KiB), allowing you to create [custom bundles](/bundler) and write your own plugins.
 
 ## Hypermedia First
 
