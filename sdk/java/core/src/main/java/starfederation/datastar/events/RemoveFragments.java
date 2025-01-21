@@ -13,6 +13,11 @@ public final class RemoveFragments extends AbstractDatastarEvent {
         super(eventType, dataLines);
     }
 
+    @Override
+    public EventType getEventType() {
+        return EventType.RemoveFragments;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -22,7 +27,8 @@ public final class RemoveFragments extends AbstractDatastarEvent {
         private String selector;
         private int settleDuration = DEFAULT_FRAGMENTS_SETTLE_DURATION; // Default
         private boolean useViewTransition = DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS; // Default
-
+        private Builder() {
+        }
         public Builder selector(String selector) {
             this.selector = selector;
             return this;
@@ -47,7 +53,7 @@ public final class RemoveFragments extends AbstractDatastarEvent {
             List<String> dataLines = new ArrayList<>();
 
             // Add selector
-            dataLines.add(SELECTOR_DATALINE_LITERAL + selector);
+            dataLines.add(SELECTOR_DATALINE_LITERAL + selector.trim());
 
             // Add settleDuration if not default
             if (settleDuration != DEFAULT_FRAGMENTS_SETTLE_DURATION) {
