@@ -1,10 +1,10 @@
 package starfederation.datastar.unit;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
+import org.opentest4j.AssertionFailedError;
 import starfederation.datastar.adapters.response.AbstractResponseAdapter;
 import starfederation.datastar.events.MergeFragments;
 import starfederation.datastar.utils.ServerSentEventGenerator;
@@ -19,30 +19,33 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 class ServerSentEventGeneratorTest {
+    private static final AbstractResponseAdapter mockResponse;
+    private static final StringWriter stringWriter;
+    private static final ServerSentEventGenerator generator;
 
-    @Mock
-    private AbstractResponseAdapter mockResponse;
-
-    private ServerSentEventGenerator generator;
-    private StringWriter stringWriter;
-    private AutoCloseable closeable;
-
-    @BeforeEach
-    void setUp() throws Exception {
-        closeable = MockitoAnnotations.openMocks(this);
+    static {
         stringWriter = new StringWriter();
-        when(mockResponse.getWriter()).thenReturn(new PrintWriter(stringWriter));
-
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        mockResponse = Mockito.mock(AbstractResponseAdapter.class);
+        try {
+            when(mockResponse.getWriter()).thenReturn(printWriter);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         generator = new ServerSentEventGenerator(mockResponse);
+    }
+
+    @AfterAll
+    static void end() {
+        generator.close();
     }
 
     @AfterEach
     void tearDown() throws Exception {
         resetCounter();
-        generator.close();
-        closeable.close();
-    }
+        stringWriter.getBuffer().setLength(0);
 
+    }
     private void resetCounter() throws Exception {
         Field counterField = ServerSentEventGenerator.class.getDeclaredField("counter");
         counterField.setAccessible(true);
@@ -63,6 +66,7 @@ class ServerSentEventGeneratorTest {
         String expectedOutput = """
                 event: datastar-merge-fragments
                 id: 0
+                retry: 1000
                 data: selector #test
                 data: fragments <div>test</div>
                 
@@ -83,6 +87,7 @@ class ServerSentEventGeneratorTest {
         String expectedOutput = """
                 event: datastar-merge-fragments
                 id: custom-id
+                retry: 1000
                 data: selector #test
                 data: fragments <div>test</div>
                 
@@ -109,11 +114,13 @@ class ServerSentEventGeneratorTest {
         String expectedOutput = """
                 event: datastar-merge-fragments
                 id: 0
+                retry: 1000
                 data: selector #test1
                 data: fragments <div>test1</div>
                 
                 event: datastar-merge-fragments
                 id: 1
+                retry: 1000
                 data: selector #test2
                 data: fragments <div>test2</div>
                 
@@ -129,6 +136,10 @@ class ServerSentEventGeneratorTest {
 
     @Test
     void constructorShouldThrowExceptionForNullResponse() {
-        assertThrows(IllegalArgumentException.class, () -> new ServerSentEventGenerator(null));
+        assertThrows(IllegalArgumentException.class, () -> {
+            try (ServerSentEventGenerator ignored = new ServerSentEventGenerator(null)) {
+                throw new AssertionFailedError();
+            }
+        });
     }
 }
