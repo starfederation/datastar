@@ -31,6 +31,12 @@ self.addEventListener("fetch", (event) => {
         }
       }
 
+      if (!navigator.onLine) {
+        console.log("Browser is offline, using service worker response.");
+        router.offline = true;
+        return await router.fetch(event.request);
+      }
+
       try {
         const networkResponse = await fetch(event.request);
         router.offline = false;
@@ -49,19 +55,6 @@ self.addEventListener("fetch", (event) => {
         // Get response from router
         const response = await router.fetch(event.request);
 
-        // If this is an SSE endpoint, preserve the streaming nature
-        if (
-          response.headers.get("Content-Type")?.includes("text/event-stream")
-        ) {
-          return new Response(response.body, {
-            headers: {
-              "Content-Type": "text/event-stream",
-              "Cache-Control": "no-cache",
-              "Connection": "keep-alive",
-            },
-          });
-        }
-
         return response;
       }
     })(),
@@ -69,13 +62,7 @@ self.addEventListener("fetch", (event) => {
 });
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    (async () => {
-      const cache = await caches.open("static-v1");
-      await cache.add("/styles.css");
-      self.skipWaiting();
-    })(),
-  );
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener("activate", (event) => {

@@ -25,8 +25,8 @@ app.route("/", createRouter({ serviceWorkerPath: swPath }));
 
 Deno.serve({
   port: 8000,
-  hostname: "localhost",
-  onListen({ hostname, port }) {
-    console.log(`Listening on http://localhost:${port}`);
+  hostname: "localhost", // Changed to only listen on localhost
+  onListen({ port }) {
+    console.log(`Deno server running on http://localhost:${port}`);
   },
 }, app.fetch);
