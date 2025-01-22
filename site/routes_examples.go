@@ -191,6 +191,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 			setupExamplesModelBinding(examplesRouter),
 			setupExamplesTitleUpdateBackend(examplesRouter),
 			setupExamplesSignalsChanged(examplesRouter, signals),
+			setupExamplesPolling(examplesRouter, signals),
 			setupExamplesCSRF(examplesRouter),
 			setupExamplesScrollIntoView(examplesRouter),
 			setupExamplesQuickPrimerGo(examplesRouter),

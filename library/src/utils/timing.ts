@@ -5,7 +5,7 @@ export function delay(
   wait: number,
   leading = false,
 ): TimerHandler {
-  return function wrapper(...args: any[]) {
+  return (...args: any[]) => {
     if (leading) {
       callback(...args)
     } else {
