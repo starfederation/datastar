@@ -12,9 +12,7 @@ await buildProcess.output();
 
 // Now start the server
 const app = new Hono();
-const swPath = minify
-  ? "/service-worker.min.js"
-  : "/service-worker.js";
+const swPath = minify ? "/service-worker.min.js" : "/service-worker.js";
 
 // Serve static files from public directory
 app.use("/*", serveStatic({ root: "./public" }));

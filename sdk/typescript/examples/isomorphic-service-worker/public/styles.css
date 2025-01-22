@@ -1,120 +1,120 @@
 .offlineNotice {
-    display: block;
-    color: red;
+  display: block;
+  color: red;
 }
 
 #ds-content {
-    height: 450px;
-    overflow: auto;
-    border: 1px solid #ccc;
+  height: 450px;
+  overflow: auto;
+  border: 1px solid #ccc;
 }
 
 .progress {
-    position: sticky;
-    top: 0;
-    background: #fff;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
 }
 
 .progress-bar {
-    width: 100%;
-    background: #e0e0e0;
-    border-radius: 5px;
-    overflow: hidden;
+  width: 100%;
+  background: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
 }
 
 .progress-bar-fill {
-    height: 20px;
-    background: #76c7c0;
-    width: 0;
-    transition: width 0.25s;
+  height: 20px;
+  background: #76c7c0;
+  width: 0;
+  transition: width 0.25s;
 }
 
 .item {
-    padding: 10px;
-    margin: 5px 0;
-    border: 1px solid #eee;
-    animation: fadeIn 0.5s ease-in;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #eee;
+  animation: fadeIn 0.5s ease-in;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
+  from {
+    opacity: 0;
+  }
 
-    to {
-        opacity: 1;
-    }
+  to {
+    opacity: 1;
+  }
 }
 
 .demo-controls {
-    margin: 20px 0;
-    text-align: center;
+  margin: 20px 0;
+  text-align: center;
 }
 
 .button-group {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin: 15px 0;
-    flex-wrap: wrap;
-    /* Allow buttons to wrap on small screens */
-    padding: 0 10px;
-    /* Add some padding for small screens */
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin: 15px 0;
+  flex-wrap: wrap;
+  /* Allow buttons to wrap on small screens */
+  padding: 0 10px;
+  /* Add some padding for small screens */
 }
 
 .button-group button {
-    min-width: 160px;
-    padding: 12px 24px;
-    font-size: 1rem;
-    border: none;
-    background: #76c7c0;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
+  min-width: 160px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border: none;
+  background: #76c7c0;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .button-group button:hover {
-    background: #5fb5ae;
+  background: #5fb5ae;
 }
 
 .button-group button:active {
-    transform: scale(0.98);
+  transform: scale(0.98);
 }
 
 /* Make buttons more touch-friendly on small screens */
 @media (max-width: 600px) {
-    .button-group {
-        gap: 10px;
-    }
+  .button-group {
+    gap: 10px;
+  }
 
-    .button-group button {
-        width: 100%;
-        padding: 16px 24px;
-        font-size: 1.1rem;
-    }
+  .button-group button {
+    width: 100%;
+    padding: 16px 24px;
+    font-size: 1.1rem;
+  }
 }
 
 .description {
-    color: #666;
-    font-size: 1.1em;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.6;
+  color: #666;
+  font-size: 1.1em;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
 .description ul {
-    text-align: left;
-    margin: 15px auto;
+  text-align: left;
+  margin: 15px auto;
 }
 
 .description li {
-    margin: 10px 0;
+  margin: 10px 0;
 }
 
 .items-counter {
-    margin-top: 5px;
-    font-size: 0.9em;
+  margin-top: 5px;
+  font-size: 0.9em;
 }
