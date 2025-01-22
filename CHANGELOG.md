@@ -4,4 +4,5 @@
 
 ### Fixed
 
-- Fixed a bug when using the `__delay` modifier on the `data-on-interval` attribute ([#511](https://github.com/starfederation/datastar/issues/511)).
+- Fixed a bug when using the `__delay` modifier on the `data-on-load` attribute ([#511](https://github.com/starfederation/datastar/issues/511)).
+- Fixed a bug when using the `__delay` modifier on the `data-on-interval` attribute ([#513](https://github.com/starfederation/datastar/issues/513)).
