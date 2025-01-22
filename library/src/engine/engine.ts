@@ -217,21 +217,14 @@ export class Engine {
     //
     // [^;\n]
     //
-    // Once all the blocks we want are captured due to how split works in JS
-    // they will be added to the split result. We can the filter `;` and `\n`
-    // from the result to get our statements.
-    //
-    const statementSplitRe = /((?:\/(?:\\\/|[^\/])*\/|"(?:\\"|[^\"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|[^;\n])*)/gm
-
-    const stmts = ctx.value.split(statementSplitRe)
-      .map((s) => s.trim())
-      .filter((s) => s !== '' && s !== ';')
+    const statementRe = /(?:\/(?:\\\/|[^\/])*\/|"(?:\\"|[^\"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|[^;\n])+/gm
+    const stmts = ctx.value.trim().match(statementRe)
     const lastIdx = stmts.length - 1
     const last = stmts[lastIdx]
     if (!last.startsWith('return')) {
-      stmts[lastIdx] = `return (${stmts[lastIdx]});`
+      stmts[lastIdx] = `return (${last});`
     }
-    let userExpression = stmts.join(';\n').trim()
+    let userExpression = stmts.join(';')
 
     // Ingore any escaped values
     const escaped = new Map<string, string>()
