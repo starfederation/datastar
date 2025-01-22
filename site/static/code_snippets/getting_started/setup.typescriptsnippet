@@ -1,7 +1,7 @@
 const reader = await ServerSentEventGenerator.readSignals(req);
 
 if (!reader.success) {
-    res.end('Error while reading signals`);
+    res.end('Error while reading signals');
     return;
 }
 
