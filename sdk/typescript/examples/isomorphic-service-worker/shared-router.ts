@@ -8,11 +8,27 @@ interface RouterApp extends Hono {
   offline: boolean; // Simpler - offline is now just a boolean
 }
 
-// Improved wrapper function with type checking
-const mergeFragment = (stream: ServerSentEventGenerator, fragment: unknown, options?: { selector?: string; mergeMode?: "morph" | "inner" | "outer" | "prepend" | "append" | "before" | "after" | "upsertAttributes" }) => {
+// Wrap D* mergeFragments so that whatever is passed into it is converted to a string first (Hono HTML uses promises)
+// TODO: perhaps remove new lines/minify it so that its all sent in one sse message?
+const mergeFragment = (
+  stream: ServerSentEventGenerator,
+  fragment: unknown,
+  options?: {
+    selector?: string;
+    mergeMode?:
+      | "morph"
+      | "inner"
+      | "outer"
+      | "prepend"
+      | "append"
+      | "before"
+      | "after"
+      | "upsertAttributes";
+  },
+) => {
   let content: string;
-  if (typeof fragment === 'object' && fragment !== null) {
-    if ('isEscaped' in fragment) {
+  if (typeof fragment === "object" && fragment !== null) {
+    if ("isEscaped" in fragment) {
       // Handle Hono's HtmlEscapedString
       content = (fragment as HtmlEscapedString).toString();
     } else {
@@ -35,25 +51,9 @@ const isServiceWorker = () => {
 
 const source = isServiceWorker() ? "Service Worker" : "Deno Server";
 
-// Static file extensions that should be cached when offline
-const STATIC_EXTENSIONS = [
-  ".css",
-  ".js",
-  ".jpg",
-  ".jpeg",
-  ".png",
-  ".gif",
-  ".svg",
-  ".woff",
-  ".woff2",
-];
-
-const isStaticFile = (url: string) => {
-  return STATIC_EXTENSIONS.some((ext) => url.endsWith(ext));
-};
-
-// Change return type to string since that's what we need
-const progressTemplate = (progress: number, itemCount: number) => html`
+// Progress bar template
+const progressTemplate = (progress: number, itemCount: number) =>
+  html`
   <div id="progress-container" class="progress">
     <div class="progress-bar">
         <div id="progress-bar-fill" class="progress-bar-fill" style="width: ${progress}%"></div>
@@ -66,14 +66,14 @@ const progressTemplate = (progress: number, itemCount: number) => html`
 
 export function createRouter(options: { serviceWorkerPath?: string } = {}) {
   const app = new Hono() as RouterApp;
-  app.offline = false; // Simpler assignment
+  app.offline = false;
 
-  // Add main page route
+  // Main page route
   app.get("/", (c) => {
-    const swPath = options.serviceWorkerPath || '/service-worker.js';
+    const swPath = options.serviceWorkerPath || "/service-worker.js";
     return c.html(html`
       <html><head>
-      <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.1/bundles/datastar.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.2/bundles/datastar.js"></script>
       <link rel="stylesheet" href="/styles.css">
       </head><body>
       
@@ -127,11 +127,12 @@ export function createRouter(options: { serviceWorkerPath?: string } = {}) {
           }
       </script>
       </body></html>
-  `)
+  `);
   });
 
   // Single item template
-  const itemTemplate = (index: number) => html`
+  const itemTemplate = (index: number) =>
+    html`
   <div class="item">
       <h2>Sample Content #${index + 1}</h2>
       <p>This is a longer piece of content that will be repeated many times to demonstrate compression effectiveness.</p>
@@ -145,19 +146,24 @@ export function createRouter(options: { serviceWorkerPath?: string } = {}) {
       stream.mergeSignals({ offlineSig: app.offline });
       const numItems = Math.floor(Math.random() * 50) + 50;
 
-      mergeFragment(stream, html`<div id="ds-content">
+      mergeFragment(
+        stream,
+        html`<div id="ds-content">
         <h1>${bulk ? "Bulk" : "Streaming"} Content (from ${source})</h1>
         <div id="items"></div>
-      </div>`);
+      </div>`,
+      );
 
       if (bulk) {
         mergeFragment(
           stream,
-          Array.from({ length: numItems }, (_, i) => itemTemplate(i)).join("\n"),
+          Array.from({ length: numItems }, (_, i) => itemTemplate(i)).join(
+            "\n",
+          ),
           {
             selector: "#items",
             mergeMode: "append",
-          }
+          },
         );
 
         mergeFragment(stream, progressTemplate(100, numItems));
@@ -169,10 +175,10 @@ export function createRouter(options: { serviceWorkerPath?: string } = {}) {
             {
               selector: "#items",
               mergeMode: "append",
-            }
+            },
           );
           const progress = ((i + 1) / numItems) * 100;
-          
+
           mergeFragment(stream, progressTemplate(progress, i + 1));
           await delay(10);
         }
@@ -180,34 +186,8 @@ export function createRouter(options: { serviceWorkerPath?: string } = {}) {
     });
   });
 
-  // Catch-all route with context-aware handling
-  app.all("*", async (c) => {
-    if (isServiceWorker()) {
-      try {
-        const response = await fetch(c.req.raw);
-        // Cache successful static file responses
-        const url = new URL(c.req.url);
-        if (response.ok && isStaticFile(url.pathname)) {
-          const cache = await caches.open("static-v1");
-          await cache.put(url.pathname, response.clone());
-        }
-        return response;
-      } catch (error) {
-        // Check cache for static files
-        const url = new URL(c.req.url);
-        if (isStaticFile(url.pathname)) {
-          const cache = await caches.open("static-v1");
-          const cachedResponse = await cache.match(url.pathname);
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-        }
-        return c.text("Resource not available offline", 404);
-      }
-    }
-    // In Deno server, return 404
-    return c.text(`Path not found: ${c.req.url}`, 404);
-  });
+  // Catch-all route - just return 404 for unmatched routes
+  app.all("*", (c) => c.text(`Path not found: ${c.req.url}`, 404));
 
   return app;
 }
