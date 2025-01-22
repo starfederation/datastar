@@ -26,11 +26,6 @@ export const Bind: AttributePlugin = {
     let setFromSignal = () => {}
     let el2sig = () => {}
 
-    // I better be tied to a signal
-    if (typeof signalName !== 'string') {
-      throw runtimeErr('InvalidExpression', ctx)
-    }
-
     const tnl = el.tagName.toLowerCase()
     let signalDefault: string | boolean | number | File = ''
     const isInput = tnl.includes('input')

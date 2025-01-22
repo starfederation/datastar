@@ -54,5 +54,6 @@ You can manually add your own plugins to the core:
     Datastar.load(
         // Look ma’, I made a plugin!
     )
+    Datastar.apply(document.body)
     </script>
 ```

@@ -5,15 +5,21 @@ import { type InitContext, PluginType, type RuntimeContext } from './types'
 // const url = 'https://data-star.dev/errors'
 const url = `${window.location.origin}/errors`
 
-function dserr(type: string, reason: string, metadata = {}) {
+interface Metadata {
+  error?: string;
+  [key: string]: any;
+}
+
+function dserr(type: string, reason: string, metadata: Metadata = {}) {
   const e = new Error()
   reason = reason[0].toUpperCase() + reason.slice(1)
-  e.name = `${DATASTAR} ${type} error ${reason}`
+  e.name = `${DATASTAR} ${type} error`
   const r = kebabize(reason).replaceAll('-', '_')
   const q = new URLSearchParams({
     metadata: JSON.stringify(metadata),
   }).toString()
-  e.message = `for more info see ${url}/${type}/${r}?${q}`
+  const c = JSON.stringify(metadata, null, 2)
+  e.message = `${reason}\nMore info: ${url}/${type}/${r}?${q}\nContext: ${c}`
   return e
 }
 
@@ -41,11 +47,8 @@ export function runtimeErr(reason: string, ctx: RuntimeContext, metadata = {}) {
       id: ctx.el.id,
       tag: ctx.el.tagName,
     },
-    raw: {
-      key: ctx.rawKey,
-      value: ctx.rawValue,
-    },
     expression: {
+      rawKey: ctx.rawKey,
       key: ctx.key,
       value: ctx.value,
       validSignals: ctx.signals.paths(),

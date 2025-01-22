@@ -1,4 +1,4 @@
-package starfederation.datastar.unit;
+package starfederation.datastar.adapter.unit;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.HttpHeaders;

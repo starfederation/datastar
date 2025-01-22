@@ -13,7 +13,6 @@ import (
 	"github.com/delaneyj/toolbelt"
 	"github.com/go-chi/chi/v5"
 	"github.com/goccy/go-json"
-	"github.com/grafana/regexp"
 	"github.com/samber/lo"
 	"github.com/valyala/bytebufferpool"
 )
@@ -31,11 +30,8 @@ type RuntimeErrorInfo struct {
 		ID  string `json:"id"`
 		Tag string `json:"tag"`
 	} `json:"element"`
-	Raw struct {
-		Key   string `json:"key"`
-		Value string `json:"value"`
-	} `json:"raw"`
 	Expression struct {
+		RawKey   	 string   `json:"rawKey"`
 		Key          string   `json:"key"`
 		Value        string   `json:"value"`
 		ValidSignals []string `json:"validSignals"`
@@ -67,8 +63,6 @@ func (InitErrorInfo) isErrorInfo() {}
 type InternalErrorInfo map[string]any
 
 func (InternalErrorInfo) isErrorInfo() {}
-
-var isSignalRe = regexp.MustCompile("(\\$\\S*) is not defined")
 
 func setupErrors(router chi.Router) error {
 

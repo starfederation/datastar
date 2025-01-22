@@ -21,7 +21,7 @@ With Datastar, you can build any UI that a full-stack framework like React, Vue.
 The quickest way to use Datastar is to include it in your HTML using a script tag hosted on a CDN.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.2/bundles/datastar.js"></script>
 ```
 
 If you prefer to host the file yourself, download your own bundle using the [bundler](/bundler), then include it from the appropriate path.
@@ -61,7 +61,7 @@ Datastar provides us with a way to set up two-way data binding on an element usi
 
 This creates a new signal called `input`, and binds it to the element's value. If either is changed, the other automatically updates.
 
-An alternative syntax exists for `data-bind`, in which the value is used as the signal name. This can be useful depending on the templating language you are using.
+An alternative syntax, in which the value is used as the signal name, is also available. This can be useful depending on the templating language you are using.
 
 ```html
 <input data-bind="input" />
@@ -92,6 +92,8 @@ To see this in action, we can use the [`data-text`](/reference/attribute_plugins
 
 This sets the text content of an element to the value of the signal `$input`. The `$` prefix is required to denote a signal.
 
+Note that `data-*`  attributes are evaluated in the order they appear in the DOM, so the `data-text` attribute must come _after_ the `data-bind` attribute. See the [attribute plugins reference](/reference/attribute_plugins) for more information.
+
 The value of the `data-text` attribute is a [Datastar expression](/guide/datastar_expressions) that is evaluated, meaning that we can use JavaScript in it.
 
 ```html
@@ -118,17 +120,17 @@ The value of the `data-text` attribute is a [Datastar expression](/guide/datasta
 The [`data-computed`](/reference/attribute_plugins#data-computed) attribute creates a new signal that is computed based on an expression. The computed signal is read-only, and its value is automatically updated when any signals in the expression are updated.
 
 ```html
+<input data-bind-input />
 <div data-computed-repeated="$input.repeat(2)">
-  <input data-bind-input />
-  <div data-text="$repeated">
-    Will be replaced with the contents of the repeated signal
-  </div>
-</div>
+    <div data-text="$repeated">
+        Will be replaced with the contents of the repeated signal
+    </div>
+</div>>
 ```
 
 This results in the `$repeated` signal's value always being equal to the value of the `$input` signal repeated twice. Computed signals are useful for memoizing expressions containing other signals.
 
-<div data-signals-input3="''" data-computed-repeated="$input3.repeat(2)" class="flex items-start justify-between p-8 alert">
+<div class="flex items-start justify-between p-8 alert">
     <div class="flex flex-col gap-4">
         <div class="flex items-center">
             <div class="w-20">Input:</div>
@@ -136,7 +138,7 @@ This results in the `$repeated` signal's value always being equal to the value o
         </div>
         <div class="flex items-center">
             <div class="w-20">Output:</div>
-            <div data-text="$repeated" class="output"></div>
+            <div data-computed-repeated="$input3.repeat(2)" data-text="$repeated" class="output"></div>
         </div>
     </div>
 </div>
@@ -288,7 +290,7 @@ See if you can follow the code below based on what you've learned so far, _befor
 ```html
 <div
   data-signals="{response: '', answer: 'bread'}"
-  data-computed-correct="$response.toLowerCase() == answer"
+  data-computed-correct="$response.toLowerCase() == $answer"
 >
   <div id="question">What do you put in a toaster?</div>
   <button data-on-click="$response = prompt('Answer:') ?? ''">BUZZ</button>
@@ -328,7 +330,7 @@ We've just scratched the surface of frontend reactivity. Now let's take a look a
 
 Datastar uses [Server-Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) (SSE) to stream zero or more events from the web server to the browser. There's no special backend plumbing required to use SSE, just some syntax. Fortunately, SSE is straightforward and [provides us with some advantages](/essays/event_streams_all_the_way_down).
 
-First, set up your backend in the language of your choice. Using one of the helper SDKs (currently available for [Go](https://github.com/starfederation/datastar/tree/main/sdk/go), [PHP](https://github.com/starfederation/datastar/tree/main/sdk/php), [dotnet](https://github.com/starfederation/datastar/tree/main/sdk/dotnet) and [Java](https://github.com/starfederation/datastar/tree/main/sdk/java)) will help you get up and running faster. We're going to use the SDKs in the examples below, which set the appropriate headers and format the events for us, but this is optional.
+First, set up your backend in the language of your choice. Using one of the backend [SDKs](/reference/sdks) will help you get up and running faster. We're going to use the SDKs in the examples below, which set the appropriate headers and format the events for us, but this is optional.
 
 The following code would exist in a controller action endpoint in your backend.
 

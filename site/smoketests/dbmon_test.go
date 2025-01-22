@@ -2,6 +2,7 @@ package smoketests
 
 import (
 	"testing"
+	"time"
 
 	"github.com/go-rod/rod"
 	"github.com/stretchr/testify/assert"
@@ -15,6 +16,7 @@ func TestExampleDbmon(t *testing.T) {
 			initial := page.MustElement(selector).MustHTML()
 			// start := time.Now()
 
+			time.Sleep(100 * time.Millisecond)
 			page.MustWait("() => document.querySelector(`" + selector + "`).innerHTML !== `" + initial + "`")
 			// t.Logf("TestExampleDbmon - database monitoring - MustWait duration: %s", time.Since(start))
 

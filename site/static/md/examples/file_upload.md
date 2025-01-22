@@ -18,15 +18,14 @@ In this example we show how to create a file upload form that will be submitted 
 <!-- Removed styling for brevity -->
 <div
   id="file_upload" data-on-load="@get('/examples/file_upload/data')"
-  data-signals="{"files": [],"filesMimes": [],"filesNames": []}"
+  data-signals="{files: [], filesMimes: [], filesNames: []}"
 >
   <div>
     <label>
       <span class="label-text">Pick anything reasonably sized</span>
     </label>
     <input type="file" data-bind="files" multiple />
-    <button
-      data-on-click="@post('/upload')"
+    <button data-on-click="@post('/upload')">
       Submit
     </button>
   </div>

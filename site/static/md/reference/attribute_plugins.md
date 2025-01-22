@@ -9,6 +9,31 @@ Datastar provides the following [`data-*`](https://developer.mozilla.org/en-US/d
     </div>
 </div>
 
+### Attribute Order
+
+Note that `data-*` attributes are evaluated in the order they appear in the DOM. Elements are evaluated by walking the DOM in a depth-first manner, and attributes are processed in the order they appear in the element. This means that if you use a signal in a [Datastar expression](/guide/datastar_expressions), it must be defined _before_ it is used.
+
+```html
+<!-- This works: -->
+<div data-signals-foo="1" data-text="$foo"></div>
+
+<!-- This works: -->
+<div data-signals-foo="1"></div>
+<div data-text="$foo"></div>
+
+<!-- This works: -->
+<div data-signals-foo="1">
+  <div data-text="$foo"></div>
+</div>
+
+<!-- This does NOT work: -->
+<div data-text="$foo" data-signals-foo="1"></div>
+
+<!-- This does NOT work: -->
+<div data-text="$foo"></div>
+<div data-signals-foo="1"></div>
+```
+
 ## Core Plugins
 
 [Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/core/attributes)
@@ -155,10 +180,11 @@ An `evt` variable that represents the event object is available in the expressio
 The `data-on` attribute matches DOM events, however there are currently a few special cases for custom events.
 
 1. `data-on-load` is triggered when an element is loaded into the DOM.
-2. `data-on-signals-change` is triggered when any signals change.
-3. `data-on-raf` is triggered on every `requestAnimationFrame` event.
+2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__delay` modifier.
+3. `data-on-raf` is triggered on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.
+4. `data-on-signals-change` is triggered when any signals change.
 
-Note that the `data-on-submit` event listener now prevents the default submission behavior of forms.
+Note that the `data-on-submit` event listener prevents the default submission behavior of forms.
 
 #### Modifiers
 
@@ -167,6 +193,10 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 - `__once` \* - Only trigger the event listener once.
 - `__passive` \* - Do not call `preventDefault` on the event listener.
 - `__capture` \* - Use a capture event listener.
+- `__delay` - Delay the event listener.
+  - `.500ms` - Delay for 500 milliseconds.
+  - `.1s` - Delay for 1 second.
+  - `.leading` - Delay with leading edge. Nullifies the delay but can be used to execute the expression immediately when using `data-on-interval`.
 - `__debounce` - Debounce the event listener.
   - `.500ms` - Debounce for 500 milliseconds.
   - `.1s` - Debounce for 1 second.
@@ -358,10 +388,16 @@ The signal name can be specified in the key (as above), or in the value (as belo
 
 ### `data-star-ignore`
 
-Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries.
+Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element and its descendants by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries.
 
 ```html
 <div data-star-ignore data-show-thirdpartylib>
-  This element’s attributes will not be processed by Datastar.
+  <div data-show-thirdpartylib>
+    These element will not be processed by Datastar.
+  </div>
 </div>
 ```
+
+#### Modifiers
+
+- `__self` - Only ignore the element itself, not its descendants.

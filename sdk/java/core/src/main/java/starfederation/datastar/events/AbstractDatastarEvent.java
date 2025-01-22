@@ -8,7 +8,6 @@ import java.util.Objects;
 sealed public abstract class AbstractDatastarEvent implements DatastarEvent permits MergeFragments, MergeSignals, RemoveFragments,
         RemoveSignals, ExecuteScript, CustomEvent {
 
-    private final EventType eventType;
     private final String[] dataLines;
 
     protected AbstractDatastarEvent(EventType eventType, List<String> dataLines) {
@@ -17,14 +16,7 @@ sealed public abstract class AbstractDatastarEvent implements DatastarEvent perm
         if (dataLines.isEmpty()) {
             throw new IllegalArgumentException("Data lines cannot be empty");
         }
-        this.eventType = eventType;
         this.dataLines = dataLines.toArray(String[]::new);
-    }
-
-
-    @Override
-    public EventType getEventType() {
-        return eventType;
     }
 
     @Override
@@ -35,7 +27,7 @@ sealed public abstract class AbstractDatastarEvent implements DatastarEvent perm
 
     @Override
     public String toString() {
-        return String.join("\n", dataLines);
+        return "event: %s\n%s".formatted(getEventType(), String.join("\n", dataLines));
     }
 
 }
