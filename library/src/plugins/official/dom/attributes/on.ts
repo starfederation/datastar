@@ -22,7 +22,7 @@ export const On: AttributePlugin = {
   keyReq: Requirement.Must,
   valReq: Requirement.Must,
   argNames: [EVT],
-  onLoad: ({ el, key, genRX, mods, signals, effect }) => {
+  onLoad: ({ el, key, rawKey, genRX, mods, signals, effect }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
@@ -72,7 +72,7 @@ export const On: AttributePlugin = {
     switch (eventName) {
       case 'load': {
         callback()
-        delete el.dataset.onLoad
+        delete el.dataset[rawKey]
         return () => {}
       }
 
