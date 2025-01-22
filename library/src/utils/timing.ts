@@ -3,16 +3,11 @@ export type TimerHandler = (...args: any[]) => void
 export function delay(
   callback: TimerHandler,
   wait: number,
-  leading = false,
 ): TimerHandler {
   return (...args: any[]) => {
-    if (leading) {
+    setTimeout(() => {
       callback(...args)
-    } else {
-      setTimeout(() => {
-        callback(...args)
-      }, wait)
-    }
+    }, wait)
   }
 }
 

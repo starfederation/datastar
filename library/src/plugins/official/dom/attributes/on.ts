@@ -39,8 +39,7 @@ export const On: AttributePlugin = {
     const delayArgs = mods.get('delay')
     if (delayArgs) {
       const wait = tagToMs(delayArgs)
-      const leading = tagHas(delayArgs, 'leading', false)
-      callback = delay(callback, wait, leading)
+      callback = delay(callback, wait)
     }
 
     const debounceArgs = mods.get('debounce')
@@ -82,9 +81,6 @@ export const On: AttributePlugin = {
           // Set the callback to the original `rx` function in order to revert the applied `delay` function
           callback = rx
           delay = tagToMs(delayArgs)
-          if (tagHas(delayArgs, 'leading', false)) {
-            callback()
-          }
         }
 
         const intervalId = setInterval(callback, delay)
