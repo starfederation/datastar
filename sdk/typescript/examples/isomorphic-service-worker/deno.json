@@ -14,5 +14,6 @@
     "dev:min": "deno task watch:sw:min & MINIFY=true deno task serve:dev",
     "start": "deno task build:sw & deno task serve",
     "start:min": "MINIFY=true deno task build:sw:min & MINIFY=true deno task serve"
-  }
+  },
+  "nodeModulesDir": "auto"
 }
