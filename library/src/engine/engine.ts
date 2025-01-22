@@ -213,7 +213,7 @@ export class Engine {
     // single quotes     '(?:\\'|[^'])*'
     // ticks             `(?:\\`|[^`])*`
     //
-    // We want we want to capture the non delimiter part of statements too:
+    // We want to capture the non delimiter part of statements too:
     //
     // [^;\n]
     //
