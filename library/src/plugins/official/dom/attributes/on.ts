@@ -82,7 +82,6 @@ export const On: AttributePlugin = {
           callback = rx
           delay = tagToMs(delayArgs)
         }
-
         const intervalId = setInterval(callback, delay)
 
         return () => {
