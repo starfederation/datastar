@@ -180,7 +180,7 @@ An `evt` variable that represents the event object is available in the expressio
 The `data-on` attribute matches DOM events, however there are currently a few special cases for custom events.
 
 1. `data-on-load` is triggered when an element is loaded into the DOM.
-2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__delay` modifier.
+2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__duration` modifier.
 3. `data-on-raf` is triggered on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.
 4. `data-on-signals-change` is triggered when any signals change.
 
@@ -196,7 +196,6 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 - `__delay` - Delay the event listener.
   - `.500ms` - Delay for 500 milliseconds.
   - `.1s` - Delay for 1 second.
-  - `.leading` - Delay with leading edge. Nullifies the delay but can be used to execute the expression immediately when using `data-on-interval`.
 - `__debounce` - Debounce the event listener.
   - `.500ms` - Debounce for 500 milliseconds.
   - `.1s` - Debounce for 1 second.
@@ -207,6 +206,10 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
   - `.1s` - Throttle for 1 second.
   - `.noleading` - Throttle without leading edge.
   - `.trail` - Throttle with trailing edge.
+- `__duration` - Sets the interval duration for `data-on-interval`.
+  - `.500ms` - Interval duration of 500 milliseconds.
+  - `.1s` - Interval duration of 1 second.
+  - `.leading` - Execute the first interval immediately.
 - `__window` - Attaches the event listener to the `window` element.
 - `__outside` - Triggers when the event is outside the element.
 - `__prevent` - Calls `preventDefault` on the event listener.

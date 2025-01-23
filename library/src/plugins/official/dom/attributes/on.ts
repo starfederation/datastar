@@ -22,7 +22,7 @@ export const On: AttributePlugin = {
   keyReq: Requirement.Must,
   valReq: Requirement.Must,
   argNames: [EVT],
-  onLoad: ({ el, key, rawKey, genRX, mods, signals, effect }) => {
+  onLoad: ({ el, rawKey, key, value, genRX, mods, signals, effect }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
@@ -39,8 +39,7 @@ export const On: AttributePlugin = {
     const delayArgs = mods.get('delay')
     if (delayArgs) {
       const wait = tagToMs(delayArgs)
-      const leading = tagHas(delayArgs, 'leading', false)
-      callback = delay(callback, wait, leading)
+      callback = delay(callback, wait)
     }
 
     const debounceArgs = mods.get('debounce')
@@ -77,13 +76,19 @@ export const On: AttributePlugin = {
       }
 
       case 'interval': {
-        let delay = 1000
-        if (delayArgs) {
-          delay = tagToMs(delayArgs)
-          // Run the callback now to counter the `delay` timing function wrapping the `callback` with the `setTimeout` function
-          callback()
+        let duration = 1000
+        const durationArgs = mods.get('duration')
+        if (durationArgs) {
+          duration = tagToMs(durationArgs)
+          const leading = tagHas(durationArgs, 'leading', false)
+          if (leading) {
+            // Remove `.leading` from the dataset so the callback is only ever called on page load
+            el.dataset[rawKey.replace('.leading', '')] = value
+            delete el.dataset[rawKey]
+            callback()
+          }
         }
-        const intervalId = setInterval(callback, delay)
+        const intervalId = setInterval(callback, duration)
 
         return () => {
           clearInterval(intervalId)
