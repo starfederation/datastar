@@ -10,7 +10,7 @@ use starfederation\datastar\enums\FragmentMergeMode;
 class Consts
 {
     public const DATASTAR_KEY = 'datastar';
-    public const VERSION = '1.0.0-beta.1';
+    public const VERSION = '1.0.0-beta.2';
 
     // The default duration for settling during fragment merges. Allows for CSS transitions to complete.
     public const DEFAULT_FRAGMENTS_SETTLE_DURATION = 300;

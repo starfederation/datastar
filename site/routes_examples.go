@@ -56,6 +56,8 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 			Label: "Reactive Examples",
 			Links: []*SidebarLink{
 				{ID: "plugin_order"},
+				{ID: "polling"},
+				{ID: "ignore_attributes"},
 				{ID: "bind_keys"},
 				{ID: "classes"},
 				{ID: "scroll_into_view"},
@@ -154,8 +156,8 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 		})
 
 		if err := errors.Join(
-			setupExamplesQuiz(examplesRouter, signals),
-			setupExamplesQuizSlow(examplesRouter, signals),
+			setupExamplesQuiz(examplesRouter),
+			setupExamplesQuizSlow(examplesRouter),
 			setupExamplesClickToEdit(examplesRouter),
 			setupExamplesBulkUpdate(examplesRouter),
 			setupExamplesClickToLoad(examplesRouter),
@@ -189,6 +191,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 			setupExamplesModelBinding(examplesRouter),
 			setupExamplesTitleUpdateBackend(examplesRouter),
 			setupExamplesSignalsChanged(examplesRouter, signals),
+			setupExamplesPolling(examplesRouter),
 			setupExamplesCSRF(examplesRouter),
 			setupExamplesScrollIntoView(examplesRouter),
 			setupExamplesQuickPrimerGo(examplesRouter),

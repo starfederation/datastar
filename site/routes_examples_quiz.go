@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/gorilla/sessions"
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
 
@@ -34,23 +33,22 @@ func randomQuestionId(lastQuestionId int) int {
 	return newQuestionId
 }
 
-func setupExamplesQuiz(examplesRouter chi.Router, signals sessions.Store) error {
-	sessionKey := "datastar-quiz-example"
+func setupExamplesQuiz(examplesRouter chi.Router) error {
 
 	examplesRouter.Get("/quiz/data", func(w http.ResponseWriter, r *http.Request) {
-		session, err := signals.Get(r, sessionKey)
-		if err != nil {
-			return
+        type Signals struct {
+            LastQuestionId int `json:"lastQuestionId1"`
+        }
+        signals := &Signals{
+			LastQuestionId: 0,
 		}
-
-		// Get the last question ID from the session
-		lastQuestionId, ok := session.Values["lastQuestionId1"].(int)
-		if !ok {
-			lastQuestionId = -1
-		}
+        if err := datastar.ReadSignals(r, signals); err != nil {
+            http.Error(w, err.Error(), http.StatusBadRequest)
+            return
+        }
 
 		sse := datastar.NewSSE(w, r)
-		questionID := randomQuestionId(lastQuestionId)
+		questionID := randomQuestionId(signals.LastQuestionId)
 		QA := qaList[questionID]
 		sse.MergeFragments(fmt.Sprintf(`<div id="question2">%s</div>`, QA.Question))
 		sse.MarshalAndMergeSignals(map[string]any{

@@ -44,8 +44,8 @@ _Author: [Patrick Marchand](https://github.com/Superpat)_
 
 Examples:
 
- - [NodeJS example](htttps://github.com/starfederation/datastar/tree/develop/sdk/typescript/examples/node.ts)
- - [Deno example](htttps://github.com/starfederation/datastar/tree/develop/sdk/typescript/examples/deno.ts)
+ - [NodeJS example](https://github.com/starfederation/datastar/tree/develop/sdk/typescript/examples/node.ts)
+ - [Deno example](https://github.com/starfederation/datastar/tree/develop/sdk/typescript/examples/deno.ts)
 
 ## dotnet
 
