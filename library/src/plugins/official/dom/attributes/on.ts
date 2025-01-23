@@ -82,7 +82,7 @@ export const On: AttributePlugin = {
           duration = tagToMs(durationArgs)
           const leading = tagHas(durationArgs, 'leading', false)
           if (leading) {
-            // Remove `.leading` from the dataset so that the callback is only called once
+            // Remove `.leading` from the dataset so the callback is only ever called on page load
             el.dataset[rawKey.replace('.leading', '')] = value
             delete el.dataset[rawKey]
             callback()
