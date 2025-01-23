@@ -206,18 +206,19 @@ export class Engine {
     // This regex allows Datastar expressions to support nested
     // regex and strings that contain ; and/or \n without breaking.
     //
-    // Each of these regex defines a block type we want to capture:
+    // Each of these regex defines a block type we want to match
+    // (importantly we ignore the content within these blocks):
     //
-    // regex            \/(?:\\\/|[^\/])*\/
-    // double quotes     "(?:\\"|[^\"])*"
-    // single quotes     '(?:\\'|[^'])*'
-    // ticks             `(?:\\`|[^`])*`
+    // regex            \/(\\\/|[^\/])*\/
+    // double quotes      "(\\"|[^\"])*"
+    // single quotes      '(\\'|[^'])*'
+    // ticks              `(\\`|[^`])*`
     //
-    // We want to capture the non delimiter part of statements too:
+    // We also want to match the non delimiter part of statements:
     //
     // [^;\n]
     //
-    const statementRe = /(?:\/(?:\\\/|[^\/])*\/|"(?:\\"|[^\"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|[^;\n])+/gm
+    const statementRe = /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;\n])+/gm
     const stmts = ctx.value.trim().match(statementRe)
     const lastIdx = stmts.length - 1
     const last = stmts[lastIdx]
