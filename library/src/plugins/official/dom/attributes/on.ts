@@ -78,7 +78,7 @@ export const On: AttributePlugin = {
       case 'interval': {
         let delay = 1000
         if (delayArgs) {
-          // Set the callback to the original `rx` function in order to revert the applied `delay` function
+          // Set the callback to the original `rx` function in order to revert the applied `delay` function.
           callback = rx
           delay = tagToMs(delayArgs)
         }
