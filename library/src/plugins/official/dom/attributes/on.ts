@@ -22,7 +22,7 @@ export const On: AttributePlugin = {
   keyReq: Requirement.Must,
   valReq: Requirement.Must,
   argNames: [EVT],
-  onLoad: ({ el, key, rawKey, genRX, mods, signals, effect }) => {
+  onLoad: ({ el, rawKey, key, value, genRX, mods, signals, effect }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
@@ -80,6 +80,13 @@ export const On: AttributePlugin = {
         const durationArgs = mods.get('duration')
         if (durationArgs) {
           duration = tagToMs(durationArgs)
+          const leading = tagHas(durationArgs, 'leading', false)
+          if (leading) {
+            // Remove `.leading` from the dataset so that the callback is only called once
+            el.dataset[rawKey.replace('.leading', '')] = value
+            delete el.dataset[rawKey]
+            callback()
+          }
         }
         const intervalId = setInterval(callback, duration)
 

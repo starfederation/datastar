@@ -209,6 +209,7 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 - `__duration` - Sets the interval duration for `data-on-interval`.
   - `.500ms` - Interval duration of 500 milliseconds.
   - `.1s` - Interval duration of 1 second.
+  - `.leading` - Execute the first interval immediately.
 - `__window` - Attaches the event listener to the `window` element.
 - `__outside` - Triggers when the event is outside the element.
 - `__prevent` - Calls `preventDefault` on the event listener.
