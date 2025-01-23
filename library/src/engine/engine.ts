@@ -200,16 +200,29 @@ export class Engine {
     ctx: RuntimeContext,
     ...argNames: string[]
   ): RuntimeExpressionFunction {
-    const stmts = ctx.value
-      .split(/;|\n/)
-      .map((s) => s.trim())
-      .filter((s) => s !== '')
+    // This regex allows Datastar expressions to support nested
+    // regex and strings that contain ; and/or \n without breaking.
+    //
+    // Each of these regex defines a block type we want to match
+    // (importantly we ignore the content within these blocks):
+    //
+    // regex            \/(\\\/|[^\/])*\/
+    // double quotes      "(\\"|[^\"])*"
+    // single quotes      '(\\'|[^'])*'
+    // ticks              `(\\`|[^`])*`
+    //
+    // We also want to match the non delimiter part of statements:
+    //
+    // [^;\n]
+    //
+    const statementRe = /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;\n])+/gm
+    const stmts = ctx.value.trim().match(statementRe)
     const lastIdx = stmts.length - 1
     const last = stmts[lastIdx]
     if (!last.startsWith('return')) {
-      stmts[lastIdx] = `return (${stmts[lastIdx]});`
+      stmts[lastIdx] = `return (${last});`
     }
-    let userExpression = stmts.join(';\n').trim()
+    let userExpression = stmts.join('\n')
 
     // Ingore any escaped values
     const escaped = new Map<string, string>()
