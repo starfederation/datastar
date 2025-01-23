@@ -4,7 +4,7 @@
 
 <div 
   data-signals-count="0"
-  data-on-interval__delay.2s="@get('/examples/polling/interval')"
+  data-on-interval__duration.2s="@get('/examples/polling/interval')"
   class="text-primary"
 >
   Count: <span data-text="$count"></span>
@@ -15,7 +15,7 @@
 ```html
 <div 
     data-signals-count="0"
-    data-on-interval__delay.2s="@get('/endpoint')"
+    data-on-interval__duration.2s="@get('/endpoint')"
 >
     Count: <span data-text="$count"></span>
 </div>

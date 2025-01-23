@@ -76,13 +76,12 @@ export const On: AttributePlugin = {
       }
 
       case 'interval': {
-        let delay = 1000
-        if (delayArgs) {
-          // Set the callback to the original `rx` function in order to revert the applied `delay` function.
-          callback = rx
-          delay = tagToMs(delayArgs)
+        let duration = 1000
+        const durationArgs = mods.get('duration')
+        if (durationArgs) {
+          duration = tagToMs(durationArgs)
         }
-        const intervalId = setInterval(callback, delay)
+        const intervalId = setInterval(callback, duration)
 
         return () => {
           clearInterval(intervalId)

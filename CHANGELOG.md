@@ -2,10 +2,13 @@
 
 ## v1.0.0-beta.3
 
+### Changed
+
+- Changed the `data-on-interval` attribute to accept a `__duration` modifier to the ([#513](https://github.com/starfederation/datastar/issues/513)).
+
 ### Fixed
 
 - Fixed a bug when using the `__delay` modifier on the `data-on-load` attribute ([#511](https://github.com/starfederation/datastar/issues/511)).
-- Fixed a bug when using the `__delay` modifier on the `data-on-interval` attribute ([#513](https://github.com/starfederation/datastar/issues/513)).
 
 ### Removed
 
