@@ -5,11 +5,15 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"io/fs"
+	"log"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"github.com/a-h/templ"
 	"github.com/benbjohnson/hashfs"
+	"github.com/blevesearch/bleve/v2"
 	"github.com/delaneyj/toolbelt"
 	"github.com/delaneyj/toolbelt/embeddednats"
 	"github.com/go-chi/chi/v5"
@@ -24,6 +28,7 @@ var staticFS embed.FS
 var (
 	staticSys    = hashfs.NewFS(staticFS)
 	highlightCSS templ.Component
+	indexPath    = "data-star.bleve"
 )
 
 func staticPath(path string) string {
@@ -96,11 +101,33 @@ func setupRoutes(ctx context.Context, router chi.Router) (err error) {
 	}
 	ns.WaitForServer()
 
+	index, err := bleve.Open(indexPath)
+	if err == bleve.ErrorIndexPathDoesNotExist {
+		log.Printf("Creating new index...")
+		// create a mapping
+		mapping := bleve.NewIndexMapping()
+		index, err = bleve.New(indexPath, mapping)
+		if err != nil {
+			log.Fatal(fmt.Errorf("failed to create index: %w", err))
+		}
+
+	} else if err != nil {
+		log.Fatal("failed to open index: %w", err)
+	} else {
+		log.Printf("Opening existing index...")
+	}
+
+	if err := indexSiteContent(ctx, index); err != nil {
+		log.Fatal("failed to index site content, ", err)
+	}
+
+	log.Println("Indexed site, index can be found at: ", indexPath)
+
 	sessionSignals := sessions.NewCookieStore([]byte("datastar-session-secret"))
 	sessionSignals.MaxAge(int(24 * time.Hour / time.Second))
 
 	if err := errors.Join(
-		setupHome(router, sessionSignals, ns),
+		setupHome(router, sessionSignals, ns, index),
 		setupGuide(ctx, router),
 		setupReferenceRoutes(ctx, router),
 		setupExamples(ctx, router, sessionSignals),
@@ -113,4 +140,39 @@ func setupRoutes(ctx context.Context, router chi.Router) (err error) {
 	}
 
 	return nil
+}
+
+// indexes the markdown site content
+func indexSiteContent(ctx context.Context, index bleve.Index) error {
+	markdownDir := "site/static/md"
+
+	return filepath.WalkDir(markdownDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return fmt.Errorf("error accessing path %s: %w", path, err)
+		}
+
+		if d.IsDir() && path != markdownDir {
+			relDirName, err := filepath.Rel(markdownDir, path)
+			if err != nil {
+				return fmt.Errorf("failed to compute relative path for %s: %w", path, err)
+			}
+
+			log.Printf("Indexing directory: %s", relDirName)
+
+			dataset, err := markdownRenders(ctx, relDirName)
+			if err != nil {
+				return fmt.Errorf("failed to render markdown directory %s: %w", relDirName, err)
+			}
+
+			// walks through each file in the directory and indexes it
+			for key, value := range dataset {
+				url := fmt.Sprintf("/%s", key) // Adjust this as needed for your URL structure
+				if err := index.Index(url, value); err != nil {
+					return fmt.Errorf("error indexing %s: %w", url, err)
+				}
+			}
+		}
+
+		return nil
+	})
 }
