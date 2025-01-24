@@ -222,7 +222,7 @@ export class Engine {
     if (!last.startsWith('return')) {
       stmts[lastIdx] = `return (${last});`
     }
-    let userExpression = stmts.join('\n')
+    let userExpression = stmts.join(';\n')
 
     // Ingore any escaped values
     const escaped = new Map<string, string>()
