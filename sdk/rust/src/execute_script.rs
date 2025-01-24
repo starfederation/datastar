@@ -1,11 +1,10 @@
-//! [`ExecuteScript`] is used to execute JavaScript in the browser using the `datastar-execute-script` event.
+//! [`ExecuteScript`] executes JavaScript in the browser.
 
 use {crate::ServerSentEventGenerator, core::time::Duration};
 
-/// [`ExecuteScript`] is used to execute JavaScript in the browser
-/// using the `datastar-execute-script` event.
+/// [`ExecuteScript`] executes JavaScript in the browser
 ///
-/// See the [Datastar documentation](https://data-star.dev/reference/plugins_backend#datastar-sse-events).
+/// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-execute-script).
 ///
 /// # Examples
 ///
@@ -29,18 +28,20 @@ use {crate::ServerSentEventGenerator, core::time::Duration};
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 
 pub struct ExecuteScript {
-    /// This can be used by the backend to replay events.
+    /// `id` can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
     pub id: Option<String>,
-    /// This is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
+    /// `retry_duration` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
+    /// Defaults to `1000ms`.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     pub retry_duration: Duration,
-    /// Each element contains JavaScript to be executed by the browser
+    /// `script` is a string that represents the JavaScript to be executed by the browser.
     pub script: String,
-    /// Determines whether to remove the script after execution.
+    /// Whether to remove the script after execution, if not provided the Datastar client side will default to `true`.
     pub auto_remove: bool,
-    /// Each element adds an attribute (in the format `name value`) to the `script` tag
+    /// A list of attributes to add to the script element, if not provided the Datastar client side will default to `type module`.
+    /// Each item in the array ***must*** be a string in the format `key value`.
     pub attributes: Vec<String>,
 }
 
@@ -56,25 +57,25 @@ impl ExecuteScript {
         }
     }
 
-    /// Adds an id to the [`ExecuteScript`] event.
+    /// Sets the `id` of the [`ExecuteScript`] event.
     pub fn id(mut self, id: impl Into<String>) -> Self {
         self.id = Some(id.into());
         self
     }
 
-    /// Adds a retry duration to the [`ExecuteScript`] event.
+    /// Sets the `retry_duration` of the [`ExecuteScript`] event.
     pub fn retry_duration(mut self, retry_duration: Duration) -> Self {
         self.retry_duration = retry_duration;
         self
     }
 
-    /// Adds a script to the [`ExecuteScript`] event.
+    /// Sets the `script` of the [`ExecuteScript`] event.
     pub fn auto_remove(mut self, auto_remove: bool) -> Self {
         self.auto_remove = auto_remove;
         self
     }
 
-    /// Adds an attribute to the [`ExecuteScript`] event.
+    /// Sets the `attribute` of the [`ExecuteScript`] event.
     pub fn attributes(mut self, attributes: impl IntoIterator<Item = impl Into<String>>) -> Self {
         self.attributes = attributes.into_iter().map(Into::into).collect();
         self

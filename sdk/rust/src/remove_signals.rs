@@ -1,10 +1,10 @@
-//! [`RemoveSignals`] event used to remove signals from the DOM.
+//! [`RemoveSignals`] sends signals to the browser to be removed from the signals.
 
 use {crate::ServerSentEventGenerator, core::time::Duration};
 
-/// [`RemoveSignals`] is an event used to remove signals from the DOM.
+/// [`RemoveSignals`] sends signals to the browser to be removed from the signals.
 ///
-/// See the [Datastar documentation](https://data-star.dev/reference/plugins_backend#datastar-sse-events) for more information.
+/// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-remove-signals) for more information.
 ///
 /// # Examples
 ///
@@ -24,14 +24,17 @@ use {crate::ServerSentEventGenerator, core::time::Duration};
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RemoveSignals {
-    /// This can be used by the backend to replay events.
+    /// `id` can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
     pub id: Option<String>,
-    /// This is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
+    /// `retry_duration` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
+    /// Defaults to `1000ms`.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     pub retry_duration: Duration,
-    /// The paths to match on and remove.
+    /// `paths` is a list of strings that represent the signal paths to be removed from the signals.
+    /// The paths ***must*** be valid . delimited paths to signals within the signals.
+    /// The Datastar client side will use these paths to remove the data from the signals.
     pub paths: Vec<String>,
 }
 
@@ -45,13 +48,13 @@ impl RemoveSignals {
         }
     }
 
-    /// Adds an id to the [`ExecuteScript`] event.
+    /// Sets the `id` of the [`RemoveSignals`] event.
     pub fn id(mut self, id: impl Into<String>) -> Self {
         self.id = Some(id.into());
         self
     }
 
-    /// Adds a retry duration to the [`ExecuteScript`] event.
+    /// Sets the `retry_duration` of the [`RemoveSignals`] event.
     pub fn retry_duration(mut self, retry_duration: Duration) -> Self {
         self.retry_duration = retry_duration;
         self

@@ -1,14 +1,15 @@
-//! [`MergeFragments`] event used to merge fragments of HTML into the DOM using the `datastar-merge-fragments` event.
+//! [`MergeFragments`] merges one or more fragments into the DOM.
+//! By default, Datastar merges fragments using Idiomorph, which matches top level elements based on their ID.
 
 use {
     crate::{MergeMode, ServerSentEventGenerator},
     core::time::Duration,
 };
 
-/// [`MergeFragments`] is an event used to merge fragments of HTML into the DOM
-/// using the `datastar-merge-fragments` event.
+/// [`MergeFragments`] merges one or more fragments into the DOM. By default,
+/// Datastar merges fragments using Idiomorph, which matches top level elements based on their ID.
 ///
-/// See the [Datastar documentation](https://data-star.dev/reference/plugins_backend#datastar-sse-events) for more information.
+/// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-merge-fragments) for more information.
 ///
 /// # Examples
 ///
@@ -38,34 +39,27 @@ use {
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MergeFragments {
-    /// This can be used by the backend to replay events.
+    /// `id` is can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
     pub id: Option<String>,
-    /// This is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
+    /// `retry_duration` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
+    /// Defaults to `1000ms`.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     pub retry_duration: Duration,
     /// The HTML fragments to merge into the DOM.
     pub fragments: String,
-    /// Selects the target element of the merge process using a CSS selector.
-    ///
-    /// # Note
-    /// You should almost never need this attribute.
-    /// It is only for special cases.
-    /// The default is to use idiomorph to merge the fragment by using the top level id into the DOM.
-    /// Unless you are adding to a list, this is almost always the right answer!
+    /// The CSS selector to use to insert the fragments.
+    /// If not provided, Datastar will default to using the id attribute of the fragment.
     pub selector: Option<String>,
-    /// Determines how the fragments are merged into the DOM.
-    ///
-    /// # Note
-    /// You should almost never need this attribute.
-    /// It is only for special cases.
-    /// The default is to use idiomorph to merge the fragment by using the top level id into the DOM.
-    /// Unless you are adding to a list, this is almost always the right answer!
+    /// The mode to use when merging the fragment into the DOM.
+    /// If not provided the Datastar client side will default to [`MergeMode::Morph`].
     pub merge_mode: MergeMode,
-    /// The duration to wait before merging the fragments.
+    /// The amount of time that a fragment should take before removing any CSS related to settling.
+    /// `settle_duration` is used to allow for animations in the browser via the Datastar client.
+    /// Defaults to `300ms`.
     pub settle_duration: Duration,
-    /// Whether to use view transitions when merging into the DOM.
+    /// Whether to use view transitions, if not provided the Datastar client side will default to `false`.
     pub use_view_transition: bool,
 }
 
@@ -83,41 +77,37 @@ impl MergeFragments {
         }
     }
 
-    /// Adds an id to the [`ExecuteScript`] event.
+    /// Sets the `id` of the [`MergeFragments`] event.
     pub fn id(mut self, id: impl Into<String>) -> Self {
         self.id = Some(id.into());
         self
     }
 
-    /// Adds a retry duration to the [`ExecuteScript`] event.
+    /// Sets the `retry_duration` of the [`MergeFragments`] event.
     pub fn retry_duration(mut self, retry_duration: Duration) -> Self {
         self.retry_duration = retry_duration;
         self
     }
 
-    /// Sets the css selector of the [`MergeFragments`] event.
-    /// See [`selector`](MergeFragments::selector).
+    /// Sets the `selector` of the [`MergeFragments`] event.
     pub fn selector(mut self, selector: impl Into<String>) -> Self {
         self.selector = Some(selector.into());
         self
     }
 
-    /// Sets the merge mode of the [`MergeFragments`] event.
-    /// See [`MergeMode`](MergeFragments::merge_mode).
+    /// Sets the `merge_mode` of the [`MergeFragments`] event.
     pub fn merge_mode(mut self, merge_mode: MergeMode) -> Self {
         self.merge_mode = merge_mode;
         self
     }
 
-    /// Sets the settle duration of the [`MergeFragments`] event.
-    /// See [`settle_duration`](MergeFragments::settle_duration).
+    /// Sets the `settle_duration` of the [`MergeFragments`] event.
     pub fn settle_duration(mut self, settle_duration: Duration) -> Self {
         self.settle_duration = settle_duration;
         self
     }
 
-    /// Sets whether to use view transitions of the [`MergeFragments`] event.
-    /// See [`use_view_transition`](MergeFragments::use_view_transition).
+    /// Sets the `use_view_transition` of the [`MergeFragments`] event.
     pub fn use_view_transition(mut self, use_view_transition: bool) -> Self {
         self.use_view_transition = use_view_transition;
         self
