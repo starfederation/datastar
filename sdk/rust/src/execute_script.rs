@@ -1,6 +1,9 @@
 //! [`ExecuteScript`] executes JavaScript in the browser.
 
-use {crate::ServerSentEventGenerator, core::time::Duration};
+use {
+    crate::{consts, ServerSentEventGenerator},
+    core::time::Duration,
+};
 
 /// [`ExecuteScript`] executes JavaScript in the browser
 ///
@@ -50,10 +53,10 @@ impl ExecuteScript {
     pub fn new(script: impl Into<String>) -> Self {
         Self {
             id: Default::default(),
-            retry_duration: Duration::from_millis(1000),
+            retry_duration: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             script: script.into(),
-            auto_remove: true,
-            attributes: vec!["type module".into()],
+            auto_remove: consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE,
+            attributes: vec![consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES.to_string()],
         }
     }
 
@@ -86,7 +89,9 @@ impl ServerSentEventGenerator for ExecuteScript {
     fn send(&self) -> String {
         let mut result = String::new();
 
-        result.push_str("event: datastar-execute-script\n");
+        result.push_str("event: ");
+        result.push_str(consts::EventType::ExecuteScript.as_str());
+        result.push_str("\n");
 
         if let Some(id) = &self.id {
             result.push_str("id: ");
@@ -101,17 +106,27 @@ impl ServerSentEventGenerator for ExecuteScript {
         }
 
         if !self.auto_remove {
-            result.push_str("data: autoRemove false\n");
+            result.push_str("data: ");
+            result.push_str(consts::AUTO_REMOVE_DATALINE_LITERAL);
+            result.push_str(" false\n");
         }
 
-        for attribute in &self.attributes {
-            result.push_str("data: attributes ");
-            result.push_str(attribute);
-            result.push_str("\n");
+        if !(self.attributes.len() == 1
+            && self.attributes[0] == consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES)
+        {
+            for attribute in &self.attributes {
+                result.push_str("data: ");
+                result.push_str(consts::ATTRIBUTES_DATALINE_LITERAL);
+                result.push_str(" ");
+                result.push_str(attribute);
+                result.push_str("\n");
+            }
         }
 
         for line in self.script.lines() {
-            result.push_str("data: script ");
+            result.push_str("data: ");
+            result.push_str(consts::SCRIPT_DATALINE_LITERAL);
+            result.push_str(" ");
             result.push_str(line);
             result.push_str("\n");
         }

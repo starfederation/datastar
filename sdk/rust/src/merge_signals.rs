@@ -1,6 +1,9 @@
 //! [`MergeSignals`] sends one or more signals to the browser to be merged into the signals.
 
-use {crate::ServerSentEventGenerator, core::time::Duration};
+use {
+    crate::{consts, ServerSentEventGenerator},
+    core::time::Duration,
+};
 
 /// [`MergeSignals`] sends one or more signals to the browser to be merged into the signals.
 ///
@@ -46,9 +49,9 @@ impl MergeSignals {
     pub fn new(signals: impl Into<String>) -> Self {
         Self {
             id: Default::default(),
-            retry_duration: Duration::from_millis(1000),
+            retry_duration: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             signals: signals.into(),
-            only_if_missing: false,
+            only_if_missing: consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING,
         }
     }
 
@@ -75,7 +78,9 @@ impl ServerSentEventGenerator for MergeSignals {
     fn send(&self) -> String {
         let mut result = String::new();
 
-        result.push_str("event: datastar-merge-signals\n");
+        result.push_str("event: ");
+        result.push_str(consts::EventType::MergeSignals.as_str());
+        result.push_str("\n");
 
         if let Some(id) = &self.id {
             result.push_str("id: ");
@@ -83,17 +88,21 @@ impl ServerSentEventGenerator for MergeSignals {
             result.push_str("\n");
         }
 
-        if self.retry_duration.as_millis() != 1000 {
+        if self.retry_duration.as_millis() != consts::DEFAULT_SSE_RETRY_DURATION as u128 {
             result.push_str("retryDuration: ");
             result.push_str(&self.retry_duration.as_millis().to_string());
             result.push_str("\n");
         }
 
         if self.only_if_missing {
-            result.push_str("data: onlyIfMissing true\n");
+            result.push_str("data: ");
+            result.push_str(consts::ONLY_IF_MISSING_DATALINE_LITERAL);
+            result.push_str(" true\n");
         }
 
-        result.push_str("data: signals ");
+        result.push_str("data: ");
+        result.push_str(consts::SIGNALS_DATALINE_LITERAL);
+        result.push_str(" ");
         result.push_str(&self.signals);
         result.push_str("\n\n");
 

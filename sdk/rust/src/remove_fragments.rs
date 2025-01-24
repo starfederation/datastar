@@ -1,6 +1,9 @@
 //! [`RemoveFragments`] sends a selector to the browser to remove HTML fragments from the DOM.
 
-use {crate::ServerSentEventGenerator, core::time::Duration};
+use {
+    crate::{consts, ServerSentEventGenerator},
+    core::time::Duration,
+};
 
 /// [`RemoveFragments`] sends a selector to the browser to remove HTML fragments from the DOM.
 ///
@@ -55,10 +58,10 @@ impl RemoveFragments {
     pub fn new(selector: impl Into<String>) -> Self {
         Self {
             id: Default::default(),
-            retry_duration: Duration::from_millis(1000),
+            retry_duration: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             selector: selector.into(),
-            settle_duration: Duration::from_millis(300),
-            use_view_transition: false,
+            settle_duration: Duration::from_millis(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION),
+            use_view_transition: consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
         }
     }
 
@@ -91,7 +94,9 @@ impl ServerSentEventGenerator for RemoveFragments {
     fn send(&self) -> String {
         let mut result = String::new();
 
-        result.push_str("event: datastar-remove-fragments\n");
+        result.push_str("event: ");
+        result.push_str(consts::EventType::RemoveFragments.as_str());
+        result.push_str("\n");
 
         if let Some(id) = &self.id {
             result.push_str("id: ");
@@ -99,24 +104,29 @@ impl ServerSentEventGenerator for RemoveFragments {
             result.push_str("\n");
         }
 
-        if self.retry_duration.as_millis() != 1000 {
+        if self.retry_duration.as_millis() != consts::DEFAULT_SSE_RETRY_DURATION as u128 {
             result.push_str("retryDuration: ");
             result.push_str(&self.retry_duration.as_millis().to_string());
             result.push_str("\n");
         }
 
         if self.settle_duration.as_millis() != 300 {
-            result.push_str("data: settleDuration ");
+            result.push_str("data: ");
+            result.push_str(consts::SETTLE_DURATION_DATALINE_LITERAL);
+            result.push_str(" ");
             result.push_str(&self.settle_duration.as_millis().to_string());
             result.push_str("\n");
         }
 
         if self.use_view_transition {
-            result.push_str("data: useViewTransition ");
-            result.push_str("true\n");
+            result.push_str("data: ");
+            result.push_str(consts::USE_VIEW_TRANSITION_DATALINE_LITERAL);
+            result.push_str(" true\n");
         }
 
-        result.push_str("data: selector ");
+        result.push_str("data: ");
+        result.push_str(consts::SELECTOR_DATALINE_LITERAL);
+        result.push_str(" ");
         result.push_str(&self.selector);
         result.push_str("\n\n");
 

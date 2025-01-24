@@ -29,19 +29,19 @@ assert_eq!(execute_script, expected);
 ```rust
 use {
     core::time::Duration,
-    datastar::prelude::{ServerSentEventGenerator, MergeFragments, MergeMode}
+    datastar::prelude::{ServerSentEventGenerator, MergeFragments, FragmentMergeMode}
 };
 
 let merge_fragments: String = MergeFragments::new("<h1>Hello, world!</h1>")
     .selector("body")
-    .merge_mode(MergeMode::Append)
+    .merge_mode(FragmentMergeMode::Append)
     .settle_duration(Duration::from_millis(1000))
     .use_view_transition(true)
     .send();
 
 let expected: &str = "event: datastar-merge-fragments
 data: selector body
-data: mergeMode append
+data: FragmentMergeMode append
 data: settleDuration 1000
 data: useViewTransition true
 data: fragments <h1>Hello, world!</h1>
@@ -53,7 +53,7 @@ assert_eq!(merge_fragments, expected);
 
 ## Merge Signals
 
- ```rust
+```rust
 use datastar::prelude::{ServerSentEventGenerator, MergeSignals};
 
 let merge_signals: String = MergeSignals::new("{foo: 1234}")
@@ -72,11 +72,19 @@ assert_eq!(merge_signals, expected);
 ## Remove Fragments
 
 ```rust
-use datastar::prelude::{ServerSentEventGenerator, RemoveFragments};
+use {
+    core::time::Duration,
+    datastar::prelude::{ServerSentEventGenerator, RemoveFragments}
+};
 
-let remove_fragments: String = RemoveFragments::new("#foo").send();
+let remove_fragments: String = RemoveFragments::new("#foo")
+    .settle_duration(Duration::from_millis(1000))
+    .use_view_transition(true)
+    .send();
 
 let expected: &str = "event: datastar-remove-fragments
+data: settleDuration 1000
+data: useViewTransition true
 data: selector #foo
 
 ";
@@ -136,7 +144,7 @@ pub async fn infinite_scroll(ReadSignals(mut signals): ReadSignals<Signals>) -> 
                 .map(|i| {
                     MergeFragments::new(AgentPartial { i: offset + i }.render().unwrap())
                         .selector("#click_to_load_rows")
-                        .merge_mode(MergeMode::Append)
+                        .merge_mode(FragmentMergeMode::Append)
                 })
                 .collect::<Vec<_>>();
 
