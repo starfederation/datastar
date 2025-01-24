@@ -1,0 +1,35 @@
+[package]
+authors = ["Johnathan Stevers <jmstevers@gmail.com>"]
+categories = ["web-programming"]
+description = "Datastar SDK implementation for Rust"
+documentation = "..."
+edition = "2021"
+keywords = ["datastar", "web", "backend"]
+license = "MIT OR Apache-2.0"
+name = "datastar"
+readme = "README.md"
+repository = "https://github.com/jmstevers/datastar-rust-sdk"
+version = "0.1.0"
+
+[dependencies]
+axum = { version = "0.8.1", default-features = false, optional = true }
+mime = { version = "0.3.17", default-features = false, optional = true }
+serde = { version = "1.0.217", optional = true }
+serde_json = { version = "1.0.137", optional = true }
+typle = "0.10.6"
+
+[features]
+axum = ["dep:axum", "dep:mime", "dep:serde", "dep:serde_json"]
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+
+[workspace]
+members = ["examples/*"]
