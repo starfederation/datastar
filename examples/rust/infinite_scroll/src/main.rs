@@ -1,10 +1,10 @@
 use {
     axum::{
-        Router,
         response::{Html, Response},
         routing::get,
+        Router,
     },
-    datastar::prelude::{IntoResponse, MergeFragments, MergeMode, ReadSignals},
+    datastar::prelude::{FragmentMergeMode, IntoResponse, MergeFragments, ReadSignals},
     rinja::Template,
     serde::{Deserialize, Serialize},
     std::error::Error,
@@ -113,7 +113,7 @@ pub async fn infinite_scroll(ReadSignals(mut signals): ReadSignals<Signals>) -> 
                 .map(|i| {
                     MergeFragments::new(AgentPartial { i: offset + i }.render().unwrap())
                         .selector("#click_to_load_rows")
-                        .merge_mode(MergeMode::Append)
+                        .merge_mode(FragmentMergeMode::Append)
                 })
                 .collect::<Vec<_>>();
 
