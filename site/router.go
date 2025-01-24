@@ -112,7 +112,6 @@ func setupRoutes(ctx context.Context, router chi.Router, enabledFeatures Feature
 	index, err := bleve.Open(indexPath)
 	if err == bleve.ErrorIndexPathDoesNotExist {
 		log.Printf("Creating new index...")
-		// create a mapping
 		mapping := bleve.NewIndexMapping()
 		index, err = bleve.New(indexPath, mapping)
 		if err != nil {
@@ -150,7 +149,6 @@ func setupRoutes(ctx context.Context, router chi.Router, enabledFeatures Feature
 	return nil
 }
 
-// indexes the markdown site content
 func indexSiteContent(ctx context.Context, index bleve.Index) error {
 	markdownDir := "site/static/md"
 
@@ -174,7 +172,7 @@ func indexSiteContent(ctx context.Context, index bleve.Index) error {
 
 			// walks through each file in the directory and indexes it
 			for key, value := range dataset {
-				url := fmt.Sprintf("/%s", key) // Adjust this as needed for your URL structure
+				url := fmt.Sprintf("/%s", key)
 				if err := index.Index(url, value); err != nil {
 					return fmt.Errorf("error indexing %s: %w", url, err)
 				}
