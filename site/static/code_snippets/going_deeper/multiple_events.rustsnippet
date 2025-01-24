@@ -1,0 +1,7 @@
+use datastar::prelude::*;
+
+(
+    MergeFragments::new("<div id='hello'>Hello, world!</div>"),
+    MergeSignals::new("{foo: {bar: 1}}"),
+    ExecuteScript::new("console.log('Success!')),
+).into_response()
