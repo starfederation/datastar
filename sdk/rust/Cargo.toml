@@ -1,7 +1,7 @@
 [package]
 authors = ["Johnathan Stevers <jmstevers@gmail.com>"]
 categories = ["web-programming"]
-description = "Datastar SDK implementation for Rust"
+description = "Datastar is a Rust implementation of the [Datastar](https://data-star.dev) SDK specification."
 documentation = "..."
 edition = "2021"
 keywords = ["datastar", "web", "backend"]

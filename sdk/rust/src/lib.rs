@@ -1,6 +1,4 @@
-//! Datastar event implementations for Server-Sent ServerSentEventGenerators (SSE)
-//!
-//! This crate provides strongly-typed event implementations for [Datastar](https://data-star.dev).
+//! Datastar is a Rust implementation of the [Datastar](https://data-star.dev) SDK specification.
 
 #![forbid(missing_docs)]
 #![forbid(missing_debug_implementations)]
