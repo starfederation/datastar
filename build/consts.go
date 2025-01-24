@@ -75,6 +75,18 @@ var Consts = &ConstTemplateData{
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/php",
 		},
 		{
+			FileExtension: "python",
+			Name:          "Python",
+			Icon:          "vscode-icons:file-type-python",
+			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/python",
+		},
+		{
+			FileExtension: "typescript",
+			Name:          "TypeScript",
+			Icon:          "vscode-icons:file-type-typescript-official",
+			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/typescript",
+		},
+		{
 			FileExtension: "fs",
 			Name:          "Dotnet",
 			Icon:          "vscode-icons:file-type-fsharp2",
