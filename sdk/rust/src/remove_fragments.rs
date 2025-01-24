@@ -1,6 +1,6 @@
 //! [`RemoveFragments`] event used to remove HTML fragments that match the provided selector from the DOM.
 
-use {crate::ServerSentEventGenerator, std::time::Duration};
+use {crate::ServerSentEventGenerator, core::time::Duration};
 
 /// [`RemoveFragments`] is an event used to remove HTML fragments that match the provided selector from the DOM.
 ///

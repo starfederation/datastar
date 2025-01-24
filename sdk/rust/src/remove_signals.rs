@@ -1,6 +1,6 @@
 //! [`RemoveSignals`] event used to remove signals from the DOM.
 
-use {crate::ServerSentEventGenerator, std::time::Duration};
+use {crate::ServerSentEventGenerator, core::time::Duration};
 
 /// [`RemoveSignals`] is an event used to remove signals from the DOM.
 ///

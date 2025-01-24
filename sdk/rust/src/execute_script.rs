@@ -1,6 +1,6 @@
 //! [`ExecuteScript`] is used to execute JavaScript in the browser using the `datastar-execute-script` event.
 
-use {crate::ServerSentEventGenerator, std::time::Duration};
+use {crate::ServerSentEventGenerator, core::time::Duration};
 
 /// [`ExecuteScript`] is used to execute JavaScript in the browser
 /// using the `datastar-execute-script` event.
