@@ -36,7 +36,7 @@ pub const {%s literal.ScreamingSnake %}_DATALINE_LITERAL: &str = "{%s literal.Ca
 
 {%- for _, b := range data.DefaultBools -%}
 /// {%s= b.Description %}
-pub const DEFAULT_{%s b.Name.ScreamingSnake %}: bool = {%v b.Value %}
+pub const DEFAULT_{%s b.Name.ScreamingSnake %}: bool = {%v b.Value %};
 {%- endfor -%}
 
 // #endregion

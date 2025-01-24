@@ -16,7 +16,7 @@ pub const DEFAULT_SSE_RETRY_DURATION: u64 = 1000;
 
 // #region Default strings
 
-/// The default attributes for <script/> element use when executing scripts. It is a set of of key-value pairs delimited by a newline \\n character.
+/// The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
 pub const DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES: &str = "type module";
 
 // #endregion
@@ -40,18 +40,18 @@ pub const AUTO_REMOVE_DATALINE_LITERAL: &str = "autoRemove";
 // #region Default booleans
 
 /// Should fragments be merged using the ViewTransition API?
-pub const DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS: bool = false
+pub const DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS: bool = false;
 /// Should a given set of signals merge if they are missing?
-pub const DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING: bool = false
+pub const DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING: bool = false;
 /// Should script element remove itself after execution?
-pub const DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE: bool = true
+pub const DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE: bool = true;
 
 // #endregion
 
 // #region Enums
 
 /// The mode in which a fragment is merged into the DOM.
-#[derive(Default,Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FragmentMergeMode {
     /// Morphs the fragment into the existing element using idiomorph.
     #[default]
