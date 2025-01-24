@@ -6,4 +6,3 @@ ServerSentEventGenerator.stream(req, res, (stream) => {
      // Merges signals into the signals.
      stream.mergeSignals({'response',  '', 'answer' => 'bread'});
 });
-

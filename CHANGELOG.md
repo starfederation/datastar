@@ -1,26 +1,12 @@
 # WIP Release Notes for Datastar
 
-## v1.0.0-beta.2
-
-### Added
-
-- Added the `data-on-interval` attribute.
-- Added the `__delay` modifier to `data-on-*` attributes.
-- Added the `__self` modifier to the `data-star-ignore` attribute.
-- Added the entire context to error messages output in the browser console.
-- Added the ability to use an empty value when using the `data-signals-*` syntax, which sets the value to an empty string.
+## v1.0.0-beta.3
 
 ### Changed
 
-- Changed the order in which plugins are applied to elements to be depth-first per element, then per `data` attribute ([#495](https://github.com/starfederation/datastar/issues/495)).
-- Improved the handling of invalid expressions and signals, and made error handling generally more granular ([#452](https://github.com/starfederation/datastar/issues/452)).
-- The `data-star-ignore` attribute now ignores descendant elements by default.
+- Changed the `data-on-interval` attribute to accept a `__duration` modifier instead of a `__delay` modifier ([#513](https://github.com/starfederation/datastar/issues/513)).
 
 ### Fixed
 
-- Fixed dashes not being trimmed from keys when double dashes were used ([#450](https://github.com/starfederation/datastar/issues/450)).
-
-### Removed
-
-- Removed the now redundant `method` option from backend plugin actions ([#443](https://github.com/starfederation/datastar/issues/443)).
-- Removed the concept of macro plugins.
+- Fixed how Datastar expressions are evaluated to allow regular expressions and strings that contain semicolons and new lines ([#508](https://github.com/starfederation/datastar/issues/508)).
+- Fixed a bug when using the `__delay` modifier on the `data-on-load` attribute ([#511](https://github.com/starfederation/datastar/issues/511)).
