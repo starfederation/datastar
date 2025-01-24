@@ -9,11 +9,19 @@ use {crate::ServerSentEventGenerator, core::time::Duration};
 /// # Examples
 ///
 /// ```
-/// use datastar::prelude::{ServerSentEventGenerator, RemoveFragments};
+/// use {
+///     core::time::Duration,
+///     datastar::prelude::{ServerSentEventGenerator, RemoveFragments}
+/// };
 ///
-/// let remove_fragments: String = RemoveFragments::new("#foo").send();
+/// let remove_fragments: String = RemoveFragments::new("#foo")
+///     .settle_duration(Duration::from_millis(1000))
+///     .use_view_transition(true)
+///     .send();
 ///
 /// let expected: &str = "event: datastar-remove-fragments
+/// data: settleDuration 1000
+/// data: useViewTransition true
 /// data: selector #foo
 ///
 /// ";
@@ -58,6 +66,20 @@ impl RemoveFragments {
     /// Adds a retry duration to the [`ExecuteScript`] event.
     pub fn retry_duration(mut self, retry_duration: Duration) -> Self {
         self.retry_duration = retry_duration;
+        self
+    }
+
+    /// Sets the settle duration of the [`RemoveFragments`] event.
+    /// See [`settle_duration`](RemoveFragments::settle_duration).
+    pub fn settle_duration(mut self, settle_duration: Duration) -> Self {
+        self.settle_duration = settle_duration;
+        self
+    }
+
+    /// Sets whether to use view transitions of the [`RemoveFragments`] event.
+    /// See [`use_view_transition`](RemoveFragments::use_view_transition).
+    pub fn use_view_transition(mut self, use_view_transition: bool) -> Self {
+        self.use_view_transition = use_view_transition;
         self
     }
 }
