@@ -14,11 +14,11 @@ Processing GET cases...
 Processing POST cases...
 ```
 
- If nothing else is outputted then all tests passed !
+If nothing else is outputted then all tests passed !
 
- Results of the test can be found in `./get_cases/$case_name/testOutput.txt` (or `post_cases` depending on the test).
+Results of the test can be found in `./get_cases/$case_name/testOutput.txt` (or `post_cases` depending on the test).
 
- Take note that these tests are stricter about data line ordering then the SDK spec is, but unless that becomes an actual problem I dont intend to fix it, since it would add complexity.
+Take note that these tests are stricter about data line ordering then the SDK spec is, but unless that becomes an actual problem I dont intend to fix it, since it would add complexity.
 
  ## Adding new cases
 

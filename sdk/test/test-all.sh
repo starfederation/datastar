@@ -1,7 +1,5 @@
 #!/bin/sh
 
-#!/bin/sh
-
 # Check if an argument is provided
 if [ -z "$1" ]; then
   echo "Usage: $0 <argument>"
@@ -18,6 +16,7 @@ if [ -d "./get-cases" ]; then
       ./test-get.sh "$case" "$1"
     fi
   done
+  echo "Finished processing GET cases"
 else
   echo "Directory './get-cases' not found!"
 fi
@@ -30,6 +29,7 @@ if [ -d "./post-cases" ]; then
       ./test-post.sh "$case" "$1"
     fi
   done
+  echo "Finished processing POST cases"
 else
   echo "Directory './post-cases' not found!"
 fi
