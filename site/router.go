@@ -25,6 +25,14 @@ import (
 //go:embed static/*
 var staticFS embed.FS
 
+type FeatureName string
+
+type FeatureFlags = map[FeatureName]bool
+
+var (
+	EnableSearchFlag FeatureName = "enable-search"
+)
+
 var (
 	staticSys    = hashfs.NewFS(staticFS)
 	highlightCSS templ.Component
@@ -43,14 +51,14 @@ func canonicalUrl(uri string) string {
 	return "https://data-star.dev" + uri
 }
 
-func RunBlocking(port int, readyCh chan struct{}) toolbelt.CtxErrFunc {
+func RunBlocking(port int, readyCh chan struct{}, enabledFeatures FeatureFlags) toolbelt.CtxErrFunc {
 	return func(ctx context.Context) error {
 
 		router := chi.NewRouter()
 
 		router.Use(middleware.Recoverer, middleware.Logger)
 
-		if err := setupRoutes(ctx, router); err != nil {
+		if err := setupRoutes(ctx, router, enabledFeatures); err != nil {
 			return fmt.Errorf("error setting up routes: %w", err)
 		}
 
@@ -71,7 +79,7 @@ func RunBlocking(port int, readyCh chan struct{}) toolbelt.CtxErrFunc {
 	}
 }
 
-func setupRoutes(ctx context.Context, router chi.Router) (err error) {
+func setupRoutes(ctx context.Context, router chi.Router, enabledFeatures FeatureFlags) (err error) {
 	defer router.Handle("/static/*", hashfs.FileServer(staticSys))
 
 	// Redirect `datastar.fly.dev`
@@ -127,7 +135,7 @@ func setupRoutes(ctx context.Context, router chi.Router) (err error) {
 	sessionSignals.MaxAge(int(24 * time.Hour / time.Second))
 
 	if err := errors.Join(
-		setupHome(router, sessionSignals, ns, index),
+		setupHome(router, sessionSignals, ns, index, enabledFeatures),
 		setupGuide(ctx, router),
 		setupReferenceRoutes(ctx, router),
 		setupExamples(ctx, router, sessionSignals),
