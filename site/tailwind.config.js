@@ -5,7 +5,7 @@ module.exports = {
     extend: {
       colors: {
         discord: '#5865F2',
-        youtube: '#F03F03',
+        youtube: '#DC2626',
         github: '#554B4B',
       },
     },
