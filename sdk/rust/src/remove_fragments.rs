@@ -31,6 +31,10 @@ pub struct RemoveFragments {
     pub retry_duration: Duration,
     /// Selects the fragments to remove from the DOM using a CSS selector.
     pub selector: String,
+    /// The duration to wait before removing the fragments.
+    pub settle_duration: Duration,
+    /// Whether to use view transitions when merging into the DOM.
+    pub use_view_transition: bool,
 }
 
 impl RemoveFragments {
@@ -40,6 +44,8 @@ impl RemoveFragments {
             id: Default::default(),
             retry_duration: Duration::from_millis(1000),
             selector: selector.into(),
+            settle_duration: Duration::from_millis(300),
+            use_view_transition: false,
         }
     }
 
@@ -72,6 +78,17 @@ impl ServerSentEventGenerator for RemoveFragments {
             result.push_str("retryDuration: ");
             result.push_str(&self.retry_duration.as_millis().to_string());
             result.push_str("\n");
+        }
+
+        if self.settle_duration.as_millis() != 300 {
+            result.push_str("data: settleDuration ");
+            result.push_str(&self.settle_duration.as_millis().to_string());
+            result.push_str("\n");
+        }
+
+        if self.use_view_transition {
+            result.push_str("data: useViewTransition ");
+            result.push_str("true\n");
         }
 
         result.push_str("data: selector ");
