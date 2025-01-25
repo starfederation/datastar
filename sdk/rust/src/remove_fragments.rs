@@ -126,7 +126,7 @@ impl ServerSentEventGenerator for RemoveFragments {
         result.push_str(consts::SELECTOR_DATALINE_LITERAL);
         result.push_str(" ");
         result.push_str(&self.selector);
-        result.push_str("\n\n");
+        result.push_str("\n\n\n");
 
         result
     }

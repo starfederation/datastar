@@ -90,7 +90,7 @@ impl ServerSentEventGenerator for RemoveSignals {
             result.push_str("\n");
         }
 
-        result.push_str("\n");
+        result.push_str("\n\n");
 
         result
     }

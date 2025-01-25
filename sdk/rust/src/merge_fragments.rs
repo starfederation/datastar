@@ -173,7 +173,7 @@ impl ServerSentEventGenerator for MergeFragments {
             result.push_str("\n");
         }
 
-        result.push_str("\n");
+        result.push_str("\n\n");
 
         result
     }

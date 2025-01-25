@@ -102,7 +102,7 @@ impl ServerSentEventGenerator for MergeSignals {
         result.push_str(consts::SIGNALS_DATALINE_LITERAL);
         result.push_str(" ");
         result.push_str(&self.signals);
-        result.push_str("\n\n");
+        result.push_str("\n\n\n");
 
         result
     }

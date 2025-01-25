@@ -129,7 +129,7 @@ impl ServerSentEventGenerator for ExecuteScript {
             result.push_str("\n");
         }
 
-        result.push_str("\n");
+        result.push_str("\n\n");
 
         result
     }
