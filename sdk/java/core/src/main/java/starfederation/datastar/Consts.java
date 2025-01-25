@@ -24,7 +24,7 @@ public final class Consts {
     // Should script element remove itself after execution?
     public static final boolean DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE = true;
 
-    // The default attributes for <script/> element use when executing scripts. It is a set of of key-value pairs delimited by a newline \\n character.
+    // The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
     public static final String DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = "type module";
 
     // The mode in which a fragment is merged into the DOM.

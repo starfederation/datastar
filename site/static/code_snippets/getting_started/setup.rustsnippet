@@ -1,8 +1,10 @@
 use datastar::prelude::*;
 
+// Transforms tuple of events into a response
 (
     // Merges HTML fragments into the DOM.
     MergeFragments::new("<div id='question'>What do you put in a toaster?</div>"),
+
     // Merges signals into the signals.
     MergeSignals::new("{response: '', answer: 'bread'}"),
-).into_response() // Transforms tuple of events into a response
+).into_response() 

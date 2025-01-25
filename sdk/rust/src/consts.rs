@@ -51,7 +51,7 @@ pub const DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE: bool = true;
 // #region Enums
 
 /// The mode in which a fragment is merged into the DOM.
-#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Default,Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FragmentMergeMode {
     /// Morphs the fragment into the existing element using idiomorph.
     #[default]

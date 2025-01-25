@@ -81,15 +81,21 @@ var Consts = &ConstTemplateData{
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/python",
 		},
 		{
-			FileExtension: "typescript",
+			FileExtension: "ts",
 			Name:          "TypeScript",
 			Icon:          "vscode-icons:file-type-typescript-official",
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/typescript",
 		},
 		{
-			FileExtension: "fs",
+			FileExtension: "rust",
+			Name:          "Rust",
+			Icon:          "vscode-icons:file-type-rust",
+			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/rust",
+		},
+		{
+			FileExtension: "csharp",
 			Name:          "Dotnet",
-			Icon:          "vscode-icons:file-type-fsharp2",
+			Icon:          "vscode-icons:file-type-csharp2",
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/dotnet",
 		},
 		{
