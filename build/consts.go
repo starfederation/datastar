@@ -132,7 +132,7 @@ var Consts = &ConstTemplateData{
 	DefaultStrings: []*DefaultString{
 		{
 			Name:        toolbelt.ToCasedString("executeScriptAttributes"),
-			Description: `The default attributes for <script/> element use when executing scripts. It is a set of of key-value pairs delimited by a newline \\n character.`,
+			Description: `The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.`,
 			Value:       "type module",
 		},
 	},

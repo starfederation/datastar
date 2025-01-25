@@ -1,0 +1,6 @@
+(
+    MergeFragments::new("<div id='question'>...</div>"),
+    MergeFragments::new("<div id='instructions'>...</div>"),
+    MergeSignals::new("{answer: '...'}"),
+    MergeSignals::new("{prize: '...'}"),
+)
