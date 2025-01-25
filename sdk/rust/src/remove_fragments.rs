@@ -104,7 +104,7 @@ impl ServerSentEventGenerator for RemoveFragments {
             result.push_str("\n");
         }
 
-        result.push_str("retryDuration: ");
+        result.push_str("retry: ");
         result.push_str(&self.retry_duration.as_millis().to_string());
         result.push_str("\n");
 
