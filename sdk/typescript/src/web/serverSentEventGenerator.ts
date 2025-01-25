@@ -1,8 +1,8 @@
 import { DatastarEventOptions, EventType, sseHeaders } from "../types.ts";
-
 import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator.ts";
 
 import type { Jsonifiable } from "npm:type-fest";
+import { deepmerge } from "npm:deepmerge-ts";
 
 function isRecord(obj: unknown): obj is Record<string, Jsonifiable> {
   return typeof obj === "object" && obj !== null;
@@ -29,6 +29,7 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
    */
   static stream(
     streamFunc: (stream: ServerSentEventGenerator) => Promise<void> | void,
+    init: ResponseInit = {}
   ): Response {
     const stream = new ReadableStream({
       async start(controller) {
@@ -38,9 +39,9 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
       },
     });
 
-    return new Response(stream, {
+    return new Response(stream, deepmerge({
       headers: sseHeaders,
-    });
+    }, init));
   }
 
   protected override send(
