@@ -94,3 +94,212 @@ where
         Ok(Self(json))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use {
+        crate::{
+            prelude::{
+                ExecuteScript, FragmentMergeMode, MergeFragments, MergeSignals, ReadSignals,
+                RemoveFragments, RemoveSignals,
+            },
+            ServerSentEventGenerator,
+        },
+        axum::{
+            http,
+            response::{IntoResponse, Response},
+            routing::{get, post},
+            Router,
+        },
+        core::time::Duration,
+        serde::Deserialize,
+        serde_json::Value,
+        tokio::net::TcpListener,
+    };
+
+    #[derive(Deserialize)]
+    #[serde(tag = "type", rename_all = "camelCase")]
+    pub enum ServerSentEvent {
+        #[serde(rename_all = "camelCase")]
+        ExecuteScript {
+            script: String,
+            event_id: Option<String>,
+            retry_duration: Option<u64>,
+            attributes: Option<Value>,
+            auto_remove: Option<bool>,
+        },
+        #[serde(rename_all = "camelCase")]
+        MergeFragments {
+            fragments: String,
+            event_id: Option<String>,
+            retry_duration: Option<u64>,
+            selector: Option<String>,
+            merge_mode: Option<String>,
+            settle_duration: Option<u64>,
+            use_view_transition: Option<bool>,
+        },
+        #[serde(rename_all = "camelCase")]
+        MergeSignals {
+            signals: Value,
+            event_id: Option<String>,
+            retry_duration: Option<u64>,
+            only_if_missing: Option<bool>,
+        },
+        #[serde(rename_all = "camelCase")]
+        RemoveFragments {
+            selector: String,
+            event_id: Option<String>,
+            retry_duration: Option<u64>,
+            settle_duration: Option<u64>,
+            use_view_transition: Option<bool>,
+        },
+        #[serde(rename_all = "camelCase")]
+        RemoveSignals {
+            paths: Vec<String>,
+            event_id: Option<String>,
+            retry_duration: Option<u64>,
+        },
+    }
+
+    #[derive(Deserialize)]
+    pub struct Signals {
+        events: Vec<Value>,
+    }
+
+    async fn test(ReadSignals(signals): ReadSignals<Signals>) -> Response {
+        let events = signals
+            .events
+            .into_iter()
+            .map(|event| {
+                println!("input: {:#?}", event);
+
+                let event = serde_json::from_value::<ServerSentEvent>(event).unwrap();
+
+                match event {
+                    ServerSentEvent::ExecuteScript {
+                        script,
+                        event_id,
+                        retry_duration,
+                        attributes,
+                        auto_remove,
+                    } => {
+                        let attributes = attributes
+                            .map(|attrs| {
+                                attrs
+                                    .as_object()
+                                    .unwrap()
+                                    .iter()
+                                    .map(|(name, value)| {
+                                        format!("{} {}", name, value.as_str().unwrap())
+                                    })
+                                    .collect()
+                            })
+                            .unwrap_or(vec![]);
+
+                        ExecuteScript {
+                            script,
+                            id: event_id,
+                            retry_duration: Duration::from_millis(retry_duration.unwrap_or(1000)),
+                            attributes,
+                            auto_remove: auto_remove.unwrap_or(true),
+                        }
+                        .send()
+                    }
+                    ServerSentEvent::MergeFragments {
+                        fragments,
+                        event_id,
+                        retry_duration,
+                        selector,
+                        merge_mode,
+                        settle_duration,
+                        use_view_transition,
+                    } => {
+                        let merge_mode = merge_mode
+                            .map(|mode| match mode.as_str() {
+                                "morph" => FragmentMergeMode::Morph,
+                                "inner" => FragmentMergeMode::Inner,
+                                "outer" => FragmentMergeMode::Outer,
+                                "prepend" => FragmentMergeMode::Prepend,
+                                "append" => FragmentMergeMode::Append,
+                                "before" => FragmentMergeMode::Before,
+                                "after" => FragmentMergeMode::After,
+                                "upsertAttributes" => FragmentMergeMode::UpsertAttributes,
+                                _ => unreachable!(),
+                            })
+                            .unwrap_or(FragmentMergeMode::Morph);
+
+                        MergeFragments {
+                            fragments,
+                            id: event_id,
+                            retry_duration: Duration::from_millis(retry_duration.unwrap_or(1000)),
+                            selector,
+                            merge_mode,
+                            settle_duration: Duration::from_millis(settle_duration.unwrap_or(300)),
+                            use_view_transition: use_view_transition.unwrap_or(false),
+                        }
+                        .send()
+                    }
+                    ServerSentEvent::MergeSignals {
+                        signals,
+                        event_id,
+                        retry_duration,
+                        only_if_missing,
+                    } => MergeSignals {
+                        signals: serde_json::to_string(&signals).unwrap(),
+                        id: event_id,
+                        retry_duration: Duration::from_millis(retry_duration.unwrap_or(1000)),
+                        only_if_missing: only_if_missing.unwrap_or(false),
+                    }
+                    .send(),
+                    ServerSentEvent::RemoveFragments {
+                        selector,
+                        event_id,
+                        retry_duration,
+                        settle_duration,
+                        use_view_transition,
+                    } => RemoveFragments {
+                        selector,
+                        id: event_id,
+                        retry_duration: Duration::from_millis(retry_duration.unwrap_or(1000)),
+                        settle_duration: Duration::from_millis(settle_duration.unwrap_or(300)),
+                        use_view_transition: use_view_transition.unwrap_or(false),
+                    }
+                    .send(),
+                    ServerSentEvent::RemoveSignals {
+                        paths,
+                        event_id,
+                        retry_duration,
+                    } => RemoveSignals {
+                        paths,
+                        id: event_id,
+                        retry_duration: Duration::from_millis(retry_duration.unwrap_or(1000)),
+                    }
+                    .send(),
+                }
+            })
+            .fold(String::new(), |acc, event| acc + &event);
+
+        println!("output: {}", events);
+
+        (
+            [
+                (http::header::CONTENT_TYPE, "text/event-stream"),
+                (http::header::CACHE_CONTROL, "no-cache"),
+            ],
+            events,
+        )
+            .into_response()
+    }
+
+    #[tokio::test]
+    async fn sdk_test() -> Result<(), Box<dyn std::error::Error>> {
+        let listener = TcpListener::bind("127.0.0.1:3000").await?;
+        let app = Router::new()
+            .route("/test", get(test))
+            .route("/test", post(test));
+
+        axum::serve(listener, app).await?;
+
+        Ok(())
+    }
+}
