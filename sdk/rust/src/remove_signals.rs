@@ -74,7 +74,7 @@ impl ServerSentEventGenerator for RemoveSignals {
 
         if let Some(id) = &self.id {
             result.push_str("id: ");
-            result.push_str(id.as_ref());
+            result.push_str(id);
             result.push_str("\n");
         }
 
