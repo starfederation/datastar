@@ -8,7 +8,7 @@ use {
         http::{self},
         response::{IntoResponse as AxumIntoResponse, Response},
     },
-    serde::{Deserialize, de::DeserializeOwned},
+    serde::{de::DeserializeOwned, Deserialize},
 };
 
 fn into_response<T: ServerSentEventGenerator>(event: T) -> Response {
@@ -69,14 +69,6 @@ where
     type Rejection = Response;
 
     async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
-        if req.headers().get("datastar-request").is_none() {
-            return Err((
-                http::StatusCode::BAD_REQUEST,
-                "Missing 'datastar-request' header",
-            )
-                .into_response());
-        }
-
         let json = match *req.method() {
             http::Method::GET => {
                 let query = Query::<DatastarQuery>::from_request(req, state)
