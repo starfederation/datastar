@@ -53,6 +53,7 @@ Multiple statements can be used in a single expression by separating them with a
 <div data-signals-foo="1">
   <div data-on-click="$foo++; @post('/endpoint')"></div>
 </div>
+```
 
 Expressions may span multiple lines, but a semicolon must be used to separate statements.
 
@@ -63,6 +64,7 @@ Expressions may span multiple lines, but a semicolon must be used to separate st
         @post('/endpoint')
   "></div>
 </div>
+```
 
 ### Security
 
