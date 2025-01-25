@@ -211,11 +211,12 @@ export class Engine {
     // single quotes      '(\\'|[^'])*'
     // ticks              `(\\`|[^`])*`
     //
-    // We also want to match the non delimiter part of statements:
+    // We also want to match the non delimiter part of statements
+    // note we only support ; statement delimiters and not \n :
     //
-    // [^;\n]
+    // [^;]
     //
-    const statementRe = /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;\n])+/gm
+    const statementRe = /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;])+/gm
     const stmts = ctx.value.trim().match(statementRe)
     const lastIdx = stmts.length - 1
     const last = stmts[lastIdx]
