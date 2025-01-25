@@ -23,9 +23,11 @@ use {
 ///     .send();
 ///
 /// let expected: &str = "event: datastar-remove-fragments
+/// retry: 1000
 /// data: settleDuration 1000
 /// data: useViewTransition true
 /// data: selector #foo
+///
 ///
 /// ";
 ///

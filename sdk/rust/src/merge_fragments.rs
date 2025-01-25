@@ -30,11 +30,13 @@ use {
 ///     .send();
 ///
 /// let expected: &str = "event: datastar-merge-fragments
+/// retry: 1000
 /// data: selector body
 /// data: mergeMode append
 /// data: settleDuration 1000
 /// data: useViewTransition true
 /// data: fragments <h1>Hello, world!</h1>
+///
 ///
 /// ";
 ///

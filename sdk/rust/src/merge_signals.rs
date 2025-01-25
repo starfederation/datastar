@@ -19,8 +19,10 @@ use {
 ///     .send();
 ///
 /// let expected: &str = "event: datastar-merge-signals
+/// retry: 1000
 /// data: onlyIfMissing true
 /// data: signals {foo: 1234}
+///
 ///
 /// ";
 ///

@@ -20,9 +20,11 @@ use {
 ///     .send();
 ///
 /// let expected: &str = "event: datastar-execute-script
+/// retry: 1000
 /// data: autoRemove false
 /// data: attributes type text/javascript
 /// data: script console.log('Hello, world!')
+///
 ///
 /// ";
 ///

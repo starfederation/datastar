@@ -17,9 +17,11 @@ use {
 /// let remove_signals: String = RemoveSignals::new(["foo.bar", "1234", "abc"]).send();
 ///
 /// let expected: &str = r#"event: datastar-remove-signals
+/// retry: 1000
 /// data: paths foo.bar
 /// data: paths 1234
 /// data: paths abc
+///
 ///
 /// "#;
 ///
