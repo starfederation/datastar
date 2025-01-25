@@ -200,6 +200,8 @@ export class Engine {
     ctx: RuntimeContext,
     ...argNames: string[]
   ): RuntimeExpressionFunction {
+    let userExpression = ''
+
     // This regex allows Datastar expressions to support nested
     // regex and strings that contain ; and/or \n without breaking.
     //
@@ -217,13 +219,15 @@ export class Engine {
     // [^;]
     //
     const statementRe = /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;])+/gm
-    const stmts = ctx.value.trim().match(statementRe)
-    const lastIdx = stmts.length - 1
-    const last = stmts[lastIdx]
-    if (!last.startsWith('return')) {
-      stmts[lastIdx] = `return (${last});`
+    const statements = ctx.value.trim().match(statementRe)
+    if (statements) {
+      const lastIdx = statements.length - 1
+      const last = statements[lastIdx].trim()
+      if (!last.startsWith('return')) {
+        statements[lastIdx] = `return (${last});`
+      }
+      userExpression = statements.join(';\n')
     }
-    let userExpression = stmts.join(';\n')
 
     // Ingore any escaped values
     const escaped = new Map<string, string>()
