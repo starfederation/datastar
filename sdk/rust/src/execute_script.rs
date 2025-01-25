@@ -99,11 +99,9 @@ impl ServerSentEventGenerator for ExecuteScript {
             result.push_str("\n");
         }
 
-        if self.retry_duration.as_millis() != 1000 {
-            result.push_str("retryDuration: ");
-            result.push_str(&self.retry_duration.as_millis().to_string());
-            result.push_str("\n");
-        }
+        result.push_str("retryDuration: ");
+        result.push_str(&self.retry_duration.as_millis().to_string());
+        result.push_str("\n");
 
         if !self.auto_remove {
             result.push_str("data: ");

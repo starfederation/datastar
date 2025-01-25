@@ -78,11 +78,9 @@ impl ServerSentEventGenerator for RemoveSignals {
             result.push_str("\n");
         }
 
-        if self.retry_duration.as_millis() != consts::DEFAULT_SSE_RETRY_DURATION as u128 {
-            result.push_str("retryDuration: ");
-            result.push_str(&self.retry_duration.as_millis().to_string());
-            result.push_str("\n");
-        }
+        result.push_str("retryDuration: ");
+        result.push_str(&self.retry_duration.as_millis().to_string());
+        result.push_str("\n");
 
         for line in &self.paths {
             result.push_str("data: ");

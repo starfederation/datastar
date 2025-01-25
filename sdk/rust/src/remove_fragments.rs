@@ -104,11 +104,9 @@ impl ServerSentEventGenerator for RemoveFragments {
             result.push_str("\n");
         }
 
-        if self.retry_duration.as_millis() != consts::DEFAULT_SSE_RETRY_DURATION as u128 {
-            result.push_str("retryDuration: ");
-            result.push_str(&self.retry_duration.as_millis().to_string());
-            result.push_str("\n");
-        }
+        result.push_str("retryDuration: ");
+        result.push_str(&self.retry_duration.as_millis().to_string());
+        result.push_str("\n");
 
         if self.settle_duration.as_millis() != 300 {
             result.push_str("data: ");
