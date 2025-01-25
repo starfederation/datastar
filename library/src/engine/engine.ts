@@ -226,7 +226,7 @@ export class Engine {
       if (!last.startsWith('return')) {
         statements[lastIdx] = `return (${last});`
       }
-      userExpression = statements.join(';')
+      userExpression = statements.join(';\n')
     }
 
     // Ingore any escaped values
