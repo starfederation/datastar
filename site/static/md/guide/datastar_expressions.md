@@ -47,6 +47,25 @@ The following example is valid because both `$foo.bar` and `$baz` are signals.
 
 Note that `data-*` attributes are evaluated in the order they appear in the DOM, so the `data-text` attributes must come _after_ the `data-signals-*` attributes in the example above. See the [attribute plugins reference](/reference/attribute_plugins) for more information.
 
+Multiple statements can be used in a single expression by separating them with a semicolon.
+
+```html
+<div data-signals-foo="1">
+  <button data-on-click="$foo++; @post('/endpoint')"></button>
+</div>
+```
+
+Expressions may span multiple lines, but a semicolon must be used to separate statements.
+
+```html
+<div data-signals-foo="1">
+  <button data-on-click="
+        $foo++; 
+        @post('/endpoint')
+  "></button>
+</div>
+```
+
 ### Security
 
 When using a [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) (CSP), `unsafe-eval` must be allowed for scripts, since Datastar evaluates expressions inline. 
