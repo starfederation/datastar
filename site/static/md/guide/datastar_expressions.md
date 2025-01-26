@@ -51,7 +51,7 @@ Multiple statements can be used in a single expression by separating them with a
 
 ```html
 <div data-signals-foo="1">
-  <div data-on-click="$foo++; @post('/endpoint')"></div>
+  <button data-on-click="$foo++; @post('/endpoint')"></button>
 </div>
 ```
 
@@ -59,10 +59,10 @@ Expressions may span multiple lines, but a semicolon must be used to separate st
 
 ```html
 <div data-signals-foo="1">
-  <div data-on-click="
+  <button data-on-click="
         $foo++; 
         @post('/endpoint')
-  "></div>
+  "></button>
 </div>
 ```
 
