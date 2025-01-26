@@ -1,0 +1,8 @@
+const datastar = @import("datastar");
+
+// Creates a new `ServerSentEventGenerator`.
+sse = datastar.ServerSentEventGenerator.init(req);
+
+sse.mergeFragments("<div id='hello'>Hello, world!</div>");
+sse.mergeSignals("{foo: {bar: 1}}");
+sse.executeScript("console.log('Success!')");
