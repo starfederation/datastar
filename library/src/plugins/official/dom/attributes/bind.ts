@@ -175,12 +175,18 @@ export const Bind: AttributePlugin = {
       el.addEventListener(event, el2sig)
     }
     const elSigClean = effect(() => setFromSignal())
+    const onPageshow = (ev: PageTransitionEvent) => {
+      if (!ev.persisted) return
+      el2sig()
+    }
+    window.addEventListener("pageshow", onPageshow)
 
     return () => {
       elSigClean()
       for (const event of updateEvents) {
         el.removeEventListener(event, el2sig)
       }
+      window.removeEventListener("pageshow", onPageshow)
     }
   },
 }

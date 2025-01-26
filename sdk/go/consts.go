@@ -115,4 +115,3 @@ const (
 )
 //endregion EventType
 
-//endregion Enums
