@@ -203,7 +203,7 @@ export class Engine {
     let userExpression = ''
 
     // This regex allows Datastar expressions to support nested
-    // regex and strings that contain ; and/or \n without breaking.
+    // regex and strings that contain ; without breaking.
     //
     // Each of these regex defines a block type we want to match
     // (importantly we ignore the content within these blocks):
@@ -214,7 +214,7 @@ export class Engine {
     // ticks              `(\\`|[^`])*`
     //
     // We also want to match the non delimiter part of statements
-    // note we only support ; statement delimiters and not \n :
+    // note we only support ; statement delimiters:
     //
     // [^;]
     //
@@ -229,7 +229,7 @@ export class Engine {
       userExpression = statements.join(';\n')
     }
 
-    // Ingore any escaped values
+    // Ignore any escaped values
     const escaped = new Map<string, string>()
     const escapeRe = new RegExp(`(?:${DSP})(.*?)(?:${DSS})`, 'gm')
     for (const match of userExpression.matchAll(escapeRe)) {
