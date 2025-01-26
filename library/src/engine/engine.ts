@@ -44,15 +44,12 @@ export class Engine {
         addedNodes,
         removedNodes,
       } of mutations) {
-        const elify = (n: Node) => n as HTMLorSVGElement
-
         switch (type) {
           case 'childList':
             {
               if (removedNodes.length) {
                 for (const node of removedNodes) {
-                  const el = elify(node)
-
+                  const el = node as HTMLorSVGElement
                   const elRemovals = this.#removals.get(el)
                   if (!elRemovals) continue
 
@@ -65,7 +62,7 @@ export class Engine {
 
               if (addedNodes.length) {
                 for (const node of addedNodes) {
-                  const el = elify(node)
+                  const el = node as HTMLorSVGElement
                   this.#apply(el)
                 }
               }
@@ -77,7 +74,7 @@ export class Engine {
                 break
               }
 
-              const el = elify(target)
+              const el = target as HTMLorSVGElement
               const rawKey = camelize(attributeName.slice(dsPrefix.length))
 
               // If the value is not null and has changed, cleanup the old value
