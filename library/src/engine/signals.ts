@@ -201,6 +201,10 @@ export class SignalsRoot {
   }
 
   remove(...dotDelimitedPaths: string[]) {
+    if (!dotDelimitedPaths.length) {
+      this.#signals = {}
+      return
+    }
     for (const path of dotDelimitedPaths) {
       const parts = path.split('.')
       let subSignals = this.#signals

@@ -14,19 +14,99 @@ import {
   type InitContext,
   type OnRemovalFn,
   PluginType,
-  type RemovalEntry,
   Requirement,
   type RuntimeContext,
   type RuntimeExpressionFunction,
   type WatcherPlugin,
 } from './types'
 
+const removalKey = (k: string, v: string) => `${k}${DSP}${v}`
+
 export class Engine {
   #signals = new SignalsRoot()
   #plugins: AttributePlugin[] = []
   #actions: ActionPlugins = {}
   #watchers: WatcherPlugin[] = []
-  #removals = new Map<Element, RemovalEntry>()
+
+  // Map of cleanup functions by element, keyed by the raw dataset key and value
+  #removals = new Map<Element, Map<string, OnRemovalFn>>()
+
+  constructor() {
+    const dsPrefix = 'data-'
+
+    const ob = new MutationObserver((mutations) => {
+      for (const {
+        target,
+        type,
+        attributeName,
+        oldValue,
+        addedNodes,
+        removedNodes,
+      } of mutations) {
+        const elify = (n: Node) => n as HTMLorSVGElement
+
+        switch (type) {
+          case 'childList':
+            {
+              if (removedNodes.length) {
+                for (const node of removedNodes) {
+                  const el = elify(node)
+
+                  const elRemovals = this.#removals.get(el)
+                  if (!elRemovals) continue
+
+                  for (const [_, removalFn] of elRemovals) {
+                    removalFn()
+                  }
+                  this.#removals.delete(el)
+                }
+              }
+
+              if (addedNodes.length) {
+                for (const node of addedNodes) {
+                  const el = elify(node)
+                  this.apply(el)
+                }
+              }
+            }
+            break
+          case 'attributes': {
+            {
+              if (!attributeName?.startsWith(dsPrefix)) {
+                break
+              }
+
+              const el = elify(target)
+              const rawKey = camelize(attributeName.slice(dsPrefix.length))
+
+              // If the value is not null and has changed, cleanup the old value
+              if (oldValue !== null && el.dataset[rawKey] !== oldValue) {
+                const elRemovals = this.#removals.get(el)
+                if (elRemovals) {
+                  const rk = removalKey(rawKey, oldValue)
+                  const removalFn = elRemovals.get(rk)
+                  if (removalFn) {
+                    removalFn()
+                    elRemovals.delete(rk)
+                  }
+                }
+              }
+
+              this.#applyAttributePlugin(el, rawKey)
+            }
+            break
+          }
+        }
+      }
+    })
+
+    ob.observe(document.body, {
+      attributes: true,
+      attributeOldValue: true,
+      childList: true,
+      subtree: true,
+    })
+  }
 
   get signals() {
     return this.#signals
@@ -46,7 +126,6 @@ export class Engine {
         effect: (cb: () => void): OnRemovalFn => effect(cb),
         actions: this.#actions,
         apply: this.apply.bind(this),
-        cleanup: this.#cleanup.bind(this),
         plugin,
       }
 
@@ -88,112 +167,110 @@ export class Engine {
   // Apply all plugins to the element and its children
   public apply(rootElement: Element) {
     this.#walkDownDOM(rootElement, (el) => {
-      // Cleanup any previous plugins
-      this.#cleanup(el)
+      // Cleanup any existing removal functions
+      const elRemovals = this.#removals.get(el)
+      if (elRemovals) {
+        for (const [, removalFn] of elRemovals) {
+          removalFn()
+        }
+        this.#removals.delete(el)
+      }
 
       // Apply the plugins to the element in order of application
       // since DOMStringMap is ordered, we can be deterministic
       for (const rawKey of Object.keys(el.dataset)) {
-        // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically
-        // the first match will be the most specific
-        const plugin = this.#plugins.find((p) => rawKey.startsWith(p.name))
-
-        // Skip if no plugin is found
-        if (!plugin) continue
-
-        // Ensure the element has an id
-        if (!el.id.length) el.id = elUniqId(el)
-
-        // Extract the key and value from the dataset
-        let [key, ...rawModifiers] = rawKey
-          .slice(plugin.name.length)
-          .split(/\_\_+/)
-
-        const hasKey = key.length > 0
-        if (hasKey) {
-          // Keys starting with a dash are not converted to camel case in the dataset
-          const keySlice1 = key.slice(1)
-          key = key.startsWith('-')
-            ? keySlice1
-            : key[0].toLowerCase() + keySlice1
-        }
-        const value = `${el.dataset[rawKey]}` || ''
-        const hasValue = value.length > 0
-
-        // Create the runtime context
-        const that = this // I hate javascript
-        const ctx: RuntimeContext = {
-          get signals() {
-            return that.#signals
-          },
-          effect: (cb: () => void): OnRemovalFn => effect(cb),
-          apply: this.apply.bind(this),
-          cleanup: this.#cleanup.bind(this),
-          actions: this.#actions,
-          genRX: () => this.#genRX(ctx, ...(plugin.argNames || [])),
-          plugin,
-          el,
-          rawKey,
-          key,
-          value,
-          mods: new Map(),
-        }
-
-        // Check the requirements
-        const keyReq = plugin.keyReq || Requirement.Allowed
-        if (hasKey) {
-          if (keyReq === Requirement.Denied) {
-            throw runtimeErr(`${plugin.name}KeyNotAllowed`, ctx)
-          }
-        } else if (keyReq === Requirement.Must) {
-          throw runtimeErr(`${plugin.name}KeyRequired`, ctx)
-        }
-        const valReq = plugin.valReq || Requirement.Allowed
-        if (hasValue) {
-          if (valReq === Requirement.Denied) {
-            throw runtimeErr(`${plugin.name}ValueNotAllowed`, ctx)
-          }
-        } else if (valReq === Requirement.Must) {
-          throw runtimeErr(`${plugin.name}ValueRequired`, ctx)
-        }
-
-        // Check for exclusive requirements
-        if (
-          keyReq === Requirement.Exclusive ||
-          valReq === Requirement.Exclusive
-        ) {
-          if (hasKey && hasValue) {
-            throw runtimeErr(`${plugin.name}KeyAndValueProvided`, ctx)
-          }
-          if (!hasKey && !hasValue) {
-            throw runtimeErr(`${plugin.name}KeyOrValueRequired`, ctx)
-          }
-        }
-
-        for (const rawMod of rawModifiers) {
-          const [label, ...mod] = rawMod.split('.')
-          ctx.mods.set(
-            camelize(label),
-            new Set(mod.map((t) => t.toLowerCase())),
-          )
-        }
-
-        // Load the plugin and store any cleanup functions
-        const removal = plugin.onLoad(ctx)
-        if (removal) {
-          if (!this.#removals.has(el)) {
-            this.#removals.set(el, {
-              id: el.id,
-              fns: [],
-            })
-          }
-          this.#removals.get(el)?.fns.push(removal)
-        }
-
-        // Remove the attribute if required
-        if (plugin?.removeOnLoad) delete el.dataset[rawKey]
+        this.#applyAttributePlugin(el, rawKey)
       }
     })
+  }
+
+  #applyAttributePlugin(el: HTMLorSVGElement, rawKey: string) {
+    // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically
+    // the first match will be the most specific
+    const plugin = this.#plugins.find((p) => rawKey.startsWith(p.name))
+
+    // Skip if no plugin is found
+    if (!plugin) return
+
+    // Ensure the element has an id
+    if (!el.id.length) el.id = elUniqId(el)
+
+    // Extract the key and value from the dataset
+    let [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/\_\_+/)
+
+    const hasKey = key.length > 0
+    if (hasKey) {
+      // Keys starting with a dash are not converted to camel case in the dataset
+      const keySlice1 = key.slice(1)
+      key = key.startsWith('-') ? keySlice1 : key[0].toLowerCase() + keySlice1
+    }
+    const value = `${el.dataset[rawKey]}` || ''
+    const hasValue = value.length > 0
+
+    // Create the runtime context
+    const that = this // I hate javascript
+    const ctx: RuntimeContext = {
+      get signals() {
+        return that.#signals
+      },
+      effect: (cb: () => void): OnRemovalFn => effect(cb),
+      apply: this.apply.bind(this),
+      actions: this.#actions,
+      genRX: () => this.#genRX(ctx, ...(plugin.argNames || [])),
+      plugin,
+      el,
+      rawKey,
+      key,
+      value,
+      mods: new Map(),
+    }
+
+    // Check the requirements
+    const keyReq = plugin.keyReq || Requirement.Allowed
+    if (hasKey) {
+      if (keyReq === Requirement.Denied) {
+        throw runtimeErr(`${plugin.name}KeyNotAllowed`, ctx)
+      }
+    } else if (keyReq === Requirement.Must) {
+      throw runtimeErr(`${plugin.name}KeyRequired`, ctx)
+    }
+    const valReq = plugin.valReq || Requirement.Allowed
+    if (hasValue) {
+      if (valReq === Requirement.Denied) {
+        throw runtimeErr(`${plugin.name}ValueNotAllowed`, ctx)
+      }
+    } else if (valReq === Requirement.Must) {
+      throw runtimeErr(`${plugin.name}ValueRequired`, ctx)
+    }
+
+    // Check for exclusive requirements
+    if (keyReq === Requirement.Exclusive || valReq === Requirement.Exclusive) {
+      if (hasKey && hasValue) {
+        throw runtimeErr(`${plugin.name}KeyAndValueProvided`, ctx)
+      }
+      if (!hasKey && !hasValue) {
+        throw runtimeErr(`${plugin.name}KeyOrValueRequired`, ctx)
+      }
+    }
+
+    for (const rawMod of rawModifiers) {
+      const [label, ...mod] = rawMod.split('.')
+      ctx.mods.set(camelize(label), new Set(mod.map((t) => t.toLowerCase())))
+    }
+
+    // Load the plugin and store any cleanup functions
+    const removalFn = plugin.onLoad(ctx)
+    if (removalFn) {
+      let elRemovals = this.#removals.get(el)
+      if (!elRemovals) {
+        elRemovals = new Map()
+        this.#removals.set(el, elRemovals)
+      }
+      elRemovals.set(removalKey(rawKey, value), removalFn)
+    }
+
+    // Remove the attribute if required
+    if (plugin?.removeOnLoad) delete el.dataset[rawKey]
   }
 
   #genRX(
@@ -216,8 +293,9 @@ export class Engine {
     //
     // [^;]
     //
-    const statementRe = /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;])+/gm
-    const stmts = ctx.value.trim().match(statementRe)
+    const statementRe =
+      /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;])+/gm
+    const stmts = ctx.value.trim().match(statementRe) || []
     const lastIdx = stmts.length - 1
     const last = stmts[lastIdx]
     if (!last.startsWith('return')) {
@@ -312,17 +390,6 @@ export class Engine {
     while (el) {
       this.#walkDownDOM(el, callback)
       el = el.nextElementSibling
-    }
-  }
-
-  // Clenup all plugins associated with the element
-  #cleanup(el: Element) {
-    const removalSet = this.#removals.get(el)
-    if (removalSet) {
-      for (const removal of removalSet.fns) {
-        removal()
-      }
-      this.#removals.delete(el)
     }
   }
 }

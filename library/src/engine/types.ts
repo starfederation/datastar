@@ -48,7 +48,7 @@ export interface ActionPlugin extends DatastarPlugin {
 }
 
 export type GlobalInitializer = (ctx: InitContext) => void
-export type RemovalEntry = { id: string; fns: Array<OnRemovalFn> }
+// export type RemovalEntry = { id: string; fns: Array<OnRemovalFn> }
 
 export type InitContext = {
   plugin: DatastarPlugin
@@ -56,7 +56,6 @@ export type InitContext = {
   effect: (fn: EffectFn) => OnRemovalFn
   actions: Readonly<ActionPlugins>
   apply: (target: Element) => void
-  cleanup: (el: Element) => void
 }
 
 export type HTMLorSVGElement = Element & (HTMLElement | SVGElement)
