@@ -1,4 +1,5 @@
 import type { EffectFn, Signal } from '../vendored/preact-core'
+import { DATASTAR } from './consts'
 import type { SignalsRoot } from './signals'
 
 export type OnRemovalFn = () => void
@@ -19,6 +20,33 @@ export enum Requirement {
   Must = 1,
   Denied = 2,
   Exclusive = 3,
+}
+
+export interface DatastarSignalEvent {
+  added: Array<string>
+  removed: Array<string>
+  updated: Array<string>
+}
+export const DATASTAR_SIGNAL_EVENT = `${DATASTAR}-signals`
+export interface CustomEventMap {
+  [DATASTAR_SIGNAL_EVENT]: CustomEvent<DatastarSignalEvent>
+}
+export type WatcherFn<K extends keyof CustomEventMap> = (
+  this: Document,
+  ev: CustomEventMap[K],
+) => void
+declare global {
+  interface Document {
+    dispatchEvent<K extends keyof CustomEventMap>(ev: CustomEventMap[K]): void
+    addEventListener<K extends keyof CustomEventMap>(
+      type: K,
+      listener: WatcherFn<K>,
+    ): void
+    removeEventListener<K extends keyof CustomEventMap>(
+      type: K,
+      listener: WatcherFn<K>,
+    ): void
+  }
 }
 
 // A plugin accesible via a `data-${name}` attribute on an element
@@ -55,7 +83,6 @@ export type InitContext = {
   signals: SignalsRoot
   effect: (fn: EffectFn) => OnRemovalFn
   actions: Readonly<ActionPlugins>
-  apply: (target: Element) => void
 }
 
 export type HTMLorSVGElement = Element & (HTMLElement | SVGElement)

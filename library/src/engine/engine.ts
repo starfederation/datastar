@@ -1,5 +1,6 @@
 import { Hash, elUniqId } from '../utils/dom'
 import { camelize } from '../utils/text'
+import { debounce } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS, VERSION } from './consts'
 import { initErr, runtimeErr } from './errors'
@@ -65,7 +66,7 @@ export class Engine {
               if (addedNodes.length) {
                 for (const node of addedNodes) {
                   const el = elify(node)
-                  this.apply(el)
+                  this.#apply(el)
                 }
               }
             }
@@ -125,7 +126,6 @@ export class Engine {
         },
         effect: (cb: () => void): OnRemovalFn => effect(cb),
         actions: this.#actions,
-        apply: this.apply.bind(this),
         plugin,
       }
 
@@ -162,10 +162,16 @@ export class Engine {
       if (lenDiff !== 0) return lenDiff
       return a.name.localeCompare(b.name)
     })
+
+    this.#debouncedApply()
   }
 
+  #debouncedApply = debounce(() => {
+    this.#apply(document.body)
+  }, 1)
+
   // Apply all plugins to the element and its children
-  public apply(rootElement: Element) {
+  #apply(rootElement: Element) {
     this.#walkDownDOM(rootElement, (el) => {
       // Cleanup any existing removal functions
       const elRemovals = this.#removals.get(el)
@@ -214,7 +220,6 @@ export class Engine {
         return that.#signals
       },
       effect: (cb: () => void): OnRemovalFn => effect(cb),
-      apply: this.apply.bind(this),
       actions: this.#actions,
       genRX: () => this.#genRX(ctx, ...(plugin.argNames || [])),
       plugin,
