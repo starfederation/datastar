@@ -58,3 +58,7 @@ Examples:
 
 [Java SDK](https://github.com/starfederation/datastar/blob/develop/sdk/java)  
 _Author: [Peter Humulock](https://github.com/rphumulock)_
+
+## Zig
+[Zig SDK](https://github.com/starfederation/datastar/tree/develop/sdk/zig)  
+ _Author: [Johnathan Stevers](https://github.com/jmstevers)_
