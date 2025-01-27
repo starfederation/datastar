@@ -104,6 +104,12 @@ var Consts = &ConstTemplateData{
 			Icon:          "vscode-icons:file-type-java",
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/java",
 		},
+		{
+			FileExtension: "zig",
+			Name:          "Zig",
+			Icon:          "vscode-icons:file-type-zig",
+			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/zig",
+		},
 	},
 	DatastarKey: "datastar",
 	DefaultBools: []*DefaultBool{

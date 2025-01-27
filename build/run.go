@@ -146,6 +146,7 @@ func writeOutConsts(version string) error {
 		"sdk/python/src/datastar_py/consts.py":    pythonConsts,
 		"sdk/typescript/src/consts.ts":            typescriptConsts,
 		"sdk/rust/src/consts.rs":                  rustConsts,
+		"sdk/zig/src/consts.zig":                  zigConsts,
 	}
 
 	for path, tmplFn := range templates {
