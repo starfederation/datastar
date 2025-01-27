@@ -6,8 +6,10 @@
 
 - Changed the `data-on-interval` attribute to accept a `__duration` modifier instead of a `__delay` modifier ([#513](https://github.com/starfederation/datastar/issues/513)).
 - Changed the parsing of Datastar expressions so that only semicolons can be used to explicitly indicate a statement delimiter ([#525](https://github.com/starfederation/datastar/issues/525)).
+- The `data-custom-validity` attribute can now be used on all valid elements, not just input elements ([534](https://github.com/starfederation/datastar/pull/534)).
 
 ### Fixed
+
 - Fixed how Datastar expressions are evaluated to allow regular expressions and strings that contain semicolons and new lines ([#508](https://github.com/starfederation/datastar/issues/508)).
 - Fixed a bug when using the `__delay` modifier on the `data-on-load` attribute ([#511](https://github.com/starfederation/datastar/issues/511)).
 - Fixed a bug with the `inner` merge mode that was causing only the inner HTML of the fragment to be merged ([#524](https://github.com/starfederation/datastar/issues/524)).
