@@ -1,0 +1,95 @@
+<div class="demo-section">
+    <div style="display: flex; justify-content: space-between; gap: 1rem;">
+        <a href="/infinite-scroll" class="demo-nav-link">
+            ← PREVIOUS: INFINITE SCROLL
+        </a>
+        <a href="/progress-bar" class="demo-nav-link">
+            NEXT: PROGRESS BAR →
+        </a>
+    </div>
+
+    <h2>Active Search (ASP.NET MVC)</h2>
+    <p style="margin-bottom: 1rem;">
+        <a href="https://data-star.dev/examples/active_search" target="_blank"
+           style="color: #C9A75F; text-decoration: none;">
+            Learn more about this example on data-star.dev →
+        </a>
+    </p>
+    <p id="total-count">
+        Showing @ViewData["CurrentCount"] of @ViewData["TotalCount"] notes
+    </p>
+    <div class="demo-content">
+        <div class="search-container">
+            <input type="text" placeholder="Search..." class="search-input" data-bind-input
+                   data-on-input__debounce.1000ms="@@put('/search')"/>
+        </div>
+        <div id="notes-list" class="notes-list">
+            @foreach (var note in Model)
+            {
+                <div class="note-item">
+                    <p>@note.Content</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; gap: 1rem;">
+        <a href="/infinite-scroll" class="demo-nav-link">
+            ← PREVIOUS: INFINITE SCROLL
+        </a>
+        <a href="/progress-bar" class="demo-nav-link">
+            NEXT: PROGRESS BAR →
+        </a>
+    </div>
+</div>
+
+<style>
+    .search-container {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    .search-input {
+        width: 100%;
+        max-width: 500px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0.375rem;
+        transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #C9A75F;
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .notes-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .note-item {
+        width: 100%;
+        max-width: 500px;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.375rem;
+    }
+
+    .note-item p {
+        margin: 0;
+        line-height: 1.5;
+    }
+</style>

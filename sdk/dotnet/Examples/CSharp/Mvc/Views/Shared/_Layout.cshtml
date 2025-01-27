@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    @* <meta http-equiv="refresh" content="5" /> *@
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/demo.css" asp-append-version="true"/>
+    <script type="module"
+            src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.2/bundles/datastar.js"></script>
+</head>
+<body>
+<div class="demo-container">
+    <!-- Left Sidebar -->
+    <aside class="demo-sidebar" aria-label="Examples navigation">
+        <a href="/click-to-edit" style="text-decoration: none;">
+            <h1>DATASTAR Examples</h1>
+        </a>
+        <p style="color: #C9A75F">PORTED HTMX EXAMPLES</p>
+        <nav class="demo-nav">
+            <ul role="list">
+                <li><a href="/click-to-edit" class="demo-link">CLICK TO EDIT <span class="status">TODO</span></a></li>
+                <li><a href="/bulk-update" class="demo-link">BULK UPDATE <span class="status">TODO</span></a></li>
+                <li><a href="/click-to-load" class="demo-link">CLICK TO LOAD <span class="status">TODO</span></a></li>
+                <li><a href="/delete-row" class="demo-link">DELETE ROW <span class="status">TODO</span></a></li>
+                <li><a href="/edit-row" class="demo-link">EDIT ROW <span class="status">TODO</span></a></li>
+                <li><a href="/lazy-load" class="demo-link">LAZY LOAD <span class="status">TODO</span></a></li>
+                <li><a href="/loading-indicator" class="demo-link">LOADING INDICATOR <span
+                            class="status">TODO</span></a></li>
+                <li><a href="/inline-validation" class="demo-link">INLINE VALIDATION <span
+                            class="status">TODO</span></a></li>
+                <li><a href="/infinite-scroll" class="demo-link">INFINITE SCROLL <span class="status">TODO</span></a>
+                </li>
+                <li><a href="/active-search" class="demo-link">ACTIVE SEARCH</a></li>
+                <li><a href="/progress-bar" class="demo-link">PROGRESS BAR <span class="status">TODO</span></a></li>
+                <li><a href="/value-select" class="demo-link">VALUE SELECT <span class="status">TODO</span></a></li>
+                <li><a href="/animations" class="demo-link">ANIMATIONS <span class="status">TODO</span></a></li>
+                <li><a href="/file-upload" class="demo-link">FILE UPLOAD <span class="status">TODO</span></a></li>
+                <li><a href="/dialogs-browser" class="demo-link">DIALOGS BROWSER <span class="status">TODO</span></a>
+                </li>
+                <li><a href="/lazy-tabs" class="demo-link">LAZY TABS <span class="status">TODO</span></a></li>
+                <li><a href="/sortable" class="demo-link">SORTABLE <span class="status">TODO</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Right Content Area -->
+    <main class="demo-content" role="main" aria-label="Example content">
+        @RenderBody()
+    </main>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", false)
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const links = document.querySelectorAll('.demo-link');
+        const currentPath = window.location.pathname;
+
+        // Remove active class from all links
+        links.forEach(l => l.classList.remove('active'));
+
+        // If we're at the root, activate ActiveSearch
+        if (currentPath === '/' || currentPath.toLowerCase() === '/home') {
+            window.location.href = '/active-search';
+        } else {
+            // Otherwise highlight the current page link
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                    // Scroll the active link into view with some padding
+                    setTimeout(() => {
+                        link.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    }, 100);
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>
