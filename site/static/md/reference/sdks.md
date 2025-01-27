@@ -44,7 +44,7 @@ Examples:
 
 ## Rust
 
-[Rust SDK](https://github.com/starfederation/datastar/tree/develop/sdk/rust)
+[Rust SDK](https://github.com/starfederation/datastar/tree/main/sdk/rust)
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_
  
 ## TypeScript
@@ -57,5 +57,5 @@ Examples:
 [Deno example](https://github.com/starfederation/datastar/tree/main/sdk/typescript/examples/deno.ts)
 
 ## Zig
-[Zig SDK](https://github.com/starfederation/datastar/tree/develop/sdk/zig)  
+[Zig SDK](https://github.com/starfederation/datastar/tree/main/sdk/zig)  
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_
