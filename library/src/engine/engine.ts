@@ -207,7 +207,7 @@ export class Engine {
       const keySlice1 = key.slice(1)
       key = key.startsWith('-') ? keySlice1 : key[0].toLowerCase() + keySlice1
     }
-    const value = `${el.dataset[rawKey]}` || ''
+    const value = el.dataset[rawKey] || ''
     const hasValue = value.length > 0
 
     // Create the runtime context
