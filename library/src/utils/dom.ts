@@ -49,7 +49,6 @@ export function elUniqId(el: Element) {
       ) {
         hash.with(i)
       }
-      currentEl = currentEl.parentNode as Element
     }
 
     currentEl = currentEl.parentNode as Element
