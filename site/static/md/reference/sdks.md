@@ -44,7 +44,7 @@ Examples:
 
 ## Rust
 
-[Rust SDK](https://github.com/starfederation/datastar/tree/main/rust/dotnet)  
+[Rust SDK](https://github.com/starfederation/datastar/tree/develop/sdk/rust)
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_
  
 ## TypeScript

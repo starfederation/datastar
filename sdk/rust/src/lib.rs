@@ -27,7 +27,7 @@ use typle::{typle, typle_fold};
 
 /// [`ServerSentEventGenerator`] is a trait that represents a Datastar event.
 pub trait ServerSentEventGenerator {
-    /// Serializes the event into a Server-Sent ServerSentEventGenerator (SSE) string.
+    /// Serializes the event into a Server-Sent Event (SSE) string.
     fn send(&self) -> String;
 }
 

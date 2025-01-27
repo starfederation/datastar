@@ -93,7 +93,7 @@ var Consts = &ConstTemplateData{
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/python",
 		},
 		{
-			FileExtension: "rust",
+			FileExtension: "rs",
 			Name:          "Rust",
 			Icon:          "vscode-icons:file-type-rust",
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/rust",
