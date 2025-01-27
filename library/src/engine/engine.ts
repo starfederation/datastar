@@ -47,24 +47,20 @@ export class Engine {
         switch (type) {
           case 'childList':
             {
-              if (removedNodes.length) {
-                for (const node of removedNodes) {
-                  const el = node as HTMLorSVGElement
-                  const elRemovals = this.#removals.get(el)
-                  if (!elRemovals) continue
+              for (const node of removedNodes) {
+                const el = node as HTMLorSVGElement
+                const elRemovals = this.#removals.get(el)
+                if (!elRemovals) continue
 
-                  for (const [_, removalFn] of elRemovals) {
-                    removalFn()
-                  }
-                  this.#removals.delete(el)
+                for (const [_, removalFn] of elRemovals) {
+                  removalFn()
                 }
+                this.#removals.delete(el)
               }
 
-              if (addedNodes.length) {
-                for (const node of addedNodes) {
-                  const el = node as HTMLorSVGElement
-                  this.#apply(el)
-                }
+              for (const node of addedNodes) {
+                const el = node as HTMLorSVGElement
+                this.#apply(el)
               }
             }
             break
