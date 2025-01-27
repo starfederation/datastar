@@ -8,7 +8,7 @@
 - Changed the parsing of Datastar expressions so that only semicolons can be used to explicitly indicate a statement delimiter ([#525](https://github.com/starfederation/datastar/issues/525)).
 
 ### Fixed
-
 - Fixed how Datastar expressions are evaluated to allow regular expressions and strings that contain semicolons and new lines ([#508](https://github.com/starfederation/datastar/issues/508)).
 - Fixed a bug when using the `__delay` modifier on the `data-on-load` attribute ([#511](https://github.com/starfederation/datastar/issues/511)).
 - Fixed a bug with the `inner` merge mode that was causing only the inner HTML of the fragment to be merged ([#524](https://github.com/starfederation/datastar/issues/524)).
+- Fixed a bug when generating IDs for elements that was resulting in duplicate IDs ([#533](https://github.com/starfederation/datastar/pull/533)).
