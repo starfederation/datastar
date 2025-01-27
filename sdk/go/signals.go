@@ -101,11 +101,6 @@ func (sse *ServerSentEventGenerator) RemoveSignals(paths ...string) error {
 func ReadSignals(r *http.Request, signals any) error {
 	var dsInput []byte
 
-	isDatastarRequest := r.Header.Get("datastar-request") == "true"
-	if !isDatastarRequest {
-		return fmt.Errorf("not a datastar request")
-	}
-
 	if r.Method == "GET" {
 		dsJSON := r.URL.Query().Get(DatastarKey)
 		if dsJSON == "" {
