@@ -44,7 +44,7 @@
             Start
         </button>
     </div>
-    <div class="rainbow flex justify-center my-16 text-8xl font-bold text-transparent" style="background: linear-gradient(to right, red, orange, yellow, green, blue, blue, violet); background-clip: text">
+    <div class="my-16 text-8xl font-bold text-transparent" style="background: linear-gradient(to right in oklch, red, orange, yellow, green, blue, blue, violet); background-clip: text">
         <div id="message">Hello, world!</div>
     </div>
 </body>
