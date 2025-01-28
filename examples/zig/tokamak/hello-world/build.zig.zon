@@ -1,0 +1,18 @@
+.{
+    .name = "hello-world",
+    .version = "0.0.0",
+    .dependencies = .{
+        .tokamak = .{
+            .url = "git+https://github.com/cztomsik/tokamak#b1c5d41533eb10d064d6c65d5e4e63f9fafa84de",
+            .hash = "1220f64b4f83d842ce370ea3b41a04f1d1355e80aaadffad02e044f55fb17f4251a4",
+        },
+        .datastar_tokamak = .{
+            .path = "../../../../sdk/zig/tokamak",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
