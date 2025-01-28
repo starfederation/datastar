@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SDK", "SDK", "{6A315935-F22
 		..\..\.github\workflows\sdk-dotnet.yml = ..\..\.github\workflows\sdk-dotnet-nuget.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "HelloWorld\HelloWorld.csproj", "{13C54C9C-7829-4F35-8E53-A5CE976FC38A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{382378B5-BC91-492F-A808-43722E83015D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{382378B5-BC91-492F-A808-43722E83015D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{382378B5-BC91-492F-A808-43722E83015D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13C54C9C-7829-4F35-8E53-A5CE976FC38A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13C54C9C-7829-4F35-8E53-A5CE976FC38A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13C54C9C-7829-4F35-8E53-A5CE976FC38A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13C54C9C-7829-4F35-8E53-A5CE976FC38A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{01B23A4D-E3AD-4C90-A321-F8FE8D60F1BE} = {6A050804-DE2F-461B-9B8B-2B36D83D6A3E}
