@@ -9,6 +9,6 @@ DS.load(
     {%s p.Name %},
 {%- endfor -%}
 )
-
+DS.apply(document.body)
 export const Datastar = DS
 {% endfunc %}
