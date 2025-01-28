@@ -149,6 +149,8 @@ func writeOutConsts(version string) error {
 		"sdk/zig/src/consts.zig":                  zigConsts,
 		"examples/go/hello-world/hello-world.html": helloWorldExample,
 		"examples/php/hello-world/public/hello-world.html": helloWorldExamplePHP,
+		"examples/zig/httpz/hello-world/src/hello-world.html": helloWorldExample,
+		"examples/zig/tokamak/hello-world.html":   helloWorldExample,
 	}
 
 	for path, tmplFn := range templates {

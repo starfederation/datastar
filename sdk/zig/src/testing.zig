@@ -1,23 +1,12 @@
 const std = @import("std");
-const root = @import("root.zig");
 const consts = @import("consts.zig");
-const httpz = @import("httpz");
-const Logger = @import("Logger.zig");
+const ServerSentEventGenerator = @import("ServerSentEventGenerator.zig");
 
-const App = struct {
-    pub fn uncaughtError(_: *App, req: *httpz.Request, res: *httpz.Response, err: anyerror) void {
-        std.log.err("500 {} {s} {}", .{ req.method, req.url.path, err });
-        res.status = 500;
-        res.body = "sorry";
-    }
-};
-
-const Signals = struct {
+pub const Signals = struct {
     events: []const std.json.Value,
 };
 
 const ExecuteScript = struct {
-    type: []const u8,
     script: []const u8,
     eventId: ?[]const u8 = null,
     retryDuration: ?u32 = null,
@@ -26,7 +15,6 @@ const ExecuteScript = struct {
 };
 
 const MergeFragments = struct {
-    type: []const u8,
     fragments: []const u8,
     eventId: ?[]const u8 = null,
     retryDuration: ?u32 = null,
@@ -37,7 +25,6 @@ const MergeFragments = struct {
 };
 
 const MergeSignals = struct {
-    type: []const u8,
     signals: std.json.Value,
     eventId: ?[]const u8 = null,
     retryDuration: ?u32 = null,
@@ -45,7 +32,6 @@ const MergeSignals = struct {
 };
 
 const RemoveFragments = struct {
-    type: []const u8,
     selector: []const u8,
     eventId: ?[]const u8 = null,
     retryDuration: ?u32 = null,
@@ -54,39 +40,31 @@ const RemoveFragments = struct {
 };
 
 const RemoveSignals = struct {
-    type: []const u8,
     paths: []const []const u8,
     eventId: ?[]const u8 = null,
     retryDuration: ?u32 = null,
 };
 
-fn sdkTest(_: *App, req: *httpz.Request, res: *httpz.Response) !void {
-    const datastar = try root.readSignals(
-        Signals,
-        req,
-    );
-
-    var sse = try root.ServerSentEventGenerator.init(res);
-
-    for (datastar.events) |event| {
+pub fn sdk(sse: *ServerSentEventGenerator, signals: Signals) !void {
+    for (signals.events) |event| {
         const event_type = event.object.get("type").?.string;
 
         if (std.mem.eql(u8, event_type, "executeScript")) {
             const ev = try std.json.parseFromValueLeaky(
                 ExecuteScript,
-                res.arena,
+                sse.allocator,
                 event,
-                .{},
+                .{ .ignore_unknown_fields = true },
             );
 
             const attrs = blk: {
                 if (ev.attributes) |attrs| {
-                    var result = std.ArrayList([]const u8).init(res.arena);
+                    var result = std.ArrayList([]const u8).init(sse.allocator);
 
                     var iter = attrs.object.iterator();
                     while (iter.next()) |entry| {
                         var value = try std.json.stringifyAlloc(
-                            res.arena,
+                            sse.allocator,
                             entry.value_ptr.*,
                             .{},
                         );
@@ -99,7 +77,7 @@ fn sdkTest(_: *App, req: *httpz.Request, res: *httpz.Response) !void {
                         }
 
                         const string = try std.fmt.allocPrint(
-                            res.arena,
+                            sse.allocator,
                             "{s} {s}",
                             .{
                                 entry.key_ptr.*,
@@ -128,9 +106,9 @@ fn sdkTest(_: *App, req: *httpz.Request, res: *httpz.Response) !void {
         } else if (std.mem.eql(u8, event_type, "mergeFragments")) {
             const ev = try std.json.parseFromValueLeaky(
                 MergeFragments,
-                res.arena,
+                sse.allocator,
                 event,
-                .{},
+                .{ .ignore_unknown_fields = true },
             );
 
             try sse.mergeFragments(
@@ -147,13 +125,13 @@ fn sdkTest(_: *App, req: *httpz.Request, res: *httpz.Response) !void {
         } else if (std.mem.eql(u8, event_type, "mergeSignals")) {
             const ev = try std.json.parseFromValueLeaky(
                 MergeSignals,
-                res.arena,
+                sse.allocator,
                 event,
-                .{},
+                .{ .ignore_unknown_fields = true },
             );
 
             const json = try std.json.stringifyAlloc(
-                res.arena,
+                sse.allocator,
                 ev.signals,
                 .{},
             );
@@ -169,9 +147,9 @@ fn sdkTest(_: *App, req: *httpz.Request, res: *httpz.Response) !void {
         } else if (std.mem.eql(u8, event_type, "removeFragments")) {
             const ev = try std.json.parseFromValueLeaky(
                 RemoveFragments,
-                res.arena,
+                sse.allocator,
                 event,
-                .{},
+                .{ .ignore_unknown_fields = true },
             );
 
             try sse.removeFragments(
@@ -186,9 +164,9 @@ fn sdkTest(_: *App, req: *httpz.Request, res: *httpz.Response) !void {
         } else if (std.mem.eql(u8, event_type, "removeSignals")) {
             const ev = try std.json.parseFromValueLeaky(
                 RemoveSignals,
-                res.arena,
+                sse.allocator,
                 event,
-                .{},
+                .{ .ignore_unknown_fields = true },
             );
 
             try sse.removeSignals(
@@ -200,28 +178,4 @@ fn sdkTest(_: *App, req: *httpz.Request, res: *httpz.Response) !void {
             );
         }
     }
-}
-
-test "sdk" {
-    var app = App{};
-    var server = try httpz.Server(*App).init(
-        std.testing.allocator,
-        .{ .port = 5882 },
-        &app,
-    );
-    defer {
-        server.stop();
-        server.deinit();
-    }
-
-    const logger = try server.middleware(Logger, .{});
-
-    var router = server.router(.{});
-
-    router.middlewares = &.{logger};
-
-    router.get("/test", sdkTest, .{});
-    router.post("/test", sdkTest, .{});
-
-    try server.listen();
 }
