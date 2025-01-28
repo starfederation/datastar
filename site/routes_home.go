@@ -22,7 +22,7 @@ import (
 	"github.com/wcharczuk/go-chart/v2/drawing"
 )
 
-func setupHome(router chi.Router, signals sessions.Store, ns *embeddednats.Server, searchIndex bleve.Index, enabledFeatures FeatureFlags) error {
+func setupHome(router chi.Router, signals sessions.Store, ns *embeddednats.Server, searchIndex bleve.Index) error {
 
 	nc, err := ns.Client()
 	if err != nil {
@@ -157,52 +157,50 @@ func setupHome(router chi.Router, signals sessions.Store, ns *embeddednats.Serve
 
 	router.Route("/api", func(apiRouter chi.Router) {
 
-		if enabledFeatures[EnableSearchFlag] {
-			apiRouter.Get("/search", func(w http.ResponseWriter, r *http.Request) {
+		apiRouter.Get("/search", func(w http.ResponseWriter, r *http.Request) {
 
-				signals := &SiteSearchSignals{}
+			signals := &SiteSearchSignals{}
 
-				if err := datastar.ReadSignals(r, signals); err != nil {
-					http.Error(w, err.Error(), http.StatusBadRequest)
-					return
+			if err := datastar.ReadSignals(r, signals); err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			searchRequest := bleve.NewSearchRequest(bleve.NewQueryStringQuery(signals.Search))
+			searchRequest.Fields = []string{"*"}
+			searchRequest.Size = 5
+			searchRequest.Highlight = bleve.NewHighlight()
+
+			searchResult, err := searchIndex.Search(searchRequest)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			results := make([]SearchResult, 0, len(searchResult.Hits))
+			for _, hit := range searchResult.Hits {
+
+				topFragment := ""
+				if len(hit.Fragments["Contents"]) > 0 {
+					topFragment = hit.Fragments["Contents"][0]
 				}
 
-				searchRequest := bleve.NewSearchRequest(bleve.NewQueryStringQuery(signals.Search))
-				searchRequest.Fields = []string{"*"}
-				searchRequest.Size = 5
-				searchRequest.Highlight = bleve.NewHighlight()
+				title := hit.Fields["Title"].(string)
 
-				searchResult, err := searchIndex.Search(searchRequest)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
+				results = append(results, SearchResult{
+					ID:       hit.ID,
+					Title:    title,
+					Score:    hit.Score,
+					Fragment: topFragment,
+				})
+			}
 
-				results := make([]SearchResult, 0, len(searchResult.Hits))
-				for _, hit := range searchResult.Hits {
+			signals.SearchFetching = false
+			signals.OpenSearchResults = true
 
-					topFragment := ""
-					if len(hit.Fragments["Contents"]) > 0 {
-						topFragment = hit.Fragments["Contents"][0]
-					}
+			datastar.NewSSE(w, r).MergeFragmentTempl(SiteSearch(signals, results))
 
-					title := hit.Fields["Title"].(string)
-
-					results = append(results, SearchResult{
-						ID:       hit.ID,
-						Title:    title,
-						Score:    hit.Score,
-						Fragment: topFragment,
-					})
-				}
-
-				signals.SearchFetching = false
-				signals.OpenSearchResults = true
-
-				datastar.NewSSE(w, r).MergeFragmentTempl(SiteSearch(signals, results))
-
-			})
-		}
+		})
 		apiRouter.Route("/todos", func(todosRouter chi.Router) {
 			todosRouter.Get("/", func(w http.ResponseWriter, r *http.Request) {
 

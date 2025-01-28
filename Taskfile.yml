@@ -155,4 +155,4 @@ tasks:
   default:
     cmds:
       - task: site
-      - ./datastar-website --enable-search
+      - ./datastar-website
