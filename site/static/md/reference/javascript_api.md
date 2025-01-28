@@ -49,11 +49,3 @@ The signal root, on which you can access signal methods. Beware that you should 
 ```js
 Datastar.signals.values()
 ```
-
-### `version`
-
-The current version number.
-
-```js
-Datastar.version
-```
