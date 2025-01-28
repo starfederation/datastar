@@ -2,6 +2,11 @@
 
 Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specific to Datastar.
 
+## Clojure
+
+[Clojure SDK](https://github.com/starfederation/datastar/tree/main/sdk/clojure)  
+_Author: [Jeremy Schoffen](https://github.com/JeremS)_
+
 ## dotnet
 
 [dotnet SDK](https://github.com/starfederation/datastar/tree/main/sdk/dotnet), including support for C#.  
@@ -60,8 +65,3 @@ Examples:
 
 [Zig SDK](https://github.com/starfederation/datastar/tree/main/sdk/zig)  
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_
-
-## Clojure
-
-[Clojure SDK](https://github.com/starfederation/datastar/tree/main/sdk/clojure)  
-_Author: [Jeremy Schoffen](https://github.com/JeremS)_

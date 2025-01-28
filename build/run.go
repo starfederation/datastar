@@ -131,15 +131,16 @@ func writeOutConsts(version string) error {
 	})
 
 	templates := map[string]func(data *ConstTemplateData) string{
-		"README.md":                               datastarREADME,
-		"library/README.md":                       datastarREADME,
-		"library/src/engine/consts.ts":            datastarClientConsts,
-		"library/package.json":                    datastarClientPackageJSON,
-		"sdk/go/consts.go":                        goConsts,
-		"sdk/dotnet/src/Consts.fs":                dotnetConsts,
-		"sdk/php/src/Consts.php":                  phpConsts,
-		"sdk/php/src/enums/EventType.php":         phpEventType,
-		"sdk/php/src/enums/FragmentMergeMode.php": phpFragmentMergeMode,
+		"README.md":                    datastarREADME,
+		"library/README.md":            datastarREADME,
+		"library/src/engine/consts.ts": datastarClientConsts,
+		"library/package.json":         datastarClientPackageJSON,
+		"sdk/clojure/sdk/src/main/starfederation/datastar/clojure/consts.clj": clojureConsts,
+		"sdk/go/consts.go":                                                                 goConsts,
+		"sdk/dotnet/src/Consts.fs":                                                         dotnetConsts,
+		"sdk/php/src/Consts.php":                                                           phpConsts,
+		"sdk/php/src/enums/EventType.php":                                                  phpEventType,
+		"sdk/php/src/enums/FragmentMergeMode.php":                                          phpFragmentMergeMode,
 		"sdk/java/core/src/main/java/starfederation/datastar/Consts.java":                  javaConsts,
 		"sdk/java/core/src/main/java/starfederation/datastar/enums/EventType.java":         javaEventType,
 		"sdk/java/core/src/main/java/starfederation/datastar/enums/FragmentMergeMode.java": javaFragmentMergeMode,
@@ -147,10 +148,9 @@ func writeOutConsts(version string) error {
 		"sdk/typescript/src/consts.ts":                                                     typescriptConsts,
 		"sdk/rust/src/consts.rs":                                                           rustConsts,
 		"sdk/zig/src/consts.zig":                                                           zigConsts,
-		"sdk/clojure/sdk/src/main/starfederation/datastar/clojure/consts.clj":              clojureConsts,
+		"examples/clojure/hello-world/resources/public/hello-world.html":                   helloWorldClojure,
 		"examples/go/hello-world/hello-world.html":                                         helloWorldGo,
 		"examples/php/hello-world/public/hello-world.html":                                 helloWorldPHP,
-		"examples/clojure/hello-world/resources/public/hello-world.html":                   helloWorldClojure,
 	}
 
 	for path, tmplFn := range templates {
