@@ -6,7 +6,7 @@
 
 - Changed the `data-on-interval` attribute to accept a `__duration` modifier instead of a `__delay` modifier ([#513](https://github.com/starfederation/datastar/issues/513)).
 - Changed the parsing of Datastar expressions so that only semicolons can be used to explicitly indicate a statement delimiter ([#525](https://github.com/starfederation/datastar/issues/525)).
-- The `data-custom-validity` attribute can now be used on all valid elements, not just input elements ([534](https://github.com/starfederation/datastar/pull/534)).
+- The `data-custom-validity` attribute can now be used on select and textarea elements, in addition to input elements ([534](https://github.com/starfederation/datastar/pull/534)).
 
 ### Fixed
 
