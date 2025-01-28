@@ -1,7 +1,7 @@
 import { Hash, elUniqId } from '../utils/dom'
 import { camelize } from '../utils/text'
 import { effect } from '../vendored/preact-core'
-import { DSP, DSS, VERSION } from './consts'
+import { DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
 import { SignalsRoot } from './signals'
 import {
@@ -30,10 +30,6 @@ export class Engine {
 
   get signals() {
     return this.#signals
-  }
-
-  get version() {
-    return VERSION
   }
 
   public load(...pluginsToLoad: DatastarPlugin[]) {
