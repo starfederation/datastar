@@ -147,8 +147,8 @@ func writeOutConsts(version string) error {
 		"sdk/typescript/src/consts.ts":            typescriptConsts,
 		"sdk/rust/src/consts.rs":                  rustConsts,
 		"sdk/zig/src/consts.zig":                  zigConsts,
-		"examples/go/hello-world/hello-world.html": helloWorldStandard,
-		"examples/php/hello-world/public/hello-world.html": helloWorldPHP,
+		"examples/go/hello-world/hello-world.html": helloWorldExample,
+		"examples/php/hello-world/public/hello-world.html": helloWorldExamplePHP,
 	}
 
 	for path, tmplFn := range templates {

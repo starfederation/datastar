@@ -1,4 +1,18 @@
-{%- func helloWorldExample(data *ConstTemplateData, action string) -%}
+{%- func helloWorldExample(data *ConstTemplateData) -%}
+
+    {%s= helloWorldExampleSource(data, "@get('/hello-world')") %}
+
+{%- endfunc -%}
+
+
+{%- func helloWorldExamplePHP(data *ConstTemplateData) -%}
+
+    {%s= helloWorldExampleSource(data, "@get('/hello-world.php')") %}
+
+{%- endfunc -%}
+
+
+{%- func helloWorldExampleSource(data *ConstTemplateData, action string) -%}
 
 <!-- {%s data.DoNotEdit %} -->
 
@@ -35,19 +49,5 @@
     </div>
 </body>
 </html>
-
-{%- endfunc -%}
-
-
-{%- func helloWorldPHP(data *ConstTemplateData) -%}
-
-    {%s= helloWorldExample(data, "@get('/hello-world.php')") %}
-
-{%- endfunc -%}
-
-
-{%- func helloWorldStandard(data *ConstTemplateData) -%}
-
-    {%s= helloWorldExample(data, "@get('/hello-world')") %}
 
 {%- endfunc -%}
