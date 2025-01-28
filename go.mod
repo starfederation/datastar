@@ -25,6 +25,7 @@ require (
 	github.com/gorilla/sessions v1.4.0
 	github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc
 	github.com/hashicorp/golang-lru/v2 v2.0.7
+	github.com/huantt/plaintext-extractor v1.1.0
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.17.11
 	github.com/lithammer/fuzzysearch v1.1.8
@@ -98,6 +99,7 @@ require (
 	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 // indirect
 	golang.org/x/image v0.23.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect

@@ -24,3 +24,30 @@ pre code {
     image-rendering: pixelated;
 }
 
+.search-results {
+    z-index: 99;
+    max-height: 400px;
+    min-width: 100%;
+    /* same width as input */
+    position: absolute;
+    top: 100%;
+    margin-top: .5rem;
+    padding: 1rem;
+    border-radius: 12px;
+    background: #2e3440;
+    overflow-y: scroll;
+}
+
+.search-results li a {
+    display: block;
+    scroll-margin: 3rem;
+    padding-left: .625rem;
+    padding-right: .625rem;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+}
+
+.search-results li a:hover {
+    border-radius: .375rem;
+    background-color: hsl(204deg 100% calc(calc(50% /50) * 50)/.1);
+}

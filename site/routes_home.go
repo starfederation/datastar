@@ -159,19 +159,18 @@ func setupHome(router chi.Router, signals sessions.Store, ns *embeddednats.Serve
 
 		if enabledFeatures[EnableSearchFlag] {
 			apiRouter.Get("/search", func(w http.ResponseWriter, r *http.Request) {
-				type Result struct {
-					ID    string  `json:"id"`
-					Score float64 `json:"score"`
-				}
-				query := r.URL.Query().Get("q")
-				if query == "" {
-					http.Error(w, "missing query", http.StatusBadRequest)
+
+				signals := &SiteSearchSignals{}
+
+				if err := datastar.ReadSignals(r, signals); err != nil {
+					http.Error(w, err.Error(), http.StatusBadRequest)
 					return
 				}
 
-				searchRequest := bleve.NewSearchRequest(bleve.NewQueryStringQuery(query))
+				searchRequest := bleve.NewSearchRequest(bleve.NewQueryStringQuery(signals.Search))
 				searchRequest.Fields = []string{"*"}
 				searchRequest.Size = 5
+				searchRequest.Highlight = bleve.NewHighlight()
 
 				searchResult, err := searchIndex.Search(searchRequest)
 				if err != nil {
@@ -179,22 +178,29 @@ func setupHome(router chi.Router, signals sessions.Store, ns *embeddednats.Serve
 					return
 				}
 
-				results := make([]Result, 0, len(searchResult.Hits))
+				results := make([]SearchResult, 0, len(searchResult.Hits))
 				for _, hit := range searchResult.Hits {
-					results = append(results, Result{
-						ID:    hit.ID,
-						Score: hit.Score,
+
+					topFragment := ""
+					if len(hit.Fragments["Contents"]) > 0 {
+						topFragment = hit.Fragments["Contents"][0]
+					}
+
+					title := hit.Fields["Title"].(string)
+
+					results = append(results, SearchResult{
+						ID:       hit.ID,
+						Title:    title,
+						Score:    hit.Score,
+						Fragment: topFragment,
 					})
 				}
 
-				b, err := json.MarshalIndent(results, "", " ")
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
+				signals.SearchFetching = false
+				signals.OpenSearchResults = true
 
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(b)
+				datastar.NewSSE(w, r).MergeFragmentTempl(SiteSearch(signals, results))
+
 			})
 		}
 		apiRouter.Route("/todos", func(todosRouter chi.Router) {

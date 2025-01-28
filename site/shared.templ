@@ -101,6 +101,61 @@ templ headerTopLevelLinks(r *http.Request) {
 	@headerTopLevelLink(r, "Bundler")
 }
 
+type SiteSearchSignals struct {
+	Search string `json:"siteSearch"`
+	SearchFetching bool `json:"searchFetching"`
+	OpenSearchResults bool `json:"openSearchResults"`
+}
+
+type SearchResult struct {
+	ID    string  `json:"id"`
+	Title string `json:"title"`
+	Score float64 `json:"score"`
+	Fragment string `json:"fragment"`
+}
+
+templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult) {
+	<div id="site_search" class="hidden lg:flex lg:gap-4 relative" data-signals={templ.JSONString(signals)}>
+		<div>
+			<input 
+				id="site_search_input" 
+				class="flex-1 input input-bordered h-8" 
+				type="search"
+				placeholder="Search..."
+				data-bind="siteSearch"
+				data-on-input__debounce.300ms={ fmt.Sprintf(
+					"$siteSearch.length > 1 && %s", datastar.GetSSE("/api/search"),
+				)}
+				data-indicator="$searchFetching"
+			/>
+			@sseIndicator("searchFetching")
+		</div>
+			<ul 
+				id="search_results" 
+				class={
+					"search-results", 
+					templ.KV("-left-full", len(searchResults) > 0) 
+				} 
+				data-on-click__outside="$openSearchResults ? $openSearchResults = false : null" 
+				data-show="$openSearchResults">
+				if len(searchResults) > 0 {
+					for _, result := range searchResults {
+						<li>
+							<a href={templ.SafeURL(result.ID)}>
+								<h3 class="border-b-1">{result.Title}</h3>
+								<div class="text-sm">
+									@templ.Raw(result.Fragment)
+								</div>
+							</a>
+						</li>
+					}
+				} else {
+					<p>No results found.</p>
+				}
+			</ul>
+	</div>
+}
+
 templ header(r *http.Request) {
 	<div class="navbar bg-base-200">
 		<div class="flex justify-between w-full gap-4">
@@ -117,6 +172,7 @@ templ header(r *http.Request) {
 			<div class="hidden lg:text-md lg:text-lg lg:flex lg:gap-4 lg:visible ">
 				@headerTopLevelLinks(r)
 			</div>
+			@SiteSearch(&SiteSearchSignals{SearchFetching: false}, []SearchResult{})
 			<div class="hidden text-xl lg:flex lg:gap-4 lg:visible">
 				@headerExternalLinks()
 			</div>

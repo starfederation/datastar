@@ -19,6 +19,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/sessions"
+	"github.com/huantt/plaintext-extractor"
 	natsserver "github.com/nats-io/nats-server/v2/server"
 )
 
@@ -149,8 +150,15 @@ func setupRoutes(ctx context.Context, router chi.Router, enabledFeatures Feature
 	return nil
 }
 
+type SiteIndexDoc struct {
+	Title       string
+	Description string
+	Contents    string
+}
+
 func indexSiteContent(ctx context.Context, index bleve.Index) error {
 	markdownDir := "site/static/md"
+	extractor := plaintext.NewHtmlExtractor()
 
 	return filepath.WalkDir(markdownDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -172,8 +180,20 @@ func indexSiteContent(ctx context.Context, index bleve.Index) error {
 
 			// walks through each file in the directory and indexes it
 			for key, value := range dataset {
-				url := fmt.Sprintf("/%s", key)
-				if err := index.Index(url, value); err != nil {
+				url := fmt.Sprintf("/%s/%s", relDirName, key)
+
+				output, err := extractor.PlainText(value.Contents)
+				if err != nil {
+					return fmt.Errorf("failed to extract plain text from markdown %w", err)
+				}
+
+				doc := SiteIndexDoc{
+					Title:       value.Title,
+					Description: value.Description,
+					Contents:    *output,
+				}
+
+				if err := index.Index(url, doc); err != nil {
 					return fmt.Errorf("error indexing %s: %w", url, err)
 				}
 			}
