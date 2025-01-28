@@ -46,7 +46,7 @@
 {%- endfunc -%}
 
 
-{%- func helloWorldGo(data *ConstTemplateData) -%}
+{%- func helloWorldStandard(data *ConstTemplateData) -%}
 
     {%s= helloWorldExample(data, "@get('/hello-world')") %}
 

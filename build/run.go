@@ -147,7 +147,7 @@ func writeOutConsts(version string) error {
 		"sdk/typescript/src/consts.ts":            typescriptConsts,
 		"sdk/rust/src/consts.rs":                  rustConsts,
 		"sdk/zig/src/consts.zig":                  zigConsts,
-		"examples/go/hello-world/hello-world.html": helloWorldGo,
+		"examples/go/hello-world/hello-world.html": helloWorldStandard,
 		"examples/php/hello-world/public/hello-world.html": helloWorldPHP,
 	}
 
