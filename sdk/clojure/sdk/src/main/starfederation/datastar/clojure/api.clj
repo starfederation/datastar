@@ -291,9 +291,16 @@
     the signals. The paths must be valid `.` delimited paths to signals within the
     signals. The Datastar client side will use these paths to remove the data
     from the signals.
+
+  Options keys:
+  - [[id]]
+  - [[retry-duration]]
+  - [[only-if-missing]]
   "
   ([sse-gen paths]
-   (signals/remove-signals! sse-gen paths)))
+   (signals/remove-signals! sse-gen paths {}))
+  ([sse-gen paths opts]
+   (signals/remove-signals! sse-gen paths opts)))
 
 
 (defn get-signals

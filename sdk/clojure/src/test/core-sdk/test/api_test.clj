@@ -423,7 +423,7 @@
 
         (expect-execute-script gen {d*/attributes test-attrs
                                     d*/auto-remove false}
-                                   (concat [auto-remove-line]
-                                           test-attrs-lines
+                                   (concat test-attrs-lines
+                                           [auto-remove-line]
                                            script-content-lines))))))
 

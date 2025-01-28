@@ -54,10 +54,14 @@
 
 ;; -----------------------------------------------------------------------------
 ;; View transition helpers
+(defn add-view-transition? [val]
+  (common/add-boolean-option? consts/default-fragments-use-view-transitions
+                              val))
+
 (defn- add-view-transition?! [data-lines! uvt]
   (common/add-opt-line!
     data-lines!
-    true?
+    add-view-transition?
     consts/use-view-transition-dataline-literal
     uvt))
 

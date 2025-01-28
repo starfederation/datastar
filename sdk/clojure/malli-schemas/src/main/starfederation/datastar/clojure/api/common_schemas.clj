@@ -86,6 +86,8 @@
 ;; -----------------------------------------------------------------------------
 (def signal-paths-schema :string)
 
+(def remove-signals-options-schemas sse-options-schema)
+
 ;; -----------------------------------------------------------------------------
 (def script-content-schema :string)
 

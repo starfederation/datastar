@@ -10,10 +10,14 @@
 ;; -----------------------------------------------------------------------------
 ;; Merge signal
 ;; -----------------------------------------------------------------------------
+(defn add-only-if-missing? [val]
+  (common/add-boolean-option? consts/default-merge-signals-only-if-missing
+                              val))
+
 (defn- add-only-if-missing?! [data-lines! only-if-missing]
   (common/add-opt-line!
     data-lines!
-    true?
+    add-only-if-missing?
     consts/only-if-missing-dataline-literal
     only-if-missing))
 
@@ -78,7 +82,7 @@
       "paths bar"])
 
 
-(defn remove-signals! [sse-gen paths]
+(defn remove-signals! [sse-gen paths opts]
   (when-not (seq paths)
     (throw (ex-info "Invalid signal paths to remove."
                     {:paths paths})))
@@ -87,7 +91,7 @@
     (sse/send-event! sse-gen
                      consts/event-type-remove-signals
                      (->remove-signals paths)
-                     {})
+                     opts)
     (catch Exception e
       (throw (ex-info "Failed to send remove signals"
                       {:signals paths}
@@ -102,12 +106,14 @@
 
  
 (defn get-signals
-  "Returns the signals json string.
+  "Returns the signals json string. You need to use some middleware
+  that adds the :query-params key to the request for this function
+  to work properly.
+
   (Bring your own json parsing)"
   [request]
-  (when (datastar-request? request)
-    (if (= :get (:request-method request))
-      (get-in request [:query-params consts/datastar-key])
-      (:body request))))
+  (if (= :get (:request-method request))
+    (get-in request [:query-params consts/datastar-key])
+    (:body request)))
 
 

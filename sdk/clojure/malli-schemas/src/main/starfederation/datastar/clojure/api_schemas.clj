@@ -17,7 +17,7 @@
 
 (m/=> starfederation.datastar.clojure.api/merge-fragments!
       [:function
-       [:-> cs/sse-gen-schema cs/fragment-schema :any]
+       [:-> cs/sse-gen-schema cs/fragments-schema :any]
        [:-> cs/sse-gen-schema cs/fragments-schema cs/merge-fragment-options-schemas :any]])
 
 
@@ -34,7 +34,9 @@
 
 
 (m/=> starfederation.datastar.clojure.api/remove-signals!
-      [:-> cs/sse-gen-schema cs/signal-paths-schema :any])
+      [:function
+       [:-> cs/sse-gen-schema cs/signal-paths-schema :any]
+       [:-> cs/sse-gen-schema cs/signal-paths-schema cs/remove-signals-options-schemas :any]])
 
 
 (m/=> starfederation.datastar.clojure.api/execute-script!

@@ -7,10 +7,14 @@
     [starfederation.datastar.clojure.utils :as u]))
 
 
+(defn add-auto-remove? [val]
+  (common/add-boolean-option? consts/default-execute-script-auto-remove
+                              val))
+
 (defn- add-auto-remove?! [data-lines! ar]
   (common/add-opt-line!
     data-lines!
-    false?
+    add-auto-remove?
     consts/auto-remove-dataline-literal
     ar))
 
@@ -45,8 +49,8 @@
 
 (defn ->script [script-content opts]
   (u/transient-> []
-    (add-auto-remove?! (common/auto-remove opts))
     (add-attributes! (common/attributes opts))
+    (add-auto-remove?! (common/auto-remove opts))
     (add-script! script-content)))
 
 
