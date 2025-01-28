@@ -11,7 +11,7 @@ import {
 import { onElementRemoved } from '../../../../utils/dom'
 import { tagHas, tagToMs } from '../../../../utils/tags'
 import { kebabize } from '../../../../utils/text'
-import { debounce, throttle } from '../../../../utils/timing'
+import { debounce, delay, throttle } from '../../../../utils/timing'
 
 const lastSignalsMarshalled = new Map<string, any>()
 
@@ -22,7 +22,7 @@ export const On: AttributePlugin = {
   keyReq: Requirement.Must,
   valReq: Requirement.Must,
   argNames: [EVT],
-  onLoad: ({ el, key, genRX, mods, signals, effect }) => {
+  onLoad: ({ el, rawKey, key, value, genRX, mods, signals, effect }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
@@ -34,6 +34,12 @@ export const On: AttributePlugin = {
         if (mods.has('stop')) evt.stopPropagation()
       }
       rx(evt)
+    }
+
+    const delayArgs = mods.get('delay')
+    if (delayArgs) {
+      const wait = tagToMs(delayArgs)
+      callback = delay(callback, wait)
     }
 
     const debounceArgs = mods.get('debounce')
@@ -65,9 +71,30 @@ export const On: AttributePlugin = {
     switch (eventName) {
       case 'load': {
         callback()
-        delete el.dataset.onLoad
+        delete el.dataset[rawKey]
         return () => {}
       }
+
+      case 'interval': {
+        let duration = 1000
+        const durationArgs = mods.get('duration')
+        if (durationArgs) {
+          duration = tagToMs(durationArgs)
+          const leading = tagHas(durationArgs, 'leading', false)
+          if (leading) {
+            // Remove `.leading` from the dataset so the callback is only ever called on page load
+            el.dataset[rawKey.replace('.leading', '')] = value
+            delete el.dataset[rawKey]
+            callback()
+          }
+        }
+        const intervalId = setInterval(callback, duration)
+
+        return () => {
+          clearInterval(intervalId)
+        }
+      }
+
       case 'raf': {
         let rafId: number | undefined
         const raf = () => {
@@ -95,6 +122,7 @@ export const On: AttributePlugin = {
           }
         })
       }
+
       default: {
         const testOutside = mods.has('outside')
         if (testOutside) {

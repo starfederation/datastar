@@ -17,7 +17,7 @@ export const CustomValidity: AttributePlugin = {
   valReq: Requirement.Must,
   onLoad: (ctx) => {
     const { el, genRX, effect } = ctx
-    if (!(el instanceof HTMLInputElement)) {
+    if (!(el instanceof HTMLObjectElement)) {
       throw runtimeErr('CustomValidityInvalidElement', ctx)
     }
     const rx = genRX()

@@ -91,9 +91,6 @@ export class Engine {
       // Cleanup any previous plugins
       this.#cleanup(el)
 
-      // Skip elements with empty dataset or marked to be ignored
-      if (!el.dataset || 'starIgnore' in el.dataset) return
-
       // Apply the plugins to the element in order of application
       // since DOMStringMap is ordered, we can be deterministic
       for (const rawKey of Object.keys(el.dataset)) {
@@ -203,18 +200,36 @@ export class Engine {
     ctx: RuntimeContext,
     ...argNames: string[]
   ): RuntimeExpressionFunction {
-    const stmts = ctx.value
-      .split(/;|\n/)
-      .map((s) => s.trim())
-      .filter((s) => s !== '')
-    const lastIdx = stmts.length - 1
-    const last = stmts[lastIdx]
-    if (!last.startsWith('return')) {
-      stmts[lastIdx] = `return (${stmts[lastIdx]});`
-    }
-    let userExpression = stmts.join(';\n').trim()
+    let userExpression = ''
 
-    // Ingore any escaped values
+    // This regex allows Datastar expressions to support nested
+    // regex and strings that contain ; without breaking.
+    //
+    // Each of these regex defines a block type we want to match
+    // (importantly we ignore the content within these blocks):
+    //
+    // regex            \/(\\\/|[^\/])*\/
+    // double quotes      "(\\"|[^\"])*"
+    // single quotes      '(\\'|[^'])*'
+    // ticks              `(\\`|[^`])*`
+    //
+    // We also want to match the non delimiter part of statements
+    // note we only support ; statement delimiters:
+    //
+    // [^;]
+    //
+    const statementRe = /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;])+/gm
+    const statements = ctx.value.trim().match(statementRe)
+    if (statements) {
+      const lastIdx = statements.length - 1
+      const last = statements[lastIdx].trim()
+      if (!last.startsWith('return')) {
+        statements[lastIdx] = `return (${last});`
+      }
+      userExpression = statements.join(';\n')
+    }
+
+    // Ignore any escaped values
     const escaped = new Map<string, string>()
     const escapeRe = new RegExp(`(?:${DSP})(.*?)(?:${DSS})`, 'gm')
     for (const match of userExpression.matchAll(escapeRe)) {
@@ -287,9 +302,16 @@ export class Engine {
     if (
       !element ||
       !(element instanceof HTMLElement || element instanceof SVGElement)
-    )
+    ) {
       return null
-    callback(element)
+    }
+    const dataset = element.dataset
+    if ('starIgnore' in dataset) {
+      return null
+    }
+    if (!('starIgnore__self' in dataset)) {
+      callback(element)
+    }
     let el = element.firstElementChild
     while (el) {
       this.#walkDownDOM(el, callback)

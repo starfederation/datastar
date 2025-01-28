@@ -85,6 +85,7 @@ templ headerTopLevelLink(r *http.Request, text string) {
 
 templ headerExternalLinks() {
 	@headerIconLink("simple-icons:discord", "https://discord.gg/bnRNgZjgPh")
+	@headerIconLink("simple-icons:youtube", "https://www.youtube.com/@data-star")
 	@headerIconLink("simple-icons:github", "https://github.com/starfederation/datastar/tree/main/library")
 	@headerIconLink("simple-icons:npm", "https://www.npmjs.com/package/@starfederation/datastar")
 	@headerIconLink("simple-icons:twitter", "https://x.com/DelaneyGillilan")
@@ -250,7 +251,7 @@ templ codeSnippetFragment(block CodeSnippetBlock) {
 			<div class="join">
 				for _, snippet := range block.Snippets {
 					<button
-						class="btn join-item btn-lg flex items-center gap-2"
+						class="btn px-4 join-item btn-lg flex items-center gap-2"
 						data-class={ fmt.Sprintf(
 							"{'btn-primary btn-outline z-0': $language == '%s'}",
 							snippet.Extension,

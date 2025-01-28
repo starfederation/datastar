@@ -29,17 +29,16 @@ import { SetAll } from '../plugins/official/logic/actions/setAll'
 import { ToggleAll } from '../plugins/official/logic/actions/toggleAll'
 
 DS.load(
-  // Plugins that can create signals must be loaded first
-  Bind,
-  Indicator,
-  Ref,
   // DOM
   Attr,
+  Bind,
   Class,
   On,
+  Ref,
   Show,
   Text,
   // Backend
+  Indicator,
   GET,
   POST,
   PUT,
