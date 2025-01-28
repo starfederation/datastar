@@ -14,6 +14,7 @@
 - Fixed a bug when using the `__delay` modifier on the `data-on-load` attribute ([#511](https://github.com/starfederation/datastar/issues/511)).
 - Fixed a bug with the `inner` merge mode that was causing only the inner HTML of the fragment to be merged ([#524](https://github.com/starfederation/datastar/issues/524)).
 - Fixed a bug when generating IDs for elements that was resulting in duplicate IDs ([#533](https://github.com/starfederation/datastar/issues/533)).
+- Fixed a bug with signal value out of sync when input populated by chrome's back/forward cache ([#530](https://github.com/starfederation/datastar/pull/530))
 
 ### Removed
 

@@ -7,8 +7,8 @@ import "time"
 const (
     DatastarKey = "datastar"
     Version                   = "1.0.0-beta.2"
-    VersionClientByteSize     = 36531
-    VersionClientByteSizeGzip = 13367
+    VersionClientByteSize     = 36634
+    VersionClientByteSizeGzip = 13401
 
     //region Default durations
 
@@ -115,3 +115,4 @@ const (
 )
 //endregion EventType
 
+//endregion Enums

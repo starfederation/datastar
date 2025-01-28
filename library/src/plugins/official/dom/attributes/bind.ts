@@ -175,6 +175,14 @@ export const Bind: AttributePlugin = {
       el.addEventListener(event, el2sig)
     }
     const elSigClean = effect(() => setFromSignal())
+    /*
+     * The signal value needs to be updated after the "pageshow" event.
+     * Sometimes, the browser might populate inputs with previous values
+     * when navigating between pages using the back/forward navigation.
+     *
+     * For more information, read about bfcache:
+     * https://web.dev/articles/bfcache
+     */
     const onPageshow = (ev: PageTransitionEvent) => {
       if (!ev.persisted) return
       el2sig()
