@@ -12,7 +12,7 @@ Run `zig build test`.
 const datastar = @import("datastar");
 
 // Creates a new `ServerSentEventGenerator`.
-var sse = try datastar.httpz.ServerSentEventGenerator.init(res);
+var sse = try datastar.ServerSentEventGenerator.init(res);
 
 // Merges HTML fragments into the DOM.
 try sse.mergeFragments("<div id='question'>What do you put in a toaster?</div>", .{});
