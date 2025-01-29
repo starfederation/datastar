@@ -22,7 +22,7 @@ The `data-on-interval` attribute allows us to execute an expression at a regular
 ></div>
 ```
 
-In addition to the interval, we could also execute the expression immediately by adding the `.leading` to the modifier.
+In addition to the interval, we could also execute the expression immediately by adding `.leading` to the modifier.
 
 ```html
 <div id="time"
