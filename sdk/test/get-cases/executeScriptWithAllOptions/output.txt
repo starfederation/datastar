@@ -1,5 +1,5 @@
 event: datastar-execute-script
-id: 1
+id: event1
 retry: 2000
 data: attributes type text/javascript
 data: attributes blocking false

@@ -5,8 +5,7 @@
       "signals": {
         "one": 1,
         "two": 2
-      },
-      "onlyIfMissing": false
+      }
     }
   ]
 }

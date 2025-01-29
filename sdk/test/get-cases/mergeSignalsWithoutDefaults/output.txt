@@ -1,7 +1,5 @@
 event: datastar-merge-signals
-id: event1
-retry: 2000
-data: onlyIfMissing true
+retry: 1000
 data: signals {"one":1,"two":2}
 
 
