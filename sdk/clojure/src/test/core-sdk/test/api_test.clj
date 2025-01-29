@@ -265,14 +265,14 @@
 
       (it "handles settle duration"
         (expect-remove-fragment gen {d*/settle-duration test-settle-duration}
-                                    [selector-line settle-duration-line])
+                                    [settle-duration-line selector-line])
         (expect-remove-fragment gen {d*/settle-duration consts/default-fragments-settle-duration}
                                     [selector-line]))
 
 
       (it "handles view transitions"
         (expect-remove-fragment gen {d*/use-view-transition true}
-                                [selector-line use-view-transition-line])
+                                [use-view-transition-line selector-line])
         (expect-remove-fragment gen {d*/use-view-transition :true}
                                 [selector-line])
         (expect-remove-fragment gen {d*/use-view-transition false}
@@ -281,9 +281,9 @@
       (it "handles all options"
         (expect-remove-fragment gen {d*/settle-duration test-settle-duration
                                      d*/use-view-transition true}
-                                    [selector-line
-                                     settle-duration-line
-                                     use-view-transition-line])))))
+                                    [settle-duration-line
+                                     use-view-transition-line
+                                     selector-line])))))
 
 ;; -----------------------------------------------------------------------------
 ;; Merge signals

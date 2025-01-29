@@ -174,9 +174,9 @@
 ;; -----------------------------------------------------------------------------
 (defn ->remove-fragment [selector opts]
   (u/transient-> []
-    (add-selector! selector)
     (add-settle-duration?! (common/settle-duration opts))
-    (add-view-transition?! (common/use-view-transition opts))))
+    (add-view-transition?! (common/use-view-transition opts))
+    (add-selector! selector)))
 
 
 (comment

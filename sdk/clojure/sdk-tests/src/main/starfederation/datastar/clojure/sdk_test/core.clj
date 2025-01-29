@@ -66,8 +66,7 @@
   (let [selector (get event "selector")
         opts (-> event
                  (select-keys options)
-                 (set/rename-keys str->datastar-opt)
-                 (dissoc d*/selector))]
+                 (set/rename-keys str->datastar-opt))]
     (d*/remove-fragment! sse selector opts)))
 
 
@@ -89,12 +88,12 @@
     (d*/remove-signals! sse paths opts)))
 
 
-
 (defn execute-script! [sse event]
   (let [script (get event "script")
         opts (-> event
                  (select-keys options)
-                 (set/rename-keys str->datastar-opt))]
+                 (set/rename-keys str->datastar-opt)
+                 (update d*/attributes update-keys keyword))]
     (d*/execute-script! sse script opts)))
 
 

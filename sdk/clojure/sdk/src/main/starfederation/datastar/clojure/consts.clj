@@ -6,8 +6,8 @@
 
 (def datastar-key                  "datastar")
 (def version                       "1.0.0-beta.2")
-(def version-client-byte-size      36508)
-(def version-client-byte-size-gzip 13371)
+(def version-client-byte-size      36634)
+(def version-client-byte-size-gzip 13401)
 
 
 ;; -----------------------------------------------------------------------------
