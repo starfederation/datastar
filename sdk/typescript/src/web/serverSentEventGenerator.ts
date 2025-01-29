@@ -29,7 +29,7 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
    */
   static stream(
     streamFunc: (stream: ServerSentEventGenerator) => Promise<void> | void,
-    init: ResponseInit = {}
+    init: ResponseInit = {},
   ): Response {
     const stream = new ReadableStream({
       async start(controller) {
@@ -39,9 +39,12 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
       },
     });
 
-    return new Response(stream, deepmerge({
-      headers: sseHeaders,
-    }, init));
+    return new Response(
+      stream,
+      deepmerge({
+        headers: sseHeaders,
+      }, init),
+    );
   }
 
   protected override send(

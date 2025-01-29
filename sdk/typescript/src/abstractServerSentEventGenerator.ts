@@ -10,7 +10,7 @@ import {
 
 import {
   DatastarDatalineAttributes,
-  DefaultExecuteScriptAttributes
+  DefaultExecuteScriptAttributes,
 } from "./consts.ts";
 
 import { DefaultSseRetryDurationMs } from "./consts.ts";
@@ -81,8 +81,8 @@ export abstract class ServerSentEventGenerator {
   }
 
   private hasDefaultValue(key: string, val: unknown): boolean {
-    if (key === DefaultExecuteScriptAttributes.split(' ')[0]) {
-      return val === DefaultExecuteScriptAttributes.split(' ')[1];
+    if (key === DefaultExecuteScriptAttributes.split(" ")[0]) {
+      return val === DefaultExecuteScriptAttributes.split(" ")[1];
     }
 
     if (key in DefaultMapping) {
