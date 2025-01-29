@@ -148,9 +148,12 @@ func writeOutConsts(version string) error {
 		"sdk/typescript/src/consts.ts":                                                     typescriptConsts,
 		"sdk/rust/src/consts.rs":                                                           rustConsts,
 		"sdk/zig/src/consts.zig":                                                           zigConsts,
-		"examples/clojure/hello-world/resources/public/hello-world.html":                   helloWorldClojure,
-		"examples/go/hello-world/hello-world.html":                                         helloWorldGo,
-		"examples/php/hello-world/public/hello-world.html":                                 helloWorldPHP,
+		"examples/clojure/hello-world/resources/public/hello-world.html":                   helloWorldExample,
+		"examples/dotnet/HelloWorld/wwwroot/hello-world.html":                              helloWorldExample,
+		"examples/go/hello-world/hello-world.html":                                         helloWorldExample,
+		"examples/php/hello-world/public/hello-world.html":                                 helloWorldExamplePHP,
+		"examples/zig/httpz/hello-world/src/hello-world.html":                              helloWorldExample,
+		"examples/zig/tokamak/hello-world/hello-world.html":                                helloWorldExample,
 	}
 
 	for path, tmplFn := range templates {

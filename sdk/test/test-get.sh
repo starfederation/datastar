@@ -5,7 +5,7 @@
 
 input=$(cat "$1/input.json")
 
-rm "$1/testOutput.txt"
+[ -f "$1/testOutput.txt" ] && rm "$1/testOutput.txt"
 
 curl -sN --get -H "datastar-request"  --data-urlencode "datastar=$input"  "$2/test" -o "$1/testOutput.txt"
 

@@ -1,9 +1,11 @@
 const std = @import("std");
 const consts = @import("consts.zig");
-const httpz = @import("httpz");
+
 const default_execute_script_attributes: []const []const u8 = &[_][]const u8{consts.default_execute_script_attributes};
 
-res: *httpz.Response,
+allocator: std.mem.Allocator,
+writer: std.net.Stream.Writer,
+mutex: std.Thread.Mutex = .{},
 
 pub const ExecuteScriptOptions = struct {
     /// `event_id` can be used by the backend to replay events.
@@ -43,7 +45,7 @@ pub const MergeSignalsOptions = struct {
     /// `event_id` can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
-    event_id: ?[]const u8,
+    event_id: ?[]const u8 = null,
     /// `retry_duration` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     retry_duration: u32 = consts.default_sse_retry_duration,
@@ -55,7 +57,7 @@ pub const RemoveFragmentsOptions = struct {
     /// `event_id` can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
-    event_id: ?[]const u8,
+    event_id: ?[]const u8 = null,
     /// `retry_duration` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     retry_duration: u32 = consts.default_sse_retry_duration,
@@ -70,21 +72,11 @@ pub const RemoveSignalsOptions = struct {
     /// `event_id` can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
-    event_id: ?[]const u8,
+    event_id: ?[]const u8 = null,
     /// `retry_duration` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     retry_duration: u32 = consts.default_sse_retry_duration,
 };
-
-pub fn init(res: *httpz.Response) !@This() {
-    res.header("Cache-Control", "nocache");
-    res.header("Content-Type", "text/event-stream");
-    res.header("Connection", "keep-alive");
-
-    return .{
-        .res = res,
-    };
-}
 
 fn send(
     self: *@This(),
@@ -95,21 +87,22 @@ fn send(
         retry_duration: u32 = consts.default_sse_retry_duration,
     },
 ) !void {
-    const writer = self.res.writer();
+    self.mutex.lock();
+    defer self.mutex.unlock();
 
-    try writer.print("event: {}\n", .{event});
+    try self.writer.print("event: {}\n", .{event});
 
     if (options.event_id) |id| {
-        try writer.print("id: {s}\n", .{id});
+        try self.writer.print("id: {s}\n", .{id});
     }
 
-    try writer.print("retry: {d}\n", .{options.retry_duration});
+    try self.writer.print("retry: {d}\n", .{options.retry_duration});
 
     for (data) |line| {
-        try writer.print("data: {s}\n", .{line});
+        try self.writer.print("data: {s}\n", .{line});
     }
 
-    try writer.writeAll("\n\n");
+    try self.writer.writeAll("\n\n");
 }
 
 /// `ExecuteScript` executes JavaScript in the browser
@@ -121,7 +114,7 @@ pub fn executeScript(
     script: []const u8,
     options: ExecuteScriptOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.res.arena);
+    var data = std.ArrayList([]const u8).init(self.allocator);
 
     if (!std.meta.eql(
         default_execute_script_attributes,
@@ -129,7 +122,7 @@ pub fn executeScript(
     )) {
         for (options.attributes) |attribute| {
             const line = try std.fmt.allocPrint(
-                self.res.arena,
+                self.allocator,
                 "{s} {s}",
                 .{
                     consts.attributes_dataline_literal,
@@ -143,7 +136,7 @@ pub fn executeScript(
 
     if (options.auto_remove != consts.default_execute_script_auto_remove) {
         const line = try std.fmt.allocPrint(
-            self.res.arena,
+            self.allocator,
             "{s} {s}",
             .{
                 consts.auto_remove_dataline_literal,
@@ -157,7 +150,7 @@ pub fn executeScript(
     var iter = std.mem.splitScalar(u8, script, '\n');
     while (iter.next()) |elem| {
         const line = try std.fmt.allocPrint(
-            self.res.arena,
+            self.allocator,
             "{s} {s}",
             .{
                 consts.script_dataline_literal,
@@ -178,7 +171,7 @@ pub fn executeScript(
     );
 }
 
-/// [`MergeFragments`] merges one or more fragments into the DOM. By default,
+/// `MergeFragments` merges one or more fragments into the DOM. By default,
 /// Datastar merges fragments using Idiomorph, which matches top level elements based on their ID.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-merge-fragments) for more information.
@@ -188,11 +181,11 @@ pub fn mergeFragments(
     fragments: []const u8,
     options: MergeFragmentsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.res.arena);
+    var data = std.ArrayList([]const u8).init(self.allocator);
 
     if (options.selector) |selector| {
         const line = try std.fmt.allocPrint(
-            self.res.arena,
+            self.allocator,
             "{s} {s}",
             .{
                 consts.selector_dataline_literal,
@@ -205,7 +198,7 @@ pub fn mergeFragments(
 
     if (options.merge_mode != consts.default_fragment_merge_mode) {
         const line = try std.fmt.allocPrint(
-            self.res.arena,
+            self.allocator,
             "{s} {}",
             .{
                 consts.merge_mode_dataline_literal,
@@ -218,7 +211,7 @@ pub fn mergeFragments(
 
     if (options.settle_duration != consts.default_fragments_settle_duration) {
         const line = try std.fmt.allocPrint(
-            self.res.arena,
+            self.allocator,
             "{s} {d}",
             .{
                 consts.settle_duration_dataline_literal,
@@ -231,7 +224,7 @@ pub fn mergeFragments(
 
     if (options.use_view_transition != consts.default_fragments_use_view_transitions) {
         const line = try std.fmt.allocPrint(
-            self.res.arena,
+            self.allocator,
             "{s} {}",
             .{
                 consts.use_view_transition_dataline_literal,
@@ -245,7 +238,7 @@ pub fn mergeFragments(
     var iter = std.mem.splitScalar(u8, fragments, '\n');
     while (iter.next()) |elem| {
         const line = try std.fmt.allocPrint(
-            self.res.arena,
+            self.allocator,
             "{s} {s}",
             .{
                 consts.fragments_dataline_literal,
@@ -266,7 +259,7 @@ pub fn mergeFragments(
     );
 }
 
-/// [`MergeSignals`] sends one or more signals to the browser to be merged into the signals.
+/// `MergeSignals` sends one or more signals to the browser to be merged into the signals.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-merge-signals) for more information.
 pub fn mergeSignals(
@@ -274,11 +267,11 @@ pub fn mergeSignals(
     signals: []const u8,
     options: MergeSignalsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.res.arena);
+    var data = std.ArrayList([]const u8).init(self.allocator);
 
     if (options.only_if_missing != consts.default_merge_signals_only_if_missing) {
         const line = try std.fmt.allocPrint(
-            self.res.arena,
+            self.allocator,
             "{s} {}",
             .{
                 consts.only_if_missing_dataline_literal,
@@ -290,7 +283,7 @@ pub fn mergeSignals(
     }
 
     const line = try std.fmt.allocPrint(
-        self.res.arena,
+        self.allocator,
         "{s} {s}",
         .{
             consts.signals_dataline_literal,
@@ -310,7 +303,7 @@ pub fn mergeSignals(
     );
 }
 
-/// [`RemoveFragments`] sends a selector to the browser to remove HTML fragments from the DOM.
+/// `RemoveFragments` sends a selector to the browser to remove HTML fragments from the DOM.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-remove-fragments) for more information.
 pub fn removeFragments(
@@ -318,11 +311,11 @@ pub fn removeFragments(
     selector: []const u8,
     options: RemoveFragmentsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.res.arena);
+    var data = std.ArrayList([]const u8).init(self.allocator);
 
     if (options.settle_duration != consts.default_fragments_settle_duration) {
         const line = try std.fmt.allocPrint(
-            self.res.arena,
+            self.allocator,
             "{s} {d}",
             .{
                 consts.settle_duration_dataline_literal,
@@ -335,7 +328,7 @@ pub fn removeFragments(
 
     if (options.use_view_transition != consts.default_fragments_use_view_transitions) {
         const line = try std.fmt.allocPrint(
-            self.res.arena,
+            self.allocator,
             "{s} {}",
             .{
                 consts.use_view_transition_dataline_literal,
@@ -347,7 +340,7 @@ pub fn removeFragments(
     }
 
     const line = try std.fmt.allocPrint(
-        self.res.arena,
+        self.allocator,
         "{s} {s}",
         .{
             consts.selector_dataline_literal,
@@ -367,7 +360,7 @@ pub fn removeFragments(
     );
 }
 
-/// [`RemoveSignals`] sends signals to the browser to be removed from the signals.
+/// `RemoveSignals` sends signals to the browser to be removed from the signals.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-remove-signals) for more information.
 pub fn removeSignals(
@@ -375,11 +368,11 @@ pub fn removeSignals(
     paths: []const []const u8,
     options: RemoveSignalsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.res.arena);
+    var data = std.ArrayList([]const u8).init(self.allocator);
 
     for (paths) |path| {
         const line = try std.fmt.allocPrint(
-            self.res.arena,
+            self.allocator,
             "{s} {s}",
             .{
                 consts.paths_dataline_literal,
