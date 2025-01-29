@@ -4,7 +4,7 @@ Datastar provides backend SDKs that simplify the process of generating [SSE even
 
 ## Go
 
-[Go SDK](https://github.com/starfederation/datastar/tree/develop/sdk/go)
+[Go SDK](https://github.com/starfederation/datastar/tree/main/sdk/go)
 
 _Author: [Delaney Gillilan](https://github.com/delaneyj)_
 
@@ -28,34 +28,34 @@ Examples:
 
 ## Python
 
-[Python SDK](https://github.com/starfederation/datastar/tree/develop/sdk/python) and [PyPI package](https://pypi.org/project/datastar-py/), including support for Sanic, Django, Quart and FastAPI.  
+[Python SDK](https://github.com/starfederation/datastar/tree/main/sdk/python) and [PyPI package](https://pypi.org/project/datastar-py/), including support for Sanic, Django, Quart and FastAPI.  
 
 _Author: [Felix Ingram](https://github.com/lllama)_
 
 Examples:
 
-- [Python examples](https://github.com/starfederation/datastar/tree/develop/examples/python)
+- [Python examples](https://github.com/starfederation/datastar/tree/main/examples/python)
 
 ## TypeScript
 
-[TypeScript SDK](https://github.com/starfederation/datastar/tree/develop/sdk/typescript), including support for NodeJS and Web standard runtimes (Deno, Bun, etc.).  
+[TypeScript SDK](https://github.com/starfederation/datastar/tree/main/sdk/typescript), including support for NodeJS and Web standard runtimes (Deno, Bun, etc.).  
 
 _Author: [Patrick Marchand](https://github.com/Superpat)_
 
 Examples:
 
- - [NodeJS example](htttps://github.com/starfederation/datastar/tree/develop/sdk/typescript/examples/node.ts)
- - [Deno example](htttps://github.com/starfederation/datastar/tree/develop/sdk/typescript/examples/deno.ts)
+ - [NodeJS example](https://github.com/starfederation/datastar/tree/main/sdk/typescript/examples/node.ts)
+ - [Deno example](https://github.com/starfederation/datastar/tree/main/sdk/typescript/examples/deno.ts)
 
 ## dotnet
 
-[dotnet SDK](https://github.com/starfederation/datastar/tree/develop/sdk/dotnet), including support for C#.  
+[dotnet SDK](https://github.com/starfederation/datastar/tree/main/sdk/dotnet), including support for C#.  
 
 _Author: [Greg H](https://github.com/SpiralOSS)_
 
 Examples:
 
-- [dotnet examples](https://github.com/starfederation/datastar/tree/develop/examples/dotnet)
+- [dotnet examples](https://github.com/starfederation/datastar/tree/main/examples/dotnet)
 
 ## Java
 
