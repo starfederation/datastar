@@ -8,10 +8,7 @@ import {
   MergeSignalsOptions,
 } from "./types.ts";
 
-import {
-  DatastarDatalineAttributes,
-  DefaultExecuteScriptAttributes,
-} from "./consts.ts";
+import { DefaultExecuteScriptAttributes } from "./consts.ts";
 
 import { DefaultSseRetryDurationMs } from "./consts.ts";
 
