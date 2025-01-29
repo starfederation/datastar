@@ -11,7 +11,7 @@ Deno is used for building the npm package: `deno run -A build.ts VERSION`
 
 Usage is straightforward:
 
-```
+```javascript
 // this example is for node
 const reader = await ServerSentEventGenerator.readSignals(req);
 
@@ -41,7 +41,7 @@ Follow the links for more complete (and executable) examples
 
 ## Frameworks / Alternate runtimes
 
-If you cant simply use the node / web versions, then you can extend the abstract
+If you can't simply use the node / web versions, then you can extend the abstract
 class in `./src/abstractServerSentEventGenerator.ts`. You will need to provide
 implementations of the `constructor`, `readSignals`, `stream` and `send`
 methods.
@@ -55,14 +55,14 @@ more information.
 
 Start by building and running the node server
 
-```
+```shell
 $ deno run -A build.ts xxx
 $ node ./npm/esm/node/node.js
 ```
 
 Then run the test suite
 
-```
+```shell
 $ cd ../test
 $ ./test-all.sh http://127.0.0.1:3000
 Running tests with argument: http://127.0.0.1:3000
@@ -74,13 +74,13 @@ Processing POST cases...
 
 Start by running the deno server
 
-```
+```shell
 $ deno --allow-net  ./src/web/deno.ts
 ```
 
 Then run the test suite
 
-```
+```shell
 $ cd ../test
 $ ./test-all.sh http://localhost:8000/
 Running tests with argument: http://localhost:8000/

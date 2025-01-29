@@ -100,8 +100,8 @@ function applyToTargets(
         break
       }
       case FragmentMergeModes.Inner:
-        // Replace the contents of the target element with the response
-        modifiedTarget.innerHTML = fragment.innerHTML
+        // Replace the contents of the target element with the outer HTML of the response
+        modifiedTarget.innerHTML = fragment.outerHTML
         break
       case FragmentMergeModes.Outer:
         // Replace the entire target element with the response

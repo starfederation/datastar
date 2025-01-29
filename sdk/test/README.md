@@ -14,11 +14,11 @@ Processing GET cases...
 Processing POST cases...
 ```
 
- If nothing else is outputted then all tests passed !
+If nothing else is output then all tests passed!
 
- Results of the test can be found in `./get_cases/$case_name/testOutput.txt` (or `post_cases` depending on the test).
+Results of the test can be found in `./get_cases/$case_name/testOutput.txt` (or `post_cases` depending on the test).
 
- Take note that these tests are stricter about data line ordering then the SDK spec is, but unless that becomes an actual problem I dont intend to fix it, since it would add complexity.
+Take note that these tests are stricter about data line ordering then the SDK spec is, but unless that becomes an actual problem I dont intend to fix it, since it would add complexity.
 
  ## Adding new cases
 
@@ -27,6 +27,7 @@ Processing POST cases...
 That folder must contain an `input.json` file and an `output.txt` file.
 
 The `input.json` file must contain valid json of the following shape:
+
 ```
 {"events":
   [
@@ -54,7 +55,4 @@ data: attributes type text/javascript
 data: attributes blocking false
 data: autoRemove false
 data: script console.log('hello');
-
-
 ```
-

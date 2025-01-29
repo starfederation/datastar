@@ -59,7 +59,7 @@ templ ComputedValueRequired(name string, info *RuntimeErrorInfo) {
 
 templ CustomValidityInvalidElement(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>The <code>data-custom-validity</code> attribute was used on an element that is not a <code>HTMLInputElement</code>. The <code>data-custom-validity</code> attribute can only be used on form elements.</p>
+		<p>The <code>data-custom-validity</code> attribute was used on an element that is not a <code>HTMLInputElement</code>, <code>HTMLSelectElement</code> or <code>HTMLTextAreaElement</code>. The <code>data-custom-validity</code> attribute can only be used on input, select and textarea elements.</p>
 		@customValidityError()
 	}
 }
@@ -73,7 +73,7 @@ templ CustomValidityInvalidExpression(name string, info *RuntimeErrorInfo) {
 
 templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 	{{
-		var isSignalRe = regexp.MustCompile("^(\\$\\S*) is not defined")
+		var isSignalRe = regexp.MustCompile(`^(\$\S*) is not defined`)
 		isSignalMatches := isSignalRe.FindAllStringSubmatch(info.Error, -1)
 	}}
 	@RuntimeErrorView(name, info) {
@@ -110,7 +110,7 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 </div>`)
 		} else {
 			{{
-				var isUndefinedStringRe = regexp.MustCompile("^(\\S*) is not defined")
+				var isUndefinedStringRe = regexp.MustCompile(`^(\S*) is not defined`)
 				isStringMatches := isUndefinedStringRe.FindAllStringSubmatch(info.Error, -1)
 			}}
 			if len(isStringMatches) > 0 {
@@ -128,8 +128,24 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 }
 
 templ GenerateExpression(name string, info *RuntimeErrorInfo) {
+	{{
+
+		var isMultilineReturnRe = regexp.MustCompile(`return \([\s\S]*\n[\s\S]*\);`)
+		isMultilineReturnMatches := isMultilineReturnRe.FindAllStringSubmatch(info.Expression.FnContent, -1)
+	}}
 	@RuntimeErrorView(name, info) {
 		<p>A valid expression could not be generated.</p>
+		if len(isMultilineReturnMatches) > 0 {
+			<p>Multiple statements can be used in a single expression by separating them with a semicolon Expressions may span multiple lines, but a semicolon must be used to separate statements.</p>
+			@sampleCode("Example", "html", `<div data-signals-foo="1">
+  <div data-on-click="
+        $foo++; 
+        @post('/endpoint')
+  "></div>
+</div>`)
+		} else {
+			<pre>{ info.Expression.FnContent }</pre>
+		}
 		@expressionDocs()
 	}
 }

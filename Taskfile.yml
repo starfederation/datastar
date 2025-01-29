@@ -88,6 +88,21 @@ tasks:
       - GOPROXY=proxy.golang.org go list -m github.com/starfederation/datastar@v{{.VERSION}}
       - task: deploy
 
+  sdktspub:
+    dir: sdk/typescript
+    requires:
+      vars: [VERSION]
+    cmds:
+      - git push origin
+      - git tag sdktsv{{.VERSION}}
+      - git push origin --tags
+      - deno run -A build.ts {{.VERSION}}
+      - npm publish --access public npm
+      - curl https://purge.jsdelivr.net/gh/starfederation/datastar/sdk/typescript/npm/esm/web/serverSentEventGenerator.js
+      - curl https://purge.jsdelivr.net/gh/starfederation/datastar/sdk/typescript/npm/esm/abstractServerSentEventGenerator.js
+      - curl https://purge.jsdelivr.net/gh/starfederation/datastar/sdk/typescript/npm/esm/node/serverSentEventGenerator.js
+      - git push origin --tags
+
   css:
     dir: site
     sources:

@@ -1,0 +1,18 @@
+.{
+    .name = "hello-world",
+    .version = "0.0.0",
+    .dependencies = .{
+        .httpz = .{
+            .url = "git+https://github.com/karlseguin/http.zig?ref=master#7000f03ad3b328277c70e84d9d9e58076af0a91a",
+            .hash = "1220c4c8ea5cf4575ce7effde670cfa52e7773e62a92558361eb2636f68e57d53b90",
+        },
+        .datastar_httpz = .{
+            .path = "../../../../sdk/zig/httpz",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

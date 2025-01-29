@@ -5,9 +5,9 @@
 <div
 	data-signals="{duration:0, lastRenderTime:Date.now()}"
   data-on-raf="
-    const now = Date.now()
-	const delta = now - $lastRenderTime
-	$duration += delta / 1000
+    const now = Date.now();
+	const delta = now - $lastRenderTime;
+	$duration += delta / 1000;
 	$lastRenderTime = now
   "
 >
@@ -20,9 +20,9 @@
 <div
   data-signals="{duration:0, lastRenderTime:Date.now()}"
   data-on-raf="
-    const now = Date.now()
-    const delta = now - $lastRenderTime
-    $duration += delta / 1000
+    const now = Date.now();
+    const delta = now - $lastRenderTime;
+    $duration += delta / 1000;
     $lastRenderTime = now
   "
 >

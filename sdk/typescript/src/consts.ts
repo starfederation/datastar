@@ -18,7 +18,7 @@ export const DefaultSseRetryDurationMs = 1000;
 
 // #region Default strings
 
-// The default attributes for <script/> element use when executing scripts. It is a set of of key-value pairs delimited by a newline \\n character.
+// The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
 export const DefaultExecuteScriptAttributes = "type module";
 
 // #endregion

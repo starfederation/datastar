@@ -1,7 +1,7 @@
 import { Hash, elUniqId } from '../utils/dom'
 import { camelize } from '../utils/text'
 import { effect } from '../vendored/preact-core'
-import { DSP, DSS, VERSION } from './consts'
+import { DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
 import { SignalsRoot } from './signals'
 import {
@@ -30,10 +30,6 @@ export class Engine {
 
   get signals() {
     return this.#signals
-  }
-
-  get version() {
-    return VERSION
   }
 
   public load(...pluginsToLoad: DatastarPlugin[]) {
@@ -200,8 +196,10 @@ export class Engine {
     ctx: RuntimeContext,
     ...argNames: string[]
   ): RuntimeExpressionFunction {
+    let userExpression = ''
+
     // This regex allows Datastar expressions to support nested
-    // regex and strings that contain ; and/or \n without breaking.
+    // regex and strings that contain ; without breaking.
     //
     // Each of these regex defines a block type we want to match
     // (importantly we ignore the content within these blocks):
@@ -211,20 +209,23 @@ export class Engine {
     // single quotes      '(\\'|[^'])*'
     // ticks              `(\\`|[^`])*`
     //
-    // We also want to match the non delimiter part of statements:
+    // We also want to match the non delimiter part of statements
+    // note we only support ; statement delimiters:
     //
-    // [^;\n]
+    // [^;]
     //
-    const statementRe = /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;\n])+/gm
-    const stmts = ctx.value.trim().match(statementRe)
-    const lastIdx = stmts.length - 1
-    const last = stmts[lastIdx]
-    if (!last.startsWith('return')) {
-      stmts[lastIdx] = `return (${last});`
+    const statementRe = /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;])+/gm
+    const statements = ctx.value.trim().match(statementRe)
+    if (statements) {
+      const lastIdx = statements.length - 1
+      const last = statements[lastIdx].trim()
+      if (!last.startsWith('return')) {
+        statements[lastIdx] = `return (${last});`
+      }
+      userExpression = statements.join(';\n')
     }
-    let userExpression = stmts.join('\n')
 
-    // Ingore any escaped values
+    // Ignore any escaped values
     const escaped = new Map<string, string>()
     const escapeRe = new RegExp(`(?:${DSP})(.*?)(?:${DSS})`, 'gm')
     for (const match of userExpression.matchAll(escapeRe)) {
