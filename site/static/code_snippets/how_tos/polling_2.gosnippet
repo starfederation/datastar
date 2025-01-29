@@ -1,0 +1,17 @@
+import (
+    "time"
+    datastar "github.com/starfederation/datastar/sdk/go"
+)
+
+sse := datastar.NewSSE(w, r)
+currentTime := time.Now().Unix()
+currentSeconds := time.Now().Format("05")
+duration := currentSeconds < 50 ? 5 : 1
+
+sse.MergeFragments(`
+    <div id="time"
+         data-on-interval__duration.` + duration + `s.leading="@get('/endpoint')"
+    >
+        ` + currentTime + `
+    </div>
+`)

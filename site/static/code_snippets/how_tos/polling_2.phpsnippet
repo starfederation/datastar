@@ -1,0 +1,16 @@
+use starfederation\datastar\ServerSentEventGenerator;
+
+$currentTime = time();
+$currentSeconds = $currentTime % 60;
+$duration = $currentSeconds < 50 ? 5 : 1;
+
+$sse = new ServerSentEventGenerator();
+$sse->sendHeaders();
+$sse->mergeFragments(`
+    <div id="time"
+         data-on-interval__duration.${duration}s.leading="@get('/endpoint')"
+    >
+        $currentTime
+    </div>
+
+`);

@@ -102,7 +102,8 @@ func setupRoutes(ctx context.Context, router chi.Router) (err error) {
 	if err := errors.Join(
 		setupHome(router, sessionSignals, ns),
 		setupGuide(ctx, router),
-		setupReferenceRoutes(ctx, router),
+		setupReferences(ctx, router),
+		setupHowTos(ctx, router),
 		setupExamples(ctx, router, sessionSignals),
 		setupEssays(ctx, router),
 		setupErrors(router),

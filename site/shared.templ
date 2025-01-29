@@ -71,7 +71,7 @@ templ headerIconLink(iconName, href string) {
 }
 
 templ headerTopLevelLink(r *http.Request, text string) {
-	{{ url := templ.SafeURL("/" + strings.ToLower(text)) }}
+	{{ url := templ.SafeURL("/" + toolbelt.Snake(text)) }}
 	<a
 		href={ url }
 		class={
@@ -95,6 +95,7 @@ templ headerExternalLinks() {
 templ headerTopLevelLinks(r *http.Request) {
 	@headerTopLevelLink(r, "Guide")
 	@headerTopLevelLink(r, "Reference")
+	@headerTopLevelLink(r, "How Tos")
 	@headerTopLevelLink(r, "Examples")
 	@headerTopLevelLink(r, "Essays")
 	@headerTopLevelLink(r, "Memes")
