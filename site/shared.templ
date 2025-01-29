@@ -2,7 +2,6 @@ package site
 
 import (
 	"fmt"
-	"github.com/delaneyj/toolbelt"
 	datastar "github.com/starfederation/datastar/sdk/go"
 	"net/http"
 	"strings"
@@ -259,7 +258,6 @@ templ codeSnippetFragment(block CodeSnippetBlock) {
 						) }
 						data-on-click={ fmt.Sprintf("$language = '%s'", snippet.Extension) }
 					>
-						{ toolbelt.Upper( snippet.Extension) }
 						<iconify-icon icon={ snippet.Icon } class="text-4xl" noobserver></iconify-icon>
 					</button>
 				}
