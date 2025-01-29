@@ -30,7 +30,7 @@ In addition to the interval, we could also execute the expression immediately by
 ></div>
 ```
 
-Most of the time we'd just render the current time on page load using a backend templating language.
+Most of the time, however, we'd just render the current time on page load using a backend templating language.
 
 ```html
 <div id="time"
