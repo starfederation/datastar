@@ -24,17 +24,33 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
   /**
    * Initializes the server-sent event generator and executes the streamFunc function.
    *
-   * @param streamFunc - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
+   * @param onStart - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
    * @returns an HTTP Response
    */
   static stream(
-    streamFunc: (stream: ServerSentEventGenerator) => Promise<void> | void,
-    init: ResponseInit = {},
+    onStart: (stream: ServerSentEventGenerator) => Promise<void> | void,
+    options?: Partial<{
+      onError: (
+        stream: ServerSentEventGenerator,
+        error: unknown,
+      ) => Promise<void> | void;
+      init: ResponseInit;
+    }>,
   ): Response {
     const stream = new ReadableStream({
       async start(controller) {
-        const stream = streamFunc(new ServerSentEventGenerator(controller));
-        if (stream instanceof Promise) await stream;
+        const generator = new ServerSentEventGenerator(controller);
+
+        try {
+          const stream = onStart(generator);
+          if (stream instanceof Promise) await stream;
+        } catch (error: unknown) {
+          const errorStream = options && options.onError
+            ? options.onError(generator, error)
+            : null;
+          if (errorStream instanceof Promise) await errorStream;
+        }
+
         controller.close();
       },
     });
@@ -43,7 +59,7 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
       stream,
       deepmerge({
         headers: sseHeaders,
-      }, init),
+      }, options?.init ?? {}),
     );
   }
 

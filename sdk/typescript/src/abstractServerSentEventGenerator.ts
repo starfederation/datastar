@@ -83,7 +83,7 @@ export abstract class ServerSentEventGenerator {
     }
 
     if (key in DefaultMapping) {
-      return val === DefaultMapping[key];
+      return val === DefaultMapping[key as keyof typeof DefaultMapping];
     }
 
     return false;
