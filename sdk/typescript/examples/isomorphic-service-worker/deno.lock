@@ -1,8 +1,8 @@
 {
   "version": "4",
   "specifiers": {
-    "jsr:@hono/hono@*": "4.6.17",
-    "jsr:@hono/hono@^4.6.16": "4.6.17",
+    "jsr:@hono/hono@*": "4.6.19",
+    "jsr:@hono/hono@^4.6.19": "4.6.19",
     "jsr:@luca/esbuild-deno-loader@*": "0.9.0",
     "jsr:@luca/esbuild-deno-loader@0.9": "0.9.0",
     "jsr:@std/assert@~0.213.1": "0.213.1",
@@ -10,11 +10,12 @@
     "jsr:@std/json@~0.213.1": "0.213.1",
     "jsr:@std/jsonc@0.213": "0.213.1",
     "jsr:@std/path@0.213": "0.213.1",
-    "npm:esbuild@0.20": "0.20.2"
+    "npm:esbuild@0.20": "0.20.2",
+    "npm:type-fest@*": "4.33.0"
   },
   "jsr": {
-    "@hono/hono@4.6.17": {
-      "integrity": "932fcc61d043b14a8b2cb65242716eb32da44e91f2ee117fd7390508669fea31"
+    "@hono/hono@4.6.19": {
+      "integrity": "5ba1bd0ef74449c0a647f029e29896776c30fb64aefbcef8724af4ce4846791b"
     },
     "@luca/esbuild-deno-loader@0.9.0": {
       "integrity": "288bbcede5c8a6f97e635f8fa4df779b13440ee0c0506d9e478fb6537789dc93",
@@ -145,6 +146,9 @@
         "@esbuild/win32-ia32",
         "@esbuild/win32-x64"
       ]
+    },
+    "type-fest@4.33.0": {
+      "integrity": "sha512-s6zVrxuyKbbAsSAD5ZPTB77q4YIdRctkTbJ2/Dqlinwz+8ooH2gd+YA7VA6Pa93KML9GockVvoxjZ2vHP+mu8g=="
     }
   },
   "redirects": {
@@ -158,7 +162,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@hono/hono@^4.6.16",
+      "jsr:@hono/hono@^4.6.19",
       "jsr:@luca/esbuild-deno-loader@0.9"
     ]
   }

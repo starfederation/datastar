@@ -9,7 +9,6 @@ interface RouterApp extends Hono {
 }
 
 // Wrap D* mergeFragments so that whatever is passed into it is converted to a string first (Hono HTML uses promises)
-// TODO: perhaps remove new lines/minify it so that its all sent in one sse message?
 const mergeFragment = (
   stream: ServerSentEventGenerator,
   fragment: unknown,
@@ -180,7 +179,7 @@ export function createRouter(options: { serviceWorkerPath?: string } = {}) {
           const progress = ((i + 1) / numItems) * 100;
 
           mergeFragment(stream, progressTemplate(progress, i + 1));
-          await delay(10);
+          await delay(20);
         }
       }
     });
