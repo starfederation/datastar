@@ -8,7 +8,6 @@ import { jsStrToObject } from '../../../../utils/text'
 export const Signals: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'signals',
-  removeOnLoad: true,
   onLoad: (ctx) => {
     const { key, value, genRX, signals, mods } = ctx
     const ifMissing = mods.has('ifmissing')

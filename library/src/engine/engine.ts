@@ -73,6 +73,11 @@ export class Engine {
               const el = target as HTMLorSVGElement
               const rawKey = camelize(attributeName.slice(dsPrefix.length))
 
+              // Ignore the signals attribute, as it will be removed immediately after being applied
+              if (rawKey.startsWith('signals')) {
+                break
+              }
+
               // If the value is not null and has changed, cleanup the old value
               if (oldValue !== null && el.dataset[rawKey] !== oldValue) {
                 const elRemovals = this.#removals.get(el)
@@ -263,8 +268,8 @@ export class Engine {
       elRemovals.set(removalKey(rawKey, value), removalFn)
     }
 
-    // Remove the attribute if required
-    if (plugin?.removeOnLoad) delete el.dataset[rawKey]
+    // Remove the signals attribute after applying
+    if (plugin.name === 'signals') delete el.dataset[rawKey]
   }
 
   #genRX(

@@ -57,7 +57,6 @@ export interface AttributePlugin extends DatastarPlugin {
   mods?: Set<string> // If not provided, all modifiers are allowed
   keyReq?: Requirement // The rules for the key requirements
   valReq?: Requirement // The rules for the value requirements
-  removeOnLoad?: boolean // If true, the attribute is removed after onLoad (useful for plugins you don’t want reapplied)
   argNames?: string[] // argument names for the reactive expression
 }
 
