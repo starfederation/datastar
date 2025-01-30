@@ -26,7 +26,6 @@ serde = { version = "1.0.217", default-features = false, optional = true, featur
 serde_json = { version = "1.0.137", default-features = false, optional = true, features = [
     "std",
 ] }
-typle = { version = "0.10.6", default-features = false }
 
 [features]
 axum = ["dep:axum", "dep:mime", "dep:serde", "dep:serde_json"]
