@@ -6,32 +6,17 @@ interface Store {
   delay: number;
 }
 
-
-
-
-
-
-
 export function createRouter() {
   const app = new Hono();
-  console.log(`Router created`);
-  // Middleware to log incoming requests
-  app.use("*", async (c, next) => {
-    console.log(`Incoming request - router: ${c.req.method} ${c.req.url}`);
-    await next();
-  });
-  
+    
   // Homepage route
   app.get("/", async (c) => {
     console.log("Handling / route");
     return c.html(getHelloWorldHtml());
   });
   
-  
-  // Hello world SSE route
+  // Hello, world! route
   app.get("/hello-world", async (c) => {
-    
-    
     const reader = await ServerSentEventGenerator.readSignals<Store>(c.req);
 
     if (!reader.success) {

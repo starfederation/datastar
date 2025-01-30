@@ -10,25 +10,14 @@ await buildProcess.output();
 
 const app = new Hono();
 
-// Middleware to log incoming requests
-app.use("*", async (c, next) => {
-  console.log(`Incoming request: ${c.req.method} ${c.req.url}`);
-  await next();
-});
-
-
-// Serve static files from public directory after router
+// Serve static files
 app.use("/static/*", serveStatic({ root: "./" }));
 
-// Serve the service worker from the root path
+// Serve the service worker from the root path - this is need so that it has scope for the entire application rather than just /static
 app.use("/service-worker.js", serveStatic({ path: "./static/service-worker.js" }));
 
 // Mount the shared router at the root path
 app.route("/", createRouter());
-
-
-// Serve the fallback static file
-// app.use("/", serveStatic({ path: "./public/hello-world.html" }));
 
 Deno.serve({
   port: 8000,

@@ -9,7 +9,7 @@ const CORE_ASSETS = [
   '/static/datastar.js',
   '/static/datastar.js.map',
   '/static/rocket.png',
-  '/service-worker.js' // Ensure the service worker script is cached
+  '/service-worker.js'
 ];
 
 const router = createRouter();
@@ -49,7 +49,7 @@ self.addEventListener('fetch', (event) => {
       }
 
       // If offline, use router for dynamic routes
-      if (!self.navigator.onLine) { // Use self.navigator instead of window.navigator
+      if (!self.navigator.onLine) {
         console.log('Browser is offline, using router fallback');
         return await router.fetch(event.request);
       }
@@ -67,6 +67,7 @@ self.addEventListener('fetch', (event) => {
         
         return networkResponse;
       } catch (error) {
+        // Fall back to router for dynamic routes
         console.log('Network request failed, using router fallback');
         return await router.fetch(event.request);
       }
