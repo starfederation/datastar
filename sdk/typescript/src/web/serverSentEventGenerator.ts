@@ -22,9 +22,21 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
   }
 
   /**
+   * Closes the ReadableStream
+   */
+  public close() {
+    this.controller.close();
+  }
+
+  /**
    * Initializes the server-sent event generator and executes the streamFunc function.
    *
    * @param onStart - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
+   * @param options? - An object that can contain options for the Response constructor as well as onError and onCancel callbacks.
+   * The onAbort callback will be called whenever the request is aborted or the stream is cancelled
+   * The onError callback keeps the stream open after an exception  to report the error. If it is not provided it will
+   * cancel the stream and throw the error.
+   *
    * @returns an HTTP Response
    */
   static stream(
@@ -34,29 +46,44 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
         stream: ServerSentEventGenerator,
         error: unknown,
       ) => Promise<void> | void;
+      onAbort: (reason: string) => Promise<void> | void;
       init: ResponseInit;
     }>,
   ): Response {
-    const stream = new ReadableStream({
+    const readableStream = new ReadableStream({
       async start(controller) {
         const generator = new ServerSentEventGenerator(controller);
 
         try {
-          const stream = onStart(generator);
-          if (stream instanceof Promise) await stream;
+          const startedStream = onStart(generator);
+          if (startedStream instanceof Promise) await startedStream;
         } catch (error: unknown) {
-          const errorStream = options && options.onError
-            ? options.onError(generator, error)
+          const abortResult = options && options.onAbort
+            ? options.onAbort(
+              error.message ?? "onStart callback threw an error",
+            )
             : null;
-          if (errorStream instanceof Promise) await errorStream;
-        }
 
-        controller.close();
+          if (abortResult instanceof Promise) await abortResult;
+          if (options && options.onError) {
+            const errorStream = options.onError(generator, error);
+            if (errorStream instanceof Promise) await errorStream;
+          } else {
+            controller.close();
+            throw error;
+          }
+        }
+      },
+      async cancel(reason) {
+        const abortResult = options && options.onAbort
+          ? options.onAbort(reason)
+          : null;
+        if (abortResult instanceof Promise) await abortResult;
       },
     });
 
     return new Response(
-      stream,
+      readableStream,
       deepmerge({
         headers: sseHeaders,
       }, options?.init ?? {}),
