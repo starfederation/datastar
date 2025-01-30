@@ -15,6 +15,5 @@ DS.load(
     {%s p.Name %},
 {%- endfor -%}
 )
-
 export const Datastar = DS
 {% endfunc %}

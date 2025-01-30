@@ -2,7 +2,6 @@ package site
 
 import (
 	"fmt"
-	"github.com/delaneyj/toolbelt"
 	datastar "github.com/starfederation/datastar/sdk/go"
 	"net/http"
 	"strings"
@@ -86,6 +85,7 @@ templ headerTopLevelLink(r *http.Request, text string) {
 templ headerExternalLinks() {
 	@headerIconLink("simple-icons:discord", "https://discord.gg/bnRNgZjgPh")
 	@headerIconLink("simple-icons:youtube", "https://www.youtube.com/@data-star")
+	@headerIconLink("simple-icons:spotify", "https://creators.spotify.com/pod/show/datastar")
 	@headerIconLink("simple-icons:github", "https://github.com/starfederation/datastar/tree/main/library")
 	@headerIconLink("simple-icons:npm", "https://www.npmjs.com/package/@starfederation/datastar")
 	@headerIconLink("simple-icons:twitter", "https://x.com/DelaneyGillilan")
@@ -258,7 +258,6 @@ templ codeSnippetFragment(block CodeSnippetBlock) {
 						) }
 						data-on-click={ fmt.Sprintf("$language = '%s'", snippet.Extension) }
 					>
-						{ toolbelt.Upper( snippet.Extension) }
 						<iconify-icon icon={ snippet.Icon } class="text-4xl" noobserver></iconify-icon>
 					</button>
 				}

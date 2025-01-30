@@ -1,0 +1,28 @@
+{:paths ["src/main" "src/bb"]
+ :tasks
+ {:requires ([tasks :as t])
+
+  -prep (t/prep-libs)
+
+  dev {:task (do (println "Starting Dev repl")
+                 (t/dev))}
+  
+
+  test:all (t/lazytest [:http-kit
+                        :ring-jetty
+                        :malli-schemas]
+                       [:test.paths/core-sdk
+                        :test.paths/malli-schemas
+                        :test.paths/adapter-http-kit
+                        :test.paths/adapter-ring-jetty])
+  
+
+  test:all-w (t/lazytest [:http-kit
+                          :ring-jetty
+                          :malli-schemas]
+                         [:test.paths/core-sdk
+                          :test.paths/malli-schemas
+                          :test.paths/adapter-http-kit
+                          :test.paths/adapter-ring-jetty]
+                         "--watch"
+                         "--delay 1000")}}

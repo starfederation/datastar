@@ -1,6 +1,6 @@
 # Datastar Zig SDK
 
-An implementation of the Datastar SDK in Zig. Currently, this only has framework integration for http.zig.
+An implementation of the Datastar SDK in Zig with framework integration for http.zig and tokamak.
 
 ## Testing
 
@@ -12,11 +12,11 @@ Run `zig build test`.
 const datastar = @import("datastar");
 
 // Creates a new `ServerSentEventGenerator`.
-var sse = datastar.ServerSentEventGenerator.init(res);
+var sse = try datastar.ServerSentEventGenerator.init(res);
 
 // Merges HTML fragments into the DOM.
-sse.mergeFragments("<div id='question'>What do you put in a toaster?</div>", .{});
+try sse.mergeFragments("<div id='question'>What do you put in a toaster?</div>", .{});
 
 // Merges signals into the signals.
-sse.mergeSignals("{response: '', answer: 'bread'}", .{})
+try sse.mergeSignals("{response: '', answer: 'bread'}", .{});
 ```
