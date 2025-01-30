@@ -1,4 +1,4 @@
-import { Hono } from "jsr:@hono/hono";
+import { Hono } from "jsr:@hono/hono/tiny";
 import { serveStatic } from "jsr:@hono/hono/deno";
 import { createRouter } from "./shared-router.ts";
 
