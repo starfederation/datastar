@@ -1,1 +1,8 @@
-{"events": [{ "type": "mergeFragments", "fragments": "<div>\n  <span>Merge</span>\n</div>"}]}
+{
+  "events": [
+    {
+      "type": "mergeFragments",
+      "fragments": "<div>\n  <span>Merge</span>\n</div>"
+    }
+  ]
+}

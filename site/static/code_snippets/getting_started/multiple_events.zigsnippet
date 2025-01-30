@@ -1,4 +1,4 @@
-sse.mergeFragments("<div id='question'>...</div>"), .{};
-sse.mergeFragments("<div id='instructions'>...</div>", .{});
-sse.mergeSignals("{answer: '...'}", .{});
-sse.mergeSignals("{prize: '...'}", .{});
+try sse.mergeFragments("<div id='question'>...</div>"), .{};
+try sse.mergeFragments("<div id='instructions'>...</div>", .{});
+try sse.mergeSignals("{answer: '...'}", .{});
+try sse.mergeSignals("{prize: '...'}", .{});

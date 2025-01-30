@@ -59,7 +59,7 @@ templ ComputedValueRequired(name string, info *RuntimeErrorInfo) {
 
 templ CustomValidityInvalidElement(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>The <code>data-custom-validity</code> attribute was used on an element that is not a <code>HTMLInputElement</code>. The <code>data-custom-validity</code> attribute can only be used on form elements.</p>
+		<p>The <code>data-custom-validity</code> attribute was used on an element that is not a <code>HTMLInputElement</code>, <code>HTMLSelectElement</code> or <code>HTMLTextAreaElement</code>. The <code>data-custom-validity</code> attribute can only be used on input, select and textarea elements.</p>
 		@customValidityError()
 	}
 }
