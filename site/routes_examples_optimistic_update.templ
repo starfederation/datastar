@@ -1,0 +1,16 @@
+package site
+
+templ updateSucess(name string) {
+	<div>{ name }</div>
+	<div id="optimistic" class="text-primary" data-show="$fetching" data-text="$name"></div>
+}
+
+templ updateError() {
+    <div class="text-primary" data-show="$fetching" data-text="$name"></div>
+	<div data-show="!$fetching" class="text-primary">
+            <input type="text" data-bind="name">
+            <button class="flex-1 btn btn-primary" data-indicator-fetching data-on-click="@post('/examples/optimistic_update/update_data')" data-attr-disabled="$fetching" >
+                Save
+            </button>
+        </div>
+}
