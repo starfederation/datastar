@@ -52,9 +52,7 @@ impl Display for DatastarEvent {
             writeln!(f, "id: {}", id)?;
         }
 
-        if self.retry.as_millis() != crate::consts::DEFAULT_SSE_RETRY_DURATION as u128 {
-            writeln!(f, "retry: {}", self.retry.as_millis())?;
-        }
+        writeln!(f, "retry: {}", self.retry.as_millis())?;
 
         for line in &self.data {
             writeln!(f, "data: {}", line)?;
