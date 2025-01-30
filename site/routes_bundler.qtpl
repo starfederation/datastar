@@ -4,6 +4,18 @@ import { Datastar as DS } from "../engine"
 import { {%s p.Name %} } from "{%s p.Path %}"
 {%- endfor -%}
 
+{%- if manifest.Alias != "" -%}
+// You included an alias in your manifest
+// Please use this as a last resort as you will have to convert any issues or errors back to the original form before reporting them if you want help.
+function aliased(s:string) {
+    let pascal = s.charAt(0).toUpperCase() + s.slice(1)
+    return "{%s manifest.Alias %}" + pascal
+}
+{%- for _, p := range manifest.Plugins -%}
+{%s p.Name %}.name = aliased({%s p.Name %}.name)
+{%- endfor -%}
+{%- endif -%}
+
 DS.load(
 {%- for _, p := range manifest.Plugins -%}
     {%s p.Name %},
