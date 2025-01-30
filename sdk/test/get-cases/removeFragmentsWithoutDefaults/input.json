@@ -1,0 +1,8 @@
+{
+  "events": [
+    {
+      "type": "removeFragments",
+      "selector": "#target"
+    }
+  ]
+}

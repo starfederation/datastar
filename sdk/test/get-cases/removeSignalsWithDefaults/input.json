@@ -1,1 +1,10 @@
-{"events": [ { "type": "removeSignals", "paths": ["one"]}]}
+{
+  "events": [
+    {
+      "type": "removeSignals",
+      "paths": [
+        "one"
+      ]
+    }
+  ]
+}
