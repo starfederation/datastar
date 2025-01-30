@@ -7,8 +7,6 @@
 
 (def datastar-key                  "{%s data.DatastarKey %}")
 (def version                       "{%s data.Version %}")
-(def version-client-byte-size      {%d data.VersionClientByteSize %})
-(def version-client-byte-size-gzip {%d data.VersionClientByteSizeGzip %})
 
 
 ;; -----------------------------------------------------------------------------
