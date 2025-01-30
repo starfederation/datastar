@@ -5,12 +5,16 @@
 
 #[cfg(feature = "axum")]
 pub mod axum;
-mod consts;
+#[cfg(feature = "rocket")]
+pub mod rocket;
+
 pub mod execute_script;
 pub mod merge_fragments;
 pub mod merge_signals;
 pub mod remove_fragments;
 pub mod remove_signals;
+
+mod consts;
 
 ///
 pub mod prelude {

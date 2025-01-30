@@ -18,17 +18,25 @@ tokio = { version = "1.43.0", features = ["full"] }
 [dependencies]
 axum = { version = "0.8.1", default-features = false, optional = true, features = [
     "query",
+    "tokio",
+] }
+bevy_utils = { version = "0.15.1", default-features = false, optional = true, features = [
+    "std",
 ] }
 mime = { version = "0.3.17", default-features = false, optional = true }
+rocket = { version = "0.5.1", default-features = false, optional = true, features = [
+] }
 serde = { version = "1.0.217", default-features = false, optional = true, features = [
     "derive",
 ] }
-serde_json = { version = "1.0.137", default-features = false, optional = true, features = [
+serde_json = { version = "1.0.138", default-features = false, optional = true, features = [
     "std",
 ] }
 
 [features]
-axum = ["dep:axum", "dep:mime", "dep:serde", "dep:serde_json"]
+axum = ["dep:axum", "dep:mime", "dep:serde", "dep:serde_json", "dep:bevy_utils"]
+default = ["axum", "rocket"]
+rocket = ["dep:rocket"]
 
 [profile.dev]
 opt-level = 1
