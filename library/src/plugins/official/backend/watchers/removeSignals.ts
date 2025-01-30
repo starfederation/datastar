@@ -19,7 +19,6 @@ export const RemoveSignals: WatcherPlugin = {
           throw initErr('NoPathsProvided', ctx)
         }
         ctx.signals.remove(...paths)
-        ctx.apply(document.body)
       },
     )
   },

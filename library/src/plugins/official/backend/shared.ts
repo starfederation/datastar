@@ -13,7 +13,7 @@ export interface DatastarSSEEvent {
 }
 
 export interface CustomEventMap {
-  'datastar-sse': CustomEvent<DatastarSSEEvent>
+  [DATASTAR_SSE_EVENT]: CustomEvent<DatastarSSEEvent>
 }
 export type WatcherFn<K extends keyof CustomEventMap> = (
   this: Document,
