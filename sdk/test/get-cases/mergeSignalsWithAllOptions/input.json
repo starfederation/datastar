@@ -1,1 +1,14 @@
-{"events": [ { "type": "mergeSignals", "signals": { "one": 1, "two": 2 }, "eventId": "1", "retryDuration": 2000,  "onlyIfMissing": false }]}
+{
+  "events": [
+    {
+      "type": "mergeSignals",
+      "signals": {
+        "one": 1,
+        "two": 2
+      },
+      "eventId": "event1",
+      "retryDuration": 2000,
+      "onlyIfMissing": true
+    }
+  ]
+}

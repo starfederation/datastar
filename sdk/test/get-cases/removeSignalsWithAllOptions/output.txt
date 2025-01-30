@@ -1,5 +1,5 @@
 event: datastar-remove-signals
-id: 1
+id: event1
 retry: 2000
 data: paths one
 data: paths two.alpha

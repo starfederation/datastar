@@ -85,14 +85,7 @@ function applyToTargets(
     let modifiedTarget = initialTarget
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
-        const result = idiomorph(modifiedTarget, fragment, {
-          callbacks: {
-            beforeNodeRemoved: (oldNode: Element, _: Element) => {
-              ctx.cleanup(oldNode)
-              return true
-            },
-          },
-        })
+        const result = idiomorph(modifiedTarget, fragment)
         if (!result?.length) {
           throw initErr('MorphFailed', ctx)
         }
@@ -133,12 +126,11 @@ function applyToTargets(
       default:
         throw initErr('InvalidMergeMode', ctx, { mergeMode })
     }
-    ctx.cleanup(modifiedTarget)
 
     const cl = modifiedTarget.classList
     cl.add(SWAPPING_CLASS)
 
-    ctx.apply(document.body)
+    // ctx.apply(document.body)
 
     setTimeout(() => {
       initialTarget.classList.remove(SWAPPING_CLASS)

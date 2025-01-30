@@ -1,1 +1,11 @@
-{"events": [ { "type": "mergeFragments", "fragments": "<div>Merge</div>" }]}
+{
+  "events": [
+    {
+      "type": "mergeFragments",
+      "fragments": "<div>Merge</div>",
+      "mergeMode": "morph",
+      "settleDuration": 300,
+      "useViewTransition": false
+    }
+  ]
+}

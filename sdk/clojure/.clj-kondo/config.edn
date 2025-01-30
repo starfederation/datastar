@@ -1,0 +1,6 @@
+{:lint-as {fr.jeremyschoffen.datastar.utils/defroutes clojure.core/def
+           starfederation.datastar.clojure.utils/transient-> clojure.core/->}
+ :hooks
+ {:analyze-call
+  {test.utils/with-server hooks.test-hooks/with-server}}}
+
