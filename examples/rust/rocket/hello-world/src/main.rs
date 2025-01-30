@@ -4,6 +4,7 @@ use {
         get, launch,
         response::{content::RawHtml, stream::EventStream},
         routes,
+        serde::{json::Json, Deserialize},
     },
     std::time::Duration,
 };
@@ -20,15 +21,19 @@ fn index() -> RawHtml<String> {
 
 const MESSAGE: &str = "Hello, world!";
 
-#[get("/hello-world")]
-fn hello_world() -> EventStream![] {
-    EventStream! {
-        let mut i = 0;
+#[derive(Deserialize)]
+#[serde(crate = "rocket::serde")]
+struct Signals {
+    delay: u64,
+}
 
-        while i < MESSAGE.len() {
-            i += 1;
-            yield MergeFragments::new(format!("<div id='message'>{}</div>", &MESSAGE[0..i])).into();
-            std::thread::sleep(Duration::from_millis(100));
+#[get("/hello-world?<datastar>")]
+fn hello_world(datastar: Json<Signals>) -> EventStream![] {
+    EventStream! {
+
+        for i in 0..MESSAGE.len() {
+            yield MergeFragments::new(format!("<div id='message'>{}</div>", &MESSAGE[0..i+1])).into();
+            std::thread::sleep(Duration::from_millis(datastar.delay));
         }
     }
 }
