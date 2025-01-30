@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@hono/hono": "jsr:@hono/hono@^4.6.19",
+    "@luca/esbuild-deno-loader": "jsr:@luca/esbuild-deno-loader@^0.9.0"
+  },
+  "nodeModulesDir": "auto"
+}
