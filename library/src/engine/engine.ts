@@ -22,6 +22,7 @@ import {
 } from './types'
 
 export class Engine {
+  aliasPrefix = ''
   #signals = new SignalsRoot()
   #plugins: AttributePlugin[] = []
   #actions: ActionPlugins = {}
@@ -74,6 +75,12 @@ export class Engine {
       }
       if (globalInitializer) {
         globalInitializer(ctx)
+      }
+    }
+
+    for (const p of this.#plugins) {
+      if (!p.name.startsWith(this.aliasPrefix)) {
+        p.name = this.aliasPrefix + p.name[0].toUpperCase() + p.name.slice(1)
       }
     }
 
@@ -218,7 +225,8 @@ export class Engine {
     //
     // [^;]
     //
-    const statementRe = /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;])+/gm
+    const statementRe =
+      /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;])+/gm
     const statements = ctx.value.trim().match(statementRe)
     if (statements) {
       const lastIdx = statements.length - 1
