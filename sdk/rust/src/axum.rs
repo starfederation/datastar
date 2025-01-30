@@ -22,11 +22,7 @@ impl Into<Event> for DatastarEvent {
             event = event.id(id);
         }
 
-        if self.retry.as_millis() != crate::consts::DEFAULT_SSE_RETRY_DURATION as u128 {
-            event = event.retry(self.retry);
-        }
-
-        event.data(self.data.join("\n"))
+        event.retry(self.retry).data(self.data.join("\n"))
     }
 }
 
