@@ -23,6 +23,12 @@ Examples:
 [Java SDK](https://github.com/starfederation/datastar/blob/develop/sdk/java)  
 _Author: [Peter Humulock](https://github.com/rphumulock)_
 
+
+## Kotlin
+
+[Kotlin SDK](https://github.com/starfederation/datastar/tree/main/sdk/kotlin)  
+_Author: [Peter Humulock](https://github.com/MikeDepies)_
+
 ## PHP
 
 [PHP SDK](https://github.com/starfederation/datastar-php)  
