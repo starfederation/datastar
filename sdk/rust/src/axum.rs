@@ -30,7 +30,7 @@ impl IntoResponse for DatastarEvent {
     fn into_response(self) -> Response {
         (
             [
-                (http::header::CONTENT_TYPE, mime::TEXT_EVENT_STREAM.as_ref()),
+                (http::header::CONTENT_TYPE, "text/event-stream"),
                 (http::header::CACHE_CONTROL, "no-cache"),
                 (http::header::CONNECTION, "keep-alive"),
             ],
