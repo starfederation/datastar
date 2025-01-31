@@ -96,6 +96,22 @@ RSpec.describe Datastar::Dispatcher do
     end
   end
 
+  describe '#stream' do
+    it 'writes multiple events to socket' do
+      dispatcher.stream do |sse|
+        sse.merge_fragments %(<div id="foo">\n<span>hello</span>\n</div>\n)
+        sse.merge_signals(foo: 'bar')
+      end
+
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines.size).to eq(2)
+      expect(socket.lines[0]).to eq("event: datastar-merge-fragments\ndata: fragments <div id=\"foo\">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n")
+      expect(socket.lines[1]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n")
+    end
+  end
+
   private
 
   def build_request(path, body: nil, content_type: 'application/json', accept: 'text/event-stream')
