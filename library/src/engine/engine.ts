@@ -30,7 +30,7 @@ export class Engine {
   #actions: ActionPlugins = {}
   #watchers: WatcherPlugin[] = []
 
-  // Map of cleanup functions by element, keyed by the raw key and value
+  // Map of cleanup functions by element, keyed by the dataset key and value
   #removals = new Map<Element, Map<string, OnRemovalFn>>()
 
   constructor() {
@@ -74,19 +74,12 @@ export class Engine {
 
               const el = target as HTMLorSVGElement
               const datasetKey = camelize(attributeName.slice(datasetPrefix.length))
-              const rawKey = this.#getRawKey(datasetKey)
-              const plugin = this.#getPluginByKey(rawKey)
 
-              // Skip if no plugin is found
-              if (!plugin) break
-              
-              const removeOnLoad = plugin.removeOnLoad?.(rawKey)
-
-              // If the value has changed and the plugin attribute is not removed on load, clean up the old value
-              if (oldValue !== null && el.dataset[datasetKey] !== oldValue && !removeOnLoad) {
+              // If the value has changed, clean up the old value
+              if (oldValue !== null && el.dataset[datasetKey] !== oldValue) {
                 const elRemovals = this.#removals.get(el)
                 if (elRemovals) {
-                  const rk = removalKey(rawKey, oldValue)
+                  const rk = removalKey(datasetKey, oldValue)
                   const removalFn = elRemovals.get(rk)
                   if (removalFn) {
                     removalFn()
@@ -95,7 +88,10 @@ export class Engine {
                 }
               }
 
-              this.#applyAttributePlugin(el, datasetKey)
+              // Apply the plugin only if the dataset value exists
+              if (el.dataset[datasetKey] !== undefined) {
+                this.#applyAttributePlugin(el, datasetKey)
+              }
             }
             break
           }
@@ -190,7 +186,7 @@ export class Engine {
 
   #applyAttributePlugin(el: HTMLorSVGElement, datasetKey: string) {
     // Extract the raw key from the dataset
-    const rawKey = this.#getRawKey(datasetKey)
+    const rawKey = lcFirst(datasetKey.slice(this.aliasPrefix.length))
 
     // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically
     // the first match will be the most specific
@@ -271,7 +267,7 @@ export class Engine {
         elRemovals = new Map()
         this.#removals.set(el, elRemovals)
       }
-      elRemovals.set(removalKey(rawKey, value), removalFn)
+      elRemovals.set(removalKey(datasetKey, value), removalFn)
     }
 
     // Remove the attribute if required
@@ -279,14 +275,6 @@ export class Engine {
     if (removeOnLoad && removeOnLoad(rawKey) === true) {
       delete el.dataset[datasetKey]
     }
-  }
-
-  #getRawKey(datasetKey: string) {
-    return lcFirst(datasetKey.slice(this.aliasPrefix.length))
-  }
-
-  #getPluginByKey(rawKey: string) {
-    return this.#plugins.find((p) => rawKey.startsWith(p.name))
   }
 
   #genRX(
