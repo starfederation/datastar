@@ -5,7 +5,7 @@ builder.Services.AddDatastar();
 
 app.MapGet("/", async (IServerSentEventService sse) =>
 {
-    await sse.MergeFragments(@"<div id=""question"">What do you put in a toaster?</div>");
-    await sse.MergeSignals("{foo: {bar: 1}}");
-    await sse.ExecuteScript(@"console.log(""Success!"")");
+    await sse.MergeFragmentsAsync(@"<div id=""question"">What do you put in a toaster?</div>");
+    await sse.MergeSignalsAsync("{foo: {bar: 1}}");
+    await sse.ExecuteScriptAsync(@"console.log(""Success!"")");
 });

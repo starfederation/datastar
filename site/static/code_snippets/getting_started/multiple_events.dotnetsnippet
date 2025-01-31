@@ -1,4 +1,4 @@
-sse.MergeFragments(@"<div id=""question"">...</div>");
-sse.MergeFragments(@"<div id=""instructions"">...</div>");
-sse.MergeSignals("{answer: '...'}");
-sse.MergeSignals("{prize: '...'}");
+sse.MergeFragmentsAsync(@"<div id=""question"">...</div>");
+sse.MergeFragmentsAsync(@"<div id=""instructions"">...</div>");
+sse.MergeSignalsAsync("{answer: '...'}");
+sse.MergeSignalsAsync("{prize: '...'}");
