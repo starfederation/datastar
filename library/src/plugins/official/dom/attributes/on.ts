@@ -24,7 +24,7 @@ export const On: AttributePlugin = {
   keyReq: Requirement.Must,
   valReq: Requirement.Must,
   argNames: [EVT],
-  removeOnLoad: (rawKey: string) => rawKey === 'onLoad',
+  removeOnLoad: (rawKey: string) => rawKey.startsWith('onLoad'),
   onLoad: ({ el, rawKey, key, value, genRX, mods }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
