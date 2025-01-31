@@ -3,8 +3,10 @@
 require_relative 'datastar/version'
 
 module Datastar
-  class Error < StandardError; end
-  # Your code goes here...
+  def self.new(request:, response:)
+    Dispatcher.new(request:, response:)
+  end
 end
 
+require_relative 'datastar/dispatcher'
 require_relative 'datastar/server_sent_event_generator'
