@@ -55,6 +55,13 @@ module Datastar
       @stream << buffer
     end
 
+    def execute_script(script, options = BLANK_OPTIONS)
+      buffer = +"event: datastar-execute-script\n"
+      build_options(options, buffer)
+      buffer << "data: script #{script}\n\n"
+      @stream << buffer
+    end
+
     private
 
     attr_reader :view_context, :stream

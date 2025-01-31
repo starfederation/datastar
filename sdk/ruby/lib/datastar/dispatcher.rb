@@ -45,6 +45,12 @@ module Datastar
       end
     end
 
+    def execute_script(script, options = BLANK_OPTIONS)
+      stream do |stream|
+        stream.execute_script(script, options)
+      end
+    end
+
     def stream(streamer = nil, &block)
       raise SSEUnsupportedError.new(request.get_header(HTTP_ACCEPT)) unless sse?
 

@@ -132,6 +132,24 @@ RSpec.describe Datastar::Dispatcher do
     end
   end
 
+  describe '#execute_script' do
+    it 'produces a streameable response body with D* execute-script' do
+      dispatcher.execute_script %(alert('hello'))
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: script alert('hello')\n\n)])
+    end
+
+    it 'takes D* options' do
+      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: true
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-execute-script\nid: 72\ndata: autoRemove true\ndata: script alert('hello')\n\n)])
+    end
+  end
+
   describe '#stream' do
     it 'writes multiple events to socket' do
       dispatcher.stream do |sse|
