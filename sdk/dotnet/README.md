@@ -31,7 +31,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 // define your signals
-public record DatastarSignals : ISignals
+public record DatastarSignals
 {
     [JsonPropertyName("input")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -60,10 +60,10 @@ app.MapGet("/displayDate", async (IServerSentEventService sse) =>
 app.MapGet("/removeDate", async (IServerSentEventService sse) => { await sse.RemoveFragments("#date"); });
 
 // changeOutput - reads the signals, update the Output, and merge back
-app.MapPost("/changeOutput", async (IServerSentEventService sse, ISignals signals) =>
+app.MapPost("/changeOutput", async (IServerSentEventService sse, ISignalsService dsSignals) =>
 {
-    DatastarSignals dsSignals = (signals as DatastarSignals) ?? throw new InvalidCastException("Unknown ISignals passed");
-    DatastarSignals newSignals = new() { Output = $"Your Input: {dsSignals.Input}" };
-    await sse.MergeSignals(newSignals);
+    DatastarSignals signals = await dsSignals.ReadSignalsAsync<DatastarSignals>();
+    DatastarSignals newSignals = new() { Output = $"Your Input: {signals.Input}" };
+    await sse.MergeSignalsAsync(newSignals.Serialize());
 });
 ```
