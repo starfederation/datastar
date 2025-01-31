@@ -158,6 +158,11 @@ func setupHome(router chi.Router, signals sessions.Store, ns *embeddednats.Serve
 	router.Route("/api", func(apiRouter chi.Router) {
 
 		apiRouter.Get("/search", func(w http.ResponseWriter, r *http.Request) {
+			fromHeaderValue := r.Header.Get(SearchFromHeaderKey)
+			isFromHeader := false
+			if fromHeaderValue == "true" {
+				isFromHeader = true
+			}
 
 			signals := &SiteSearchSignals{}
 
@@ -198,7 +203,11 @@ func setupHome(router chi.Router, signals sessions.Store, ns *embeddednats.Serve
 			signals.SearchFetching = false
 			signals.OpenSearchResults = true
 
-			datastar.NewSSE(w, r).MergeFragmentTempl(SiteSearch(signals, results))
+			if isFromHeader {
+				datastar.NewSSE(w, r).MergeFragmentTempl(HeaderSiteSearch(signals, results))
+			} else {
+				datastar.NewSSE(w, r).MergeFragmentTempl(DrawerSiteSearch(signals, results))
+			}
 
 		})
 		apiRouter.Route("/todos", func(todosRouter chi.Router) {
