@@ -148,6 +148,14 @@ RSpec.describe Datastar::Dispatcher do
       expect(socket.open).to be(false)
       expect(socket.lines).to eq([%(event: datastar-execute-script\nid: 72\ndata: autoRemove true\ndata: script alert('hello')\n\n)])
     end
+
+    it 'takes attributes Hash' do
+      dispatcher.execute_script %(alert('hello')), attributes: { type: 'text/javascript', title: 'alert' }
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: attributes type text/javascript\ndata: attributes title alert\ndata: script alert('hello')\n\n)])
+    end
   end
 
   describe '#stream' do

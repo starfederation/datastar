@@ -71,6 +71,8 @@ module Datastar
         k = camelize(k)
         if (sse_key = SSE_OPTION_MAPPING[k])
           buffer << "#{sse_key}: #{v}\n"
+        elsif v.is_a?(Hash)
+          v.each { |kk, vv| buffer << "data: #{k} #{kk} #{vv}\n" }
         else
           buffer << "data: #{k} #{v}\n"
         end
