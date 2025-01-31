@@ -1,9 +1,8 @@
 //! Axum integration for Datastar.
 
 use {
-    crate::{
-        prelude::{ExecuteScript, MergeFragments, MergeSignals, RemoveFragments, RemoveSignals},
-        DatastarEvent,
+    crate::prelude::{
+        DatastarEvent, ExecuteScript, MergeFragments, MergeSignals, RemoveFragments, RemoveSignals,
     },
     axum::{
         body::Bytes,
@@ -16,27 +15,16 @@ use {
 
 impl Into<Event> for DatastarEvent {
     fn into(self) -> Event {
-        let mut event = Event::default().event(self.event.as_str());
+        let mut event = Event::default();
 
         if let Some(id) = self.id {
             event = event.id(id);
         }
 
-        event.retry(self.retry).data(self.data.join("\n"))
-    }
-}
-
-impl IntoResponse for DatastarEvent {
-    fn into_response(self) -> Response {
-        (
-            [
-                (http::header::CONTENT_TYPE, "text/event-stream"),
-                (http::header::CACHE_CONTROL, "no-cache"),
-                (http::header::CONNECTION, "keep-alive"),
-            ],
-            self.to_string(),
-        )
-            .into_response()
+        event
+            .event(self.event.as_str())
+            .retry(self.retry)
+            .data(self.data.join("\n"))
     }
 }
 
@@ -47,13 +35,6 @@ macro_rules! impls {
                 fn into(self) -> Event {
                     let event: DatastarEvent = self.into();
                     event.into()
-                }
-            }
-
-            impl IntoResponse for $type {
-                fn into_response(self) -> Response {
-                    let event: DatastarEvent = self.into();
-                    event.into_response()
                 }
             }
         )*
@@ -67,23 +48,6 @@ impls!(
     RemoveFragments,
     RemoveSignals
 );
-
-// #[typle(Tuple for 1..=15)]
-// impl<T: Tuple> IntoResponse for DatastarEvent {
-//     fn into_response(&self) -> Res[p] {
-//         typle_fold!(String::new(); i in .. => |acc| acc + &self[[i]].into().to_string())
-//     }
-// }
-
-// macro_rules! impl_wrapped_in_foo {
-//     ($($T:ident),*) => {
-//         impl<$($T),*> WrappedInFoo for ($($T,)*) {
-//             type Tup = ($(Foo<$T>,)*);
-//         }
-//     };
-// }
-
-// all_tuples!(impl_wrapped_in_foo, 0, 15, T);
 
 #[derive(Deserialize)]
 struct DatastarParam {

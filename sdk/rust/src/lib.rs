@@ -20,12 +20,10 @@ mod consts;
 pub mod prelude {
     #[cfg(feature = "axum")]
     pub use crate::axum::ReadSignals;
-    // #[cfg(feature = "rocket")]
-    // pub use crate::rocket::ReadSignals;
     pub use crate::{
         consts::FragmentMergeMode, execute_script::ExecuteScript, merge_fragments::MergeFragments,
         merge_signals::MergeSignals, remove_fragments::RemoveFragments,
-        remove_signals::RemoveSignals,
+        remove_signals::RemoveSignals, DatastarEvent,
     };
 }
 

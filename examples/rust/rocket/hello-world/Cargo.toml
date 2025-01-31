@@ -4,5 +4,5 @@ name = "hello_world"
 version = "0.1.0"
 
 [dependencies]
-datastar = { path = "../../../../sdk/rust", features = ["axum"] }
+datastar = { path = "../../../../sdk/rust", features = ["rocket"] }
 rocket = { version = "0.5.1", features = ["json"] }

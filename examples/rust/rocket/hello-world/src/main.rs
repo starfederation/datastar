@@ -1,4 +1,5 @@
 use {
+    core::time::Duration,
     datastar::prelude::MergeFragments,
     rocket::{
         get, launch,
@@ -6,7 +7,6 @@ use {
         routes,
         serde::{json::Json, Deserialize},
     },
-    std::time::Duration,
 };
 
 #[launch]
@@ -30,7 +30,6 @@ struct Signals {
 #[get("/hello-world?<datastar>")]
 fn hello_world(datastar: Json<Signals>) -> EventStream![] {
     EventStream! {
-
         for i in 0..MESSAGE.len() {
             yield MergeFragments::new(format!("<div id='message'>{}</div>", &MESSAGE[0..i+1])).into();
             std::thread::sleep(Duration::from_millis(datastar.delay));

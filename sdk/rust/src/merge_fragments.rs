@@ -4,8 +4,7 @@
 use {
     crate::{
         consts::{self},
-        prelude::FragmentMergeMode,
-        DatastarEvent,
+        prelude::{DatastarEvent, FragmentMergeMode},
     },
     core::time::Duration,
 };

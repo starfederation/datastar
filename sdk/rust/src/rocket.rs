@@ -1,41 +1,24 @@
 //! Rocket integration for Datastar.
 
 use {
-    crate::{
-        prelude::{ExecuteScript, MergeFragments, MergeSignals, RemoveFragments, RemoveSignals},
-        DatastarEvent,
+    crate::prelude::{
+        DatastarEvent, ExecuteScript, MergeFragments, MergeSignals, RemoveFragments, RemoveSignals,
     },
-    rocket::{
-        http::ContentType,
-        response::{self, stream::Event, Responder},
-        Request, Response,
-    },
-    std::io::Cursor,
+    rocket::response::stream::Event,
 };
 
 impl Into<Event> for DatastarEvent {
     fn into(self) -> Event {
-        let mut event = Event::empty().event(self.event.as_str().to_owned());
+        let mut event = Event::empty();
 
         if let Some(id) = self.id {
             event = event.id(id);
         }
 
-        event.with_retry(self.retry).with_data(self.data.join("\n"))
-    }
-}
-
-#[rocket::async_trait]
-impl<'r> Responder<'r, 'static> for DatastarEvent {
-    fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
-        let body = self.to_string();
-
-        Response::build()
-            .header(ContentType::EventStream)
-            .raw_header("Cache-Control", "no-cache")
-            .raw_header("Connection", "keep-alive")
-            .sized_body(body.len(), Cursor::new(body))
-            .ok()
+        event
+            .event(self.event.as_str().to_owned())
+            .with_retry(self.retry)
+            .with_data(self.data.join("\n"))
     }
 }
 
@@ -46,14 +29,6 @@ macro_rules! impls {
                 fn into(self) -> Event {
                     let event: DatastarEvent = self.into();
                     event.into()
-                }
-            }
-
-            #[rocket::async_trait]
-            impl<'r> Responder<'r, 'static> for $type {
-                fn respond_to(self, req: &'r Request<'_>) -> response::Result<'static> {
-                    let event: DatastarEvent = self.into();
-                    event.respond_to(req)
                 }
             }
         )*

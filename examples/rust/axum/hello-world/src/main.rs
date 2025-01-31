@@ -4,11 +4,8 @@ use {
         routing::get,
         Router,
     },
-    datastar::{
-        prelude::{MergeFragments, ReadSignals},
-        DatastarEvent,
-    },
-    futures::{stream, Stream},
+    core::{convert::Infallible, error::Error, time::Duration},
+    datastar::prelude::{MergeFragments, ReadSignals},
     serde::Deserialize,
     std::{convert::Infallible, error::Error},
     tokio_stream::StreamExt,
