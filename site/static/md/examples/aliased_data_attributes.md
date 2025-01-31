@@ -9,7 +9,7 @@
 
 ## Explanation
 
-This demo uses a bundle with the custom alias `ds`, meaning that data attributes must use the format `data-ds-*`.
+This demo uses a custom bundle with the alias `ds`, meaning that data attributes must use the format `data-ds-*`.
 
 ```html
 <div data-ds-signals-foo="1" data-ds-on-load__delay.1s="$foo++">
