@@ -87,6 +87,12 @@ var Consts = &ConstTemplateData{
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/java",
 		},
 		{
+			FileExtension: "kotlin",
+			Name:          "Kotlin",
+			Icon:          "vscode-icons:file-type-kotlin",
+			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/kotlin",
+		},
+		{
 			FileExtension: "php",
 			Name:          "PHP",
 			Icon:          "vscode-icons:file-type-php",
