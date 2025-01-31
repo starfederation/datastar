@@ -24,7 +24,7 @@ import {
 const removalKey = (k: string, v: string) => `${k}${DSP}${v}`
 
 export class Engine {
-  aliasPrefix: string = ''
+  aliasPrefix = ''
   #signals: SignalsRoot = new SignalsRoot()
   #plugins: AttributePlugin[] = []
   #actions: ActionPlugins = {}
@@ -67,7 +67,7 @@ export class Engine {
             break
           case 'attributes': {
             {
-              const requiredPrefix = datasetPrefix + (this.aliasPrefix ? this.aliasPrefix + '-' : '')
+              const requiredPrefix = datasetPrefix + (this.aliasPrefix ? `${this.aliasPrefix}-` : '')
               if (!attributeName?.startsWith(requiredPrefix)) {
                 break
               }
@@ -75,20 +75,15 @@ export class Engine {
               const el = target as HTMLorSVGElement
               const datasetKey = camelize(attributeName.slice(datasetPrefix.length))
               const rawKey = this.#getRawKey(datasetKey)
-
-              // Ignore plugin attributes that are removed immediately after being applied
               const plugin = this.#getPluginByKey(rawKey)
 
               // Skip if no plugin is found
-              if (!plugin) return
-
-              const removeOnLoad = plugin.removeOnLoad
-              if (removeOnLoad && removeOnLoad(rawKey) === true) {
-                break
-              }
+              if (!plugin) break
               
-              // If the value is not null and has changed, clean up the old value
-              if (oldValue !== null && el.dataset[datasetKey] !== oldValue) {
+              const removeOnLoad = plugin.removeOnLoad?.(rawKey)
+
+              // If the value has changed and the plugin attribute is not removed on load, clean up the old value
+              if (oldValue !== null && el.dataset[datasetKey] !== oldValue && !removeOnLoad) {
                 const elRemovals = this.#removals.get(el)
                 if (elRemovals) {
                   const rk = removalKey(rawKey, oldValue)
