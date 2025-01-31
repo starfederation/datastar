@@ -57,10 +57,12 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
         try {
           const startedStream = onStart(generator);
           if (startedStream instanceof Promise) await startedStream;
-        } catch (error: unknown) {
+        } catch (error) {
           const abortResult = options && options.onAbort
             ? options.onAbort(
-              error.message ?? "onStart callback threw an error",
+              error instanceof Error
+                ? error.message
+                : "onStart callback threw an error",
             )
             : null;
 
