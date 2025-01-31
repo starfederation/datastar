@@ -39,6 +39,12 @@ module Datastar
       end
     end
 
+    def remove_signals(paths, options = BLANK_OPTIONS)
+      stream do |stream|
+        stream.remove_signals(paths, options)
+      end
+    end
+
     def stream(streamer = nil, &block)
       raise SSEUnsupportedError.new(request.get_header(HTTP_ACCEPT)) unless sse?
 

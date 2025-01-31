@@ -45,6 +45,16 @@ module Datastar
       @stream << buffer
     end
 
+    def remove_signals(paths, options = BLANK_OPTIONS)
+      paths = [paths].flatten
+
+      buffer = +"event: datastar-remove-signals\n"
+      build_options(options, buffer)
+      paths.each { |path| buffer << "data: paths #{path}\n" }
+      buffer << "\n"
+      @stream << buffer
+    end
+
     private
 
     attr_reader :view_context, :stream
