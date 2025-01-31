@@ -14,7 +14,7 @@ While it is generally recommended against, you can manually import the Datastar 
 <script type="module">
     import { Datastar } from '/path/to/datastar.js'
     
-    Datastar.load()
+    console.log(Datastar.signals.values())
 </script>
 ```
 

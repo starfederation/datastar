@@ -62,6 +62,7 @@ func createBundles(version string) error {
 		EntryPoints: []string{
 			"library/src/bundles/datastar-core.ts",
 			"library/src/bundles/datastar.ts",
+			"library/src/bundles/datastar-aliased.ts",
 		},
 		Banner: map[string]string{
 			"js": "// Datastar v" + version,

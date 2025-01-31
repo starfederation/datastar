@@ -24,8 +24,8 @@ import {
 const removalKey = (k: string, v: string) => `${k}${DSP}${v}`
 
 export class Engine {
-  aliasPrefix = 'ds'
-  #signals = new SignalsRoot()
+  aliasPrefix: string = ''
+  #signals: SignalsRoot = new SignalsRoot()
   #plugins: AttributePlugin[] = []
   #actions: ActionPlugins = {}
   #watchers: WatcherPlugin[] = []
