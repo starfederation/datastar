@@ -70,6 +70,24 @@ RSpec.describe Datastar::Dispatcher do
     end
   end
 
+  describe '#remove_fragments' do
+    it 'produces D* remove fragments' do
+      dispatcher.remove_fragments('#list-item-1')
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-remove-fragments\ndata: selector #list-item-1\n\n)])
+    end
+
+    it 'takes D* options' do
+      dispatcher.remove_fragments('#list-item-1', id: 72, settle_duration: 1000)
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-remove-fragments\nid: 72\ndata: settleDuration 1000\ndata: selector #list-item-1\n\n)])
+    end
+  end
+
   describe '#merge_signals' do
     it 'produces a streameable response body with D* signals' do
       dispatcher.merge_signals %({ "foo": "bar" })

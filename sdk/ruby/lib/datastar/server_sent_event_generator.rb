@@ -29,6 +29,13 @@ module Datastar
       @stream << buffer
     end
 
+    def remove_fragments(selector, options = BLANK_OPTIONS)
+      buffer = +"event: datastar-remove-fragments\n"
+      build_options(options, buffer)
+      buffer << "data: selector #{selector}\n\n"
+      @stream << buffer
+    end
+
     def merge_signals(signals, options = BLANK_OPTIONS)
       signals = JSON.dump(signals) unless signals.is_a?(String)
 

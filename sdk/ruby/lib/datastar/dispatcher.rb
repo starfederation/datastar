@@ -27,6 +27,12 @@ module Datastar
       end
     end
 
+    def remove_fragments(selector, options = BLANK_OPTIONS)
+      stream do |stream|
+        stream.remove_fragments(selector, options)
+      end
+    end
+
     def merge_signals(signals, options = BLANK_OPTIONS)
       stream do |stream|
         stream.merge_signals(signals, options)
