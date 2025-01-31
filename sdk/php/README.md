@@ -30,12 +30,10 @@ use starfederation\datastar\enums\EventType;
 use starfederation\datastar\enums\FragmentMergeMode;
 use starfederation\datastar\ServerSentEventGenerator;
 
+// If your framework has its own way of sending response headers, you must manually send the headers returned by `ServerSentEventGenerator::headers()` before creating a new instance of `ServerSentEventGenerator`.
+
 // Creates a new `ServerSentEventGenerator` instance.
 $sse = new ServerSentEventGenerator();
-
-// Sends the response headers. 
-// If your framework has its own way of sending response headers, manually send the headers returned by `ServerSentEventGenerator::headers()` instead.
-$sse->sendHeaders();
 
 // Merges HTML fragments into the DOM.
 $sse->mergeFragments('<div></div>', [
