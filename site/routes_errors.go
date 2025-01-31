@@ -149,6 +149,7 @@ func setupErrors(router chi.Router) error {
 		"sse_invalid_content_type":           runtimeFn(SseInvalidContentType),
 		"sse_no_url_provided":                runtimeFn(SseNoUrlProvided),
 		"text_invalid_element":               runtimeFn(TextInvalidElement),
+		"text_value_required":                runtimeFn(TextValueRequired),
 	}
 
 	sidebarLinks := make([]*SidebarLink, 0, len(reasonComponents))
