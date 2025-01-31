@@ -1,14 +1,14 @@
 use {
+    async_stream::try_stream,
     axum::{
-        response::{sse::Event, Html, IntoResponse, Sse},
+        response::{sse::Event, Html, Sse},
         routing::get,
         Router,
     },
     core::{convert::Infallible, error::Error, time::Duration},
     datastar::prelude::{MergeFragments, ReadSignals},
     serde::Deserialize,
-    std::{convert::Infallible, error::Error},
-    tokio_stream::StreamExt,
+    tokio_stream::Stream,
     tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
 };
 
@@ -52,14 +52,10 @@ pub struct Signals {
 async fn hello_world(
     ReadSignals(signals): ReadSignals<Signals>,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let mut i = 0;
-
-    let stream = stream::repeat_with(move || -> Result<Event, Infallible> {
-        i += 1;
-        Ok(MergeFragments::new(format!("<div id='message'>{}</div>", &MESSAGE[0..i])).into())
+    Sse::new(try_stream! {
+        for i in 0..MESSAGE.len() {
+            yield MergeFragments::new(format!("<div id='message'>{}</div>", &MESSAGE[0..i + 1])).into();
+            tokio::time::sleep(Duration::from_millis(signals.delay)).await;
+        }
     })
-    .throttle(std::time::Duration::from_millis(signals.delay))
-    .take(MESSAGE.len());
-
-    axum::response::Sse::new(stream)
 }
