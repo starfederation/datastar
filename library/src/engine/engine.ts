@@ -1,5 +1,5 @@
 import { Hash, elUniqId } from '../utils/dom'
-import { camelize } from '../utils/text'
+import { camelize, lcFirst } from '../utils/text'
 import { debounce } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS } from './consts'
@@ -24,7 +24,7 @@ import {
 const removalKey = (k: string, v: string) => `${k}${DSP}${v}`
 
 export class Engine {
-  aliasPrefix = ''
+  aliasPrefix = 'ds'
   #signals = new SignalsRoot()
   #plugins: AttributePlugin[] = []
   #actions: ActionPlugins = {}
@@ -34,7 +34,7 @@ export class Engine {
   #removals = new Map<Element, Map<string, OnRemovalFn>>()
 
   constructor() {
-    const dsPrefix = 'data-'
+    const datasetPrefix = 'data-'
 
     const ob = new MutationObserver((mutations) => {
       for (const {
@@ -67,18 +67,31 @@ export class Engine {
             break
           case 'attributes': {
             {
-              if (!attributeName?.startsWith(dsPrefix)) {
+              const requiredPrefix = datasetPrefix + (this.aliasPrefix ? this.aliasPrefix + '-' : '')
+              if (!attributeName?.startsWith(requiredPrefix)) {
                 break
               }
 
               const el = target as HTMLorSVGElement
-              const rawKey = camelize(attributeName.slice(dsPrefix.length))
+              const datasetKey = camelize(attributeName.slice(datasetPrefix.length))
 
-              // If the value is not null and has changed, cleanup the old value
-              if (oldValue !== null && el.dataset[rawKey] !== oldValue) {
+              // Ignore plugin attributes that are removed immediately after being applied
+              const rawKey = this.#getRawKey(datasetKey)
+              const plugin = this.#getPluginByKey(rawKey)
+
+              // Skip if no plugin is found
+              if (!plugin) return
+
+              const removeOnLoad = plugin.removeOnLoad
+              if (removeOnLoad && removeOnLoad(rawKey) === true) {
+                break
+              }
+              
+              // If the value is not null and has changed, clean up the old value
+              if (oldValue !== null && el.dataset[datasetKey] !== oldValue) {
                 const elRemovals = this.#removals.get(el)
                 if (elRemovals) {
-                  const rk = removalKey(rawKey, oldValue)
+                  const rk = removalKey(datasetKey, oldValue)
                   const removalFn = elRemovals.get(rk)
                   if (removalFn) {
                     removalFn()
@@ -87,7 +100,7 @@ export class Engine {
                 }
               }
 
-              this.#applyAttributePlugin(el, rawKey)
+              this.#applyAttributePlugin(el, datasetKey)
             }
             break
           }
@@ -146,12 +159,6 @@ export class Engine {
       }
     }
 
-    for (const p of this.#plugins) {
-      if (!p.name.startsWith(this.aliasPrefix)) {
-        p.name = this.aliasPrefix + p.name[0].toUpperCase() + p.name.slice(1)
-      }
-    }
-
     // Sort attribute plugins by descending length then alphabetically
     this.#plugins.sort((a, b) => {
       const lenDiff = b.name.length - a.name.length
@@ -180,13 +187,16 @@ export class Engine {
 
       // Apply the plugins to the element in order of application
       // since DOMStringMap is ordered, we can be deterministic
-      for (const rawKey of Object.keys(el.dataset)) {
-        this.#applyAttributePlugin(el, rawKey)
+      for (const datasetKey of Object.keys(el.dataset)) {
+        this.#applyAttributePlugin(el, datasetKey)
       }
     })
   }
 
-  #applyAttributePlugin(el: HTMLorSVGElement, rawKey: string) {
+  #applyAttributePlugin(el: HTMLorSVGElement, datasetKey: string) {
+    // Extract the raw key from the dataset
+    const rawKey = this.#getRawKey(datasetKey)
+
     // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically
     // the first match will be the most specific
     const plugin = this.#plugins.find((p) => rawKey.startsWith(p.name))
@@ -197,16 +207,15 @@ export class Engine {
     // Ensure the element has an id
     if (!el.id.length) el.id = elUniqId(el)
 
-    // Extract the key and value from the dataset
+    // Extract the key and modifiers
     let [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/\_\_+/)
 
     const hasKey = key.length > 0
     if (hasKey) {
       // Keys starting with a dash are not converted to camel case in the dataset
-      const keySlice1 = key.slice(1)
-      key = key.startsWith('-') ? keySlice1 : key[0].toLowerCase() + keySlice1
+      key = key.startsWith('-') ? key.slice(1) : lcFirst(key)
     }
-    const value = el.dataset[rawKey] || ''
+    const value = el.dataset[datasetKey] || ''
     const hasValue = value.length > 0
 
     // Create the runtime context
@@ -271,7 +280,18 @@ export class Engine {
     }
 
     // Remove the attribute if required
-    if (plugin?.removeOnLoad) delete el.dataset[rawKey]
+    const removeOnLoad = plugin.removeOnLoad
+    if (removeOnLoad && removeOnLoad(rawKey) === true) {
+      delete el.dataset[datasetKey]
+    }
+  }
+
+  #getRawKey(datasetKey: string) {
+    return lcFirst(datasetKey.slice(this.aliasPrefix.length))
+  }
+
+  #getPluginByKey(rawKey: string) {
+    return this.#plugins.find((p) => rawKey.startsWith(p.name))
   }
 
   #genRX(
