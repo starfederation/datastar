@@ -30,7 +30,7 @@ export class Engine {
   #actions: ActionPlugins = {}
   #watchers: WatcherPlugin[] = []
 
-  // Map of cleanup functions by element, keyed by the raw dataset key and value
+  // Map of cleanup functions by element, keyed by the raw key and value
   #removals = new Map<Element, Map<string, OnRemovalFn>>()
 
   constructor() {
@@ -74,9 +74,9 @@ export class Engine {
 
               const el = target as HTMLorSVGElement
               const datasetKey = camelize(attributeName.slice(datasetPrefix.length))
+              const rawKey = this.#getRawKey(datasetKey)
 
               // Ignore plugin attributes that are removed immediately after being applied
-              const rawKey = this.#getRawKey(datasetKey)
               const plugin = this.#getPluginByKey(rawKey)
 
               // Skip if no plugin is found
@@ -91,7 +91,7 @@ export class Engine {
               if (oldValue !== null && el.dataset[datasetKey] !== oldValue) {
                 const elRemovals = this.#removals.get(el)
                 if (elRemovals) {
-                  const rk = removalKey(datasetKey, oldValue)
+                  const rk = removalKey(rawKey, oldValue)
                   const removalFn = elRemovals.get(rk)
                   if (removalFn) {
                     removalFn()
