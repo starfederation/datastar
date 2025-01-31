@@ -44,12 +44,13 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.merge_fragments(
         %(<div id="foo">\n<span>hello</span>\n</div>\n),
         id: 72,
-        retry_duration: 2000
+        retry_duration: 2000,
+        settle_duration: 1000
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\ndata: id 72\ndata: retryDuration 2000\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: settleDuration 1000\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n)])
     end
   end
 
@@ -68,6 +69,14 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
       expect(socket.lines).to eq([%(event: datastar-merge-signals\ndata: signals {"foo":"bar"}\n\n)])
+    end
+
+    it 'takes D* options' do
+      dispatcher.merge_signals({foo: 'bar'}, event_id: 72, retry_duration: 2000, only_if_missing: true)
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-merge-signals\nid: 72\nretry: 2000\ndata: onlyIfMissing true\ndata: signals {"foo":"bar"}\n\n)])
     end
   end
 

@@ -4,6 +4,13 @@ require 'json'
 
 module Datastar
   class ServerSentEventGenerator
+    SSE_OPTION_MAPPING = {
+      'eventId' => 'id',
+      'retryDuration' => 'retry',
+      'id' => 'id',
+      'retry' => 'retry',
+    }.freeze
+
     def initialize(stream, view_context: nil)
       @stream = stream
       @view_context = view_context
@@ -12,32 +19,37 @@ module Datastar
     def merge_fragments(fragments, options = BLANK_OPTIONS)
       # Support Phlex components
       fragments = fragments.call(view_context:) if fragments.respond_to?(:call)
+      fragment_lines = fragments.to_s.split("\n")
 
-      data = build_options(options)
-      data_lines = fragments.to_s.split("\n")
-      data.concat(data_lines.map { |d| "fragments #{d}" })
+      buffer = +"event: datastar-merge-fragments\n"
+      build_options(options, buffer)
+      fragment_lines.each { |line| buffer << "data: fragments #{line}\n" }
 
-      data_str = data.map { |d| "data: #{d}" }.join("\n")
-      @stream << %(event: datastar-merge-fragments\n#{data_str}\n\n)
+      buffer << "\n"
+      @stream << buffer
     end
 
     def merge_signals(signals, options = BLANK_OPTIONS)
       signals = JSON.dump(signals) unless signals.is_a?(String)
 
-      data = build_options(options)
-      data.concat([%(signals #{signals})])
-
-      data_str = data.map { |d| "data: #{d}" }.join("\n")
-      @stream << %(event: datastar-merge-signals\n#{data_str}\n\n)
+      buffer = +"event: datastar-merge-signals\n"
+      build_options(options, buffer)
+      buffer << "data: signals #{signals}\n\n"
+      @stream << buffer
     end
 
     private
 
     attr_reader :view_context, :stream
 
-    def build_options(options)
-      options.each.with_object([]) do |(k, v), acc|
-        acc << "#{camelize(k)} #{v}"
+    def build_options(options, buffer)
+      options.each do |k, v|
+        k = camelize(k)
+        if (sse_key = SSE_OPTION_MAPPING[k])
+          buffer << "#{sse_key}: #{v}\n"
+        else
+          buffer << "data: #{k} #{v}\n"
+        end
       end
     end
 
