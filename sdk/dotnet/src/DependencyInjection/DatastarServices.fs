@@ -25,7 +25,7 @@ and ISignals =
 
 and ServerSentEventService (handler:ISendServerEvent) =
     new (httpContext:HttpContext) =
-        ServerSentEventService (DatastarHttpHandlers httpContext)
+        ServerSentEventService (ServerSentEventHttpHandlers httpContext.Response)
     new (httpContextAccessor:IHttpContextAccessor) =
         ServerSentEventService httpContextAccessor.HttpContext
 
@@ -47,7 +47,7 @@ and ServerSentEventService (handler:ISendServerEvent) =
 
 and ReadSignalsService (handler:IReadSignals) =
     new (httpContext:HttpContext) =
-        ReadSignalsService (DatastarHttpHandlers httpContext)
+        ReadSignalsService (SignalsHttpHandlers httpContext.Request)
     new (httpContextAccessor:IHttpContextAccessor) =
         ReadSignalsService httpContextAccessor.HttpContext
 

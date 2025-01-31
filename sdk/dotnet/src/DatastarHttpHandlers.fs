@@ -57,24 +57,30 @@ module DatastarHttpHandlers =
         httpResponse.BodyWriter.WriteAsync(bytes).AsTask()
 
 /// <summary>
-/// Implementation of IDatastarHandler, for sending SSEs to the HttpResponse and
-/// reading the Signals from the HttpRequest
+/// Implementation of ISendServerEvent, for sending SSEs to the HttpResponse
 /// </summary>
-type DatastarHttpHandlers (httpContext:HttpContext) =
+type ServerSentEventHttpHandlers (httpResponse:HttpResponse) =
     do
-        let startResponseTask = DatastarHttpHandlers.startResponse httpContext.Response
+        let startResponseTask = DatastarHttpHandlers.startResponse httpResponse
         startResponseTask.GetAwaiter().GetResult()
 
-    member _.HttpContext = httpContext
+    member _.HttpResponse = httpResponse
 
     interface ISendServerEvent with
-        member this.SendServerEvent (event:ServerSentEvent) = DatastarHttpHandlers.sendServerEvent this.HttpContext.Response event
+        member this.SendServerEvent (event:ServerSentEvent) = DatastarHttpHandlers.sendServerEvent this.HttpResponse event
+
+/// <summary>
+/// Implementation of ISignal, for reading the Signals from the HttpRequest
+/// </summary>
+type SignalsHttpHandlers (httpRequest:HttpRequest) =
+
+    member _.HttpRequest = httpRequest
 
     interface IReadSignals with
-        member this.ReadSignals () = DatastarHttpHandlers.readSignals this.HttpContext.Request
+        member this.ReadSignals () = DatastarHttpHandlers.readSignals this.HttpRequest
         member this.ReadSignals<'T> () =
             let tt = task {
-                let! rawSignals = DatastarHttpHandlers.readSignals this.HttpContext.Request
+                let! rawSignals = DatastarHttpHandlers.readSignals this.HttpRequest
                 let ret =
                     match rawSignals with
                     | ValueNone -> ValueNone
