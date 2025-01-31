@@ -2,12 +2,12 @@ namespace StarFederation.Datastar
 
 open System.Threading.Tasks
 
+/// <summary>
+/// Converts requests into SSEs, serializes, and sends to client
+/// </summary>
 module ServerSentEventGenerator =
 
-    let send env sse =
-        let sendEvent (env:ISendServerEvent) event = env.SendServerEvent(event)
-        let serializedEvent = sse |> ServerSentEvent.serialize
-        sendEvent env serializedEvent
+    let send (env:ISendServerEvent) sse = env.SendServerEvent sse
 
     let mergeFragmentsWithOptions (options:MergeFragmentsOptions) env fragments =
         { EventType = MergeFragments
@@ -35,13 +35,13 @@ module ServerSentEventGenerator =
         |> send env
     let removeFragments env = removeFragmentsWithOptions RemoveFragmentsOptions.defaults env
 
-    let mergeSignalsWithOptions (options:MergeSignalsOptions) env (mergeSignalData:ISignals) : Task =
+    let mergeSignalsWithOptions (options:MergeSignalsOptions) env (mergeSignals:Signals) : Task =
         { EventType = MergeSignals
           Id = options.EventId
           Retry = options.Retry
           DataLines = [|
             if (options.OnlyIfMissing <> Consts.DefaultMergeSignalsOnlyIfMissing) then $"{Consts.DatastarDatalineOnlyIfMissing} %A{options.OnlyIfMissing}"
-            yield! (mergeSignalData.Serialize() |> Utility.splitLine |> Seq.map (fun dataLine -> $"{Consts.DatastarDatalineSignals} %s{dataLine}"))
+            yield! mergeSignals |> Signals.value |> Utility.splitLine |> Seq.map (fun dataLine -> $"{Consts.DatastarDatalineSignals} %s{dataLine}")
             |] }
        |> send env
     let mergeSignals env = mergeSignalsWithOptions MergeSignalsOptions.defaults env
