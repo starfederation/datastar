@@ -1,6 +1,0 @@
-@HelloWorld_HostAddress = http://localhost:5214
-
-GET {{HelloWorld_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
