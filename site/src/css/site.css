@@ -27,8 +27,7 @@ pre code {
 .search-results {
     z-index: 99;
     max-height: 400px;
-    min-width: 100%;
-    /* same width as input */
+    min-width: clamp(100%, 90vw, 400px);
     position: absolute;
     top: 100%;
     margin-top: .5rem;

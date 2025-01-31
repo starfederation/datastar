@@ -115,11 +115,11 @@ type SearchResult struct {
 }
 
 templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult) {
-	<div id="site_search" class="hidden lg:flex lg:gap-4 relative" data-signals={templ.JSONString(signals)}>
-		<div>
+	<div id="site_search" data-signals={templ.JSONString(signals)} class="w-full">
+		<div class="flex flex-nowrap w-full">
 			<input 
 				id="site_search_input" 
-				class="flex-1 input input-bordered h-8" 
+				class="flex-1 input input-bordered h-8 w-full" 
 				type="search"
 				placeholder="Search..."
 				data-bind="siteSearch"
@@ -134,9 +134,14 @@ templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult) {
 				id="search_results" 
 				class={
 					"search-results", 
-					templ.KV("-left-full", len(searchResults) > 0) 
+					"w-[90vw]",
+					"lg:w-full",
+					"relative",
+					"lg:absolute",
+					templ.KV("lg:-left-full", len(searchResults) > 0) 
 				} 
-				data-on-click__outside="$openSearchResults ? $openSearchResults = false : null" 
+				data-on-click__outside="$openSearchResults ? $openSearchResults = false : null"
+				data-on-keydown__window="evt.key == 'Escape' && $openSearchResults ? $openSearchResults = false : null" 
 				data-show="$openSearchResults">
 				if len(searchResults) > 0 {
 					for _, result := range searchResults {
@@ -172,7 +177,9 @@ templ header(r *http.Request) {
 			<div class="hidden lg:text-md lg:text-lg lg:flex lg:gap-4 lg:visible ">
 				@headerTopLevelLinks(r)
 			</div>
-			@SiteSearch(&SiteSearchSignals{SearchFetching: false}, []SearchResult{})
+			<div class="hidden lg:flex lg:gap-4 relative z-10">
+				@SiteSearch(&SiteSearchSignals{SearchFetching: false}, []SearchResult{})
+			</div>
 			<div class="hidden text-xl lg:flex lg:gap-4 lg:visible">
 				@headerExternalLinks()
 			</div>
@@ -221,7 +228,10 @@ templ SidebarPage(
 			</div>
 			<aside class="drawer-side">
 				<label for="sidebar-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-				<ul class="min-h-full px-4 menu w-80 bg-base-300 text-base-content">
+				<div id="mobile_site_search" class="flex lg:hidden z-10 p-4 w-80">
+					@SiteSearch(&SiteSearchSignals{SearchFetching: false}, []SearchResult{})
+				</div>
+				<ul class="min-h-full pt-8 px-4 menu w-80 bg-base-300 text-base-content">
 					@SidebarContents(sidebarGroups, current)
 				</ul>
 			</aside>
