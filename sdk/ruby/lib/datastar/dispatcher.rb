@@ -21,7 +21,21 @@ module Datastar
       @request.get_header(HTTP_ACCEPT) == SSE_CONTENT_TYPE
     end
 
+    def merge_fragments(fragments, options = BLANK_OPTIONS)
+      stream do |stream|
+        stream.merge_fragments(fragments, options)
+      end
+    end
+
+    def merge_signals(signals, options = BLANK_OPTIONS)
+      stream do |stream|
+        stream.merge_signals(signals, options)
+      end
+    end
+
     def stream(streamer = nil, &block)
+      raise SSEUnsupportedError.new(request.get_header(HTTP_ACCEPT)) unless sse?
+
       streamer ||= block
 
       body = proc do |out|

@@ -3,8 +3,18 @@
 require_relative 'datastar/version'
 
 module Datastar
-  def self.new(request:, response:)
-    Dispatcher.new(request:, response:)
+  BLANK_OPTIONS = {}.freeze
+
+  Error = Class.new(StandardError)
+
+  class SSEUnsupportedError < Error
+    def initialize(accept)
+      super("Server Sent Events are not supported for Accept: #{accept}")
+    end
+  end
+
+  def self.new(request:, response:, view_context: nil)
+    Dispatcher.new(request:, response:, view_context:)
   end
 end
 
