@@ -258,6 +258,13 @@ templ TextInvalidElement(name string, info *RuntimeErrorInfo) {
 	}
 }
 
+templ TextValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("text")
+		@attributeDocs("text")
+	}
+}
+
 templ attrError() {
 	<p>The <code>data-attr</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are attribute names and the values are expressions.</p>
 	@sampleCode("Example", "html", `<div data-attr-disabled="$foo"></div>`)

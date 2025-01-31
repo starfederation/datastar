@@ -41,13 +41,6 @@ func extractVersion() (string, error) {
 
 	version := strings.TrimSpace(string(versionBytes))
 
-	// Write out the version to the version file.
-	versionPath := "library/src/engine/version.ts"
-	versionContents := fmt.Sprintf("export const VERSION = '%s';\n", version)
-	if err := os.WriteFile(versionPath, []byte(versionContents), 0o644); err != nil {
-		return "", fmt.Errorf("error writing version file: %w", err)
-	}
-
 	return version, nil
 }
 

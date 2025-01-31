@@ -19,11 +19,6 @@ export class Hash {
     return this
   }
 
-  reset(): Hash {
-    this.#value = 0
-    return this
-  }
-
   get value() {
     return this.#prefix + Math.abs(this.#value).toString(36)
   }

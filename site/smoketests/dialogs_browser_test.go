@@ -9,7 +9,7 @@ import (
 )
 
 func TestExampleDialogsBrowser(t *testing.T) {
-	t.Skip("Skip sortable test because it's flaky")
+	t.Skip("Skip test because it's flaky")
 	setupPageTest(t, "examples/dialogs_browser", func(runner runnerFn) {
 		runner("launch dialog", func(t *testing.T, page *rod.Page) {
 			btn := page.MustElement("#dialogs")
