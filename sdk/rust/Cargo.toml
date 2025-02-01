@@ -11,8 +11,10 @@ readme = "README.md"
 version = "0.1.0"
 
 [dev-dependencies]
+async-stream = "0.3.6"
 axum = { version = "0.8.1" }
 tokio = { version = "1.43.0", features = ["full"] }
+tokio-stream = "0.1.17"
 
 [dependencies]
 axum = { version = "0.8.1", default-features = false, optional = true, features = [

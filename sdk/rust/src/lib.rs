@@ -8,6 +8,9 @@ pub mod axum;
 #[cfg(feature = "rocket")]
 pub mod rocket;
 
+#[cfg(test)]
+mod testing;
+
 pub mod execute_script;
 pub mod merge_fragments;
 pub mod merge_signals;
