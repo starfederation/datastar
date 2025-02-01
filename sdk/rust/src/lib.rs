@@ -5,42 +5,62 @@
 
 #[cfg(feature = "axum")]
 pub mod axum;
-mod consts;
+#[cfg(feature = "rocket")]
+pub mod rocket;
+
+#[cfg(test)]
+mod testing;
+
 pub mod execute_script;
 pub mod merge_fragments;
 pub mod merge_signals;
 pub mod remove_fragments;
 pub mod remove_signals;
 
+mod consts;
+
 ///
 pub mod prelude {
     #[cfg(feature = "axum")]
-    pub use crate::axum::{IntoResponse, ReadSignals};
+    pub use crate::axum::ReadSignals;
     pub use crate::{
         consts::FragmentMergeMode, execute_script::ExecuteScript, merge_fragments::MergeFragments,
         merge_signals::MergeSignals, remove_fragments::RemoveFragments,
-        remove_signals::RemoveSignals, ServerSentEventGenerator,
+        remove_signals::RemoveSignals, DatastarEvent,
     };
 }
 
-use typle::{typle, typle_fold};
+use {core::time::Duration, std::fmt::Display};
 
-/// [`ServerSentEventGenerator`] is a trait that represents a Datastar event.
-pub trait ServerSentEventGenerator {
-    /// Serializes the event into a Server-Sent Event (SSE) string.
-    fn send(&self) -> String;
+#[derive(Debug)]
+/// TODO
+pub struct DatastarEvent {
+    /// TODO
+    pub event: consts::EventType,
+    /// TODO
+    pub id: Option<String>,
+    /// TODO
+    pub retry: Duration,
+    /// TODO
+    pub data: Vec<String>,
 }
 
-#[typle(Tuple for 1..=15)]
-impl<T: Tuple + ServerSentEventGenerator> ServerSentEventGenerator for T {
-    fn send(&self) -> String {
-        typle_fold!(String::new(); i in .. => |acc| acc + &self[[i]].send())
-    }
-}
+impl Display for DatastarEvent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "event: {}", self.event.as_str())?;
 
-impl<T: ServerSentEventGenerator> ServerSentEventGenerator for Vec<T> {
-    fn send(&self) -> String {
-        self.iter()
-            .fold(String::new(), |acc, event| acc + &event.send())
+        if let Some(id) = &self.id {
+            writeln!(f, "id: {}", id)?;
+        }
+
+        writeln!(f, "retry: {}", self.retry.as_millis())?;
+
+        for line in &self.data {
+            writeln!(f, "data: {}", line)?;
+        }
+
+        write!(f, "\n\n")?;
+
+        Ok(())
     }
 }

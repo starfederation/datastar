@@ -1,41 +1,56 @@
 //! Axum integration for Datastar.
 
 use {
-    crate::prelude::*,
+    crate::prelude::{
+        DatastarEvent, ExecuteScript, MergeFragments, MergeSignals, RemoveFragments, RemoveSignals,
+    },
     axum::{
         body::Bytes,
         extract::{FromRequest, Query, Request},
         http::{self},
-        response::{IntoResponse as AxumIntoResponse, Response},
+        response::{sse::Event, IntoResponse, Response},
     },
     serde::{de::DeserializeOwned, Deserialize},
 };
 
-fn into_response<T: ServerSentEventGenerator>(event: T) -> Response {
-    (
-        [
-            (http::header::CONTENT_TYPE, mime::TEXT_EVENT_STREAM.as_ref()),
-            (http::header::CACHE_CONTROL, "no-cache"),
-        ],
-        event.send(),
-    )
-        .into_response()
-}
+impl Into<Event> for DatastarEvent {
+    fn into(self) -> Event {
+        let mut event = Event::default();
 
-/// [`IntoResponse`] is a trait that converts a type into an Axum response. Import this instead of `axum::response::IntoResponse`.
-pub trait IntoResponse {
-    /// Create a response.
-    fn into_response(self) -> Response;
-}
+        if let Some(id) = self.id {
+            event = event.id(id);
+        }
 
-impl<T: ServerSentEventGenerator> IntoResponse for T {
-    fn into_response(self) -> Response {
-        into_response(self)
+        event
+            .event(self.event.as_str())
+            .retry(self.retry)
+            .data(self.data.join("\n"))
     }
 }
 
+macro_rules! impls {
+    ($($type:ty),*) => {
+        $(
+            impl Into<Event> for $type {
+                fn into(self) -> Event {
+                    let event: DatastarEvent = self.into();
+                    event.into()
+                }
+            }
+        )*
+    };
+}
+
+impls!(
+    ExecuteScript,
+    MergeFragments,
+    MergeSignals,
+    RemoveFragments,
+    RemoveSignals
+);
+
 #[derive(Deserialize)]
-struct DatastarQuery {
+struct DatastarParam {
     datastar: serde_json::Value,
 }
 
@@ -71,9 +86,9 @@ where
     async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
         let json = match *req.method() {
             http::Method::GET => {
-                let query = Query::<DatastarQuery>::from_request(req, state)
+                let query = Query::<DatastarParam>::from_request(req, state)
                     .await
-                    .map_err(AxumIntoResponse::into_response)?;
+                    .map_err(IntoResponse::into_response)?;
 
                 let signals = query.0.datastar.as_str().ok_or(
                     (http::StatusCode::BAD_REQUEST, "Failed to parse JSON").into_response(),
@@ -84,7 +99,7 @@ where
             _ => {
                 let body = Bytes::from_request(req, state)
                     .await
-                    .map_err(AxumIntoResponse::into_response)?;
+                    .map_err(IntoResponse::into_response)?;
 
                 serde_json::from_slice(&body)
             }
@@ -99,84 +114,33 @@ where
 mod tests {
     use {
         crate::{
+            consts,
             prelude::{
                 ExecuteScript, FragmentMergeMode, MergeFragments, MergeSignals, ReadSignals,
                 RemoveFragments, RemoveSignals,
             },
-            ServerSentEventGenerator,
+            testing::{Signals, TestEvent},
         },
+        async_stream::try_stream,
         axum::{
-            http,
-            response::{IntoResponse, Response},
+            response::{sse::Event, Sse},
             routing::{get, post},
             Router,
         },
-        core::time::Duration,
-        serde::Deserialize,
-        serde_json::Value,
+        core::{convert::Infallible, time::Duration},
         tokio::net::TcpListener,
+        tokio_stream::Stream,
     };
 
-    #[derive(Deserialize)]
-    #[serde(tag = "type", rename_all = "camelCase")]
-    pub enum ServerSentEvent {
-        #[serde(rename_all = "camelCase")]
-        ExecuteScript {
-            script: String,
-            event_id: Option<String>,
-            retry_duration: Option<u64>,
-            attributes: Option<Value>,
-            auto_remove: Option<bool>,
-        },
-        #[serde(rename_all = "camelCase")]
-        MergeFragments {
-            fragments: String,
-            event_id: Option<String>,
-            retry_duration: Option<u64>,
-            selector: Option<String>,
-            merge_mode: Option<String>,
-            settle_duration: Option<u64>,
-            use_view_transition: Option<bool>,
-        },
-        #[serde(rename_all = "camelCase")]
-        MergeSignals {
-            signals: Value,
-            event_id: Option<String>,
-            retry_duration: Option<u64>,
-            only_if_missing: Option<bool>,
-        },
-        #[serde(rename_all = "camelCase")]
-        RemoveFragments {
-            selector: String,
-            event_id: Option<String>,
-            retry_duration: Option<u64>,
-            settle_duration: Option<u64>,
-            use_view_transition: Option<bool>,
-        },
-        #[serde(rename_all = "camelCase")]
-        RemoveSignals {
-            paths: Vec<String>,
-            event_id: Option<String>,
-            retry_duration: Option<u64>,
-        },
-    }
+    async fn test(
+        ReadSignals(signals): ReadSignals<Signals>,
+    ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+        Sse::new(try_stream! {
+            for event in signals.events {
+                let event: TestEvent = serde_json::from_value(event).unwrap();
 
-    #[derive(Deserialize)]
-    pub struct Signals {
-        events: Vec<Value>,
-    }
-
-    async fn test(ReadSignals(signals): ReadSignals<Signals>) -> Response {
-        let events = signals
-            .events
-            .into_iter()
-            .map(|event| {
-                println!("input: {:#?}", event);
-
-                let event = serde_json::from_value::<ServerSentEvent>(event).unwrap();
-
-                match event {
-                    ServerSentEvent::ExecuteScript {
+                yield match event {
+                    TestEvent::ExecuteScript {
                         script,
                         event_id,
                         retry_duration,
@@ -199,13 +163,13 @@ mod tests {
                         ExecuteScript {
                             script,
                             id: event_id,
-                            retry_duration: Duration::from_millis(retry_duration.unwrap_or(1000)),
+                            retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
                             attributes,
-                            auto_remove: auto_remove.unwrap_or(true),
+                            auto_remove: auto_remove.unwrap_or(consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE),
                         }
-                        .send()
+                        .into()
                     }
-                    ServerSentEvent::MergeFragments {
+                    TestEvent::MergeFragments {
                         fragments,
                         event_id,
                         retry_duration,
@@ -226,20 +190,20 @@ mod tests {
                                 "upsertAttributes" => FragmentMergeMode::UpsertAttributes,
                                 _ => unreachable!(),
                             })
-                            .unwrap_or(FragmentMergeMode::Morph);
+                            .unwrap_or_default();
 
                         MergeFragments {
                             fragments,
                             id: event_id,
-                            retry_duration: Duration::from_millis(retry_duration.unwrap_or(1000)),
+                            retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
                             selector,
                             merge_mode,
-                            settle_duration: Duration::from_millis(settle_duration.unwrap_or(300)),
-                            use_view_transition: use_view_transition.unwrap_or(false),
+                            settle_duration: Duration::from_millis(settle_duration.unwrap_or(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION)),
+                            use_view_transition: use_view_transition.unwrap_or(consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS),
                         }
-                        .send()
+                        .into()
                     }
-                    ServerSentEvent::MergeSignals {
+                    TestEvent::MergeSignals {
                         signals,
                         event_id,
                         retry_duration,
@@ -247,11 +211,11 @@ mod tests {
                     } => MergeSignals {
                         signals: serde_json::to_string(&signals).unwrap(),
                         id: event_id,
-                        retry_duration: Duration::from_millis(retry_duration.unwrap_or(1000)),
-                        only_if_missing: only_if_missing.unwrap_or(false),
+                        retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
+                        only_if_missing: only_if_missing.unwrap_or(consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING),
                     }
-                    .send(),
-                    ServerSentEvent::RemoveFragments {
+                    .into(),
+                    TestEvent::RemoveFragments {
                         selector,
                         event_id,
                         retry_duration,
@@ -260,35 +224,24 @@ mod tests {
                     } => RemoveFragments {
                         selector,
                         id: event_id,
-                        retry_duration: Duration::from_millis(retry_duration.unwrap_or(1000)),
-                        settle_duration: Duration::from_millis(settle_duration.unwrap_or(300)),
-                        use_view_transition: use_view_transition.unwrap_or(false),
+                        retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
+                        settle_duration: Duration::from_millis(settle_duration.unwrap_or(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION)),
+                        use_view_transition: use_view_transition.unwrap_or(consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS),
                     }
-                    .send(),
-                    ServerSentEvent::RemoveSignals {
+                    .into(),
+                    TestEvent::RemoveSignals {
                         paths,
                         event_id,
                         retry_duration,
                     } => RemoveSignals {
                         paths,
                         id: event_id,
-                        retry_duration: Duration::from_millis(retry_duration.unwrap_or(1000)),
+                        retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
                     }
-                    .send(),
+                    .into(),
                 }
-            })
-            .fold(String::new(), |acc, event| acc + &event);
-
-        println!("output: {}", events);
-
-        (
-            [
-                (http::header::CONTENT_TYPE, "text/event-stream"),
-                (http::header::CACHE_CONTROL, "no-cache"),
-            ],
-            events,
-        )
-            .into_response()
+            }
+        })
     }
 
     #[tokio::test]
