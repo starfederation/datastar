@@ -26,6 +26,7 @@ templ BindKeyOrValueRequired(name string, info *RuntimeErrorInfo) {
 
 templ BindUnsupportedSignalType(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
+		<p>The <code>data-bind</code> attribute was bound to a signal that is unsupported. The <code>data-bind</code> attribute may only be used with signals of the following type: <code>number</code>, <code>string</code>, <code>boolean</code>, <code>array</code>.</p>
 		@attributeDocs("bind")
 	}
 }
@@ -66,7 +67,21 @@ templ CustomValidityInvalidElement(name string, info *RuntimeErrorInfo) {
 
 templ CustomValidityInvalidExpression(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>An invalid expression was provided to the <code>data-custom-validity</code> attribute. The expression must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.</p>
+		<p>An invalid expression was provided to the <code>data-custom-validity</code> attribute.</p>
+		@customValidityError()
+	}
+}
+
+templ CustomValidityKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("custom-validity", info.Expression.Key)
+		@customValidityError()
+	}
+}
+
+templ CustomValidityValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("custom-validity")
 		@customValidityError()
 	}
 }
@@ -150,6 +165,34 @@ templ GenerateExpression(name string, info *RuntimeErrorInfo) {
 	}
 }
 
+templ IndicatorKeyAndValueProvided(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyAndValueProvided("indicator")
+		@indicatorError()
+	}
+}
+
+templ IndicatorKeyOrValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyOrValueRequired("indicator")
+		@indicatorError()
+	}
+}
+
+templ IntersectsKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("intersects", info.Expression.Key)
+		@intersectsError()
+	}
+}
+
+templ IntersectsValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("intersects")
+		@intersectsError()
+	}
+}
+
 templ InvalidContentType(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		if info.URL == "" {
@@ -176,11 +219,88 @@ templ InvalidFileResultType(name string, info *RuntimeErrorInfo) {
 	}
 }
 
+templ OnKeyRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyRequired("on")
+		@onError()
+	}
+}
+
+templ OnValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("on")
+		@onError()
+	}
+}
+
+templ RefKeyAndValueProvided(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyAndValueProvided("ref")
+		@refError()
+	}
+}
+
+templ RefKeyOrValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyOrValueRequired("ref")
+		@refError()
+	}
+}
+
+templ ReplaceUrlKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("replace-url", info.Expression.Key)
+		@replaceUrlError()
+	}
+}
+
+templ ReplaceUrlValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("replace-url")
+		@replaceUrlError()
+	}
+}
+
 templ ScrollIntoViewInvalidElement(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
-		<p>The <code>data-scroll-into-view</code> attribute was placed on an invalid element. It may only be placed on an HTML element.</p>
+		<p>The <code>data-scroll-into-view</code> attribute was placed on an invalid element. It may only be placed on an HTML element or an SVG element.</p>
 		@sampleCode("Example", "html", `<div data-scroll-into-view></div>`)
 		@attributeDocs("scroll-into-view")
+	}
+}
+
+templ ScrollIntoViewKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("scroll-into-view", info.Expression.Key)
+		@scrollIntoViewError()
+	}
+}
+
+templ ScrollIntoViewValueNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueNotAllowed("scroll-into-view", info.Expression.Value)
+		@scrollIntoViewError()
+	}
+}
+
+templ ShowKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("show", info.Expression.Key)
+		@showError()
+	}
+}
+
+templ ShowValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("show")
+		@showError()
+	}
+}
+
+templ SignalsValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("signals")
+		@signalsError()
 	}
 }
 
@@ -258,10 +378,31 @@ templ TextInvalidElement(name string, info *RuntimeErrorInfo) {
 	}
 }
 
+templ TextKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("text", info.Expression.Key)
+		@textError()
+	}
+}
+
 templ TextValueRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@valueRequired("text")
-		@attributeDocs("text")
+		@textError()
+	}
+}
+
+templ ViewTransitionKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("view-transition", info.Expression.Key)
+		@viewTransitionError()
+	}
+}
+
+templ ViewTransitionValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("view-transition")
+		@viewTransitionError()
 	}
 }
 
@@ -293,6 +434,7 @@ templ computedError() {
 }
 
 templ customValidityError() {
+	<p>The <code>data-intersects</code> attribute must <em>only</em> have a value, representing an expression that must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.</p>
 	@sampleCode("Example", "html", `<form>
 	<input data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" 
 		   data-bind-foo
@@ -306,8 +448,78 @@ templ customValidityError() {
 	@attributeDocs("custom-validity")
 }
 
+templ indicatorError() {
+	<p>The <code>data-indicator</code> attribute must have either a key <em>or</em> a value, representing the name of a signal. The signal will be assigned the <code>value</code> true when an SSE request is in-flight, otherwise it will be <code>false</code>.</p>
+	@sampleCode("Example", "html", `<div data-indicator-foo></div>`)
+	@sampleCode("Alternative syntax", "html", `<div data-indicator="foo"></div>`)
+	@attributeDocs("indicator")
+}
+
+templ intersectsError() {
+	<p>The <code>data-intersects</code> attribute must <em>only</em> have a value, representing an expression to run when the element intersects with the viewport.</p>
+	@sampleCode("Example", "html", `<div data-intersects="console.log('I am intersecting!')"></div>`)
+	@attributeDocs("intersects")
+}
+
+templ onError() {
+	<p>The <code>data-on</code> attribute <em>must</em> have a key representing the event listener to attach to the element, and a value representing an expression to execute when the event listener is triggered.</p>
+	@sampleCode("Example", "html", `<button data-on-click="alert($foo)">Click Me</button>`)
+	@attributeDocs("on")
+}
+
+templ refError() {
+	<p>The <code>data-ref</code> attribute must have either a key <em>or</em> a value, representing the name of a signal. The signal will be assigned the element as its value.</p>
+	@sampleCode("Example", "html", `<div data-ref-foo></div>`)
+	@attributeDocs("ref")
+}
+
+templ replaceUrlError() {
+	<p>The <code>data-replace-url</code> attribute must <em>only</em> have a value, representing an expression that evaluates to a URL to replace in the browser without reloading the page.</p>
+	@sampleCode("Example", "html", `<div data-replace-url="'?page=1'"></div>`)
+	@attributeDocs("replace-url")
+}
+
+templ scrollIntoViewError() {
+	<p> The <code>data-scroll-into-view</code> attribute must <em>not</em> have a key <em>nor</em> a value.</p>
+	@sampleCode("Example", "html", `<div data-scroll-into-view></div>`)
+	@attributeDocs("scroll-into-view")
+}
+
+templ showError() {
+	<p> The <code>data-show</code> attribute must <em>only</em> have a value, representing an expression evaluating to <code>true</code> or <code>false</code>, which determines whether to show or hide the element, respectively.</p>
+	@sampleCode("Example", "html", `<div data-show="$foo"></div>`)
+	@attributeDocs("show")
+}
+
+templ signalsError() {
+	<p>The <code>data-signalsError</code> attribute <em>must</em> have a value, representing either an expression (if a key is provided), or an object of key-value pairs, where the keys are signal names and the values are expressions.</p>
+	@sampleCode("Example", "html", `<div data-signals-foo="1"></div>`)
+	@sampleCode("Alternative syntax", "html", `<div data-signals="{foo: 1}"></div>`)
+	@attributeDocs("signals")
+}
+
+templ textError() {
+	<p>The <code>data-text</code> attribute must <em>only</em> have a value, representing an expression that is evaluated and used as the text content of the element.</p>
+	@sampleCode("Example", "html", `<div data-text="$foo"></div>`)
+	@attributeDocs("text")
+}
+
+templ viewTransitionError() {
+	<p>The <code>data-view-transition</code> attribute must <em>only</em> have a value, representing a <code>view-transition-name</code>.</p>
+	@sampleCode("Example", "html", `<div data-view-transition="$foo"></div>`)
+	@attributeDocs("view-transition")
+}
+
+templ keyNotAllowed(pluginName string, key string) {
+	<p>The key { key } was provided to the <code>data-{ pluginName }</code> attribute.</p>
+}
+
 templ keyRequired(pluginName string) {
 	<p>No key was provided to the <code>data-{ pluginName }</code> attribute.</p>
+}
+
+templ valueNotAllowed(pluginName string, value string) {
+	<p>The value { value } was provided to the <code>data-{ pluginName }</code> attribute.</p>
 }
 
 templ valueRequired(pluginName string) {
