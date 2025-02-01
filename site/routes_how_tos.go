@@ -20,6 +20,7 @@ func setupHowTos(ctx context.Context, router chi.Router) error {
 		{
 			Label: "Guide",
 			Links: []*SidebarLink{
+				{ID: "how_to_bind_keydown_events_to_specific_keys"},
 				{ID: "how_to_poll_the_backend_at_regular_intervals"},
 				{ID: "how_to_redirect_the_page_from_the_backend"},
 				{ID: "how_to_stream_sse_events_with_a_user_defined _delay"},
