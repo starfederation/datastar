@@ -88,8 +88,8 @@ export class Engine {
                 }
               }
 
-              // Apply the plugin only if the dataset value exists
-              if (el.dataset[datasetKey] !== undefined) {
+              // Apply the plugin only if the dataset key exists
+              if (datasetKey in el.dataset) {
                 this.#applyAttributePlugin(el, datasetKey)
               }
             }
