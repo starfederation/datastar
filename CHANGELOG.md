@@ -2,6 +2,10 @@
 
 ## v1.0.0-beta.3
 
+### Added
+
+- Added the ability to use an alias prefix when using the [bundler](https://data-star.dev/bundler). This makes it possible to use `data-customPrefix-*` attributes instead of `data-*`, and should only be used as a last resort.
+
 ### Changed
 
 - Changed the `data-on-interval` attribute to accept a `__duration` modifier instead of a `__delay` modifier ([#513](https://github.com/starfederation/datastar/issues/513)).
