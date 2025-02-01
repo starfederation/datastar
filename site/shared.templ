@@ -251,7 +251,7 @@ templ SidebarPage(
 			<aside class="drawer-side">
 				<label for="sidebar-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
 				@DrawerSiteSearch(&SiteSearchSignals{SearchFetching: false}, []SearchResult{})
-				<ul class="min-h-full pt-8 px-4 menu w-80 bg-base-300 text-base-content">
+				<ul class="min-h-full pt-[4rem] px-4 menu w-80 bg-base-300 text-base-content">
 					@SidebarContents(sidebarGroups, current)
 				</ul>
 			</aside>
