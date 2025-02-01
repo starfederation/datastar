@@ -80,12 +80,6 @@ impl Into<DatastarEvent> for MergeSignals {
     fn into(self) -> DatastarEvent {
         let mut data: Vec<String> = Vec::new();
 
-        data.push(format!(
-            "{} {}",
-            consts::SIGNALS_DATALINE_LITERAL,
-            self.signals
-        ));
-
         if self.only_if_missing != consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING {
             data.push(format!(
                 "{} {}",

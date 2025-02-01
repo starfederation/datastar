@@ -59,6 +59,8 @@ impl Display for DatastarEvent {
             writeln!(f, "data: {}", line)?;
         }
 
+        write!(f, "\n\n")?;
+
         Ok(())
     }
 }

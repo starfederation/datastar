@@ -131,14 +131,6 @@ impl Into<DatastarEvent> for MergeFragments {
             ));
         }
 
-        if let Some(selector) = &self.selector {
-            data.push(format!(
-                "{} {}",
-                consts::SELECTOR_DATALINE_LITERAL,
-                selector
-            ));
-        }
-
         if self.merge_mode != FragmentMergeMode::default() {
             data.push(format!(
                 "{} {}",

@@ -91,11 +91,6 @@ impl Into<DatastarEvent> for ExecuteScript {
     fn into(self) -> DatastarEvent {
         let mut data: Vec<String> = Vec::new();
 
-        data.push(format!(
-            "event: {}",
-            consts::EventType::ExecuteScript.as_str()
-        ));
-
         if self.auto_remove != consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE {
             data.push(format!(
                 "{} {}",
