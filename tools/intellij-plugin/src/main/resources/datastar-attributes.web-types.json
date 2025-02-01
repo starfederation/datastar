@@ -9,7 +9,10 @@
     "js": {
       "events": [
         {
-          "name": "signal-change"
+          "name": "interval"
+        },
+        {
+          "name": "signals-change"
         },
         {
           "name": "raf"
@@ -39,24 +42,36 @@
           "description": "Debounce the event listener"
         },
         {
-          "name": "debounce_1000ms",
-          "description": "Debounce for 1000ms"
+          "name": "debounce.500ms",
+          "description": "Debounce for 1000 milliseconds"
         },
         {
-          "name": "debounce_1s",
-          "description": "Debounce for 1s"
+          "name": "debounce.1s",
+          "description": "Debounce for 1 second"
         },
         {
-          "name": "debounce_leading",
+          "name": "debounce.leading",
           "description": "Debounce with leading edge"
         },
         {
-          "name": "debounce_noTrail",
+          "name": "debounce.notrail",
           "description": "Debounce without trailing edge"
         },
         {
-          "name": "throttle",
-          "description": "Throttle the event listener"
+          "name": "delay",
+          "description": "Delay the event listener"
+        },
+        {
+          "name": "delay.1s",
+          "description": "Delay for 1 second"
+        },
+        {
+          "name": "duration",
+          "description": "The interval duration"
+        },
+        {
+          "name": "duration.500ms",
+          "description": "Set an interval duration of 500 milliseconds"
         },
         {
           "name": "once",
@@ -71,19 +86,23 @@
           "description": "Do not call `preventDefault` on the event listener"
         },
         {
-          "name": "throttle_1000ms",
-          "description": "Throttle for 1000ms"
+          "name": "throttle",
+          "description": "Throttle the event listener"
         },
         {
-          "name": "throttle_1s",
-          "description": "Throttle for 1s"
+          "name": "throttle.500ms",
+          "description": "Throttle for 500 milliseconds"
         },
         {
-          "name": "throttle_noLead",
+          "name": "throttle.1s",
+          "description": "Throttle for 1 second"
+        },
+        {
+          "name": "throttle.nolead",
           "description": "Throttle without leading edge"
         },
         {
-          "name": "throttle_noTrail",
+          "name": "throttle.notrail",
           "description": "Throttle without trailing edge"
         },
         {
