@@ -29,6 +29,10 @@ RSpec.describe Datastar::Dispatcher do
     it 'sets Cache-Control to no-cache' do
       expect(dispatcher.response['Cache-Control']).to eq('no-cache')
     end
+
+    it 'sets Connection to keep-alive' do
+      expect(dispatcher.response['Connection']).to eq('keep-alive')
+    end
   end
 
   describe '#merge_fragments' do

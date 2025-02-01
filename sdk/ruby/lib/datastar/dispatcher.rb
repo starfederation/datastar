@@ -14,6 +14,7 @@ module Datastar
       @response = Rack::Response.new(BLANK_BODY, 200, response.headers)
       @response.content_type = SSE_CONTENT_TYPE
       @response.headers['Cache-Control'] = 'no-cache'
+      @response.headers['Connection'] = 'keep-alive'
       @response.delete_header 'Content-Length'
     end
 
