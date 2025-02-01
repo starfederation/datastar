@@ -8,7 +8,7 @@ Real-time Hypermedia first Library and Framework for dotnet
 <html lang="en">
 <head>
     <script type="module"
-            src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.2/bundles/datastar.js"></script>
+            src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.3/bundles/datastar.js"></script>
     <title>D* Demo</title>
 </head>
 <body>

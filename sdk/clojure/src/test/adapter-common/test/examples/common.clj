@@ -19,7 +19,7 @@
 
 ;; NOTE: Monitor the datastar cdn version
 (def datastar
-  (script "module" "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.2/bundles/datastar.js"))
+  (script "module" "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.3/bundles/datastar.js"))
 
 (defn scaffold [content & {:as _}]
   (hc/compile
