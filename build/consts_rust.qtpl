@@ -1,0 +1,73 @@
+{%- func rustConsts(data *ConstTemplateData) -%}
+// {%s data.DoNotEdit %}
+
+pub const DATASTAR_KEY: &str = "{%s data.DatastarKey %}";
+pub const VERSION: &str = "{%s data.Version %}";
+
+// #region Defaults
+
+// #region Default durations
+
+{%- for _, d := range data.DefaultDurations -%}
+/// {%s= d.Description %}
+pub const DEFAULT_{%s d.Name.ScreamingSnake %}: u64 = {%d durationToMs(d.Duration) %};
+{%- endfor -%}
+
+// #endregion
+
+// #region Default strings
+
+{%- for _, s := range data.DefaultStrings -%}
+/// {%s= s.Description %}
+pub const DEFAULT_{%s s.Name.ScreamingSnake %}: &str = "{%s s.Value %}";
+{%- endfor -%}
+
+// #endregion
+
+// #region Datalines
+
+{%- for _, literal := range data.DatalineLiterals -%}
+pub const {%s literal.ScreamingSnake %}_DATALINE_LITERAL: &str = "{%s literal.Camel %}";
+{%- endfor -%}
+
+// #endregion
+
+// #region Default booleans
+
+{%- for _, b := range data.DefaultBools -%}
+/// {%s= b.Description %}
+pub const DEFAULT_{%s b.Name.ScreamingSnake %}: bool = {%v b.Value %};
+{%- endfor -%}
+
+// #endregion
+
+// #region Enums
+
+{%- for _, enum := range data.Enums -%}
+/// {%s= enum.Description %}
+#[derive({%- if enum.Default != nil-%}Default,{%- endif -%} Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum {%s enum.Name.Pascal %} {
+{%- for _, entry := range enum.Values -%}
+    /// {%s= entry.Description %}
+{%- if enum.Default != nil && enum.Default.Value == entry.Value -%}
+    #[default]
+{%- endif -%}
+    {%s entry.Name.Pascal %},
+{%- endfor -%}
+}
+
+impl {%s enum.Name.Pascal %} {
+    /// Returns the [`{%s enum.Name.Pascal %}`] as a string.
+    pub const fn as_str(&self) -> &str {
+        match self {
+{%- for _, entry := range enum.Values -%}
+            Self::{%s entry.Name.Pascal %} => "{%s entry.Value %}",
+{%- endfor -%}
+        }
+    }
+}
+{%- endfor -%}
+// #endregion
+
+// #endregion
+{%- endfunc -%}

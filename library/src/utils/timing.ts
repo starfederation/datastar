@@ -3,16 +3,11 @@ export type TimerHandler = (...args: any[]) => void
 export function delay(
   callback: TimerHandler,
   wait: number,
-  leading = false,
 ): TimerHandler {
-  return function wrapper(...args: any[]) {
-    if (leading) {
+  return (...args: any[]) => {
+    setTimeout(() => {
       callback(...args)
-    } else {
-      setTimeout(() => {
-        callback(...args)
-      }, wait)
-    }
+    }, wait)
   }
 }
 
@@ -26,7 +21,7 @@ export function debounce(
 
   const resetTimer = () => timer && clearTimeout(timer)
 
-  return function wrapper(...args: any[]) {
+  return (...args: any[]) => {
     resetTimer()
 
     if (leading && !timer) {
@@ -50,7 +45,7 @@ export function throttle(
 ): TimerHandler {
   let waiting = false
 
-  return function wrapper(...args: any[]) {
+  return (...args: any[]) => {
     if (waiting) return
 
     if (leading) {

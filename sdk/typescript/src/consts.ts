@@ -2,7 +2,7 @@
 
 export const DATASTAR = "datastar" as const;
 export const DATASTAR_REQUEST = "Datastar-Request";
-export const VERSION = "1.0.0-beta.2";
+export const VERSION = "1.0.0-beta.3";
 
 // #region Defaults
 
@@ -18,7 +18,7 @@ export const DefaultSseRetryDurationMs = 1000;
 
 // #region Default strings
 
-// The default attributes for <script/> element use when executing scripts. It is a set of of key-value pairs delimited by a newline \\n character.
+// The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
 export const DefaultExecuteScriptAttributes = "type module";
 
 // #endregion

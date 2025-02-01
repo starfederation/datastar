@@ -1,1 +1,15 @@
-{"events": [ { "type": "executeScript", "script": "console.log('hello');", "eventId": 1, "retryDuration": 2000,  "attributes": { "type": "text/javascript", "blocking": false }, "autoRemove": false}]}
+{
+  "events": [
+    {
+      "type": "executeScript",
+      "script": "console.log('hello');",
+      "eventId": "event1",
+      "retryDuration": 2000,
+      "attributes": {
+        "type": "text/javascript",
+        "blocking": false
+      },
+      "autoRemove": false
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+{:paths ["src/main"]
+ :deps {ring/ring-jetty-adapter {:mvn/version "1.13.0"}}}

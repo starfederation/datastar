@@ -10,7 +10,7 @@ use starfederation\datastar\enums\FragmentMergeMode;
 class Consts
 {
     public const DATASTAR_KEY = 'datastar';
-    public const VERSION = '1.0.0-beta.2';
+    public const VERSION = '1.0.0-beta.3';
 
     // The default duration for settling during fragment merges. Allows for CSS transitions to complete.
     public const DEFAULT_FRAGMENTS_SETTLE_DURATION = 300;
@@ -27,7 +27,7 @@ class Consts
     // Should script element remove itself after execution?
     public const DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE = true;
 
-    // The default attributes for <script/> element use when executing scripts. It is a set of of key-value pairs delimited by a newline \\n character.}
+    // The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.}
     public const DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = 'type module';
 
     // The mode in which a fragment is merged into the DOM.

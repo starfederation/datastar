@@ -101,27 +101,15 @@ function morphOldNodeTo(oldNode: Element, newContent: Element, ctx: any) {
   if (ctx.ignoreActive && oldNode === document.activeElement) {
     // don't morph focused element
   } else if (newContent == null) {
-    if (ctx.callbacks.beforeNodeRemoved(oldNode) === false) return
-
     oldNode.remove()
-    ctx.callbacks.afterNodeRemoved(oldNode)
     return
   } else if (!isSoftMatch(oldNode, newContent)) {
-    if (ctx.callbacks.beforeNodeRemoved(oldNode) === false) return
-    if (ctx.callbacks.beforeNodeAdded(newContent) === false) return
-
     if (!oldNode.parentElement) {
       throw internalErr(from, 'NoParentElementFound', { oldNode })
     }
     oldNode.parentElement.replaceChild(newContent, oldNode)
-    ctx.callbacks.afterNodeAdded(newContent)
-    ctx.callbacks.afterNodeRemoved(oldNode)
     return newContent
   } else {
-    if (ctx.callbacks.beforeNodeMorphed(oldNode, newContent) === false) {
-      return
-    }
-
     if (oldNode instanceof HTMLHeadElement && ctx.head.ignore) {
       // ignore the head element
     } else if (
@@ -134,7 +122,6 @@ function morphOldNodeTo(oldNode: Element, newContent: Element, ctx: any) {
       syncNodeFrom(newContent, oldNode)
       morphChildren(newContent, oldNode, ctx)
     }
-    ctx.callbacks.afterNodeMorphed(oldNode, newContent)
     return oldNode
   }
 }
@@ -173,10 +160,7 @@ function morphChildren(newParent: Element, oldParent: Element, ctx: any) {
 
     // if we are at the end of the exiting parent's children, just append
     if (insertionPoint == null) {
-      if (ctx.callbacks.beforeNodeAdded(newChild) === false) return
-
       oldParent.appendChild(newChild)
-      ctx.callbacks.afterNodeAdded(newChild)
       removeIdsFromConsideration(ctx, newChild)
       continue
     }
@@ -219,10 +203,7 @@ function morphChildren(newParent: Element, oldParent: Element, ctx: any) {
 
     // abandon all hope of morphing, just insert the new child before the insertion point
     // and move on
-    if (ctx.callbacks.beforeNodeAdded(newChild) === false) return
-
     oldParent.insertBefore(newChild, insertionPoint)
-    ctx.callbacks.afterNodeAdded(newChild)
     removeIdsFromConsideration(ctx, newChild)
   }
 
@@ -384,30 +365,24 @@ function handleHeadElement(
     if (!newElt) {
       throw internalErr(from, 'NewElementCouldNotBeCreated', { newNode })
     }
-    if (ctx.callbacks.beforeNodeAdded(newElt)) {
-      if (newElt.hasAttribute('href') || newElt.hasAttribute('src')) {
-        let resolver: (value: unknown) => void
-        const promise = new Promise((resolve) => {
-          resolver = resolve
-        })
-        newElt.addEventListener('load', () => {
-          resolver(undefined)
-        })
-        promises.push(promise)
-      }
-      currentHead.appendChild(newElt)
-      ctx.callbacks.afterNodeAdded(newElt)
-      added.push(newElt)
+    if (newElt.hasAttribute('href') || newElt.hasAttribute('src')) {
+      let resolver: (value: unknown) => void
+      const promise = new Promise((resolve) => {
+        resolver = resolve
+      })
+      newElt.addEventListener('load', () => {
+        resolver(undefined)
+      })
+      promises.push(promise)
     }
+    currentHead.appendChild(newElt)
+    added.push(newElt)
   }
 
   // remove all removed elements, after we have appended the new elements to avoid
   // additional network requests for things like style sheets
   for (const removedElement of removed) {
-    if (ctx.callbacks.beforeNodeRemoved(removedElement) !== false) {
-      currentHead.removeChild(removedElement)
-      ctx.callbacks.afterNodeRemoved(removedElement)
-    }
+    currentHead.removeChild(removedElement)
   }
 
   ctx.head.afterHeadMorphed(currentHead, {
@@ -436,17 +411,6 @@ function createMorphContext(
     ignoreActive: config.ignoreActive,
     idMap: createIdMap(oldNode, newContent),
     deadIds: new Set(),
-    callbacks: Object.assign(
-      {
-        beforeNodeAdded: noOp,
-        afterNodeAdded: noOp,
-        beforeNodeMorphed: noOp,
-        afterNodeMorphed: noOp,
-        beforeNodeRemoved: noOp,
-        afterNodeRemoved: noOp,
-      },
-      config.callbacks,
-    ),
     head: Object.assign(
       {
         style: 'merge',
@@ -721,10 +685,7 @@ function scoreElement(node1: Element, node2: Element, ctx: any) {
 
 function removeNode(tempNode: Element, ctx: any) {
   removeIdsFromConsideration(ctx, tempNode)
-  if (ctx.callbacks.beforeNodeRemoved(tempNode) === false) return
-
   tempNode.remove()
-  ctx.callbacks.afterNodeRemoved(tempNode)
 }
 
 //=============================================================================

@@ -1,0 +1,4 @@
+sse.MergeFragmentsAsync(@"<div id=""question"">...</div>");
+sse.MergeFragmentsAsync(@"<div id=""instructions"">...</div>");
+sse.MergeSignalsAsync("{answer: '...'}");
+sse.MergeSignalsAsync("{prize: '...'}");

@@ -6,9 +6,9 @@ import "time"
 
 const (
     DatastarKey = "datastar"
-    Version                   = "1.0.0-beta.2"
-    VersionClientByteSize     = 36410
-    VersionClientByteSizeGzip = 13273
+    Version                   = "1.0.0-beta.3"
+    VersionClientByteSize     = 36870
+    VersionClientByteSizeGzip = 13685
 
     //region Default durations
 
@@ -21,7 +21,7 @@ const (
 
     //region Default strings
 
-    // The default attributes for <script/> element use when executing scripts. It is a set of of key-value pairs delimited by a newline \\n character.
+    // The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
     DefaultExecuteScriptAttributes = "type module"
 
     //endregion Default strings
