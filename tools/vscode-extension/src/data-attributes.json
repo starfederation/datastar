@@ -175,10 +175,10 @@
       }
     ]
   },
-  "data-on-signal-change": {
-    "prefix": "data-on-signal-change",
-    "body": "data-on-signal-change=\"${1:expression}\"",
-    "description": "Executes an expression whenever a signal changes.",
+  "data-on-signals-change": {
+    "prefix": "data-on-signals-change",
+    "body": "data-on-signals-change=\"${1:expression}\"",
+    "description": "Executes an expression whenever any signals change.",
     "references": [
       {
         "name": "Documentation",
