@@ -9,10 +9,10 @@ import (
 	"strings"
 )
 
-templ PageBundler(r *http.Request, manifest PluginManifest, signals *BundlerSignals) {
+templ PageBundler(r *http.Request, manifest PluginManifest, store *BundlerStore) {
 	@Page("Bundler", "Bundle only the plugins you need to reduce the size of Datastar even further.", "/bundler") {
 		@header(r)
-		<div data-signals={ templ.JSONString(signals) } class="p-8 flex flex-col gap-4">
+		<div data-signals={ templ.JSONString(store) } class="p-8 flex flex-col gap-8">
 			<div>
 				<div class="text-6xl font-brand font-bold text-center">Bundler</div>
 				<div class="text-center">While Datastar is still one of the smallest frameworks available, you can bundle only the plugins you need to reduce the size even further.</div>
@@ -22,7 +22,7 @@ templ PageBundler(r *http.Request, manifest PluginManifest, signals *BundlerSign
 				@icon("material-symbols:build")
 				Bundle
 			</button>
-			<div class="flex flex-col gap-2">
+			<div>
 				<div class="flex justify-between items-center">
 					<div class="font-bold text-3xl">Plugins</div>
 					<div class="flex gap-2">
@@ -96,6 +96,30 @@ templ PageBundler(r *http.Request, manifest PluginManifest, signals *BundlerSign
 					}
 				</div>
 			</div>
+			<div>
+				<div class="flex justify-between items-center">
+					<div class="font-bold text-3xl">Advanced</div>
+				</div>
+				<label class="form-control w-full">
+					<div class="label">
+						<span class="label-text">Alias Prefix</span>
+						<div class="label-text">
+							Only use this if you have some conflict with a legacy library.
+						</div>
+					</div>
+					<input type="text" class="input input-bordered w-full lowercase" data-bind-alias/>
+					<div class="label" data-show="$alias">
+						<div class="label-text-alt">
+							For example it will change
+							<span class="font-bold text-primary lowercase">data-on-click</span>
+							to
+							<span class="font-bold text-primary lowercase" data-text="`data-${$alias}-on-click`"></span>.
+							You now will have to convert any issues or errors back to the original form before reporting them if you want help.
+							This is a last resort and should be avoided if possible.
+						</div>
+					</div>
+				</label>
+			</div>
 		</div>
 	}
 }
@@ -108,14 +132,27 @@ templ bundlerResultsFragment(results BundleResults) {
 					<th>Hash</th>
 					<th>Compile Time</th>
 					<th>Source Size Gzipped</th>
+					<th>Fast 4G</th>
+					<th>Slow 4G</th>
+					<th>3G</th>
 					<th class="text-right">Download</th>
 				</tr>
 			</thead>
 			<tbody>
+				{{
+					srcBitsF := float64(8 * results.SourceSizeGzipped)
+					srcTime := func(mbps float64) string {
+						srcSecsF := srcBitsF / (mbps * 1024 * 1024)
+						return fmt.Sprintf("%0.1fms", srcSecsF*1000)
+					}
+				}}
 				<tr>
 					<td>{ results.Hash }</td>
 					<td>{ results.CompileTime.String() }</td>
 					<td>{ humanize.Comma(int64( results.SourceSizeGzipped)) } ({ humanize.IBytes(results.SourceSizeGzipped) }) </td>
+					<td>{ srcTime(9) }</td>
+					<td>{ srcTime(1.6) }</td>
+					<td>{ srcTime(0.5) }</td>
 					<td class="text-right">
 						<a class="btn btn-success" href={ templ.SafeURL(results.DownloadURL) }>
 							@icon("material-symbols:folder-zip")
