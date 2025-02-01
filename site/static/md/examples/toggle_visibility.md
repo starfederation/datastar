@@ -12,7 +12,7 @@ This example displays how to toggle visibility using the `data-show` attribute.
 <div
   id="container"
   class="flex flex-col gap-4"
-  data-signals={ templ.JSONString(signals) }
+  data-signals="{bindBool: false}"
 >
   <button
     class="btn btn-primary"
