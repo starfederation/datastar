@@ -142,6 +142,17 @@
       }
     ]
   },
+  "data-on-interval": {
+    "prefix": "data-on-interval",
+    "body": "data-on-interval=\"${1:expression}\"",
+    "description": "Executes an expression at a regular interval.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
+      }
+    ]
+  },
   "data-on-keydown": {
     "prefix": "data-on-keydown",
     "body": "data-on-keydown=\"${1:expression}\"",
