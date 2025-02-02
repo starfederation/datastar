@@ -9,7 +9,7 @@ import (
 
 templ Home() {
 	{{
-		cdnText := `<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.2/bundles/datastar.js"></script>`
+		cdnText := `<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.3/bundles/datastar.js"></script>`
 	}}
 	{{
 		usageSample := `<input data-bind-title />
@@ -59,7 +59,7 @@ templ Home() {
 						{ humanize.CommafWithDigits( datastar.VersionClientByteSizeGzip / 1024.0, 1) } KiB
 					</span>
 					file and start adding reactivity to your frontend immediately. Write your backend in the language of your choice!  Official <a href="/reference/sdks" class="font-bold text-primary">SDKs</a> are available to help you get up and running even faster, with more languages on the way.
-					<div class="flex flex-wrap justify-center gap-8 mx-auto">
+					<div class="flex flex-wrap justify-center gap-6 mx-auto">
 						for _, lang := range build.Consts.SDKLanguages {
 							<a href={ templ.SafeURL(lang.SdkUrl) } class="flex flex-col justify-center items-center">
 								@icon(lang.Icon, "class", "text-9xl")

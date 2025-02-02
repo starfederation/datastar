@@ -112,7 +112,7 @@ ServerSentEventGenerator.MergeFragments(
 ```
 event: datastar-merge-fragments
 id: 123
-retryDuration: 2000
+retry: 2000
 data: selector #feed
 data: settleDuration 10
 data: useViewTransition true
@@ -174,7 +174,7 @@ ServerSentEventGenerator.RemoveFragments(
 ```
 event: datastar-remove-fragments
 id: 123
-retryDuration: 2000
+retry: 2000
 data: selector #target
 data: settleDuration 200
 data: useViewTransition true
@@ -216,7 +216,7 @@ ServerSentEventGenerator.MergeSignals(
 ```
 event: datastar-merge-signals
 id: 123
-retryDuration: 2000
+retry: 2000
 data: onlyIfMissing true
 data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 ```
@@ -254,7 +254,7 @@ ServerSentEventGenerator.RemoveSignals(
 ```
 event: datastar-remove-signals
 id: 123
-retryDuration: 2000
+retry: 2000
 data: paths user.name
 data: paths user.email
 ```
@@ -289,7 +289,7 @@ ServerSentEventGenerator.ExecuteScript(
 ```
 event: datastar-execute-script
 id: 123
-retryDuration: 2000
+retry: 2000
 data: autoRemove false
 data: attributes type text/javascript
 data: script window.location = "https://data-star.dev"

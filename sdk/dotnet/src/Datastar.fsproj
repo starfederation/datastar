@@ -52,14 +52,13 @@
         </None>
         <Compile Include="Utility.fs" />
         <Compile Include="Consts.fs" />
-        <Compile Include="ServerSentEvent.fs" />
-        <Compile Include="Signals.fs" />
+        <Compile Include="DatastarTypes.fs" />
         <Compile Include="ServerSentEventGenerator.fs" />
-        <Compile Include="ServerSentEventHttpHandler.fs" />
+        <Compile Include="DatastarHttpHandlers.fs" />
         <Compile Include="Scripts\BrowserConsole.fs" />
         <Compile Include="Scripts\Redirect.fs" />
-        <Compile Include="DependencyInjection\ServerSentEventService.fs" />
-        <Compile Include="DependencyInjection\ServerSentEventServiceProvider.fs" />
+        <Compile Include="DependencyInjection\DatastarServices.fs" />
+        <Compile Include="DependencyInjection\DatastarServicesProvider.fs" />
         <Compile Include="DependencyInjection\ServerSentEventScriptExtensions.fs" />
     </ItemGroup>
 

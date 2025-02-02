@@ -49,11 +49,15 @@ class ServerSentEventGenerator
     }
 
     /**
-     * Sends the response headers, if not already sent.
+     * Constructor.
      */
-    public function sendHeaders(): void
+    public function __construct()
     {
-        if (headers_sent()) {
+        // Abort the process if the client closes the connection.
+        ignore_user_abort(false);
+
+        // Sends the response headers only if not already sent.
+        if (!headers_sent()) {
             return;
         }
 

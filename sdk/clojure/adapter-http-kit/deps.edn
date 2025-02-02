@@ -1,0 +1,3 @@
+{:paths ["src/main"]
+ :deps {http-kit/http-kit  {:git/url "https://github.com/http-kit/http-kit" :git/sha "76b869fc34536ad0c43afa9a98d971a0fc32c644"}}}
+

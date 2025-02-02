@@ -1,1 +1,10 @@
-{"events": [ { "type": "removeFragments", "selector": "#target"}]}
+{
+  "events": [
+    {
+      "type": "removeFragments",
+      "selector": "#target",
+      "settleDuration": 300,
+      "useViewTransition": false
+    }
+  ]
+}

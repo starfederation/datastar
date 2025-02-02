@@ -7,13 +7,11 @@ namespace HelloWorld;
 
 public class Program
 {
-    public record Signals : ISignals
+    public record Signals
     {
         [JsonPropertyName("delay")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public float? Delay { get; init; } = null;
-
-        public string Serialize() => JsonSerializer.Serialize(this);
+        public float? Delay { get; set; } = null;
     }
 
     public const string Message = "Hello, World!";
@@ -21,23 +19,23 @@ public class Program
     public static void Main(string[] args)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddDatastar<Signals>();
+        builder.Services.AddDatastar();
 
         WebApplication app = builder.Build();
         app.UseStaticFiles();
 
         app.MapGet("/hello-world", async (IServerSentEventService sse, ISignals signals) =>
         {
-            Signals signal = signals as Signals ?? new Signals();
+            Signals mySignals = await signals.ReadSignalsAsync<Signals>();
             for (int index = 0; index < Message.Length; ++index)
             {
-                await sse.MergeFragments($"""<div id="message">{Message[..index]}</div>""");
+                await sse.MergeFragmentsAsync($"""<div id="message">{Message[..index]}</div>""");
                 if (!char.IsWhiteSpace(Message[index]))
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(signal.Delay.GetValueOrDefault(0)));
+                    await Task.Delay(TimeSpan.FromMilliseconds(mySignals.Delay.GetValueOrDefault(0)));
                 }
             }
-            await sse.MergeFragments($"""<div id="message">{Message}</div>""");
+            await sse.MergeFragmentsAsync($"""<div id="message">{Message}</div>""");
         });
 
         app.Run();

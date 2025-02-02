@@ -3,7 +3,7 @@
 const std = @import("std");
 
 pub const datastar_key = "datastar";
-pub const version = "1.0.0-beta.2";
+pub const version = "1.0.0-beta.3";
 
 // #region Defaults
 

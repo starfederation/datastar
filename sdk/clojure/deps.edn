@@ -1,0 +1,38 @@
+{:paths ["sdk/src/main"]
+ 
+ :deps {io.github.paintparty/fireworks {:mvn/version "0.10.4"}}
+ 
+ :aliases
+ {:repl {:extra-paths ["src/dev"]
+         :extra-deps  {org.clojure/clojure         {:mvn/version "1.12.0"}
+                       nrepl/nrepl                 {:mvn/version "1.3.0"}
+                       cider/cider-nrepl           {:mvn/version "0.50.2"}
+                       io.github.tonsky/clj-reload {:mvn/version "0.7.1"}}}
+
+  
+  :test {:extra-paths ["test-resources/"
+                       :test.paths/core-sdk
+                       :test.paths/malli-schemas
+                       :test.paths/adapter-common
+                       :test.paths/adapter-http-kit
+                       :test.paths/adapter-ring-jetty]
+
+
+         :extra-deps {io.github.noahtheduke/lazytest {:mvn/version "1.5.0"}
+                      metosin/reitit                 {:mvn/version "0.7.2"}
+                      etaoin/etaoin                  {:mvn/version "1.1.42"}
+                      com.cnuernber/charred          {:mvn/version "1.034"}
+                      dev.onionpancakes/chassis      {:mvn/version "1.0.365"}}}
+
+
+  :http-kit {:extra-deps {sdk/adapter-http-kit {:local/root "./adapter-http-kit"}}}
+  :ring-jetty {:extra-deps {sdk/adapter-jetty {:local/root "./adapter-jetty"}}}
+  :malli-schemas {:extra-deps {sdk/malli {:local/root "./malli-schemas"}}}
+  
+  
+  :test.paths/core-sdk           ["src/test/core-sdk"]
+  :test.paths/malli-schemas      ["src/test/malli-schemas"]
+  :test.paths/adapter-common     ["src/test/adapter-common"]
+  :test.paths/adapter-http-kit   ["src/test/adapter-http-kit"]
+  :test.paths/adapter-ring-jetty ["src/test/adapter-ring-jetty"]}}
+
