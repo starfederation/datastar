@@ -1,6 +1,6 @@
 # SDKs
 
-Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specific to Datastar.
+Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specific to Datastar. Every SDK must follow the [Architecture Decision Record](https://github.com/starfederation/datastar/blob/develop/sdk/README.md) document.
 
 ## Clojure
 

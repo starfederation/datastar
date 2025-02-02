@@ -1,5 +1,4 @@
 event: datastar-remove-signals
-retry: 1000
 data: paths one
 
 
