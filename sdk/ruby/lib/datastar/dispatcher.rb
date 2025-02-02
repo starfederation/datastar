@@ -98,5 +98,26 @@ module Datastar
 
       response.body = body
     end
+
+    private
+
+    def parse_signals(request)
+      if request.post? || request.put? || request.patch?
+        payload = request.env['action_dispatch.request.request_parameters']
+        if payload
+          return payload['event'] || {}
+        elsif request.media_type == 'application/json'
+          request.body.rewind
+          return JSON.parse(request.body.read)
+        elsif request.media_type == 'multipart/form-data'
+          return request.params
+        end
+      else
+        query = request.params['datastar']
+        return query ? JSON.parse(query) : request.params
+      end
+
+      {}
+    end
   end
 end

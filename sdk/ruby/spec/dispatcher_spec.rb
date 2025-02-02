@@ -162,6 +162,83 @@ RSpec.describe Datastar::Dispatcher do
     end
   end
 
+  describe '#signals' do
+    context 'with POST request' do
+      specify 'Rails parsed parameters' do
+        request = build_request(
+          '/events', 
+          method: 'POST', 
+          headers: { 
+            'action_dispatch.request.request_parameters' => { 'event' => { 'foo' => 'bar' } }
+          }
+        )
+
+        dispatcher = Datastar.new(request:, response:)
+        expect(dispatcher.signals).to eq({ 'foo' => 'bar' })
+      end
+
+      specify 'no signals in Rails parameters' do
+        request = build_request(
+          '/events', 
+          method: 'POST', 
+          headers: { 
+            'action_dispatch.request.request_parameters' => {}
+          }
+        )
+
+        dispatcher = Datastar.new(request:, response:)
+        expect(dispatcher.signals).to eq({})
+      end
+
+      specify 'JSON request with signals in body' do
+        request = build_request(
+          '/events', 
+          method: 'POST', 
+          content_type: 'application/json',
+          body: %({ "foo": "bar" })
+        )
+
+        dispatcher = Datastar.new(request:, response:)
+        expect(dispatcher.signals).to eq({ 'foo' => 'bar' })
+      end
+
+      specify 'multipart form request' do
+        request = build_request(
+          '/events', 
+          method: 'POST', 
+          content_type: 'multipart/form-data',
+          body: 'user[name]=joe&user[email]=joe@email.com'
+        )
+
+        dispatcher = Datastar.new(request:, response:)
+        expect(dispatcher.signals).to eq('user' => { 'name' => 'joe', 'email' => 'joe@email.com' })
+      end
+    end
+
+    context 'with GET request' do
+      specify 'with signals in ?datastar=[JSON signals]' do
+        query = %({"foo":"bar"})
+        request = build_request(
+          %(/events?datastar=#{URI.encode_uri_component(query)}), 
+          method: 'GET', 
+        )
+
+        dispatcher = Datastar.new(request:, response:)
+        expect(dispatcher.signals).to eq('foo' => 'bar')
+      end
+
+      specify 'with no signals' do
+        request = build_request(
+          %(/events), 
+          method: 'GET', 
+        )
+
+        dispatcher = Datastar.new(request:, response:)
+        expect(dispatcher.signals).to eq({})
+      end
+    end
+  end
+
   describe '#stream' do
     it 'writes multiple events to socket' do
       dispatcher.stream do |sse|
@@ -175,6 +252,26 @@ RSpec.describe Datastar::Dispatcher do
       expect(socket.lines.size).to eq(2)
       expect(socket.lines[0]).to eq("event: datastar-merge-fragments\ndata: fragments <div id=\"foo\">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n")
       expect(socket.lines[1]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
+    end
+
+    specify '#signals' do
+      request = build_request(
+        %(/events), 
+        method: 'POST', 
+        content_type: 'multipart/form-data',
+        body: 'user[name]=joe&user[email]=joe@email.com'
+      )
+
+      dispatcher = Datastar.new(request:, response:)
+      signals = nil
+
+      dispatcher.stream do |sse|
+        signals = sse.signals
+      end
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+
+      expect(signals['user']['name']).to eq('joe')
     end
 
     specify '#on_connect' do
@@ -223,12 +320,14 @@ RSpec.describe Datastar::Dispatcher do
 
   private
 
-  def build_request(path, body: nil, content_type: 'application/json', accept: 'text/event-stream')
-    Rack::Request.new(Rack::MockRequest.env_for(
-                        path,
-                        'CONTENT_TYPE' => content_type,
-                        'HTTP_ACCEPT' => accept,
-                        Rack::RACK_INPUT => body ? StringIO.new(body) : nil
-                      ))
+  def build_request(path, method: 'GET', body: nil, content_type: 'application/json', accept: 'text/event-stream', headers: {})
+    headers = { 
+      'HTTP_ACCEPT' => accept, 
+      'CONTENT_TYPE' => content_type,
+      'REQUEST_METHOD' => method,
+      Rack::RACK_INPUT => body ? StringIO.new(body) : nil
+    }.merge(headers)
+
+    Rack::Request.new(Rack::MockRequest.env_for(path, headers))
   end
 end

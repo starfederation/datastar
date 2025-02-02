@@ -13,8 +13,11 @@ module Datastar
       'retry' => 'retry',
     }.freeze
 
-    def initialize(stream, view_context: nil)
+    attr_reader :signals
+
+    def initialize(stream, signals:, view_context: nil)
       @stream = stream
+      @signals = signals
       @view_context = view_context
     end
 
