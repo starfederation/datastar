@@ -29,7 +29,7 @@ func (sse *ServerSentEventGenerator) Redirectf(format string, args ...any) error
 }
 
 func (sse *ServerSentEventGenerator) Redirect(url string, opts ...ExecuteScriptOption) error {
-	js := fmt.Sprintf("window.location.href = %q;", url)
+	js := fmt.Sprintf("setTimeout(() => window.location.href = %q)", url)
 	return sse.ExecuteScript(js, opts...)
 }
 
