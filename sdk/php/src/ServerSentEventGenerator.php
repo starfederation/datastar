@@ -121,6 +121,15 @@ class ServerSentEventGenerator
     }
 
     /**
+     * Redirects the browser to the provided URI.
+     */
+    public function redirect(string $uri, array $options = []): void
+    {
+        $script = 'setTimeout(() => window.location = "' . $uri . '")';
+        $this->executeScript($script, $options);
+    }
+
+    /**
      * Sends an event.
      */
     protected function sendEvent(EventInterface $event): void
