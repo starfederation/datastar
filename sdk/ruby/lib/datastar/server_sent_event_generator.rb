@@ -70,7 +70,10 @@ module Datastar
     def execute_script(script, options = BLANK_OPTIONS)
       buffer = +"event: datastar-execute-script\n"
       build_options(options, buffer)
-      buffer << "data: script #{script}\n"
+      scripts = script.to_s.split("\n")
+      scripts.each do |sc|
+        buffer << "data: script #{sc}\n"
+      end
       write(buffer)
     end
 

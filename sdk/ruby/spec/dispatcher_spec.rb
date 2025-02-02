@@ -158,6 +158,14 @@ RSpec.describe Datastar::Dispatcher do
       expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: script alert('hello')\n\n\n)])
     end
 
+    it 'splits multi-line script into multiple data lines' do
+      dispatcher.execute_script %(alert('hello');\nalert('world'))
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: script alert('hello');\ndata: script alert('world')\n\n\n)])
+    end
+
     it 'takes D* options' do
       dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: false
       socket = TestSocket.new
