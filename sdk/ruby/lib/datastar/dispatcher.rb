@@ -9,6 +9,9 @@ module Datastar
     attr_reader :request, :response
 
     def initialize(request:, response:, view_context: nil)
+      @on_connect = []
+      @on_disconnect = []
+      @on_error = []
       @view_context = view_context
       @request = request
       @response = Rack::Response.new(BLANK_BODY, 200, response.headers)
@@ -20,6 +23,25 @@ module Datastar
 
     def sse?
       @request.get_header(HTTP_ACCEPT) == SSE_CONTENT_TYPE
+    end
+
+    def on_connect(callable = nil, &block)
+      @on_connect << (callable || block)
+      self
+    end
+
+    def on_disconnect(callable = nil, &block)
+      @on_disconnect << (callable || block)
+      self
+    end
+
+    def on_error(callable = nil, &block)
+      @on_error << (callable || block)
+      self
+    end
+
+    def signals
+      @signals ||= parse_signals(request)
     end
 
     def merge_fragments(fragments, options = BLANK_OPTIONS)
@@ -58,14 +80,19 @@ module Datastar
       streamer ||= block
 
       body = proc do |out|
-        streamer.call(ServerSentEventGenerator.new(out, view_context: @view_context))
+        @on_connect.each { |callable| callable.call(out) }
+
+        streamer.call(ServerSentEventGenerator.new(out, signals:, view_context: @view_context))
         # TODO: some exceptions such as Puma::ConnectionError
         # mean the client disconnected, which is not really an error
         # and perhaps should tigger an on_close callback
-        # Other excetions should be re-raised
+        # Other exceptions should be re-raised
+      rescue IOError, Errno::EPIPE, Errno::ECONNRESET => ex
+        @on_disconnect.each { |callable| callable.call(out) }
+      rescue Exception => ex
+        @on_error.each { |callable| callable.call(ex) }
       ensure
         # Ensure the stream is closed
-        # TODO: trigger on_close callback here
         out.close
       end
 

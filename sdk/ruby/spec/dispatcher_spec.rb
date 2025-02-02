@@ -176,6 +176,49 @@ RSpec.describe Datastar::Dispatcher do
       expect(socket.lines[0]).to eq("event: datastar-merge-fragments\ndata: fragments <div id=\"foo\">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n")
       expect(socket.lines[1]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
     end
+
+    specify '#on_connect' do
+      connected = false
+      dispatcher.on_connect { |conn| connected = true }
+      dispatcher.stream do |sse|
+        sse.merge_signals(foo: 'bar')
+      end
+      socket = TestSocket.new
+      # allow(socket).to receive(:<<).and_raise(Errno::EPIPE, 'Socket closed')
+      #
+      dispatcher.response.body.call(socket)
+      expect(connected).to be(true)
+    end
+
+    specify '#on_disconnect' do
+      events = []
+      dispatcher
+        .on_connect { |conn| events << true }
+        .on_disconnect { |conn| events << false }
+
+      dispatcher.stream do |sse|
+        sse.merge_signals(foo: 'bar')
+      end
+      socket = TestSocket.new
+      allow(socket).to receive(:<<).and_raise(Errno::EPIPE, 'Socket closed')
+      
+      dispatcher.response.body.call(socket)
+      expect(events).to eq([true, false])
+    end
+
+    specify '#on_error' do
+      errors = []
+      dispatcher.on_error { |ex| errors << ex }
+
+      dispatcher.stream do |sse|
+        sse.merge_signals(foo: 'bar')
+      end
+      socket = TestSocket.new
+      allow(socket).to receive(:<<).and_raise(ArgumentError, 'Invalid argument')
+      
+      dispatcher.response.body.call(socket)
+      expect(errors.first).to be_a(ArgumentError)
+    end
   end
 
   private
