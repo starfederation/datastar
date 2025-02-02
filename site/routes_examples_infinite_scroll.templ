@@ -38,7 +38,7 @@ templ infiniteScrollAgents(signals *infiniteScrollSignals) {
 	<div
 		id="infinite_scroll"
 		data-signals={ templ.JSONString(signals) }
-		class="flex flex-col gap-2"
+		class="flex flex-col gap-2 overflow-scroll"
 	>
 		<table class="table w-full table-zebra">
 			<caption>Agents</caption>

@@ -29,7 +29,7 @@ templ deleteRowContact(cs *ContactActive) {
 }
 
 templ deleteRowContacts(contacts []*ContactActive) {
-	<div id="delete_row" class="flex flex-col gap-8">
+	<div id="delete_row" class="flex flex-col gap-8 overflow-scroll">
 		<table class="table w-full table-zebra">
 			<caption>Contacts</caption>
 			<thead>

@@ -20,7 +20,7 @@ type LazyTabsSignals struct {
 
 templ setupExamplesLazyTabsComponent(tabCount int, contents templ.Component, signals *LazyTabsSignals) {
 	<div id="lazy_tabs" data-signals={ templ.JSONString(signals) } class="flex flex-col">
-		<div id="tabButtons" role="tablist" class="tabs tabs-bordered">
+		<div id="tabButtons" role="tablist" class="tabs tabs-bordered overflow-scroll">
 			for i := 0; i < tabCount; i++ {
 				<button
 					id={ fmt.Sprintf("tabBtn%d", i) }
