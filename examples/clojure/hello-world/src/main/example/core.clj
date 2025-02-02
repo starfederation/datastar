@@ -9,7 +9,7 @@
     [reitit.ring :as rr]
     [ring.util.response :as ruresp]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.ring-jetty :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response]]))
 
 
 (def home-page

@@ -6,8 +6,8 @@ For now the SDK and adapters are distributed as git dependencies using a `deps.e
 
 ```clojure
 {datastar/sdk {:git/url "https://github.com/starfederation/datastar/tree/develop"
-              :git/sha "LATEST SHA"
-              :deps/root "sdk/clojure/sdk"}
+               :git/sha "LATEST SHA"
+               :deps/root "sdk/clojure/sdk"}
 
  datastar/http-kit {:git/url "https://github.com/starfederation/datastar/tree/develop"
                     :git/sha "LATEST SHA"
