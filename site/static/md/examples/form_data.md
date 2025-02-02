@@ -31,7 +31,7 @@ Setting the `contentType` option to `form` tells the `@get()` action to look for
   <button data-on-click="@get('/endpoint', {contentType: 'form'})">
     Submit GET request
   </button>
-  <button data-on-click="@post('/endpoint', {contentType: 'form')">
+  <button data-on-click="@post('/endpoint', {contentType: 'form'})">
     Submit POST request
   </button>
 </form>
