@@ -34,7 +34,7 @@ module DatastarHttpHandlers =
     /// <summary>
     /// Read the signals, as a string, from the HttpRequest
     /// </summary>
-    let readSignals (httpRequest:HttpRequest) : ValueTask<string voption> =
+    let readSignals (httpRequest:HttpRequest) : ValueTask<Signals voption> =
         match httpRequest.Method with
         | System.Net.WebRequestMethods.Http.Get ->
             match httpRequest.Query.TryGetValue(Consts.DatastarKey) with
@@ -46,10 +46,10 @@ module DatastarHttpHandlers =
                 use readResult = new StreamReader(httpRequest.BodyReader.AsStream())
                 let! str = readResult.ReadToEndAsync()
                 return ValueSome str
-                } |> ValueTask<string voption>
+                } |> ValueTask<Signals voption>
 
     /// <summary>
-    /// Sends a serialized SSE to the HttpResponse
+    /// Sends an SSE to the HttpResponse
     /// </summary>
     let sendServerEvent (httpResponse:HttpResponse) (sse:ServerSentEvent) =
         let serializedEvent = sse |> ServerSentEvent.serialize
@@ -70,24 +70,33 @@ type ServerSentEventHttpHandlers (httpResponse:HttpResponse) =
         member this.SendServerEvent (event:ServerSentEvent) = DatastarHttpHandlers.sendServerEvent this.HttpResponse event
 
 /// <summary>
-/// Implementation of ISignal, for reading the Signals from the HttpRequest
+/// Implementation of IReadSignals, for reading the Signals from the HttpRequest
 /// </summary>
 type SignalsHttpHandlers (httpRequest:HttpRequest) =
-
+    let mutable _cachedSignals : Signals voption voption = ValueNone
     member _.HttpRequest = httpRequest
 
     interface IReadSignals with
-        member this.ReadSignals () = DatastarHttpHandlers.readSignals this.HttpRequest
+        member this.ReadSignals () =
+            let readTask =
+                match _cachedSignals with
+                | ValueSome signals -> task { return signals }
+                | ValueNone ->
+                    task {
+                        let! signals = (DatastarHttpHandlers.readSignals this.HttpRequest)
+                        _cachedSignals <- (ValueSome signals)
+                        return signals
+                    }
+            readTask |> ValueTask<Signals voption>
         member this.ReadSignals<'T> () =
-            let tt = task {
-                let! rawSignals = DatastarHttpHandlers.readSignals this.HttpRequest
+            let readTask = task {
+                let! signals = (this :> IReadSignals).ReadSignals()
                 let ret =
-                    match rawSignals with
+                    match signals with
                     | ValueNone -> ValueNone
                     | ValueSome rs ->
-                        try
-                            ValueSome (JsonSerializer.Deserialize<'T>(rs))
+                        try ValueSome (JsonSerializer.Deserialize<'T>(rs))
                         with _ -> ValueNone
                 return ret
                 }
-            tt |> ValueTask<'T voption>
+            readTask |> ValueTask<'T voption>
