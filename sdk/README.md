@@ -104,6 +104,7 @@ event: datastar-merge-fragments
 data: fragments <div id="feed">
 data: fragments     <span>1</span>
 data: fragments </div>
+```
 
 Maximal:
 
