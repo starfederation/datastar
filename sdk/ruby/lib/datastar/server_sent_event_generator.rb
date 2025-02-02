@@ -16,6 +16,10 @@ module Datastar
     OPTION_DEFAULTS = {
       'retry' => 1000,
       'autoRemove' => true,
+      'mergeMode' => 'morph',
+      'settleDuration' => 300,
+      'useViewTransition' => false,
+      'onlyIfMissing' => false,
     }.freeze
 
     ATTRIBUTE_DEFAULTS = {
