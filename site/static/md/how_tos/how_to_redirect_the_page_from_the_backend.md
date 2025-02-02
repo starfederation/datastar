@@ -1,41 +1,49 @@
-## How to redirect the page from the backend
+# How to redirect the page from the backend
 
 ## Intro
 
-The [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE event allows the server to execute JavaScript on the browser.
-While this might seem like a simple task, there are some browser-specific caveats to be aware of.
+Redirecting to another page is a common task that can be done from the backend using the [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE event.
 
 ## Goal
 
-Our goal is to show how to redirect to a different page from the backend using SSE.
+Our goal is to indicate to the user that they will be redirected, wait 3 seconds, and then redirect them to `/guide`, all from the backend.
+
+## Demo
+
+<button data-on-click="@get('/how_tos/redirect/data')" class="btn btn-primary font-bold">
+Click to be redirected from the backend
+</button>
+<br/>
+<span id="indicator" class="text-primary font-bold"></span>
 
 ## Steps
 
-In this example we'll redirect the user to the `/foo` page:
+We'll place a `data-on-click` attribute on a button and use the `@get` action to send a `GET` request to the backend. We'll include an empty indicator `div` to show the user that they will be redirected.
+
+```html
+<button data-on-click="@get('/endpoint')">
+    Click to be redirected from the backend
+</button>
+<div id="indicator"></div>
+```
+
+We'll set up our backend to first send a [`datastar-merge-fragments`](/reference/sse_events#datastar-merge-fragments) event with a populated indicator fragment, then wait 3 seconds, and finally send a [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE event to execute the JavaScript required to redirect the page.
 
 ```
 event: datastar-execute-script
-data: script setTimeout(() => window.location.href = "/foo")
+data: script window.location.href = "/guide"
 ```
 
-Check out [Issue #529](https://github.com/starfederation/datastar/issues/529) to find out more why you need to execute this inside of `setTimeout`.
+Here's how it would look using the SDKs.
 
-Another method for redirecting uses the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState):
-- This method is useful for changing the URL without reloading (e.g. building a search page that returns results as you type but also keeps your search query in the URL).
-- You'll probably want to use this in combination with sending some signals/fragments, otherwise the site won't change.
+!!!CODE_SNIPPET:how_tos/redirect_1!!!
 
-```
-event: datastar-execute-script
-data: script window.history.pushState({}, "", "/search?query=dog")
-```
+Note that in Firefox, if a redirect happens within a `script` tag then the URL is _replaced_, rather than _pushed_, meaning that the previous URL won't show up in the back history (or back/forward navigation).
 
-Finally, you can also utilize `replaceState` in order to replace the current URL instead. This is useful when you don't want the previous URL to show up in your back/forward browser navigation:
+To work around this, you can wrap the redirect in a `setTimeout` function call (see [issue #529](https://github.com/starfederation/datastar/issues/529)).
 
-```
-event: datastar-execute-script
-data: script window.history.replaceState({}, "", "/search?query=dog")
-```
+!!!CODE_SNIPPET:how_tos/redirect_2!!!
 
 ## Conclusion
 
-We've covered three approaches for redirecting the page, allowing us to control what happens to the current history item.
+Redirecting to another page can be done from the backend thanks to the ability to execute JavaScript on the frontend using the [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE event.

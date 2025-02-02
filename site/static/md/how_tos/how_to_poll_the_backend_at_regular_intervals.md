@@ -12,6 +12,11 @@ In PHP, for example, keeping long-lived SSE connections is fine for a dashboard 
 
 Our goal is to poll the backend at regular intervals (starting at 5 second intervals) and update the UI accordingly. The backend will determine changes to the DOM and be able to control the rate at which the frontend polls based on some criteria. For this example, we will simply output the server time, increasing the polling frequency to 1 second during the last 10 seconds of every minute. The criteria could of course be anything such as the number of times previously polled, the user's role, load on the server, etc.
 
+## Demo
+
+<div id="time" data-on-interval__duration.5s.leading="@get('/how_tos/polling/data')" class="text-primary font-bold">
+</div>
+
 ## Steps
 
 The `data-on-interval` attribute allows us to execute an expression at a regular interval. We'll use it to send a `GET` request to the backend, and use the `__duration` modifier to set the interval duration.
@@ -41,6 +46,15 @@ Most of the time, however, we'd just render the current time on page load using 
 ```
 
 Now our backend can respond to each request with a [`datastar-merge-fragments`](/reference/sse_events#datastar-merge-fragments) event with an updated version of the element.
+
+```
+event: datastar-merge-fragments
+data: fragments <div id="time" data-on-interval__duration.5s="@get('/endpoint')">
+data: fragments     {{ now }}
+data: fragments </div>
+```
+
+Here's how it would look using the SDKs.
 
 !!!CODE_SNIPPET:how_tos/polling_1!!!
 

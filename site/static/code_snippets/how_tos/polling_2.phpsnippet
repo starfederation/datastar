@@ -1,7 +1,7 @@
 use starfederation\datastar\ServerSentEventGenerator;
 
-$currentTime = time();
-$currentSeconds = $currentTime % 60;
+$currentTime = date('Y-m-d H:i:s');
+$currentSeconds = date('s');
 $duration = $currentSeconds < 50 ? 5 : 1;
 
 $sse = new ServerSentEventGenerator();

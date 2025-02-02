@@ -1,6 +1,6 @@
 use starfederation\datastar\ServerSentEventGenerator;
 
-$currentTime = time();
+$currentTime = date('Y-m-d H:i:s');
 
 $sse = new ServerSentEventGenerator();
 $sse->sendHeaders();

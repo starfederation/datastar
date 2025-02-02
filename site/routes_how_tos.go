@@ -2,6 +2,8 @@ package site
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -48,12 +50,12 @@ func setupHowTos(ctx context.Context, router chi.Router) error {
 		})
 	})
 
-	router.Route("/how_tos", func(guideRouter chi.Router) {
-		guideRouter.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	router.Route("/how_tos", func(howTosRouter chi.Router) {
+		howTosRouter.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, string(sidebarGroups[0].Links[0].URL), http.StatusFound)
 		})
 
-		guideRouter.Get("/{name}", func(w http.ResponseWriter, r *http.Request) {
+		howTosRouter.Get("/{name}", func(w http.ResponseWriter, r *http.Request) {
 			name := chi.URLParam(r, "name")
 			mdData, ok := mdDataset[name]
 			if !ok {
@@ -73,6 +75,13 @@ func setupHowTos(ctx context.Context, router chi.Router) error {
 
 			SidebarPage(r, sidebarGroups, currentLink, mdData.Title, mdData.Description, mdData.Contents).Render(r.Context(), w)
 		})
+
+		if err := errors.Join(
+			setupHowTosPolling(howTosRouter),
+			setupHowTosRedirects(howTosRouter),
+		); err != nil {
+			panic(fmt.Sprintf("error setting up examples routes: %s", err))
+		}
 	})
 
 	return nil

@@ -3,13 +3,11 @@ import (
     datastar "github.com/starfederation/datastar/sdk/go"
 )
 
-currentTime := time.Now().Unix()
+currentTime := time.Now().Format("2006-01-02 15:04:05")
 
 sse := datastar.NewSSE(w, r)
-sse.MergeFragments(`
-    <div id="time"
-         data-on-interval__duration.5s="@get('/endpoint')"
-    >
-        ` + currentTime + `
+sse.MergeFragments(fmt.Sprintf(`
+    <div id="time" data-on-interval__duration.5s="@get('/endpoint')">
+        %s
     </div>
-`)
+`, currentTime))

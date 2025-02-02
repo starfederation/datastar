@@ -10,9 +10,9 @@ Our goal is to show an alert whenver the user presses the `Enter` key, or a comb
 
 ## Demo
 
-<h2 data-on-keydown__window="(evt.key === 'Enter' || (evt.ctrlKey && evt.key === 'l')) && alert('Key pressed')">
-     Press Enter or Ctrl + L
-</h2>
+<div data-on-keydown__window="(evt.key === 'Enter' || (evt.ctrlKey && evt.key === 'l')) && alert('Key pressed')" class="text-primary font-bold">
+Press Enter or Ctrl + L
+</div>
 
 ## Steps
 
