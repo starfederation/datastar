@@ -5,4 +5,4 @@ $sse->mergeFragments(`
     <div id="indicator">Redirecting in 3 seconds...</div>
 `);
 sleep(3);
-$sse->redirect('/guide');
+$sse->location('/guide');
