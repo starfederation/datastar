@@ -13,6 +13,10 @@ module Datastar
       'retry' => 'retry',
     }.freeze
 
+    OPTION_DEFAULTS = {
+      'retry' => 1000,
+    }.freeze
+
     attr_reader :signals
 
     def initialize(stream, signals:, view_context: nil)
@@ -78,7 +82,8 @@ module Datastar
       options.each do |k, v|
         k = camelize(k)
         if (sse_key = SSE_OPTION_MAPPING[k])
-          buffer << "#{sse_key}: #{v}\n"
+          default_value = OPTION_DEFAULTS[sse_key]
+          buffer << "#{sse_key}: #{v}\n" unless v == default_value
         elsif v.is_a?(Hash)
           v.each { |kk, vv| buffer << "data: #{k} #{kk} #{vv}\n" }
         else

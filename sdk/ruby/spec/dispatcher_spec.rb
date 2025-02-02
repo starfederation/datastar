@@ -57,6 +57,19 @@ RSpec.describe Datastar::Dispatcher do
       expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: settleDuration 1000\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n)])
     end
 
+    it 'omits retry if using default value' do
+      dispatcher.merge_fragments(
+        %(<div id="foo">\n<span>hello</span>\n</div>\n),
+        id: 72,
+        retry_duration: 1000,
+        settle_duration: 1000
+      )
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\ndata: settleDuration 1000\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n)])
+    end
+
     it 'works with #call(view_context:) interfaces' do
       template_class = Class.new do
         def self.call(view_context:) = %(<div id="foo">\n<span>#{view_context}</span>\n</div>\n)
