@@ -4,6 +4,8 @@ require 'json'
 
 module Datastar
   class ServerSentEventGenerator
+    MSG_END = "\n\n"
+
     SSE_OPTION_MAPPING = {
       'eventId' => 'id',
       'retryDuration' => 'retry',
@@ -25,15 +27,14 @@ module Datastar
       build_options(options, buffer)
       fragment_lines.each { |line| buffer << "data: fragments #{line}\n" }
 
-      buffer << "\n"
-      @stream << buffer
+      write(buffer)
     end
 
     def remove_fragments(selector, options = BLANK_OPTIONS)
       buffer = +"event: datastar-remove-fragments\n"
       build_options(options, buffer)
-      buffer << "data: selector #{selector}\n\n"
-      @stream << buffer
+      buffer << "data: selector #{selector}\n"
+      write(buffer)
     end
 
     def merge_signals(signals, options = BLANK_OPTIONS)
@@ -41,8 +42,8 @@ module Datastar
 
       buffer = +"event: datastar-merge-signals\n"
       build_options(options, buffer)
-      buffer << "data: signals #{signals}\n\n"
-      @stream << buffer
+      buffer << "data: signals #{signals}\n"
+      write(buffer)
     end
 
     def remove_signals(paths, options = BLANK_OPTIONS)
@@ -51,14 +52,18 @@ module Datastar
       buffer = +"event: datastar-remove-signals\n"
       build_options(options, buffer)
       paths.each { |path| buffer << "data: paths #{path}\n" }
-      buffer << "\n"
-      @stream << buffer
+      write(buffer)
     end
 
     def execute_script(script, options = BLANK_OPTIONS)
       buffer = +"event: datastar-execute-script\n"
       build_options(options, buffer)
-      buffer << "data: script #{script}\n\n"
+      buffer << "data: script #{script}\n"
+      write(buffer)
+    end
+
+    def write(buffer)
+      buffer << MSG_END
       @stream << buffer
     end
 
