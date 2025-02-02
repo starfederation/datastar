@@ -17,12 +17,15 @@ GEM
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
+    nio4r (2.7.4)
     pp (0.6.2)
       prettyprint
     prettyprint (0.2.0)
     psych (5.2.3)
       date
       stringio
+    puma (6.6.0)
+      nio4r (~> 2.0)
     rack (3.1.9)
     rake (13.2.1)
     rdoc (6.11.0)
@@ -51,6 +54,7 @@ PLATFORMS
 DEPENDENCIES
   datastar!
   debug
+  puma
   rake (~> 13.0)
   rspec (~> 3.0)
 
