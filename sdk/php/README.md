@@ -56,6 +56,9 @@ $sse->removeSignals(['foo', 'bar']);
 
 // Executes JavaScript in the browser.
 $sse->executeScript('console.log("Hello, world!")');
+
+// Redirects the browser by setting the location to the provided URI.
+$sse->location('/guide');
 ```
 
 ```php
