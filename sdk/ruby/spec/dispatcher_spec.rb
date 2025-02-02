@@ -159,11 +159,19 @@ RSpec.describe Datastar::Dispatcher do
     end
 
     it 'takes D* options' do
+      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: false
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-execute-script\nid: 72\ndata: autoRemove false\ndata: script alert('hello')\n\n\n)])
+    end
+
+    it 'omits autoRemove true' do
       dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: true
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\nid: 72\ndata: autoRemove true\ndata: script alert('hello')\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-execute-script\nid: 72\ndata: script alert('hello')\n\n\n)])
     end
 
     it 'takes attributes Hash' do
@@ -172,6 +180,14 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
       expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: attributes type text/javascript\ndata: attributes title alert\ndata: script alert('hello')\n\n\n)])
+    end
+
+    it 'takes attributes Hash' do
+      dispatcher.execute_script %(alert('hello')), attributes: { type: 'module', title: 'alert' }
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: attributes title alert\ndata: script alert('hello')\n\n\n)])
     end
   end
 

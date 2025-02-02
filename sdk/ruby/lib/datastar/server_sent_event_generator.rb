@@ -15,6 +15,11 @@ module Datastar
 
     OPTION_DEFAULTS = {
       'retry' => 1000,
+      'autoRemove' => true,
+    }.freeze
+
+    ATTRIBUTE_DEFAULTS = {
+      'type' => 'module'
     }.freeze
 
     attr_reader :signals
@@ -85,9 +90,13 @@ module Datastar
           default_value = OPTION_DEFAULTS[sse_key]
           buffer << "#{sse_key}: #{v}\n" unless v == default_value
         elsif v.is_a?(Hash)
-          v.each { |kk, vv| buffer << "data: #{k} #{kk} #{vv}\n" }
+          v.each do |kk, vv| 
+            default_value = ATTRIBUTE_DEFAULTS[kk.to_s]
+            buffer << "data: #{k} #{kk} #{vv}\n" unless vv == default_value
+          end
         else
-          buffer << "data: #{k} #{v}\n"
+          default_value = OPTION_DEFAULTS[k]
+          buffer << "data: #{k} #{v}\n" unless v == default_value
         end
       end
     end
