@@ -44,7 +44,7 @@ To work around this, you can wrap the redirect in a `setTimeout` function call. 
 
 !!!CODE_SNIPPET:how_tos/redirect_2!!!
 
-Some SDKs provide a `redirect` method that automatically wraps the redirect in a `setTimeout` function call, so you don't have to worry about it (you're welcome!).
+Some SDKs provide a helper method that automatically wraps the statement in a `setTimeout` function call, so you don't have to worry about doing so (you're welcome!).
 
 !!!CODE_SNIPPET:how_tos/redirect_3!!!
 
