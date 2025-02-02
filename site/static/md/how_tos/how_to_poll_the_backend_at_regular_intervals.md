@@ -54,6 +54,8 @@ data: fragments     {{ now }}
 data: fragments </div>
 ```
 
+Be careful not to add `.leading` to the modifier in the response, as it will cause the frontend to immediately send another request.
+
 Here's how it would look using the SDKs.
 
 !!!CODE_SNIPPET:how_tos/polling_1!!!

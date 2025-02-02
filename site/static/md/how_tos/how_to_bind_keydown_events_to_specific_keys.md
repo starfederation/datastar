@@ -2,7 +2,7 @@
 
 ## Intro
 
-The []`data-on`](/reference/attribute_plugins#data-on) attribute allows us to attach an event listener to any element, and execute an expression whenever the event is triggered. We can use this to listen for keydown events and execute an expression only when a specific key or key combination is pressed.
+The [`data-on`](/reference/attribute_plugins#data-on) attribute allows us to attach an event listener to any element, and execute an expression whenever the event is triggered. We can use this to listen for keydown events and execute an expression only when a specific key or key combination is pressed.
 
 ## Goal
 
