@@ -1,5 +1,4 @@
 event: datastar-merge-fragments
-retry: 1000
 data: fragments <div>Merge</div>
 
 

@@ -49,11 +49,15 @@ class ServerSentEventGenerator
     }
 
     /**
-     * Sends the response headers, if not already sent.
+     * Constructor.
      */
-    public function sendHeaders(): void
+    public function __construct()
     {
-        if (headers_sent()) {
+        // Abort the process if the client closes the connection.
+        ignore_user_abort(false);
+
+        // Sends the response headers only if not already sent.
+        if (!headers_sent()) {
             return;
         }
 
@@ -117,6 +121,15 @@ class ServerSentEventGenerator
     }
 
     /**
+     * Redirects the browser by setting the location to the provided URI.
+     */
+    public function location(string $uri, array $options = []): void
+    {
+        $script = 'setTimeout(() => window.location = "' . $uri . '")';
+        $this->executeScript($script, $options);
+    }
+
+    /**
      * Sends an event.
      */
     protected function sendEvent(EventInterface $event): void
@@ -157,7 +170,9 @@ class ServerSentEventGenerator
             $output[] = 'id: ' . $eventData->eventId;
         }
 
-        $output[] = 'retry: ' . $eventData->retryDuration;
+        if ($eventData->retryDuration !== Consts::DEFAULT_SSE_RETRY_DURATION) {
+            $output[] = 'retry: ' . $eventData->retryDuration;
+        }
 
         foreach ($eventData->data as $line) {
             $output[] = $line;

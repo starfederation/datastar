@@ -11,18 +11,6 @@ Provide an SDK in a language agnostic way, to that end
 1. Keep SDK as minimal as possible
 2. Allow per language/framework extended features to live in an SDK ***sugar*** version
 
-### Status
-
-- [x] Create a document (this) to allow any one to make a spec compliant SDK for any language or framework
-- [x] Provide a [reference implementation](../sdk/go) in Go
-- [ ] Provide SDKs for
-  - [ ] JS/TS
-  - [x] PHP
-  - [x] .NET
-  - [x] Python
-  - [x] Java
-  - [ ] Haskell?
-
 ## Details
 
 ### Assumptions
@@ -84,12 +72,12 @@ Currently valid values are
 
 #### Logic
 When called the function ***must*** write to the response buffer the following in specified order.  If any part of this process fails you ***must*** return/throw an error depending on language norms.
-1. ***Must*** write `event: EVENT_TYPE\n` where `EVENT_TYPE` is [EventType](#EventType)
+1. ***Must*** write `event: EVENT_TYPE\n` where `EVENT_TYPE` is [EventType](#EventType).
 2. If a user defined event ID is provided, the function ***must*** write `id: EVENT_ID\n` where `EVENT_ID` is the event ID.
 3. ***Must*** write `retry: RETRY_DURATION\n` where `RETRY_DURATION` is the provided retry duration, ***unless*** the value is the default of `1000` milliseconds.
 4. For each string in the provided `dataLines`, you ***must*** write `data: DATA\n` where `DATA` is the provided string.
 5. ***Must*** write a `\n\n` to complete the event per the SSE spec.
-6. Afterward the writer ***should*** immediately flush.  This can be confounded by other middlewares such as compression layers
+6. Afterward the writer ***should*** immediately flush.  This can be confounded by other middlewares such as compression layers.
 
 ### `ServerSentEventGenerator.MergeFragments`
 
@@ -109,10 +97,21 @@ ServerSentEventGenerator.MergeFragments(
 
 #### Example Output
 
+Minimal:
+
+```
+event: datastar-merge-fragments
+data: fragments <div id="feed">
+data: fragments     <span>1</span>
+data: fragments </div>
+```
+
+Maximal:
+
 ```
 event: datastar-merge-fragments
 id: 123
-retryDuration: 2000
+retry: 2000
 data: selector #feed
 data: settleDuration 10
 data: useViewTransition true
@@ -171,10 +170,19 @@ ServerSentEventGenerator.RemoveFragments(
 
 #### Example Output
 
+Minimal:
+
+```
+event: datastar-remove-fragments
+data: selector #target
+```
+
+Maximal:
+
 ```
 event: datastar-remove-fragments
 id: 123
-retryDuration: 2000
+retry: 2000
 data: selector #target
 data: settleDuration 200
 data: useViewTransition true
@@ -213,10 +221,19 @@ ServerSentEventGenerator.MergeSignals(
 
 #### Example Output
 
+Minimal:
+
+```
+event: datastar-merge-signals
+data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
+```
+
+Maximal:
+
 ```
 event: datastar-merge-signals
 id: 123
-retryDuration: 2000
+retry: 2000
 data: onlyIfMissing true
 data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 ```
@@ -251,10 +268,20 @@ ServerSentEventGenerator.RemoveSignals(
 
 #### Example Output
 
+Minimal:
+
+```
+event: datastar-remove-signals
+data: paths user.name
+data: paths user.email
+```
+
+Maximal:
+
 ```
 event: datastar-remove-signals
 id: 123
-retryDuration: 2000
+retry: 2000
 data: paths user.name
 data: paths user.email
 ```
@@ -286,10 +313,19 @@ ServerSentEventGenerator.ExecuteScript(
 
 #### Example Output
 
+Minimal:
+
+```
+event: datastar-execute-script
+data: script window.location = "https://data-star.dev"
+```
+
+Maximal:
+
 ```
 event: datastar-execute-script
 id: 123
-retryDuration: 2000
+retry: 2000
 data: autoRemove false
 data: attributes type text/javascript
 data: script window.location = "https://data-star.dev"

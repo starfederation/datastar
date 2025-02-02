@@ -41,13 +41,6 @@ func extractVersion() (string, error) {
 
 	version := strings.TrimSpace(string(versionBytes))
 
-	// Write out the version to the version file.
-	versionPath := "library/src/engine/version.ts"
-	versionContents := fmt.Sprintf("export const VERSION = '%s';\n", version)
-	if err := os.WriteFile(versionPath, []byte(versionContents), 0o644); err != nil {
-		return "", fmt.Errorf("error writing version file: %w", err)
-	}
-
 	return version, nil
 }
 
@@ -62,6 +55,7 @@ func createBundles(version string) error {
 		EntryPoints: []string{
 			"library/src/bundles/datastar-core.ts",
 			"library/src/bundles/datastar.ts",
+			"library/src/bundles/datastar-aliased.ts",
 		},
 		Banner: map[string]string{
 			"js": "// Datastar v" + version,

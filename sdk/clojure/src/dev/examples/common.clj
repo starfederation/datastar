@@ -11,5 +11,5 @@
       [:head
        [:meta {:charset "UTF-8"}]
        [:script {:type "module"
-                 :src "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.2/bundles/datastar.js"}]]
+                 :src "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.3/bundles/datastar.js"}]]
       [:body body]]]))
