@@ -44,6 +44,10 @@ To work around this, you can wrap the redirect in a `setTimeout` function call. 
 
 !!!CODE_SNIPPET:how_tos/redirect_2!!!
 
+Some SDKs provide a `redirect` method that automatically wraps the redirect in a `setTimeout` function call, so you don't have to worry about it (you're welcome!).
+
+!!!CODE_SNIPPET:how_tos/redirect_3!!!
+
 ## Conclusion
 
 Redirecting to another page can be done from the backend thanks to the ability to execute JavaScript on the frontend using the [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE event.

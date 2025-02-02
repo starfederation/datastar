@@ -18,9 +18,7 @@ func setupHowTosRedirects(howTosRedirect chi.Router) error {
 				<span id="indicator">Redirecting in 3 seconds...</span>
 			`)
 			time.Sleep(3 * time.Second)
-			sse.ExecuteScript(`
-				setTimeout(() => window.location = "/guide")
-			`)
+			sse.Redirect("/guide")
 		})
 	})
 
