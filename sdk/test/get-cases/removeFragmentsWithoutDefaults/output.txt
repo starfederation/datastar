@@ -1,5 +1,4 @@
 event: datastar-remove-fragments
-retry: 1000
 data: selector #target
 
 

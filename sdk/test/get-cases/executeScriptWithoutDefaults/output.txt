@@ -1,5 +1,4 @@
 event: datastar-execute-script
-retry: 1000
 data: script console.log('hello');
 
 
