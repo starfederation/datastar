@@ -3,6 +3,20 @@ Bundler.setup(:test)
 
 require 'datastar'
 
+# This is a test Rack endpoint to run
+# Datastar's SDK test suite agains.
+# To run:
+# 
+#   # install dependencies
+#   bundle install
+#   # run this endpoint with Puma server
+#   puma examples/test.ru
+#
+# Then you can run SDK's test bash script:
+# See https://github.com/starfederation/datastar/blob/develop/sdk/test/README.md
+#
+#   ./test-all.sh http://localhost:9292
+#
 run do |env|
   request = Rack::Request.new(env)
   response = Rack::Response.new([], 200)
