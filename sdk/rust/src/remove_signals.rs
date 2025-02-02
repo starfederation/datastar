@@ -12,20 +12,12 @@ use {
 /// # Examples
 ///
 /// ```
-/// use datastar::prelude::{ServerSentEventGenerator, RemoveSignals};
+/// use datastar::prelude::{Sse, RemoveSignals};
+/// use async_stream::stream;
 ///
-/// let remove_signals: String = RemoveSignals::new(["foo.bar", "1234", "abc"]).send();
-///
-/// let expected: &str = r#"event: datastar-remove-signals
-/// retry: 1000
-/// data: paths foo.bar
-/// data: paths 1234
-/// data: paths abc
-///
-///
-/// "#;
-///
-/// assert_eq!(remove_signals, expected);
+/// Sse(stream! {
+///     yield RemoveSignals::new(["foo.bar", "1234", "abc"]).into();
+/// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RemoveSignals {
@@ -34,7 +26,6 @@ pub struct RemoveSignals {
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// Defaults to `1000ms`.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     pub retry: Duration,
     /// `paths` is a list of strings that represent the signal paths to be removed from the signals.

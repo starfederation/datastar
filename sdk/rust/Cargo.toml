@@ -11,28 +11,41 @@ readme = "README.md"
 version = "0.1.0"
 
 [dev-dependencies]
-async-stream = "0.3.6"
-axum = { version = "0.8.1" }
-tokio = { version = "1.43.0", features = ["full"] }
-tokio-stream = "0.1.17"
+async-stream = { version = "0.3.6", default-features = false }
+serde = { version = "1.0.217", default-features = false, features = ["derive"] }
+serde_json = { version = "1.0.138", default-features = false, features = [
+    "std",
+] }
+
 
 [dependencies]
 axum = { version = "0.8.1", default-features = false, optional = true, features = [
     "query",
     "tokio",
 ] }
-rocket = { version = "0.5.1", default-features = false, optional = true, features = [
-] }
+futures = { version = "0.3.31", default-features = false }
+http-body = { version = "1.0.1", default-features = false, optional = true }
+pin-project-lite = { version = "0.2.16", default-features = false, optional = true }
+rocket = { version = "0.5.1", default-features = false, optional = true }
 serde = { version = "1.0.217", default-features = false, optional = true, features = [
     "derive",
 ] }
 serde_json = { version = "1.0.138", default-features = false, optional = true, features = [
     "std",
 ] }
+sync_wrapper = { version = "1.0.2", default-features = false, optional = true }
+
 
 [features]
-axum = ["dep:axum", "dep:serde", "dep:serde_json"]
-default = ["axum", "rocket"]
+axum = [
+    "dep:axum",
+    "dep:http-body",
+    "dep:pin-project-lite",
+    "dep:serde",
+    "dep:serde_json",
+    "dep:sync_wrapper",
+]
+http2 = []
 rocket = ["dep:rocket"]
 
 [profile.dev]

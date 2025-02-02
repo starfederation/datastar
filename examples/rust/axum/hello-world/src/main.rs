@@ -1,14 +1,16 @@
 use {
-    async_stream::try_stream,
+    async_stream::stream,
     axum::{
-        response::{sse::Event, Html, Sse},
+        response::{Html, IntoResponse},
         routing::get,
         Router,
     },
-    core::{convert::Infallible, error::Error, time::Duration},
-    datastar::prelude::{MergeFragments, ReadSignals},
+    core::{error::Error, time::Duration},
+    datastar::{
+        prelude::{MergeFragments, ReadSignals},
+        Sse,
+    },
     serde::Deserialize,
-    tokio_stream::Stream,
     tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
 };
 
@@ -49,10 +51,8 @@ pub struct Signals {
     pub delay: u64,
 }
 
-async fn hello_world(
-    ReadSignals(signals): ReadSignals<Signals>,
-) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    Sse::new(try_stream! {
+async fn hello_world(ReadSignals(signals): ReadSignals<Signals>) -> impl IntoResponse {
+    Sse(stream! {
         for i in 0..MESSAGE.len() {
             yield MergeFragments::new(format!("<div id='message'>{}</div>", &MESSAGE[0..i + 1])).into();
             tokio::time::sleep(Duration::from_millis(signals.delay)).await;

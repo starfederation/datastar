@@ -1,7 +1,9 @@
 use datastar::prelude::*;
+use async_stream::stream;
 
-(
-    MergeFragments::new("<div id='hello'>Hello, world!</div>"),
-    MergeSignals::new("{foo: {bar: 1}}"),
-    ExecuteScript::new("console.log('Success!')),
-).into_response()
+Sse(stream! {
+    yield MergeFragments::new("<div id='hello'>Hello, world!</div>").into();
+    yield MergeSignals::new("{foo: {bar: 1}}").into();
+    yield ExecuteScript::new("console.log('Success!')).into();
+})
+    

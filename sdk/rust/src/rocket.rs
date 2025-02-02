@@ -1,44 +1,88 @@
 //! Rocket integration for Datastar.
 
 use {
-    crate::prelude::{
-        DatastarEvent, ExecuteScript, MergeFragments, MergeSignals, RemoveFragments, RemoveSignals,
+    crate::{prelude::DatastarEvent, Sse, TrySse},
+    core::error::Error,
+    futures::{Stream, StreamExt},
+    rocket::{
+        http::ContentType,
+        response::{self, stream::ReaderStream, Responder},
+        Request, Response,
     },
-    rocket::response::stream::Event,
+    std::io::Cursor,
 };
 
-impl Into<Event> for DatastarEvent {
-    fn into(self) -> Event {
-        let mut event = Event::empty();
+impl<'r, S: Stream<Item = DatastarEvent> + Send + 'static> Responder<'r, 'r> for Sse<S> {
+    fn respond_to(self, _: &'r Request<'_>) -> response::Result<'r> {
+        let stream = self.0.map(|event| Cursor::new(event.to_string()));
 
-        if let Some(id) = self.id {
-            event = event.id(id);
-        }
+        let mut response = Response::build();
 
-        event
-            .event(self.event.as_str().to_owned())
-            .with_retry(self.retry)
-            .with_data(self.data.join("\n"))
+        #[cfg(not(feature = "http2"))]
+        response.raw_header("Connection", "keep-alive");
+
+        response
+            .header(ContentType::EventStream)
+            .raw_header("Cache-Control", "no-cache")
+            .streamed_body(ReaderStream::from(stream))
+            .ok()
     }
 }
 
-macro_rules! impls {
-    ($($type:ty),*) => {
-        $(
-            impl Into<Event> for $type {
-                fn into(self) -> Event {
-                    let event: DatastarEvent = self.into();
-                    event.into()
-                }
+impl<'r, S, E> Responder<'r, 'r> for TrySse<S>
+where
+    E: Into<Box<dyn Error + Send + Sync>> + Send + 'r,
+    S: Stream<Item = Result<DatastarEvent, E>> + Send + 'static,
+{
+    fn respond_to(self, _: &'r Request<'_>) -> response::Result<'r> {
+        // we just ignore errors because rocket doesn't support them in streams!
+        let stream = self.0.filter_map(|event| async {
+            match event {
+                Ok(event) => Some(Cursor::new(event.to_string())),
+                _ => None,
             }
-        )*
-    };
+        });
+
+        let mut response = Response::build();
+
+        #[cfg(not(feature = "http2"))]
+        response.raw_header("Connection", "keep-alive");
+
+        response
+            .header(ContentType::EventStream)
+            .raw_header("Cache-Control", "no-cache")
+            .streamed_body(ReaderStream::from(stream))
+            .ok()
+    }
 }
 
-impls!(
-    ExecuteScript,
-    MergeFragments,
-    MergeSignals,
-    RemoveFragments,
-    RemoveSignals
-);
+#[cfg(test)]
+mod tests {
+    use {
+        crate::{
+            testing::{self, Signals},
+            DatastarEvent, Sse,
+        },
+        futures::Stream,
+        rocket::{get, post, routes, serde::json::Json},
+    };
+
+    #[tokio::test]
+    async fn sdk_test() {
+        rocket::build()
+            .mount("/", routes![get_test, post_test])
+            .launch()
+            .await
+            .unwrap();
+    }
+
+    #[get("/test?<datastar>")]
+    fn get_test(datastar: Json<Signals>) -> Sse<impl Stream<Item = DatastarEvent>> {
+        Sse(testing::test(datastar.into_inner().events))
+    }
+
+    #[post("/test", data = "<datastar>")]
+    fn post_test(datastar: Json<Signals>) -> Sse<impl Stream<Item = DatastarEvent>> {
+        Sse(testing::test(datastar.into_inner().events))
+    }
+}

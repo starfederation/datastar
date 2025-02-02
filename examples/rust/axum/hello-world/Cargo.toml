@@ -7,6 +7,7 @@ version = "0.1.0"
 async-stream = "0.3.6"
 axum = "0.8.1"
 datastar = { path = "../../../../sdk/rust", features = ["axum"] }
+futures = "0.3.31"
 serde = { version = "1.0.217", features = ["derive"] }
 tokio = { version = "1.43.0", features = ["full"] }
 tokio-stream = "0.1.17"

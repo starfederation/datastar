@@ -12,23 +12,15 @@ use {
 /// # Examples
 ///
 /// ```
-/// use datastar::prelude::{ServerSentEventGenerator, ExecuteScript};
+/// use datastar::prelude::{Sse, ExecuteScript};
+/// use async_stream::stream;
 ///
-/// let execute_script: String = ExecuteScript::new("console.log('Hello, world!')")
-///     .auto_remove(false)
-///     .attributes(["type text/javascript"])
-///     .send();
-///
-/// let expected: &str = "event: datastar-execute-script
-/// retry: 1000
-/// data: autoRemove false
-/// data: attributes type text/javascript
-/// data: script console.log('Hello, world!')
-///
-///
-/// ";
-///
-/// assert_eq!(execute_script, expected);
+/// Sse(stream! {
+///     yield ExecuteScript::new("console.log('Hello, world!')")
+///         .auto_remove(false)
+///         .attributes(["type text/javascript"])
+///         .into();
+/// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 
@@ -38,7 +30,6 @@ pub struct ExecuteScript {
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// Defaults to `1000ms`.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     pub retry: Duration,
     /// `script` is a string that represents the JavaScript to be executed by the browser.

@@ -12,26 +12,16 @@ use {
 /// # Examples
 ///
 /// ```
-/// use {
-///     core::time::Duration,
-///     datastar::prelude::{ServerSentEventGenerator, RemoveFragments}
-/// };
+/// use datastar::prelude::{Sse, RemoveFragments};
+/// use async_stream::stream;
+/// use core::time::Duration;
 ///
-/// let remove_fragments: String = RemoveFragments::new("#foo")
-///     .settle_duration(Duration::from_millis(1000))
-///     .use_view_transition(true)
-///     .send();
-///
-/// let expected: &str = "event: datastar-remove-fragments
-/// retry: 1000
-/// data: settleDuration 1000
-/// data: useViewTransition true
-/// data: selector #foo
-///
-///
-/// ";
-///
-/// assert_eq!(remove_fragments, expected);
+/// Sse(stream! {
+///     yield RemoveFragments::new("#foo")
+///         .settle_duration(Duration::from_millis(1000))
+///         .use_view_transition(true)
+///         .into();
+/// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RemoveFragments {
@@ -40,7 +30,6 @@ pub struct RemoveFragments {
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// Defaults to `1000ms`.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     pub retry: Duration,
     /// `selector` is a CSS selector that represents the fragments to be removed from the DOM.
@@ -49,7 +38,6 @@ pub struct RemoveFragments {
     pub selector: String,
     /// The amount of time that a fragment should take before removing any CSS related to settling.
     /// `settle_duration` is used to allow for animations in the browser via the Datastar client.
-    /// Defaults to `300ms`.
     pub settle_duration: Duration,
     /// Whether to use view transitions, if not provided the Datastar client side will default to `false`.
     pub use_view_transition: bool,

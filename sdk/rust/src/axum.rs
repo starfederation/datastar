@@ -1,53 +1,96 @@
 //! Axum integration for Datastar.
 
 use {
-    crate::prelude::{
-        DatastarEvent, ExecuteScript, MergeFragments, MergeSignals, RemoveFragments, RemoveSignals,
-    },
+    crate::{prelude::DatastarEvent, Sse, TrySse},
     axum::{
-        body::Bytes,
+        body::{Body, Bytes, HttpBody},
         extract::{FromRequest, Query, Request},
         http::{self},
-        response::{sse::Event, IntoResponse, Response},
+        response::{IntoResponse, Response},
     },
+    core::{
+        convert::Infallible,
+        pin::Pin,
+        task::{Context, Poll},
+    },
+    futures::{Stream, StreamExt},
+    http_body::Frame,
+    pin_project_lite::pin_project,
     serde::{de::DeserializeOwned, Deserialize},
+    sync_wrapper::SyncWrapper,
 };
 
-impl Into<Event> for DatastarEvent {
-    fn into(self) -> Event {
-        let mut event = Event::default();
-
-        if let Some(id) = self.id {
-            event = event.id(id);
-        }
-
-        event
-            .event(self.event.as_str())
-            .retry(self.retry)
-            .data(self.data.join("\n"))
+pin_project! {
+    struct SseBody<S> {
+        #[pin]
+        stream: SyncWrapper<S>,
     }
 }
 
-macro_rules! impls {
-    ($($type:ty),*) => {
-        $(
-            impl Into<Event> for $type {
-                fn into(self) -> Event {
-                    let event: DatastarEvent = self.into();
-                    event.into()
-                }
-            }
-        )*
-    };
+impl<S> IntoResponse for Sse<S>
+where
+    S: Stream<Item = DatastarEvent> + Send + 'static,
+{
+    fn into_response(self) -> Response {
+        (
+            [
+                (http::header::CONTENT_TYPE, "text/event-stream"),
+                (http::header::CACHE_CONTROL, "no-cache"),
+                #[cfg(not(feature = "http2"))]
+                (http::header::CONNECTION, "keep-alive"),
+            ],
+            Body::new(SseBody {
+                stream: SyncWrapper::new(self.0.map(Ok::<_, Infallible>)),
+            }),
+        )
+            .into_response()
+    }
 }
 
-impls!(
-    ExecuteScript,
-    MergeFragments,
-    MergeSignals,
-    RemoveFragments,
-    RemoveSignals
-);
+impl<S, E> IntoResponse for TrySse<S>
+where
+    S: Stream<Item = Result<DatastarEvent, E>> + Send + 'static,
+    E: Into<Box<dyn std::error::Error + Send + Sync>>,
+{
+    fn into_response(self) -> Response {
+        (
+            [
+                (http::header::CONTENT_TYPE, "text/event-stream"),
+                (http::header::CACHE_CONTROL, "no-cache"),
+                #[cfg(not(feature = "http2"))]
+                (http::header::CONNECTION, "keep-alive"),
+            ],
+            Body::new(SseBody {
+                stream: SyncWrapper::new(self.0),
+            }),
+        )
+            .into_response()
+    }
+}
+
+impl<S, E> HttpBody for SseBody<S>
+where
+    S: Stream<Item = Result<DatastarEvent, E>>,
+{
+    type Data = Bytes;
+    type Error = E;
+
+    fn poll_frame(
+        self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+    ) -> Poll<Option<Result<Frame<Self::Data>, Self::Error>>> {
+        let this = self.project();
+
+        match this.stream.get_pin_mut().poll_next(cx) {
+            Poll::Pending => Poll::Pending,
+            Poll::Ready(Some(Err(error))) => Poll::Ready(Some(Err(error))),
+            Poll::Ready(None) => Poll::Ready(None),
+            Poll::Ready(Some(Ok(event))) => {
+                Poll::Ready(Some(Ok(Frame::data(event.to_string().into()))))
+            }
+        }
+    }
+}
 
 #[derive(Deserialize)]
 struct DatastarParam {
@@ -113,139 +156,25 @@ where
 #[cfg(test)]
 mod tests {
     use {
+        super::Sse,
         crate::{
-            consts,
-            prelude::{
-                ExecuteScript, FragmentMergeMode, MergeFragments, MergeSignals, ReadSignals,
-                RemoveFragments, RemoveSignals,
-            },
-            testing::{Signals, TestEvent},
+            prelude::ReadSignals,
+            testing::{self, Signals},
         },
-        async_stream::try_stream,
         axum::{
-            response::{sse::Event, Sse},
+            response::IntoResponse,
             routing::{get, post},
             Router,
         },
-        core::{convert::Infallible, time::Duration},
         tokio::net::TcpListener,
-        tokio_stream::Stream,
     };
 
-    async fn test(
-        ReadSignals(signals): ReadSignals<Signals>,
-    ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-        Sse::new(try_stream! {
-            for event in signals.events {
-                let event: TestEvent = serde_json::from_value(event).unwrap();
-
-                yield match event {
-                    TestEvent::ExecuteScript {
-                        script,
-                        event_id,
-                        retry_duration,
-                        attributes,
-                        auto_remove,
-                    } => {
-                        let attributes = attributes
-                            .map(|attrs| {
-                                attrs
-                                    .as_object()
-                                    .unwrap()
-                                    .iter()
-                                    .map(|(name, value)| {
-                                        format!("{} {}", name, value.as_str().unwrap())
-                                    })
-                                    .collect()
-                            })
-                            .unwrap_or(vec![]);
-
-                        ExecuteScript {
-                            script,
-                            id: event_id,
-                            retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
-                            attributes,
-                            auto_remove: auto_remove.unwrap_or(consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE),
-                        }
-                        .into()
-                    }
-                    TestEvent::MergeFragments {
-                        fragments,
-                        event_id,
-                        retry_duration,
-                        selector,
-                        merge_mode,
-                        settle_duration,
-                        use_view_transition,
-                    } => {
-                        let merge_mode = merge_mode
-                            .map(|mode| match mode.as_str() {
-                                "morph" => FragmentMergeMode::Morph,
-                                "inner" => FragmentMergeMode::Inner,
-                                "outer" => FragmentMergeMode::Outer,
-                                "prepend" => FragmentMergeMode::Prepend,
-                                "append" => FragmentMergeMode::Append,
-                                "before" => FragmentMergeMode::Before,
-                                "after" => FragmentMergeMode::After,
-                                "upsertAttributes" => FragmentMergeMode::UpsertAttributes,
-                                _ => unreachable!(),
-                            })
-                            .unwrap_or_default();
-
-                        MergeFragments {
-                            fragments,
-                            id: event_id,
-                            retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
-                            selector,
-                            merge_mode,
-                            settle_duration: Duration::from_millis(settle_duration.unwrap_or(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION)),
-                            use_view_transition: use_view_transition.unwrap_or(consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS),
-                        }
-                        .into()
-                    }
-                    TestEvent::MergeSignals {
-                        signals,
-                        event_id,
-                        retry_duration,
-                        only_if_missing,
-                    } => MergeSignals {
-                        signals: serde_json::to_string(&signals).unwrap(),
-                        id: event_id,
-                        retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
-                        only_if_missing: only_if_missing.unwrap_or(consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING),
-                    }
-                    .into(),
-                    TestEvent::RemoveFragments {
-                        selector,
-                        event_id,
-                        retry_duration,
-                        settle_duration,
-                        use_view_transition,
-                    } => RemoveFragments {
-                        selector,
-                        id: event_id,
-                        retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
-                        settle_duration: Duration::from_millis(settle_duration.unwrap_or(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION)),
-                        use_view_transition: use_view_transition.unwrap_or(consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS),
-                    }
-                    .into(),
-                    TestEvent::RemoveSignals {
-                        paths,
-                        event_id,
-                        retry_duration,
-                    } => RemoveSignals {
-                        paths,
-                        id: event_id,
-                        retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
-                    }
-                    .into(),
-                }
-            }
-        })
+    async fn test(ReadSignals(signals): ReadSignals<Signals>) -> impl IntoResponse {
+        Sse(testing::test(signals.events))
     }
 
     #[tokio::test]
-    async fn sdk_test() -> Result<(), Box<dyn std::error::Error>> {
+    async fn sdk_test() -> Result<(), Box<dyn core::error::Error>> {
         let listener = TcpListener::bind("127.0.0.1:3000").await?;
         let app = Router::new()
             .route("/test", get(test))

@@ -11,22 +11,15 @@ use {
 ///
 /// # Examples
 ///
-/// ```
-/// use datastar::prelude::{ServerSentEventGenerator, MergeSignals};
+///  ```
+/// use datastar::prelude::{Sse, MergeSignals};
+/// use async_stream::stream;
 ///
-/// let merge_signals: String = MergeSignals::new("{foo: 1234}")
-///     .only_if_missing(true)
-///     .send();
-///
-/// let expected: &str = "event: datastar-merge-signals
-/// retry: 1000
-/// data: onlyIfMissing true
-/// data: signals {foo: 1234}
-///
-///
-/// ";
-///
-/// assert_eq!(merge_signals, expected);
+/// Sse(stream! {
+///     yield MergeSignals::new("{foo: 1234}")
+///         .only_if_missing(true)
+///         .into();
+/// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MergeSignals {
@@ -35,7 +28,6 @@ pub struct MergeSignals {
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// Defaults to `1000ms`.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     pub retry: Duration,
     /// `signals` is a JavaScript object or JSON string that will be sent to the browser to update signals in the signals.

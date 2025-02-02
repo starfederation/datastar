@@ -17,30 +17,18 @@ use {
 /// # Examples
 ///
 /// ```
-/// use {
-///     core::time::Duration,
-///     datastar::prelude::{ServerSentEventGenerator, MergeFragments, FragmentMergeMode}
-/// };
+/// use datastar::prelude::{Sse, MergeFragments, FragmentMergeMode};
+/// use async_stream::stream;
+/// use core::time::Duration;
 ///
-/// let merge_fragments: String = MergeFragments::new("<h1>Hello, world!</h1>")
-///     .selector("body")
-///     .merge_mode(FragmentMergeMode::Append)
-///     .settle_duration(Duration::from_millis(1000))
-///     .use_view_transition(true)
-///     .send();
-///
-/// let expected: &str = "event: datastar-merge-fragments
-/// retry: 1000
-/// data: selector body
-/// data: mergeMode append
-/// data: settleDuration 1000
-/// data: useViewTransition true
-/// data: fragments <h1>Hello, world!</h1>
-///
-///
-/// ";
-///
-/// assert_eq!(merge_fragments, expected);
+/// Sse(stream! {
+///     yield MergeFragments::new("<h1>Hello, world!</h1>")
+///         .selector("body")
+///         .merge_mode(FragmentMergeMode::Append)
+///         .settle_duration(Duration::from_millis(1000))
+///         .use_view_transition(true)
+///         .into();
+/// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MergeFragments {
@@ -49,7 +37,6 @@ pub struct MergeFragments {
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// Defaults to `1000ms`.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     pub retry: Duration,
     /// The HTML fragments to merge into the DOM.
@@ -62,7 +49,6 @@ pub struct MergeFragments {
     pub merge_mode: FragmentMergeMode,
     /// The amount of time that a fragment should take before removing any CSS related to settling.
     /// `settle_duration` is used to allow for animations in the browser via the Datastar client.
-    /// Defaults to `300ms`.
     pub settle_duration: Duration,
     /// Whether to use view transitions, if not provided the Datastar client side will default to `false`.
     pub use_view_transition: bool,
