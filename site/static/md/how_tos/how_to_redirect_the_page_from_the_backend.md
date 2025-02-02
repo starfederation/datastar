@@ -40,7 +40,7 @@ Here's how it would look using the SDKs.
 
 Note that in Firefox, if a redirect happens within a `script` tag then the URL is _replaced_, rather than _pushed_, meaning that the previous URL won't show up in the back history (or back/forward navigation).
 
-To work around this, you can wrap the redirect in a `setTimeout` function call (see [issue #529](https://github.com/starfederation/datastar/issues/529)).
+To work around this, you can wrap the redirect in a `setTimeout` function call. See [issue #529](https://github.com/starfederation/datastar/issues/529) for reference.
 
 !!!CODE_SNIPPET:how_tos/redirect_2!!!
 
