@@ -29,7 +29,6 @@ var staticFS embed.FS
 var (
 	staticSys    = hashfs.NewFS(staticFS)
 	highlightCSS templ.Component
-	indexPath    = "data-star.bleve"
 )
 
 func staticPath(path string) string {
@@ -102,26 +101,16 @@ func setupRoutes(ctx context.Context, router chi.Router) (err error) {
 	}
 	ns.WaitForServer()
 
-	index, err := bleve.Open(indexPath)
-	if err == bleve.ErrorIndexPathDoesNotExist {
-		log.Printf("Creating new index...")
-		mapping := bleve.NewIndexMapping()
-		index, err = bleve.New(indexPath, mapping)
-		if err != nil {
-			log.Fatal(fmt.Errorf("failed to create index: %w", err))
-		}
-
-	} else if err != nil {
-		log.Fatal("failed to open index: %w", err)
-	} else {
-		log.Printf("Opening existing index...")
+	mapping := bleve.NewIndexMapping()
+	index, err := bleve.NewMemOnly(mapping)
+	if err != nil {
+		log.Fatal("failed to create in-memory index: ", err)
 	}
-
 	if err := indexSiteContent(ctx, index); err != nil {
 		log.Fatal("failed to index site content, ", err)
 	}
 
-	log.Println("Indexed site, index can be found at: ", indexPath)
+	log.Println("Indexed site")
 
 	sessionSignals := sessions.NewCookieStore([]byte("datastar-session-secret"))
 	sessionSignals.MaxAge(int(24 * time.Hour / time.Second))
@@ -149,11 +138,14 @@ type SiteIndexDoc struct {
 	Contents    string
 }
 
+//go:embed static/md
+var embeddedFiles embed.FS
+
 func indexSiteContent(ctx context.Context, index bleve.Index) error {
-	markdownDir := "site/static/md"
+	markdownDir := "static/md"
 	extractor := plaintext.NewHtmlExtractor()
 
-	return filepath.WalkDir(markdownDir, func(path string, d fs.DirEntry, err error) error {
+	return fs.WalkDir(embeddedFiles, markdownDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return fmt.Errorf("error accessing path %s: %w", path, err)
 		}
