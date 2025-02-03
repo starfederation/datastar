@@ -2,6 +2,8 @@ package site
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -10,27 +12,25 @@ import (
 	"github.com/samber/lo"
 )
 
-func setupReferences(ctx context.Context, router chi.Router) error {
-	mdDataset, err := markdownRenders(ctx, "reference")
+func setupHowTos(ctx context.Context, router chi.Router) error {
+	mdDataset, err := markdownRenders(ctx, "how_tos")
 	if err != nil {
 		return err
 	}
 
 	sidebarGroups := []*SidebarGroup{
 		{
-			Label: "Reference",
+			Label: "How Tos",
 			Links: []*SidebarLink{
-				{ID: "attribute_plugins"},
-				{ID: "action_plugins"},
-				{ID: "sse_events"},
-				{ID: "javascript_api"},
-				{ID: "sdks"},
+				{ID: "how_to_bind_keydown_events_to_specific_keys"},
+				{ID: "how_to_poll_the_backend_at_regular_intervals"},
+				{ID: "how_to_redirect_the_page_from_the_backend"},
 			},
 		},
 	}
 	lo.ForEach(sidebarGroups, func(group *SidebarGroup, grpIdx int) {
 		lo.ForEach(group.Links, func(link *SidebarLink, linkIdx int) {
-			link.URL = templ.SafeURL("/reference/" + link.ID)
+			link.URL = templ.SafeURL("/how_tos/" + link.ID)
 			link.Label = strings.ToUpper(strings.ReplaceAll(link.ID, "_", " "))
 
 			if linkIdx > 0 {
@@ -49,20 +49,12 @@ func setupReferences(ctx context.Context, router chi.Router) error {
 		})
 	})
 
-	router.Route("/reference", func(referenceRouter chi.Router) {
-		referenceRouter.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	router.Route("/how_tos", func(howTosRouter chi.Router) {
+		howTosRouter.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, string(sidebarGroups[0].Links[0].URL), http.StatusFound)
 		})
 
-		// Redirect legacy pages to “Attribute Plugins”.
-		legacyPages := []string{"core", "dom", "browser", "backend", "logic"}
-		for _, page := range legacyPages {
-			referenceRouter.Get("/plugins_"+page, func(w http.ResponseWriter, r *http.Request) {
-				http.Redirect(w, r, "/reference/attribute_plugins", http.StatusMovedPermanently)
-			})
-		}
-
-		referenceRouter.Get("/{name}", func(w http.ResponseWriter, r *http.Request) {
+		howTosRouter.Get("/{name}", func(w http.ResponseWriter, r *http.Request) {
 			name := chi.URLParam(r, "name")
 			mdData, ok := mdDataset[name]
 			if !ok {
@@ -82,7 +74,15 @@ func setupReferences(ctx context.Context, router chi.Router) error {
 
 			SidebarPage(r, sidebarGroups, currentLink, mdData.Title, mdData.Description, mdData.Contents).Render(r.Context(), w)
 		})
+
+		if err := errors.Join(
+			setupHowTosPolling(howTosRouter),
+			setupHowTosRedirects(howTosRouter),
+		); err != nil {
+			panic(fmt.Sprintf("error setting up examples routes: %s", err))
+		}
 	})
 
 	return nil
+
 }

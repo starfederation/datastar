@@ -5,6 +5,7 @@ import (
 	datastar "github.com/starfederation/datastar/sdk/go"
 	"net/http"
 	"strings"
+	"github.com/delaneyj/toolbelt"
 )
 
 templ Page(title, description string, uri string) {
@@ -74,7 +75,7 @@ templ headerIconLink(iconName, href string) {
 }
 
 templ headerTopLevelLink(r *http.Request, text string) {
-	{{ url := templ.SafeURL("/" + strings.ToLower(text)) }}
+	{{ url := templ.SafeURL("/" + toolbelt.Snake(text)) }}
 	<a
 		href={ url }
 		class={
@@ -97,26 +98,17 @@ templ headerExternalLinks() {
 }
 
 templ headerTopLevelLinks(r *http.Request) {
-	@headerDropdownMenu("Learn") {
-		<li>
-			@headerTopLevelLink(r, "Guide")
-		</li>
-		<li>
-			@headerTopLevelLink(r, "Reference")
-		</li>
-		<li>
-			@headerTopLevelLink(r, "Examples")
-		</li>
-	}
-	@headerDropdownMenu("Vibes") {
+	@headerTopLevelLink(r, "Guide")
+	@headerTopLevelLink(r, "Reference")
+	@headerTopLevelLink(r, "How Tos")
+	@headerTopLevelLink(r, "Examples")
+	@headerDropdownMenu("More") {
 		<li>
 			@headerTopLevelLink(r, "Essays")
 		</li>
 		<li>
 			@headerTopLevelLink(r, "Memes")
 		</li>
-	}
-	@headerDropdownMenu("Tools") {
 		<li>
 			@headerTopLevelLink(r, "Bundler")
 		</li>
@@ -136,7 +128,7 @@ templ header(r *http.Request) {
 				</a>
 				<div class="font-mono text-xs text-accent">v{ datastar.Version }</div>
 			</div>
-			<div class="hidden lg:text-md lg:text-lg lg:flex lg:gap-4 lg:visible ">
+			<div class="hidden lg:text-md lg:text-lg lg:flex lg:gap-4 xl:gap-8 lg:visible ">
 				@headerTopLevelLinks(r)
 			</div>
 			<div class="hidden text-xl lg:flex lg:gap-4 lg:visible">
@@ -144,7 +136,7 @@ templ header(r *http.Request) {
 			</div>
 		</div>
 	</div>
-	<div class="flex flex-wrap justify-around visible gap-2 pb-8 text-sm bg-base-200 lg:hidden">
+	<div class="flex flex-wrap justify-around visible pb-8 text-sm bg-base-200 lg:hidden">
 		@headerTopLevelLinks(r)
 	</div>
 	<div class="visible navbar bg-base-300 lg:hidden">
@@ -306,7 +298,7 @@ templ sseIndicator(signalName string) {
 
 templ headerDropdownMenu(title string) {
 	<div class="dropdown dropdown-hover">
-		<div tabindex="0" role="button" class="font-bold uppercase link-hover m-1">{ title }</div>
+		<div tabindex="0" role="button" class="font-bold uppercase link-hover">{ title }</div>
 		<ul tabindex="0" class="dropdown-content menu bg-base-300 rounded-box z-[1] w-52 p-2 shadow">
 			{ children... }
 		</ul>
