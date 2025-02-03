@@ -6,7 +6,7 @@ The [`data-on`](/reference/attribute_plugins#data-on) attribute allows us to att
 
 ## Goal
 
-Our goal is to show an alert whenver the user presses the `Enter` key, or a combination of the `Ctrl` and `L` keys. 
+Our goal is to show an alert whenever the user presses the `Enter` key, or a combination of the `Ctrl` and `L` keys. 
 
 ## Demo
 
