@@ -316,6 +316,29 @@ RSpec.describe Datastar::Dispatcher do
       expect(disconnects).to eq([true])
     end
 
+    it 'catches exceptions raised from threads' do
+      Thread.report_on_exception = false
+      errs = []
+
+      dispatcher = Datastar
+                    .new(request:, response:)
+                    .on_error { |err| errs << err }
+
+      dispatcher.stream do |sse|
+        sleep 0.01
+        raise ArgumentError, 'Invalid argument'
+      end
+
+      dispatcher.stream do |sse|
+        sse.merge_signals(foo: 'bar')
+      end
+
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(errs.first).to be_a(ArgumentError)
+      Thread.report_on_exception = true
+    end
+
     specify '#signals' do
       request = build_request(
         %(/events), 
