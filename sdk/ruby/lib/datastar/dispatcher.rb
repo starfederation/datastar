@@ -8,11 +8,17 @@ module Datastar
 
     attr_reader :request, :response
 
-    def initialize(request:, response: nil, view_context: nil, spawner: Datastar.config.spawner)
+    def initialize(
+      request:, 
+      response: nil, 
+      view_context: nil, 
+      spawner: Datastar.config.spawner,
+      error_callback: Datastar.config.error_callback
+    )
       @on_connect = []
       @on_client_disconnect = []
       @on_server_disconnect = []
-      @on_error = []
+      @on_error = [error_callback]
       @streamers = []
       @queue = nil
       @spawner = spawner

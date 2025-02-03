@@ -393,6 +393,19 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.response.body.call(socket)
       expect(errors.first).to be_a(ArgumentError)
     end
+
+    specify 'with global on_error' do
+      errs = []
+      Datastar.config.on_error { |ex| errs << ex }
+      socket = TestSocket.new
+      allow(socket).to receive(:<<).and_raise(ArgumentError, 'Invalid argument')
+      
+      dispatcher.stream do |sse|
+        sse.merge_signals(foo: 'bar')
+      end
+      dispatcher.response.body.call(socket)
+      expect(errs.first).to be_a(ArgumentError)
+    end
   end
 
   private
