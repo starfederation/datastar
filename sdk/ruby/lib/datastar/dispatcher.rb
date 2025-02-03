@@ -2,19 +2,13 @@
 
 module Datastar
   class Dispatcher
-    class ThreadSpawner
-      def spawn(&block)
-        Thread.new(&block)
-      end
-    end
-
     BLANK_BODY = [].freeze
     SSE_CONTENT_TYPE = 'text/event-stream'
     HTTP_ACCEPT = 'HTTP_ACCEPT'
 
     attr_reader :request, :response
 
-    def initialize(request:, response: nil, view_context: nil, spawner: ThreadSpawner.new)
+    def initialize(request:, response: nil, view_context: nil, spawner: Datastar.config.spawner)
       @on_connect = []
       @on_client_disconnect = []
       @on_server_disconnect = []
