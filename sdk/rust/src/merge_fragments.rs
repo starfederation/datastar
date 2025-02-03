@@ -4,7 +4,7 @@
 use {
     crate::{
         consts::{self},
-        prelude::{FragmentMergeMode, ServerSentEventGenerator},
+        prelude::{DatastarEvent, FragmentMergeMode},
     },
     core::time::Duration,
 };
@@ -17,30 +17,18 @@ use {
 /// # Examples
 ///
 /// ```
-/// use {
-///     core::time::Duration,
-///     datastar::prelude::{ServerSentEventGenerator, MergeFragments, FragmentMergeMode}
-/// };
+/// use datastar::prelude::{Sse, MergeFragments, FragmentMergeMode};
+/// use async_stream::stream;
+/// use core::time::Duration;
 ///
-/// let merge_fragments: String = MergeFragments::new("<h1>Hello, world!</h1>")
-///     .selector("body")
-///     .merge_mode(FragmentMergeMode::Append)
-///     .settle_duration(Duration::from_millis(1000))
-///     .use_view_transition(true)
-///     .send();
-///
-/// let expected: &str = "event: datastar-merge-fragments
-/// retry: 1000
-/// data: selector body
-/// data: mergeMode append
-/// data: settleDuration 1000
-/// data: useViewTransition true
-/// data: fragments <h1>Hello, world!</h1>
-///
-///
-/// ";
-///
-/// assert_eq!(merge_fragments, expected);
+/// Sse(stream! {
+///     yield MergeFragments::new("<h1>Hello, world!</h1>")
+///         .selector("body")
+///         .merge_mode(FragmentMergeMode::Append)
+///         .settle_duration(Duration::from_millis(1000))
+///         .use_view_transition(true)
+///         .into();
+/// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MergeFragments {
@@ -48,10 +36,9 @@ pub struct MergeFragments {
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
     pub id: Option<String>,
-    /// `retry_duration` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// Defaults to `1000ms`.
+    /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
-    pub retry_duration: Duration,
+    pub retry: Duration,
     /// The HTML fragments to merge into the DOM.
     pub fragments: String,
     /// The CSS selector to use to insert the fragments.
@@ -62,7 +49,6 @@ pub struct MergeFragments {
     pub merge_mode: FragmentMergeMode,
     /// The amount of time that a fragment should take before removing any CSS related to settling.
     /// `settle_duration` is used to allow for animations in the browser via the Datastar client.
-    /// Defaults to `300ms`.
     pub settle_duration: Duration,
     /// Whether to use view transitions, if not provided the Datastar client side will default to `false`.
     pub use_view_transition: bool,
@@ -73,7 +59,7 @@ impl MergeFragments {
     pub fn new(fragments: impl Into<String>) -> Self {
         Self {
             id: Default::default(),
-            retry_duration: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
+            retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             fragments: fragments.into(),
             selector: Default::default(),
             merge_mode: Default::default(),
@@ -88,9 +74,9 @@ impl MergeFragments {
         self
     }
 
-    /// Sets the `retry_duration` of the [`MergeFragments`] event.
-    pub fn retry_duration(mut self, retry_duration: Duration) -> Self {
-        self.retry_duration = retry_duration;
+    /// Sets the `retry` of the [`MergeFragments`] event.
+    pub fn retry(mut self, retry: Duration) -> Self {
+        self.retry = retry;
         self
     }
 
@@ -119,64 +105,51 @@ impl MergeFragments {
     }
 }
 
-impl ServerSentEventGenerator for MergeFragments {
-    fn send(&self) -> String {
-        let mut result = String::new();
-
-        result.push_str("event: ");
-        result.push_str(consts::EventType::MergeFragments.as_str());
-        result.push_str("\n");
-
-        if let Some(id) = &self.id {
-            result.push_str("id: ");
-            result.push_str(id);
-            result.push_str("\n");
-        }
-
-        result.push_str("retry: ");
-        result.push_str(&self.retry_duration.as_millis().to_string());
-        result.push_str("\n");
+impl Into<DatastarEvent> for MergeFragments {
+    fn into(self) -> DatastarEvent {
+        let mut data: Vec<String> = Vec::new();
 
         if let Some(selector) = &self.selector {
-            result.push_str("data: ");
-            result.push_str(consts::SELECTOR_DATALINE_LITERAL);
-            result.push_str(" ");
-            result.push_str(selector);
-            result.push_str("\n");
+            data.push(format!(
+                "{} {}",
+                consts::SELECTOR_DATALINE_LITERAL,
+                selector
+            ));
         }
 
-        if self.merge_mode != FragmentMergeMode::Morph {
-            result.push_str("data: ");
-            result.push_str(consts::MERGE_MODE_DATALINE_LITERAL);
-            result.push_str(" ");
-            result.push_str(self.merge_mode.as_str());
-            result.push_str("\n");
+        if self.merge_mode != FragmentMergeMode::default() {
+            data.push(format!(
+                "{} {}",
+                consts::MERGE_MODE_DATALINE_LITERAL,
+                self.merge_mode.as_str()
+            ));
         }
 
-        if self.settle_duration.as_millis() != 300 {
-            result.push_str("data: ");
-            result.push_str(consts::SETTLE_DURATION_DATALINE_LITERAL);
-            result.push_str(" ");
-            result.push_str(&self.settle_duration.as_millis().to_string());
-            result.push_str("\n");
+        if self.settle_duration.as_millis() != consts::DEFAULT_FRAGMENTS_SETTLE_DURATION as u128 {
+            data.push(format!(
+                "{} {}",
+                consts::SETTLE_DURATION_DATALINE_LITERAL,
+                self.settle_duration.as_millis()
+            ));
         }
 
-        if self.use_view_transition {
-            result.push_str("data: ");
-            result.push_str(consts::USE_VIEW_TRANSITION_DATALINE_LITERAL);
-            result.push_str(" true\n");
+        if self.use_view_transition != consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS {
+            data.push(format!(
+                "{} {}",
+                consts::USE_VIEW_TRANSITION_DATALINE_LITERAL,
+                self.use_view_transition
+            ));
         }
 
         for line in self.fragments.lines() {
-            result.push_str("data: ");
-            result.push_str(consts::FRAGMENTS_DATALINE_LITERAL);
-            result.push_str(" ");
-            result.push_str(line);
-            result.push_str("\n");
+            data.push(format!("{} {}", consts::FRAGMENTS_DATALINE_LITERAL, line));
         }
 
-        result.push_str("\n\n");
-
-        result
+        DatastarEvent {
+            event: consts::EventType::MergeFragments,
+            id: self.id.clone(),
+            retry: self.retry,
+            data,
+        }
     }
 }
