@@ -50,4 +50,4 @@ Sometimes, we may want to prevent the default behavior of the keydown event, suc
 
 ## Conclusion
 
-The `evt` variable is always available in `data-on` expressions. In the case of a `keydown` event, it represents a [`keydown`](https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event) event (which is a [`KeyboardEvent`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent)), allowing us to perform actions conditionally, based on any of its properties.
+The `evt` variable is always available in `data-on` expressions. In the case of the [`keydown`](https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event) event, which is a [`KeyboardEvent`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent), we can perform actions conditionally, based on any of the event's properties.
