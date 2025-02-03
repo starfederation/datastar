@@ -97,12 +97,30 @@ templ headerExternalLinks() {
 }
 
 templ headerTopLevelLinks(r *http.Request) {
-	@headerTopLevelLink(r, "Guide")
-	@headerTopLevelLink(r, "Reference")
-	@headerTopLevelLink(r, "Examples")
-	@headerTopLevelLink(r, "Essays")
-	@headerTopLevelLink(r, "Memes")
-	@headerTopLevelLink(r, "Bundler")
+	@headerDropdownMenu("Learn") {
+		<li>
+			@headerTopLevelLink(r, "Guide")
+		</li>
+		<li>
+			@headerTopLevelLink(r, "Reference")
+		</li>
+		<li>
+			@headerTopLevelLink(r, "Examples")
+		</li>
+	}
+	@headerDropdownMenu("Vibes") {
+		<li>
+			@headerTopLevelLink(r, "Essays")
+		</li>
+		<li>
+			@headerTopLevelLink(r, "Memes")
+		</li>
+	}
+	@headerDropdownMenu("Tools") {
+		<li>
+			@headerTopLevelLink(r, "Bundler")
+		</li>
+	}
 }
 
 templ header(r *http.Request) {
@@ -284,4 +302,13 @@ templ templSignalsJSON() {
 
 templ sseIndicator(signalName string) {
 	<div class="loading-dots text-primary" data-class={ fmt.Sprintf("{'loading ml-4': $%s}", signalName) }></div>
+}
+
+templ headerDropdownMenu(title string) {
+	<div class="dropdown dropdown-hover">
+		<div tabindex="0" role="button" class="font-bold uppercase link-hover m-1">{ title }</div>
+		<ul tabindex="0" class="dropdown-content menu bg-base-300 rounded-box z-[1] w-52 p-2 shadow">
+			{ children... }
+		</ul>
+	</div>
 }
