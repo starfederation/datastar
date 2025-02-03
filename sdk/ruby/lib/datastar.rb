@@ -13,8 +13,8 @@ module Datastar
     end
   end
 
-  def self.new(request:, response:, view_context: nil)
-    Dispatcher.new(request:, response:, view_context:)
+  def self.new(...)
+    Dispatcher.new(...)
   end
 end
 

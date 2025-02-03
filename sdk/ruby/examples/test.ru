@@ -24,8 +24,10 @@ run do |env|
     .new(request:, response:, view_context: self)
     .on_connect do |socket|
       p ['connect', socket]
-    end.on_disconnect do |socket|
-      p ['disconnect', socket]
+    end.on_server_disconnect do |socket|
+      p ['server disconnect', socket]
+    end.on_client_disconnect do |socket|
+      p ['client disconnect', socket]
     end.on_error do |error|
       p ['exception', error]
       puts error.backtrace.join("\n")

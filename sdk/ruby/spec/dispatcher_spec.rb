@@ -291,6 +291,31 @@ RSpec.describe Datastar::Dispatcher do
       expect(socket.lines[1]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
     end
 
+    it 'spawns multiple streams in threads, triggering callbacks only once' do
+      disconnects = []
+
+      dispatcher = Datastar
+                    .new(request:, response:)
+                    .on_server_disconnect { |_| disconnects << true }
+
+      dispatcher.stream do |sse|
+        sleep 0.01
+        sse.merge_fragments %(<div id="foo">\n<span>hello</span>\n</div>\n)
+      end
+
+      dispatcher.stream do |sse|
+        sse.merge_signals(foo: 'bar')
+      end
+
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines.size).to eq(2)
+      expect(socket.lines[0]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
+      expect(socket.lines[1]).to eq("event: datastar-merge-fragments\ndata: fragments <div id=\"foo\">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n")
+      expect(disconnects).to eq([true])
+    end
+
     specify '#signals' do
       request = build_request(
         %(/events), 
@@ -324,17 +349,32 @@ RSpec.describe Datastar::Dispatcher do
       expect(connected).to be(true)
     end
 
-    specify '#on_disconnect' do
+    specify '#on_client_disconnect' do
       events = []
       dispatcher
         .on_connect { |conn| events << true }
-        .on_disconnect { |conn| events << false }
+        .on_client_disconnect { |conn| events << false }
 
       dispatcher.stream do |sse|
         sse.merge_signals(foo: 'bar')
       end
       socket = TestSocket.new
       allow(socket).to receive(:<<).and_raise(Errno::EPIPE, 'Socket closed')
+      
+      dispatcher.response.body.call(socket)
+      expect(events).to eq([true, false])
+    end
+
+    specify '#on_server_disconnect' do
+      events = []
+      dispatcher
+        .on_connect { |conn| events << true }
+        .on_server_disconnect { |conn| events << false }
+
+      dispatcher.stream do |sse|
+        sse.merge_signals(foo: 'bar')
+      end
+      socket = TestSocket.new
       
       dispatcher.response.body.call(socket)
       expect(events).to eq([true, false])
