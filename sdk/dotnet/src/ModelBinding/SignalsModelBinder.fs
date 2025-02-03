@@ -16,26 +16,32 @@ type SignalsModelBinder(signalsReader:IDatastarSignalsReaderService) =
                 if bindingContext.ModelType.IsValueType || bindingContext.ModelType = typedefof<string> then
                     task {
                         let! signalsJson = signalsReader.ReadSignalsAsync()
-                        let signalsJsonObject = JsonObject.Parse(signalsJson).AsObject()
-                        let signals = JsonPath.getValue bindingContext.ModelType signalsJsonObject bindingContext.FieldName
-                        bindingContext.Result <- ModelBindingResult.Success(signals)
+                        try
+                            let signalsJsonObject = JsonObject.Parse(signalsJson).AsObject()
+                            let signals = JsonPath.getValue bindingContext.ModelType signalsJsonObject bindingContext.FieldName
+                            bindingContext.Result <- ModelBindingResult.Success(signals)
+                        with _ -> bindingContext.Result <- ModelBindingResult.Failed()
                     }
                 else
                     task {
                         let! signalsJson = signalsReader.ReadSignalsAsync()
-                        let signalsJsonObject = JsonObject.Parse(signalsJson).AsObject()
-                        let signals =
-                            if signalsJsonObject.ContainsKey bindingContext.FieldName
-                            then JsonPath.getValue bindingContext.ModelType signalsJsonObject bindingContext.FieldName
-                            else JsonSerializer.Deserialize(signalsJsonObject, bindingContext.ModelType)
-                        bindingContext.Result <- ModelBindingResult.Success(signals)
+                        try
+                            let signalsJsonObject = JsonObject.Parse(signalsJson).AsObject()
+                            let signals =
+                                if signalsJsonObject.ContainsKey bindingContext.FieldName
+                                then JsonPath.getValue bindingContext.ModelType signalsJsonObject bindingContext.FieldName
+                                else JsonSerializer.Deserialize(signalsJsonObject, bindingContext.ModelType)
+                            bindingContext.Result <- ModelBindingResult.Success(signals)
+                        with _ -> bindingContext.Result <- ModelBindingResult.Failed()
                     }
             | path ->
                 task {
                     let! signalsJson = signalsReader.ReadSignalsAsync()
-                    let signalsJsonObject = JsonObject.Parse(signalsJson).AsObject()
-                    let signals = JsonPath.getValue bindingContext.ModelType signalsJsonObject path
-                    bindingContext.Result <- ModelBindingResult.Success(signals)
+                    try
+                        let signalsJsonObject = JsonObject.Parse(signalsJson).AsObject()
+                        let signals = JsonPath.getValue bindingContext.ModelType signalsJsonObject path
+                        bindingContext.Result <- ModelBindingResult.Success(signals)
+                    with _ -> bindingContext.Result <- ModelBindingResult.Failed()
                 }
 
 type SignalsModelBinderProvider() =

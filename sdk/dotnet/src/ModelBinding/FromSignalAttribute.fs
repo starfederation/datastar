@@ -11,10 +11,9 @@ type DatastarSignalsBindingSource(Path:string) =
     member this.Path = Path
 
 [<AttributeUsage(AttributeTargets.Parameter + AttributeTargets.Property, AllowMultiple = false, Inherited = true)>]
-type FromSignalsAttribute(Path:string) =
+type FromSignalsAttribute() =
     inherit Attribute()
-    member this.Path = Path
-    new() = FromSignalsAttribute("")
+    member val Path = "" with get, set
 
     with
     interface IBindingSourceMetadata with
