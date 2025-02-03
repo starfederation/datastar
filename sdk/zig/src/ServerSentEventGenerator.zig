@@ -96,7 +96,9 @@ fn send(
         try self.writer.print("id: {s}\n", .{id});
     }
 
-    try self.writer.print("retry: {d}\n", .{options.retry_duration});
+    if (options.retry_duration != consts.default_sse_retry_duration) {
+        try self.writer.print("retry: {d}\n", .{options.retry_duration});
+    }
 
     for (data) |line| {
         try self.writer.print("data: {s}\n", .{line});
