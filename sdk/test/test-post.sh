@@ -10,6 +10,6 @@ curl -sN -H "datastar-request" --json "$input" "$2/test" -o "$1/testOutput.txt"
 
 [ ! -f "$1/testOutput.txt" ] && echo "case $1 failed: your server did not return anything" && return 1
 
-diff -q "$1/testOutput.txt" "$1/output.txt"
+diff -q "$1/testOutput.txt" "$1/output.txt" || { exit 1; }
 
 exit 0

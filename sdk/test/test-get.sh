@@ -11,6 +11,6 @@ curl -sN --get -H "datastar-request" --data-urlencode "datastar=$input" "$2/test
 
 [ ! -f "$1/testOutput.txt" ] && echo "case $1 failed: your server did not return anything" && return 1
 
-diff -q "$1/testOutput.txt" "$1/output.txt"
+diff -q "$1/testOutput.txt" "$1/output.txt" || { exit 1; }
 
 exit 0
