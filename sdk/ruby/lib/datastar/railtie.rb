@@ -6,7 +6,6 @@ module Datastar
     class RailsThreadSpawner
       def spawn(&block)
         Thread.new do
-          Thread.current.abort_on_exception = true
           Rails.application.executor.wrap(&block)
         end
       end

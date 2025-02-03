@@ -125,6 +125,8 @@ module Datastar
                      generator = ServerSentEventGenerator.new(@queue, signals: signs, view_context: @view_context)
                      streamer.call(generator)
                      @queue << :done
+                   rescue StandardError => ex
+                    @queue << ex
                    end
                  end
 
@@ -136,6 +138,8 @@ module Datastar
                      if done_count == threads.size
                        @queue << nil
                      end
+                   elsif data.is_a?(Exception)
+                    raise data
                    else
                      out << data
                    end
@@ -147,7 +151,7 @@ module Datastar
                rescue Exception => e
                  @on_error.each { |callable| callable.call(e) }
                ensure
-                 # Ensure the stream is closed
+                 threads&.each(&:kill)
                  out.close
                end
              end
