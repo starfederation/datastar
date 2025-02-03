@@ -271,15 +271,25 @@ type BundleResults struct {
 func bundlePlugins(tmpDir string, manifest PluginManifest) (results *BundleResults, err error) {
 	start := time.Now()
 
+	hasAlias := manifest.Alias != ""
 	distDir := filepath.Join(tmpDir, "dist")
-
 	h := xxh3.New()
 	h.WriteString(manifest.Version)
+	if hasAlias {
+		h.WriteString(manifest.Alias)
+	}
 	for _, plugin := range manifest.Plugins {
 		h.WriteString(plugin.Contents)
 	}
 	hash := h.Sum64()
-	hashedName := fmt.Sprintf("datastar-%s-%x", toolbelt.Kebab(manifest.Version), hash)
+	var hashedName string
+
+	versionKebab := toolbelt.Kebab(manifest.Version)
+	if hasAlias {
+		hashedName = fmt.Sprintf("datastar-%s-%s-%x", toolbelt.Kebab(manifest.Alias), versionKebab, hash)
+	} else {
+		hashedName = fmt.Sprintf("datastar-%s-%x", versionKebab, hash)
+	}
 
 	bundleResultsPath := filepath.Join(distDir, hashedName+".json")
 
