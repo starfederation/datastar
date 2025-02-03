@@ -120,7 +120,6 @@ templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromH
 	<div data-signals={templ.JSONString(signals)} class="w-full">
 		<div class="flex flex-nowrap w-full relative">
 			<input 
-				id="site_search_input" 
 				class="flex-1 input input-bordered h-10 w-full" 
 				type="search"
 				placeholder="Search..."
@@ -140,7 +139,6 @@ templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromH
 			</div>
 		</div>
 			<ul 
-				id="search_results" 
 				class={
 					"search-results", 
 					"w-[90vw]",
