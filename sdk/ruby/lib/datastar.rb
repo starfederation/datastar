@@ -31,3 +31,4 @@ end
 require_relative 'datastar/configuration'
 require_relative 'datastar/dispatcher'
 require_relative 'datastar/server_sent_event_generator'
+require_relative 'datastar/rails/railtie' if defined?(Rails::Railtie)
