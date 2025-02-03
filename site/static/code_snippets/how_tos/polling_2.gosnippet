@@ -1,0 +1,18 @@
+import (
+    "time"
+    datastar "github.com/starfederation/datastar/sdk/go"
+)
+
+currentTime := time.Now().Format("2006-01-02 15:04:05")
+currentSeconds := time.Now().Format("05")
+duration := 1
+if currentSeconds < "50" {
+    duration = 5
+}
+
+sse := datastar.NewSSE(w, r)
+sse.MergeFragments(fmt.Sprintf(`
+    <div id="time" data-on-interval__duration.%ds="@get('/endpoint')">
+        %s
+    </div>
+`, duration, currentTime))
