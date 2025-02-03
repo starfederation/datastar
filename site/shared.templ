@@ -118,7 +118,7 @@ const SearchFromHeaderKey = "X-Search-From-Header"
 
 templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromHeader bool) {
 	<div data-signals={templ.JSONString(signals)} class="w-full">
-		<div class="flex flex-nowrap w-full">
+		<div class="flex flex-nowrap w-full relative">
 			<input 
 				id="site_search_input" 
 				class="flex-1 input input-bordered h-8 w-full" 
@@ -135,7 +135,9 @@ templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromH
 					data-on-keydown__window="evt.key == 'k' && (evt.metaKey || evt.ctrlKey) && ($siteSearchInput.focus(), evt.preventDefault())"
 				}
 			/>
-			@sseIndicator("searchFetching")
+			<div class="absolute right-8 flex items-center h-full">
+				@sseIndicator("searchFetching")
+			</div>
 		</div>
 			<ul 
 				id="search_results" 
