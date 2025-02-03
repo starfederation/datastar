@@ -29,7 +29,6 @@ pre code {
     max-height: 400px;
     min-width: clamp(100%, 90vw, 400px);
     position: absolute;
-    top: 100%;
     margin-top: .5rem;
     padding: 1rem;
     border-radius: 12px;
