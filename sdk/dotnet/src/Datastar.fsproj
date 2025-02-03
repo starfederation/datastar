@@ -60,6 +60,9 @@
         <Compile Include="DependencyInjection\DatastarServices.fs" />
         <Compile Include="DependencyInjection\DatastarServicesProvider.fs" />
         <Compile Include="DependencyInjection\ServerSentEventScriptExtensions.fs" />
+        <Compile Include="ModelBinding\FromSignalAttribute.fs" />
+        <Compile Include="ModelBinding\SignalsModelBinder.fs"/>
+        <Compile Include="ModelBinding\DatastarMvcServiceProvider.fs" />
     </ItemGroup>
 
 </Project>
