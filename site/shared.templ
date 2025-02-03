@@ -121,7 +121,7 @@ templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromH
 		<div class="flex flex-nowrap w-full relative">
 			<input 
 				id="site_search_input" 
-				class="flex-1 input input-bordered h-8 w-full" 
+				class="flex-1 input input-bordered h-10 w-full" 
 				type="search"
 				placeholder="Search..."
 				data-bind="siteSearch"
@@ -135,7 +135,7 @@ templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromH
 					data-on-keydown__window="evt.key == 'k' && (evt.metaKey || evt.ctrlKey) && ($siteSearchInput.focus(), evt.preventDefault())"
 				}
 			/>
-			<div class="absolute right-8 flex items-center h-full">
+			<div class="absolute right-4 flex items-center h-full">
 				@sseIndicator("searchFetching")
 			</div>
 		</div>
