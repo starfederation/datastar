@@ -1,7 +1,7 @@
 //! [`RemoveSignals`] sends signals to the browser to be removed from the signals.
 
 use {
-    crate::{consts, ServerSentEventGenerator},
+    crate::{consts, DatastarEvent},
     core::time::Duration,
 };
 
@@ -12,20 +12,12 @@ use {
 /// # Examples
 ///
 /// ```
-/// use datastar::prelude::{ServerSentEventGenerator, RemoveSignals};
+/// use datastar::prelude::{Sse, RemoveSignals};
+/// use async_stream::stream;
 ///
-/// let remove_signals: String = RemoveSignals::new(["foo.bar", "1234", "abc"]).send();
-///
-/// let expected: &str = r#"event: datastar-remove-signals
-/// retry: 1000
-/// data: paths foo.bar
-/// data: paths 1234
-/// data: paths abc
-///
-///
-/// "#;
-///
-/// assert_eq!(remove_signals, expected);
+/// Sse(stream! {
+///     yield RemoveSignals::new(["foo.bar", "1234", "abc"]).into();
+/// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RemoveSignals {
@@ -33,10 +25,9 @@ pub struct RemoveSignals {
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
     pub id: Option<String>,
-    /// `retry_duration` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// Defaults to `1000ms`.
+    /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
-    pub retry_duration: Duration,
+    pub retry: Duration,
     /// `paths` is a list of strings that represent the signal paths to be removed from the signals.
     /// The paths ***must*** be valid . delimited paths to signals within the signals.
     /// The Datastar client side will use these paths to remove the data from the signals.
@@ -48,7 +39,7 @@ impl RemoveSignals {
     pub fn new(paths: impl IntoIterator<Item = impl Into<String>>) -> Self {
         Self {
             id: Default::default(),
-            retry_duration: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
+            retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             paths: paths.into_iter().map(Into::into).collect(),
         }
     }
@@ -59,41 +50,26 @@ impl RemoveSignals {
         self
     }
 
-    /// Sets the `retry_duration` of the [`RemoveSignals`] event.
-    pub fn retry_duration(mut self, retry_duration: Duration) -> Self {
-        self.retry_duration = retry_duration;
+    /// Sets the `retry` of the [`RemoveSignals`] event.
+    pub fn retry(mut self, retry: Duration) -> Self {
+        self.retry = retry;
         self
     }
 }
 
-impl ServerSentEventGenerator for RemoveSignals {
-    fn send(&self) -> String {
-        let mut result = String::new();
-
-        result.push_str("event: ");
-        result.push_str(consts::EventType::RemoveSignals.as_str());
-        result.push_str("\n");
-
-        if let Some(id) = &self.id {
-            result.push_str("id: ");
-            result.push_str(id);
-            result.push_str("\n");
-        }
-
-        result.push_str("retry: ");
-        result.push_str(&self.retry_duration.as_millis().to_string());
-        result.push_str("\n");
+impl Into<DatastarEvent> for RemoveSignals {
+    fn into(self) -> DatastarEvent {
+        let mut data: Vec<String> = Vec::new();
 
         for line in &self.paths {
-            result.push_str("data: ");
-            result.push_str(consts::PATHS_DATALINE_LITERAL);
-            result.push_str(" ");
-            result.push_str(line);
-            result.push_str("\n");
+            data.push(format!("{} {}", consts::PATHS_DATALINE_LITERAL, line));
         }
 
-        result.push_str("\n\n");
-
-        result
+        DatastarEvent {
+            event: consts::EventType::RemoveSignals,
+            id: self.id,
+            retry: self.retry,
+            data,
+        }
     }
 }

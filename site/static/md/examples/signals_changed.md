@@ -6,7 +6,7 @@
   data-signals="{clicks:0, _localState: {bar: 1234}, _anotherLocalVar: 'hello'}"
   data-on-signals-change__remote="@post('/examples/signals_changed/updates')"
   >
-    <div class="flex gap-4">
+    <div class="flex flex-col md:flex-row gap-4">
       <button
         id="increment"
         class="btn btn-success"
