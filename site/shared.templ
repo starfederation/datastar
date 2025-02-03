@@ -115,6 +115,94 @@ templ headerTopLevelLinks(r *http.Request) {
 	}
 }
 
+type SiteSearchSignals struct {
+	Search string `json:"siteSearch"`
+	SearchFetching bool `json:"searchFetching"`
+	OpenSearchResults bool `json:"openSearchResults"`
+}
+
+type SearchResult struct {
+	ID    string  `json:"id"`
+	Title string `json:"title"`
+	Score float64 `json:"score"`
+	Fragment string `json:"fragment"`
+}
+
+const SearchFromHeaderKey = "X-Search-From-Header"
+
+templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromHeader bool) {
+	<div data-signals={templ.JSONString(signals)} class="w-full">
+		<div class="flex flex-nowrap w-full relative">
+			<input 
+				class="flex-1 input input-bordered h-10 w-full" 
+				type="search"
+				placeholder="Search..."
+				data-bind="siteSearch"
+				data-on-input__debounce.300ms={ fmt.Sprintf(
+    				"$siteSearch.length > 1 && @get('/api/search', %s)", 
+   					 fmt.Sprintf(`{"headers": {"%s": "%t"}}`, SearchFromHeaderKey, fromHeader),
+				)}
+				data-indicator="$searchFetching"
+				if fromHeader {
+					data-ref-site-search-input
+					data-on-keydown__window="evt.key == 'k' && (evt.metaKey || evt.ctrlKey) && ($siteSearchInput.focus(), evt.preventDefault())"
+				}
+			/>
+			<div class="absolute right-4 flex items-center h-full">
+				@sseIndicator("searchFetching")
+			</div>
+		</div>
+			<ul 
+				class={
+					"search-results", 
+					"w-[90vw]",
+					"lg:w-full",
+					"relative",
+					"lg:absolute",
+					templ.KV("lg:-left-full", len(searchResults) > 0) 
+				} 
+				data-on-click__outside="$openSearchResults ? $openSearchResults = false : null"
+				data-on-keydown__window="evt.key == 'Escape' && $openSearchResults ? $openSearchResults = false : null" 
+				data-show="$openSearchResults">
+				if len(searchResults) > 0 {
+					for _, result := range searchResults {
+						<li>
+							<a href={templ.SafeURL(result.ID)}>
+								<h3 class="border-b-1">{result.Title}</h3>
+								<div class="text-sm">
+									@templ.Raw(result.Fragment)
+								</div>
+							</a>
+						</li>
+					}
+				} else {
+					<p>No results found.</p>
+				}
+			</ul>
+	</div>
+}
+
+templ HeaderSiteSearch(signals *SiteSearchSignals, searchResults []SearchResult) {
+	<div id="header_site_search" class="hidden lg:flex lg:gap-4 relative z-10">
+		@SiteSearch(&SiteSearchSignals{
+			Search: signals.Search,
+			SearchFetching: signals.SearchFetching,
+			OpenSearchResults: signals.OpenSearchResults,
+		}, searchResults, true)
+	</div>
+}
+
+templ DrawerSiteSearch(signals *SiteSearchSignals, searchResults []SearchResult) {
+	<div id="drawer_site_search" class="flex lg:hidden z-10 p-4 w-80">
+		@SiteSearch(&SiteSearchSignals{
+			Search: signals.Search, 
+			SearchFetching: signals.SearchFetching,
+			OpenSearchResults: signals.OpenSearchResults,
+		}, searchResults, false)
+	</div>
+}
+
+
 templ header(r *http.Request) {
 	<div class="navbar bg-base-200">
 		<div class="flex justify-between w-full gap-4">
@@ -131,6 +219,7 @@ templ header(r *http.Request) {
 			<div class="hidden lg:text-md lg:text-lg lg:flex lg:gap-4 xl:gap-8 lg:visible ">
 				@headerTopLevelLinks(r)
 			</div>
+			@HeaderSiteSearch(&SiteSearchSignals{SearchFetching: false}, []SearchResult{})
 			<div class="hidden text-xl lg:flex lg:gap-4 lg:visible">
 				@headerExternalLinks()
 			</div>
@@ -179,7 +268,8 @@ templ SidebarPage(
 			</div>
 			<aside class="drawer-side">
 				<label for="sidebar-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-				<ul class="min-h-full px-4 menu w-80 bg-base-300 text-base-content">
+				@DrawerSiteSearch(&SiteSearchSignals{SearchFetching: false}, []SearchResult{})
+				<ul class="min-h-full pt-[4rem] px-4 menu w-80 bg-base-300 text-base-content">
 					@SidebarContents(sidebarGroups, current)
 				</ul>
 			</aside>
