@@ -13,3 +13,6 @@ datastar-website
 __pycache__
 sdk/test/**/**/testOutput.txt
 __debug_bin*
+
+# search index
+/data-star.bleve
