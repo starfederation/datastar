@@ -41,9 +41,9 @@ Follow the links for more complete (and executable) examples
 
 ## Frameworks / Alternate runtimes
 
-If you can't simply use the node / web versions, then you can extend the abstract
-class in `./src/abstractServerSentEventGenerator.ts`. You will need to provide
-implementations of the `constructor`, `readSignals`, `stream` and `send`
+If you can't simply use the node / web versions, then you can extend the
+abstract class in `./src/abstractServerSentEventGenerator.ts`. You will need to
+provide implementations of the `constructor`, `readSignals`, `stream` and `send`
 methods.
 
 ## Testing

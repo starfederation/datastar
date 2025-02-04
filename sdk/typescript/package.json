@@ -18,6 +18,7 @@
   "homepage": "https://github.com/starfederation/datastar#readme",
   "dependencies": {
     "@types/node": "^22.10.2",
+    "deepmerge-ts": "^7.1.4",
     "type-fest": "^4.32.0"
   },
   "devDependencies": {
