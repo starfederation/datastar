@@ -141,6 +141,56 @@ Returns signals sent by the browser.
 sse.signals # => { user: { name: 'John' } }
  ```
 
+### Lifecycle callbacks
+
+#### `on_connect`
+Register server-side code to run when the connection is first handled.
+
+```ruby
+datastar.on_connect do
+  puts 'A user has connected'
+end
+```
+
+#### `on_client_disconnect`
+Register server-side code to run when the connection is closed by the client
+
+```ruby
+datastar.on_client_connect do
+  puts 'A user has disconnected connected'
+end
+```
+
+#### `on_server_disconnect`
+Register server-side code to run when the connection is closed by the server.
+Ie when the served is done streaming without errors.
+
+```ruby
+datastar.on_server_connect do
+  puts 'Server is done streaming'
+end
+```
+
+#### `on_error`
+Ruby code to handle any exceptions raised by streaming blocks.
+
+```ruby
+datastar.on_error do |exception|
+  Sentry.notify(exception)
+end
+```
+Note that this callback can be registered globally, too.
+
+### Global configuration
+
+```ruby
+Datastar.configure do |config|
+  config.on_error do |exception|
+    Sentry.notify(exception)
+  end
+end
+```
+
 ### Tests
 
 ```ruby
