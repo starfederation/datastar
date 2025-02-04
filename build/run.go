@@ -133,6 +133,7 @@ func writeOutConsts(version string) error {
 		"sdk/go/consts.go":                                                                 goConsts,
 		"sdk/dotnet/src/Consts.fs":                                                         dotnetConsts,
 		"sdk/php/src/Consts.php":                                                           phpConsts,
+		"sdk/ruby/lib/datastar/consts.rb":                                                  rubyConsts,
 		"sdk/php/src/enums/EventType.php":                                                  phpEventType,
 		"sdk/php/src/enums/FragmentMergeMode.php":                                          phpFragmentMergeMode,
 		"sdk/java/core/src/main/java/starfederation/datastar/Consts.java":                  javaConsts,

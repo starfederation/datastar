@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'datastar/version'
+require_relative 'datastar/consts'
 
 module Datastar
   BLANK_OPTIONS = {}.freeze

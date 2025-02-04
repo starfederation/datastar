@@ -14,17 +14,22 @@ module Datastar
     }.freeze
 
     OPTION_DEFAULTS = {
-      'retry' => 1000,
-      'autoRemove' => true,
-      'mergeMode' => 'morph',
-      'settleDuration' => 300,
-      'useViewTransition' => false,
-      'onlyIfMissing' => false,
+      'retry' => Consts::DEFAULT_SSE_RETRY_DURATION,
+      Consts::AUTO_REMOVE_DATALINE_LITERAL => Consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE,
+      Consts::MERGE_MODE_DATALINE_LITERAL => Consts::DEFAULT_FRAGMENT_MERGE_MODE,
+      Consts::SETTLE_DURATION_DATALINE_LITERAL => Consts::DEFAULT_FRAGMENTS_SETTLE_DURATION,
+      Consts::USE_VIEW_TRANSITION_DATALINE_LITERAL => Consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
+      Consts::ONLY_IF_MISSING_DATALINE_LITERAL => Consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING,
     }.freeze
 
-    ATTRIBUTE_DEFAULTS = {
-      'type' => 'module'
-    }.freeze
+    # ATTRIBUTE_DEFAULTS = {
+    #   'type' => 'module'
+    # }.freeze
+    ATTRIBUTE_DEFAULTS = Consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES
+      .split("\n")
+      .map { |attr| attr.split(' ') }
+      .to_h
+      .freeze
 
     attr_reader :signals
 
