@@ -48,7 +48,7 @@
     (it "error can go through"
       (expect (lt/throws? ExceptionInfo thunk-wrong-script-type))
       (expect (= (d*/execute-script! sse-gen dumy-script {d*/auto-remove :wrong-type})
-                 "event: datastar-execute-script\nretry: 1000\ndata: script console.log('hello')\n\n\n"))))
+                 "event: datastar-execute-script\ndata: script console.log('hello')\n\n\n"))))
 
   (describe "with malli"
     {:context [with-malli]}

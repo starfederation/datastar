@@ -1,4 +1,4 @@
-(ns starfederation.datastar.clojure.adapter.ring-jetty.impl
+(ns starfederation.datastar.clojure.adapter.ring.impl
   (:require
     [clojure.java.io :as io]
     [starfederation.datastar.clojure.api.sse :as sse]

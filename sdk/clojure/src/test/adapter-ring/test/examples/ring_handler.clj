@@ -1,9 +1,9 @@
-(ns test.examples.ring-jetty-handler
+(ns test.examples.ring-handler
   (:require
     [test.examples.common :as common]
     [test.examples.counter :as counter]
     [test.examples.form :as form]
-    [starfederation.datastar.clojure.adapter.ring-jetty :as jetty-gen]
+    [starfederation.datastar.clojure.adapter.ring :as jetty-gen]
     [reitit.ring :as rr]))
 
 ;; -----------------------------------------------------------------------------

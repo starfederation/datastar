@@ -1,7 +1,14 @@
 (ns examples.common
   (:require
     [dev.onionpancakes.chassis.core :as h]
-    [dev.onionpancakes.chassis.compiler :as hc]))
+    [dev.onionpancakes.chassis.compiler :as hc]
+    [starfederation.datastar.clojure.consts :as consts]))
+
+
+(def cdn-url
+  (str "https://cdn.jsdelivr.net/gh/starfederation/datastar@"
+       consts/version
+       "/bundles/datastar.js"))
 
 
 (defn page-scaffold [body]
@@ -11,5 +18,5 @@
       [:head
        [:meta {:charset "UTF-8"}]
        [:script {:type "module"
-                 :src "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.3/bundles/datastar.js"}]]
+                 :src cdn-url}]]
       [:body body]]]))
