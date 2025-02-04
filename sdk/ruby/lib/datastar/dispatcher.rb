@@ -9,9 +9,9 @@ module Datastar
     attr_reader :request, :response
 
     def initialize(
-      request:, 
-      response: nil, 
-      view_context: nil, 
+      request:,
+      response: nil,
+      view_context: nil,
       spawner: Datastar.config.spawner,
       error_callback: Datastar.config.error_callback
     )
@@ -60,32 +60,32 @@ module Datastar
     end
 
     def merge_fragments(fragments, options = BLANK_OPTIONS)
-      stream do |stream|
-        stream.merge_fragments(fragments, options)
+      stream do |sse|
+        sse.merge_fragments(fragments, options)
       end
     end
 
     def remove_fragments(selector, options = BLANK_OPTIONS)
-      stream do |stream|
-        stream.remove_fragments(selector, options)
+      stream do |sse|
+        sse.remove_fragments(selector, options)
       end
     end
 
     def merge_signals(signals, options = BLANK_OPTIONS)
-      stream do |stream|
-        stream.merge_signals(signals, options)
+      stream do |sse|
+        sse.merge_signals(signals, options)
       end
     end
 
     def remove_signals(paths, options = BLANK_OPTIONS)
-      stream do |stream|
-        stream.remove_signals(paths, options)
+      stream do |sse|
+        sse.remove_signals(paths, options)
       end
     end
 
     def execute_script(script, options = BLANK_OPTIONS)
-      stream do |stream|
-        stream.execute_script(script, options)
+      stream do |sse|
+        sse.execute_script(script, options)
       end
     end
 
@@ -96,70 +96,94 @@ module Datastar
       @streamers << streamer
 
       body = if @streamers.size == 1
-               proc do |out|
-                 conn_generator = ServerSentEventGenerator.new(out, signals:, view_context: @view_context)
-                 @on_connect.each { |callable| callable.call(conn_generator) }
+        stream_one(streamer) 
+      else
+        stream_many(streamer) 
+      end
 
-                 streamer.call(conn_generator)
-
-                 @on_server_disconnect.each { |callable| callable.call(conn_generator) }
-               rescue IOError, Errno::EPIPE, Errno::ECONNRESET => e
-                 @on_client_disconnect.each { |callable| callable.call(out) }
-               rescue Exception => e
-                 @on_error.each { |callable| callable.call(e) }
-               ensure
-                 # Ensure the stream is closed
-                 out.close
-               end
-             else
-               @queue ||= Queue.new
-
-               proc do |out|
-                 signs = signals
-                 conn_generator = ServerSentEventGenerator.new(out, signals: signs, view_context: @view_context)
-                 @on_connect.each { |callable| callable.call(conn_generator) }
-
-                 threads = @streamers.map do |streamer|
-                  @spawner.spawn do
-                     # TODO: Review thread-safe view context
-                     generator = ServerSentEventGenerator.new(@queue, signals: signs, view_context: @view_context)
-                     streamer.call(generator)
-                     @queue << :done
-                   rescue StandardError => ex
-                    @queue << ex
-                   end
-                 end
-
-                 done_count = 0
-
-                 while (data = @queue.pop)
-                   if data == :done
-                     done_count += 1
-                     if done_count == threads.size
-                       @queue << nil
-                     end
-                   elsif data.is_a?(Exception)
-                    raise data
-                   else
-                     out << data
-                   end
-                 end
-
-                 @on_server_disconnect.each { |callable| callable.call(conn_generator) }
-               rescue IOError, Errno::EPIPE, Errno::ECONNRESET => e
-                 @on_client_disconnect.each { |callable| callable.call(out) }
-               rescue Exception => e
-                 @on_error.each { |callable| callable.call(e) }
-               ensure
-                 threads&.each(&:kill)
-                 out.close
-               end
-             end
-
-      response.body = body
+      @response.body = body
+      self
     end
 
     private
+
+    # Produce a response body for a single stream
+    # In this case, the SSE generator can write directly to the socket
+    #
+    # @param streamer [#call(ServerSentEventGenerator)]
+    # @return [Proc]
+    # @api private
+    def stream_one(streamer)
+      proc do |socket|
+        generator = ServerSentEventGenerator.new(socket, signals:, view_context: @view_context)
+        @on_connect.each { |callable| callable.call(generator) }
+        handling_errors(generator, socket) do
+          streamer.call(generator)
+        end
+      ensure
+        socket.close
+      end
+    end
+
+    # Produce a response body for multiple streams
+    # Each "streamer" is spawned in a separate thread
+    # and they write to a shared queue
+    # Then we wait on the queue and write to the socket
+    # In this way we linearize socket writes
+    # Exceptions raised in streamer threads are pushed to the queue
+    # so that the main thread can re-raise them and handle them linearly.
+    #
+    # @param streamer [#call(ServerSentEventGenerator)]
+    # @return [Proc]
+    # @api private
+    def stream_many(streamer)
+      @queue ||= Queue.new
+
+      proc do |socket|
+        signs = signals
+        conn_generator = ServerSentEventGenerator.new(socket, signals: signs, view_context: @view_context)
+        @on_connect.each { |callable| callable.call(conn_generator) }
+
+        threads = @streamers.map do |streamer|
+          @spawner.spawn do
+            # TODO: Review thread-safe view context
+            generator = ServerSentEventGenerator.new(@queue, signals: signs, view_context: @view_context)
+            streamer.call(generator)
+            @queue << :done
+          rescue StandardError => e
+            @queue << e
+          end
+        end
+
+        handling_errors(conn_generator, socket) do
+          done_count = 0
+
+          while (data = @queue.pop)
+            if data == :done
+              done_count += 1
+              @queue << nil if done_count == threads.size
+            elsif data.is_a?(Exception)
+              raise data
+            else
+              socket << data
+            end
+          end
+        end
+      ensure
+        threads&.each(&:kill)
+        socket.close
+      end
+    end
+
+    def handling_errors(generator, socket, &)
+      yield
+
+      @on_server_disconnect.each { |callable| callable.call(generator) }
+    rescue IOError, Errno::EPIPE, Errno::ECONNRESET => e
+      @on_client_disconnect.each { |callable| callable.call(socket) }
+    rescue Exception => e
+      @on_error.each { |callable| callable.call(e) }
+    end
 
     def parse_signals(request)
       if request.post? || request.put? || request.patch?

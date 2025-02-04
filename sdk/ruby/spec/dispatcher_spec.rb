@@ -297,6 +297,7 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher = Datastar
                     .new(request:, response:)
                     .on_server_disconnect { |_| disconnects << true }
+        .on_error { |err| puts err.backtrace.join("\n") }
 
       dispatcher.stream do |sse|
         sleep 0.01
