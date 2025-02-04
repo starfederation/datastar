@@ -4,6 +4,10 @@ require 'async'
 require 'async/queue'
 
 module Datastar
+  # An executor that uses Fibers (via the Async library)
+  # Use this when Rails is configured to use Fibers
+  # or when using the Falcon web server
+  # See https://github.com/socketry/falcon
   class AsyncExecutor
     def initialize
       # Async::Task instances

@@ -3,6 +3,7 @@
 require 'thread'
 
 module Datastar
+  # The default executor based on Ruby threads
   class ThreadExecutor
     def new_queue = Queue.new
 
@@ -17,6 +18,17 @@ module Datastar
     end
   end
 
+  # Datastar configuration
+  # @example
+  #
+  #  Datastar.configure do |config|
+  #    config.on_error do |error|
+  #      Sentry.notify(error)
+  #    end
+  #  end
+  #
+  # You'd normally do this on app initialization 
+  # For example in a Rails initializer
   class Configuration
     NOOP_CALLBACK = ->(_error) {}
     RACK_FINALIZE = ->(_view_context, response) { response.finish }
