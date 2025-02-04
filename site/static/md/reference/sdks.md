@@ -30,15 +30,16 @@ _Author: [Peter Humulock](https://github.com/rphumulock)_
 PHP [SDK](https://github.com/starfederation/datastar-php) and [examples](https://github.com/starfederation/datastar/tree/main/examples/php).    
 _Author: [Ben Croker](https://github.com/bencroker) ([PutYourLightsOn](https://putyourlightson.com/))_
 
+### Laravel
+
 [Laravel package](https://github.com/putyourlightson/laravel-datastar)  
-_Author: [Ben Croker](https://github.com/bencroker) ([PutYourLightsOn](https://putyourlightson.com/))_
+
+### Craft CMS
 
 [Craft CMS plugin](https://putyourlightson.com/plugins/datastar)  
-_Author: [Ben Croker](https://github.com/bencroker) ([PutYourLightsOn](https://putyourlightson.com/))_
 
 Other examples:  
 [Craft Datastar Pokemon demo](https://github.com/khalwat/craft-datastar-pokemon-demo)  
-_Author: [Andrew Welch](https://github.com/khalwat) ([nystudio107](https://nystudio107.com/))_
 
 ## Python
 
