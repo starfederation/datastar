@@ -28,6 +28,13 @@ Finally, `task` will build the library and serve the reference documentation web
 
 The website should be available on http://localhost:8080 with hot-reloading enabled.
 
+The following example runs the `build` task via Docker.
+This task will rebuild SDK constants.
+
+```
+make task "build -f"
+```
+
 ## End to end tests
 
 Once you have the website running, you should be able to run the
