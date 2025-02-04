@@ -82,6 +82,8 @@ datastar.stream do |sse|
 end
 ```
 
+See the `examples` directory.
+
 ### Datastar methods
 
 All these methods are available in both the one-off and the streaming modes.
