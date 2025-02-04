@@ -86,6 +86,10 @@ module Datastar
       write(buffer)
     end
 
+    def redirect(url)
+      execute_script %(setTimeout(() => { window.location = '#{url}' }))
+    end
+
     def write(buffer)
       buffer << MSG_END
       @stream << buffer

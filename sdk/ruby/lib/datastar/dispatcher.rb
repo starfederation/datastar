@@ -182,6 +182,16 @@ module Datastar
       end
     end
 
+    # Send an execute_script event
+    # to change window.location
+    #
+    # @param url [String] the URL or path to redirect to
+    def redirect(url)
+      stream do |sse|
+        sse.redirect(url)
+      end
+    end
+
     # Start a streaming response
     # A generator object is passed to the block
     # The generator supports all the Datastar methods listed above (it's the same type)

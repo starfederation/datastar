@@ -217,6 +217,16 @@ RSpec.describe Datastar::Dispatcher do
     end
   end
 
+  describe '#redirect' do
+    it 'sends an execute_script event with a window.location change' do
+      dispatcher.redirect '/guide'
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: script setTimeout(() => { window.location = '/guide' })\n\n\n)])
+    end
+  end
+
   describe '#signals' do
     context 'with POST request' do
       specify 'Rails parsed parameters' do

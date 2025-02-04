@@ -141,6 +141,13 @@ Returns signals sent by the browser.
 sse.signals # => { user: { name: 'John' } }
  ```
 
+#### `redirect`
+This is just a helper to send a script to update the browser's location.
+
+```ruby
+sse.redirect('/new_location')
+ ```
+
 ### Lifecycle callbacks
 
 #### `on_connect`
