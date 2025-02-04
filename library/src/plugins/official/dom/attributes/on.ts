@@ -10,14 +10,14 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import { onElementRemoved } from '../../../../utils/dom'
 import { tagHas, tagToMs } from '../../../../utils/tags'
-import { kebabize } from '../../../../utils/text'
+import { kebabize, lcFirst } from '../../../../utils/text'
 import { debounce, delay, throttle } from '../../../../utils/timing'
 
-const lastSignalsMarshalled = new Map<string, any>()
-
 const EVT = 'evt'
+const SIGNALS_CHANGE_PREFIX = 'signalsChange'
+const signalChangeKeyLength = SIGNALS_CHANGE_PREFIX.length
+
 export const On: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'on',
@@ -25,7 +25,8 @@ export const On: AttributePlugin = {
   valReq: Requirement.Must,
   argNames: [EVT],
   removeOnLoad: (rawKey: string) => rawKey.startsWith('onLoad'),
-  onLoad: ({ el, rawKey, key, value, genRX, mods }) => {
+  onLoad: (ctx) => {
+    const { el, key, value, mods, signals, genRX, rawKey, effect } = ctx
     const rx = genRX()
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
@@ -70,80 +71,82 @@ export const On: AttributePlugin = {
     if (mods.has('passive')) evtListOpts.passive = true
     if (mods.has('once')) evtListOpts.once = true
 
-    const eventName = kebabize(key).toLowerCase()
-    switch (eventName) {
-      case 'load': {
-        callback()
-        return () => {}
-      }
+    if (key === 'load') {
+      callback()
+      return () => {}
+    }
 
-      case 'interval': {
-        let duration = 1000
-        const durationArgs = mods.get('duration')
-        if (durationArgs) {
-          duration = tagToMs(durationArgs)
-          const leading = tagHas(durationArgs, 'leading', false)
-          if (leading) {
-            // Remove `.leading` from the dataset so the callback is only ever called on page load
-            el.dataset[rawKey.replace('.leading', '')] = value
-            delete el.dataset[rawKey]
-            callback()
-          }
-        }
-        const intervalId = setInterval(callback, duration)
-
-        return () => {
-          clearInterval(intervalId)
-        }
-      }
-
-      case 'raf': {
-        let rafId: number | undefined
-        const raf = () => {
+    if (key === 'interval') {
+      let duration = 1000
+      const durationArgs = mods.get('duration')
+      if (durationArgs) {
+        duration = tagToMs(durationArgs)
+        const leading = tagHas(durationArgs, 'leading', false)
+        if (leading) {
+          // Remove `.leading` from the dataset so the callback is only ever called on page load
+          el.dataset[rawKey.replace('.leading', '')] = value
+          delete el.dataset[rawKey]
           callback()
-          rafId = requestAnimationFrame(raf)
-        }
-        rafId = requestAnimationFrame(raf)
-
-        return () => {
-          if (rafId) cancelAnimationFrame(rafId)
         }
       }
+      const intervalId = setInterval(callback, duration)
 
-      case 'signals-change': {
-        onElementRemoved(el, () => {
-          lastSignalsMarshalled.delete(el.id)
-        })
+      return () => {
+        clearInterval(intervalId)
+      }
+    }
 
+    if (key === 'raf') {
+      let rafId: number | undefined
+      const raf = () => {
         callback()
-        const signalFn = (event: CustomEvent<DatastarSignalEvent>) => {
+        rafId = requestAnimationFrame(raf)
+      }
+      rafId = requestAnimationFrame(raf)
+
+      return () => {
+        if (rafId) cancelAnimationFrame(rafId)
+      }
+    }
+
+    if (key.startsWith(SIGNALS_CHANGE_PREFIX)) {
+      if (key === SIGNALS_CHANGE_PREFIX) {
+        callback()
+        const signalFn = (event: CustomEvent<DatastarSignalEvent>) =>
           callback(event)
-        }
         document.addEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
         return () => {
           document.removeEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
         }
       }
 
-      default: {
-        const testOutside = mods.has('outside')
-        if (testOutside) {
-          target = document
-          const cb = callback
-          const targetOutsideCallback = (e?: Event) => {
-            const targetHTML = e?.target as HTMLElement
-            if (!el.contains(targetHTML)) {
-              cb(e)
-            }
-          }
-          callback = targetOutsideCallback
+      const signalName = lcFirst(key.slice(signalChangeKeyLength))
+      const s = signals.signal(signalName)!
+      const prev = s.value
+      return effect(() => {
+        if (prev !== s.value) {
+          callback()
         }
+      })
+    }
 
-        target.addEventListener(eventName, callback, evtListOpts)
-        return () => {
-          target.removeEventListener(eventName, callback)
+    const testOutside = mods.has('outside')
+    if (testOutside) {
+      target = document
+      const cb = callback
+      const targetOutsideCallback = (e?: Event) => {
+        const targetHTML = e?.target as HTMLElement
+        if (!el.contains(targetHTML)) {
+          cb(e)
         }
       }
+      callback = targetOutsideCallback
+    }
+
+    const eventName = kebabize(key).toLowerCase()
+    target.addEventListener(eventName, callback, evtListOpts)
+    return () => {
+      target.removeEventListener(eventName, callback)
     }
   },
 }
