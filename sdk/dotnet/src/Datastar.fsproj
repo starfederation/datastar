@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>StarFederation.Datastar</AssemblyName>
-        <Version>0.21.2</Version>
+        <Version>1.0.0-beta.1</Version>
         <RootNamespace>StarFederation.Datastar</RootNamespace>
         <Nullable>disabled</Nullable>
 
@@ -33,6 +33,7 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
+        <Title>StarFederation.Datastar</Title>
     </PropertyGroup>
 
     <ItemGroup>
