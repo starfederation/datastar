@@ -13,12 +13,14 @@ module Datastar
       response: nil,
       view_context: nil,
       executor: Datastar.config.executor,
-      error_callback: Datastar.config.error_callback
+      error_callback: Datastar.config.error_callback,
+      finalize: Datastar.config.finalize
     )
       @on_connect = []
       @on_client_disconnect = []
       @on_server_disconnect = []
       @on_error = [error_callback]
+      @finalize = finalize
       @streamers = []
       @queue = nil
       @executor = executor
@@ -103,7 +105,7 @@ module Datastar
       end
 
       @response.body = body
-      self
+      @finalize.call(@view_context, @response)
     end
 
     private

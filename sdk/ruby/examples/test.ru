@@ -57,7 +57,7 @@ run do |env|
       end
     end
 
-    datastar.response.finish
+    # datastar.response.finish
 	else
 		[200, {'content-type' => 'text/plain'}, ['hello']]
 	end

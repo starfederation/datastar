@@ -293,6 +293,16 @@ RSpec.describe Datastar::Dispatcher do
       expect(socket.lines[1]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
     end
 
+    it 'returns a Rack array response' do
+      status, headers, body = dispatcher.stream do |sse|
+        sse.merge_signals(foo: 'bar')
+      end
+      expect(status).to eq(200)
+      expect(headers['content-type']).to eq('text/event-stream')
+      expect(headers['cache-control']).to eq('no-cache')
+      expect(headers['connection']).to eq('keep-alive')
+    end
+
     context 'with multiple streams' do
       let(:executor) { Datastar.config.executor }
 

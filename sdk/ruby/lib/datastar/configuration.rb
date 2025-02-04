@@ -19,12 +19,14 @@ module Datastar
 
   class Configuration
     NOOP_CALLBACK = ->(_error) {}
+    RACK_FINALIZE = ->(_view_context, response) { response.finish }
 
-    attr_accessor :executor, :error_callback
+    attr_accessor :executor, :error_callback, :finalize
 
     def initialize
       @executor = ThreadExecutor.new
       @error_callback = NOOP_CALLBACK
+      @finalize = RACK_FINALIZE
     end
 
     def on_error(callable = nil, &block)
