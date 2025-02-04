@@ -6,7 +6,7 @@
 [ -f "$1/testOutput.txt" ] && rm "$1/testOutput.txt"
 
 input=$(cat "$1/input.json")
-curl -sN -H "Accept: text/event-stream" -H "datastar-request" --json "$input" "$2/test" -o "$1/testOutput.txt"
+curl -sN -H "Accept: text/event-stream" -H "datastar-request: true" --json "$input" "$2/test" -o "$1/testOutput.txt"
 
 [ ! -f "$1/testOutput.txt" ] && echo "case $1 failed: your server did not return anything" && return 1
 
