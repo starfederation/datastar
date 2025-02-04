@@ -1,8 +1,7 @@
-const root = @import("root");
 const std = @import("std");
 const httpz = @import("httpz");
-const datastar = @import("datastar");
-const testing = datastar.testing;
+const testing = @import("datastar").testing;
+const root = @import("root.zig");
 
 fn sdk(req: *httpz.Request, res: *httpz.Response) !void {
     var sse = try root.ServerSentEventGenerator.init(res);
