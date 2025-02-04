@@ -15,6 +15,8 @@ class TestSocket
 end
 
 RSpec.describe Datastar::Dispatcher do
+  include DispatcherExamples
+
   subject(:dispatcher) { Datastar.new(request:, response:, view_context:) }
 
   let(:request) { build_request('/events') }
@@ -291,53 +293,23 @@ RSpec.describe Datastar::Dispatcher do
       expect(socket.lines[1]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
     end
 
-    it 'spawns multiple streams in threads, triggering callbacks only once' do
-      disconnects = []
+    context 'with multiple streams' do
+      let(:executor) { Datastar.config.executor }
 
-      dispatcher = Datastar
-                    .new(request:, response:)
-                    .on_server_disconnect { |_| disconnects << true }
-        .on_error { |err| puts err.backtrace.join("\n") }
-
-      dispatcher.stream do |sse|
-        sleep 0.01
-        sse.merge_fragments %(<div id="foo">\n<span>hello</span>\n</div>\n)
+      describe 'default thread-based executor' do
+        it_behaves_like 'a dispatcher handling concurrent streams'
       end
 
-      dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+      describe 'Async-based executor' do
+        around do |example|
+          Sync do
+            example.run
+          end
+        end
+
+        let(:executor) { Datastar::AsyncExecutor.new }
+        it_behaves_like 'a dispatcher handling concurrent streams'
       end
-
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(socket.open).to be(false)
-      expect(socket.lines.size).to eq(2)
-      expect(socket.lines[0]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
-      expect(socket.lines[1]).to eq("event: datastar-merge-fragments\ndata: fragments <div id=\"foo\">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n")
-      expect(disconnects).to eq([true])
-    end
-
-    it 'catches exceptions raised from threads' do
-      Thread.report_on_exception = false
-      errs = []
-
-      dispatcher = Datastar
-                    .new(request:, response:)
-                    .on_error { |err| errs << err }
-
-      dispatcher.stream do |sse|
-        sleep 0.01
-        raise ArgumentError, 'Invalid argument'
-      end
-
-      dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
-      end
-
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(errs.first).to be_a(ArgumentError)
-      Thread.report_on_exception = true
     end
 
     specify '#signals' do

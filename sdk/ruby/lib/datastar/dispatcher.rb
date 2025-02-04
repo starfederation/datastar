@@ -138,7 +138,7 @@ module Datastar
     # @return [Proc]
     # @api private
     def stream_many(streamer)
-      @queue ||= Queue.new
+      @queue ||= @executor.new_queue
 
       proc do |socket|
         signs = signals

@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+require 'thread'
+
 module Datastar
   class ThreadExecutor
+    def new_queue = Queue.new
+
     def prepare(response); end
 
     def spawn(&block)

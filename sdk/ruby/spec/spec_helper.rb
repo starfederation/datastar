@@ -2,7 +2,9 @@
 
 require 'datastar'
 require 'rack'
+require 'datastar/async_executor'
 require 'debug'
+require_relative './support/dispatcher_examples'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
