@@ -138,7 +138,7 @@ templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromH
 				type="search"
 				placeholder="Search..."
 				data-bind="siteSearch"
-				data-on-input__debounce.300ms={ fmt.Sprintf(
+				data-on-input__debounce.500ms={ fmt.Sprintf(
     				"$siteSearch.length > 1 && @get('/api/search', %s)", 
    					 fmt.Sprintf(`{"headers": {"%s": "%t"}}`, SearchFromHeaderKey, fromHeader),
 				)}
