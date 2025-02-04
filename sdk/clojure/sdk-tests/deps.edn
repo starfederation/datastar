@@ -1,7 +1,8 @@
 {:paths ["src/main"]
  
  :deps {datastar/sdk              {:local/root "../sdk"}
-        datastar/ring-jetty       {:local/root "../adapter-jetty"}
+        datastar/ring             {:local/root "../adapter-ring"}
+        ring/ring-jetty-adapter   {:mvn/version "1.13.0"}
         metosin/reitit            {:mvn/version "0.7.2"}
         com.cnuernber/charred     {:mvn/version "1.034"}
         dev.onionpancakes/chassis {:mvn/version "1.0.365"}}

@@ -21,14 +21,22 @@
 (def dev-aliases
   [:test
    :repl
-   :http-kit
-   :ring-jetty
    :malli-schemas])
 
-(defn dev []
- (t/clojure
-   (str (base-cli-invocation dev-aliases 'nrepl.cmdline)
-        " --middleware \"[cider.nrepl/cider-middleware]\"")))
+(defn arg->kw [s]
+  (if (string/starts-with? s ":")
+    (keyword (subs s 1))
+    (keyword s)))
+
+
+(defn dev [& aliases]
+  (let [aliases (-> dev-aliases
+                    (into aliases)
+                    (into (map arg->kw *command-line-args*)))]
+    (println "Starting Dev repl with aliases: " aliases)
+    (t/clojure
+      (str (base-cli-invocation aliases 'nrepl.cmdline)
+           " --middleware \"[cider.nrepl/cider-middleware]\""))))
 
 
 ;; -----------------------------------------------------------------------------

@@ -11,11 +11,11 @@ We provide several libraries for working with [Datastar](https://data-star.dev/)
 
 There currently are adapter implementations for:
 
-- [ring jetty](https://github.com/ring-clojure/ring)
+- [ring](https://github.com/ring-clojure/ring)
 - [http-kit](https://github.com/http-kit/http-kit)
 
 If you want to roll your own adapter implementation, see
-[implementing-datapters](/sdk/clojure/doc/implementing-adapters.md).
+[implementing-adapters](/sdk/clojure/doc/implementing-adapters.md).
 
 ## Installation
 
@@ -36,20 +36,27 @@ datastar/sdk {:git/url "https://github.com/starfederation/datastar/tree/develop"
               :deps/root "sdk/clojure/sdk"}
 ```
 
-- ring jetty implementation
+- ring implementation
 
 ```clojure
-datastar/ring-jetty {:git/url "https://github.com/starfederation/datastar/tree/develop"
-                     :git/sha "LATEST_SHA"
-                     :deps/root "sdk/clojure/adapter-jetty"}}
+datastar/ring {:git/url "https://github.com/starfederation/datastar/tree/develop"
+               :git/sha "LATEST_SHA"
+               :deps/root "sdk/clojure/adapter-ring"}}
+
+ring-compliant/adapter "Coordinate for the ring compliant adater you wanna use."
 ```
+
+> [!important]
+> This is library that should work for ring compliant adapters,
+> specifically those that use the `ring.core.protocols/StreamableResponseBody`
+> protocol for their response bodies.
 
 - http-kit implementation
 
 ```clojure
-datastar/ring-http-kit {:git/url "https://github.com/starfederation/datastar/tree/develop"
-                        :git/sha "LATEST_SHA"
-                        :deps/root "sdk/clojure/adapter-jetty"}}
+datastar/http-kit {:git/url "https://github.com/starfederation/datastar/tree/develop"
+                   :git/sha "LATEST_SHA"
+                   :deps/root "sdk/clojure/adapter-http-kit"}}
 ```
 
 - Malli schemas:
@@ -64,10 +71,10 @@ datastar/malli-schemas {:git/url "https://github.com/starfederation/datastar/tre
 
 ### Concepts
 
-By convention adapters provide a single `->sse-responce` function. This
+By convention adapters provide a single `->sse-response` function. This
 function returns a valid ring response tailored to work with the used ring
-adapter. This function takes callbacks that receive an implementation of the
-SSE generator the only parameter.
+adapter. It takes callbacks that receive an implementation of the
+SSE generator as the first argument.
 
 You then use the Datastar SDK functions with the SSE generator.
 
@@ -127,43 +134,48 @@ somewhere and use it later:
 
 ## Adapter differences:
 
-Ring adapters are not made equals. Here are some the differences between the adapters:
+Ring adapters are not made equals. Here are some the differences for the ones we provide:
 
-| Adapter    | return values from the SDK event sending functions |
-| ---------- | -------------------------------------------------- |
-| ring-jetty | irrelevant                                         |
-| http-kit   | boolean, from `org.http-kit.server/send!`          |
+| Adapter  | return values from the SDK event sending functions |
+| -------- | -------------------------------------------------- |
+| ring     | irrelevant                                         |
+| http-kit | boolean, from `org.http-kit.server/send!`          |
 
 > [!note]
 > The SDK's event sending functions return whatever the adapter's implementation of
 > `starfederation.datastar.clojure.protocols/send-event!` returns.
 
-| Adapter    | connection lifetime in ring sync mode                                  |
-| ---------- | ---------------------------------------------------------------------- |
-| ring-jetty | same as the thread creating the sse response                           |
-| http-kit   | alive until the client or the server explicitely closes the connection |
+| Adapter  | connection lifetime in ring sync mode                                  |
+| -------- | ---------------------------------------------------------------------- |
+| ring     | same as the thread creating the sse response                           |
+| http-kit | alive until the client or the server explicitely closes the connection |
 
 > [!note]
 > You may keep the connection open in ring-jetty sync mode by somehow blocking the thread
 > handling the request.
 
-| Adapter    | connection lifetime in ring async mode                                 |
-| ---------- | ---------------------------------------------------------------------- |
-| ring-jetty | alive until the client or the server explicitely closes the connection |
-| http-kit   | alive until the client or the server explicitely closes the connection |
+| Adapter  | connection lifetime in ring async mode                                 |
+| -------- | ---------------------------------------------------------------------- |
+| ring     | alive until the client or the server explicitely closes the connection |
+| http-kit | alive until the client or the server explicitely closes the connection |
 
-| Adapter    | sending an event on closed connection              |
-| ---------- | -------------------------------------------------- |
-| ring-jetty | exception thrown                                   |
-| http-kit   | fn returns false, from `org.http-kit.server/send!` |
+| Adapter  | sending an event on closed connection              |
+| -------- | -------------------------------------------------- |
+| ring     | exception thrown                                   |
+| http-kit | fn returns false, from `org.http-kit.server/send!` |
 
 > [!note]
-> This is the way to detect the connection has been closed by the client.
+> This is one way to detect the connection has been closed by the client.
 
 > [!important]
 > At the moment, the ring-jetty adapter needs to send 2 small messages or 1 big
 > message to detect a closed connection. There must be some buffering happening
 > independent of our implementation.
+
+| Adapter    | `:on-open` callback parameters |
+| ---------- | ------------------------------ |
+| ring-jetty | `[sse-gen]`                    |
+| http-kit   | `[sse-gen]`                    |
 
 | Adapter    | `:on-close` callback parameters |
 | ---------- | ------------------------------- |
@@ -173,6 +185,6 @@ Ring adapters are not made equals. Here are some the differences between the ada
 ## TODO:
 
 - Streamlined release process (cutting releases and publish jar to a maven repo)
-- consider using a byteArrayBuilder (may require adding a dependency)
-- consider uniformizing the adapters behavior on connection closing (throwing in all adapters?)
-- add license files ?
+- Consider uniformizing the adapters behavior on connection closing (throwing in all adapters?)
+- Review the etoin tests, there are some race conditions
+- More official examples

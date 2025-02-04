@@ -5,7 +5,7 @@
     [reitit.ring.middleware.parameters :as rrm-params]
     [reitit.ring.middleware.multipart :as rrm-multi-params]
     [reitit.ring :as rr]
-    [starfederation.datastar.clojure.adapter.ring-jetty :refer [->sse-response]]
+    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response]]
     [starfederation.datastar.clojure.api :as d*]))
 
 ;; -----------------------------------------------------------------------------

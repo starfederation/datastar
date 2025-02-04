@@ -4,7 +4,8 @@
     [dev.onionpancakes.chassis.compiler :as hc]
     [ring.middleware.params :as rmp]
     [ring.middleware.multipart-params :as rmpp]
-    [reitit.ring :as rr]))
+    [reitit.ring :as rr]
+    [starfederation.datastar.clojure.consts :as consts]))
 
 
 
@@ -12,14 +13,14 @@
   [:script {:type type :src src}])
 
 
-(comment
-  (def datastar
-    (script "module"
-            "https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js")))
+(def cdn-url
+  (str "https://cdn.jsdelivr.net/gh/starfederation/datastar@"
+       consts/version
+       "/bundles/datastar.js"))
 
-;; NOTE: Monitor the datastar cdn version
 (def datastar
-  (script "module" "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.3/bundles/datastar.js"))
+  (script "module" cdn-url))
+
 
 (defn scaffold [content & {:as _}]
   (hc/compile

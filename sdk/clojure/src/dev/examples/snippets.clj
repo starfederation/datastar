@@ -4,6 +4,7 @@
     [starfederation.datastar.clojure.adapter.test :as at]))
 
 
+;; Snippets used in the website docs
 
 (def sse (at/->sse-gen))
 
@@ -21,13 +22,13 @@
 
 
   (defn handler [request]
-    (->sse-response request)
-    {:on-open
-      (fn [sse]
-        (d*/merge-fragment! sse
-          "<div id=\"question\">What do you put in a toaster?</div>")
+    (->sse-response request
+      {:on-open
+        (fn [sse]
+          (d*/merge-fragment! sse
+            "<div id=\"question\">What do you put in a toaster?</div>")
 
-        (d*/merge-signals! sse "{response: '', answer: 'bread'}"))})
+          (d*/merge-signals! sse "{response: '', answer: 'bread'}"))}))
 
 
   ;; multiple_events going deeper
@@ -37,9 +38,9 @@
 
 
   (defn handler [request]
-    (->sse-response request)
-    {:on-open
-      (fn [sse]
-        (d*/merge-fragment! sse "<div id=\"hello\">Hello, world!</div>")
-        (d*/merge-signals!  sse "{foo: {bar: 1}}")
-        (d*/execute-script! sse "console.log('Success!')"))}))
+    (->sse-response request
+      {:on-open
+        (fn [sse]
+          (d*/merge-fragment! sse "<div id=\"hello\">Hello, world!</div>")
+          (d*/merge-signals!  sse "{foo: {bar: 1}}")
+          (d*/execute-script! sse "console.log('Success!')"))})))

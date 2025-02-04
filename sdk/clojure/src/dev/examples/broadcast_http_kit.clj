@@ -1,4 +1,4 @@
-(ns examples.broadcast
+(ns examples.broadcast-http-kit
   (:require
     [examples.utils :as u]
     [reitit.ring :as rr]
@@ -6,8 +6,6 @@
     [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response]]))
 
 
-;; This is a small experiment to determine the behaviour of
-;; ring jetty in the face of the client disconnecting
 
 (defonce !conns (atom #{}))
 
@@ -19,10 +17,9 @@
        (d*/console-log! sse "'connected'"))
      :on-close
      (fn on-close [sse status-code]
-       (println "-----------------")
-       (println "Connection closed status: " status-code)
        (swap! !conns disj sse)
-       (println "-----------------"))}))
+       (println "Connection closed status: " status-code)
+       (println "remove connection from pool"))}))
 
 
 (def routes
@@ -51,8 +48,6 @@
 
 ;; open several clients:
 ;; curl -vv http://localhost:8080/persistent
-(comment)
-
 (comment
   (-> !conns deref first d*/close-sse!)
   (broadcast-number! (rand-int 25))

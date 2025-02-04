@@ -28,10 +28,13 @@
   [event-type & {id             d*/id
                  retry-duration d*/retry-duration}]
   (cond-> [(format "event: %s" event-type)]
-    id                               (conj (format "id: %s" id))
+    id
+    (conj (format "id: %s" id))
+
     (and retry-duration
-         (> retry-duration 0))       (conj (format "retry: %s" retry-duration))
-    (not retry-duration)             (conj "retry: 1000")))
+         (> retry-duration 0)
+         (not= retry-duration consts/default-sse-retry-duration))   
+    (conj (format "retry: %s" retry-duration))))
 
 
 (def event-end ["" "" ""])

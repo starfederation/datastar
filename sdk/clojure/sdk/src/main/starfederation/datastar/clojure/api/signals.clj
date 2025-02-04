@@ -101,10 +101,6 @@
 ;; -----------------------------------------------------------------------------
 ;; Read signals
 ;; -----------------------------------------------------------------------------
-(defn datastar-request? [request]
-  (= "true" (get-in request [:headers "datastar-request"])))
-
- 
 (defn get-signals
   "Returns the signals json string. You need to use some middleware
   that adds the :query-params key to the request for this function

@@ -85,18 +85,19 @@ This function takes 2 arguments:
 
 - the ring request
 - a map whose keys are:
-  - `:on-open` a mandatory callback that must be called when the SSE connection is opened.
+  - `:status`: the HTTP status for the response
+  - `:headers`: a map of `str -> str`, HTTP headers to add to the response.
+  - `:on-open`: a mandatory callback that must be called when the SSE connection is opened.
     It has 1 argument, the SSE Generator.
-  - `:on-close` A callback called when the SSE connection is closed.
+  - `:on-close`: A callback called when the SSE connection is closed.
     Each adapter may have a different parameters list for this callback, depending on what
     is relevant. Still the first parameter should be the SSE generator.
-  - `:headers` a map of `str -> str`, HTTP headers to add to the response.
 
 It has 2 responsibilities:
 
 - This function creates the SSE generator, gives the callbacks to it.
 - It must create a valid ring response with the correct HTTP SSE headers and
-  merge the headers provided with `:headers`.
+  merge the headers provided with the `:headers` option.
   See `starfederation.datastar.clojure.api.sse/headers`.
 
 ### `SSEGenerator` additional logic
