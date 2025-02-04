@@ -1,13 +1,11 @@
 package site
 
-import (
-	datastar "github.com/starfederation/datastar/sdk/go"
-)
+import datastar "github.com/starfederation/datastar/sdk/go"
 
 templ mergeFragmentView() {
 	<div id="fragment" data-signals-foo="'baz'">
 		<div data-text="$foo"></div>
 		<button data-on-click={ datastar.GetSSE("/examples/merge_fragment/data") } class="btn btn-primary">Reload</button>
 	</div>
-	<pre id="pre" data-text="ctx.signals"></pre>
+	<pre id="pre" data-text="ctx.signals.JSON()">should be replaced</pre>
 }

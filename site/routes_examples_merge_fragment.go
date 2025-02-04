@@ -10,7 +10,8 @@ import (
 func setupExamplesMergeFragment(examplesRouter chi.Router) error {
 	examplesRouter.Get("/merge_fragment/data", func(w http.ResponseWriter, r *http.Request) {
 		sse := datastar.NewSSE(w, r)
-		sse.MergeFragmentTempl(mergeFragmentView())
+		c := mergeFragmentView()
+		sse.MergeFragmentTempl(c)
 	})
 
 	return nil

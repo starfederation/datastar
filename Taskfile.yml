@@ -103,6 +103,11 @@ tasks:
       - curl https://purge.jsdelivr.net/gh/starfederation/datastar/sdk/typescript/npm/esm/node/serverSentEventGenerator.js
       - git push origin --tags
 
+  idiomorph:
+    dir: library/src/vendored
+    cmds:
+      - wget -O idiomorph.esm.js https://raw.githubusercontent.com/bigskysoftware/idiomorph/refs/heads/main/dist/idiomorph.esm.js
+      - npx -p typescript tsc *.js --declaration --allowJs --emitDeclarationOnly --outDir .
   css:
     dir: site
     sources:

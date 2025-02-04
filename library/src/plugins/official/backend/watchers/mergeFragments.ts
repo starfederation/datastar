@@ -11,6 +11,7 @@ import {
 } from '../../../../engine/consts'
 import { initErr } from '../../../../engine/errors'
 import {
+  type HTMLorSVGElement,
   type InitContext,
   PluginType,
   type WatcherPlugin,
@@ -20,7 +21,7 @@ import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
 } from '../../../../utils/view-transtions'
-import { idiomorph } from '../../../../vendored/idiomorph'
+import { Idiomorph } from '../../../../vendored/idiomorph.esm'
 import {
   SETTLING_CLASS,
   SWAPPING_CLASS,
@@ -85,11 +86,37 @@ function applyToTargets(
     let modifiedTarget = initialTarget
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
-        const result = idiomorph(modifiedTarget, fragment)
+        const toApply = new Map<Element, Array<string>>()
+        const result = Idiomorph.morph(modifiedTarget, fragment, {
+          callbacks: {
+            beforeAttributeUpdated: (
+              argument: string,
+              el: Element,
+              mode: 'update' | 'remove',
+            ): boolean => {
+              if (mode === 'update' && argument.startsWith('data-')) {
+                let elAttrs = toApply.get(el)
+                if (!elAttrs) {
+                  elAttrs = []
+                  toApply.set(el, elAttrs)
+                }
+                elAttrs.push(argument.slice('data-'.length))
+              }
+              return true
+            },
+          },
+        })
         if (!result?.length) {
           throw initErr('MorphFailed', ctx)
         }
         modifiedTarget = result[0] as Element
+
+        for (const [el, attrs] of toApply.entries()) {
+          for (const attr of attrs) {
+            ctx.applyAttributePlugin(el as HTMLorSVGElement, attr)
+          }
+        }
+
         break
       }
       case FragmentMergeModes.Inner:
