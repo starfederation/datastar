@@ -22,9 +22,7 @@ Datastar’s documentation is written in markdown files that live in [this folde
 
 ## SDKs
 
-SDKs must follow the [Architecture Decision Record](https://github.com/starfederation/datastar/blob/develop/sdk/README.md) document. 
-
-Pull requests for new SDKs should include the following:
+SDKs must follow the [Architecture Decision Record](https://github.com/starfederation/datastar/blob/develop/sdk/README.md) document. Pull requests for new SDKs should also include the following:
 
 - A README file that explains how to use the SDK.
 - An entry in the [SDKs reference guide](https://github.com/starfederation/datastar/blob/develop/site/static/md/reference/sdks.md).
