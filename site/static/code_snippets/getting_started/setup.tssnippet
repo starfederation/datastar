@@ -4,5 +4,5 @@ ServerSentEventGenerator.stream(req, res, (stream) => {
      stream.mergeFragments(`<div id="question">What do you put in a toaster?</div>`);
 
      // Merges signals into the signals.
-     stream.mergeSignals({'response',  '', 'answer' => 'bread'});
+     stream.mergeSignals({'response':  '', 'answer': 'bread'});
 });
