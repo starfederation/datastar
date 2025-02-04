@@ -26,8 +26,8 @@ SDKs must follow the [Architecture Decision Record](https://github.com/starfeder
 
 - A README file that explains how to use the SDK.
 - An entry in the [SDKs reference guide](https://github.com/starfederation/datastar/blob/develop/site/static/md/reference/sdks.md).
-- A `Language` struct in `SDKLanguages` in [`consts.go`](https://github.com/starfederation/datastar/blob/develop/build/consts.go).
-- A `consts_[language].qtpl` file for generating [constants and defaults](https://github.com/starfederation/datastar/blob/develop/build).
+- A value in `SDKLanguages` in [`consts.go`](https://github.com/starfederation/datastar/blob/develop/build/consts.go).
+- A `consts_[language].qtpl` file for generating [constants and defaults](https://github.com/starfederation/datastar/blob/develop/build) and an associated `templates` value in [`run.go`](https://github.com/starfederation/datastar/blob/develop/build/run.go).
 - Sample [code snippets](https://github.com/starfederation/datastar/tree/develop/site/static/code_snippets) in the language of your SDK.
 - An implementation of each of the [examples](https://github.com/starfederation/datastar/tree/develop/examples).
 
