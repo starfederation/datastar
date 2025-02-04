@@ -15,7 +15,7 @@ There currently are adapter implementations for:
 - [http-kit](https://github.com/http-kit/http-kit)
 
 If you want to roll your own adapter implementation, see
-[implementing-atapters](/sdk/clojure/doc/implementing-adapters.md).
+[implementing-adapters](/sdk/clojure/doc/implementing-adapters.md).
 
 ## Installation
 
