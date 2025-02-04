@@ -1,19 +1,25 @@
 # frozen_string_literal: true
 
 module Datastar
-  class ThreadSpawner
+  class ThreadExecutor
+    def prepare(response); end
+
     def spawn(&block)
       Thread.new(&block)
+    end
+
+    def stop(threads)
+      threads.each(&:kill)
     end
   end
 
   class Configuration
     NOOP_CALLBACK = ->(_error) {}
 
-    attr_accessor :spawner, :error_callback
+    attr_accessor :executor, :error_callback
 
     def initialize
-      @spawner = ThreadSpawner.new
+      @executor = ThreadExecutor.new
       @error_callback = NOOP_CALLBACK
     end
 

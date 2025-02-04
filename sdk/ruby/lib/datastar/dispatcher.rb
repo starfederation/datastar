@@ -12,7 +12,7 @@ module Datastar
       request:,
       response: nil,
       view_context: nil,
-      spawner: Datastar.config.spawner,
+      executor: Datastar.config.executor,
       error_callback: Datastar.config.error_callback
     )
       @on_connect = []
@@ -21,7 +21,7 @@ module Datastar
       @on_error = [error_callback]
       @streamers = []
       @queue = nil
-      @spawner = spawner
+      @executor = executor
       @view_context = view_context
       @request = request
       @response = Rack::Response.new(BLANK_BODY, 200, response&.headers || {})
@@ -29,6 +29,7 @@ module Datastar
       @response.headers['Cache-Control'] = 'no-cache'
       @response.headers['Connection'] = 'keep-alive'
       @response.delete_header 'Content-Length'
+      @executor.prepare(@response)
     end
 
     def sse?
@@ -145,7 +146,7 @@ module Datastar
         @on_connect.each { |callable| callable.call(conn_generator) }
 
         threads = @streamers.map do |streamer|
-          @spawner.spawn do
+          @executor.spawn do
             # TODO: Review thread-safe view context
             generator = ServerSentEventGenerator.new(@queue, signals: signs, view_context: @view_context)
             streamer.call(generator)
@@ -170,7 +171,7 @@ module Datastar
           end
         end
       ensure
-        threads&.each(&:kill)
+        @executor.stop(threads) if threads
         socket.close
       end
     end
