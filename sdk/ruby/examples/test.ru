@@ -6,7 +6,7 @@ require 'datastar'
 # This is a test Rack endpoint to run
 # Datastar's SDK test suite agains.
 # To run:
-# 
+#
 #   # install dependencies
 #   bundle install
 #   # run this endpoint with Puma server
@@ -18,20 +18,18 @@ require 'datastar'
 #   ./test-all.sh http://localhost:9292
 #
 run do |env|
-  request = Rack::Request.new(env)
-  response = Rack::Response.new([], 200)
   datastar = Datastar
-    .new(request:, response:, view_context: self)
-    .on_connect do |socket|
-      p ['connect', socket]
-    end.on_server_disconnect do |socket|
-      p ['server disconnect', socket]
-    end.on_client_disconnect do |socket|
-      p ['client disconnect', socket]
-    end.on_error do |error|
-      p ['exception', error]
-      puts error.backtrace.join("\n")
-    end
+             .from_rack_env(env)
+             .on_connect do |socket|
+    p ['connect', socket]
+  end.on_server_disconnect do |socket|
+    p ['server disconnect', socket]
+  end.on_client_disconnect do |socket|
+    p ['client disconnect', socket]
+  end.on_error do |error|
+    p ['exception', error]
+    puts error.backtrace.join("\n")
+  end
 
   datastar.stream do |sse|
     sse.signals['events'].each do |event|

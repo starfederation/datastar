@@ -25,11 +25,11 @@ In your Rack handler or Rails controller:
 ```ruby
 # Rails controllers, as well as Sinatra and others, 
 # already have request and response objects
-# In a "raw" Rack handler you will need to create them
-#  request = Rack::Request.new(env)
-#  response = Rack::Response.new([], 200)
 
 datastar = Datastar.new(request:, response:, view_context: self)
+
+# In a Rack handler, you can instantiate from the Rack env
+datastar = Datastar.from_rack_env(env)
 ```
 
 ### Sending updates to the browser

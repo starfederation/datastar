@@ -19,6 +19,11 @@ module Datastar
   def self.new(...)
     Dispatcher.new(...)
   end
+
+  def self.from_rack_env(env, view_context: nil)
+    request = Rack::Request.new(env)
+    Dispatcher.new(request:, view_context:)
+  end
 end
 
 require_relative 'datastar/configuration'

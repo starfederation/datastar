@@ -37,6 +37,14 @@ RSpec.describe Datastar::Dispatcher do
     end
   end
 
+  specify '.from_rack_env' do
+    dispatcher = Datastar.from_rack_env(request.env)
+
+    expect(dispatcher.response['Content-Type']).to eq('text/event-stream')
+    expect(dispatcher.response['Cache-Control']).to eq('no-cache')
+    expect(dispatcher.response['Connection']).to eq('keep-alive')
+  end
+
   specify '#sse?' do
     expect(dispatcher.sse?).to be(true)
     request = build_request('/events', headers: { 'HTTP_ACCEPT' => 'application/json' })
