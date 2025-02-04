@@ -177,7 +177,7 @@ RSpec.describe Datastar::Dispatcher do
     end
 
     it 'takes D* options' do
-      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: false
+      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: !Datastar::Consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
@@ -185,7 +185,7 @@ RSpec.describe Datastar::Dispatcher do
     end
 
     it 'omits autoRemove true' do
-      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: true
+      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: Datastar::Consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
