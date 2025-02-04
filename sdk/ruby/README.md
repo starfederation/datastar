@@ -1,6 +1,6 @@
 # Datastar Ruby SDK
 
-Implement the Datastart SSE procotocol in Ruby. It can be used in any Rack handler, and Rails controllers.
+Implement the [Datastart SSE procotocol](https://data-star.dev/reference/sse_events) in Ruby. It can be used in any Rack handler, and Rails controllers.
 
 ## Installation
 
