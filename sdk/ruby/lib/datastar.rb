@@ -5,14 +5,6 @@ require_relative 'datastar/version'
 module Datastar
   BLANK_OPTIONS = {}.freeze
 
-  Error = Class.new(StandardError)
-
-  class SSEUnsupportedError < Error
-    def initialize(accept)
-      super("Server Sent Events are not supported for Accept: #{accept}")
-    end
-  end
-
   def self.config
     @config ||= Configuration.new
   end

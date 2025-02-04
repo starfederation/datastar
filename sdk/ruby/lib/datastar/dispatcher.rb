@@ -93,8 +93,6 @@ module Datastar
     end
 
     def stream(streamer = nil, &block)
-      raise SSEUnsupportedError.new(request.get_header(HTTP_ACCEPT)) unless sse?
-
       streamer ||= block
       @streamers << streamer
 

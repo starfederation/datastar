@@ -37,6 +37,14 @@ RSpec.describe Datastar::Dispatcher do
     end
   end
 
+  specify '#sse?' do
+    expect(dispatcher.sse?).to be(true)
+    request = build_request('/events', headers: { 'HTTP_ACCEPT' => 'application/json' })
+
+    dispatcher = Datastar.new(request:, response:, view_context:)
+    expect(dispatcher.sse?).to be(false)
+  end
+
   describe '#merge_fragments' do
     it 'produces a streameable response body with D* fragments' do
       dispatcher.merge_fragments %(<div id="foo">\n<span>hello</span>\n</div>\n)
