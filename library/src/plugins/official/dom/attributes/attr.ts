@@ -9,7 +9,7 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import { kebabize } from '../../../../utils/text'
+import { kebab } from '../../../../utils/text'
 
 export const Attr: AttributePlugin = {
   type: PluginType.Attribute,
@@ -28,7 +28,7 @@ export const Attr: AttributePlugin = {
     }
 
     // Attributes are always kebab-case
-    key = kebabize(key)
+    key = kebab(key)
 
     return effect(async () => {
       let value = false

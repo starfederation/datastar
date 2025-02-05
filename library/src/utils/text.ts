@@ -2,19 +2,18 @@ import type { Modifiers } from '../engine/types'
 
 export const isBoolString = (str: string) => str.trim() === 'true'
 
-export const kebabize = (str: string) =>
+export const kebab = (str: string) =>
   str.replace(
     /[A-Z]+(?![a-z])|[A-Z]/g,
     ($, ofs) => (ofs ? '-' : '') + $.toLowerCase(),
   )
 
 export const camelize = (str: string) =>
-  kebabize(str).replace(/-./g, (x) => x[1].toUpperCase())
+  kebab(str).replace(/-./g, (x) => x[1].toUpperCase())
 
-export const snakeize = (str: string) =>
-  kebabize(str).replace(/-/g, '_')
+export const snake = (str: string) => kebab(str).replace(/-/g, '_')
 
-export const pascalize = (str: string) =>
+export const pascal = (str: string) =>
   camelize(str).replace(/^./, (x) => x[0].toUpperCase())
 
 export const jsStrToObject = (raw: string) =>
@@ -23,17 +22,12 @@ export const jsStrToObject = (raw: string) =>
 export const trimDollarSignPrefix = (str: string) =>
   str.startsWith('$') ? str.slice(1) : str
 
-export function modifyCasing(str: string, mods: Modifiers) {
-  const casing = mods.get('casing')
-  if (casing) {
-    str = casing.has('kebab')
-      ? kebabize(str)
-      : casing.has('snake')
-        ? snakeize(str)
-        : casing.has('pascal')
-          ? pascalize(str)
-          : str
-  }
+const caseFns: Record<string, (s: string) => string> = { kebab, snake, pascal }
 
+export function modifyCasing(str: string, mods: Modifiers) {
+  for (const c of mods.get('case') || []) {
+    const fn = caseFns[c]
+    if (fn) str = fn(str)
+  }
   return str
 }
