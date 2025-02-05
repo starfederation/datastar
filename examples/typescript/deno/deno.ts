@@ -31,6 +31,7 @@ Deno.serve({
         );
         await new Promise(resolve => setTimeout(resolve, reader.signals.delay));
       }
+      stream.close();
     });
   }
 
