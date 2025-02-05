@@ -1,0 +1,7 @@
+datastar = Datastar.new(request:, response:)
+
+datastar.stream do |sse|
+  sse.merge_fragments '<div id="indicator">Redirecting in 3 seconds...</div>'
+  sleep 3
+  sse.execute_script 'window.location = "/guide"'
+end
