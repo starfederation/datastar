@@ -188,9 +188,9 @@ export class Engine {
     })
   }
 
-  #applyAttributePlugin(el: HTMLorSVGElement, datasetKey: string) {
+  #applyAttributePlugin(el: HTMLorSVGElement, camelCasedKey: string) {
     // Extract the raw key from the dataset
-    const rawKey = lcFirst(datasetKey.slice(this.aliasPrefix.length))
+    const rawKey = camelCasedKey.slice(this.aliasPrefix.length)
 
     // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically
     // the first match will be the most specific
@@ -198,6 +198,16 @@ export class Engine {
 
     // Skip if no plugin is found
     if (!plugin) return
+
+    const elAttr = this.#removals.get(el)
+    if (elAttr) {
+      for (const [k, removalFn] of elAttr) {
+        if (k.startsWith(camelCasedKey)) {
+          removalFn()
+          elAttr.delete(k)
+        }
+      }
+    }
 
     // Ensure the element has an id
     if (!el.id.length) el.id = elUniqId(el)
@@ -210,7 +220,7 @@ export class Engine {
       // Keys starting with a dash are not converted to camel case in the dataset
       key = key.startsWith('-') ? key.slice(1) : lcFirst(key)
     }
-    const value = el.dataset[camelize(datasetKey)] || ''
+    const value = el.dataset[camelCasedKey] || ''
 
     // Create the runtime context
     const that = this // I hate javascript
@@ -273,13 +283,13 @@ export class Engine {
         elRemovals = new Map()
         this.#removals.set(el, elRemovals)
       }
-      elRemovals.set(removalKey(datasetKey, value), removalFn)
+      elRemovals.set(removalKey(camelCasedKey, value), removalFn)
     }
 
     // Remove the attribute if required
     const removeOnLoad = plugin.removeOnLoad
     if (removeOnLoad && removeOnLoad(rawKey) === true) {
-      delete el.dataset[datasetKey]
+      delete el.dataset[camelCasedKey]
     }
   }
 

@@ -16,7 +16,7 @@ import {
   PluginType,
   type WatcherPlugin,
 } from '../../../../engine/types'
-import { isBoolString } from '../../../../utils/text'
+import { camelize, isBoolString } from '../../../../utils/text'
 import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
@@ -95,12 +95,13 @@ function applyToTargets(
               mode: 'update' | 'remove',
             ): boolean => {
               if (mode === 'update' && argument.startsWith('data-')) {
-                let elAttrs = toApply.get(el)
-                if (!elAttrs) {
-                  elAttrs = []
-                  toApply.set(el, elAttrs)
+                let elAddAttrs = toApply.get(el)
+                if (!elAddAttrs) {
+                  elAddAttrs = []
+                  toApply.set(el, elAddAttrs)
                 }
-                elAttrs.push(argument.slice('data-'.length))
+                const name = argument.slice('data-'.length)
+                elAddAttrs.push(camelize(name))
               }
               return true
             },

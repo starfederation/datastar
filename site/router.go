@@ -154,7 +154,7 @@ type SiteIndexDoc struct {
 }
 
 func indexSiteContent(ctx context.Context, index bleve.Index) error {
-	markdownDir := "../../site/static/md"
+	markdownDir := "./site/static/md"
 	extractor := plaintext.NewHtmlExtractor()
 
 	return filepath.WalkDir(markdownDir, func(path string, d fs.DirEntry, err error) error {
