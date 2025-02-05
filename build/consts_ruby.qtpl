@@ -1,0 +1,45 @@
+{%- func rubyConsts(data *ConstTemplateData) -%}
+# frozen_string_literal: true
+
+# {%s data.DoNotEdit %}
+module Datastar
+  module Consts
+    DATASTAR_KEY = '{%s data.DatastarKey %}'
+    VERSION = '{%s data.Version %}'
+    {%- for _, d := range data.DefaultDurations %}
+    # {%s= d.Description %}
+    DEFAULT_{%s d.Name.ScreamingSnake %} = {%d durationToMs(d.Duration) %}
+    {%- endfor -%}
+    {%- for _, b := range data.DefaultBools %}
+    # {%s= b.Description %}
+    DEFAULT_{%s b.Name.ScreamingSnake %} = {%v b.Value %}
+    {%- endfor -%}
+    {%- for _, s := range data.DefaultStrings %}
+    # {%s= s.Description %}}
+    DEFAULT_{%s s.Name.ScreamingSnake %} = '{%s s.Value %}'
+    {%- endfor -%}
+
+    {%- for _, enum := range data.Enums -%}
+        {%- if enum.Name.Pascal == "FragmentMergeMode" -%}
+    module FragmentMergeMode
+            {%- for _, entry := range enum.Values %}
+      # {%s entry.Description %}
+      {%s entry.Name.ScreamingSnake %} = '{%s entry.Value %}'
+            {%- endfor -%}
+    end
+        {%- endif -%}
+    {%- endfor -%}
+    {%- for _, enum := range data.Enums -%}
+      {%- if enum.Default != nil %}
+    # {%s= enum.Description %}
+    DEFAULT_{%s enum.Name.ScreamingSnake %} = {%s enum.Name.Pascal %}::{%s enum.Default.Name.ScreamingSnake %}
+      {%- endif -%}
+    {%- endfor -%}
+
+    # Dataline literals.
+    {%- for _, literal := range data.DatalineLiterals -%}
+    {%s literal.ScreamingSnake %}_DATALINE_LITERAL = '{%s literal.Camel %}'
+    {%- endfor -%}
+  end
+end
+{%- endfunc -%}
