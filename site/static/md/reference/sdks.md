@@ -53,7 +53,7 @@ Rust [SDK](https://github.com/starfederation/datastar/tree/main/sdk/rust) and [e
 
 ## Ruby
 
-Ruby [SDK](https://github.com/starfederation/datastar/tree/main/sdk/ruby)
+Ruby [SDK](https://github.com/starfederation/datastar/tree/main/sdk/ruby) and [examples](https://github.com/starfederation/datastar/tree/main/examples/ruby).  
  _Author: [Ismael Celis](https://github.com/ismasan)_
 
 ## TypeScript

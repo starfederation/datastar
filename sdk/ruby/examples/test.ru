@@ -10,7 +10,7 @@ require 'datastar'
 #   # install dependencies
 #   bundle install
 #   # run this endpoint with Puma server
-#   puma examples/test.ru
+#   bundle exec puma examples/test.ru
 #
 # Then you can run SDK's test bash script:
 # See https://github.com/starfederation/datastar/blob/develop/sdk/test/README.md

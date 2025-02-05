@@ -82,7 +82,7 @@ datastar.stream do |sse|
 end
 ```
 
-See the `examples` directory.
+See the [examples](https://github.com/starfederation/datastar/tree/main/examples/ruby) directory.
 
 ### Datastar methods
 

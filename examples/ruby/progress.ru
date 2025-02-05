@@ -1,5 +1,4 @@
-require 'bundler'
-Bundler.setup(:test)
+require 'bundler/setup'
 
 require 'datastar'
 
@@ -10,7 +9,7 @@ require 'datastar'
 #   # install dependencies
 #   bundle install
 #   # run this endpoint with Puma server
-#   puma examples/progress.ru
+#   bundle exec puma ./progress.ru
 #
 #   Then open http://localhost:9292
 #

@@ -1,5 +1,4 @@
-require 'bundler'
-Bundler.setup(:test)
+require 'bundler/setup'
 
 require 'datastar'
 
@@ -10,9 +9,9 @@ require 'datastar'
 #   # install dependencies
 #   bundle install
 #   # run this endpoint with Puma server
-#   puma examples/threaded.ru
+#   bundle exec puma examples/threaded.ru
 #
-#   http://localhost:9292
+#   visit http://localhost:9292
 #
 INDEX = <<~HTML
   <!DOCTYPE html>
@@ -45,8 +44,9 @@ trap('INT') { exit }
 
 run do |env|
   # Initialize Datastar with callbacks
-  datastar = Datastar.from_rack_env(env)
-                     .on_connect do |sse|
+  datastar = Datastar
+             .from_rack_env(env)
+             .on_connect do |sse|
     sse.merge_fragments(%(<p id="connection">Connected...</p>))
     p ['connect', sse]
   end.on_server_disconnect do |sse|
@@ -64,7 +64,8 @@ run do |env|
     datastar.stream do |sse|
       11.times do |i|
         sleep 1
-        raise ArgumentError, 'This is an error' if i > 5
+        # Raising an error to demonstrate error handling
+        # raise ArgumentError, 'This is an error' if i > 5
 
         sse.merge_fragments(%(<span id="slow">#{i}</span>))
       end
