@@ -25,6 +25,7 @@ module Datastar
     BLANK_BODY = [].freeze
     SSE_CONTENT_TYPE = 'text/event-stream'
     HTTP_ACCEPT = 'HTTP_ACCEPT'
+    HTTP1 = 'HTTP/1.1'
 
     attr_reader :request, :response
 
@@ -55,8 +56,7 @@ module Datastar
       @response = Rack::Response.new(BLANK_BODY, 200, response&.headers || {})
       @response.content_type = SSE_CONTENT_TYPE
       @response.headers['Cache-Control'] = 'no-cache'
-      # Falcon adapter will remove Connection.
-      @response.headers['Connection'] = 'keep-alive'
+      @response.headers['Connection'] = 'keep-alive' if @request.env['SERVER_PROTOCOL'] == HTTP1
       # Disable response buffering in NGinx and other proxies
       @response.headers['X-Accel-Buffering'] = 'no'
       @response.delete_header 'Content-Length'

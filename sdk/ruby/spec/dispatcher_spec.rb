@@ -39,6 +39,11 @@ RSpec.describe Datastar::Dispatcher do
     it 'sets X-Accel-Buffering: no for NGinx and other proxies' do
       expect(dispatcher.response['X-Accel-Buffering']).to eq('no')
     end
+
+    it 'does not set Connection header if not HTTP/1.1' do
+      request.env['SERVER_PROTOCOL'] = 'HTTP/2.0'
+      expect(dispatcher.response['Connection']).to be_nil
+    end
   end
 
   specify '.from_rack_env' do
