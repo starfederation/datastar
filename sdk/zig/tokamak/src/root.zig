@@ -1,6 +1,8 @@
 const std = @import("std");
 const tk = @import("tokamak");
-const consts = @import("datastar").consts;
+const datastar = @import("datastar");
+const consts = datastar.consts;
+const testing = datastar.testing;
 
 pub const ServerSentEventGenerator = @import("ServerSentEventGenerator.zig");
 
@@ -19,4 +21,26 @@ pub fn readSignals(comptime T: type, req: *tk.Request) !T {
             return std.json.parseFromSliceLeaky(T, req.arena, body, .{});
         },
     }
+}
+
+fn sdk(req: *tk.Request, res: *tk.Response) !void {
+    var sse = try ServerSentEventGenerator.init(res);
+    const signals = try readSignals(
+        testing.Signals,
+        req,
+    );
+
+    try testing.sdk(&sse, signals);
+}
+
+const App = struct {
+    server: *tk.Server,
+    routes: []const tk.Route = &.{
+        .get("/test", sdk),
+        .post0("/test", sdk),
+    },
+};
+
+test sdk {
+    try tk.app.run(App);
 }
