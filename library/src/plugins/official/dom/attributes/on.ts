@@ -5,6 +5,8 @@
 
 import {
   type AttributePlugin,
+  DATASTAR_SIGNAL_EVENT,
+  type DatastarSignalEvent,
   PluginType,
   Requirement,
 } from '../../../../engine/types'
@@ -22,7 +24,8 @@ export const On: AttributePlugin = {
   keyReq: Requirement.Must,
   valReq: Requirement.Must,
   argNames: [EVT],
-  onLoad: ({ el, rawKey, key, value, genRX, mods, signals, effect }) => {
+  removeOnLoad: (rawKey: string) => rawKey.startsWith('onLoad'),
+  onLoad: ({ el, rawKey, key, value, genRX, mods }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
@@ -71,7 +74,6 @@ export const On: AttributePlugin = {
     switch (eventName) {
       case 'load': {
         callback()
-        delete el.dataset[rawKey]
         return () => {}
       }
 
@@ -112,15 +114,15 @@ export const On: AttributePlugin = {
         onElementRemoved(el, () => {
           lastSignalsMarshalled.delete(el.id)
         })
-        return effect(() => {
-          const onlyRemoteSignals = mods.has('remote')
-          const current = signals.JSON(false, onlyRemoteSignals)
-          const last = lastSignalsMarshalled.get(el.id) || ''
-          if (last !== current) {
-            lastSignalsMarshalled.set(el.id, current)
-            callback()
-          }
-        })
+
+        callback()
+        const signalFn = (event: CustomEvent<DatastarSignalEvent>) => {
+          callback(event)
+        }
+        document.addEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
+        return () => {
+          document.removeEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
+        }
       }
 
       default: {

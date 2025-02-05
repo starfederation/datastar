@@ -2,10 +2,10 @@ package site
 
 import (
 	"fmt"
-	"github.com/delaneyj/toolbelt"
 	datastar "github.com/starfederation/datastar/sdk/go"
 	"net/http"
 	"strings"
+	"github.com/delaneyj/toolbelt"
 )
 
 templ Page(title, description string, uri string) {
@@ -37,7 +37,11 @@ templ Page(title, description string, uri string) {
 			<meta name="twitter:site" content="@DelaneyGillilan"/>
 			<meta name="twitter:creator" content="@DelaneyGillilan"/>
 			<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
-			<script type="module" src={ staticPath("js/datastar.js") }></script>
+			if uri == "/examples/aliased_data_attributes" {
+				<script type="module" src={ staticPath("js/datastar-aliased.js") }></script>
+			} else {
+				<script type="module" src={ staticPath("js/datastar.js") }></script>
+			}
 			<style>
 .indicator {
 	opacity:0;
@@ -71,7 +75,7 @@ templ headerIconLink(iconName, href string) {
 }
 
 templ headerTopLevelLink(r *http.Request, text string) {
-	{{ url := templ.SafeURL("/" + strings.ToLower(text)) }}
+	{{ url := templ.SafeURL("/" + toolbelt.Snake(text)) }}
 	<a
 		href={ url }
 		class={
@@ -96,11 +100,108 @@ templ headerExternalLinks() {
 templ headerTopLevelLinks(r *http.Request) {
 	@headerTopLevelLink(r, "Guide")
 	@headerTopLevelLink(r, "Reference")
+	@headerTopLevelLink(r, "How Tos")
 	@headerTopLevelLink(r, "Examples")
-	@headerTopLevelLink(r, "Essays")
-	@headerTopLevelLink(r, "Memes")
-	@headerTopLevelLink(r, "Bundler")
+	@headerDropdownMenu("More") {
+		<li>
+			@headerTopLevelLink(r, "Essays")
+		</li>
+		<li>
+			@headerTopLevelLink(r, "Memes")
+		</li>
+		<li>
+			@headerTopLevelLink(r, "Bundler")
+		</li>
+	}
 }
+
+type SiteSearchSignals struct {
+	Search string `json:"siteSearch"`
+	SearchFetching bool `json:"searchFetching"`
+	OpenSearchResults bool `json:"openSearchResults"`
+}
+
+type SearchResult struct {
+	ID    string  `json:"id"`
+	Title string `json:"title"`
+	Score float64 `json:"score"`
+	Fragment string `json:"fragment"`
+}
+
+const SearchFromHeaderKey = "X-Search-From-Header"
+
+templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromHeader bool) {
+	<div data-signals={templ.JSONString(signals)} class="w-full">
+		<div class="flex flex-nowrap w-full relative">
+			<input 
+				class="flex-1 input input-bordered h-10 w-full" 
+				type="search"
+				placeholder="Search..."
+				data-bind="siteSearch"
+				data-on-input__debounce.300ms={ fmt.Sprintf(
+    				"$siteSearch.length > 1 && @get('/api/search', %s)", 
+   					 fmt.Sprintf(`{"headers": {"%s": "%t"}}`, SearchFromHeaderKey, fromHeader),
+				)}
+				data-indicator="$searchFetching"
+				if fromHeader {
+					data-ref-site-search-input
+					data-on-keydown__window="evt.key == 'k' && (evt.metaKey || evt.ctrlKey) && ($siteSearchInput.focus(), evt.preventDefault())"
+				}
+			/>
+			<div class="absolute right-4 flex items-center h-full">
+				@sseIndicator("searchFetching")
+			</div>
+		</div>
+			<ul 
+				class={
+					"search-results", 
+					"w-[90vw]",
+					"lg:w-full",
+					"relative",
+					"lg:absolute",
+					templ.KV("lg:-left-full", len(searchResults) > 0) 
+				} 
+				data-on-click__outside="$openSearchResults ? $openSearchResults = false : null"
+				data-on-keydown__window="evt.key == 'Escape' && $openSearchResults ? $openSearchResults = false : null" 
+				data-show="$openSearchResults">
+				if len(searchResults) > 0 {
+					for _, result := range searchResults {
+						<li>
+							<a href={templ.SafeURL(result.ID)}>
+								<h3 class="border-b-1">{result.Title}</h3>
+								<div class="text-sm">
+									@templ.Raw(result.Fragment)
+								</div>
+							</a>
+						</li>
+					}
+				} else {
+					<p>No results found.</p>
+				}
+			</ul>
+	</div>
+}
+
+templ HeaderSiteSearch(signals *SiteSearchSignals, searchResults []SearchResult) {
+	<div id="header_site_search" class="hidden lg:flex lg:gap-4 relative z-10">
+		@SiteSearch(&SiteSearchSignals{
+			Search: signals.Search,
+			SearchFetching: signals.SearchFetching,
+			OpenSearchResults: signals.OpenSearchResults,
+		}, searchResults, true)
+	</div>
+}
+
+templ DrawerSiteSearch(signals *SiteSearchSignals, searchResults []SearchResult) {
+	<div id="drawer_site_search" class="flex lg:hidden z-10 p-4 w-80">
+		@SiteSearch(&SiteSearchSignals{
+			Search: signals.Search, 
+			SearchFetching: signals.SearchFetching,
+			OpenSearchResults: signals.OpenSearchResults,
+		}, searchResults, false)
+	</div>
+}
+
 
 templ header(r *http.Request) {
 	<div class="navbar bg-base-200">
@@ -115,15 +216,16 @@ templ header(r *http.Request) {
 				</a>
 				<div class="font-mono text-xs text-accent">v{ datastar.Version }</div>
 			</div>
-			<div class="hidden lg:text-md lg:text-lg lg:flex lg:gap-4 lg:visible ">
+			<div class="hidden lg:text-md lg:text-lg lg:flex lg:gap-4 xl:gap-8 lg:visible ">
 				@headerTopLevelLinks(r)
 			</div>
+			@HeaderSiteSearch(&SiteSearchSignals{SearchFetching: false}, []SearchResult{})
 			<div class="hidden text-xl lg:flex lg:gap-4 lg:visible">
 				@headerExternalLinks()
 			</div>
 		</div>
 	</div>
-	<div class="flex flex-wrap justify-around visible gap-2 pb-8 text-sm bg-base-200 lg:hidden">
+	<div class="flex flex-wrap justify-around visible pb-8 text-sm bg-base-200 lg:hidden">
 		@headerTopLevelLinks(r)
 	</div>
 	<div class="visible navbar bg-base-300 lg:hidden">
@@ -166,7 +268,8 @@ templ SidebarPage(
 			</div>
 			<aside class="drawer-side">
 				<label for="sidebar-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-				<ul class="min-h-full px-4 menu w-80 bg-base-300 text-base-content">
+				@DrawerSiteSearch(&SiteSearchSignals{SearchFetching: false}, []SearchResult{})
+				<ul class="min-h-full pt-[4rem] px-4 menu w-80 bg-base-300 text-base-content">
 					@SidebarContents(sidebarGroups, current)
 				</ul>
 			</aside>
@@ -259,7 +362,6 @@ templ codeSnippetFragment(block CodeSnippetBlock) {
 						) }
 						data-on-click={ fmt.Sprintf("$language = '%s'", snippet.Extension) }
 					>
-						{ toolbelt.Upper( snippet.Extension) }
 						<iconify-icon icon={ snippet.Icon } class="text-4xl" noobserver></iconify-icon>
 					</button>
 				}
@@ -282,4 +384,13 @@ templ templSignalsJSON() {
 
 templ sseIndicator(signalName string) {
 	<div class="loading-dots text-primary" data-class={ fmt.Sprintf("{'loading ml-4': $%s}", signalName) }></div>
+}
+
+templ headerDropdownMenu(title string) {
+	<div class="dropdown dropdown-hover">
+		<div tabindex="0" role="button" class="font-bold uppercase link-hover">{ title }</div>
+		<ul tabindex="0" class="dropdown-content menu bg-base-300 rounded-box z-[1] w-52 p-2 shadow">
+			{ children... }
+		</ul>
+	</div>
 }

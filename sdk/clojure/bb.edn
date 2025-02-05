@@ -1,0 +1,39 @@
+{:paths ["src/main" "src/bb"]
+ :tasks
+ {:requires ([tasks :as t])
+
+  -prep (t/prep-libs)
+
+  dev {:task (t/dev :http-kit :ring-jetty :malli-schemas)}
+
+  dev:rj9a {:task (t/dev :http-kit :ring-rj9a :malli-schemas)}
+  
+  dev:empty (t/dev :malli-schemas)
+  
+
+  test:all (t/lazytest [:http-kit
+                        :ring-jetty
+                        :malli-schemas]
+                       [:test.paths/core-sdk
+                        :test.paths/malli-schemas
+                        :test.paths/adapter-http-kit
+                        :test.paths/adapter-ring-jetty])
+  
+
+  test:all-w (t/lazytest [:http-kit
+                          :ring-jetty
+                          :malli-schemas]
+                         [:test.paths/core-sdk
+                          :test.paths/malli-schemas
+                          :test.paths/adapter-ring
+                          :test.paths/adapter-ring-jetty
+                          :test.paths/adapter-http-kit]
+                         "--watch"
+                         "--delay 1000")
+  
+  test:rj9a (t/lazytest [:http-kit
+                         :ring-rj9a]
+                        [:test.paths/core-sdk
+                         :test.paths/adapter-ring
+                         :test.paths/adapter-rj9a])}}
+  

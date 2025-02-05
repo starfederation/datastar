@@ -8,27 +8,19 @@ When troubleshooting an issue, it may be useful to see the current state of the 
 <div data-text="ctx.signals.JSON()"></div>
 ```
 
-For edge-cases in which you find yourself having to change the DOM without involving Datastar, you can import Datastar and apply it to any element and its children.
+While it is generally recommended against, you can manually import the Datastar object and access its public methods and properties.
 
 ```html
 <script type="module">
     import { Datastar } from '/path/to/datastar.js'
     
-    Datastar.apply(document.body)
+    console.log(Datastar.signals.values())
 </script>
 ```
 
 ## Public Methods
 
 The Datastar object exposes the following methods.
-
-### `apply()`
-
-Applies all plugins to the provided element and its children.
-
-```js
-Datastar.apply(document.body)
-```
 
 ### `load()`
 

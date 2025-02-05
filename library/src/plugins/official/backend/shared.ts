@@ -6,6 +6,7 @@ export const SWAPPING_CLASS = `${DATASTAR}-swapping`
 export const STARTED = 'started'
 export const FINISHED = 'finished'
 export const ERROR = 'error'
+export const RETRYING = 'retrying'
 
 export interface DatastarSSEEvent {
   type: string
@@ -13,7 +14,7 @@ export interface DatastarSSEEvent {
 }
 
 export interface CustomEventMap {
-  'datastar-sse': CustomEvent<DatastarSSEEvent>
+  [DATASTAR_SSE_EVENT]: CustomEvent<DatastarSSEEvent>
 }
 export type WatcherFn<K extends keyof CustomEventMap> = (
   this: Document,

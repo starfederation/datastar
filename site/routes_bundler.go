@@ -31,8 +31,9 @@ var (
 	prefixRegexp          = regexp.MustCompile(`prefix: "(?P<name>.*)",`)
 )
 
-type BundlerSignals struct {
+type BundlerStore struct {
 	IncludedPlugins map[string]bool `json:"includedPlugins"`
+	Alias           string          `json:"alias"`
 }
 
 type PluginDetails struct {
@@ -51,6 +52,7 @@ type PluginDetails struct {
 type PluginManifest struct {
 	Version string          `json:"version"`
 	Plugins []PluginDetails `json:"plugins"`
+	Alias   string          `json:"alias"`
 }
 
 func setupBundler(router chi.Router) error {
@@ -194,7 +196,7 @@ func setupBundler(router chi.Router) error {
 
 	router.Route("/bundler", func(bundlerRouter chi.Router) {
 		bundlerRouter.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			signals := &BundlerSignals{
+			signals := &BundlerStore{
 				IncludedPlugins: map[string]bool{},
 			}
 			for _, plugin := range manifest.Plugins {
@@ -204,8 +206,8 @@ func setupBundler(router chi.Router) error {
 		})
 
 		bundlerRouter.Post("/", func(w http.ResponseWriter, r *http.Request) {
-			signals := &BundlerSignals{}
-			if err := datastar.ReadSignals(r, signals); err != nil {
+			store := &BundlerStore{}
+			if err := datastar.ReadSignals(r, store); err != nil {
 				http.Error(w, "error parsing request: "+err.Error(), http.StatusBadRequest)
 				return
 			}
@@ -214,9 +216,10 @@ func setupBundler(router chi.Router) error {
 
 			revisedManifest := PluginManifest{
 				Version: manifest.Version,
+				Alias:   toolbelt.Lower(store.Alias),
 			}
 			for _, plugin := range manifest.Plugins {
-				if !signals.IncludedPlugins[plugin.Key] {
+				if !store.IncludedPlugins[plugin.Key] {
 					continue
 				}
 
@@ -268,15 +271,25 @@ type BundleResults struct {
 func bundlePlugins(tmpDir string, manifest PluginManifest) (results *BundleResults, err error) {
 	start := time.Now()
 
+	hasAlias := manifest.Alias != ""
 	distDir := filepath.Join(tmpDir, "dist")
-
 	h := xxh3.New()
 	h.WriteString(manifest.Version)
+	if hasAlias {
+		h.WriteString(manifest.Alias)
+	}
 	for _, plugin := range manifest.Plugins {
 		h.WriteString(plugin.Contents)
 	}
 	hash := h.Sum64()
-	hashedName := fmt.Sprintf("datastar-%s-%x", toolbelt.Kebab(manifest.Version), hash)
+	var hashedName string
+
+	versionKebab := toolbelt.Kebab(manifest.Version)
+	if hasAlias {
+		hashedName = fmt.Sprintf("datastar-%s-%s-%x", toolbelt.Kebab(manifest.Alias), versionKebab, hash)
+	} else {
+		hashedName = fmt.Sprintf("datastar-%s-%x", versionKebab, hash)
+	}
 
 	bundleResultsPath := filepath.Join(distDir, hashedName+".json")
 

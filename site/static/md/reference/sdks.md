@@ -1,62 +1,62 @@
 # SDKs
 
-Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specific to Datastar.
+Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specific to Datastar. If you'd like to contribute an SDK, please follow the [Contribution Guidelines](https://github.com/starfederation/datastar/blob/main/CONTRIBUTING.md#sdks).
+
+## Clojure
+
+Clojure [SDK](https://github.com/starfederation/datastar/tree/main/sdk/clojure) and [examples](https://github.com/starfederation/datastar/tree/main/examples/clojure).  
+_Author: [Jeremy Schoffen](https://github.com/JeremS)_
 
 ## dotnet
 
-[dotnet SDK](https://github.com/starfederation/datastar/tree/main/sdk/dotnet), including support for C#.  
+dotnet [SDK](https://github.com/starfederation/datastar/tree/main/sdk/dotnet) and [examples](https://github.com/starfederation/datastar/tree/main/examples/dotnet).  
 _Author: [Greg H](https://github.com/SpiralOSS)_
-
-Examples:  
-[dotnet examples](https://github.com/starfederation/datastar/tree/main/examples/dotnet)
 
 ## Go
 
-[Go SDK](https://github.com/starfederation/datastar/tree/main/sdk/go)  
+Go [SDK](https://github.com/starfederation/datastar/tree/main/sdk/go) and [examples](https://github.com/starfederation/datastar/tree/main/examples/go).  
 _Author: [Delaney Gillilan](https://github.com/delaneyj)_
 
-Examples:  
+Other examples:  
 [1 App 5 Stacks ported to Go+Templ+Datastar](https://github.com/delaneyj/1a5s-datastar)
 
 ## Java
 
-[Java SDK](https://github.com/starfederation/datastar/blob/develop/sdk/java)  
+Java [SDK](https://github.com/starfederation/datastar/blob/develop/sdk/java).  
 _Author: [Peter Humulock](https://github.com/rphumulock)_
 
 ## PHP
 
-[PHP SDK](https://github.com/starfederation/datastar-php)  
+PHP [SDK](https://github.com/starfederation/datastar-php) and [examples](https://github.com/starfederation/datastar/tree/main/examples/php).    
 _Author: [Ben Croker](https://github.com/bencroker) ([PutYourLightsOn](https://putyourlightson.com/))_
 
+### Laravel
+
 [Laravel package](https://github.com/putyourlightson/laravel-datastar)  
+
+### Craft CMS
+
 [Craft CMS plugin](https://putyourlightson.com/plugins/datastar)  
 
-Examples:  
-[Craft Datastar Pokemon demo](https://github.com/khalwat/craft-datastar-pokemon-demo)
+Other examples:  
+[Craft Datastar Pokemon demo](https://github.com/khalwat/craft-datastar-pokemon-demo)  
 
 ## Python
 
-[Python SDK](https://github.com/starfederation/datastar/tree/main/sdk/python) and [PyPI package](https://pypi.org/project/datastar-py/), including support for Sanic, Django, Quart and FastAPI.  
+Python [SDK](https://github.com/starfederation/datastar/tree/main/sdk/python), [examples](https://github.com/starfederation/datastar/tree/main/examples/python), and [PyPI package](https://pypi.org/project/datastar-py/), including support for Sanic, Django, Quart and FastAPI.  
 _Author: [Felix Ingram](https://github.com/lllama)_
-
-Examples:  
-[Python examples](https://github.com/starfederation/datastar/tree/main/examples/python)
 
 ## Rust
 
-[Rust SDK](https://github.com/starfederation/datastar/tree/main/sdk/rust)
+Rust [SDK](https://github.com/starfederation/datastar/tree/main/sdk/rust) and [examples](https://github.com/starfederation/datastar/tree/main/examples/rust).  
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_
 
 ## TypeScript
 
-[TypeScript SDK](https://github.com/starfederation/datastar/tree/main/sdk/typescript), including support for NodeJS and Web standard runtimes (Deno, Bun, etc.).  
+TypeScript [SDK](https://github.com/starfederation/datastar/tree/main/sdk/typescript) and [examples](https://github.com/starfederation/datastar/tree/main/examples/typescript), including support for NodeJS and Web standard runtimes (Deno, Bun, etc.).  
 _Author: [Patrick Marchand](https://github.com/Superpat)_
-
-Examples:  
-[NodeJS example](https://github.com/starfederation/datastar/tree/main/sdk/typescript/examples/node.js)
-[Deno example](https://github.com/starfederation/datastar/tree/main/sdk/typescript/examples/deno.ts)
 
 ## Zig
 
-[Zig SDK](https://github.com/starfederation/datastar/tree/main/sdk/zig)  
+Zig [SDK](https://github.com/starfederation/datastar/tree/main/sdk/zig) and [examples](https://github.com/starfederation/datastar/tree/main/examples/zig).  
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_

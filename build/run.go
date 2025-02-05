@@ -41,13 +41,6 @@ func extractVersion() (string, error) {
 
 	version := strings.TrimSpace(string(versionBytes))
 
-	// Write out the version to the version file.
-	versionPath := "library/src/engine/version.ts"
-	versionContents := fmt.Sprintf("export const VERSION = '%s';\n", version)
-	if err := os.WriteFile(versionPath, []byte(versionContents), 0o644); err != nil {
-		return "", fmt.Errorf("error writing version file: %w", err)
-	}
-
 	return version, nil
 }
 
@@ -62,6 +55,7 @@ func createBundles(version string) error {
 		EntryPoints: []string{
 			"library/src/bundles/datastar-core.ts",
 			"library/src/bundles/datastar.ts",
+			"library/src/bundles/datastar-aliased.ts",
 		},
 		Banner: map[string]string{
 			"js": "// Datastar v" + version,
@@ -131,15 +125,16 @@ func writeOutConsts(version string) error {
 	})
 
 	templates := map[string]func(data *ConstTemplateData) string{
-		"README.md":                               datastarREADME,
-		"library/README.md":                       datastarREADME,
-		"library/src/engine/consts.ts":            datastarClientConsts,
-		"library/package.json":                    datastarClientPackageJSON,
-		"sdk/go/consts.go":                        goConsts,
-		"sdk/dotnet/src/Consts.fs":                dotnetConsts,
-		"sdk/php/src/Consts.php":                  phpConsts,
-		"sdk/php/src/enums/EventType.php":         phpEventType,
-		"sdk/php/src/enums/FragmentMergeMode.php": phpFragmentMergeMode,
+		"README.md":                    datastarREADME,
+		"library/README.md":            datastarREADME,
+		"library/src/engine/consts.ts": datastarClientConsts,
+		"library/package.json":         datastarClientPackageJSON,
+		"sdk/clojure/sdk/src/main/starfederation/datastar/clojure/consts.clj": clojureConsts,
+		"sdk/go/consts.go":                                                                 goConsts,
+		"sdk/dotnet/src/Consts.fs":                                                         dotnetConsts,
+		"sdk/php/src/Consts.php":                                                           phpConsts,
+		"sdk/php/src/enums/EventType.php":                                                  phpEventType,
+		"sdk/php/src/enums/FragmentMergeMode.php":                                          phpFragmentMergeMode,
 		"sdk/java/core/src/main/java/starfederation/datastar/Consts.java":                  javaConsts,
 		"sdk/java/core/src/main/java/starfederation/datastar/enums/EventType.java":         javaEventType,
 		"sdk/java/core/src/main/java/starfederation/datastar/enums/FragmentMergeMode.java": javaFragmentMergeMode,
@@ -147,6 +142,7 @@ func writeOutConsts(version string) error {
 		"sdk/typescript/src/consts.ts":                                                     typescriptConsts,
 		"sdk/rust/src/consts.rs":                                                           rustConsts,
 		"sdk/zig/src/consts.zig":                                                           zigConsts,
+		"examples/clojure/hello-world/resources/public/hello-world.html":                   helloWorldExample,
 		"examples/dotnet/HelloWorld/wwwroot/hello-world.html":                              helloWorldExample,
 		"examples/go/hello-world/hello-world.html":                                         helloWorldExample,
 		"examples/php/hello-world/public/hello-world.html":                                 helloWorldExamplePHP,
@@ -154,6 +150,8 @@ func writeOutConsts(version string) error {
 		"examples/zig/tokamak/hello-world/hello-world.html":                                helloWorldExample,
 		"examples/typescript/deno/public/hello-world.html":                                 helloWorldExample,
 		"examples/typescript/node/public/hello-world.html":                                 helloWorldExample,
+		"examples/rust/axum/hello-world/hello-world.html":                                  helloWorldExample,
+		"examples/rust/rocket/hello-world/hello-world.html":                                helloWorldExample,
 	}
 
 	for path, tmplFn := range templates {

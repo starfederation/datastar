@@ -10,7 +10,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func setupReferenceRoutes(ctx context.Context, router chi.Router) error {
+func setupReferences(ctx context.Context, router chi.Router) error {
 	mdDataset, err := markdownRenders(ctx, "reference")
 	if err != nil {
 		return err

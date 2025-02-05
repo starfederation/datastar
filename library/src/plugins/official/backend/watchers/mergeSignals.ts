@@ -23,7 +23,6 @@ export const MergeSignals: WatcherPlugin = {
         const { signals } = ctx
         const onlyIfMissing = isBoolString(onlyIfMissingRaw)
         signals.merge(jsStrToObject(raw), onlyIfMissing)
-        ctx.apply(document.body)
       },
     )
   },

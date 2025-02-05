@@ -1,0 +1,13 @@
+import (
+	"time"
+    datastar "github.com/starfederation/datastar/sdk/go"
+)
+
+sse := datastar.NewSSE(w, r)
+sse.MergeFragments(`
+    <div id="indicator">Redirecting in 3 seconds...</div>
+`)
+time.Sleep(3 * time.Second)
+sse.ExecuteScript(`
+    setTimeout(() => window.location = "/guide")
+`)

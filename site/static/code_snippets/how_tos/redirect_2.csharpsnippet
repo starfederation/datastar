@@ -1,0 +1,8 @@
+using StarFederation.Datastar.DependencyInjection;
+
+app.MapGet("/redirect", async (IDatastarServerSentEventService sse) =>
+{
+    await sse.MergeFragmentsAsync("""<div id="indicator">Redirecting in 3 seconds...</div>""");
+    await Task.Delay(TimeSpan.FromSeconds(3));
+    await sse.ExecuteScriptAsync("""setTimeout(() => window.location = "/guide");""");
+});

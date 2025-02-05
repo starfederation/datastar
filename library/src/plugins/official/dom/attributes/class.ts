@@ -8,7 +8,6 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import { kebabize } from '../../../../utils/text'
 
 export const Class: AttributePlugin = {
   type: PluginType.Attribute,
@@ -30,11 +29,10 @@ export const Class: AttributePlugin = {
         }
       } else {
         const shouldInclude = rx<boolean>()
-        const cls = kebabize(key)
         if (shouldInclude) {
-          cl.add(cls)
+          cl.add(key)
         } else {
-          cl.remove(cls)
+          cl.remove(key)
         }
       }
     })

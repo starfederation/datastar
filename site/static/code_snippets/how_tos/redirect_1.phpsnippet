@@ -1,0 +1,10 @@
+use starfederation\datastar\ServerSentEventGenerator;
+
+$sse = new ServerSentEventGenerator();
+$sse->mergeFragments(`
+    <div id="indicator">Redirecting in 3 seconds...</div>
+`);
+sleep(3);
+$sse->executeScript(`
+    window.location = "/guide"
+`);
