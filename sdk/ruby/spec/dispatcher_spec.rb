@@ -112,6 +112,22 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.response.body.call(socket)
       expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: settleDuration 1000\ndata: fragments <div id="foo">\ndata: fragments <span>#{view_context}</span>\ndata: fragments </div>\n\n\n)])
     end
+
+    it 'works with #render_in(view_context, &) interfaces' do
+      template_class = Class.new do
+        def self.render_in(view_context) = %(<div id="foo">\n<span>#{view_context}</span>\n</div>\n)
+      end
+
+      dispatcher.merge_fragments(
+        template_class,
+        id: 72,
+        retry_duration: 2000,
+        settle_duration: 1000
+      )
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: settleDuration 1000\ndata: fragments <div id="foo">\ndata: fragments <span>#{view_context}</span>\ndata: fragments </div>\n\n\n)])
+    end
   end
 
   describe '#remove_fragments' do
