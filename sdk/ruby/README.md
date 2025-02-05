@@ -198,6 +198,28 @@ Datastar.configure do |config|
 end
 ```
 
+### Rails
+
+#### Rendering Rails templates
+
+```ruby
+datastar.stream do |sse|
+  10.times do |i|
+    sleep 1
+    tpl = render_to_string('events/user', layout: false, locals: { name: "David #{i}" })
+    sse.merge_fragments tpl
+  end
+end
+```
+
+#### Rendering Phlex components
+
+`#merge_fragments` supports [Phlex](https://www.phlex.fun) component instances.
+
+```ruby
+sse.merge_fragments(UserComponent.new(user: User.first))
+```
+
 ### Tests
 
 ```ruby
