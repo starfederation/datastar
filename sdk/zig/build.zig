@@ -6,7 +6,7 @@ pub fn build(b: *std.Build) void {
     _ = target;
     _ = optimize;
     const datastar = b.addModule("datastar", .{
-        .root_source_file = b.path("src/root.zig"),
+        .root_source_file = b.path("src/main.zig"),
     });
     _ = datastar;
 }

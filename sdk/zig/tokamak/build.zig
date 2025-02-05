@@ -9,7 +9,7 @@ pub fn build(b: *std.Build) void {
     const datastar = b.dependency("datastar", dep_opts).module("datastar");
 
     const datastar_tokamak = b.addModule("datastar_tokamak", .{
-        .root_source_file = b.path("src/root.zig"),
+        .root_source_file = b.path("src/main.zig"),
         .imports = &.{
             .{ .name = "tokamak", .module = tokamak },
             .{ .name = "datastar", .module = datastar },
@@ -19,7 +19,7 @@ pub fn build(b: *std.Build) void {
 
     {
         const tests = b.addTest(.{
-            .root_source_file = b.path("src/root.zig"),
+            .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
             .test_runner = .{ .path = b.path("../test_runner.zig"), .mode = .simple },
