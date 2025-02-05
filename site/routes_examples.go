@@ -108,6 +108,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "aliased_data_attributes"},
 				{ID: "merge_fragment"},
 				{ID: "key_casing"},
+				{ID: "signals_ifmissing_onload"},
 			},
 		},
 	}

@@ -12,11 +12,15 @@ export const Signals: AttributePlugin = {
   onLoad: (ctx) => {
     const { key, mods, signals, value, genRX } = ctx
     const ifMissing = mods.has('ifmissing')
-    // BEN: investigate use of `ifMissing` in the following line
-    if (key !== '' && !ifMissing) {
+
+    if (key !== '') {
       const k = modifyCasing(key, mods)
       const v = value === '' ? value : genRX()()
-      signals.setValue(k, v)
+      if (ifMissing) {
+        signals.upsertIfMissing(k, v)
+      } else {
+        signals.setValue(k, v)
+      }
     } else {
       const obj = jsStrToObject(ctx.value)
       ctx.value = JSON.stringify(obj)
