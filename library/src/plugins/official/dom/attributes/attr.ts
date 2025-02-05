@@ -21,7 +21,6 @@ export const Attr: AttributePlugin = {
       return effect(async () => {
         const binds = rx<NestedValues>()
         for (const [attr, val] of Object.entries(binds)) {
-          // BEN: add support for boolean attributes?
           el.setAttribute(attr, val)
         }
       })
