@@ -1645,7 +1645,7 @@ var ServerSentEventGenerator2 = class _ServerSentEventGenerator extends ServerSe
   }
 };
 
-// hello-world.js
+// src/hello-world.js
 function getHelloWorldHtml() {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1686,7 +1686,7 @@ function getHelloWorldHtml() {
 </html>`;
 }
 
-// shared-router.ts
+// src/shared-router.ts
 function createRouter() {
   const app = new Hono2();
   app.get("/", async (c) => {
@@ -1715,14 +1715,13 @@ function createRouter() {
   return app;
 }
 
-// service-worker.ts
-var CACHE_NAME = "datastar-cache-v1";
+// src/service-worker.ts
+var CACHE_NAME = "datastar-cache";
 var CORE_ASSETS = [
   "/",
-  // 'https://unpkg.com/@tailwindcss/browser@4',
-  // 'https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.2/bundles/datastar.js',
+  "https://unpkg.com/@tailwindcss/browser@4",
+  "https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.2/bundles/datastar.js",
   "https://data-star.dev/static/images/rocket.png"
-  // '/service-worker.js'
 ];
 var router = createRouter();
 self.addEventListener("install", (event) => {

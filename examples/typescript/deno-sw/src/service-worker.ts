@@ -5,7 +5,9 @@ declare const self: ServiceWorkerGlobalScope;
 const CACHE_NAME = 'datastar-cache';
 const CORE_ASSETS = [
   '/',
-  'https://data-star.dev/static/images/rocket.png', // need to cache this because it doesnt have cache header
+  'https://unpkg.com/@tailwindcss/browser@4',
+  'https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.2/bundles/datastar.js',
+  'https://data-star.dev/static/images/rocket.png'
 ];
 
 const router = createRouter();
@@ -82,4 +84,5 @@ self.addEventListener('fetch', (event) => {
       }
     })()
   );
+
 });

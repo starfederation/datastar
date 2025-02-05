@@ -1,5 +1,5 @@
 import { Hono } from "jsr:@hono/hono/tiny";
-import { ServerSentEventGenerator } from "../../../sdk/typescript/src/web/serverSentEventGenerator.ts";
+import { ServerSentEventGenerator } from "../../../../sdk/typescript/src/web/serverSentEventGenerator.ts";
 import { getHelloWorldHtml } from "./hello-world.js";
 
 // Make Store properties explicitly typed
