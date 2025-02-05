@@ -12,11 +12,11 @@ Any ring adapter using this protocol should work with this library.
 For now the SDK and adapters are distributed as git dependencies using a `deps.edn` file.
 
 ```clojure
-{datastar/sdk {:git/url "https://github.com/starfederation/datastar/tree/develop"
+{datastar/sdk {:git/url "https://github.com/starfederation/datastar/"
                :git/sha "LATEST SHA"
                :deps/root "sdk/clojure/sdk"}
 
- datastar/ring {:git/url "https://github.com/starfederation/datastar/tree/develop"
+ datastar/ring {:git/url "https://github.com/starfederation/datastar/"
                 :git/sha "LATEST SHA"
                 :deps/root "sdk/clojure/adapter-ring"}}
 ```

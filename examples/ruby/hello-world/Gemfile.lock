@@ -1,0 +1,25 @@
+PATH
+  remote: ../../../sdk/ruby
+  specs:
+    datastar (1.0.0.beta.1)
+      rack (~> 3.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    nio4r (2.7.4)
+    puma (6.6.0)
+      nio4r (~> 2.0)
+    rack (3.1.9)
+
+PLATFORMS
+  arm64-darwin-24
+  ruby
+
+DEPENDENCIES
+  datastar!
+  puma
+  rack
+
+BUNDLED WITH
+   2.6.3

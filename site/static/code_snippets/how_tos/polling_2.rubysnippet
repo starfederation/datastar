@@ -1,0 +1,14 @@
+datastar = Datastar.new(request:, response:)
+
+now = Time.now
+current_time = now.strftime('%Y-%m-%d %H:%M:%S')
+current_seconds = now.strftime('%S').to_i
+duration = current_seconds < 50 ? 5 : 1
+
+datastar.merge_fragments <<~FRAGMENT
+    <div id="time"
+         data-on-interval__duration.#{duration}s="@get('/endpoint')"
+    >
+        #{current_time}
+    </div>
+FRAGMENT

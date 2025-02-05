@@ -51,6 +51,11 @@ _Author: [Felix Ingram](https://github.com/lllama)_
 Rust [SDK](https://github.com/starfederation/datastar/tree/main/sdk/rust) and [examples](https://github.com/starfederation/datastar/tree/main/examples/rust).  
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_
 
+## Ruby
+
+Ruby [SDK](https://github.com/starfederation/datastar/tree/main/sdk/ruby) and [examples](https://github.com/starfederation/datastar/tree/main/examples/ruby).  
+ _Author: [Ismael Celis](https://github.com/ismasan)_
+
 ## TypeScript
 
 TypeScript [SDK](https://github.com/starfederation/datastar/tree/main/sdk/typescript) and [examples](https://github.com/starfederation/datastar/tree/main/examples/typescript), including support for NodeJS and Web standard runtimes (Deno, Bun, etc.).  

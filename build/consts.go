@@ -105,6 +105,12 @@ var Consts = &ConstTemplateData{
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/rust",
 		},
 		{
+			FileExtension: "ruby",
+			Name:          "Ruby",
+			Icon:          "vscode-icons:file-type-ruby",
+			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/ruby",
+		},
+		{
 			FileExtension: "ts",
 			Name:          "TypeScript",
 			Icon:          "vscode-icons:file-type-typescript-official",
