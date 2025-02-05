@@ -106,6 +106,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "click_outside"},
 				{ID: "timing"},
 				{ID: "aliased_data_attributes"},
+				{ID: "merge_fragment"},
 			},
 		},
 	}
@@ -201,6 +202,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 			setupExamplesToggleVisibility(examplesRouter),
 			setupExamplesFormData(examplesRouter),
 			setupExamplesCustomValidity(examplesRouter),
+			setupExamplesMergeFragment(examplesRouter),
 		); err != nil {
 			panic(fmt.Sprintf("error setting up examples routes: %s", err))
 		}
