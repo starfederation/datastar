@@ -35,6 +35,10 @@ RSpec.describe Datastar::Dispatcher do
     it 'sets Connection to keep-alive' do
       expect(dispatcher.response['Connection']).to eq('keep-alive')
     end
+
+    it 'sets X-Accel-Buffering: no for NGinx and other proxies' do
+      expect(dispatcher.response['X-Accel-Buffering']).to eq('no')
+    end
   end
 
   specify '.from_rack_env' do

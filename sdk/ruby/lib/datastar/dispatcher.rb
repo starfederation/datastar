@@ -55,7 +55,10 @@ module Datastar
       @response = Rack::Response.new(BLANK_BODY, 200, response&.headers || {})
       @response.content_type = SSE_CONTENT_TYPE
       @response.headers['Cache-Control'] = 'no-cache'
+      # Falcon adapter will remove Connection.
       @response.headers['Connection'] = 'keep-alive'
+      # Disable response buffering in NGinx and other proxies
+      @response.headers['X-Accel-Buffering'] = 'no'
       @response.delete_header 'Content-Length'
       @executor.prepare(@response)
     end
