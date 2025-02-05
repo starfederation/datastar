@@ -11,3 +11,7 @@
 
 - Class names are no longer converted to kebab case when used in the `data-class-*` attribute ([#610](https://github.com/starfederation/datastar/issues/610)).
 - Event names are no longer converted to kebab case when used in the `data-on-*` attribute.
+
+### Fixed
+
+- Fixed a bug in which using the `__ifmissing` modifier with the `data-signals-*` attribute was not having any effect ([#605](https://github.com/starfederation/datastar/issues/605)).
