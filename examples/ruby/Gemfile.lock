@@ -1,7 +1,7 @@
 PATH
   remote: ../../sdk/ruby
   specs:
-    datastar (0.1.0)
+    datastar (1.0.0.beta.1)
       rack (~> 3.0)
 
 GEM
