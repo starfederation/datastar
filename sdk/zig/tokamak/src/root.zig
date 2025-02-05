@@ -37,7 +37,7 @@ const App = struct {
     server: *tk.Server,
     routes: []const tk.Route = &.{
         .get("/test", sdk),
-        .post("/test", sdk),
+        .post0("/test", sdk),
     },
 };
 
