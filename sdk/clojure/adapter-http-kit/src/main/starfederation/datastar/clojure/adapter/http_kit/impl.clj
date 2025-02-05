@@ -34,11 +34,9 @@
   (HK-gen. ch (ReentrantLock.)))
 
 
-(defn send-base-sse-response! [ch req headers]
-  (let [sse-headers (sse/headers req)]
-    (hk-server/send! ch
-                     {:status 200
-                      :headers (merge headers sse-headers)}
-                     false)))
-
+(defn send-base-sse-response! [ch req {:keys [status headers]}]
+  (hk-server/send! ch
+                   {:status (or status 200)
+                    :headers (merge headers (sse/headers req))}
+                   false))
 

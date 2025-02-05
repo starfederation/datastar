@@ -14,6 +14,7 @@ import {
   type DatastarSSEEvent,
   ERROR,
   FINISHED,
+  RETRYING,
   STARTED,
 } from '../shared'
 
@@ -152,6 +153,7 @@ export const sse = async (
         // do nothing and it will retry
         if (error) {
           console.error(error.message)
+          dispatchSSE(RETRYING, { message: error.message })
         }
       },
     }
