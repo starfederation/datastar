@@ -2,7 +2,7 @@
 
 module Datastar
   # The Dispatcher encapsulates the logic of handling a request
-  # and sending updating a response with datastar messages.
+  # and building a response with streaming datastar messages.
   # You'll normally instantiate a Dispatcher in your controller action of Rack handler
   # via Datastar.new.
   # @example

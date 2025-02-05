@@ -16,7 +16,7 @@ module Datastar
       # even if the exception is handled upstream
       # See https://github.com/socketry/async/blob/9851cb945ae49a85375d120219000fe7db457307/lib/async/task.rb#L204
       # Not great to silence these logs for ALL tasks
-      # in a Rails app (I ony want to silence them for Datastar tasks)
+      # in a Rails app (I only want to silence them for Datastar tasks)
       Console.logger.disable(Async::Task)
     end
 
