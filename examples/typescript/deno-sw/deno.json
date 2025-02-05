@@ -3,5 +3,10 @@
     "@hono/hono": "jsr:@hono/hono@^4.6.19",
     "@luca/esbuild-deno-loader": "jsr:@luca/esbuild-deno-loader@^0.9.0"
   },
+  "tasks": {
+    "start": "deno run -A deno.ts",
+    "build": "deno run -A build.ts",
+    "dev": "deno task build && deno run -A --watch deno.ts"
+  },
   "nodeModulesDir": "auto"
 }

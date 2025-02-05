@@ -2,12 +2,6 @@ import { Hono } from "jsr:@hono/hono/tiny";
 import { serveStatic } from "jsr:@hono/hono/deno";
 import { createRouter } from "./shared-router.ts";
 
-// Rebuild service worker first
-const buildProcess = new Deno.Command(Deno.execPath(), {
-  args: ["run", "-A", "--unstable-sloppy-imports", "build.js"],
-});
-await buildProcess.output();
-
 const app = new Hono();
 
 // Serve static files

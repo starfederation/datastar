@@ -1689,27 +1689,22 @@ function getHelloWorldHtml() {
 // shared-router.ts
 function createRouter() {
   const app = new Hono2();
-  console.log(`Router created`);
-  app.use("*", async (c, next) => {
-    console.log(`Incoming request - router: ${c.req.method} ${c.req.url}`);
-    await next();
-  });
   app.get("/", async (c) => {
-    console.log("Handling / route");
     return c.html(getHelloWorldHtml());
   });
   app.get("/hello-world", async (c) => {
-    const reader = await ServerSentEventGenerator2.readSignals(c.req);
+    const reader = await ServerSentEventGenerator2.readSignals(c.req.raw);
     if (!reader.success) {
       return c.text(`Error while reading signals: ${reader.error}`, 400);
     }
     return ServerSentEventGenerator2.stream(async (stream) => {
       const message = "Hello, world!";
+      const delay = typeof reader.signals.delay === "number" ? reader.signals.delay : 400;
       for (let i = 0; i < message.length; i++) {
         stream.mergeFragments(
           `<div id="message">${message.substring(0, i + 1)}</div>`
         );
-        await new Promise((resolve) => setTimeout(resolve, reader.signals.delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     });
   });
@@ -1729,7 +1724,6 @@ var CORE_ASSETS = [
   "/static/datastar.js.map",
   "/static/rocket.png",
   "/service-worker.js"
-  // Ensure the service worker script is cached
 ];
 var router = createRouter();
 self.addEventListener("install", (event) => {

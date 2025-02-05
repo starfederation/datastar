@@ -2,8 +2,9 @@ import { Hono } from "jsr:@hono/hono/tiny";
 import { ServerSentEventGenerator } from "../../../sdk/typescript/src/web/serverSentEventGenerator.ts";
 import { getHelloWorldHtml } from "./hello-world.js";
 
+// Make Store properties explicitly typed
 interface Store {
-  delay: number;
+  delay: number | null;
 }
 
 export function createRouter() {
@@ -11,13 +12,12 @@ export function createRouter() {
     
   // Homepage route
   app.get("/", async (c) => {
-    console.log("Handling / route");
     return c.html(getHelloWorldHtml());
   });
   
   // Hello, world! route
   app.get("/hello-world", async (c) => {
-    const reader = await ServerSentEventGenerator.readSignals<Store>(c.req);
+    const reader = await ServerSentEventGenerator.readSignals(c.req.raw);
 
     if (!reader.success) {
       return c.text(`Error while reading signals: ${reader.error}`, 400);
@@ -25,12 +25,13 @@ export function createRouter() {
 
     return ServerSentEventGenerator.stream(async (stream) => {
       const message = "Hello, world!";
+      const delay = typeof reader.signals.delay === 'number' ? reader.signals.delay : 400; // Default delay
       
       for (let i = 0; i < message.length; i++) {
         stream.mergeFragments(
           `<div id="message">${message.substring(0, i + 1)}</div>`,
         );
-        await new Promise(resolve => setTimeout(resolve, reader.signals.delay));
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
     });
   });
