@@ -1663,14 +1663,14 @@ function getHelloWorldHtml() {
             });
         }
     <\/script>
-    <script src="/static/tailwind.js"><\/script>
-    <script type="module" src="/static/datastar.js"><\/script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"><\/script>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.2/bundles/datastar.js"><\/script>
 </head>
 <body class="bg-white dark:bg-gray-900 text-lg max-w-xl mx-auto my-16">
     <div data-signals-delay="400" class="bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-lg px-6 py-8 ring shadow-xl ring-gray-900/5 space-y-2">
         <div class="flex justify-between items-center">
             <h1 class="text-gray-900 dark:text-white text-3xl font-semibold">Datastar SDK Demo</h1>
-            <img src="/static/rocket.png" alt="Rocket" width="64" height="64" />
+            <img src="https://data-star.dev/static/images/rocket.png" alt="Rocket" width="64" height="64" />
         </div>
         <p class="mt-2">SSE events will be streamed from the backend to the frontend.</p>
         <div class="space-x-2">
@@ -1719,11 +1719,10 @@ function createRouter() {
 var CACHE_NAME = "datastar-cache-v1";
 var CORE_ASSETS = [
   "/",
-  "/static/tailwind.js",
-  "/static/datastar.js",
-  "/static/datastar.js.map",
-  "/static/rocket.png",
-  "/service-worker.js"
+  // 'https://unpkg.com/@tailwindcss/browser@4',
+  // 'https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.2/bundles/datastar.js',
+  "https://data-star.dev/static/images/rocket.png"
+  // '/service-worker.js'
 ];
 var router = createRouter();
 self.addEventListener("install", (event) => {
@@ -1731,9 +1730,16 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
-      await Promise.all(
-        CORE_ASSETS.map((url) => fetch(url).then((response) => cache.put(url, response)))
-      );
+      for (const url of CORE_ASSETS) {
+        try {
+          const fetchOptions = url.includes("rocket") ? { mode: "no-cors" } : void 0;
+          const response = await fetch(url, fetchOptions);
+          await cache.put(url, response);
+          console.log("Cached:", url);
+        } catch (error) {
+          console.error("Failed to cache:", url, error);
+        }
+      }
       await self.skipWaiting();
     })()
   );
@@ -1743,14 +1749,14 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 self.addEventListener("fetch", (event) => {
-  console.log("SW Fetch:", event.request.url);
   event.respondWith(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
       const url = new URL(event.request.url);
-      if (CORE_ASSETS.includes(url.pathname)) {
+      if (CORE_ASSETS.includes(url.toString()) || CORE_ASSETS.includes(url.pathname)) {
         const cachedResponse = await cache.match(event.request);
         if (cachedResponse) {
+          console.log("SW Cache Hit:", event.request.url);
           return cachedResponse;
         }
       }
@@ -1759,9 +1765,12 @@ self.addEventListener("fetch", (event) => {
         return await router.fetch(event.request);
       }
       try {
-        const networkResponse = await fetch(event.request);
-        if (networkResponse.ok && event.request.method === "GET" && CORE_ASSETS.includes(url.pathname)) {
+        console.log("SW Fetch:", event.request.url);
+        const fetchOptions = event.request.url.includes("rocket") ? { mode: "no-cors" } : void 0;
+        const networkResponse = await fetch(event.request, fetchOptions);
+        if (networkResponse.ok && event.request.method === "GET" && (CORE_ASSETS.includes(url.toString()) || CORE_ASSETS.includes(url.pathname))) {
           await cache.put(event.request, networkResponse.clone());
+          console.log("SW Cache Put:", event.request.url);
         }
         return networkResponse;
       } catch (error) {
