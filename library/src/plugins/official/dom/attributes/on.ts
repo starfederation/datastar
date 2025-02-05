@@ -12,7 +12,7 @@ import {
 } from '../../../../engine/types'
 import { onElementRemoved } from '../../../../utils/dom'
 import { tagHas, tagToMs } from '../../../../utils/tags'
-import { kebabize } from '../../../../utils/text'
+import { modifyCasing } from '../../../../utils/text'
 import { debounce, delay, throttle } from '../../../../utils/timing'
 
 const lastSignalsMarshalled = new Map<string, any>()
@@ -25,7 +25,7 @@ export const On: AttributePlugin = {
   valReq: Requirement.Must,
   argNames: [EVT],
   removeOnLoad: (rawKey: string) => rawKey.startsWith('onLoad'),
-  onLoad: ({ el, rawKey, key, value, genRX, mods }) => {
+  onLoad: ({ el, key, mods, rawKey, value, genRX }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
@@ -70,7 +70,7 @@ export const On: AttributePlugin = {
     if (mods.has('passive')) evtListOpts.passive = true
     if (mods.has('once')) evtListOpts.once = true
 
-    const eventName = kebabize(key).toLowerCase()
+    const eventName = modifyCasing(key, mods)
     switch (eventName) {
       case 'load': {
         callback()

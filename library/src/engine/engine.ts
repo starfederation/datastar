@@ -1,5 +1,5 @@
 import { Hash, elUniqId } from '../utils/dom'
-import { camelize, lcFirst } from '../utils/text'
+import { camelize } from '../utils/text'
 import { debounce } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS } from './consts'
@@ -217,10 +217,10 @@ export class Engine {
 
     const hasKey = key.length > 0
     if (hasKey) {
-      // Keys starting with a dash are not converted to camel case in the dataset
-      key = key.startsWith('-') ? key.slice(1) : lcFirst(key)
+      key = camelize(key)
     }
     const value = el.dataset[camelCasedKey] || ''
+    const hasValue = value.length > 0
 
     // Create the runtime context
     const that = this // I hate javascript
@@ -251,7 +251,6 @@ export class Engine {
     }
 
     const valReq = plugin.valReq || Requirement.Allowed
-    const hasValue = value.length > 0
     if (hasValue) {
       if (valReq === Requirement.Denied) {
         throw runtimeErr(`${plugin.name}ValueNotAllowed`, ctx)

@@ -8,7 +8,7 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import { trimDollarSignPrefix } from '../../../../utils/text'
+import { modifyCasing, trimDollarSignPrefix } from '../../../../utils/text'
 
 // Sets the value of the element
 export const Ref: AttributePlugin = {
@@ -16,8 +16,8 @@ export const Ref: AttributePlugin = {
   name: 'ref',
   keyReq: Requirement.Exclusive,
   valReq: Requirement.Exclusive,
-  onLoad: ({ el, key, value, signals }) => {
-    const signalName = key ? key : trimDollarSignPrefix(value)
+  onLoad: ({ el, key, mods, signals, value }) => {
+    const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
     signals.setValue(signalName, el)
     return () => signals.setValue(signalName, null)
   },

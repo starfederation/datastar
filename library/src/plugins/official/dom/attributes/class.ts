@@ -8,12 +8,13 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
+import { modifyCasing } from '../../../../utils/text'
 
 export const Class: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'class',
   valReq: Requirement.Must,
-  onLoad: ({ key, el, genRX, effect }) => {
+  onLoad: ({ el, key, mods, effect, genRX }) => {
     const cl = el.classList
     const rx = genRX()
     return effect(() => {
@@ -28,6 +29,7 @@ export const Class: AttributePlugin = {
           }
         }
       } else {
+        key = modifyCasing(key, mods)
         const shouldInclude = rx<boolean>()
         if (shouldInclude) {
           cl.add(key)
