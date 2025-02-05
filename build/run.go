@@ -149,6 +149,7 @@ func writeOutConsts(version string) error {
 		"examples/php/hello-world/public/hello-world.html":                                 helloWorldExamplePHP,
 		"examples/zig/httpz/hello-world/src/hello-world.html":                              helloWorldExample,
 		"examples/zig/tokamak/hello-world/hello-world.html":                                helloWorldExample,
+		"examples/ruby/hello-world/hello-world.html":                                       helloWorldExample,
 		"examples/rust/axum/hello-world/hello-world.html":                                  helloWorldExample,
 		"examples/rust/rocket/hello-world/hello-world.html":                                helloWorldExample,
 	}
