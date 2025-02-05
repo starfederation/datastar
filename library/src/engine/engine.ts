@@ -1,5 +1,5 @@
 import { Hash, elUniqId } from '../utils/dom'
-import { camelize } from '../utils/text'
+import { camelize, lcFirst } from '../utils/text'
 import { debounce } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS } from './consts'
@@ -213,9 +213,14 @@ export class Engine {
     if (!el.id.length) el.id = elUniqId(el)
 
     // Extract the key and modifiers
-    const [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/\_\_+/)
+    let [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/\_\_+/)
 
+    const hasKey = key.length > 0
+    if (hasKey) {
+      key = lcFirst(key)
+    }
     const value = el.dataset[camelCasedKey] || ''
+    const hasValue = value.length > 0
 
     // Create the runtime context
     const that = this // I hate javascript
@@ -237,7 +242,6 @@ export class Engine {
 
     // Check the requirements
     const keyReq = plugin.keyReq || Requirement.Allowed
-    const hasKey = key.length > 0
     if (hasKey) {
       if (keyReq === Requirement.Denied) {
         throw runtimeErr(`${plugin.name}KeyNotAllowed`, ctx)
@@ -247,7 +251,6 @@ export class Engine {
     }
 
     const valReq = plugin.valReq || Requirement.Allowed
-    const hasValue = value.length > 0
     if (hasValue) {
       if (valReq === Requirement.Denied) {
         throw runtimeErr(`${plugin.name}ValueNotAllowed`, ctx)
