@@ -22,10 +22,11 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/root.zig"),
             .target = target,
             .optimize = optimize,
-            .test_runner = b.path("test_runner.zig"),
+            .test_runner = .{ .path = b.path("../test_runner.zig"), .mode = .simple },
         });
 
         tests.root_module.addImport("httpz", httpz);
+        tests.root_module.addImport("datastar", datastar);
         const run_test = b.addRunArtifact(tests);
         run_test.has_side_effects = true;
 
