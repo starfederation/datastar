@@ -63,7 +63,7 @@ In this mode, the response is kept open until `stream` blocks have finished.
 #### Concurrent streaming blocks
 
 Multiple `stream` blocks will be launched in threads/fibers, and will run concurrently.
-Then their updates are linearized and sent to the browser.
+Their updates are linearized and sent to the browser as they are produced.
 
 ```ruby
 # Stream to the browser from two concurrent threads
