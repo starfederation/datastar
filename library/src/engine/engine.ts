@@ -1,5 +1,5 @@
 import { Hash, elUniqId } from '../utils/dom'
-import { camelize, lcFirst } from '../utils/text'
+import { camelize } from '../utils/text'
 import { debounce } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS } from './consts'
@@ -217,7 +217,7 @@ export class Engine {
 
     const hasKey = key.length > 0
     if (hasKey) {
-      key = lcFirst(key)
+      key = camelize(key)
     }
     const value = el.dataset[camelCasedKey] || ''
     const hasValue = value.length > 0

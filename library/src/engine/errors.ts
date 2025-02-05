@@ -1,4 +1,4 @@
-import { kebabize, ucFirst } from '../utils/text'
+import { kebabize, snakeize, ucFirst } from '../utils/text'
 import { DATASTAR } from './consts'
 import { type InitContext, PluginType, type RuntimeContext } from './types'
 
@@ -12,9 +12,8 @@ interface Metadata {
 
 function dserr(type: string, reason: string, metadata: Metadata = {}) {
   const e = new Error()
-  reason = ucFirst(reason)
   e.name = `${DATASTAR} ${type} error`
-  const r = kebabize(reason).replaceAll('-', '_')
+  const r = snakeize(reason)
   const q = new URLSearchParams({
     metadata: JSON.stringify(metadata),
   }).toString()
