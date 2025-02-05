@@ -15,18 +15,21 @@ export const Attr: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'attr',
   valReq: Requirement.Must,
-  onLoad: ({ el, genRX, key, effect }) => {
+  onLoad: ({ el, key, effect, genRX }) => {
     const rx = genRX()
     if (key === '') {
       return effect(async () => {
         const binds = rx<NestedValues>()
         for (const [attr, val] of Object.entries(binds)) {
+          // BEN: add support for boolean attributes?
           el.setAttribute(attr, val)
         }
       })
     }
 
+    // Attributes are always kebab-case
     key = kebabize(key)
+
     return effect(async () => {
       let value = false
       try {

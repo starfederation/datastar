@@ -199,13 +199,9 @@ export class Engine {
     if (!el.id.length) el.id = elUniqId(el)
 
     // Extract the key and modifiers
-    let [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/\_\_+/)
+    const [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/\_\_+/)
 
     const hasKey = key.length > 0
-    if (hasKey) {
-      // Keys starting with a dash are not converted to camel case in the dataset
-      key = key.startsWith('-') ? key.slice(1) : lcFirst(key)
-    }
     const value = el.dataset[datasetKey] || ''
     const hasValue = value.length > 0
 

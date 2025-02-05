@@ -106,6 +106,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "click_outside"},
 				{ID: "timing"},
 				{ID: "aliased_data_attributes"},
+				{ID: "key_casing"},
 			},
 		},
 	}
