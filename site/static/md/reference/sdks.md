@@ -22,6 +22,11 @@ _Author: [Delaney Gillilan](https://github.com/delaneyj)_
 Other examples:  
 [1 App 5 Stacks ported to Go+Templ+Datastar](https://github.com/delaneyj/1a5s-datastar)
 
+## Haskell
+
+Haskell [SDK](https://github.com/starfederation/datastar/tree/main/sdk/haskell) and [examples](https://github.com/starfederation/datastar/tree/main/examples/haskell).  
+ _Author: [Henry Laxen](https://github.com/henrylaxen)_
+ 
 ## Java
 
 Java [SDK](https://github.com/starfederation/datastar/blob/develop/sdk/java).  
@@ -67,3 +72,4 @@ _Author: [Patrick Marchand](https://github.com/Superpat)_
 
 Zig [SDK](https://github.com/starfederation/datastar/tree/main/sdk/zig) and [examples](https://github.com/starfederation/datastar/tree/main/examples/zig).  
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_
+
