@@ -122,6 +122,12 @@ var Consts = &ConstTemplateData{
 			Icon:          "vscode-icons:file-type-zig",
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/zig",
 		},
+		{
+			FileExtension: "hs",
+			Name:          "Haskell",
+			Icon:          "vscode-icons:file-type-haskell",
+			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/haskell",
+		},
 	},
 	DatastarKey: "datastar",
 	DefaultBools: []*DefaultBool{

@@ -1,11 +1,9 @@
 cabal-version:      3.12
-name:               dstar
-version:            0.2.0.0
+name:               datastar
+version:            1.0.0-beta.1
 synopsis:           Interface for Server Sent Events using the DataStar framework
 description:        See https://data-star.dev/ for full information
-                    about the wonderful new (2024) backend framework,
-                    almost totally powered by the frontend.
-license:            NONE
+license:            https://github.com/starfederation/datastar/blob/develop/LICENSE
 author:             Henry Laxen
 maintainer:         nadine.and.henry@pobox.com
 category:           Language
@@ -72,7 +70,7 @@ Executable datastar-demo
   import:  deps,warnings,default-extensions
   default-language: Haskell2010
   build-depends:
-      dstar
+      datastar
     , time
   other-modules:
         ServerSentEventGenerator
@@ -89,7 +87,7 @@ Executable datastar-test
   default-language: Haskell2010
   build-depends:
       html-entities
-    , dstar
+    , datastar
     , time
   other-modules:
         ServerSentEventGenerator
@@ -108,7 +106,7 @@ Executable hello-world
       aeson
     , relude
     , scientific
-    , dstar
+    , datastar
   other-modules:
         ServerSentEventGenerator
       , ServerSentEventGenerator.Server.Snap

@@ -65,3 +65,9 @@ _Author: [Patrick Marchand](https://github.com/Superpat)_
 
 Zig [SDK](https://github.com/starfederation/datastar/tree/main/sdk/zig) and [examples](https://github.com/starfederation/datastar/tree/main/examples/zig).  
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_
+
+## Haskell
+
+Haskell [SDK](https://github.com/starfederation/datastar/tree/main/sdk/haskell) and [examples](https://github.com/starfederation/datastar/tree/main/examples/haskell).  
+ _Author: [Henry Laxen](https://github.com/henrylaxen)_
+ 
