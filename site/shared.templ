@@ -79,7 +79,7 @@ templ headerTopLevelLink(r *http.Request, text string) {
 	<a
 		href={ url }
 		class={
-			"font-bold uppercase link-hover",
+			"font-bold uppercase whitespace-nowrap link-hover",
 			templ.KV("link-primary", strings.HasPrefix(r.URL.Path, string(url))),
 		}
 	>
@@ -216,11 +216,11 @@ templ header(r *http.Request) {
 				</a>
 				<div class="font-mono text-xs text-accent">v{ datastar.Version }</div>
 			</div>
-			<div class="hidden lg:text-md lg:text-lg lg:flex lg:gap-4 xl:gap-8 lg:visible ">
+			<div class="hidden lg:text-md lg:text-lg lg:flex lg:gap-4 xl:gap-6 lg:visible ">
 				@headerTopLevelLinks(r)
 			</div>
 			@HeaderSiteSearch(&SiteSearchSignals{SearchFetching: false}, []SearchResult{})
-			<div class="hidden text-xl lg:flex lg:gap-4 lg:visible">
+			<div class="hidden text-xl xl:flex xl:gap-4 xl:visible mt-1">
 				@headerExternalLinks()
 			</div>
 		</div>
