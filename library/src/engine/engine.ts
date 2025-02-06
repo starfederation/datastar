@@ -1,5 +1,5 @@
 import { Hash, elUniqId } from '../utils/dom'
-import { camelize, lcFirst } from '../utils/text'
+import { camelize } from '../utils/text'
 import { debounce } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS } from './consts'
@@ -67,13 +67,16 @@ export class Engine {
             break
           case 'attributes': {
             {
-              const requiredPrefix = datasetPrefix + (this.aliasPrefix ? `${this.aliasPrefix}-` : '')
+              const requiredPrefix =
+                datasetPrefix + (this.aliasPrefix ? `${this.aliasPrefix}-` : '')
               if (!attributeName?.startsWith(requiredPrefix)) {
                 break
               }
 
               const el = target as HTMLorSVGElement
-              const datasetKey = camelize(attributeName.slice(datasetPrefix.length))
+              const datasetKey = camelize(
+                attributeName.slice(datasetPrefix.length),
+              )
 
               // If the value has changed, clean up the old value
               if (oldValue !== null && el.dataset[datasetKey] !== oldValue) {
@@ -121,6 +124,7 @@ export class Engine {
         effect: (cb: () => void): OnRemovalFn => effect(cb),
         actions: this.#actions,
         plugin,
+        applyAttributePlugin: that.#applyAttributePlugin.bind(that),
       }
 
       let globalInitializer: GlobalInitializer | undefined
@@ -184,9 +188,9 @@ export class Engine {
     })
   }
 
-  #applyAttributePlugin(el: HTMLorSVGElement, datasetKey: string) {
+  #applyAttributePlugin(el: HTMLorSVGElement, camelCasedKey: string) {
     // Extract the raw key from the dataset
-    const rawKey = lcFirst(datasetKey.slice(this.aliasPrefix.length))
+    const rawKey = camelCasedKey.slice(this.aliasPrefix.length)
 
     // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically
     // the first match will be the most specific
@@ -194,6 +198,16 @@ export class Engine {
 
     // Skip if no plugin is found
     if (!plugin) return
+
+    const elAttr = this.#removals.get(el)
+    if (elAttr) {
+      for (const [k, removalFn] of elAttr) {
+        if (k.startsWith(camelCasedKey)) {
+          removalFn()
+          elAttr.delete(k)
+        }
+      }
+    }
 
     // Ensure the element has an id
     if (!el.id.length) el.id = elUniqId(el)
@@ -203,10 +217,9 @@ export class Engine {
 
     const hasKey = key.length > 0
     if (hasKey) {
-      // Keys starting with a dash are not converted to camel case in the dataset
-      key = key.startsWith('-') ? key.slice(1) : lcFirst(key)
+      key = camelize(key)
     }
-    const value = el.dataset[datasetKey] || ''
+    const value = el.dataset[camelCasedKey] || ''
     const hasValue = value.length > 0
 
     // Create the runtime context
@@ -215,6 +228,7 @@ export class Engine {
       get signals() {
         return that.#signals
       },
+      applyAttributePlugin: that.#applyAttributePlugin.bind(that),
       effect: (cb: () => void): OnRemovalFn => effect(cb),
       actions: this.#actions,
       genRX: () => this.#genRX(ctx, ...(plugin.argNames || [])),
@@ -235,6 +249,7 @@ export class Engine {
     } else if (keyReq === Requirement.Must) {
       throw runtimeErr(`${plugin.name}KeyRequired`, ctx)
     }
+
     const valReq = plugin.valReq || Requirement.Allowed
     if (hasValue) {
       if (valReq === Requirement.Denied) {
@@ -267,13 +282,13 @@ export class Engine {
         elRemovals = new Map()
         this.#removals.set(el, elRemovals)
       }
-      elRemovals.set(removalKey(datasetKey, value), removalFn)
+      elRemovals.set(removalKey(camelCasedKey, value), removalFn)
     }
 
     // Remove the attribute if required
     const removeOnLoad = plugin.removeOnLoad
     if (removeOnLoad && removeOnLoad(rawKey) === true) {
-      delete el.dataset[datasetKey]
+      delete el.dataset[camelCasedKey]
     }
   }
 

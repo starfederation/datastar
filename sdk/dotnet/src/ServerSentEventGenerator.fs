@@ -3,7 +3,7 @@ namespace StarFederation.Datastar
 open System.Threading.Tasks
 
 /// <summary>
-/// Converts requests into SSEs, serializes, and sends to client
+/// Converts requests into SSEs, serializes, and sends to env handlers
 /// </summary>
 module ServerSentEventGenerator =
 

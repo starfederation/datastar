@@ -3,6 +3,7 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
+import { modifyCasing } from '../../../../utils/text'
 
 const name = 'computed'
 export const Computed: AttributePlugin = {
@@ -10,7 +11,8 @@ export const Computed: AttributePlugin = {
   name,
   keyReq: Requirement.Must,
   valReq: Requirement.Must,
-  onLoad: ({ key, signals, genRX }) => {
+  onLoad: ({ key, mods, signals, genRX }) => {
+    key = modifyCasing(key, mods)
     const rx = genRX()
     signals.setComputed(key, rx)
   },

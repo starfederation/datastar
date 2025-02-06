@@ -1,0 +1,18 @@
+const datastar = @import("datastar");
+const zdt = @import("zdt");
+const std = @import("std");
+
+var tz_chicago = try zdt.Timezone.fromTzdata("America/Chicago", res.arena);
+const datetime = try zdt.Datetime.fromISO8601("2006-01-02 15:04:05");
+const current_time = try a_datetime.tzLocalize(.{ .tz = &tz_chicago });
+
+var sse = try datastar.ServerSentEventGenerator.init(res);
+
+sse.mergeFragments(
+    std.fmt.allocPrint(
+        res.arena,
+        "<div id='time' data-on-interval__duration.5s='@get(\"/endpoint\")'>{s}</div>",
+        .{current_time},
+    ),
+    .{},
+);

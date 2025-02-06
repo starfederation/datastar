@@ -11,7 +11,7 @@ import {
   Requirement,
 } from '../../../../engine/types'
 import { tagHas, tagToMs } from '../../../../utils/tags'
-import { kebabize, lcFirst } from '../../../../utils/text'
+import { modifyCasing } from '../../../../utils/text'
 import { debounce, delay, throttle } from '../../../../utils/timing'
 
 const EVT = 'evt'
@@ -25,8 +25,7 @@ export const On: AttributePlugin = {
   valReq: Requirement.Must,
   argNames: [EVT],
   removeOnLoad: (rawKey: string) => rawKey.startsWith('onLoad'),
-  onLoad: (ctx) => {
-    const { el, key, value, mods, signals, genRX, rawKey, effect } = ctx
+  onLoad: ({ el, key, mods, rawKey, signals, value, effect, genRX }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
@@ -120,7 +119,7 @@ export const On: AttributePlugin = {
         }
       }
 
-      const signalName = lcFirst(key.slice(signalChangeKeyLength))
+      const signalName = modifyCasing(key.slice(signalChangeKeyLength), mods)
       const s = signals.signal(signalName)!
       const prev = s.value
       return effect(() => {
@@ -143,7 +142,7 @@ export const On: AttributePlugin = {
       callback = targetOutsideCallback
     }
 
-    const eventName = kebabize(key).toLowerCase()
+    const eventName = modifyCasing(key, mods)
     target.addEventListener(eventName, callback, evtListOpts)
     return () => {
       target.removeEventListener(eventName, callback)

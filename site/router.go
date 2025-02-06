@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -29,7 +30,7 @@ var staticFS embed.FS
 var (
 	staticSys    = hashfs.NewFS(staticFS)
 	highlightCSS templ.Component
-	indexPath    = "data-star.bleve"
+	indexPath    = filepath.Join(os.TempDir(), "data-star.bleve")
 )
 
 func staticPath(path string) string {
@@ -49,7 +50,10 @@ func RunBlocking(port int, readyCh chan struct{}) toolbelt.CtxErrFunc {
 
 		router := chi.NewRouter()
 
-		router.Use(middleware.Recoverer, middleware.Logger)
+		router.Use(
+			middleware.Recoverer,
+			// middleware.Logger,
+		)
 
 		if err := setupRoutes(ctx, router); err != nil {
 			return fmt.Errorf("error setting up routes: %w", err)
@@ -150,7 +154,7 @@ type SiteIndexDoc struct {
 }
 
 func indexSiteContent(ctx context.Context, index bleve.Index) error {
-	markdownDir := "site/static/md"
+	markdownDir := "./site/static/md"
 	extractor := plaintext.NewHtmlExtractor()
 
 	return filepath.WalkDir(markdownDir, func(path string, d fs.DirEntry, err error) error {

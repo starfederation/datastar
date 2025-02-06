@@ -7,9 +7,9 @@ open StarFederation.Datastar.DependencyInjection
 type ServerSentEventScriptExtensions() =
 
     [<Extension>]
-    static member Redirect (sse:IServerSentEventService, url:string) =
+    static member Redirect (sse:IDatastarServerSentEventService, url:string) =
         Redirect.redirect sse.Handler url
 
     [<Extension>]
-    static member BrowserConsoleAction (sse:IServerSentEventService, consoleAction:BrowserConsoleAction) =
+    static member BrowserConsoleAction (sse:IDatastarServerSentEventService, consoleAction:BrowserConsoleAction) =
         BrowserConsole.browserConsoleAction sse.Handler consoleAction

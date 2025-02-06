@@ -1,6 +1,6 @@
 # SDKs
 
-Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specific to Datastar. Every SDK must follow the [Architecture Decision Record](https://github.com/starfederation/datastar/blob/develop/sdk/README.md) document.
+Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specific to Datastar. If you'd like to contribute an SDK, please follow the [Contribution Guidelines](https://github.com/starfederation/datastar/blob/main/CONTRIBUTING.md#sdks).
 
 ## Clojure
 
@@ -30,15 +30,16 @@ _Author: [Peter Humulock](https://github.com/rphumulock)_
 PHP [SDK](https://github.com/starfederation/datastar-php) and [examples](https://github.com/starfederation/datastar/tree/main/examples/php).    
 _Author: [Ben Croker](https://github.com/bencroker) ([PutYourLightsOn](https://putyourlightson.com/))_
 
+### Laravel
+
 [Laravel package](https://github.com/putyourlightson/laravel-datastar)  
-_Author: [Ben Croker](https://github.com/bencroker) ([PutYourLightsOn](https://putyourlightson.com/))_
+
+### Craft CMS
 
 [Craft CMS plugin](https://putyourlightson.com/plugins/datastar)  
-_Author: [Ben Croker](https://github.com/bencroker) ([PutYourLightsOn](https://putyourlightson.com/))_
 
 Other examples:  
 [Craft Datastar Pokemon demo](https://github.com/khalwat/craft-datastar-pokemon-demo)  
-_Author: [Andrew Welch](https://github.com/khalwat) ([nystudio107](https://nystudio107.com/))_
 
 ## Python
 
@@ -49,6 +50,11 @@ _Author: [Felix Ingram](https://github.com/lllama)_
 
 Rust [SDK](https://github.com/starfederation/datastar/tree/main/sdk/rust) and [examples](https://github.com/starfederation/datastar/tree/main/examples/rust).  
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_
+
+## Ruby
+
+Ruby [SDK](https://github.com/starfederation/datastar/tree/main/sdk/ruby) and [examples](https://github.com/starfederation/datastar/tree/main/examples/ruby).  
+ _Author: [Ismael Celis](https://github.com/ismasan)_
 
 ## TypeScript
 

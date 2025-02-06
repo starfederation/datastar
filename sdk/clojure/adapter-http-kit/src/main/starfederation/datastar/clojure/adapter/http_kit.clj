@@ -13,6 +13,7 @@
   Note that the SSE connection stays opened util you close it.
 
   Opts:
+  - `:status`: Status for the HTTP response, defaults to 200
   - `:headers`: Ring headers map to add to the response.
   - `:on-open`: Mandatory callback (fn [sse-gen] ...) called when the
     generator is ready to send.
@@ -20,11 +21,11 @@
 
   The callback are based on the  HTTP-Kit channel ones, adding the sse
   generator as the second parameter."
-  [ring-request {:keys [headers on-open on-close]}]
+  [ring-request {:keys [on-open on-close] :as opts}]
   (let [future-gen (promise)
         response (hk-server/as-channel ring-request
                    {:on-open (fn [ch]
-                               (impl/send-base-sse-response! ch ring-request headers)
+                               (impl/send-base-sse-response! ch ring-request opts)
                                (let [sse-gen (impl/->sse-gen ch)]
                                  (deliver future-gen sse-gen)
                                  (on-open sse-gen)))

@@ -1,0 +1,21 @@
+use datastar::prelude::*;
+use chrono::Local;
+use async_stream::stream;
+
+let current_time = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+let current_seconds = Local::now().second();
+let duration = if current_seconds < 50 {
+    5
+} else {
+    1
+};
+
+Sse(stream! {
+    yield MergeFragments::new(
+        format!(
+            "<div id='time' data-on-interval__duration.{}s='@get(\"/endpoint\")'>{}</div>",
+            duration,
+            current_time,
+        )
+    ).into();
+})
