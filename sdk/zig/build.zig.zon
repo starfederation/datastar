@@ -1,7 +1,16 @@
 .{
     .name = "datastar",
-    .version = "0.0.0",
-    .dependencies = .{},
+    .version = "1.0.0-beta.1",
+    .dependencies = .{
+        .httpz = .{
+            .url = "git+https://github.com/karlseguin/http.zig?ref=master#a691d731047e9a5a79d71ac594cb8f5fad1d0705",
+            .hash = "122072c92285c8c44055eb45058b834d1e7ecd46a5704d58a207103c39fb5922b8f5",
+        },
+        .tokamak = .{
+            .url = "git+https://github.com/cztomsik/tokamak#3be7e419c335f5c83353ed23ac1896d7aba9571a",
+            .hash = "1220ed7a17e7c239698f58dc4819174ca72ec6273e86c4c3ca49b6a2619f48d11a15",
+        },
+    },
     .paths = .{
         "build.zig",
         "build.zig.zon",

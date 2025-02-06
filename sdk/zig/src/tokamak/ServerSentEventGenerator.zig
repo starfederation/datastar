@@ -1,8 +1,8 @@
 const std = @import("std");
-const httpz = @import("httpz");
-const ServerSentEventGenerator = @import("datastar").ServerSentEventGenerator;
+const tk = @import("tokamak");
+const ServerSentEventGenerator = @import("../ServerSentEventGenerator.zig");
 
-pub fn init(res: *httpz.Response) !ServerSentEventGenerator {
+pub fn init(res: *tk.Response) !ServerSentEventGenerator {
     res.content_type = .EVENTS;
     res.header("Cache-Control", "no-cache");
     res.header("Connection", "keep-alive");

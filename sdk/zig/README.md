@@ -9,7 +9,7 @@ Run `zig build test`.
 ## Usage
 
 ```zig
-const datastar = @import("datastar");
+const datastar = @import("datastar").httpz;
 
 // Creates a new `ServerSentEventGenerator`.
 var sse = try datastar.ServerSentEventGenerator.init(res);

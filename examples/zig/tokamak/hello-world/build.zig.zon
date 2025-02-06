@@ -6,8 +6,8 @@
             .url = "git+https://github.com/cztomsik/tokamak#3be7e419c335f5c83353ed23ac1896d7aba9571a",
             .hash = "1220ed7a17e7c239698f58dc4819174ca72ec6273e86c4c3ca49b6a2619f48d11a15",
         },
-        .datastar_tokamak = .{
-            .path = "../../../../sdk/zig/tokamak",
+        .datastar = .{
+            .path = "../../../../sdk/zig",
         },
     },
     .paths = .{

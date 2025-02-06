@@ -1,4 +1,4 @@
-const datastar = @import("datastar");
+const datastar = @import("datastar").httpz;
 const std = @import("std");
 
 var sse = try datastar.ServerSentEventGenerator.init(res);

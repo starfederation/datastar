@@ -1,6 +1,6 @@
 const std = @import("std");
 const tk = @import("tokamak");
-const datastar = @import("datastar");
+const datastar = @import("datastar").tk;
 
 const App = struct {
     server: *tk.Server,
