@@ -2,7 +2,7 @@
 
 ## Summary
 
-Datastar has had a few helper tools in the past for different languages.  The SDK effort is to unify around the tooling needed for Hypermedia On Whatever your Like (HOWL) based UIs.  Although Datastar the library can use any plugins the default bundle includes robust Server Sent Event (SSE) base approach.  Most current languages and backend don't have great tooling around the style of delivering content to the frontend.
+Datastar has had a few helper tools in the past for different languages.  The SDK effort is to unify around the tooling needed for Hypermedia On Whatever your Like (HOWL) based UIs.  Although Datastar the library can use any plugins, the default bundle includes robust Server Sent Event (SSE) base approach.  Most current languages and backend don't have great tooling around the style of delivering content to the frontend.
 
 ### Decision
 
@@ -15,14 +15,14 @@ Provide an SDK in a language agnostic way, to that end
 
 ### Assumptions
 
-The core mechanics of Datastar's SSE support is
+The core mechanics of Datastar’s SSE support is
 
 1. Data gets sent to browser as SSE events.
 2. Data comes in via JSON from browser under a `datastar` namespace.
 
 # Library
 
-> [!WARNING] All naming conventions are shown using `Go` as the standard, thing may change per language norms but please keep as close as possible.
+> [!WARNING] All naming conventions are shown using `Go` as the standard. Things may vary per language norms but please keep as close as possible.
 
 ## ServerSentEventGenerator
 
@@ -35,7 +35,7 @@ The core mechanics of Datastar's SSE support is
       2. `Content-Type = text/event-stream`
       3. `Connection = keep-alive` ***only*** if a HTTP/1.1 connection is used (see [spec](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Connection))
    3. Then the created response ***should*** `flush` immediately to avoid timeouts while 0-♾️ events are created
-   4. Multiple calls using `ServerSentEventGenerator` should be single threaded to guarantee order.  The Go implementation use a mutex to facilitate this behavior but might not be need in a some environments
+   4. Multiple calls using `ServerSentEventGenerator` should be single threaded to guarantee order.  The Go implementation uses a mutex to facilitate this behavior but might not be needed in a some environments
 
 ### `ServerSentEventGenerator.send`
 
@@ -131,7 +131,7 @@ Valid values should match the [FragmentMergeMode](#FragmentMergeMode) and curren
 
 | Mode             | Description                                             |
 |------------------|---------------------------------------------------------|
-| morph            | Use idiomorph to merge the fragment into the DOM        |
+| morph            | Use Idiomorph to merge the fragment into the DOM        |
 | inner            | Replace the innerHTML of the selector with the fragment |
 | outer            | Replace the outerHTML of the selector with the fragment |
 | prepend          | Prepend the fragment to the selector                    |
@@ -354,7 +354,7 @@ When called the function ***must*** call `ServerSentEventGenerator.send` with th
 #### Args
 
 * `r` (http.Request) The incoming request object from the browser.  This object ***must*** be a valid Request object per the language specifics.
-* `signals` (any) The signals object that will the incoming data will be unmarshalled into.  The exact function signature will depend on the language specifics.
+* `signals` (any) The signals object that the incoming data will be extracted into.  The exact function signature will depend on the language specifics.
 
 #### Logic
 
