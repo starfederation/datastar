@@ -38,3 +38,4 @@ There are also a number of custom responses/helpers for various frameworks. Curr
 * [Django](https://www.djangoproject.com/)
 * [Quart](https://quart.palletsprojects.com/en/stable/)
 * [FastAPI](https://fastapi.tiangolo.com/)
+* [FastHTML](https://fastht.ml/)
