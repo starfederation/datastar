@@ -135,7 +135,7 @@ The `data-attr` attribute can also be used to set the values of multiple attribu
 
 ### `data-bind`
 
-Creates a signal and sets up two-way data binding between it and an element's value. Can be placed on any HTML element on which data be be input or choices selected from (`input`, `textarea`, `select`, `checkbox` and `radio` elements, as well as web components).
+Creates a signal and sets up two-way data binding between it and an element's value. Can be placed on any HTML element on which data can be input or choices selected from (`input`, `textarea`, `select`, `checkbox` and `radio` elements, as well as web components).
 
 ```html
 <input data-bind-foo />
