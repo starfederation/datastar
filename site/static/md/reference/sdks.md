@@ -1,6 +1,8 @@
 # SDKs
 
-Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specific to Datastar. If you'd like to contribute an SDK, please follow the [Contribution Guidelines](https://github.com/starfederation/datastar/blob/main/CONTRIBUTING.md#sdks).
+Datastar provides backend SDKs that simplify the process of generating [SSE events](/reference/sse_events) specific to Datastar. Alternatively, use your backend as is to [send SSE events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#sending_events_from_the_server).
+
+If you'd like to contribute an SDK, please follow the [Contribution Guidelines](https://github.com/starfederation/datastar/blob/main/CONTRIBUTING.md#sdks).
 
 ## Clojure
 
