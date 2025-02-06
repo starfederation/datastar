@@ -8,13 +8,13 @@ export const kebab = (str: string) =>
     ($, ofs) => (ofs ? '-' : '') + $.toLowerCase(),
   )
 
-export const camelize = (str: string) =>
+export const camel = (str: string) =>
   kebab(str).replace(/-./g, (x) => x[1].toUpperCase())
 
 export const snake = (str: string) => kebab(str).replace(/-/g, '_')
 
 export const pascal = (str: string) =>
-  camelize(str).replace(/^./, (x) => x[0].toUpperCase())
+  camel(str).replace(/^./, (x) => x[0].toUpperCase())
 
 export const jsStrToObject = (raw: string) =>
   new Function(`return Object.assign({}, ${raw})`)()

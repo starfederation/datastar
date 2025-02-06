@@ -1,5 +1,5 @@
 import { Hash, elUniqId } from '../utils/dom'
-import { camelize } from '../utils/text'
+import { camel } from '../utils/text'
 import { debounce } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS } from './consts'
@@ -74,7 +74,7 @@ export class Engine {
               }
 
               const el = target as HTMLorSVGElement
-              const datasetKey = camelize(
+              const datasetKey = camel(
                 attributeName.slice(datasetPrefix.length),
               )
 
@@ -217,7 +217,7 @@ export class Engine {
 
     const hasKey = key.length > 0
     if (hasKey) {
-      key = camelize(key)
+      key = camel(key)
     }
     const value = el.dataset[camelCasedKey] || ''
     const hasValue = value.length > 0
@@ -271,7 +271,7 @@ export class Engine {
 
     for (const rawMod of rawModifiers) {
       const [label, ...mod] = rawMod.split('.')
-      ctx.mods.set(camelize(label), new Set(mod.map((t) => t.toLowerCase())))
+      ctx.mods.set(camel(label), new Set(mod.map((t) => t.toLowerCase())))
     }
 
     // Load the plugin and store any cleanup functions
