@@ -16,7 +16,7 @@ module DatastarHttpHandlers =
     /// <summary>
     /// Starts the SSE response, 'text/event-stream', so more SSEs can be sent
     /// </summary>
-    let startResponse (response:HttpResponse) = task {
+    let startResponse (response:HttpResponse) (additionalHeaders:(string*string) seq) = task {
         let setHeader (response:HttpResponse) (name, content:string) =
             if response.Headers.ContainsKey(name) |> not then
                 response.Headers.Add(name, StringValues(content))
@@ -26,6 +26,7 @@ module DatastarHttpHandlers =
             (HeaderNames.ContentType, "text/event-stream")
             if (response.HttpContext.Request.Protocol = HttpProtocol.Http11) then
                 ("Connection", "keep-alive")
+            yield! additionalHeaders
             } |> Seq.iter (setHeader response)
         do! response.StartAsync()
         do! response.Body.FlushAsync()
@@ -59,9 +60,9 @@ module DatastarHttpHandlers =
 /// <summary>
 /// Implementation of ISendServerEvent, for sending SSEs to the HttpResponse
 /// </summary>
-type ServerSentEventHttpHandlers (httpResponse:HttpResponse) =
+type ServerSentEventHttpHandlers (httpResponse:HttpResponse, additionalHeaders:(string*string) seq) =
     do
-        let startResponseTask = DatastarHttpHandlers.startResponse httpResponse
+        let startResponseTask = DatastarHttpHandlers.startResponse httpResponse additionalHeaders
         startResponseTask.GetAwaiter().GetResult()
 
     member _.HttpResponse = httpResponse

@@ -1,5 +1,6 @@
 namespace StarFederation.Datastar.DependencyInjection
 
+open System.Collections.Generic
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
 open StarFederation.Datastar
@@ -32,10 +33,10 @@ and IDatastarSignalsReaderService =
     abstract ReadSignalsAsync<'T when 'T : null> : unit -> Task<'T>
 
 and ServerSentEventService (handler:ISendServerEvent) =
-    new (httpContext:HttpContext) =
-        ServerSentEventService (ServerSentEventHttpHandlers httpContext.Response)
-    new (httpContextAccessor:IHttpContextAccessor) =
-        ServerSentEventService httpContextAccessor.HttpContext
+    new (httpContext:HttpContext, additionalHeaders:KeyValuePair<string, string> seq) =
+        ServerSentEventService (ServerSentEventHttpHandlers (httpContext.Response, additionalHeaders |> Seq.map KeyValuePair.toTuple))
+    new (httpContextAccessor:IHttpContextAccessor, additionalHeaders) =
+        ServerSentEventService (httpContextAccessor.HttpContext, additionalHeaders)
 
     member _.Handler = handler
 
