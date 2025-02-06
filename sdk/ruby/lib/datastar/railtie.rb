@@ -3,7 +3,12 @@
 module Datastar
   class Railtie < ::Rails::Railtie
     FINALIZE = proc do |view_context, response|
-      view_context.response = response
+      case view_context
+      when ActionView::Base
+        view_context.controller.response = response
+      else
+        raise ArgumentError, 'view_context must be an ActionView::Base'
+      end
     end
 
     initializer 'datastar' do |_app|
