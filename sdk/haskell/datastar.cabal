@@ -1,0 +1,119 @@
+cabal-version:      3.12
+name:               datastar
+version:            1.0.0.0
+synopsis:           Interface for Server Sent Events using the DataStar framework
+description:        See https://data-star.dev/ for full information
+license-file:       LICENSE            
+author:             Henry Laxen
+maintainer:         nadine.and.henry@pobox.com
+category:           Language
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+
+common warnings
+  ghc-options:
+    -O0
+    -Wall
+    -ddump-minimal-imports
+    -funbox-strict-fields
+    -fwarn-tabs
+    -fwrite-ide-info
+    -haddock
+    -threaded
+
+common deps
+  build-depends:
+        base
+      , aeson
+      , bytestring
+      , containers
+      , data-default
+      , io-streams
+      , neat-interpolation
+      , snap
+      , snap-core
+      , template-haskell
+      , text
+      , utf8-string
+      , vector
+
+common default-extensions
+  default-extensions:
+        ConstraintKinds
+      , FlexibleInstances
+      , FunctionalDependencies
+      , GeneralizedNewtypeDeriving
+      , MultiParamTypeClasses
+      , NoImplicitPrelude
+      , OverloadedStrings
+      , QuasiQuotes
+      , RecordWildCards
+      , ScopedTypeVariables
+      , TemplateHaskell
+      , TypeSynonymInstances
+
+library
+    import:           deps,warnings,default-extensions
+    exposed-modules:
+        ServerSentEventGenerator
+      , ServerSentEventGenerator.Class
+      , ServerSentEventGenerator.Constants
+      , ServerSentEventGenerator.Types
+      , ServerSentEventGenerator.Server.Snap
+    other-modules:
+        ServerSentEventGenerator.Internal
+    hs-source-dirs:   src
+    default-language: Haskell2010
+
+
+Executable datastar-demo
+  import:  deps,warnings,default-extensions
+  default-language: Haskell2010
+  build-depends:
+      datastar
+    , time
+  other-modules:
+        ServerSentEventGenerator
+      , ServerSentEventGenerator.Class
+      , ServerSentEventGenerator.Constants
+      , ServerSentEventGenerator.Types
+      , ServerSentEventGenerator.Internal
+      , ServerSentEventGenerator.Server.Snap
+  hs-source-dirs: src,src/demo
+  main-is: Main.hs
+    
+Executable datastar-test
+  import:  deps,warnings,default-extensions
+  default-language: Haskell2010
+  build-depends:
+      html-entities
+    , datastar
+    , time
+  other-modules:
+        ServerSentEventGenerator
+      , ServerSentEventGenerator.Server.Snap
+      , ServerSentEventGenerator.Class
+      , ServerSentEventGenerator.Constants
+      , ServerSentEventGenerator.Types
+      , ServerSentEventGenerator.Internal
+  hs-source-dirs: src,src/test
+  main-is: Main.hs
+    
+Executable hello-world
+  import:  deps,warnings,default-extensions
+  default-language: Haskell2010
+  build-depends:
+      aeson
+    , relude
+    , scientific
+    , datastar
+  other-modules:
+        ServerSentEventGenerator
+      , ServerSentEventGenerator.Server.Snap
+      , ServerSentEventGenerator.Class
+      , ServerSentEventGenerator.Constants
+      , ServerSentEventGenerator.Types
+      , ServerSentEventGenerator.Internal
+  hs-source-dirs: src,../../examples/haskell/hello-world
+  main-is: Main.hs
+  default-extensions:
