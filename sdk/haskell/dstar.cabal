@@ -1,9 +1,9 @@
 cabal-version:      3.12
 name:               datastar
-version:            1.0.0-beta.1
+version:            1.0.0.0
 synopsis:           Interface for Server Sent Events using the DataStar framework
 description:        See https://data-star.dev/ for full information
-license:            https://github.com/starfederation/datastar/blob/develop/LICENSE
+license-file:       LICENSE            
 author:             Henry Laxen
 maintainer:         nadine.and.henry@pobox.com
 category:           Language
