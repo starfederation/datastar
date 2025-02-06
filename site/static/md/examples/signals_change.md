@@ -1,10 +1,10 @@
-## Signals Changed
+## Signals Change
 
 ## Demo
 
 <div
   data-signals="{clicks:0, _localState: {bar: 1234}, _anotherLocalVar: 'hello'}"
-  data-on-signals-change__remote="@post('/examples/signals_changed/updates')"
+  data-on-signals-change-clicks="@post('/examples/signals_changed/updates')"
   >
     <div class="flex flex-col md:flex-row gap-4">
       <button
@@ -32,7 +32,7 @@
 ```html
 <div
   data-signals="{clicks:0, _localState: {bar: 1234}, _anotherLocalVar: 'hello'}"
-  data-on-signals-change__remote="@post('/examples/signals_changed/updates')"
+  data-on-signals-change-clicks="@post('/examples/signals_changed/updates')"
 >
   <div>
     <button id="increment" data-on-click="$clicks++">Click Me</button>
@@ -53,7 +53,6 @@
 
 `data-on-signals-change` is a special event that is triggered when the signals changes. This is useful for updating the UI when the signals changes. In this example we update the `clicks` signals with a new value. This triggers a re-render of the `clicks` span element. You can still use the `__throttle` and `__debounce` modifiers to control the rate of updates even further. In this case we are sending the signals changes to the server to update the lifetime total clicks the server has seen.
 
-**Note**: The `__remote` modifier is used to trigger this event only when remotely viewable signals are updated. This is useful for not sending data that is not needed to the server. To look at the details run `console.log(JSON.stringify(ds.$signals,null,2))` in the browser console. You should see something like
 
 ```json
 {

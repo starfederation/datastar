@@ -68,7 +68,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "redirects"},
 				{ID: "view_transition_api"},
 				{ID: "title_update_backend"},
-				{ID: "signals_changed"},
+				{ID: "signals_change"},
 				{ID: "csrf"},
 				{ID: "multiline_signals"},
 				{ID: "multi_select"},
@@ -109,6 +109,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "merge_fragment"},
 				{ID: "key_casing"},
 				{ID: "signals_ifmissing_onload"},
+				{ID: "signals_change_path"},
 			},
 		},
 	}
