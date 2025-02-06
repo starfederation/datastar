@@ -1,24 +1,32 @@
 #!/bin/sh
 
 awk '
-  # events are separated by '\n\n\n'
   BEGIN { RS = "\n\n\n"; FS = "\n"; }
-  {
-    # fragments and script
-    ordered = ""
-    # everything else
-    unordered = ""
 
-    # separate out ordered data lines
+  function flush_data(data) {
+    if (data) {
+      print data | "sort"
+      close("sort", "to")
+    }
+    return ""
+  }
+
+  {
+    data = ""
+
     for (i = 1; i <= NF; i++) {
-      if ($i ~ /^data:(fragments|script)/)
-        ordered = ordered $i "\n"
-      else
-        unordered = unordered $i "\n"
+      if ($i ~ /^data: (fragments|script|path)/) {
+        data = flush_data(data)
+        print $i
+      } else if ($i ~ /^data:/) {
+        data = data $i "\n"
+      } else {
+        data = flush_data(data)
+        print $i
+      }
     }
 
-    print unordered | "sort"
-    close("sort", "to")
-    print ordered;
+    # flush remaining unordered data lines
+    flush_data(data)
   }
-'
+' "$1"
