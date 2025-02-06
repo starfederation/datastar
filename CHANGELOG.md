@@ -4,6 +4,7 @@
 
 ### Added
 
+- Added the ability to add a signal path to the `data-on-signals-change-*` attribute ([#587](https://github.com/starfederation/datastar/issues/587)).
 - Added a `__case` modifier to the `data-signals-*`, `data-computed-*`, `data-ref-*`, `data-indicator-*`, `data-persist-*`, `data-bind-*`,  `data-class-*`, and `data-on-*` attributes, allowing you to modify the casing of the key by adding `.kebab`, `.snake` or `.pascal`.
 - Added a `retrying` event type that is dispatched when the SSE plugin is trying to reconnect ([#583](https://github.com/starfederation/datastar/issues/583)).
 

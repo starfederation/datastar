@@ -16,7 +16,7 @@ import {
   PluginType,
   type WatcherPlugin,
 } from '../../../../engine/types'
-import { camelize, isBoolString } from '../../../../utils/text'
+import { camel, isBoolString } from '../../../../utils/text'
 import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
@@ -101,7 +101,7 @@ function applyToTargets(
                   toApply.set(el, elAddAttrs)
                 }
                 const name = argument.slice('data-'.length)
-                elAddAttrs.push(camelize(name))
+                elAddAttrs.push(camel(name))
               }
               return true
             },

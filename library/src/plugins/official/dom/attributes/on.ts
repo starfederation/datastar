@@ -10,8 +10,9 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
+import type { Signal } from '../../../../vendored/preact-core'
 import { tagHas, tagToMs } from '../../../../utils/tags'
-import { modifyCasing } from '../../../../utils/text'
+import { camel, modifyCasing } from '../../../../utils/text'
 import { debounce, delay, throttle } from '../../../../utils/timing'
 
 const EVT = 'evt'
@@ -119,12 +120,22 @@ export const On: AttributePlugin = {
         }
       }
 
-      const signalName = modifyCasing(key.slice(signalChangeKeyLength), mods)
-      const s = signals.signal(signalName)!
-      const prev = s.value
+      const signalPath = modifyCasing(
+        camel(key.slice(signalChangeKeyLength)),
+        mods,
+      )
+      const signalValues = new Map<Signal, any>()
+      signals.walk((path, signal) => {
+        if (path.startsWith(signalPath)) {
+          signalValues.set(signal, signal.value)
+        }
+      })
       return effect(() => {
-        if (prev !== s.value) {
-          callback()
+        for (const [signal, prev] of signalValues) {
+          if (prev !== signal.value) {
+            callback()
+            signalValues.set(signal, signal.value)
+          }
         }
       })
     }
