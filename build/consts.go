@@ -81,7 +81,7 @@ var Consts = &ConstTemplateData{
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/go",
 		},
 		{
-			FileExtension: "hs",
+			FileExtension: "haskell",
 			Name:          "Haskell",
 			Icon:          "vscode-icons:file-type-haskell",
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/haskell",

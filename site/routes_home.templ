@@ -62,7 +62,7 @@ templ Home() {
 					<div class="flex flex-wrap justify-center gap-6 mx-auto">
 						for _, lang := range build.Consts.SDKLanguages {
 							<a href={ templ.SafeURL(lang.SdkUrl) } class="flex flex-col justify-center items-center">
-								@icon(lang.Icon, "class", "text-9xl")
+								@icon(lang.Icon, "class", "text-8xl")
 								<div class="uppercase text-sm font-bold">{ lang.Name }</div>
 							</a>
 						}
