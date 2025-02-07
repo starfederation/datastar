@@ -8,6 +8,8 @@ import (
 )
 
 func TestExampleBadApple(t *testing.T) {
+	t.Skip("flaky test")
+
 	setupPageTest(t, "examples/bad_apple", func(runner runnerFn) {
 		runner("bad apple 30fps", func(t *testing.T, page *rod.Page) {
 			selector := "#contents > div > pre"

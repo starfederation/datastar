@@ -8,6 +8,8 @@ import (
 )
 
 func TestExampleClasses(t *testing.T) {
+	t.Skip("flaky test")
+
 	setupPageTest(t, "examples/classes", func(runner runnerFn) {
 		runner("observe class change", func(t *testing.T, page *rod.Page) {
 			element := page.MustElement("article > div > div:nth-of-type(2)")

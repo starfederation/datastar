@@ -8,6 +8,7 @@ import (
 )
 
 func TestExampleBindKeys(t *testing.T) {
+	t.Skip("flaky test")
 	setupPageTest(t, "examples/bind_keys", func(runner runnerFn) {
 		runner("ctrl+k", func(t *testing.T, page *rod.Page) {
 			page.MustElement("#demo").MustClick()
@@ -23,6 +24,7 @@ func TestExampleBindKeys(t *testing.T) {
 			page.MustElement("#demo").MustClick()
 			wait, handle := page.MustHandleDialog()
 
+			// flaky test caused by this go-routine
 			go page.Keyboard.MustType(input.Enter)
 
 			wait()

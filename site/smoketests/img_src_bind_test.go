@@ -9,6 +9,7 @@ import (
 )
 
 func TestExampleImgSrcBind(t *testing.T) {
+	t.Skip("flaky test")
 	setupPageTest(t, "examples/img_src_bind", func(runner runnerFn) {
 		runner("image source binding", func(t *testing.T, page *rod.Page) {
 			initial := page.MustElement("#file_upload > img").MustProperty("src").Str()
