@@ -24,9 +24,11 @@ In your Rack handler or Rails controller:
 
 ```ruby
 # Rails controllers, as well as Sinatra and others, 
-# already have request and response objects
+# already have request and response objects.
+# `view_context` is optional and is used to render Rails templates.
+# Or view components that need access to helpers, routes, or any other context.
 
-datastar = Datastar.new(request:, response:, view_context: self)
+datastar = Datastar.new(request:, response:, view_context:)
 
 # In a Rack handler, you can instantiate from the Rack env
 datastar = Datastar.from_rack_env(env)
@@ -130,7 +132,7 @@ See https://data-star.dev/reference/sse_events#datastar-execute-script
 
 ```ruby
 sse.execute_scriprt(%(alert('Hello World!'))
- ```
+```
 
 #### `signals`
 See https://data-star.dev/guide/getting_started#data-signals
@@ -139,14 +141,14 @@ Returns signals sent by the browser.
 
 ```ruby
 sse.signals # => { user: { name: 'John' } }
- ```
+```
 
 #### `redirect`
 This is just a helper to send a script to update the browser's location.
 
 ```ruby
 sse.redirect('/new_location')
- ```
+```
 
 ### Lifecycle callbacks
 
@@ -198,11 +200,14 @@ Datastar.configure do |config|
 end
 ```
 
-### Rails
+### Rendering Rails templates
 
-#### Rendering Rails templates
+In Rails, make sure to initialize Datastar with the `view_context` in a controller.
+This is so that rendered templates, components or views have access to helpers, routes, etc.
 
 ```ruby
+datastar = Datastar.new(request:, response:, view_context:)
+
 datastar.stream do |sse|
   10.times do |i|
     sleep 1
@@ -212,13 +217,43 @@ datastar.stream do |sse|
 end
 ```
 
-#### Rendering Phlex components
+### Rendering Phlex components
 
 `#merge_fragments` supports [Phlex](https://www.phlex.fun) component instances.
 
 ```ruby
 sse.merge_fragments(UserComponent.new(user: User.first))
 ```
+
+### Rendering ViewComponent instances
+
+`#merge_fragments` also works with [ViewComponent](https://viewcomponent.org) instances.
+
+```ruby
+sse.merge_fragments(UserViewComponent.new(user: User.first))
+```
+
+### Rendering `#render_in(view_context)` interfaces
+
+Any object that supports the `#render_in(view_context) => String` API can be used as a fragment.
+
+```ruby
+class MyComponent
+  def initialize(name)
+    @name = name
+  end
+
+  def render_in(view_context)
+    "<div>Hello #{@name}</div>""
+  end
+end
+```
+
+```ruby
+sse.merge_fragments MyComponent.new('Joe')
+```
+
+
 
 ### Tests
 

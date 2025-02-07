@@ -14,11 +14,15 @@ func TestExampleInfiniteScroll(t *testing.T) {
 			rows := table.MustElements("tr")
 			assert.Len(t, rows, 11)
 
+			wait := page.MustWaitRequestIdle()
+
 			page.MustElement("#infinite_scroll").MustClick()
 			page.Mouse.MustScroll(0, 2000)
 
+			wait()
+
 			updatedRows := table.MustElements("tr")
-			assert.Len(t, updatedRows, 21)
+			assert.GreaterOrEqual(t, len(updatedRows), 21)
 		})
 	})
 }

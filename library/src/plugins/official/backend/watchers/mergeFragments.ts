@@ -11,16 +11,17 @@ import {
 } from '../../../../engine/consts'
 import { initErr } from '../../../../engine/errors'
 import {
+  type HTMLorSVGElement,
   type InitContext,
   PluginType,
   type WatcherPlugin,
 } from '../../../../engine/types'
-import { isBoolString } from '../../../../utils/text'
+import { camel, isBoolString } from '../../../../utils/text'
 import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
 } from '../../../../utils/view-transtions'
-import { idiomorph } from '../../../../vendored/idiomorph'
+import { Idiomorph } from '../../../../vendored/idiomorph.esm'
 import {
   SETTLING_CLASS,
   SWAPPING_CLASS,
@@ -85,11 +86,38 @@ function applyToTargets(
     let modifiedTarget = initialTarget
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
-        const result = idiomorph(modifiedTarget, fragment)
+        const toApply = new Map<Element, Array<string>>()
+        const result = Idiomorph.morph(modifiedTarget, fragment, {
+          callbacks: {
+            beforeAttributeUpdated: (
+              argument: string,
+              el: Element,
+              mode: 'update' | 'remove',
+            ): boolean => {
+              if (mode === 'update' && argument.startsWith('data-')) {
+                let elAddAttrs = toApply.get(el)
+                if (!elAddAttrs) {
+                  elAddAttrs = []
+                  toApply.set(el, elAddAttrs)
+                }
+                const name = argument.slice('data-'.length)
+                elAddAttrs.push(camel(name))
+              }
+              return true
+            },
+          },
+        })
         if (!result?.length) {
           throw initErr('MorphFailed', ctx)
         }
         modifiedTarget = result[0] as Element
+
+        for (const [el, attrs] of toApply.entries()) {
+          for (const attr of attrs) {
+            ctx.applyAttributePlugin(el as HTMLorSVGElement, attr)
+          }
+        }
+
         break
       }
       case FragmentMergeModes.Inner:

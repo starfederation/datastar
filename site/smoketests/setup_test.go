@@ -3,6 +3,7 @@ package smoketests
 import (
 	"context"
 	"fmt"
+	"os"
 	"sync"
 	"testing"
 
@@ -18,11 +19,15 @@ var (
 )
 
 func TestMain(m *testing.M) {
+	if err := os.Chdir("../../"); err != nil {
+		panic(fmt.Errorf("could not change the working directory: %w", err))
+	}
+
 	ctx := context.Background()
 
 	port, err := toolbelt.FreePort()
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("could not obtain a free port: %w", err))
 	}
 
 	baseURL = fmt.Sprintf("http://localhost:%d", port)

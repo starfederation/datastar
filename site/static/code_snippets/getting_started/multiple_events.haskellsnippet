@@ -1,0 +1,8 @@
+import ServerSentEventGenerator
+import ServerSentEventGenerator.Server.Snap -- or whatever is appropriate
+
+send (withDefaults MergeFragments "<div id=\"question\">...</div>")
+send (withDefaults MergeFragments "<div id=\"instructions\">...</div>")
+send (withDefaults MergeFragments "{answer: '...'}")
+send (withDefaults MergeFragments "{prize: '...'}")
+
