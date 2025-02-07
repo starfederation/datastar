@@ -32,21 +32,21 @@ fn sdk(req: *httpz.Request, res: *httpz.Response) !void {
     try testing.sdk(&sse, signals);
 }
 
-// test sdk {
-//     var server = try httpz.Server(void).init(
-//         std.testing.allocator,
-//         .{ .port = 8080 },
-//         {},
-//     );
-//     defer {
-//         server.stop();
-//         server.deinit();
-//     }
+test sdk {
+    var server = try httpz.Server(void).init(
+        std.testing.allocator,
+        .{ .port = 8080 },
+        {},
+    );
+    defer {
+        server.stop();
+        server.deinit();
+    }
 
-//     var router = server.router(.{});
+    var router = server.router(.{});
 
-//     router.get("/test", sdk, .{});
-//     router.post("/test", sdk, .{});
+    router.get("/test", sdk, .{});
+    router.post("/test", sdk, .{});
 
-//     try server.listen();
-// }
+    try server.listen();
+}
