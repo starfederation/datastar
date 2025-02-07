@@ -3,6 +3,6 @@ const std = @import("std");
 
 var sse = try datastar.ServerSentEventGenerator.init(res);
 
-sse.mergeFragments("<div id='indicator'>Redirecting in 3 seconds...</div>");
+sse.mergeFragments("<div id='indicator'>Redirecting in 3 seconds...</div>", .{});
 std.Thread.sleep(std.time.ns_per_s * 3);
-sse.executeScript("setTimeout(() => window.location = '/guide')");
+sse.executeScript("setTimeout(() => window.location = '/guide')", .{});
