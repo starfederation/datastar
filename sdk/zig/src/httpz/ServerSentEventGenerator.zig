@@ -1,11 +1,15 @@
 const std = @import("std");
+const config = @import("config");
 const httpz = @import("httpz");
 const ServerSentEventGenerator = @import("../ServerSentEventGenerator.zig");
 
 pub fn init(res: *httpz.Response) !ServerSentEventGenerator {
     res.content_type = .EVENTS;
     res.header("Cache-Control", "no-cache");
-    res.header("Connection", "keep-alive");
+
+    if (config.http1) {
+        res.header("Connection", "keep-alive");
+    }
 
     try res.write();
 

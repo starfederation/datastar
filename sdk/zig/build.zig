@@ -15,7 +15,11 @@ pub fn build(b: *std.Build) void {
             .{ .name = "tokamak", .module = tokamak },
         },
     });
-    _ = datastar;
+
+    const options = b.addOptions();
+    options.addOption(bool, "http1", true);
+
+    datastar.addOptions("config", options);
 
     const tests = b.addTest(.{
         .root_source_file = b.path("src/root.zig"),
