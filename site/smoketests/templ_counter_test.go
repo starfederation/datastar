@@ -12,7 +12,9 @@ func TestExampleTemplCounter(t *testing.T) {
 		runner("increment global", func(t *testing.T, page *rod.Page) {
 			initial := page.MustElement("#container > div:nth-of-type(2) > div > div:nth-of-type(2)").MustText()
 
+			wait := page.MustWaitRequestIdle()
 			page.MustElementR("button", "Increment Global").MustClick()
+			wait()
 
 			result := page.MustElement("#container > div:nth-of-type(2) > div > div:nth-of-type(2)").MustText()
 
@@ -22,7 +24,9 @@ func TestExampleTemplCounter(t *testing.T) {
 		runner("increment user", func(t *testing.T, page *rod.Page) {
 			initial := page.MustElement("#container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2)").MustText()
 
+			wait := page.MustWaitRequestIdle()
 			page.MustElementR("button", "Increment User").MustClick()
+			wait()
 
 			result := page.MustElement("#container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2)").MustText()
 

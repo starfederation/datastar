@@ -8,27 +8,35 @@ import (
 )
 
 func TestExampleUpdateSignals(t *testing.T) {
-	setupPageTest(t, "examples/update_signals", func(runner runnerFn) {
-		runner("apply random signal patch", func(t *testing.T, page *rod.Page) {
-			initial := page.MustElement("pre").MustHTML()
+	t.Run("examples/update_signals - apply random signal patch", func(t *testing.T) {
+		setupPageTest(t, "examples/update_signals", func(runner runnerFn) {
+			runner("apply random signal patch", func(t *testing.T, page *rod.Page) {
+				initial := page.MustElement("pre").MustHTML()
 
-			page.MustElementR("button", "Apply random signals").MustClick()
+				wait := page.MustWaitRequestIdle()
+				page.MustElementR("button", "Apply random signals").MustClick()
 
-			result := page.MustElement("pre").MustHTML()
+				wait()
+				result := page.MustElement("pre").MustHTML()
 
-			assert.NotEqual(t, initial, result)
+				assert.NotEqual(t, initial, result)
+			})
 		})
+	})
 
-		runner("remove 2 random", func(t *testing.T, page *rod.Page) {
-			initial := page.MustElement("pre").MustHTML()
+	t.Run("examples/update_signals - remove 2 random", func(t *testing.T) {
+		setupPageTest(t, "examples/update_signals", func(runner runnerFn) {
+			runner("remove 2 random", func(t *testing.T, page *rod.Page) {
+				initial := page.MustElement("pre").MustHTML()
 
-			page.MustElementR("button", "Remove 2 random").MustClick()
+				wait := page.MustWaitRequestIdle()
+				page.MustElementR("button", "Remove 2 random").MustClick()
 
-			page.MustWaitIdle()
+				wait()
+				result := page.MustElement("pre").MustHTML()
 
-			result := page.MustElement("pre").MustHTML()
-
-			assert.NotEqual(t, initial, result)
+				assert.NotEqual(t, initial, result)
+			})
 		})
 	})
 }

@@ -166,11 +166,10 @@ tasks:
       - fly deploy --local-only
 
   test:
-    dir: site/smoketests
     deps:
       - support
     cmds:
-      - go test -v
+      - go test -v github.com/starfederation/datastar/site/smoketests -count=1 -timeout=1m
 
   default:
     cmds:
