@@ -143,6 +143,10 @@ templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromH
    					 fmt.Sprintf(`{"headers": {"%s": "%t"}}`, SearchFromHeaderKey, fromHeader),
 				)}
 				data-indicator="$searchFetching"
+				if fromHeader {
+					data-ref-site-search-input
+					data-on-keydown__window="evt.key == 'k' && (evt.metaKey || evt.ctrlKey) && ($siteSearchInput.focus(), evt.preventDefault())"
+				}
 			/>
 			<div class="absolute right-4 flex items-center h-full">
 				@sseIndicator("searchFetching")
