@@ -3,11 +3,11 @@
     .version = "0.0.0",
     .dependencies = .{
         .tokamak = .{
-            .url = "git+https://github.com/cztomsik/tokamak#3be7e419c335f5c83353ed23ac1896d7aba9571a",
-            .hash = "1220ed7a17e7c239698f58dc4819174ca72ec6273e86c4c3ca49b6a2619f48d11a15",
+            .url = "git+https://github.com/cztomsik/tokamak#857fa78a6fc77c4effa235ef049b8a6461120e5d",
+            .hash = "1220ddbe12aa69b3293f0abd7078ff93c309b4f4383e18cbe24b163e4ee4b2befa49",
         },
-        .datastar_tokamak = .{
-            .path = "../../../../sdk/zig/tokamak",
+        .datastar = .{
+            .path = "../../../../sdk/zig",
         },
     },
     .paths = .{

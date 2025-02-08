@@ -1,4 +1,4 @@
-const datastar = @import("datastar");
+const datastar = @import("datastar").httpz;
 const zdt = @import("zdt");
 const std = @import("std");
 

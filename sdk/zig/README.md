@@ -2,14 +2,10 @@
 
 An implementation of the Datastar SDK in Zig with framework integration for http.zig and tokamak.
 
-## Testing
-
-Run `zig build test`.
-
 ## Usage
 
 ```zig
-const datastar = @import("datastar");
+const datastar = @import("datastar").httpz;
 
 // Creates a new `ServerSentEventGenerator`.
 var sse = try datastar.ServerSentEventGenerator.init(res);
