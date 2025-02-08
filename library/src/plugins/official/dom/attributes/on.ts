@@ -63,7 +63,7 @@ export const On: AttributePlugin = {
       callback = throttle(callback, wait, leading, trailing)
     }
 
-    if (supportsViewTransitions && mods.has('viewtransition')) {
+    if (mods.has('viewtransition') && supportsViewTransitions) {
       const cb = callback // I hate javascript
       callback = (...args: any[]) =>
         document.startViewTransition(() => cb(...args))
