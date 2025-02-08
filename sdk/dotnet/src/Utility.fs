@@ -1,6 +1,7 @@
 module internal StarFederation.Datastar.Utility
 
 open System
+open System.Collections.Generic
 open System.Text.Json
 open System.Text.Json.Nodes
 open Microsoft.FSharp.Reflection
@@ -24,3 +25,7 @@ module JsonPath =
         | [| segment |] -> jObject[segment].Deserialize(valueType)
         | [| segment; segments |] -> getValue valueType ((jObject.Item segment).AsObject()) segments
         | _ -> jObject.Deserialize(valueType)
+
+
+module KeyValuePair =
+    let toTuple (keyValuePair:KeyValuePair<'TKey, 'TValue>) = (keyValuePair.Key, keyValuePair.Value)
