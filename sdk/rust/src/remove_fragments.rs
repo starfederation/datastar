@@ -47,7 +47,7 @@ impl RemoveFragments {
     /// Creates a new [`RemoveFragments`] event with the given selector.
     pub fn new(selector: impl Into<String>) -> Self {
         Self {
-            id: Default::default(),
+            id: None,
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             selector: selector.into(),
             settle_duration: Duration::from_millis(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION),
@@ -80,36 +80,36 @@ impl RemoveFragments {
     }
 }
 
-impl Into<DatastarEvent> for RemoveFragments {
-    fn into(self) -> DatastarEvent {
+impl From<RemoveFragments> for DatastarEvent {
+    fn from(val: RemoveFragments) -> Self {
         let mut data: Vec<String> = Vec::new();
 
-        if self.settle_duration.as_millis() != consts::DEFAULT_FRAGMENTS_SETTLE_DURATION as u128 {
+        if val.settle_duration.as_millis() != consts::DEFAULT_FRAGMENTS_SETTLE_DURATION as u128 {
             data.push(format!(
                 "{} {}",
                 consts::SETTLE_DURATION_DATALINE_LITERAL,
-                self.settle_duration.as_millis()
+                val.settle_duration.as_millis()
             ));
         }
 
-        if self.use_view_transition != consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS {
+        if val.use_view_transition != consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS {
             data.push(format!(
                 "{} {}",
                 consts::USE_VIEW_TRANSITION_DATALINE_LITERAL,
-                self.use_view_transition
+                val.use_view_transition
             ));
         }
 
         data.push(format!(
             "{} {}",
             consts::SELECTOR_DATALINE_LITERAL,
-            self.selector
+            val.selector
         ));
 
-        DatastarEvent {
+        Self {
             event: consts::EventType::RemoveFragments,
-            id: self.id,
-            retry: self.retry,
+            id: val.id,
+            retry: val.retry,
             data,
         }
     }

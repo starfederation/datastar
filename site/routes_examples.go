@@ -67,6 +67,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "merge_options"},
 				{ID: "redirects"},
 				{ID: "view_transition_api"},
+				{ID: "view_transition_on_click"},
 				{ID: "title_update_backend"},
 				{ID: "signals_change"},
 				{ID: "csrf"},

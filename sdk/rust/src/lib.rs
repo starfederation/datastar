@@ -19,7 +19,7 @@ mod testing;
 
 mod consts;
 
-///
+/// The prelude for the `datastar` crate
 pub mod prelude {
     #[cfg(feature = "axum")]
     pub use crate::axum::ReadSignals;
@@ -32,7 +32,7 @@ pub mod prelude {
 
 use {
     core::{error::Error, fmt::Display, time::Duration},
-    futures::{Stream, TryStream},
+    futures_util::{Stream, TryStream},
 };
 
 /// [`DatastarEvent`] is a struct that represents a generic Datastar event.
@@ -54,19 +54,19 @@ pub struct DatastarEvent {
 
 impl Display for DatastarEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "event: {}\n", self.event.as_str())?;
+        writeln!(f, "event: {}", self.event.as_str())?;
 
         if let Some(id) = &self.id {
-            write!(f, "id: {}\n", id)?;
+            writeln!(f, "id: {}", id)?;
         }
 
         let millis = self.retry.as_millis();
         if millis != consts::DEFAULT_SSE_RETRY_DURATION as u128 {
-            write!(f, "retry: {}\n", millis)?;
+            writeln!(f, "retry: {}", millis)?;
         }
 
         for line in &self.data {
-            write!(f, "data: {}\n", line)?;
+            writeln!(f, "data: {}", line)?;
         }
 
         write!(f, "\n\n")?;

@@ -60,7 +60,7 @@ export const MergeFragments: WatcherPlugin = {
             throw initErr('NoTargetsFound', ctx, { selectorOrID })
           }
 
-          if (supportsViewTransitions && useViewTransition) {
+          if (useViewTransition && supportsViewTransitions) {
             docWithViewTransitionAPI.startViewTransition(() =>
               applyToTargets(ctx, mergeMode, settleDuration, fragment, targets),
             )

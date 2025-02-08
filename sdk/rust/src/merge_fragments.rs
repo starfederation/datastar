@@ -3,8 +3,8 @@
 
 use {
     crate::{
-        consts::{self},
-        prelude::{DatastarEvent, FragmentMergeMode},
+        consts::{self, FragmentMergeMode},
+        DatastarEvent,
     },
     core::time::Duration,
 };
@@ -58,11 +58,11 @@ impl MergeFragments {
     /// Creates a new [`MergeFragments`] event with the given fragments.
     pub fn new(fragments: impl Into<String>) -> Self {
         Self {
-            id: Default::default(),
+            id: None,
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             fragments: fragments.into(),
-            selector: Default::default(),
-            merge_mode: Default::default(),
+            selector: None,
+            merge_mode: FragmentMergeMode::default(),
             settle_duration: Duration::from_millis(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION),
             use_view_transition: consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
         }
@@ -105,11 +105,11 @@ impl MergeFragments {
     }
 }
 
-impl Into<DatastarEvent> for MergeFragments {
-    fn into(self) -> DatastarEvent {
+impl From<MergeFragments> for DatastarEvent {
+    fn from(val: MergeFragments) -> Self {
         let mut data: Vec<String> = Vec::new();
 
-        if let Some(selector) = &self.selector {
+        if let Some(selector) = &val.selector {
             data.push(format!(
                 "{} {}",
                 consts::SELECTOR_DATALINE_LITERAL,
@@ -117,38 +117,38 @@ impl Into<DatastarEvent> for MergeFragments {
             ));
         }
 
-        if self.merge_mode != FragmentMergeMode::default() {
+        if val.merge_mode != FragmentMergeMode::default() {
             data.push(format!(
                 "{} {}",
                 consts::MERGE_MODE_DATALINE_LITERAL,
-                self.merge_mode.as_str()
+                val.merge_mode.as_str()
             ));
         }
 
-        if self.settle_duration.as_millis() != consts::DEFAULT_FRAGMENTS_SETTLE_DURATION as u128 {
+        if val.settle_duration.as_millis() != consts::DEFAULT_FRAGMENTS_SETTLE_DURATION as u128 {
             data.push(format!(
                 "{} {}",
                 consts::SETTLE_DURATION_DATALINE_LITERAL,
-                self.settle_duration.as_millis()
+                val.settle_duration.as_millis()
             ));
         }
 
-        if self.use_view_transition != consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS {
+        if val.use_view_transition != consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS {
             data.push(format!(
                 "{} {}",
                 consts::USE_VIEW_TRANSITION_DATALINE_LITERAL,
-                self.use_view_transition
+                val.use_view_transition
             ));
         }
 
-        for line in self.fragments.lines() {
+        for line in val.fragments.lines() {
             data.push(format!("{} {}", consts::FRAGMENTS_DATALINE_LITERAL, line));
         }
 
         DatastarEvent {
             event: consts::EventType::MergeFragments,
-            id: self.id.clone(),
-            retry: self.retry,
+            id: val.id.clone(),
+            retry: val.retry,
             data,
         }
     }

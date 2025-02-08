@@ -10,10 +10,11 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import type { Signal } from '../../../../vendored/preact-core'
 import { tagHas, tagToMs } from '../../../../utils/tags'
 import { camel, modifyCasing } from '../../../../utils/text'
 import { debounce, delay, throttle } from '../../../../utils/timing'
+import { supportsViewTransitions } from '../../../../utils/view-transtions'
+import type { Signal } from '../../../../vendored/preact-core'
 
 const EVT = 'evt'
 const SIGNALS_CHANGE_PREFIX = 'signalsChange'
@@ -60,6 +61,12 @@ export const On: AttributePlugin = {
       const leading = !tagHas(throttleArgs, 'noleading', false)
       const trailing = tagHas(throttleArgs, 'trail', false)
       callback = throttle(callback, wait, leading, trailing)
+    }
+
+    if (mods.has('viewtransition') && supportsViewTransitions) {
+      const cb = callback // I hate javascript
+      callback = (...args: any[]) =>
+        document.startViewTransition(() => cb(...args))
     }
 
     const evtListOpts: AddEventListenerOptions = {
