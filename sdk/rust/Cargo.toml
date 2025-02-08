@@ -3,11 +3,12 @@ authors = ["Johnathan Stevers <jmstevers@gmail.com>"]
 categories = ["web-programming"]
 description = "Datastar is the Rust implementation of the [Datastar](https://data-star.dev) SDK."
 edition = "2021"
+homepage = "https://data-star.dev"
 keywords = ["datastar", "web", "backend"]
 license = "MIT OR Apache-2.0"
 name = "datastar"
 readme = "README.md"
-# repository = "https://github.com/starfederation/datastar-rs"
+repository = "https://github.com/starfederation/datastar-rs"
 version = "0.1.0"
 
 [dev-dependencies]
