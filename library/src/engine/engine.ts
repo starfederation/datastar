@@ -1,6 +1,6 @@
 import { Hash, elUniqId } from '../utils/dom'
 import { camel } from '../utils/text'
-import { debounce } from '../utils/timing'
+import { delay } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
@@ -29,94 +29,18 @@ export class Engine {
   #plugins: AttributePlugin[] = []
   #actions: ActionPlugins = {}
   #watchers: WatcherPlugin[] = []
+  #mutationObserver: MutationObserver | null = null
 
   // Map of cleanup functions by element, keyed by the dataset key and value
   #removals = new Map<Element, Map<string, OnRemovalFn>>()
-
-  constructor() {
-    const datasetPrefix = 'data-'
-
-    const ob = new MutationObserver((mutations) => {
-      for (const {
-        target,
-        type,
-        attributeName,
-        oldValue,
-        addedNodes,
-        removedNodes,
-      } of mutations) {
-        switch (type) {
-          case 'childList':
-            {
-              for (const node of removedNodes) {
-                const el = node as HTMLorSVGElement
-                const elRemovals = this.#removals.get(el)
-                if (!elRemovals) continue
-
-                for (const [_, removalFn] of elRemovals) {
-                  removalFn()
-                }
-                this.#removals.delete(el)
-              }
-
-              for (const node of addedNodes) {
-                const el = node as HTMLorSVGElement
-                this.#apply(el)
-              }
-            }
-            break
-          case 'attributes': {
-            {
-              const requiredPrefix =
-                datasetPrefix + (this.aliasPrefix ? `${this.aliasPrefix}-` : '')
-              if (!attributeName?.startsWith(requiredPrefix)) {
-                break
-              }
-
-              const el = target as HTMLorSVGElement
-              const datasetKey = camel(
-                attributeName.slice(datasetPrefix.length),
-              )
-
-              // If the value has changed, clean up the old value
-              if (oldValue !== null && el.dataset[datasetKey] !== oldValue) {
-                const elRemovals = this.#removals.get(el)
-                if (elRemovals) {
-                  const rk = removalKey(datasetKey, oldValue)
-                  const removalFn = elRemovals.get(rk)
-                  if (removalFn) {
-                    removalFn()
-                    elRemovals.delete(rk)
-                  }
-                }
-              }
-
-              // Apply the plugin only if the dataset key exists
-              if (datasetKey in el.dataset) {
-                this.#applyAttributePlugin(el, datasetKey)
-              }
-            }
-            break
-          }
-        }
-      }
-    })
-
-    ob.observe(document.body, {
-      attributes: true,
-      attributeOldValue: true,
-      childList: true,
-      subtree: true,
-    })
-  }
 
   get signals() {
     return this.#signals
   }
 
   public load(...pluginsToLoad: DatastarPlugin[]) {
+    const that = this // I hate javascript
     for (const plugin of pluginsToLoad) {
-      const that = this // I hate javascript
       const ctx: InitContext = {
         get signals() {
           return that.#signals
@@ -161,11 +85,13 @@ export class Engine {
       return a.name.localeCompare(b.name)
     })
 
-    this.#debouncedApply()
+    this.#delayedApply()
   }
 
-  #debouncedApply = debounce(() => {
+  // Delay applying plugins to give them time to load
+  #delayedApply = delay(() => {
     this.#apply(document.body)
+    this.#observe()
   }, 1)
 
   // Apply all plugins to the element and its children
@@ -185,6 +111,87 @@ export class Engine {
       for (const datasetKey of Object.keys(el.dataset)) {
         this.#applyAttributePlugin(el, datasetKey)
       }
+    })
+  }
+
+  // Set up a mutation observer to run plugin removal and apply functions
+  #observe() {
+    if (this.#mutationObserver) {
+      return
+    }
+    
+    this.#mutationObserver = new MutationObserver((mutations) => {
+      for (const {
+        target,
+        type,
+        attributeName,
+        oldValue,
+        addedNodes,
+        removedNodes,
+      } of mutations) {
+        switch (type) {
+          case 'childList':
+            {
+              for (const node of removedNodes) {
+                const el = node as HTMLorSVGElement
+                const elRemovals = this.#removals.get(el)
+                if (!elRemovals) continue
+
+                for (const [_, removalFn] of elRemovals) {
+                  removalFn()
+                }
+                this.#removals.delete(el)
+              }
+
+              for (const node of addedNodes) {
+                const el = node as HTMLorSVGElement
+                this.#apply(el)
+              }
+            }
+            break
+          case 'attributes': {
+            {
+              const datasetPrefix = 'data-'
+              const requiredPrefix =
+                datasetPrefix + (this.aliasPrefix ? `${this.aliasPrefix}-` : '')
+              if (!attributeName?.startsWith(requiredPrefix)) {
+                break
+              }
+
+              const el = target as HTMLorSVGElement
+              const datasetKey = camel(
+                attributeName.slice(datasetPrefix.length),
+              )
+
+              // If the value has changed, clean up the old value
+              if (oldValue !== null && el.dataset[datasetKey] !== oldValue) {
+                const elRemovals = this.#removals.get(el)
+                if (elRemovals) {
+                  const rk = removalKey(datasetKey, oldValue)
+                  const removalFn = elRemovals.get(rk)
+                  if (removalFn) {
+                    removalFn()
+                    elRemovals.delete(rk)
+                  }
+                }
+              }
+
+              // Apply the plugin only if the dataset key exists
+              if (datasetKey in el.dataset) {
+                this.#applyAttributePlugin(el, datasetKey)
+              }
+            }
+            break
+          }
+        }
+      }
+    })
+
+    this.#mutationObserver.observe(document.body, {
+      attributes: true,
+      attributeOldValue: true,
+      childList: true,
+      subtree: true,
     })
   }
 
