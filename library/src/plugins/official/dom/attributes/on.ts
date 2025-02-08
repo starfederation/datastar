@@ -62,6 +62,12 @@ export const On: AttributePlugin = {
       callback = throttle(callback, wait, leading, trailing)
     }
 
+    if (mods.has('viewtransition') && document.startViewTransition) {
+      callback = (...args: any[]) => {
+        document.startViewTransition(() => callback(...args))
+      }
+    }
+
     const evtListOpts: AddEventListenerOptions = {
       capture: true,
       passive: false,
