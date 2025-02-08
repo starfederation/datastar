@@ -19,12 +19,12 @@ export type ConfigCallbacks = {
     beforeNodeRemoved?: (arg0: Element) => boolean;
     afterNodeRemoved?: (arg0: Element) => void;
     beforeAttributeUpdated?: (arg0: string, arg1: Element, arg2: "update" | "remove") => boolean;
-    beforeNodePantried?: (arg0: Element) => boolean;
 };
 export type Config = {
     morphStyle?: "outerHTML" | "innerHTML";
     ignoreActive?: boolean;
     ignoreActiveValue?: boolean;
+    restoreFocus?: boolean;
     callbacks?: ConfigCallbacks;
     head?: ConfigHead;
 };
@@ -50,15 +50,18 @@ export type ConfigCallbacksInternal = {
     beforeNodeRemoved: ((arg0: Node) => boolean) | NoOp;
     afterNodeRemoved: ((arg0: Node) => void) | NoOp;
     beforeAttributeUpdated: ((arg0: string, arg1: Element, arg2: "update" | "remove") => boolean) | NoOp;
-    beforeNodePantried: ((arg0: Node) => boolean) | NoOp;
 };
 export type ConfigInternal = {
     morphStyle: "outerHTML" | "innerHTML";
     ignoreActive?: boolean;
     ignoreActiveValue?: boolean;
+    restoreFocus?: boolean;
     callbacks: ConfigCallbacksInternal;
     head: ConfigHeadInternal;
-    twoPass?: boolean;
+};
+export type IdSets = {
+    persistentIds: Set<string>;
+    idMap: Map<Node, Set<string>>;
 };
 export type Morph = Function;
 /**
@@ -82,7 +85,6 @@ export type Morph = Function;
  * @property {function(Element): boolean} [beforeNodeRemoved]
  * @property {function(Element): void} [afterNodeRemoved]
  * @property {function(string, Element, "update" | "remove"): boolean} [beforeAttributeUpdated]
- * @property {function(Element): boolean} [beforeNodePantried]
  */
 /**
  * @typedef {object} Config
@@ -90,6 +92,7 @@ export type Morph = Function;
  * @property {'outerHTML' | 'innerHTML'} [morphStyle]
  * @property {boolean} [ignoreActive]
  * @property {boolean} [ignoreActiveValue]
+ * @property {boolean} [restoreFocus]
  * @property {ConfigCallbacks} [callbacks]
  * @property {ConfigHead} [head]
  */
@@ -119,7 +122,6 @@ export type Morph = Function;
  * @property {(function(Node): boolean) | NoOp} beforeNodeRemoved
  * @property {(function(Node): void) | NoOp} afterNodeRemoved
  * @property {(function(string, Element, "update" | "remove"): boolean) | NoOp} beforeAttributeUpdated
- * @property {(function(Node): boolean) | NoOp} beforeNodePantried
  */
 /**
  * @typedef {object} ConfigInternal
@@ -127,9 +129,14 @@ export type Morph = Function;
  * @property {'outerHTML' | 'innerHTML'} morphStyle
  * @property {boolean} [ignoreActive]
  * @property {boolean} [ignoreActiveValue]
+ * @property {boolean} [restoreFocus]
  * @property {ConfigCallbacksInternal} callbacks
  * @property {ConfigHeadInternal} head
- * @property {boolean} [twoPass]
+ */
+/**
+ * @typedef {Object} IdSets
+ * @property {Set<string>} persistentIds
+ * @property {Map<Node, Set<string>>} idMap
  */
 /**
  * @typedef {Function} Morph
