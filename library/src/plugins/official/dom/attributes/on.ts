@@ -14,6 +14,7 @@ import type { Signal } from '../../../../vendored/preact-core'
 import { tagHas, tagToMs } from '../../../../utils/tags'
 import { camel, modifyCasing } from '../../../../utils/text'
 import { debounce, delay, throttle } from '../../../../utils/timing'
+import { supportsViewTransitions } from '../../../../utils/view-transtions'
 
 const EVT = 'evt'
 const SIGNALS_CHANGE_PREFIX = 'signalsChange'
@@ -62,7 +63,8 @@ export const On: AttributePlugin = {
       callback = throttle(callback, wait, leading, trailing)
     }
 
-    if (mods.has('viewtransition') && document.startViewTransition) {
+    const useViewTransition = mods.has('viewtransition')
+    if (useViewTransition && supportsViewTransitions) {
       callback = (...args: any[]) => {
         document.startViewTransition(() => callback(...args))
       }
