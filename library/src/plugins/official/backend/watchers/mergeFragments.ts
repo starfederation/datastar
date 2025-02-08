@@ -88,6 +88,7 @@ function applyToTargets(
       case FragmentMergeModes.Morph: {
         const toApply = new Map<Element, Array<string>>()
         const result = Idiomorph.morph(modifiedTarget, fragment, {
+          restoreFocuse: false,
           callbacks: {
             beforeAttributeUpdated: (
               argument: string,
