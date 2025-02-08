@@ -16,6 +16,9 @@ serde = { version = "1.0.217", default-features = false, features = ["derive"] }
 serde_json = { version = "1.0.138", default-features = false, features = [
     "std",
 ] }
+tokio = { version = "1.43.0", features = ["full"] }
+axum = { version = "0.8.1" }
+rocket = { version = "0.5.1", features = ["json"] }
 
 
 [dependencies]
