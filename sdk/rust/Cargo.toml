@@ -27,7 +27,7 @@ axum = { version = "0.8.1", default-features = false, optional = true, features 
     "query",
     "tokio",
 ] }
-futures = { version = "0.3.31", default-features = false }
+futures-util = { version = "0.3.31", default-features = false }
 http-body = { version = "1.0.1", default-features = false, optional = true }
 pin-project-lite = { version = "0.2.16", default-features = false, optional = true }
 rocket = { version = "0.5.1", default-features = false, optional = true }

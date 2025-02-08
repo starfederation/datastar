@@ -13,7 +13,7 @@ use {
         pin::Pin,
         task::{Context, Poll},
     },
-    futures::{Stream, StreamExt},
+    futures_util::{Stream, StreamExt},
     http_body::Frame,
     pin_project_lite::pin_project,
     serde::{de::DeserializeOwned, Deserialize},

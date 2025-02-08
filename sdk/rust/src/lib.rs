@@ -32,7 +32,7 @@ pub mod prelude {
 
 use {
     core::{error::Error, fmt::Display, time::Duration},
-    futures::{Stream, TryStream},
+    futures_util::{Stream, TryStream},
 };
 
 /// [`DatastarEvent`] is a struct that represents a generic Datastar event.
