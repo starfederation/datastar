@@ -38,7 +38,7 @@ impl RemoveSignals {
     /// Creates a new [`RemoveSignals`] event with the given paths.
     pub fn new(paths: impl IntoIterator<Item = impl Into<String>>) -> Self {
         Self {
-            id: Default::default(),
+            id: None,
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             paths: paths.into_iter().map(Into::into).collect(),
         }

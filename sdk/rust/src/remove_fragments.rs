@@ -47,7 +47,7 @@ impl RemoveFragments {
     /// Creates a new [`RemoveFragments`] event with the given selector.
     pub fn new(selector: impl Into<String>) -> Self {
         Self {
-            id: Default::default(),
+            id: None,
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             selector: selector.into(),
             settle_duration: Duration::from_millis(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION),

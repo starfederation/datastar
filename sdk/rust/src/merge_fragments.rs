@@ -58,11 +58,11 @@ impl MergeFragments {
     /// Creates a new [`MergeFragments`] event with the given fragments.
     pub fn new(fragments: impl Into<String>) -> Self {
         Self {
-            id: Default::default(),
+            id: None,
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             fragments: fragments.into(),
-            selector: Default::default(),
-            merge_mode: Default::default(),
+            selector: None,
+            merge_mode: FragmentMergeMode::default(),
             settle_duration: Duration::from_millis(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION),
             use_view_transition: consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
         }

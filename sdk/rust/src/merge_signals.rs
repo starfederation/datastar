@@ -42,7 +42,7 @@ impl MergeSignals {
     /// Creates a new [`MergeSignals`] event with the given signals.
     pub fn new(signals: impl Into<String>) -> Self {
         Self {
-            id: Default::default(),
+            id: None,
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             signals: signals.into(),
             only_if_missing: consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING,

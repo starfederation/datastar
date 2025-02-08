@@ -45,7 +45,7 @@ impl ExecuteScript {
     /// Creates a new [`ExecuteScript`] event with the given script.
     pub fn new(script: impl Into<String>) -> Self {
         Self {
-            id: Default::default(),
+            id: None,
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             script: script.into(),
             auto_remove: consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE,
