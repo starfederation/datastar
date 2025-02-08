@@ -179,14 +179,18 @@ An `evt` variable that represents the event object is available in the expressio
 <div data-on-myevent="$foo = evt.detail"></div>
 ```
 
-The `data-on` attribute matches DOM events, however there are currently a few special cases for custom events.
+The `data-on` attribute works with [built-in events](https://developer.mozilla.org/en-US/docs/Web/Events) and [custom events](https://developer.mozilla.org/en-US/docs/Web/Events/Creating_and_triggering_events). Note that the `data-on-submit` event listener prevents the default submission behavior of forms.
+
+#### Special Events
+
+Datastar provides a few special events of its own:
 
 1. `data-on-load` is triggered when an element is loaded into the DOM.
 2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__duration` modifier.
 3. `data-on-raf` is triggered on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.
 4. `data-on-signals-change` is triggered when any signals change.
 
-Note that the `data-on-submit` event listener prevents the default submission behavior of forms.
+Note that the `evt` variable is _not_ available in the expression when using special events.
 
 #### Modifiers
 
@@ -217,7 +221,7 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 - `__prevent` - Calls `preventDefault` on the event listener.
 - `__stop` - Calls `stopPropagation` on the event listener.
 
-\* Only works on native events.
+\* Only works on built-in events.
 
 ```html
 <div data-on-click__window__debounce.500ms.leading="$foo = ''"></div>
