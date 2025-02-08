@@ -42,7 +42,7 @@ impl MergeSignals {
     /// Creates a new [`MergeSignals`] event with the given signals.
     pub fn new(signals: impl Into<String>) -> Self {
         Self {
-            id: Default::default(),
+            id: None,
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             signals: signals.into(),
             only_if_missing: consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING,
@@ -68,28 +68,28 @@ impl MergeSignals {
     }
 }
 
-impl Into<DatastarEvent> for MergeSignals {
-    fn into(self) -> DatastarEvent {
+impl From<MergeSignals> for DatastarEvent {
+    fn from(val: MergeSignals) -> Self {
         let mut data: Vec<String> = Vec::new();
 
-        if self.only_if_missing != consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING {
+        if val.only_if_missing != consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING {
             data.push(format!(
                 "{} {}",
                 consts::ONLY_IF_MISSING_DATALINE_LITERAL,
-                self.only_if_missing
+                val.only_if_missing
             ));
         }
 
         data.push(format!(
             "{} {}",
             consts::SIGNALS_DATALINE_LITERAL,
-            self.signals
+            val.signals
         ));
 
-        DatastarEvent {
+        Self {
             event: consts::EventType::MergeSignals,
-            id: self.id,
-            retry: self.retry,
+            id: val.id,
+            retry: val.retry,
             data,
         }
     }

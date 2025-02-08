@@ -38,7 +38,7 @@ impl RemoveSignals {
     /// Creates a new [`RemoveSignals`] event with the given paths.
     pub fn new(paths: impl IntoIterator<Item = impl Into<String>>) -> Self {
         Self {
-            id: Default::default(),
+            id: None,
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             paths: paths.into_iter().map(Into::into).collect(),
         }
@@ -57,18 +57,18 @@ impl RemoveSignals {
     }
 }
 
-impl Into<DatastarEvent> for RemoveSignals {
-    fn into(self) -> DatastarEvent {
+impl From<RemoveSignals> for DatastarEvent {
+    fn from(val: RemoveSignals) -> Self {
         let mut data: Vec<String> = Vec::new();
 
-        for line in &self.paths {
+        for line in &val.paths {
             data.push(format!("{} {}", consts::PATHS_DATALINE_LITERAL, line));
         }
 
-        DatastarEvent {
+        Self {
             event: consts::EventType::RemoveSignals,
-            id: self.id,
-            retry: self.retry,
+            id: val.id,
+            retry: val.retry,
             data,
         }
     }

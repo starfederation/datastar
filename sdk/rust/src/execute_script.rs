@@ -45,7 +45,7 @@ impl ExecuteScript {
     /// Creates a new [`ExecuteScript`] event with the given script.
     pub fn new(script: impl Into<String>) -> Self {
         Self {
-            id: Default::default(),
+            id: None,
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             script: script.into(),
             auto_remove: consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE,
@@ -78,22 +78,22 @@ impl ExecuteScript {
     }
 }
 
-impl Into<DatastarEvent> for ExecuteScript {
-    fn into(self) -> DatastarEvent {
+impl From<ExecuteScript> for DatastarEvent {
+    fn from(val: ExecuteScript) -> Self {
         let mut data: Vec<String> = Vec::new();
 
-        if self.auto_remove != consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE {
+        if val.auto_remove != consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE {
             data.push(format!(
                 "{} {}",
                 consts::AUTO_REMOVE_DATALINE_LITERAL,
-                self.auto_remove
+                val.auto_remove
             ));
         }
 
-        if self.attributes.len() != 1
-            || self.attributes[0] != consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES
+        if val.attributes.len() != 1
+            || val.attributes[0] != consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES
         {
-            for attribute in &self.attributes {
+            for attribute in &val.attributes {
                 data.push(format!(
                     "{} {}",
                     consts::ATTRIBUTES_DATALINE_LITERAL,
@@ -102,14 +102,14 @@ impl Into<DatastarEvent> for ExecuteScript {
             }
         }
 
-        for line in self.script.lines() {
+        for line in val.script.lines() {
             data.push(format!("{} {}", consts::SCRIPT_DATALINE_LITERAL, line));
         }
 
-        DatastarEvent {
+        Self {
             event: consts::EventType::ExecuteScript,
-            id: self.id,
-            retry: self.retry,
+            id: val.id,
+            retry: val.retry,
             data,
         }
     }

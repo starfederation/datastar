@@ -3,7 +3,7 @@
 use {
     crate::{prelude::DatastarEvent, Sse, TrySse},
     core::error::Error,
-    futures::{Stream, StreamExt},
+    futures_util::{Stream, StreamExt},
     rocket::{
         http::ContentType,
         response::{self, stream::ReaderStream, Responder},
@@ -63,7 +63,7 @@ mod tests {
             testing::{self, Signals},
             DatastarEvent, Sse,
         },
-        futures::Stream,
+        futures_util::Stream,
         rocket::{get, post, routes, serde::json::Json},
     };
 
