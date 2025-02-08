@@ -19,7 +19,7 @@ mod testing;
 
 mod consts;
 
-///
+/// The prelude for the `datastar` crate
 pub mod prelude {
     #[cfg(feature = "axum")]
     pub use crate::axum::ReadSignals;

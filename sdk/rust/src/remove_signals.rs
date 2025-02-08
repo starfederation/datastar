@@ -57,18 +57,18 @@ impl RemoveSignals {
     }
 }
 
-impl Into<DatastarEvent> for RemoveSignals {
-    fn into(self) -> DatastarEvent {
+impl From<RemoveSignals> for DatastarEvent {
+    fn from(val: RemoveSignals) -> Self {
         let mut data: Vec<String> = Vec::new();
 
-        for line in &self.paths {
+        for line in &val.paths {
             data.push(format!("{} {}", consts::PATHS_DATALINE_LITERAL, line));
         }
 
-        DatastarEvent {
+        Self {
             event: consts::EventType::RemoveSignals,
-            id: self.id,
-            retry: self.retry,
+            id: val.id,
+            retry: val.retry,
             data,
         }
     }
