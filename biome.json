@@ -3,7 +3,7 @@
   "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
   "files": {
     "ignoreUnknown": false,
-    "include": ["library/**/*.ts"],
+    "include": ["library/**/*.ts", "site/webcomponents/**/*.ts"],
     "ignore": [
       "library/**/*.js",
       "library/**/*.d.ts",
