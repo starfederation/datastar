@@ -5,13 +5,6 @@ Real-time Hypermedia first Library and Framework for dotnet
 # HTML Frontend
 
 ```html
-<html lang="en">
-<head>
-    <script type="module"
-            src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.4/bundles/datastar.js"></script>
-    <title>D* Demo</title>
-</head>
-<body>
 <main class="container" id="main" data-signals="{'input':'','output':'what'}">
     <button data-on-click="@get('/displayDate')">Display Date</button>
     <div id="target"></div>
@@ -19,8 +12,6 @@ Real-time Hypermedia first Library and Framework for dotnet
     <span data-text-output></span>
     <button data-on-click="@post('/changeOutput')">Change Output</button>
 </main>
-</body>
-</html>
 ```
 
 # C# Backend

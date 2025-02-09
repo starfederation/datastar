@@ -50,7 +50,7 @@ You can manually add your own plugins to the core:
 <script type="importmap">
 {
     "imports": {
-      "datastar": "https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.3/bundles/datastar.js"
+      "datastar": "https://cdn.jsdelivr.net/gh/starfederation/datastar@v{%s data.Version %}/bundles/datastar.js"
     }
 }
 </script>

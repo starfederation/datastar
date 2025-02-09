@@ -1,5 +1,11 @@
 # WIP Release Notes for Datastar
 
+## v1.0.0-beta.5
+
+### Fixed
+
+- Fixed a bug in Idiomorph version 0.5.0 (pre-release).
+
 ## v1.0.0-beta.4
 
 In this release we tuned the engine, added the ability to react to specific signal changes, and added some new modifiers. Idiomorph got an upgrade, and a few bugs were squashed.
