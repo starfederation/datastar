@@ -12,7 +12,6 @@ The most exciting part of this beta release is that it marks the final round of 
 - Added a `__viewtransition` modifier to the `data-on-*` attribute that wraps the expression in `document.startViewTransition()` when the View Transition API is available ([#627](https://github.com/starfederation/datastar/issues/627)).
 - Added a `__case` modifier to the `data-signals-*`, `data-computed-*`, `data-ref-*`, `data-indicator-*`, `data-persist-*`, `data-bind-*`,  `data-class-*`, and `data-on-*` attributes, allowing you to modify the casing of the key by adding `.kebab`, `.snake` or `.pascal`.
 - Added a `retrying` event type that is dispatched when the SSE plugin is trying to reconnect ([#583](https://github.com/starfederation/datastar/issues/583)).
-- Website now has embedded fuzzy search for the API documentation ([#631](
 
 ### Changed
 
