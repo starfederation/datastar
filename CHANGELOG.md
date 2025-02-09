@@ -1,10 +1,14 @@
-# WIP Release Notes for Datastar
+# Release Notes for Datastar
+
+Each tagged version of Datastar is accompanied by a release note. Read the [release notes »](https://github.com/starfederation/datastar/releases)
+
+# WIP Release Notes
 
 ## v1.0.0-beta.5
 
 ### Fixed
 
-- Fixed a bug in Idiomorph version 0.5.0 (pre-release).
+- Fixed a bug in the morph merge mode when merging multiple top-level fragments.
 
 ## v1.0.0-beta.4
 

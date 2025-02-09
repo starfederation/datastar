@@ -40,7 +40,6 @@ func TestMergeFragment(t *testing.T) {
 
 			// There should still be 1 buttons in the example
 			assert.Equal(t, 1, buttonCount())
-
 		})
 	})
 }
