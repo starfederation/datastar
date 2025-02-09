@@ -3,9 +3,6 @@ use starfederation\datastar\ServerSentEventGenerator;
 // Creates a new `ServerSentEventGenerator` instance.
 $sse = new ServerSentEventGenerator();
 
-// Sends the response headers. 
-$sse->sendHeaders();
-
 // Merges HTML fragments into the DOM.
 $sse->mergeFragments(
     '<div id="question">What do you put in a toaster?</div>'
