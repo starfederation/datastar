@@ -96,7 +96,9 @@ fn send(
         try self.writer.print("id: {s}\n", .{id});
     }
 
-    try self.writer.print("retry: {d}\n", .{options.retry_duration});
+    if (options.retry_duration != consts.default_sse_retry_duration) {
+        try self.writer.print("retry: {d}\n", .{options.retry_duration});
+    }
 
     for (data) |line| {
         try self.writer.print("data: {s}\n", .{line});
@@ -116,9 +118,10 @@ pub fn executeScript(
 ) !void {
     var data = std.ArrayList([]const u8).init(self.allocator);
 
-    if (!std.meta.eql(
-        default_execute_script_attributes,
-        options.attributes,
+    if (options.attributes.len != 1 or !std.mem.eql(
+        u8,
+        default_execute_script_attributes[0],
+        options.attributes[0],
     )) {
         for (options.attributes) |attribute| {
             const line = try std.fmt.allocPrint(

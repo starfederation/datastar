@@ -36,7 +36,7 @@ templ ClickToLoadMoreButton(input *ClickToLoadSignals) {
 templ ClickToEditAgentsTable(input *ClickToLoadSignals) {
 	<div
 		id="click_to_load"
-		class="flex flex-col gap-2"
+		class="flex flex-col gap-2 overflow-scroll"
 		data-signals={ templ.JSONString(input) }
 	>
 		<table class="table table-zebra">

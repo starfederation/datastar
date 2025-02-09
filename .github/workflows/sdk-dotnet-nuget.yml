@@ -3,46 +3,31 @@ name: Build & Publish NuGet to GitHub Registry
 on:
   workflow_dispatch:
 
+env:
+  NuGetDirectory: ${{ github.workspace }}/nuget
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      Version: ${{ steps.gitversion.outputs.SemVer }}
-      CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}
 
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-depth: 0 #fetch-depth is needed for GitVersion
+        fetch-depth: 0
 
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0.10.2
-      with:
-        versionSpec: 5.x
-
-    - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0.10.2
-      id: gitversion  # step id used as reference for output values
-
-    - name: Display GitVersion outputs
-      run: |
-        echo "Version: ${{ steps.gitversion.outputs.SemVer }}"
-        echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
-
-    # Build/pack the project
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3.2.0
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.x
 
     - name: Build and Pack NuGet package with versioning
-      run: dotnet pack sdk/dotnet/src/Datastar.fsproj -p:Version='${{ steps.gitversion.outputs.SemVer }}' -c Release
+      run: dotnet pack sdk/dotnet/src/Datastar.fsproj --configuration Release --output ${{ env.NuGetDirectory }}
 
     - name: Upload NuGet package to GitHub
       uses: actions/upload-artifact@v4
       with:
         name: nugetPackage
-        path: sdk/dotnet/src/bin/Release/*.nupkg
+        path: ${{ env.NuGetDirectory }}/*.nupkg
 
   release:
     runs-on: ubuntu-latest
@@ -56,22 +41,5 @@ jobs:
         name: nugetPackage
         path: nugetPackage
 
-    - name: Prep packages
-      run: dotnet nuget add source --username starfederation --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/starfederation/index.json"
-
-    - name: Push package to GitHub packages
-      if: needs.build.outputs.CommitsSinceVersionSource > 0 # Only release if there has been a commit/version change
-      run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
-
     - name: Publish to NuGet.org
-      if: needs.build.outputs.CommitsSinceVersionSource > 0 # Only release if there has been a commit/version change
       run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
-
-    - name: Create Release
-      if: needs.build.outputs.CommitsSinceVersionSource > 0 # Only release if there has been a commit/version change
-      uses: ncipollo/release-action@v1.13.0
-      with:
-        tag: ${{ needs.build.outputs.Version }}
-        name: Release ${{ needs.build.outputs.Version }}
-        artifacts: "nugetPackage/*"
-        token: ${{ secrets.GITHUB_TOKEN }}

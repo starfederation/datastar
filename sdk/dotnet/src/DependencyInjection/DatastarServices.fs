@@ -1,11 +1,12 @@
 namespace StarFederation.Datastar.DependencyInjection
 
+open System.Collections.Generic
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
 open StarFederation.Datastar
 open StarFederation.Datastar.Utility
 
-type IServerSentEventService =
+type IDatastarServerSentEventService =
     abstract Handler : ISendServerEvent
     abstract MergeFragmentsAsync: fragment:string -> Task
     abstract MergeFragmentsAsync: fragment:string * options:ServerSentEventMergeFragmentsOptions -> Task
@@ -18,21 +19,29 @@ type IServerSentEventService =
     abstract ExecuteScriptAsync: script:string -> Task
     abstract ExecuteScriptAsync: script:string * options:ServerSentEventExecuteScriptOptions -> Task
 
-and ISignals =
+and IDatastarSignalsReaderService =
     abstract Handler : IReadSignals
+    /// <summary>
+    /// Read the signals and return as a serialized string
+    /// </summary>
+    /// <returns>A task that represents the asynchronous read operation. The result contains the serialized signals.</returns>
     abstract ReadSignalsAsync : unit -> Task<Signals>
-    abstract ReadSignalsAsync<'T when 'T:null> : unit -> Task<'T>
+    /// <summary>
+    /// Read the signals and deserialize as a 'T
+    /// </summary>
+    /// <returns>A task that represents the asynchronous read and deserialize operation. The result contains the deserialized data.</returns>
+    abstract ReadSignalsAsync<'T when 'T : null> : unit -> Task<'T>
 
 and ServerSentEventService (handler:ISendServerEvent) =
-    new (httpContext:HttpContext) =
-        ServerSentEventService (ServerSentEventHttpHandlers httpContext.Response)
-    new (httpContextAccessor:IHttpContextAccessor) =
-        ServerSentEventService httpContextAccessor.HttpContext
+    new (httpContext:HttpContext, additionalHeaders:KeyValuePair<string, string> seq) =
+        ServerSentEventService (ServerSentEventHttpHandlers (httpContext.Response, additionalHeaders |> Seq.map KeyValuePair.toTuple))
+    new (httpContextAccessor:IHttpContextAccessor, additionalHeaders) =
+        ServerSentEventService (httpContextAccessor.HttpContext, additionalHeaders)
 
     member _.Handler = handler
 
     with
-    interface IServerSentEventService with
+    interface IDatastarServerSentEventService with
         member this.Handler = this.Handler
         member this.MergeFragmentsAsync(fragment) = ServerSentEventGenerator.mergeFragments this.Handler fragment
         member this.MergeFragmentsAsync(fragment, options) = ServerSentEventGenerator.mergeFragmentsWithOptions options.AsOptions this.Handler fragment
@@ -45,16 +54,16 @@ and ServerSentEventService (handler:ISendServerEvent) =
         member this.ExecuteScriptAsync(script) = ServerSentEventGenerator.executeScript this.Handler script
         member this.ExecuteScriptAsync(script, options) = ServerSentEventGenerator.executeScriptWithOptions options.AsOptions this.Handler script
 
-and ReadSignalsService (handler:IReadSignals) =
+and SignalsReaderService (handler:IReadSignals) =
     new (httpContext:HttpContext) =
-        ReadSignalsService (SignalsHttpHandlers httpContext.Request)
+        SignalsReaderService (SignalsHttpHandlers httpContext.Request)
     new (httpContextAccessor:IHttpContextAccessor) =
-        ReadSignalsService httpContextAccessor.HttpContext
+        SignalsReaderService httpContextAccessor.HttpContext
 
     member _.Handler = handler
 
     with
-    interface ISignals with
+    interface IDatastarSignalsReaderService with
         member this.Handler = this.Handler
         member this.ReadSignalsAsync() = task {
             let! signalsOpt = this.Handler.ReadSignals()

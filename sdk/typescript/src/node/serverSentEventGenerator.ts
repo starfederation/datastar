@@ -35,15 +35,29 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
    *
    * @param req - The NodeJS request object.
    * @param res - The NodeJS response object.
-   * @param streamFunc - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
+   * @param onStart - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
    */
   static async stream(
     req: IncomingMessage,
     res: ServerResponse,
-    streamFunc: (stream: ServerSentEventGenerator) => Promise<void> | void,
+    onStart: (stream: ServerSentEventGenerator) => Promise<void> | void,
+    options?: Partial<{
+      onError: (
+        stream: ServerSentEventGenerator,
+        error: unknown,
+      ) => Promise<void> | void;
+    }>,
   ): Promise<void> {
-    const stream = streamFunc(new ServerSentEventGenerator(req, res));
-    if (stream instanceof Promise) await stream;
+    const generator = new ServerSentEventGenerator(req, res);
+    try {
+      const stream = onStart(generator);
+      if (stream instanceof Promise) await stream;
+    } catch (error: unknown) {
+      const errorStream = options && options.onError
+        ? options.onError(generator, error)
+        : null;
+      if (errorStream instanceof Promise) await errorStream;
+    }
 
     res.end();
   }

@@ -14,8 +14,9 @@ func TestExamplePrefetch(t *testing.T) {
 
 			initial := page.MustElement("#carousel > img").MustProperty("src").Str()
 
-			btn := page.MustElement("#carousel > button:nth-of-type(2)")
-			btn.MustClick()
+			wait := page.MustWaitRequestIdle()
+			page.MustElement("#carousel > button:nth-of-type(2)").MustClick()
+			wait()
 
 			result := page.MustElement("#carousel").MustProperty("src").Str()
 
@@ -27,8 +28,9 @@ func TestExamplePrefetch(t *testing.T) {
 
 			initial := page.MustElement("#carousel > img").MustProperty("src").Str()
 
-			btn := page.MustElement("#carousel > button:nth-of-type(1)")
-			btn.MustClick()
+			wait := page.MustWaitRequestIdle()
+			page.MustElement("#carousel > button:nth-of-type(1)").MustClick()
+			wait()
 
 			result := page.MustElement("#carousel").MustProperty("src").Str()
 

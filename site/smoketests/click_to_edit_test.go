@@ -26,8 +26,11 @@ func TestExampleClickToEdit(t *testing.T) {
 			emailInput.MustInput("Test")
 
 			// todo: this is not clicking save correctly, which causes the rest of the test to fail
+			wait := page.MustWaitRequestIdle()
 			saveBtn := page.MustElement("#contact_1 > div > button:nth-of-type(1)")
 			saveBtn.MustClick()
+
+			wait()
 
 			firstNameLabel := page.MustElement("#contact_1 > label:nth-child(1)")
 			assert.Equal(t, "First Name: Test", firstNameLabel.MustText())

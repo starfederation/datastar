@@ -2,7 +2,7 @@
 
 ## Summary
 
-Datastar has had a few helper tools in the past for different languages.  The SDK effort is to unify around the tooling needed for Hypermedia On Whatever your Like (HOWL) based UIs.  Although Datastar the library can use any plugins the default bundle includes robust Server Sent Event (SSE) base approach.  Most current languages and backend don't have great tooling around the style of delivering content to the frontend.
+Datastar has had a few helper tools in the past for different languages.  The SDK effort is to unify around the tooling needed for Hypermedia On Whatever your Like (HOWL) based UIs.  Although Datastar the library can use any plugins, the default bundle includes robust Server Sent Event (SSE) base approach.  Most current languages and backend don't have great tooling around the style of delivering content to the frontend.
 
 ### Decision
 
@@ -11,30 +11,18 @@ Provide an SDK in a language agnostic way, to that end
 1. Keep SDK as minimal as possible
 2. Allow per language/framework extended features to live in an SDK ***sugar*** version
 
-### Status
-
-- [x] Create a document (this) to allow any one to make a spec compliant SDK for any language or framework
-- [x] Provide a [reference implementation](../sdk/go) in Go
-- [ ] Provide SDKs for
-  - [ ] JS/TS
-  - [x] PHP
-  - [x] .NET
-  - [x] Python
-  - [x] Java
-  - [ ] Haskell?
-
 ## Details
 
 ### Assumptions
 
-The core mechanics of Datastar's SSE support is
+The core mechanics of Datastar’s SSE support is
 
 1. Data gets sent to browser as SSE events.
 2. Data comes in via JSON from browser under a `datastar` namespace.
 
 # Library
 
-> [!WARNING] All naming conventions are shown using `Go` as the standard, thing may change per language norms but please keep as close as possible.
+> [!WARNING] All naming conventions are shown using `Go` as the standard. Things may vary per language norms but please keep as close as possible.
 
 ## ServerSentEventGenerator
 
@@ -47,7 +35,7 @@ The core mechanics of Datastar's SSE support is
       2. `Content-Type = text/event-stream`
       3. `Connection = keep-alive` ***only*** if a HTTP/1.1 connection is used (see [spec](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Connection))
    3. Then the created response ***should*** `flush` immediately to avoid timeouts while 0-♾️ events are created
-   4. Multiple calls using `ServerSentEventGenerator` should be single threaded to guarantee order.  The Go implementation use a mutex to facilitate this behavior but might not be need in a some environments
+   4. Multiple calls using `ServerSentEventGenerator` should be single threaded to guarantee order.  The Go implementation uses a mutex to facilitate this behavior but might not be needed in a some environments
 
 ### `ServerSentEventGenerator.send`
 
@@ -84,12 +72,12 @@ Currently valid values are
 
 #### Logic
 When called the function ***must*** write to the response buffer the following in specified order.  If any part of this process fails you ***must*** return/throw an error depending on language norms.
-1. ***Must*** write `event: EVENT_TYPE\n` where `EVENT_TYPE` is [EventType](#EventType)
+1. ***Must*** write `event: EVENT_TYPE\n` where `EVENT_TYPE` is [EventType](#EventType).
 2. If a user defined event ID is provided, the function ***must*** write `id: EVENT_ID\n` where `EVENT_ID` is the event ID.
 3. ***Must*** write `retry: RETRY_DURATION\n` where `RETRY_DURATION` is the provided retry duration, ***unless*** the value is the default of `1000` milliseconds.
 4. For each string in the provided `dataLines`, you ***must*** write `data: DATA\n` where `DATA` is the provided string.
 5. ***Must*** write a `\n\n` to complete the event per the SSE spec.
-6. Afterward the writer ***should*** immediately flush.  This can be confounded by other middlewares such as compression layers
+6. Afterward the writer ***should*** immediately flush.  This can be confounded by other middlewares such as compression layers.
 
 ### `ServerSentEventGenerator.MergeFragments`
 
@@ -108,6 +96,17 @@ ServerSentEventGenerator.MergeFragments(
 ```
 
 #### Example Output
+
+Minimal:
+
+```
+event: datastar-merge-fragments
+data: fragments <div id="feed">
+data: fragments     <span>1</span>
+data: fragments </div>
+```
+
+Maximal:
 
 ```
 event: datastar-merge-fragments
@@ -132,7 +131,7 @@ Valid values should match the [FragmentMergeMode](#FragmentMergeMode) and curren
 
 | Mode             | Description                                             |
 |------------------|---------------------------------------------------------|
-| morph            | Use idiomorph to merge the fragment into the DOM        |
+| morph            | Use Idiomorph to merge the fragment into the DOM        |
 | inner            | Replace the innerHTML of the selector with the fragment |
 | outer            | Replace the outerHTML of the selector with the fragment |
 | prepend          | Prepend the fragment to the selector                    |
@@ -170,6 +169,15 @@ ServerSentEventGenerator.RemoveFragments(
 ```
 
 #### Example Output
+
+Minimal:
+
+```
+event: datastar-remove-fragments
+data: selector #target
+```
+
+Maximal:
 
 ```
 event: datastar-remove-fragments
@@ -213,6 +221,15 @@ ServerSentEventGenerator.MergeSignals(
 
 #### Example Output
 
+Minimal:
+
+```
+event: datastar-merge-signals
+data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
+```
+
+Maximal:
+
 ```
 event: datastar-merge-signals
 id: 123
@@ -251,6 +268,16 @@ ServerSentEventGenerator.RemoveSignals(
 
 #### Example Output
 
+Minimal:
+
+```
+event: datastar-remove-signals
+data: paths user.name
+data: paths user.email
+```
+
+Maximal:
+
 ```
 event: datastar-remove-signals
 id: 123
@@ -286,6 +313,15 @@ ServerSentEventGenerator.ExecuteScript(
 
 #### Example Output
 
+Minimal:
+
+```
+event: datastar-execute-script
+data: script window.location = "https://data-star.dev"
+```
+
+Maximal:
+
 ```
 event: datastar-execute-script
 id: 123
@@ -318,7 +354,7 @@ When called the function ***must*** call `ServerSentEventGenerator.send` with th
 #### Args
 
 * `r` (http.Request) The incoming request object from the browser.  This object ***must*** be a valid Request object per the language specifics.
-* `signals` (any) The signals object that will the incoming data will be unmarshalled into.  The exact function signature will depend on the language specifics.
+* `signals` (any) The signals object that the incoming data will be extracted into.  The exact function signature will depend on the language specifics.
 
 #### Logic
 

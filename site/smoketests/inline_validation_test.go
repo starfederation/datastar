@@ -17,9 +17,7 @@ func TestExampleInlineValidation(t *testing.T) {
 			assert.Equal(t, "Email '' is already taken or is invalid. Please enter another email.", emailValidatorMsg)
 
 			emailInput := page.MustElement("#inline_validation > div > div:nth-of-type(1) > input")
-			emailInput.MustInput("test@test.co")
-
-			emailInput.Type(input.KeyM) // actually triggers the debounce
+			emailInput.MustInput("test@test.com")
 
 			// first name
 			firstNameValidatorSelector := "div.form-control:nth-child(2) > label:nth-child(3)"
@@ -27,8 +25,7 @@ func TestExampleInlineValidation(t *testing.T) {
 			assert.Equal(t, "First name must be at least 2 characters.", firstNameValidatorSelectorMsg)
 
 			firstNameInput := page.MustElement("#inline_validation > div > div:nth-of-type(2) > input")
-			firstNameInput.MustInput("tes")
-			firstNameInput.Type(input.KeyT) // actually triggers the debounce
+			firstNameInput.MustInput("test")
 
 			// last name
 			lastNameValidatorSelector := "div.form-control:nth-child(3) > label:nth-child(3)"
@@ -36,8 +33,9 @@ func TestExampleInlineValidation(t *testing.T) {
 			assert.Equal(t, "Last name must be at least 2 characters.", lastNameValidatorSelectorMsg)
 
 			lastNameInput := page.MustElement("#inline_validation > div > div:nth-of-type(3) > input")
-			lastNameInput.MustInput("tes")
-			lastNameInput.Type(input.KeyT) // actually triggers the debounce
+			lastNameInput.MustInput("test")
+
+			emailInput.Type(input.Enter) // will actually trigger the debounce
 
 			page.MustWaitStable()
 

@@ -15,7 +15,9 @@
                        :test.paths/malli-schemas
                        :test.paths/adapter-common
                        :test.paths/adapter-http-kit
-                       :test.paths/adapter-ring-jetty]
+                       :test.paths/adapter-ring
+                       :test.paths/adapter-ring-jetty
+                       :test.paths/adapter-rj9a]
 
 
          :extra-deps {io.github.noahtheduke/lazytest {:mvn/version "1.5.0"}
@@ -25,14 +27,22 @@
                       dev.onionpancakes/chassis      {:mvn/version "1.0.365"}}}
 
 
-  :http-kit {:extra-deps {sdk/adapter-http-kit {:local/root "./adapter-http-kit"}}}
-  :ring-jetty {:extra-deps {sdk/adapter-jetty {:local/root "./adapter-jetty"}}}
+  :http-kit      {:extra-deps {sdk/adapter-http-kit       {:local/root "./adapter-http-kit"}}}
+
+  :ring-jetty    {:extra-deps {sdk/adapter-ring           {:local/root "./adapter-ring"}
+                               ring/ring-jetty-adapter    {:mvn/version "1.13.0"}}}
+  
+  :ring-rj9a {:extra-deps {sdk/adapter-ring               {:local/root "./adapter-ring"}
+                           info.sunng/ring-jetty9-adapter {:mvn/version "0.36.1"}}}
+
   :malli-schemas {:extra-deps {sdk/malli {:local/root "./malli-schemas"}}}
   
   
   :test.paths/core-sdk           ["src/test/core-sdk"]
   :test.paths/malli-schemas      ["src/test/malli-schemas"]
   :test.paths/adapter-common     ["src/test/adapter-common"]
-  :test.paths/adapter-http-kit   ["src/test/adapter-http-kit"]
-  :test.paths/adapter-ring-jetty ["src/test/adapter-ring-jetty"]}}
+  :test.paths/adapter-ring       ["src/test/adapter-ring"]
+  :test.paths/adapter-ring-jetty ["src/test/adapter-ring-jetty"]
+  :test.paths/adapter-rj9a       ["src/test/adapter-rj9a"]
+  :test.paths/adapter-http-kit   ["src/test/adapter-http-kit"]}}
 

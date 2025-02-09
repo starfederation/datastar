@@ -81,6 +81,12 @@ var Consts = &ConstTemplateData{
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/go",
 		},
 		{
+			FileExtension: "haskell",
+			Name:          "Haskell",
+			Icon:          "vscode-icons:file-type-haskell",
+			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/haskell",
+		},
+		{
 			FileExtension: "java",
 			Name:          "Java",
 			Icon:          "vscode-icons:file-type-java",
@@ -103,6 +109,12 @@ var Consts = &ConstTemplateData{
 			Name:          "Rust",
 			Icon:          "vscode-icons:file-type-rust",
 			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/rust",
+		},
+		{
+			FileExtension: "ruby",
+			Name:          "Ruby",
+			Icon:          "vscode-icons:file-type-ruby",
+			SdkUrl:        "https://github.com/starfederation/datastar/tree/main/sdk/ruby",
 		},
 		{
 			FileExtension: "ts",
