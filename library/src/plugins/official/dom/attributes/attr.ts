@@ -9,13 +9,13 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import { kebabize } from '../../../../utils/text'
+import { kebab } from '../../../../utils/text'
 
 export const Attr: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'attr',
   valReq: Requirement.Must,
-  onLoad: ({ el, genRX, key, effect }) => {
+  onLoad: ({ el, key, effect, genRX }) => {
     const rx = genRX()
     if (key === '') {
       return effect(async () => {
@@ -26,7 +26,9 @@ export const Attr: AttributePlugin = {
       })
     }
 
-    key = kebabize(key)
+    // Attributes are always kebab-case
+    key = kebab(key)
+
     return effect(async () => {
       let value = false
       try {

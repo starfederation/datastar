@@ -1,0 +1,11 @@
+require 'datastar'
+
+# Create a Datastar::Dispatcher instance
+
+datastar = Datastar.new(request:, response:)
+
+datastar.stream do |sse|
+  sse.merge_fragments('<div id="hello">Hello, world!</div>')
+  sse.merge_signals(foo: { bar: 1 })
+  sse.execute_script('console.log("Success!")')
+end

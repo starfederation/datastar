@@ -16,8 +16,6 @@ With Datastar, you can build any UI that a full-stack framework like React, Vue.
 
 ## Installation
 
-### Using a Script Tag
-
 The quickest way to use Datastar is to include it in your HTML using a script tag hosted on a CDN.
 
 ```html
@@ -30,8 +28,6 @@ If you prefer to host the file yourself, download your own bundle using the [bun
 <script type="module" src="/path/to/datastar.js"></script>
 ```
 
-### Using NPM
-
 You can alternatively install Datastar via [npm](https://www.npmjs.com/package/@starfederation/datastar). We don't recommend this for most use-cases, as it requires a build step, but it can be useful for legacy frontend projects.
 
 ```bash
@@ -42,7 +38,7 @@ npm install @starfederation/datastar
 
 At the core of Datastar are [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) attributes (hence the name). They allow you to add reactivity to your frontend in a declarative way, and to interact with your backend.
 
-Datastar uses signals to manage state. You can think of signals as reactive variables that automatically track and propagate changes in [expressions](/guide/datastar_expressions). They can be created and modified using data attributes on the frontend, or events sent from the backend. Don't worry if this sounds complicated; it will become clearer as we look at some examples.
+Datastar uses signals to manage state. You can think of signals as reactive variables that automatically track and propagate changes in expressions. They can be created and modified using data attributes on the frontend, or events sent from the backend. Don't worry if this sounds complicated; it will become clearer as we look at some examples.
 
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
@@ -53,13 +49,13 @@ Datastar uses signals to manage state. You can think of signals as reactive vari
 
 ### `data-bind`
 
-Datastar provides us with a way to set up two-way data binding on an element using the [`data-bind`](/reference/attribute_plugins#data-bind) attribute, which can be placed on any HTML element on which data be be input or choices selected from (`input`, `textarea`, `select`, `checkbox` and `radio` elements, as well as web components).
+Datastar provides us with a way to set up two-way data binding on an element using the [`data-bind`](/reference/attribute_plugins#data-bind) attribute, which can be placed on any HTML element on which data can be input or choices selected from (`input`, `textarea`, `select`, `checkbox` and `radio` elements, as well as web components).
 
 ```html
 <input data-bind-input />
 ```
 
-This creates a new signal called `input`, and binds it to the element's value. If either is changed, the other automatically updates.
+This creates a new signal that can be called using `$input`, and binds it to the element's value. If either is changed, the other automatically updates.
 
 An alternative syntax, in which the value is used as the signal name, is also available. This can be useful depending on the templating language you are using.
 
@@ -72,8 +68,9 @@ An alternative syntax, in which the value is used as the signal name, is also av
 To see this in action, we can use the [`data-text`](/reference/attribute_plugins#data-text) attribute.
 
 ```html
+<input data-bind-input />
 <div data-text="$input">
-  I will get replaced with the contents of the input signal
+  I will be replaced with the contents of the input signal
 </div>
 ```
 
@@ -97,6 +94,7 @@ Note that `data-*`  attributes are evaluated in the order they appear in the DOM
 The value of the `data-text` attribute is a [Datastar expression](/guide/datastar_expressions) that is evaluated, meaning that we can use JavaScript in it.
 
 ```html
+<input data-bind-input />
 <div data-text="$input.toUpperCase()">
   Will be replaced with the uppercase contents of the input signal
 </div>
@@ -117,7 +115,7 @@ The value of the `data-text` attribute is a [Datastar expression](/guide/datasta
 
 ### `data-computed`
 
-The [`data-computed`](/reference/attribute_plugins#data-computed) attribute creates a new signal that is computed based on an expression. The computed signal is read-only, and its value is automatically updated when any signals in the expression are updated.
+The [`data-computed`](/reference/attribute_plugins#data-computed) attribute creates a new signal that is computed based on a reactive expression. The computed signal is read-only, and its value is automatically updated when any signals in the expression are updated.
 
 ```html
 <input data-bind-input />
@@ -148,6 +146,7 @@ This results in the `$repeated` signal's value always being equal to the value o
 The [`data-show`](/reference/attribute_plugins#data-show) attribute can be used to show or hide an element based on whether an expression evaluates to `true` or `false`.
 
 ```html
+<input data-bind-input />
 <button data-show="$input != ''">Save</button>
 ```
 
@@ -174,6 +173,7 @@ This results in the button being visible only when the input is _not_ an empty s
 The [`data-class`](/reference/attribute_plugins#data-class) attribute allows us to add or remove a class to or from an element based on an expression.
 
 ```html
+<input data-bind-input />
 <button data-class-hidden="$input == ''">Save</button>
 ```
 
@@ -206,6 +206,7 @@ The `data-class` attribute can also be used to add or remove multiple classes fr
 The [`data-attr`](/reference/attribute_plugins#data-attr) attribute can be used to bind the value of any HTML attribute to an expression.
 
 ```html
+<input data-bind-input />
 <button data-attr-disabled="$input == ''">Save</button>
 ```
 
@@ -262,6 +263,7 @@ The `data-signals` attribute can also be used to merge multiple signals using a 
 The [`data-on`](/reference/attribute_plugins#data-on) attribute can be used to attach an event listener to an element and execute an expression whenever the event is triggered.
 
 ```html
+<input data-bind-input />
 <button data-on-click="$input = ''">Reset</button>
 ```
 
@@ -330,7 +332,7 @@ We've just scratched the surface of frontend reactivity. Now let's take a look a
 
 Datastar uses [Server-Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) (SSE) to stream zero or more events from the web server to the browser. There's no special backend plumbing required to use SSE, just some syntax. Fortunately, SSE is straightforward and [provides us with some advantages](/essays/event_streams_all_the_way_down).
 
-First, set up your backend in the language of your choice. Using one of the backend [SDKs](/reference/sdks) will help you get up and running faster. We're going to use the SDKs in the examples below, which set the appropriate headers and format the events for us, but this is optional.
+First, set up your backend in the language of your choice. Familiarize yourself with [sending SSE events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#sending_events_from_the_server), or use one of the backend [SDKs](/reference/sdks) to get up and running even faster. We're going to use the SDKs in the examples below, which set the appropriate headers and format the events for us.
 
 The following code would exist in a controller action endpoint in your backend.
 
@@ -392,13 +394,13 @@ The [`data-indicator`](/reference/attribute_plugins#data-data-indicator) attribu
 
 ```html
 <div id="question"></div>
-<div data-class-loading="$fetching" class="indicator"></div>
 <button
   data-on-click="@get('/actions/quiz')"
   data-indicator-fetching
 >
   Fetch a question
 </button>
+<div data-class-loading="$fetching" class="indicator"></div>
 ```
 
 <div data-signals="{response3: '', answer3: ''}" data-computed-correct3="$response3.toLowerCase() == $answer3" class="flex items-start justify-between gap-4 p-8 alert">

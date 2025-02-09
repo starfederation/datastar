@@ -170,7 +170,9 @@ class ServerSentEventGenerator
             $output[] = 'id: ' . $eventData->eventId;
         }
 
-        $output[] = 'retry: ' . $eventData->retryDuration;
+        if ($eventData->retryDuration !== Consts::DEFAULT_SSE_RETRY_DURATION) {
+            $output[] = 'retry: ' . $eventData->retryDuration;
+        }
 
         foreach ($eventData->data as $line) {
             $output[] = $line;
