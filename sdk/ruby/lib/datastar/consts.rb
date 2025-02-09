@@ -4,7 +4,7 @@
 module Datastar
   module Consts
     DATASTAR_KEY = 'datastar'
-    VERSION = '1.0.0-beta.3'
+    VERSION = '1.0.0-beta.4'
 
     # The default duration for settling during fragment merges. Allows for CSS transitions to complete.
     DEFAULT_FRAGMENTS_SETTLE_DURATION = 300

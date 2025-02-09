@@ -3,7 +3,6 @@ import { DATASTAR } from './consts'
 import { type InitContext, PluginType, type RuntimeContext } from './types'
 
 const url = 'https://data-star.dev/errors'
-//const url = `${window.location.origin}/errors`
 
 interface Metadata {
   error?: string

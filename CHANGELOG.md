@@ -2,6 +2,10 @@
 
 ## v1.0.0-beta.4
 
+In this release we tuned the engine, added the ability to react to specific signal changes, and added some new modifiers. Idiomorph got an upgrade, and a few bugs were squashed.
+
+The most exciting part of this beta release is that it marks the final round of planned changes before we move to a stable v1 release 🚀
+
 ### Added
 
 - Added the ability to add a signal path to the `data-on-signals-change-*` attribute ([#587](https://github.com/starfederation/datastar/issues/587)).
@@ -11,7 +15,7 @@
 
 ### Changed
 
-- Idiomorph was updated to version [0.4.0](https://github.com/bigskysoftware/idiomorph/releases/tag/v0.4.0) , fixing some bugs, and is now imported as a module, making it easier to import future versions ([#608](https://github.com/starfederation/datastar/issues/608)).
+- Idiomorph was updated to version 0.5.0 (pre-release) and is now imported as a module, making it easier to import future versions ([#608](https://github.com/starfederation/datastar/issues/608), [#633](https://github.com/starfederation/datastar/issues/633)).
 - Class names are no longer converted to kebab case when used in the `data-class-*` attribute ([#610](https://github.com/starfederation/datastar/issues/610)).
 - Event names are no longer converted to kebab case when used in the `data-on-*` attribute.
 
