@@ -87,35 +87,37 @@ function applyToTargets(
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
         const toApply = new Map<Element, Array<string>>()
-        const result = Idiomorph.morph(modifiedTarget, fragment, {
-          restoreFocuse: false,
-          callbacks: {
-            beforeAttributeUpdated: (
-              argument: string,
-              el: Element,
-              mode: 'update' | 'remove',
-            ): boolean => {
-              if (mode === 'update' && argument.startsWith('data-')) {
-                let elAddAttrs = toApply.get(el)
-                if (!elAddAttrs) {
-                  elAddAttrs = []
-                  toApply.set(el, elAddAttrs)
+        const result = Idiomorph.morph(
+          modifiedTarget,
+          fragment.cloneNode(true),
+          {
+            restoreFocus: true,
+            callbacks: {
+              beforeAttributeUpdated: (
+                argument: string,
+                el: Element,
+                mode: 'update' | 'remove',
+              ): boolean => {
+                if (mode === 'update' && argument.startsWith('data-')) {
+                  let elAddAttrs = toApply.get(el)
+                  if (!elAddAttrs) {
+                    elAddAttrs = []
+                    toApply.set(el, elAddAttrs)
+                  }
+                  const name = argument.slice('data-'.length)
+                  elAddAttrs.push(camel(name))
                 }
-                const name = argument.slice('data-'.length)
-                elAddAttrs.push(camel(name))
-              }
-              return true
+                return true
+              },
             },
           },
-        })
-        if (!result?.length) {
-          throw initErr('MorphFailed', ctx)
-        }
-        modifiedTarget = result[0] as Element
-
-        for (const [el, attrs] of toApply.entries()) {
-          for (const attr of attrs) {
-            ctx.applyAttributePlugin(el as HTMLorSVGElement, attr)
+        )
+        if (result?.length) {
+          modifiedTarget = result[0] as Element
+          for (const [el, attrs] of toApply.entries()) {
+            for (const attr of attrs) {
+              ctx.applyAttributePlugin(el as HTMLorSVGElement, attr)
+            }
           }
         }
 
@@ -157,18 +159,18 @@ function applyToTargets(
     }
 
     const cl = modifiedTarget.classList
-    cl.add(SWAPPING_CLASS)
+    cl?.add(SWAPPING_CLASS)
 
     // ctx.apply(document.body)
 
     setTimeout(() => {
       initialTarget.classList.remove(SWAPPING_CLASS)
-      cl.remove(SWAPPING_CLASS)
+      cl?.remove(SWAPPING_CLASS)
     }, settleDuration)
 
     const revisedHTML = modifiedTarget.outerHTML
 
-    if (originalHTML !== revisedHTML) {
+    if (cl && originalHTML !== revisedHTML) {
       cl.add(SETTLING_CLASS)
       setTimeout(() => {
         cl.remove(SETTLING_CLASS)
