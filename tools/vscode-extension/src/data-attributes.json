@@ -142,17 +142,6 @@
       }
     ]
   },
-  "data-on-interval": {
-    "prefix": "data-on-interval",
-    "body": "data-on-interval=\"${1:expression}\"",
-    "description": "Executes an expression at a regular interval.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
-      }
-    ]
-  },
   "data-on-keydown": {
     "prefix": "data-on-keydown",
     "body": "data-on-keydown=\"${1:expression}\"",
@@ -175,10 +164,10 @@
       }
     ]
   },
-  "data-on-signals-change": {
-    "prefix": "data-on-signals-change",
-    "body": "data-on-signals-change=\"${1:expression}\"",
-    "description": "Executes an expression whenever any signals change.",
+  "data-on-signal-change": {
+    "prefix": "data-on-signal-change",
+    "body": "data-on-signal-change=\"${1:expression}\"",
+    "description": "Executes an expression whenever a signal changes.",
     "references": [
       {
         "name": "Documentation",

@@ -1,6 +1,0 @@
-import ServerSentEventGenerator
-import ServerSentEventGenerator.Server.Snap -- or whatever is appropriate
-
-send (withDefaults mergeFragments "<div id=\"indicator\">Redirecting in 3 seconds...</div>")
-threadDelay (3 * 1000 * 1000)
-send (withDefaults executeScript "window.location = \"/guide\"")

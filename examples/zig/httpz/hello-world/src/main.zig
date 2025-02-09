@@ -1,6 +1,6 @@
 const std = @import("std");
 const httpz = @import("httpz");
-const datastar = @import("datastar").httpz;
+const datastar = @import("datastar");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};

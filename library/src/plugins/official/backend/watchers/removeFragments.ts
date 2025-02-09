@@ -49,7 +49,7 @@ export const RemoveFragments: WatcherPlugin = {
           }, settleDuration)
         }
 
-        if (useViewTransition && supportsViewTransitions) {
+        if (supportsViewTransitions && useViewTransition) {
           docWithViewTransitionAPI.startViewTransition(() => applyToTargets())
         } else {
           applyToTargets()

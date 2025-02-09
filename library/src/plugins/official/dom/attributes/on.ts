@@ -10,16 +10,14 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
+import { onElementRemoved } from '../../../../utils/dom'
 import { tagHas, tagToMs } from '../../../../utils/tags'
-import { camel, modifyCasing } from '../../../../utils/text'
+import { kebabize } from '../../../../utils/text'
 import { debounce, delay, throttle } from '../../../../utils/timing'
-import { supportsViewTransitions } from '../../../../utils/view-transtions'
-import type { Signal } from '../../../../vendored/preact-core'
+
+const lastSignalsMarshalled = new Map<string, any>()
 
 const EVT = 'evt'
-const SIGNALS_CHANGE_PREFIX = 'signalsChange'
-const signalChangeKeyLength = SIGNALS_CHANGE_PREFIX.length
-
 export const On: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'on',
@@ -27,7 +25,7 @@ export const On: AttributePlugin = {
   valReq: Requirement.Must,
   argNames: [EVT],
   removeOnLoad: (rawKey: string) => rawKey.startsWith('onLoad'),
-  onLoad: ({ el, key, mods, rawKey, signals, value, effect, genRX }) => {
+  onLoad: ({ el, rawKey, key, value, genRX, mods }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
@@ -63,12 +61,6 @@ export const On: AttributePlugin = {
       callback = throttle(callback, wait, leading, trailing)
     }
 
-    if (mods.has('viewtransition') && supportsViewTransitions) {
-      const cb = callback // I hate javascript
-      callback = (...args: any[]) =>
-        document.startViewTransition(() => cb(...args))
-    }
-
     const evtListOpts: AddEventListenerOptions = {
       capture: true,
       passive: false,
@@ -78,92 +70,80 @@ export const On: AttributePlugin = {
     if (mods.has('passive')) evtListOpts.passive = true
     if (mods.has('once')) evtListOpts.once = true
 
-    if (key === 'load') {
-      callback()
-      return () => {}
-    }
+    const eventName = kebabize(key).toLowerCase()
+    switch (eventName) {
+      case 'load': {
+        callback()
+        return () => {}
+      }
 
-    if (key === 'interval') {
-      let duration = 1000
-      const durationArgs = mods.get('duration')
-      if (durationArgs) {
-        duration = tagToMs(durationArgs)
-        const leading = tagHas(durationArgs, 'leading', false)
-        if (leading) {
-          // Remove `.leading` from the dataset so the callback is only ever called on page load
-          el.dataset[rawKey.replace('.leading', '')] = value
-          delete el.dataset[rawKey]
-          callback()
+      case 'interval': {
+        let duration = 1000
+        const durationArgs = mods.get('duration')
+        if (durationArgs) {
+          duration = tagToMs(durationArgs)
+          const leading = tagHas(durationArgs, 'leading', false)
+          if (leading) {
+            // Remove `.leading` from the dataset so the callback is only ever called on page load
+            el.dataset[rawKey.replace('.leading', '')] = value
+            delete el.dataset[rawKey]
+            callback()
+          }
+        }
+        const intervalId = setInterval(callback, duration)
+
+        return () => {
+          clearInterval(intervalId)
         }
       }
-      const intervalId = setInterval(callback, duration)
 
-      return () => {
-        clearInterval(intervalId)
-      }
-    }
-
-    if (key === 'raf') {
-      let rafId: number | undefined
-      const raf = () => {
-        callback()
+      case 'raf': {
+        let rafId: number | undefined
+        const raf = () => {
+          callback()
+          rafId = requestAnimationFrame(raf)
+        }
         rafId = requestAnimationFrame(raf)
-      }
-      rafId = requestAnimationFrame(raf)
 
-      return () => {
-        if (rafId) cancelAnimationFrame(rafId)
+        return () => {
+          if (rafId) cancelAnimationFrame(rafId)
+        }
       }
-    }
 
-    if (key.startsWith(SIGNALS_CHANGE_PREFIX)) {
-      if (key === SIGNALS_CHANGE_PREFIX) {
+      case 'signals-change': {
+        onElementRemoved(el, () => {
+          lastSignalsMarshalled.delete(el.id)
+        })
+
         callback()
-        const signalFn = (event: CustomEvent<DatastarSignalEvent>) =>
+        const signalFn = (event: CustomEvent<DatastarSignalEvent>) => {
           callback(event)
+        }
         document.addEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
         return () => {
           document.removeEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
         }
       }
 
-      const signalPath = modifyCasing(
-        camel(key.slice(signalChangeKeyLength)),
-        mods,
-      )
-      const signalValues = new Map<Signal, any>()
-      signals.walk((path, signal) => {
-        if (path.startsWith(signalPath)) {
-          signalValues.set(signal, signal.value)
-        }
-      })
-      return effect(() => {
-        for (const [signal, prev] of signalValues) {
-          if (prev !== signal.value) {
-            callback()
-            signalValues.set(signal, signal.value)
+      default: {
+        const testOutside = mods.has('outside')
+        if (testOutside) {
+          target = document
+          const cb = callback
+          const targetOutsideCallback = (e?: Event) => {
+            const targetHTML = e?.target as HTMLElement
+            if (!el.contains(targetHTML)) {
+              cb(e)
+            }
           }
+          callback = targetOutsideCallback
         }
-      })
-    }
 
-    const testOutside = mods.has('outside')
-    if (testOutside) {
-      target = document
-      const cb = callback
-      const targetOutsideCallback = (e?: Event) => {
-        const targetHTML = e?.target as HTMLElement
-        if (!el.contains(targetHTML)) {
-          cb(e)
+        target.addEventListener(eventName, callback, evtListOpts)
+        return () => {
+          target.removeEventListener(eventName, callback)
         }
       }
-      callback = targetOutsideCallback
-    }
-
-    const eventName = modifyCasing(key, mods)
-    target.addEventListener(eventName, callback, evtListOpts)
-    return () => {
-      target.removeEventListener(eventName, callback)
     }
   },
 }

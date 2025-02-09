@@ -64,9 +64,7 @@ The `data-signals` attribute can also be used to merge multiple signals using a 
 
 The value above is written in Javascript object notation, but JSON, which is a subset and which most templating languages have built-in support for, is also allowed.
 
-Note that `data-*` attributes are case-insensitive. If you want to use uppercase characters in signal names, you'll need to kebabize them or use object syntax. So the signal name `mySignal` must be written as `data-signals-my-signal` or `data-signals="{mySignal: 1}"`.
-
-You can further modify the casing of keys in `data-*` attributes using the `__case` modifier, followed by `.kebab`, `.snake`, or `.pascal`.
+Note that `data-*` attributes are case-insensitive. If you want to use uppercase characters in signal names, you’ll need to kebabize them or use the object syntax. So the signal name `mySignal` must be written as `data-signals-my-signal` or `data-signals="{mySignal: 1}"`.
 
 #### Modifiers
 
@@ -135,7 +133,7 @@ The `data-attr` attribute can also be used to set the values of multiple attribu
 
 ### `data-bind`
 
-Creates a signal and sets up two-way data binding between it and an element's value. Can be placed on any HTML element on which data can be input or choices selected from (`input`, `textarea`, `select`, `checkbox` and `radio` elements, as well as web components).
+Creates a signal and sets up two-way data binding between it and an element's value. Can be placed on any HTML element on which data be be input or choices selected from (`input`, `textarea`, `select`, `checkbox` and `radio` elements, as well as web components).
 
 ```html
 <input data-bind-foo />
@@ -179,18 +177,14 @@ An `evt` variable that represents the event object is available in the expressio
 <div data-on-myevent="$foo = evt.detail"></div>
 ```
 
-The `data-on` attribute works with [built-in events](https://developer.mozilla.org/en-US/docs/Web/Events) and [custom events](https://developer.mozilla.org/en-US/docs/Web/Events/Creating_and_triggering_events). Note that the `data-on-submit` event listener prevents the default submission behavior of forms.
-
-#### Special Events
-
-Datastar provides a few special events of its own:
+The `data-on` attribute matches DOM events, however there are currently a few special cases for custom events.
 
 1. `data-on-load` is triggered when an element is loaded into the DOM.
 2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__duration` modifier.
 3. `data-on-raf` is triggered on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.
 4. `data-on-signals-change` is triggered when any signals change.
 
-Note that the `evt` variable is _not_ available in the expression when using special events.
+Note that the `data-on-submit` event listener prevents the default submission behavior of forms.
 
 #### Modifiers
 
@@ -216,13 +210,12 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
   - `.500ms` - Interval duration of 500 milliseconds.
   - `.1s` - Interval duration of 1 second.
   - `.leading` - Execute the first interval immediately.
-- `__viewtransition` - Wraps the expression in `document.startViewTransition()` when the View Transition API is available.
 - `__window` - Attaches the event listener to the `window` element.
 - `__outside` - Triggers when the event is outside the element.
 - `__prevent` - Calls `preventDefault` on the event listener.
 - `__stop` - Calls `stopPropagation` on the event listener.
 
-\* Only works on built-in events.
+\* Only works on native events.
 
 ```html
 <div data-on-click__window__debounce.500ms.leading="$foo = ''"></div>

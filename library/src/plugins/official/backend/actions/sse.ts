@@ -2,7 +2,7 @@
 // Slug: Use a GET request to fetch data from a server using Server-Sent Events matching the Datastar SDK interface
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.
 
-import { DATASTAR, DATASTAR_REQUEST, DefaultSseRetryDurationMs } from '../../../../engine/consts'
+import { DATASTAR, DATASTAR_REQUEST } from '../../../../engine/consts'
 import { runtimeErr } from '../../../../engine/errors'
 import type { RuntimeContext } from '../../../../engine/types'
 import {
@@ -14,7 +14,6 @@ import {
   type DatastarSSEEvent,
   ERROR,
   FINISHED,
-  RETRYING,
   STARTED,
 } from '../shared'
 
@@ -76,7 +75,7 @@ export const sse = async (
       includeLocal: false,
       selector: null,
       openWhenHidden: false, // will keep the request open even if the document is hidden.
-      retryInterval: DefaultSseRetryDurationMs, // the retry interval in milliseconds
+      retryInterval: 1_000, // the retry interval in milliseconds
       retryScaler: 2, // the amount to multiply the retry interval by each time
       retryMaxWaitMs: 30_000, // the maximum retry interval in milliseconds
       retryMaxCount: 10, // the maximum number of retries before giving up
@@ -153,7 +152,6 @@ export const sse = async (
         // do nothing and it will retry
         if (error) {
           console.error(error.message)
-          dispatchSSE(RETRYING, { message: error.message })
         }
       },
     }

@@ -4,5 +4,5 @@ import (datastar "github.com/starfederation/datastar/sdk/go")
 sse := datastar.NewSSE(w,r)
 
 sse.MergeFragments(`<div id="hello">Hello, world!</div>`)
-sse.MergeSignals([]byte(`{foo: {bar: 1}}`))
+sse.MergeSignals(`{foo: {bar: 1}}`)
 sse.ExecuteScript(`console.log('Success!')`)

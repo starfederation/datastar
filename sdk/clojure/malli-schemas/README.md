@@ -5,7 +5,7 @@
 For now the SDK and adapters are distributed as git dependencies using a `deps.edn` file.
 
 ```clojure
-{datastar/malli-schemas {:git/url "https://github.com/starfederation/datastar/"
+{datastar/malli-schemas {:git/url "https://github.com/starfederation/datastar/tree/develop"
                          :git/sha "LATEST SHA"
                          :deps/root "sdk/clojure/malli-schemas"}}
 ```

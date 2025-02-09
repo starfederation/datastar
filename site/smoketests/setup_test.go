@@ -3,9 +3,9 @@ package smoketests
 import (
 	"context"
 	"fmt"
-	"os"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/delaneyj/toolbelt"
 	"github.com/go-rod/rod"
@@ -13,40 +13,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	baseURL string
-	browser *rod.Browser
-)
+type runnerFn func(name string, fn func(t *testing.T, page *rod.Page))
 
-func TestMain(m *testing.M) {
-	if err := os.Chdir("../../"); err != nil {
-		panic(fmt.Errorf("could not change the working directory: %w", err))
-	}
-
-	ctx := context.Background()
+func setupPageTest(t *testing.T, subURL string, gen func(runner runnerFn)) {
+	t.Parallel()
+	browser := rod.New().MustConnect()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
 	port, err := toolbelt.FreePort()
-	if err != nil {
-		panic(fmt.Errorf("could not obtain a free port: %w", err))
-	}
+	require.NoError(t, err)
 
-	baseURL = fmt.Sprintf("http://localhost:%d", port)
+	baseURL := fmt.Sprintf("http://localhost:%d", port)
 
 	readyCh := make(chan struct{})
 	go site.RunBlocking(port, readyCh)(ctx)
 	<-readyCh
 
-	browser = rod.New().MustConnect()
-
-	m.Run()
-
-	ctx.Done()
-}
-
-type runnerFn func(name string, fn func(t *testing.T, page *rod.Page))
-
-func setupPageTest(t *testing.T, subURL string, gen func(runner runnerFn)) {
-	t.Parallel()
 	page := browser.MustIncognito().MustPage(fmt.Sprintf("%s/%s", baseURL, subURL))
 	require.NotNil(t, page)
 	t.Cleanup(page.MustClose)

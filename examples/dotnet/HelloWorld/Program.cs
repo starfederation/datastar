@@ -24,7 +24,7 @@ public class Program
         WebApplication app = builder.Build();
         app.UseStaticFiles();
 
-        app.MapGet("/hello-world", async (IDatastarServerSentEventService sse, IDatastarSignalsReaderService signals) =>
+        app.MapGet("/hello-world", async (IServerSentEventService sse, ISignals signals) =>
         {
             Signals mySignals = await signals.ReadSignalsAsync<Signals>();
             for (int index = 0; index < Message.Length; ++index)

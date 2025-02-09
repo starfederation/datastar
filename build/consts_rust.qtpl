@@ -1,8 +1,8 @@
 {%- func rustConsts(data *ConstTemplateData) -%}
 // {%s data.DoNotEdit %}
 
-pub const _DATASTAR_KEY: &str = "{%s data.DatastarKey %}";
-pub const _VERSION: &str = "{%s data.Version %}";
+pub const DATASTAR_KEY: &str = "{%s data.DatastarKey %}";
+pub const VERSION: &str = "{%s data.Version %}";
 
 // #region Defaults
 

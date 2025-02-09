@@ -58,7 +58,7 @@ Datastar automatically adds the proper `<meta/>` tags to properly transition ful
 
 ## Inter-page transitions
 
-By default, if `document.startViewTransition` exists and incoming SSE fragment has [data: useViewTransition true](https://data-star.dev/reference/sse_events#event-types) update will be wrapped in a `startViewTransition` async call. This will automatically fade in/out. If you want custom animation, such as
+By default, if `docuument.startViewTransition` exists and incoming SSE fragment has [data: useViewTransition true](https://data-star.dev/reference/sse_events#event-types) update will be wrapped in a `startViewTransition` async call. This will automatically fade in/out. If you want custom animation, such as
 
 ```html
 <style>

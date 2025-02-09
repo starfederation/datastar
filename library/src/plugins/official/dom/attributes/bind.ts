@@ -9,7 +9,7 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import { modifyCasing, trimDollarSignPrefix } from '../../../../utils/text'
+import { trimDollarSignPrefix } from '../../../../utils/text'
 
 const dataURIRegex = /^data:(?<mime>[^;]+);base64,(?<contents>.*)$/
 const updateEvents = ['change', 'input', 'keydown']
@@ -20,8 +20,8 @@ export const Bind: AttributePlugin = {
   keyReq: Requirement.Exclusive,
   valReq: Requirement.Exclusive,
   onLoad: (ctx) => {
-    const { el, key, mods, signals, value, effect } = ctx
-    const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
+    const { el, value, key, signals, effect } = ctx
+    const signalName = key ? key : trimDollarSignPrefix(value)
 
     let setFromSignal = () => {}
     let el2sig = () => {}

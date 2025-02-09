@@ -1,8 +1,8 @@
 import { DatastarEventOptions, EventType, sseHeaders } from "../types.ts";
+
 import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator.ts";
 
 import type { Jsonifiable } from "npm:type-fest";
-import { deepmerge } from "npm:deepmerge-ts";
 
 function isRecord(obj: unknown): obj is Record<string, Jsonifiable> {
   return typeof obj === "object" && obj !== null;
@@ -22,74 +22,25 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
   }
 
   /**
-   * Closes the ReadableStream
-   */
-  public close() {
-    this.controller.close();
-  }
-
-  /**
    * Initializes the server-sent event generator and executes the streamFunc function.
    *
-   * @param onStart - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
-   * @param options? - An object that can contain options for the Response constructor as well as onError and onCancel callbacks.
-   * The onAbort callback will be called whenever the request is aborted or the stream is cancelled
-   * The onError callback keeps the stream open after an exception  to report the error. If it is not provided it will
-   * cancel the stream and throw the error.
-   *
+   * @param streamFunc - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
    * @returns an HTTP Response
    */
   static stream(
-    onStart: (stream: ServerSentEventGenerator) => Promise<void> | void,
-    options?: Partial<{
-      onError: (
-        stream: ServerSentEventGenerator,
-        error: unknown,
-      ) => Promise<void> | void;
-      onAbort: (reason: string) => Promise<void> | void;
-      init: ResponseInit;
-    }>,
+    streamFunc: (stream: ServerSentEventGenerator) => Promise<void> | void,
   ): Response {
-    const readableStream = new ReadableStream({
+    const stream = new ReadableStream({
       async start(controller) {
-        const generator = new ServerSentEventGenerator(controller);
-
-        try {
-          const startedStream = onStart(generator);
-          if (startedStream instanceof Promise) await startedStream;
-        } catch (error) {
-          const abortResult = options && options.onAbort
-            ? options.onAbort(
-              error instanceof Error
-                ? error.message
-                : "onStart callback threw an error",
-            )
-            : null;
-
-          if (abortResult instanceof Promise) await abortResult;
-          if (options && options.onError) {
-            const errorStream = options.onError(generator, error);
-            if (errorStream instanceof Promise) await errorStream;
-          } else {
-            controller.close();
-            throw error;
-          }
-        }
-      },
-      async cancel(reason) {
-        const abortResult = options && options.onAbort
-          ? options.onAbort(reason)
-          : null;
-        if (abortResult instanceof Promise) await abortResult;
+        const stream = streamFunc(new ServerSentEventGenerator(controller));
+        if (stream instanceof Promise) await stream;
+        controller.close();
       },
     });
 
-    return new Response(
-      readableStream,
-      deepmerge({
-        headers: sseHeaders,
-      }, options?.init ?? {}),
-    );
+    return new Response(stream, {
+      headers: sseHeaders,
+    });
   }
 
   protected override send(

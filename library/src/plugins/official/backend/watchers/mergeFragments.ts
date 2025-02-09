@@ -11,17 +11,16 @@ import {
 } from '../../../../engine/consts'
 import { initErr } from '../../../../engine/errors'
 import {
-  type HTMLorSVGElement,
   type InitContext,
   PluginType,
   type WatcherPlugin,
 } from '../../../../engine/types'
-import { camel, isBoolString } from '../../../../utils/text'
+import { isBoolString } from '../../../../utils/text'
 import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
 } from '../../../../utils/view-transtions'
-import { Idiomorph } from '../../../../vendored/idiomorph.esm'
+import { idiomorph } from '../../../../vendored/idiomorph'
 import {
   SETTLING_CLASS,
   SWAPPING_CLASS,
@@ -60,7 +59,7 @@ export const MergeFragments: WatcherPlugin = {
             throw initErr('NoTargetsFound', ctx, { selectorOrID })
           }
 
-          if (useViewTransition && supportsViewTransitions) {
+          if (supportsViewTransitions && useViewTransition) {
             docWithViewTransitionAPI.startViewTransition(() =>
               applyToTargets(ctx, mergeMode, settleDuration, fragment, targets),
             )
@@ -86,39 +85,11 @@ function applyToTargets(
     let modifiedTarget = initialTarget
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
-        const toApply = new Map<Element, Array<string>>()
-        const result = Idiomorph.morph(modifiedTarget, fragment, {
-          restoreFocuse: false,
-          callbacks: {
-            beforeAttributeUpdated: (
-              argument: string,
-              el: Element,
-              mode: 'update' | 'remove',
-            ): boolean => {
-              if (mode === 'update' && argument.startsWith('data-')) {
-                let elAddAttrs = toApply.get(el)
-                if (!elAddAttrs) {
-                  elAddAttrs = []
-                  toApply.set(el, elAddAttrs)
-                }
-                const name = argument.slice('data-'.length)
-                elAddAttrs.push(camel(name))
-              }
-              return true
-            },
-          },
-        })
+        const result = idiomorph(modifiedTarget, fragment)
         if (!result?.length) {
           throw initErr('MorphFailed', ctx)
         }
         modifiedTarget = result[0] as Element
-
-        for (const [el, attrs] of toApply.entries()) {
-          for (const attr of attrs) {
-            ctx.applyAttributePlugin(el as HTMLorSVGElement, attr)
-          }
-        }
-
         break
       }
       case FragmentMergeModes.Inner:

@@ -5,8 +5,4 @@
 
 
 (defn -main [& _]
-  (let [server (server/start! c/handler)]
-    (.addShutdownHook (Runtime/getRuntime)
-                      (Thread. (fn []
-                                  (server/stop! server)
-                                  (shutdown-agents))))))
+  (server/start! c/handler {:join? true}))

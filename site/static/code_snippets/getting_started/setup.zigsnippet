@@ -1,4 +1,4 @@
-const datastar = @import("datastar").httpz;
+const datastar = @import("datastar");
 
 // Creates a new `ServerSentEventGenerator`.
 var sse = try datastar.ServerSentEventGenerator.init(res);

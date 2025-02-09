@@ -1,7 +1,7 @@
 //! [`ExecuteScript`] executes JavaScript in the browser.
 
 use {
-    crate::{consts, DatastarEvent},
+    crate::{consts, ServerSentEventGenerator},
     core::time::Duration,
 };
 
@@ -12,15 +12,23 @@ use {
 /// # Examples
 ///
 /// ```
-/// use datastar::prelude::{Sse, ExecuteScript};
-/// use async_stream::stream;
+/// use datastar::prelude::{ServerSentEventGenerator, ExecuteScript};
 ///
-/// Sse(stream! {
-///     yield ExecuteScript::new("console.log('Hello, world!')")
-///         .auto_remove(false)
-///         .attributes(["type text/javascript"])
-///         .into();
-/// });
+/// let execute_script: String = ExecuteScript::new("console.log('Hello, world!')")
+///     .auto_remove(false)
+///     .attributes(["type text/javascript"])
+///     .send();
+///
+/// let expected: &str = "event: datastar-execute-script
+/// retry: 1000
+/// data: autoRemove false
+/// data: attributes type text/javascript
+/// data: script console.log('Hello, world!')
+///
+///
+/// ";
+///
+/// assert_eq!(execute_script, expected);
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 
@@ -29,9 +37,10 @@ pub struct ExecuteScript {
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
     pub id: Option<String>,
-    /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
+    /// `retry_duration` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
+    /// Defaults to `1000ms`.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
-    pub retry: Duration,
+    pub retry_duration: Duration,
     /// `script` is a string that represents the JavaScript to be executed by the browser.
     pub script: String,
     /// Whether to remove the script after execution, if not provided the Datastar client side will default to `true`.
@@ -45,8 +54,8 @@ impl ExecuteScript {
     /// Creates a new [`ExecuteScript`] event with the given script.
     pub fn new(script: impl Into<String>) -> Self {
         Self {
-            id: None,
-            retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
+            id: Default::default(),
+            retry_duration: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             script: script.into(),
             auto_remove: consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE,
             attributes: vec![consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES.to_string()],
@@ -59,9 +68,9 @@ impl ExecuteScript {
         self
     }
 
-    /// Sets the `retry` of the [`ExecuteScript`] event.
-    pub fn retry(mut self, retry: Duration) -> Self {
-        self.retry = retry;
+    /// Sets the `retry_duration` of the [`ExecuteScript`] event.
+    pub fn retry_duration(mut self, retry_duration: Duration) -> Self {
+        self.retry_duration = retry_duration;
         self
     }
 
@@ -78,39 +87,52 @@ impl ExecuteScript {
     }
 }
 
-impl From<ExecuteScript> for DatastarEvent {
-    fn from(val: ExecuteScript) -> Self {
-        let mut data: Vec<String> = Vec::new();
+impl ServerSentEventGenerator for ExecuteScript {
+    fn send(&self) -> String {
+        let mut result = String::new();
 
-        if val.auto_remove != consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE {
-            data.push(format!(
-                "{} {}",
-                consts::AUTO_REMOVE_DATALINE_LITERAL,
-                val.auto_remove
-            ));
+        result.push_str("event: ");
+        result.push_str(consts::EventType::ExecuteScript.as_str());
+        result.push_str("\n");
+
+        if let Some(id) = &self.id {
+            result.push_str("id: ");
+            result.push_str(id);
+            result.push_str("\n");
         }
 
-        if val.attributes.len() != 1
-            || val.attributes[0] != consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES
+        result.push_str("retry: ");
+        result.push_str(&self.retry_duration.as_millis().to_string());
+        result.push_str("\n");
+
+        if !self.auto_remove {
+            result.push_str("data: ");
+            result.push_str(consts::AUTO_REMOVE_DATALINE_LITERAL);
+            result.push_str(" false\n");
+        }
+
+        if !(self.attributes.len() == 1
+            && self.attributes[0] == consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES)
         {
-            for attribute in &val.attributes {
-                data.push(format!(
-                    "{} {}",
-                    consts::ATTRIBUTES_DATALINE_LITERAL,
-                    attribute
-                ));
+            for attribute in &self.attributes {
+                result.push_str("data: ");
+                result.push_str(consts::ATTRIBUTES_DATALINE_LITERAL);
+                result.push_str(" ");
+                result.push_str(attribute);
+                result.push_str("\n");
             }
         }
 
-        for line in val.script.lines() {
-            data.push(format!("{} {}", consts::SCRIPT_DATALINE_LITERAL, line));
+        for line in self.script.lines() {
+            result.push_str("data: ");
+            result.push_str(consts::SCRIPT_DATALINE_LITERAL);
+            result.push_str(" ");
+            result.push_str(line);
+            result.push_str("\n");
         }
 
-        Self {
-            event: consts::EventType::ExecuteScript,
-            id: val.id,
-            retry: val.retry,
-            data,
-        }
+        result.push_str("\n\n");
+
+        result
     }
 }

@@ -140,7 +140,6 @@ func writeOutConsts(version string) error {
 		"sdk/java/core/src/main/java/starfederation/datastar/enums/FragmentMergeMode.java": javaFragmentMergeMode,
 		"sdk/python/src/datastar_py/consts.py":                                             pythonConsts,
 		"sdk/typescript/src/consts.ts":                                                     typescriptConsts,
-		"sdk/ruby/lib/datastar/consts.rb":                                                  rubyConsts,
 		"sdk/rust/src/consts.rs":                                                           rustConsts,
 		"sdk/zig/src/consts.zig":                                                           zigConsts,
 		"examples/clojure/hello-world/resources/public/hello-world.html":                   helloWorldExample,
@@ -149,9 +148,6 @@ func writeOutConsts(version string) error {
 		"examples/php/hello-world/public/hello-world.html":                                 helloWorldExamplePHP,
 		"examples/zig/httpz/hello-world/src/hello-world.html":                              helloWorldExample,
 		"examples/zig/tokamak/hello-world/hello-world.html":                                helloWorldExample,
-		"examples/ruby/hello-world/hello-world.html":                                       helloWorldExample,
-		"examples/rust/axum/hello-world/hello-world.html":                                  helloWorldExample,
-		"examples/rust/rocket/hello-world/hello-world.html":                                helloWorldExample,
 	}
 
 	for path, tmplFn := range templates {

@@ -75,9 +75,7 @@
 (def ^:private add-event-id? u/not-empty-string?)
 
 (defn- add-retry-duration? [d]
-  (and d
-       (> d 0)
-       (not= d consts/default-sse-retry-duration)))
+  (and d (> d 0)))
 
 
 (defn- append-opts! [buffer {event-id common/id retry-duration common/retry-duration}]

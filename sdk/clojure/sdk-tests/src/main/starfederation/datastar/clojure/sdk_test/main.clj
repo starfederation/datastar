@@ -20,8 +20,6 @@
 
 
 (defn stop! [server]
-  (println "Stopping server")
-  (println server)
   (.stop ^Server server))
 
 
@@ -37,8 +35,4 @@
   (reboot-jetty-server! #'c/handler))
 
 (defn -main [& _]
-  (let [server (start! c/handler)]
-    (.addShutdownHook (Runtime/getRuntime)
-                      (Thread. (fn []
-                                  (stop! server)
-                                  (shutdown-agents))))))
+  (start! c/handler {:join? true}))

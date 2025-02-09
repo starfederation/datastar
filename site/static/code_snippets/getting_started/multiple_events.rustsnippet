@@ -1,4 +1,6 @@
-yield MergeFragments::new("<div id='question'>...</div>").into()
-yield MergeFragments::new("<div id='instructions'>...</div>").into()
-yield MergeSignals::new("{answer: '...'}").into()
-yield MergeSignals::new("{prize: '...'}").into()
+(
+    MergeFragments::new("<div id='question'>...</div>"),
+    MergeFragments::new("<div id='instructions'>...</div>"),
+    MergeSignals::new("{answer: '...'}"),
+    MergeSignals::new("{prize: '...'}"),
+)

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>StarFederation.Datastar</AssemblyName>
-        <Version>1.0.0-beta.2</Version>
+        <Version>0.21.2</Version>
         <RootNamespace>StarFederation.Datastar</RootNamespace>
         <Nullable>disabled</Nullable>
 
@@ -33,7 +33,6 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
-        <Title>StarFederation.Datastar</Title>
     </PropertyGroup>
 
     <ItemGroup>
@@ -61,9 +60,6 @@
         <Compile Include="DependencyInjection\DatastarServices.fs" />
         <Compile Include="DependencyInjection\DatastarServicesProvider.fs" />
         <Compile Include="DependencyInjection\ServerSentEventScriptExtensions.fs" />
-        <Compile Include="ModelBinding\FromSignalAttribute.fs" />
-        <Compile Include="ModelBinding\SignalsModelBinder.fs"/>
-        <Compile Include="ModelBinding\DatastarMvcServiceProvider.fs" />
     </ItemGroup>
 
 </Project>

@@ -24,7 +24,7 @@ pub fn build(b: *std.Build) void {
     run_step.dependOn(&run_cmd.step);
 
     const httpz = b.dependency("httpz", dep_opts).module("httpz");
-    const datastar = b.dependency("datastar", dep_opts).module("datastar");
+    const datastar = b.dependency("datastar_httpz", dep_opts).module("datastar_httpz");
 
     exe.root_module.addImport("httpz", httpz);
     exe.root_module.addImport("datastar", datastar);

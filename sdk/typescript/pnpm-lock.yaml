@@ -10,9 +10,6 @@ importers:
       "@types/node":
         specifier: ^22.10.2
         version: 22.10.2
-      deepmerge-ts:
-        specifier: ^7.1.4
-        version: 7.1.4
       type-fest:
         specifier: ^4.32.0
         version: 4.32.0
@@ -26,12 +23,6 @@ packages:
     resolution: {
       integrity: sha512-Xxr6BBRCAOQixvonOye19wnzyDiUtTeqldOOmj3CkeblonbccA12PFwlufvRdrpjXxqnmUaeiU5EOA+7s5diUQ==,
     }
-
-  deepmerge-ts@7.1.4:
-    resolution: {
-      integrity: sha512-fxqo6nHGQ9zOVgI4KXqtWXJR/yCLtC7aXIVq+6jc8tHPFUxlFmuUcm2kC4vztQ+LJxQ3gER/XAWearGYQ8niGA==,
-    }
-    engines: { node: ">=16.0.0" }
 
   type-fest@4.32.0:
     resolution: {
@@ -55,8 +46,6 @@ snapshots:
   "@types/node@22.10.2":
     dependencies:
       undici-types: 6.20.0
-
-  deepmerge-ts@7.1.4: {}
 
   type-fest@4.32.0: {}
 

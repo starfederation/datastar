@@ -1,14 +1,11 @@
 import {
   DatastarEventOptions,
-  DefaultMapping,
   EventType,
   ExecuteScriptOptions,
   FragmentOptions,
   MergeFragmentsOptions,
   MergeSignalsOptions,
 } from "./types.ts";
-
-import { DefaultExecuteScriptAttributes } from "./consts.ts";
 
 import { DefaultSseRetryDurationMs } from "./consts.ts";
 
@@ -67,26 +64,12 @@ export abstract class ServerSentEventGenerator {
   private eachOptionIsADataLine(
     options: Record<string, Jsonifiable>,
   ): string[] {
-    return Object.keys(options).filter((key) => {
-      return !this.hasDefaultValue(key, options[key as keyof typeof options]);
-    }).flatMap((key) => {
+    return Object.keys(options).flatMap((key) => {
       return this.eachNewlineIsADataLine(
         key,
         options[key as keyof typeof options]!.toString(),
       );
     });
-  }
-
-  private hasDefaultValue(key: string, val: unknown): boolean {
-    if (key === DefaultExecuteScriptAttributes.split(" ")[0]) {
-      return val === DefaultExecuteScriptAttributes.split(" ")[1];
-    }
-
-    if (key in DefaultMapping) {
-      return val === DefaultMapping[key as keyof typeof DefaultMapping];
-    }
-
-    return false;
   }
 
   /**
@@ -101,7 +84,6 @@ export abstract class ServerSentEventGenerator {
   ): ReturnType<typeof this.send> {
     const { eventId, retryDuration, ...renderOptions } = options ||
       {} as Partial<MergeFragmentsOptions>;
-
     const dataLines = this.eachOptionIsADataLine(renderOptions)
       .concat(this.eachNewlineIsADataLine("fragments", data));
 

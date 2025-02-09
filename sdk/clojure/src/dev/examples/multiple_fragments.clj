@@ -35,7 +35,6 @@
            (res "res-2" input-val)]))
 
 
-;; TODO: use merge fragments
 (defn endpoint [req]
   (let [signals (u/get-signals req)
         input-val (get signals "input")]

@@ -52,10 +52,6 @@ type MarkdownData struct {
 }
 type MarkdownDataset map[string]*MarkdownData
 
-// markdownRenders parses and renders Markdown files located at the specified path.
-// It applies syntax highlighting, processes custom placeholders (e.g., code snippets),
-// and generates a dataset containing HTML-rendered content, titles, and anchor metadata.
-// Returns the rendered Markdown dataset or an error if processing fails.
 func markdownRenders(ctx context.Context, staticMdPath string) (MarkdownDataset, error) {
 	if mdRenderer == nil {
 		htmlFormatter := html.New(html.WithClasses(true), html.TabWidth(2))

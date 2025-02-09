@@ -9,4 +9,4 @@ sse.MergeFragments(
 )
 
 // Merges signals into the signals.
-sse.MergeSignals([]byte(`{response: '', answer: 'bread'}`))
+sse.MergeSignals(`{response: '', answer: 'bread'}`)

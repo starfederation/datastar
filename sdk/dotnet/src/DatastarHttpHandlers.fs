@@ -16,7 +16,7 @@ module DatastarHttpHandlers =
     /// <summary>
     /// Starts the SSE response, 'text/event-stream', so more SSEs can be sent
     /// </summary>
-    let startResponse (response:HttpResponse) (additionalHeaders:(string*string) seq) = task {
+    let startResponse (response:HttpResponse) = task {
         let setHeader (response:HttpResponse) (name, content:string) =
             if response.Headers.ContainsKey(name) |> not then
                 response.Headers.Add(name, StringValues(content))
@@ -26,7 +26,6 @@ module DatastarHttpHandlers =
             (HeaderNames.ContentType, "text/event-stream")
             if (response.HttpContext.Request.Protocol = HttpProtocol.Http11) then
                 ("Connection", "keep-alive")
-            yield! additionalHeaders
             } |> Seq.iter (setHeader response)
         do! response.StartAsync()
         do! response.Body.FlushAsync()
@@ -35,7 +34,7 @@ module DatastarHttpHandlers =
     /// <summary>
     /// Read the signals, as a string, from the HttpRequest
     /// </summary>
-    let readSignals (httpRequest:HttpRequest) : ValueTask<Signals voption> =
+    let readSignals (httpRequest:HttpRequest) : ValueTask<string voption> =
         match httpRequest.Method with
         | System.Net.WebRequestMethods.Http.Get ->
             match httpRequest.Query.TryGetValue(Consts.DatastarKey) with
@@ -47,10 +46,10 @@ module DatastarHttpHandlers =
                 use readResult = new StreamReader(httpRequest.BodyReader.AsStream())
                 let! str = readResult.ReadToEndAsync()
                 return ValueSome str
-                } |> ValueTask<Signals voption>
+                } |> ValueTask<string voption>
 
     /// <summary>
-    /// Sends an SSE to the HttpResponse
+    /// Sends a serialized SSE to the HttpResponse
     /// </summary>
     let sendServerEvent (httpResponse:HttpResponse) (sse:ServerSentEvent) =
         let serializedEvent = sse |> ServerSentEvent.serialize
@@ -60,9 +59,9 @@ module DatastarHttpHandlers =
 /// <summary>
 /// Implementation of ISendServerEvent, for sending SSEs to the HttpResponse
 /// </summary>
-type ServerSentEventHttpHandlers (httpResponse:HttpResponse, additionalHeaders:(string*string) seq) =
+type ServerSentEventHttpHandlers (httpResponse:HttpResponse) =
     do
-        let startResponseTask = DatastarHttpHandlers.startResponse httpResponse additionalHeaders
+        let startResponseTask = DatastarHttpHandlers.startResponse httpResponse
         startResponseTask.GetAwaiter().GetResult()
 
     member _.HttpResponse = httpResponse
@@ -71,33 +70,24 @@ type ServerSentEventHttpHandlers (httpResponse:HttpResponse, additionalHeaders:(
         member this.SendServerEvent (event:ServerSentEvent) = DatastarHttpHandlers.sendServerEvent this.HttpResponse event
 
 /// <summary>
-/// Implementation of IReadSignals, for reading the Signals from the HttpRequest
+/// Implementation of ISignal, for reading the Signals from the HttpRequest
 /// </summary>
 type SignalsHttpHandlers (httpRequest:HttpRequest) =
-    let mutable _cachedSignals : Signals voption voption = ValueNone
+
     member _.HttpRequest = httpRequest
 
     interface IReadSignals with
-        member this.ReadSignals () =
-            let readTask =
-                match _cachedSignals with
-                | ValueSome signals -> task { return signals }
-                | ValueNone ->
-                    task {
-                        let! signals = (DatastarHttpHandlers.readSignals this.HttpRequest)
-                        _cachedSignals <- (ValueSome signals)
-                        return signals
-                    }
-            readTask |> ValueTask<Signals voption>
+        member this.ReadSignals () = DatastarHttpHandlers.readSignals this.HttpRequest
         member this.ReadSignals<'T> () =
-            let readTask = task {
-                let! signals = (this :> IReadSignals).ReadSignals()
+            let tt = task {
+                let! rawSignals = DatastarHttpHandlers.readSignals this.HttpRequest
                 let ret =
-                    match signals with
+                    match rawSignals with
                     | ValueNone -> ValueNone
                     | ValueSome rs ->
-                        try ValueSome (JsonSerializer.Deserialize<'T>(rs))
+                        try
+                            ValueSome (JsonSerializer.Deserialize<'T>(rs))
                         with _ -> ValueNone
                 return ret
                 }
-            readTask |> ValueTask<'T voption>
+            tt |> ValueTask<'T voption>

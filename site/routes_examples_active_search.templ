@@ -19,7 +19,7 @@ type ActiveSearchUser struct {
 templ ActiveSearchComponent(filteredUsers []*ActiveSearchUser, scores map[string]float64, signals *ActiveSearchSignals) {
 	<div
 		id="active_search"
-		class="flex flex-col gap-4 overflow-scroll"
+		class="flex flex-col gap-4"
 		data-signals={ templ.JSONString(signals) }
 	>
 		<div class="flex">

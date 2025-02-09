@@ -27,10 +27,8 @@ func TestExampleMergeOptions(t *testing.T) {
 		assert.Nil(t, initial)
 
 		mergeModeBtn := page.MustElement("#" + mmStr)
-
-		wait := page.MustWaitRequestIdle()
 		mergeModeBtn.MustClick()
-		wait()
+		page.MustWaitIdle()
 
 		fn(t, page)
 	}

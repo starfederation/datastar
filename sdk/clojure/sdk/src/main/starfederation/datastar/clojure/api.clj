@@ -332,7 +332,6 @@
    (scripts/execute-script! sse-gen script-content opts)))
 
 
- 
 ;; -----------------------------------------------------------------------------
 ;; SSE helpers
 ;; -----------------------------------------------------------------------------
@@ -416,12 +415,4 @@
    (redirect! sse-gen url {}))
   ([sse-gen url opts]
    (execute-script! sse-gen (str "window.location.href = \""url"\";") opts)))
-
-;; -----------------------------------------------------------------------------
-;; Misc
-;; -----------------------------------------------------------------------------
-(defn datastar-request?
-  "Test for the presence of the datastar header in a ring request."
-  [request]
-  (= "true" (get-in request [:headers "datastar-request"])))
 

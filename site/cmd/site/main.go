@@ -14,9 +14,7 @@ import (
 	"github.com/starfederation/datastar/site"
 )
 
-const (
-	port = 8080
-)
+const port = 8080
 
 func main() {
 	godotenv.Load()

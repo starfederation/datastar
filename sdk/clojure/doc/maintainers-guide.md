@@ -2,23 +2,17 @@
 
 ## Directory structure
 
-In the whole project:
-
-- `examples/clojure`
-
-In the sdk code proper `sdk/clojure`:
-
-- `sdk`: the source folder for the main sdk
-- `adapter-*`: source folders for adapter specific code
-- `malli-schemas`: self explanatory...
-- `src/bb`: tasks used run a repl, tests...
-- `src/dev`: dev utils, examples
-- `src/test`: centralized tests for all the libraries
-- `test-resources`: self explanatory
+- sdk: the source folder for the main sdk
+- adapter-\*: source folders for adapter specific code
+- malli-schemas: self explanatory...
+- src/bb: tasks used run a repl, tests...
+- src/dev: dev utils, examples
+- src/test: centralized tests for all the libraries
+- test-resources: self explanatory
 
 ## bb tasks
 
-- `bb run dev`: start a repl with all the sub projects in the classpath
+- `bb run tasks`: start a repl with all the sub projects in the classpath
 - `bb run test:all`: run all test for sdk, adapters...
 
 ## Test

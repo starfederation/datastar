@@ -16,7 +16,7 @@ export const Text: AttributePlugin = {
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
   onLoad: (ctx) => {
-    const { el, effect, genRX } = ctx
+    const { el, genRX, effect } = ctx
     const rx = genRX()
     if (!(el instanceof HTMLElement)) {
       runtimeErr('TextInvalidElement', ctx)

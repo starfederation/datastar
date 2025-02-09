@@ -1,6 +1,6 @@
 import { Hash, elUniqId } from '../utils/dom'
-import { camel } from '../utils/text'
-import { delay } from '../utils/timing'
+import { camelize, lcFirst } from '../utils/text'
+import { debounce } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
@@ -29,18 +29,91 @@ export class Engine {
   #plugins: AttributePlugin[] = []
   #actions: ActionPlugins = {}
   #watchers: WatcherPlugin[] = []
-  #mutationObserver: MutationObserver | null = null
 
   // Map of cleanup functions by element, keyed by the dataset key and value
   #removals = new Map<Element, Map<string, OnRemovalFn>>()
+
+  constructor() {
+    const datasetPrefix = 'data-'
+
+    const ob = new MutationObserver((mutations) => {
+      for (const {
+        target,
+        type,
+        attributeName,
+        oldValue,
+        addedNodes,
+        removedNodes,
+      } of mutations) {
+        switch (type) {
+          case 'childList':
+            {
+              for (const node of removedNodes) {
+                const el = node as HTMLorSVGElement
+                const elRemovals = this.#removals.get(el)
+                if (!elRemovals) continue
+
+                for (const [_, removalFn] of elRemovals) {
+                  removalFn()
+                }
+                this.#removals.delete(el)
+              }
+
+              for (const node of addedNodes) {
+                const el = node as HTMLorSVGElement
+                this.#apply(el)
+              }
+            }
+            break
+          case 'attributes': {
+            {
+              const requiredPrefix = datasetPrefix + (this.aliasPrefix ? `${this.aliasPrefix}-` : '')
+              if (!attributeName?.startsWith(requiredPrefix)) {
+                break
+              }
+
+              const el = target as HTMLorSVGElement
+              const datasetKey = camelize(attributeName.slice(datasetPrefix.length))
+
+              // If the value has changed, clean up the old value
+              if (oldValue !== null && el.dataset[datasetKey] !== oldValue) {
+                const elRemovals = this.#removals.get(el)
+                if (elRemovals) {
+                  const rk = removalKey(datasetKey, oldValue)
+                  const removalFn = elRemovals.get(rk)
+                  if (removalFn) {
+                    removalFn()
+                    elRemovals.delete(rk)
+                  }
+                }
+              }
+
+              // Apply the plugin only if the dataset key exists
+              if (datasetKey in el.dataset) {
+                this.#applyAttributePlugin(el, datasetKey)
+              }
+            }
+            break
+          }
+        }
+      }
+    })
+
+    ob.observe(document.body, {
+      attributes: true,
+      attributeOldValue: true,
+      childList: true,
+      subtree: true,
+    })
+  }
 
   get signals() {
     return this.#signals
   }
 
   public load(...pluginsToLoad: DatastarPlugin[]) {
-    const that = this // I hate javascript
     for (const plugin of pluginsToLoad) {
+      const that = this // I hate javascript
       const ctx: InitContext = {
         get signals() {
           return that.#signals
@@ -48,7 +121,6 @@ export class Engine {
         effect: (cb: () => void): OnRemovalFn => effect(cb),
         actions: this.#actions,
         plugin,
-        applyAttributePlugin: that.#applyAttributePlugin.bind(that),
       }
 
       let globalInitializer: GlobalInitializer | undefined
@@ -85,13 +157,11 @@ export class Engine {
       return a.name.localeCompare(b.name)
     })
 
-    this.#delayedApply()
+    this.#debouncedApply()
   }
 
-  // Delay applying plugins to give them time to load
-  #delayedApply = delay(() => {
+  #debouncedApply = debounce(() => {
     this.#apply(document.body)
-    this.#observe()
   }, 1)
 
   // Apply all plugins to the element and its children
@@ -114,90 +184,9 @@ export class Engine {
     })
   }
 
-  // Set up a mutation observer to run plugin removal and apply functions
-  #observe() {
-    if (this.#mutationObserver) {
-      return
-    }
-    
-    this.#mutationObserver = new MutationObserver((mutations) => {
-      for (const {
-        target,
-        type,
-        attributeName,
-        oldValue,
-        addedNodes,
-        removedNodes,
-      } of mutations) {
-        switch (type) {
-          case 'childList':
-            {
-              for (const node of removedNodes) {
-                const el = node as HTMLorSVGElement
-                const elRemovals = this.#removals.get(el)
-                if (!elRemovals) continue
-
-                for (const [_, removalFn] of elRemovals) {
-                  removalFn()
-                }
-                this.#removals.delete(el)
-              }
-
-              for (const node of addedNodes) {
-                const el = node as HTMLorSVGElement
-                this.#apply(el)
-              }
-            }
-            break
-          case 'attributes': {
-            {
-              const datasetPrefix = 'data-'
-              const requiredPrefix =
-                datasetPrefix + (this.aliasPrefix ? `${this.aliasPrefix}-` : '')
-              if (!attributeName?.startsWith(requiredPrefix)) {
-                break
-              }
-
-              const el = target as HTMLorSVGElement
-              const datasetKey = camel(
-                attributeName.slice(datasetPrefix.length),
-              )
-
-              // If the value has changed, clean up the old value
-              if (oldValue !== null && el.dataset[datasetKey] !== oldValue) {
-                const elRemovals = this.#removals.get(el)
-                if (elRemovals) {
-                  const rk = removalKey(datasetKey, oldValue)
-                  const removalFn = elRemovals.get(rk)
-                  if (removalFn) {
-                    removalFn()
-                    elRemovals.delete(rk)
-                  }
-                }
-              }
-
-              // Apply the plugin only if the dataset key exists
-              if (datasetKey in el.dataset) {
-                this.#applyAttributePlugin(el, datasetKey)
-              }
-            }
-            break
-          }
-        }
-      }
-    })
-
-    this.#mutationObserver.observe(document.body, {
-      attributes: true,
-      attributeOldValue: true,
-      childList: true,
-      subtree: true,
-    })
-  }
-
-  #applyAttributePlugin(el: HTMLorSVGElement, camelCasedKey: string) {
+  #applyAttributePlugin(el: HTMLorSVGElement, datasetKey: string) {
     // Extract the raw key from the dataset
-    const rawKey = camelCasedKey.slice(this.aliasPrefix.length)
+    const rawKey = lcFirst(datasetKey.slice(this.aliasPrefix.length))
 
     // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically
     // the first match will be the most specific
@@ -205,16 +194,6 @@ export class Engine {
 
     // Skip if no plugin is found
     if (!plugin) return
-
-    const elAttr = this.#removals.get(el)
-    if (elAttr) {
-      for (const [k, removalFn] of elAttr) {
-        if (k.startsWith(camelCasedKey)) {
-          removalFn()
-          elAttr.delete(k)
-        }
-      }
-    }
 
     // Ensure the element has an id
     if (!el.id.length) el.id = elUniqId(el)
@@ -224,9 +203,10 @@ export class Engine {
 
     const hasKey = key.length > 0
     if (hasKey) {
-      key = camel(key)
+      // Keys starting with a dash are not converted to camel case in the dataset
+      key = key.startsWith('-') ? key.slice(1) : lcFirst(key)
     }
-    const value = el.dataset[camelCasedKey] || ''
+    const value = el.dataset[datasetKey] || ''
     const hasValue = value.length > 0
 
     // Create the runtime context
@@ -235,7 +215,6 @@ export class Engine {
       get signals() {
         return that.#signals
       },
-      applyAttributePlugin: that.#applyAttributePlugin.bind(that),
       effect: (cb: () => void): OnRemovalFn => effect(cb),
       actions: this.#actions,
       genRX: () => this.#genRX(ctx, ...(plugin.argNames || [])),
@@ -256,7 +235,6 @@ export class Engine {
     } else if (keyReq === Requirement.Must) {
       throw runtimeErr(`${plugin.name}KeyRequired`, ctx)
     }
-
     const valReq = plugin.valReq || Requirement.Allowed
     if (hasValue) {
       if (valReq === Requirement.Denied) {
@@ -278,7 +256,7 @@ export class Engine {
 
     for (const rawMod of rawModifiers) {
       const [label, ...mod] = rawMod.split('.')
-      ctx.mods.set(camel(label), new Set(mod.map((t) => t.toLowerCase())))
+      ctx.mods.set(camelize(label), new Set(mod.map((t) => t.toLowerCase())))
     }
 
     // Load the plugin and store any cleanup functions
@@ -289,13 +267,13 @@ export class Engine {
         elRemovals = new Map()
         this.#removals.set(el, elRemovals)
       }
-      elRemovals.set(removalKey(camelCasedKey, value), removalFn)
+      elRemovals.set(removalKey(datasetKey, value), removalFn)
     }
 
     // Remove the attribute if required
     const removeOnLoad = plugin.removeOnLoad
     if (removeOnLoad && removeOnLoad(rawKey) === true) {
-      delete el.dataset[camelCasedKey]
+      delete el.dataset[datasetKey]
     }
   }
 

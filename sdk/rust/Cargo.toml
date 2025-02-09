@@ -1,56 +1,35 @@
 [package]
 authors = ["Johnathan Stevers <jmstevers@gmail.com>"]
 categories = ["web-programming"]
-description = "Datastar is the Rust implementation of the [Datastar](https://data-star.dev) SDK."
+description = "Datastar is a Rust implementation of the [Datastar](https://data-star.dev) SDK specification."
+documentation = "..."
 edition = "2021"
-homepage = "https://data-star.dev"
 keywords = ["datastar", "web", "backend"]
 license = "MIT OR Apache-2.0"
 name = "datastar"
 readme = "README.md"
-repository = "https://github.com/starfederation/datastar-rs"
+repository = "https://github.com/jmstevers/datastar-rust-sdk"
 version = "0.1.0"
 
 [dev-dependencies]
-async-stream = { version = "0.3.6", default-features = false }
-serde = { version = "1.0.217", default-features = false, features = ["derive"] }
-serde_json = { version = "1.0.138", default-features = false, features = [
-    "std",
-] }
-tokio = { version = "1.43.0", features = ["full"] }
 axum = { version = "0.8.1" }
-rocket = { version = "0.5.1", features = ["json"] }
-
+tokio = { version = "1.43.0", features = ["full"] }
 
 [dependencies]
 axum = { version = "0.8.1", default-features = false, optional = true, features = [
     "query",
-    "tokio",
 ] }
-futures-util = { version = "0.3.31", default-features = false }
-http-body = { version = "1.0.1", default-features = false, optional = true }
-pin-project-lite = { version = "0.2.16", default-features = false, optional = true }
-rocket = { version = "0.5.1", default-features = false, optional = true }
+mime = { version = "0.3.17", default-features = false, optional = true }
 serde = { version = "1.0.217", default-features = false, optional = true, features = [
     "derive",
 ] }
-serde_json = { version = "1.0.138", default-features = false, optional = true, features = [
+serde_json = { version = "1.0.137", default-features = false, optional = true, features = [
     "std",
 ] }
-sync_wrapper = { version = "1.0.2", default-features = false, optional = true }
-
+typle = { version = "0.10.6", default-features = false }
 
 [features]
-axum = [
-    "dep:axum",
-    "dep:http-body",
-    "dep:pin-project-lite",
-    "dep:serde",
-    "dep:serde_json",
-    "dep:sync_wrapper",
-]
-http2 = []
-rocket = ["dep:rocket"]
+axum = ["dep:axum", "dep:mime", "dep:serde", "dep:serde_json"]
 
 [profile.dev]
 opt-level = 1

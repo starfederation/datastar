@@ -6,19 +6,18 @@
     org.eclipse.jetty.server.Server))
 
 
+
+
 (defonce !jetty-server (atom nil))
 
 
 (defn start! [handler & {:as opts}]
-  (let [opts (merge {:port 8080 :join? false}
-                    opts)]
-    (println "Starting server on port:" (:port opts))
-    (jetty/run-jetty handler opts)))
+  (jetty/run-jetty handler
+                   (merge {:port 8080 :join? false}
+                          opts)))
 
 
 (defn stop! [server]
-  (println "Stopping server")
-  (println server)
   (.stop ^Server server))
 
 

@@ -19,16 +19,14 @@ serve(async (req: Request) => {
       if (isEventArray(events)) {
         return ServerSentEventGenerator.stream((stream) => {
           testEvents(stream, events);
-          stream.close();
         });
       }
     }
   } else if (url.pathname.includes("await")) {
     return ServerSentEventGenerator.stream(async (stream) => {
       stream.mergeFragments('<div id="toMerge">Merged</div>');
-      await delay(5000);
-      stream.mergeFragments('<div id="toMerge">After 5 seconds</div>');
-      stream.close();
+      await delay(10000);
+      stream.mergeFragments('<div id="toMerge">After 10 seconds</div>');
     });
   }
 

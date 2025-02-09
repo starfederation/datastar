@@ -1,25 +1,27 @@
 # WIP Release Notes for Datastar
 
-## v1.0.0-beta.4
-
-In this release we tuned the engine, added the ability to react to specific signal changes, and added some new modifiers. Idiomorph got an upgrade, and a few bugs were squashed.
-
-The most exciting part of this beta release is that it marks the final round of planned changes before we move to a stable v1 release 🚀
+## v1.0.0-beta.3
 
 ### Added
 
-- Added the ability to add a signal path to the `data-on-signals-change-*` attribute ([#587](https://github.com/starfederation/datastar/issues/587)).
-- Added a `__viewtransition` modifier to the `data-on-*` attribute that wraps the expression in `document.startViewTransition()` when the View Transition API is available ([#627](https://github.com/starfederation/datastar/issues/627)).
-- Added a `__case` modifier to the `data-signals-*`, `data-computed-*`, `data-ref-*`, `data-indicator-*`, `data-persist-*`, `data-bind-*`,  `data-class-*`, and `data-on-*` attributes, allowing you to modify the casing of the key by adding `.kebab`, `.snake` or `.pascal`.
-- Added a `retrying` event type that is dispatched when the SSE plugin is trying to reconnect ([#583](https://github.com/starfederation/datastar/issues/583)).
+- Added the ability to use an alias prefix when using the [bundler](https://data-star.dev/bundler). This makes it possible to use `data-customPrefix-*` attributes instead of `data-*`.
 
 ### Changed
 
-- Idiomorph was updated to version 0.5.0 (pre-release) and is now imported as a module, making it easier to import future versions ([#608](https://github.com/starfederation/datastar/issues/608), [#633](https://github.com/starfederation/datastar/issues/633)).
-- Class names are no longer converted to kebab case when used in the `data-class-*` attribute ([#610](https://github.com/starfederation/datastar/issues/610)).
-- Event names are no longer converted to kebab case when used in the `data-on-*` attribute.
+- Changed the `data-on-interval` attribute to accept a `__duration` modifier instead of a `__delay` modifier ([#513](https://github.com/starfederation/datastar/issues/513)).
+- The `data-custom-validity` attribute can now be used on `select` and `textarea` elements, in addition to `input` elements ([534](https://github.com/starfederation/datastar/issues/534)).
+- Changed how plugins are applied and cleaned up to use `MutationObserver` ([#528](https://github.com/starfederation/datastar/issues/528)).
+- Changed the parsing of Datastar expressions so that only semicolons can be used to explicitly indicate a statement delimiter ([#525](https://github.com/starfederation/datastar/issues/525)).
 
 ### Fixed
 
-- Fixed a bug in which signals were being cleared when merge fragments were sending down `data-signals` attributes ([#588](https://github.com/starfederation/datastar/issues/588)).
-- Fixed a bug in which using the `__ifmissing` modifier with the `data-signals-*` attribute was not having any effect ([#605](https://github.com/starfederation/datastar/issues/605)).
+- Fixed a bug when using the `__delay` modifier on the `data-on-load` attribute ([#511](https://github.com/starfederation/datastar/issues/511)).
+- Fixed how Datastar expressions are evaluated to allow regular expressions and strings that contain semicolons and new lines ([#508](https://github.com/starfederation/datastar/issues/508)).
+- Fixed a bug with the `inner` merge mode that was causing only the inner HTML of a fragment to be merged ([#524](https://github.com/starfederation/datastar/issues/524)).
+- Fixed a bug in which signal values could get out of sync when populated by an input element by Chrome’s back/forward cache ([#530](https://github.com/starfederation/datastar/pull/530)).
+- Fixed a bug when generating IDs for elements that could result in duplicate IDs ([#533](https://github.com/starfederation/datastar/issues/533)).
+
+### Removed
+
+- Removed the `apply` function from the JavaScript API ([#528](https://github.com/starfederation/datastar/issues/528)).
+- Removed the `version` property from the JavaScript API ([#545](https://github.com/starfederation/datastar/issues/545)).

@@ -1,8 +1,8 @@
-const datastar = @import("datastar").httpz;
+const datastar = @import("datastar");
 
 // Creates a new `ServerSentEventGenerator`.
 sse = try datastar.ServerSentEventGenerator.init(res);
 
-try sse.mergeFragments("<div id='hello'>Hello, world!</div>", .{});
-try sse.mergeSignals("{foo: {bar: 1}}", .{});
-try sse.executeScript("console.log('Success!')", .{});
+try sse.mergeFragments("<div id='hello'>Hello, world!</div>");
+try sse.mergeSignals("{foo: {bar: 1}}");
+try sse.executeScript("console.log('Success!')");

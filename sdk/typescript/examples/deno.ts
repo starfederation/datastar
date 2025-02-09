@@ -34,7 +34,6 @@ serve(async (req: Request) => {
       stream.mergeFragments(
         `<div id="toMerge">Hello ${reader.signals.foo}</div>`,
       );
-      stream.close();
     });
   }
 

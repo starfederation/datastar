@@ -1,10 +1,10 @@
 (ns test.ring-jetty-test
   (:require
     [test.common :as common]
-    [test.examples.ring-handler :as rh]
+    [test.examples.ring-jetty-handler :as rjh]
     [lazytest.core :as lt :refer [defdescribe expect it]]
     [ring.adapter.jetty :as jetty]
-    [starfederation.datastar.clojure.adapter.ring :as jetty-gen])
+    [starfederation.datastar.clojure.adapter.ring-jetty :as jetty-gen])
   (:import
     [org.eclipse.jetty.server Server ServerConnector]))
 
@@ -35,7 +35,7 @@
 ;; -----------------------------------------------------------------------------
 (defdescribe  counters-test
   {:webdriver true
-   :context [(common/with-server-f rh/handler ring-jetty-basic-opts)]}
+   :context [(common/with-server-f rjh/handler ring-jetty-basic-opts)]}
   (it "manages signals"
     (doseq [[driver-type driver] common/drivers]
       (let [res (common/run-counters! @driver)]
@@ -44,7 +44,7 @@
 
 (defdescribe counters-async-test
   {:webdriver true
-   :context [(common/with-server-f rh/handler
+   :context [(common/with-server-f rjh/handler
                                    (assoc ring-jetty-basic-opts :async? true))]}
   (it "manages signals"
     (doseq [[driver-type driver] common/drivers]
@@ -54,7 +54,7 @@
 ;; -----------------------------------------------------------------------------
 (defdescribe form-test
   {:webdriver true
-   :context [(common/with-server-f rh/handler ring-jetty-basic-opts)]}
+   :context [(common/with-server-f rjh/handler ring-jetty-basic-opts)]}
   (it "manages forms"
     (doseq [[driver-type driver] common/drivers]
       (let [res (common/run-form-test! @driver)]
@@ -63,7 +63,7 @@
 
 (defdescribe form-test-async
   {:webdriver true
-   :context [(common/with-server-f rh/handler
+   :context [(common/with-server-f rjh/handler
                                    (assoc ring-jetty-basic-opts :async? true))]}
   (it "manages forms"
     (doseq [[driver-type driver] common/drivers]

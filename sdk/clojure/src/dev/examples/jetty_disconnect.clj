@@ -3,7 +3,7 @@
     [examples.utils :as u]
     [reitit.ring :as rr]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.ring-jetty :refer [->sse-response]]))
 
 
 ;; This is a small experiment to determine the behaviour of
@@ -78,6 +78,7 @@
       (ex-cause))) ;closed
 
 (comment
+  (user/reload!)
   (u/clear-terminal!)
   (u/reboot-jetty-server! #'handler {:async? true}))
 

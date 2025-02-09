@@ -11,7 +11,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     /* Linting */
-    "allowJs": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -19,5 +18,5 @@
     "declaration": true,
     "outDir": "dist",
   },
-  "include": ["src/**/*.ts", "src/**/*.js"]
+  "include": ["src/**/*.ts"]
 }

@@ -7,7 +7,7 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import { modifyCasing, trimDollarSignPrefix } from '../../../../utils/text'
+import { trimDollarSignPrefix } from '../../../../utils/text'
 import {
   DATASTAR_SSE_EVENT,
   type DatastarSSEEvent,
@@ -20,8 +20,8 @@ export const Indicator: AttributePlugin = {
   name: 'indicator',
   keyReq: Requirement.Exclusive,
   valReq: Requirement.Exclusive,
-  onLoad: ({ el, key, mods, signals, value }) => {
-    const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
+  onLoad: ({ value, signals, el, key }) => {
+    const signalName = key ? key : trimDollarSignPrefix(value)
     const signal = signals.upsertIfMissing(signalName, false)
     const watcher = (event: CustomEvent<DatastarSSEEvent>) => {
       const {

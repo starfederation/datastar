@@ -126,7 +126,7 @@ func (sse *ServerSentEventGenerator) Send(eventType EventType, dataLines []strin
 	}
 
 	// write retry if needed
-	if evt.RetryDuration.Milliseconds() > 0 && evt.RetryDuration.Milliseconds() != DefaultSseRetryDuration.Milliseconds() {
+	if evt.RetryDuration.Milliseconds() > 0 {
 		retry := int(evt.RetryDuration.Milliseconds())
 		retryStr := strconv.Itoa(retry)
 		if err := errors.Join(
