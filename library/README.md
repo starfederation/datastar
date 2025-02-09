@@ -26,6 +26,8 @@ Then start adding frontend reactivity using declarative <code>data-*</code> attr
 
 Visit the [Datastar Website »](https://data-star.dev/)
 
+Watch the [Videos »](https://www.youtube.com/@data-star)
+
 Join the [Discord Server »](https://discord.com/channels/1296224603642925098/1296224603642925102)
 
 ## Getting Started
@@ -44,7 +46,7 @@ You can manually add your own plugins to the core:
 <script type="importmap">
 {
     "imports": {
-      "datastar": "https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.4/bundles/datastar.js"
+      "datastar": "https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.3/bundles/datastar.js"
     }
 }
 </script>
