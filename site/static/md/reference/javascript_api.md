@@ -5,8 +5,10 @@ Datastar is intentional about not (indecently) exposing itself in the global sco
 When troubleshooting an issue, it may be useful to see the current state of the signals. The easiest way to do this is by outputting them in JSON format using `data-text`.
 
 ```html
-<div data-text="ctx.signals.JSON()"></div>
+<pre data-text="ctx.signals.JSON()"></pre>
 ```
+
+## Importing Datastar
 
 While it is generally recommended against, you can manually import the Datastar object and access its public methods and properties.
 
@@ -18,11 +20,11 @@ While it is generally recommended against, you can manually import the Datastar 
 </script>
 ```
 
-## Public Methods
+### Public Methods
 
 The Datastar object exposes the following methods.
 
-### `load()`
+#### `load()`
 
 Loads all plugins and applies them to the DOM.
 
@@ -30,11 +32,11 @@ Loads all plugins and applies them to the DOM.
 Datastar.load()
 ```
 
-## Public Properties
+### Public Properties
 
 The Datastar object exposes the following properties.
 
-### `signals`
+#### `signals`
 
 The signal root, on which you can access signal methods. Beware that you should avoid using this for anything other than troubleshooting.
 
