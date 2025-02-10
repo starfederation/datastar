@@ -30,7 +30,7 @@ The `@get()` action takes a second argument of options.
 - `includeLocal` - Whether to include local signals (those beggining with an underscore) in the request. Defaults to `false`.
 - `selector` - Optionally specifies a form to send when the `contentType` option is set to `form`. If the value is `null`, the closest form is used. Defaults to `null`.
 - `headers` - An object containing headers to send with the request.
-- `openWhenHidden` - Whether to keep the connection open with the page is hidden. Useful for dashboards but can cause a drain on battery life and other resources when enabled. Defaults to `false`
+- `openWhenHidden` - Whether to keep the connection open when the page is hidden. Useful for dashboards but can cause a drain on battery life and other resources when enabled. Defaults to `false`.
 - `retryInterval` - The retry interval in milliseconds. Defaults to `1000` (1 second).
 - `retryScaler` - A numeric multiplier applied to scale retry wait times. Defaults to `2`.
 - `retryMaxWaitMs` - The maximum allowable wait time in milliseconds between retries. Defaults to `30000` (30 seconds).
