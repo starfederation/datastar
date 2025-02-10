@@ -25,6 +25,11 @@ export abstract class ServerSentEventGenerator {
   protected constructor() {}
 
   /**
+   * Closes the stream. Must be implemented by concrete classes.
+   */
+  public abstract close(): void;
+
+  /**
    * Sends a server-sent event (SSE) to the client.
    *
    * Runtimes should override this method by calling the parent function
@@ -40,7 +45,7 @@ export abstract class ServerSentEventGenerator {
     dataLines: string[],
     options: DatastarEventOptions,
   ): string[] {
-    const { eventId, retryDuration } = options || {};
+    const { eventId, retryDuration, keepAlive } = options || {};
 
     const typeLine = [`event: ${event}\n`];
     const idLine = eventId ? [`id: ${eventId}\n`] : [];
@@ -48,7 +53,7 @@ export abstract class ServerSentEventGenerator {
       `retry: ${retryDuration ?? DefaultSseRetryDurationMs}\n`,
     ];
 
-    return typeLine.concat(
+    const lines = typeLine.concat(
       idLine,
       retryLine,
       dataLines.map((data) => {
@@ -56,6 +61,13 @@ export abstract class ServerSentEventGenerator {
       }),
       ["\n\n"],
     );
+
+    // Auto-close the stream if keepAlive is not true
+    if (keepAlive !== true) {
+      setTimeout(() => this.close(), 0);
+    }
+
+    return lines;
   }
 
   private eachNewlineIsADataLine(prefix: string, data: string) {
@@ -99,7 +111,7 @@ export abstract class ServerSentEventGenerator {
     data: string,
     options?: MergeFragmentsOptions,
   ): ReturnType<typeof this.send> {
-    const { eventId, retryDuration, ...renderOptions } = options ||
+    const { eventId, retryDuration, keepAlive, ...renderOptions } = options ||
       {} as Partial<MergeFragmentsOptions>;
 
     const dataLines = this.eachOptionIsADataLine(renderOptions)
@@ -108,6 +120,7 @@ export abstract class ServerSentEventGenerator {
     return this.send("datastar-merge-fragments", dataLines, {
       eventId,
       retryDuration,
+      keepAlive,
     });
   }
 
@@ -118,7 +131,7 @@ export abstract class ServerSentEventGenerator {
    * @param [options] - Additional options for removing.
    */
   public removeFragments(selector: string, options?: FragmentOptions) {
-    const { eventId, retryDuration, ...eventOptions } = options ||
+    const { eventId, retryDuration, keepAlive, ...eventOptions } = options ||
       {} as Partial<FragmentOptions>;
     const dataLines = this.eachOptionIsADataLine(eventOptions)
       .concat(this.eachNewlineIsADataLine("selector", selector));
@@ -126,6 +139,7 @@ export abstract class ServerSentEventGenerator {
     return this.send("datastar-remove-fragments", dataLines, {
       eventId,
       retryDuration,
+      keepAlive,
     });
   }
 
@@ -139,7 +153,7 @@ export abstract class ServerSentEventGenerator {
     data: Record<string, Jsonifiable>,
     options?: MergeSignalsOptions,
   ): ReturnType<typeof this.send> {
-    const { eventId, retryDuration, ...eventOptions } = options ||
+    const { eventId, retryDuration, keepAlive, ...eventOptions } = options ||
       {} as Partial<MergeSignalsOptions>;
     const dataLines = this.eachOptionIsADataLine(eventOptions)
       .concat(this.eachNewlineIsADataLine("signals", JSON.stringify(data)));
@@ -147,6 +161,7 @@ export abstract class ServerSentEventGenerator {
     return this.send("datastar-merge-signals", dataLines, {
       eventId,
       retryDuration,
+      keepAlive,
     });
   }
 
@@ -160,12 +175,16 @@ export abstract class ServerSentEventGenerator {
     paths: string[],
     options?: DatastarEventOptions,
   ): ReturnType<typeof this.send> {
-    const eventOptions = options || {} as DatastarEventOptions;
+    const { eventId, retryDuration, keepAlive } = options || {} as DatastarEventOptions;
     const dataLines = paths.flatMap((path) => path.split(" ")).map((path) =>
       `paths ${path}`
     );
 
-    return this.send("datastar-remove-signals", dataLines, eventOptions);
+    return this.send("datastar-remove-signals", dataLines, {
+      eventId,
+      retryDuration,
+      keepAlive,
+    });
   }
 
   /**
@@ -181,6 +200,7 @@ export abstract class ServerSentEventGenerator {
     const {
       eventId,
       retryDuration,
+      keepAlive,
       attributes,
       ...eventOptions
     } = options || {} as Partial<ExecuteScriptOptions>;
@@ -196,6 +216,7 @@ export abstract class ServerSentEventGenerator {
     return this.send("datastar-execute-script", dataLines, {
       eventId,
       retryDuration,
+      keepAlive,
     });
   }
 }
