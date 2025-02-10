@@ -5,8 +5,6 @@ from datetime import datetime
 from fasthtml.common import *
 from datastar_py import DatastarFastHTMLResponse
 
-
-# Import datastar from a CDN and as a module
 app, rt = fast_app(
     live=True,
     hdrs=(
@@ -30,15 +28,12 @@ async def index():
         example_style,
         Body(data_signals=json.dumps({"currentTime": now}))(
             Div(cls="container")(
-                # Initiate a GET request on load to the /updates endpoint, which returns a stream
                 Div(data_on_load="@get('/updates')", cls="time")(
                     "Current time from fragment: ",
-                    # Use currentTime ID for fragment replacement
                     Span(id="currentTime")(now),
                 ),
                 Div(cls="time")(
                     "Current time from signal: ",
-                    # Use currentTime as data-text for signal replacement
                     Span(data_text="$currentTime")(now),
                 ),
             ),
