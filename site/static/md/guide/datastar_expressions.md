@@ -68,7 +68,7 @@ Expressions may span multiple lines, but a semicolon must be used to separate st
 
 ## `ctx.signals`
 
-Every expression is evaluated in the context of `ctx`, which is the Datastar context. This means that `ctx` can be used in Datastar expressions to access the `signals` object.
+Every expression is evaluated in the context of `ctx`, which is the Datastar context. This means that `ctx` can be used in expressions to access the `signals` object.
 
 Here is the equivalent of the first example using `ctx.signals`.
 
