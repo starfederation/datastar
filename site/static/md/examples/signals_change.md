@@ -4,7 +4,7 @@
 
 <div
   data-signals="{clicks:0, _localState: {bar: 1234}, _anotherLocalVar: 'hello'}"
-  data-on-signals-change-clicks="@post('/examples/signals_changed/updates')"
+  data-on-signals-change="@post('/examples/signals_changed/updates')"
   >
     <div class="flex flex-col md:flex-row gap-4">
       <button
@@ -32,7 +32,7 @@
 ```html
 <div
   data-signals="{clicks:0, _localState: {bar: 1234}, _anotherLocalVar: 'hello'}"
-  data-on-signals-change-clicks="@post('/examples/signals_changed/updates')"
+  data-on-signals-change="@post('/examples/signals_changed/updates')"
 >
   <div>
     <button id="increment" data-on-click="$clicks++">Click Me</button>
