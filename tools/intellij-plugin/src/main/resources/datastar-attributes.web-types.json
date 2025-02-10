@@ -18,6 +18,30 @@
           "name": "raf"
         }
       ],
+      "datastar-bind-modifiers": [
+        {
+          "name": "case",
+          "description": "Modify the casing of the signal name"
+        }
+      ],
+      "datastar-class-modifiers": [
+        {
+          "name": "case",
+          "description": "Modify the casing of the class"
+        }
+      ],
+      "datastar-computed-modifiers": [
+        {
+          "name": "case",
+          "description": "Modify the casing of the signal name"
+        }
+      ],
+      "datastar-indicator-modifiers": [
+        {
+          "name": "case",
+          "description": "Modify the casing of the signal name"
+        }
+      ],
       "datastar-intersects-modifiers": [
         {
           "name": "full",
@@ -36,6 +60,10 @@
         {
           "name": "capture",
           "description": "Use a capture event listener"
+        },
+        {
+          "name": "case",
+          "description": "Modify the casing of the event name"
         },
         {
           "name": "debounce",
@@ -106,14 +134,28 @@
           "description": "Throttle without trailing edge"
         },
         {
+          "name": "viewtransition",
+          "description": "Wraps the expression in `document.startViewTransition()` when the View Transition API is available"
+        },
+        {
           "name": "window",
           "description": "Attaches the event listener to the `window` element"
         }
       ],
       "datastar-persist-modifiers": [
         {
+          "name": "case",
+          "description": "Modify the casing of the key"
+        },
+        {
           "name": "session",
           "description": "Persists signals values in Session Storage"
+        }
+      ],
+      "datastar-ref-modifiers": [
+        {
+          "name": "case",
+          "description": "Modify the casing of the signal name"
         }
       ],
       "datastar-scroll-into-view-modifiers": [
@@ -167,6 +209,10 @@
         }
       ],
       "datastar-signals-modifiers": [
+        {
+          "name": "case",
+          "description": "Modify the casing of the signal name"
+        },
         {
           "name": "ifmissing",
           "description": "Only set the signals if the key does not exist. This is useful for setting defaults without overwriting existing values"
@@ -229,7 +275,7 @@
           "pattern": {
             "or": [
               {
-                "items": "/css/classes",
+                "items": "/js/datastar-class-modifiers",
                 "template": [
                   "data-class-",
                   "$...",
@@ -260,7 +306,15 @@
             "template": [
               "data-computed-",
               {
-                "regex": "[-a-z0-9]+"
+                "regex": "[-a-z0-9]+",
+                "items": "/js/datastar-computed-modifiers",
+                "template": [
+                  "__",
+                  "$...",
+                  "#item:modifier"
+                ],
+                "required": false,
+                "repeat": true
               }
             ],
             "priority": "normal"
@@ -299,7 +353,15 @@
                 "template": [
                   "data-indicator-",
                   {
-                    "regex": "[-a-z0-9]+"
+                    "regex": "[-a-z0-9]+",
+                    "items": "/js/datastar-indicator-modifiers",
+                    "template": [
+                      "__",
+                      "$...",
+                      "#item:modifier"
+                    ],
+                    "required": false,
+                    "repeat": true
                   }
                 ],
                 "priority": "normal"
@@ -417,7 +479,15 @@
                 "template": [
                   "data-ref-",
                   {
-                    "regex": "[-a-z0-9]+"
+                    "regex": "[-a-z0-9]+",
+                    "items": "/js/datastar-ref-modifiers",
+                    "template": [
+                      "__",
+                      "$...",
+                      "#item:modifier"
+                    ],
+                    "required": false,
+                    "repeat": true
                   }
                 ],
                 "priority": "normal"
@@ -628,7 +698,15 @@
                     "template": [
                       "data-bind-",
                       {
-                        "regex": "[-a-z0-9]+"
+                        "regex": "[-a-z0-9]+",
+                        "items": "/js/datastar-bind-modifiers",
+                        "template": [
+                          "__",
+                          "$...",
+                          "#item:modifier"
+                        ],
+                        "required": false,
+                        "repeat": true
                       }
                     ],
                     "priority": "normal",

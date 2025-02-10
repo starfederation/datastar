@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.0.2] - 2025.02.10
+
+### Added
+
+- Added the `case` modifier to `data-on-*`.
+- Added the `viewtransition` modifier to `data-on-*`.
+
 ## [1.0.1] - 2025.02.01
 
 ### Added
