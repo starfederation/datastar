@@ -10,15 +10,18 @@ import (
 func TestExampleSignalsChange(t *testing.T) {
 	setupPageTest(t, "examples/signals_change", func(runner runnerFn) {
 		runner("increment", func(t *testing.T, page *rod.Page) {
-			initial := page.MustElement("#local_clicks").MustText()
+			initialClicks := page.MustElement("#local_clicks").MustText()
+			initialServer := page.MustElement("#from_server").MustText()
 
 			wait := page.MustWaitRequestIdle()
 			page.MustElement("#increment").MustClick()
 			wait()
 
 			result := page.MustElement("#local_clicks").MustText()
+			assert.NotEqual(t, initialClicks, result)
 
-			assert.NotEqual(t, initial, result)
+			result = page.MustElement("#from_server").MustText()
+			assert.NotEqual(t, initialServer, result)
 		})
 	})
 }
