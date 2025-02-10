@@ -68,6 +68,8 @@ Note that `data-*` attributes are case-insensitive. If you want to use uppercase
 
 You can further modify the casing of keys in `data-*` attributes using the `__case` modifier, followed by `.kebab`, `.snake`, or `.pascal`.
 
+Signals beginning with an underscore are considered _local signals_ and are not included in requests to the backend by default. You can include them by setting the [`includeLocal` option](/reference/action_plugins#options) to `true`.
+
 #### Modifiers
 
 Modifiers allow you to modify behavior when merging signals.
