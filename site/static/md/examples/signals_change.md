@@ -25,6 +25,7 @@
     </div>
     <div id="local_clicks">Local Clicks: <span data-text="$clicks"></span></div>
     <div id="from_server"></div>
+    <pre data-text="ctx.signals.JSON()"></pre>
 </div>
 
 ## Explanation
