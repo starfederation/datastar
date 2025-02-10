@@ -9,7 +9,7 @@ import (
 
 templ Home() {
 	{{
-		cdnText := fmt.Sprintf(`<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@%s/bundles/datastar.js`, datastar.Version)
+		cdnText := fmt.Sprintf(`<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@%s/bundles/datastar.js"></script>`, datastar.Version)
 	}}
 	{{
 		usageSample := `<input data-bind-title />
