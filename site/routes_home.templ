@@ -21,10 +21,106 @@ templ Home() {
 		"Datastar helps you build reactive web applications with the simplicity of server-side rendering and the power of a full-stack SPA framework.",
 		"/",
 	) {
+		<script type="module" src={ staticPath("webcomponents/datastar.js") }></script>
+		<div
+			class="w-full aspect-[1] md:aspect-[2.77] relative"
+			data-signals="{centerX:25,centerY:50,speed:10}"
+		>
+			<div class="w-full aspect-[1] md:aspect-[2.77] bg-base-100 text-base-content absolute">
+				<ds-starfield
+					data-attr-center-x="$centerX"
+					data-attr-center-y="$centerY"
+					data-attr-speed="$speed"
+				></ds-starfield>
+			</div>
+			<div class="absolute left-0 top-0 flex w-full h-full flex flex-col items-center justify-center">
+				<div class="flex flex-col md:flex-row flex-wrap gap-8 justify-center items-start p-8">
+					<div class="flex flex-col items-end font-bold uppercase font-brand">
+						<div class="text-3xl md:text-6xl text-primary">
+							<div>Hello,</div>
+							<div>Datastar</div>
+						</div>
+						<div class="md:text-2xl text-secondary">v{ datastar.Version }</div>
+					</div>
+					<div class="text-center font-brand flex flex-col gap-4">
+						<div class="text-xl md:text-3xl">
+							The hypermedia framework.
+						</div>
+						<div class="hidden md:block">
+							<input
+								type="range"
+								min="0"
+								max="25"
+								step="0.1"
+								class="range range-primary range-xs"
+								data-bind-speed
+							/>
+							<input
+								type="range"
+								min="0"
+								max="100"
+								class="range range-primary range-xs"
+								data-bind-center-x
+							/>
+							<input
+								type="range"
+								min="0"
+								max="100"
+								class="range range-primary range-xs"
+								data-bind-center-y
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="border-y-4 border-base-300 bg-base-200">
+			<div class="mx-auto max-w-7xl md:px-6 lg:px-8 grid grid-cols-2 p-32 items-center gap-8">
+				<div class="text-4xl flex flex-col gap-16 font-bold">
+					<p>
+						Are you tired of the constant disconnect between single page applications and server-side rendering?
+					</p>
+					<p>
+						Hypermedia first is the solution.  Replace your frontend with Datastar and your backend with the language of your choice.
+					</p>
+					<ul class="flex flex-col gap-8">
+						@listCheckmark() {
+							Tiny { humanize.CommafWithDigits( datastar.VersionClientByteSizeGzip / 1024.0, 1) } KiB package size
+						}
+						@listCheckmark() {
+							Streaming HTML fragments
+						}
+						@listCheckmark() {
+							Fine grain reactivity
+						}
+					</ul>
+				</div>
+				<div class="flex flex-col items-center gap-8">
+					<img class="w-96 h-96" src={ staticPath("images/rocket.webp") }/>
+					<div class="flex flex-col gap-4">
+						<a
+							class="flex items-center w-full gap-1 btn btn-accent btn-lg"
+							href={ templ.SafeURL("/guide") }
+						>
+							@icon("simple-icons:rocket")
+							{ "Get started" }
+						</a>
+						<a
+							class="flex items-center w-full gap-4 btn btn-primary btn-lg"
+							href={ templ.SafeURL("/examples") }
+						>
+							@icon("svg-spinners:bars-scale-middle")
+							{ "Show me some examples!" }
+							@icon("svg-spinners:bars-scale-middle")
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div class="flex flex-col w-full min-h-screen bg-base-200 md:bg-gradient-to-br md:items-center from-base-300 to-base-100">
 			<div class="flex flex-col items-stretch gap-7 p-4 md:pt-8 md:max-w-3xl max-w-none">
 				<div class="flex flex-col items-center gap-7">
-					<img class="w-48 sm:w-56 md:w-72" src={ staticPath("images/rocket.webp") }/>
+					<img class="w-48 md:w-56 md:w-72" src={ staticPath("images/rocket.webp") }/>
 					<div class="flex flex-col items-end font-bold uppercase font-brand">
 						<div class="text-3xl md:text-5xl text-primary">Datastar</div>
 						<div class="text-sm text-secondary">v{ datastar.Version }</div>
@@ -137,6 +233,13 @@ templ Home() {
 			</div>
 		</div>
 	}
+}
+
+templ listCheckmark() {
+	<li class="flex items-center gap-4 text-success">
+		@icon("mdi:check-bold")
+		{ children... }
+	</li>
 }
 
 type TodoViewMode int

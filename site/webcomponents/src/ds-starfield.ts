@@ -11,10 +11,10 @@ export class DatastarStarfield extends LitElement {
   @property({ type: Number })
   numStars = 5000
 
-  @property({ type: Number })
+  @property({ type: Number, attribute: 'center-x' })
   centerXPercentage = 25
 
-  @property({ type: Number })
+  @property({ type: Number, attribute: 'center-y' })
   centerYPercentage = 50
 
   @property({ type: Number })
