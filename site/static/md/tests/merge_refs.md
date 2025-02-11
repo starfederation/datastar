@@ -1,13 +1,12 @@
 ## Merge Refs
 
-`data-ref` is correctly applied after merging.
+Tests that `data-ref` is correctly applied after merging.
 
-<div id="content">
-  Input:
-  <button data-ref-foo data-on-click="@get('/tests/merge_refs/data')" class="btn">foo</button>
+<div>
+  <div id="content"><button data-ref-result data-on-click="@get('/tests/merge_refs/data')" data-val="0" class="btn">Merge</button></div>
   <hr />
-  Output:
-  <code id="result" data-text="$foo.innerHTML"></code>
+  Result:
+  <code id="result" data-text="$result.getAttribute('data-val')"></code>
   <hr />
-  Expected result: <code>foo</code>
+  Expected result on click: <code>1</code>
 </div>
