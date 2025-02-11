@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.0.2] - 2025.02.11
+
+### Added
+
+- Added the `case` modifier to `data-on-*`.
+- Added the `viewtransition` modifier to `data-on-*`.
+
 ## [1.0.1] - 2025.02.01
 
 ### Added
@@ -28,7 +35,8 @@
 
 - Initial public release
 
-[Unreleased]: https://github.com/starfederation/datastar/tools/intellij-plugin/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/starfederation/datastar/tools/intellij-plugin/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/starfederation/datastar/tools/intellij-plugin/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/starfederation/datastar/tools/intellij-plugin/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/starfederation/datastar/tools/intellij-plugin/compare/v0.21.0...v1.0.0
 [0.21.0]: https://github.com/starfederation/datastar/tools/intellij-plugin/commits/v0.21.0
