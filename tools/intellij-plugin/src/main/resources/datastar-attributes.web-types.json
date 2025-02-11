@@ -275,13 +275,21 @@
           "pattern": {
             "or": [
               {
-                "items": "/js/datastar-class-modifiers",
                 "template": [
                   "data-class-",
-                  "$...",
-                  "#item:event name"
-                ],
-                "priority": "normal"
+                  {
+                    "regex": "[-a-z0-9]+"
+                  },
+                  {
+                    "items": "/js/datastar-class-modifiers",
+                    "template": [
+                      "data-class-",
+                      "$...",
+                      "#item:event name"
+                    ],
+                    "priority": "normal"
+                  }
+                ]
               },
               {
                 "template": [
@@ -306,7 +314,9 @@
             "template": [
               "data-computed-",
               {
-                "regex": "[-a-z0-9]+",
+                "regex": "[-a-z0-9]+"
+              },
+              {
                 "items": "/js/datastar-computed-modifiers",
                 "template": [
                   "__",
@@ -353,7 +363,9 @@
                 "template": [
                   "data-indicator-",
                   {
-                    "regex": "[-a-z0-9]+",
+                    "regex": "[-a-z0-9]+"
+                  },
+                  {
                     "items": "/js/datastar-indicator-modifiers",
                     "template": [
                       "__",
@@ -479,7 +491,9 @@
                 "template": [
                   "data-ref-",
                   {
-                    "regex": "[-a-z0-9]+",
+                    "regex": "[-a-z0-9]+"
+                  },
+                  {
                     "items": "/js/datastar-ref-modifiers",
                     "template": [
                       "__",
@@ -514,6 +528,50 @@
           "pattern": {
             "template": [
               "data-replace-url"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-scroll-into-view",
+          "virtual": true,
+          "description": "Scrolls the element into view.",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-scroll-into-view",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-scroll-into-view",
+              {
+                "items": "/js/datastar-scroll-into-view-modifiers",
+                "template": [
+                  "__",
+                  "$...",
+                  "#item:modifier"
+                ],
+                "required": false,
+                "repeat": true
+              }
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-show",
+          "virtual": true,
+          "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-show",
+          "value": {
+            "kind": "expression",
+            "type": "boolean",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-show"
             ],
             "priority": "normal"
           }
@@ -569,50 +627,6 @@
                 "priority": "normal"
               }
             ]
-          }
-        },
-        {
-          "name": "data-scroll-into-view",
-          "virtual": true,
-          "description": "Scrolls the element into view.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-scroll-into-view",
-          "value": {
-            "kind": "expression",
-            "type": "string",
-            "required": true
-          },
-          "pattern": {
-            "template": [
-              "data-scroll-into-view",
-              {
-                "items": "/js/datastar-scroll-into-view-modifiers",
-                "template": [
-                  "__",
-                  "$...",
-                  "#item:modifier"
-                ],
-                "required": false,
-                "repeat": true
-              }
-            ],
-            "priority": "normal"
-          }
-        },
-        {
-          "name": "data-show",
-          "virtual": true,
-          "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-show",
-          "value": {
-            "kind": "expression",
-            "type": "boolean",
-            "required": true
-          },
-          "pattern": {
-            "template": [
-              "data-show"
-            ],
-            "priority": "normal"
           }
         },
         {
@@ -698,7 +712,9 @@
                     "template": [
                       "data-bind-",
                       {
-                        "regex": "[-a-z0-9]+",
+                        "regex": "[-a-z0-9]+"
+                      },
+                      {
                         "items": "/js/datastar-bind-modifiers",
                         "template": [
                           "__",
