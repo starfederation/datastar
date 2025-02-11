@@ -29,8 +29,11 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 		{
 			Label: "tests",
 			Links: []*SidebarLink{
+				{ID: "key_casing"},
 				{ID: "merge_fragment_signal"},
 				{ID: "merge_refs"},
+				{ID: "signals_change"},
+				{ID: "signals_change_path"},
 			},
 		},
 	}

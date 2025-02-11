@@ -3,7 +3,7 @@
 ## Demo
 
 <div>
-     <div data-ref="foo">I'm a div that is getting referenced</div>
+     <div data-ref-foo>I'm a div that is getting referenced</div>
      <div class="card bg-primary text-primary-content">
           <div class="card-body">
                <div class="card-title" data-text="`I'm using content of '${$foo.innerHTML}'`">
@@ -17,11 +17,9 @@
 
 ```html
 <div>
-  <div data-ref="foo">I'm a div that is getting referenced</div>
+  <div data-ref-foo>I'm a div that is getting referenced</div>
   <div data-text="`I'm using content of '${$foo.innerHTML}'`"></div>
 </div>
 ```
 
-Adding `data-ref="foo"` to an element creates a signal called `$foo` that points to that element.
-
-***Note:*** We have to wrap the reference in `()` to avoid parsing issues.  This is mostly to support namespaced signals.  To the parser `foo.bar.bar` and `foo.bar.length` look the same.  We are looking at efficient ways to handle this but for now this is the solution.
+Adding `data-ref-foo` to an element creates a signal called `$foo` that points to that element.
