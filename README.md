@@ -1,6 +1,6 @@
 [![Version](https://img.shields.io/github/package-json/v/starfederation/datastar?filename=library/package.json)](https://github.com/starfederation/datastar/releases)
-[![License](https://img.shields.io/github/license/starfederation/datastar)](https://github.com/starfederation/datastar?tab=MIT-1-ov-file#readme)
-[![Stars](https://img.shields.io/github/stars/starfederation/datastar?style=flat)](https://github.com/starfederation/datastar)
+[![License](https://img.shields.io/github/license/starfederation/datastar)](https://github.com/starfederation/datastar/blob/main/LICENSE)
+[![Stars](https://img.shields.io/github/stars/starfederation/datastar?style=flat)](https://github.com/starfederation/datastar/stargazers)
 
 <p align="center"><img width="200" src="https://data-star.dev/static/images/rocket.webp"></p>
 
