@@ -18,6 +18,7 @@ import {
 } from '../../../../engine/types'
 import { elUniqId, walkDOM } from '../../../../utils/dom'
 import { camel, isBoolString } from '../../../../utils/text'
+import { delay } from '../../../../utils/timing'
 import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
@@ -167,9 +168,7 @@ function applyToTargets(
     const cl = modifiedTarget.classList
     cl?.add(SWAPPING_CLASS)
 
-    // ctx.apply(document.body)
-
-    setTimeout(() => {
+    delay(() => {
       initialTarget.classList.remove(SWAPPING_CLASS)
       cl?.remove(SWAPPING_CLASS)
     }, settleDuration)
@@ -178,7 +177,7 @@ function applyToTargets(
 
     if (cl && originalHTML !== revisedHTML) {
       cl.add(SETTLING_CLASS)
-      setTimeout(() => {
+      delay(() => {
         cl.remove(SETTLING_CLASS)
       }, settleDuration)
     }

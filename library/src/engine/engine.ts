@@ -199,8 +199,7 @@ export class Engine {
     // Extract the raw key from the dataset
     const rawKey = camelCasedKey.slice(this.aliasPrefix.length)
 
-    // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically
-    // the first match will be the most specific
+    // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically. The first match will be the most specific.
     const plugin = this.#plugins.find((p) => rawKey.startsWith(p.name))
 
     // Skip if no plugin is found
