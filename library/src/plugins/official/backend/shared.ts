@@ -37,7 +37,6 @@ declare global {
 }
 
 export function datastarSSEEventWatcher(
-  // ctx: InitContext,
   eventType: string,
   fn: (argsRaw: Record<string, string>) => void,
 ) {

@@ -313,7 +313,6 @@ export function fetchEventSource(
 
     const fetch = inputFetch ?? window.fetch
     const onopen = inputOnOpen ?? function defaultOnOpen() {}
-    // response: Response
 
     async function create() {
       curRequestController = new AbortController()
