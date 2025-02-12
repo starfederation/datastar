@@ -65,7 +65,7 @@ Ruby [SDK](https://github.com/starfederation/datastar/tree/main/sdk/ruby) and [e
 
 ## TypeScript
 
-TypeScript [SDK](https://github.com/starfederation/datastar/tree/main/sdk/typescript) and [examples](https://github.com/starfederation/datastar/tree/main/examples/typescript), including support for NodeJS and Web standard runtimes (Deno, Bun, etc.).  
+TypeScript [SDK](https://github.com/starfederation/datastar/tree/main/sdk/typescript) and [examples](https://github.com/starfederation/datastar/tree/main/sdk/typescript/examples), including support for NodeJS and Web standard runtimes (Deno, Bun, etc.).  
 _Author: [Patrick Marchand](https://github.com/Superpat)_
 
 ## Zig

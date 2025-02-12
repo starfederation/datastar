@@ -1,4 +1,4 @@
-import { Hash, elUniqId } from '../utils/dom'
+import { Hash, elUniqId, walkDOM } from '../utils/dom'
 import { camel } from '../utils/text'
 import { delay } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
@@ -96,7 +96,7 @@ export class Engine {
 
   // Apply all plugins to the element and its children
   #apply(rootElement: Element) {
-    this.#walkDownDOM(rootElement, (el) => {
+    walkDOM(rootElement, (el) => {
       // Cleanup any existing removal functions
       const elRemovals = this.#removals.get(el)
       if (elRemovals) {
@@ -119,7 +119,7 @@ export class Engine {
     if (this.#mutationObserver) {
       return
     }
-    
+
     this.#mutationObserver = new MutationObserver((mutations) => {
       for (const {
         target,
@@ -199,8 +199,7 @@ export class Engine {
     // Extract the raw key from the dataset
     const rawKey = camelCasedKey.slice(this.aliasPrefix.length)
 
-    // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically
-    // the first match will be the most specific
+    // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically. The first match will be the most specific.
     const plugin = this.#plugins.find((p) => rawKey.startsWith(p.name))
 
     // Skip if no plugin is found
@@ -396,30 +395,6 @@ export class Engine {
       throw runtimeErr('GenerateExpression', ctx, {
         error: error.message,
       })
-    }
-  }
-
-  #walkDownDOM(
-    element: Element | null,
-    callback: (el: HTMLorSVGElement) => void,
-  ) {
-    if (
-      !element ||
-      !(element instanceof HTMLElement || element instanceof SVGElement)
-    ) {
-      return null
-    }
-    const dataset = element.dataset
-    if ('starIgnore' in dataset) {
-      return null
-    }
-    if (!('starIgnore__self' in dataset)) {
-      callback(element)
-    }
-    let el = element.firstElementChild
-    while (el) {
-      this.#walkDownDOM(el, callback)
-      el = el.nextElementSibling
     }
   }
 }

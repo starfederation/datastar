@@ -76,7 +76,6 @@ export interface ActionPlugin extends DatastarPlugin {
 }
 
 export type GlobalInitializer = (ctx: InitContext) => void
-// export type RemovalEntry = { id: string; fns: Array<OnRemovalFn> }
 
 export type InitContext = {
   plugin: DatastarPlugin

@@ -29,7 +29,12 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 		{
 			Label: "tests",
 			Links: []*SidebarLink{
-				{ID: "merge_refs"},
+				{ID: "key_casing"},
+				{ID: "merge_fragment_signal"},
+				{ID: "on_load"},
+				{ID: "ref"},
+				{ID: "signals_change"},
+				{ID: "signals_change_path"},
 			},
 		},
 	}
@@ -82,7 +87,8 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 		})
 
 		if err := errors.Join(
-			setupTestsMergeRefs(testsRouter),
+			setupTestsMergeFragmentSignal(testsRouter),
+			setupTestsOnLoad(testsRouter),
 		); err != nil {
 			panic(fmt.Sprintf("error setting up tests routes: %s", err))
 		}

@@ -4,10 +4,10 @@ Implement the [Datastart SSE procotocol](https://data-star.dev/reference/sse_eve
 
 ## Installation
 
-Install the gem and add to the application's Gemfile by executing:
+Add this gem to your `Gemfile`
 
 ```bash
-bundle add datastar
+gem 'datastar'
 ```
 
 Or point your `Gemfile` to the source
@@ -170,7 +170,10 @@ datastar.on_client_connect do
 end
 ```
 
+This callback's behaviour depends on the configured [heartbeat](#heartbeat)
+
 #### `on_server_disconnect`
+
 Register server-side code to run when the connection is closed by the server.
 Ie when the served is done streaming without errors.
 
@@ -188,15 +191,64 @@ datastar.on_error do |exception|
   Sentry.notify(exception)
 end
 ```
-Note that this callback can be registered globally, too.
+Note that this callback can be [configured globally](#global-configuration), too.
+
+### heartbeat
+
+By default, streaming responses (using the `#stream` block) launch a background thread/fiber to periodically check the connection.
+
+This is because the browser could have disconnected during a long-lived, idle connection (for example waiting on an event bus).
+
+The default heartbeat is 3 seconds, and it will close the connection and trigger [on_client_disconnect](#on_client_disconnect) callbacks if the client has disconnected.
+
+In cases where a streaming block doesn't need a heartbeat and you want to save precious threads (for example a regular ticker update, ie non-idle), you can disable the heartbeat:
+
+```ruby
+datastar = Datastar.new(request:, response:, view_context:, heartbeat: false)
+
+datastar.stream do |sse|
+  100.times do |i|
+    sleep 1
+    sse.merge_signals count: i
+  end
+end
+```
+
+You can also set it to a different number (in seconds)
+
+```ruby
+heartbeat: 0.5
+```
+
+#### Manual connection check
+
+If you want to check connection status on your own, you can disable the heartbeat and use `sse.check_connection!`, which will close the connection and trigger callbacks if the client is disconnected.
+
+```ruby
+datastar = Datastar.new(request:, response:, view_context:, heartbeat: false)
+
+datastar.stream do |sse|
+  # The event bus implementaton will check connection status when idle
+  # by calling #check_connection! on it
+  EventBus.subscribe('channel', sse) do |event|
+    sse.merge_signals eventName: event.name
+  end
+end
+```
 
 ### Global configuration
 
 ```ruby
 Datastar.configure do |config|
+  # Global on_error callback
+  # Can be overriden on specific instances
   config.on_error do |exception|
     Sentry.notify(exception)
   end
+  
+  # Global heartbeat interval (or false, to disable)
+  # Can be overriden on specific instances
+  config.heartbeat = 0.3
 end
 ```
 
@@ -274,7 +326,7 @@ From this library's root, run the bundled-in test Rack app:
 bundle puma examples/test.ru
 ```
 
-Now run the test bash scripts in the `test` directory in this repo.
+Now run the test bash scripts in the `sdk/test` directory in this repo.
 
 ```bash
 ./test-all.sh http://localhost:9292

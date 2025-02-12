@@ -39,6 +39,13 @@ module Datastar
       @view_context = view_context
     end
 
+    # Sometimes we'll want to run periodic checks to ensure the connection is still alive
+    # ie. the browser hasn't disconnected
+    # For example when idle listening on an event bus.
+    def check_connection!
+      @stream << MSG_END
+    end
+
     def merge_fragments(fragments, options = BLANK_OPTIONS)
       # Support Phlex components
       # And Rails' #render_in interface

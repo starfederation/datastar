@@ -19,6 +19,5 @@ export const Ref: AttributePlugin = {
   onLoad: ({ el, key, mods, signals, value }) => {
     const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
     signals.setValue(signalName, el)
-    return () => signals.setValue(signalName, null)
   },
 }

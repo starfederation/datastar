@@ -32,13 +32,15 @@ module Datastar
   class Configuration
     NOOP_CALLBACK = ->(_error) {}
     RACK_FINALIZE = ->(_view_context, response) { response.finish }
+    DEFAULT_HEARTBEAT = 3
 
-    attr_accessor :executor, :error_callback, :finalize
+    attr_accessor :executor, :error_callback, :finalize, :heartbeat
 
     def initialize
       @executor = ThreadExecutor.new
       @error_callback = NOOP_CALLBACK
       @finalize = RACK_FINALIZE
+      @heartbeat = DEFAULT_HEARTBEAT
     end
 
     def on_error(callable = nil, &block)

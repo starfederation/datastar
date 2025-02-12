@@ -79,9 +79,7 @@ function endBatch() {
   batchIteration = 0
   batchDepth--
 
-  if (hasError) {
-    throw internalErr(from, 'BatchError, error', { error })
-  }
+  if (hasError) throw error
 }
 
 /**
@@ -230,6 +228,9 @@ function addDependency(signal: Signal): Node | undefined {
 // This enables better control of the transpiled output size.
 declare class Signal<T = any> {
   /** @internal */
+  _onChange: (change: { old: T; revised: T }) => void
+
+  /** @internal */
   _value: unknown
 
   /**
@@ -370,6 +371,8 @@ Object.defineProperty(Signal.prototype, 'value', {
       if (batchIteration > 100) {
         throw internalErr(from, 'SignalCycleDetected')
       }
+      const old = this._value
+      const revised = value
 
       this._value = value
       this._version++
@@ -387,6 +390,8 @@ Object.defineProperty(Signal.prototype, 'value', {
       } finally {
         endBatch()
       }
+
+      this?._onChange({ old, revised })
     }
   },
 })

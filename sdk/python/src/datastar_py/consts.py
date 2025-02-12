@@ -51,7 +51,7 @@ class EventType(StrEnum):
 #endregion Enums
 
 DATASTAR_KEY = "datastar"
-VERSION                   = "1.0.0-beta.5"
+VERSION                   = "1.0.0-beta.6"
 
 #region Default durations
 

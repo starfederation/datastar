@@ -4,32 +4,15 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 # WIP Release Notes
 
-## v1.0.0-beta.5
-
-### Fixed
-
-- Fixed a bug in the morph merge mode when merging multiple top-level fragments.
-
-## v1.0.0-beta.4
-
-In this release we tuned the engine, added the ability to react to specific signal changes, and added some new modifiers. Idiomorph got an upgrade, and a few bugs were squashed.
-
-The most exciting part of this beta release is that it marks the final round of planned changes before we move to a stable v1 release 🚀
-
-### Added
-
-- Added the ability to add a signal path to the `data-on-signals-change-*` attribute ([#587](https://github.com/starfederation/datastar/issues/587)).
-- Added a `__viewtransition` modifier to the `data-on-*` attribute that wraps the expression in `document.startViewTransition()` when the View Transition API is available ([#627](https://github.com/starfederation/datastar/issues/627)).
-- Added a `__case` modifier to the `data-signals-*`, `data-computed-*`, `data-ref-*`, `data-indicator-*`, `data-persist-*`, `data-bind-*`,  `data-class-*`, and `data-on-*` attributes, allowing you to modify the casing of the key by adding `.kebab`, `.snake` or `.pascal`.
-- Added a `retrying` event type that is dispatched when the SSE plugin is trying to reconnect ([#583](https://github.com/starfederation/datastar/issues/583)).
+## v1.0.0-beta.6
 
 ### Changed
 
-- Idiomorph was updated to version 0.5.0 (pre-release) and is now imported as a module, making it easier to import future versions ([#608](https://github.com/starfederation/datastar/issues/608), [#633](https://github.com/starfederation/datastar/issues/633)).
-- Class names are no longer converted to kebab case when used in the `data-class-*` attribute ([#610](https://github.com/starfederation/datastar/issues/610)).
-- Event names are no longer converted to kebab case when used in the `data-on-*` attribute.
+- The `data-on-load` callback is now delayed to the next microtask, making it possible to place the `data-indicator` attribute later on the same element.
 
 ### Fixed
 
-- Fixed a bug in which signals were being cleared when merge fragments were sending down `data-signals` attributes ([#588](https://github.com/starfederation/datastar/issues/588)).
-- Fixed a bug in which using the `__ifmissing` modifier with the `data-signals-*` attribute was not having any effect ([#605](https://github.com/starfederation/datastar/issues/605)).
+- Fixed a bug in which the `data-on-signals-change` attribute expression was not being executed when signal values changed ([#641](https://github.com/starfederation/datastar/issues/641)).
+- Fixed a bug in which the signal created by `data-ref` was being removed during the cleanup process ([#642](https://github.com/starfederation/datastar/issues/642)).
+- Fixed a bug in which errors were being caught in preact core, which was obfuscating the original error ([#643](https://github.com/starfederation/datastar/issues/643)).
+- Fixed a bug in which morphed DOM elements could lose their focus, due to a change of behavior in Idiomorph ([#645](https://github.com/starfederation/datastar/issues/645)).

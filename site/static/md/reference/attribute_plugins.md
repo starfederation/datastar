@@ -68,7 +68,7 @@ Note that `data-*` attributes are case-insensitive. If you want to use uppercase
 
 You can further modify the casing of keys in `data-*` attributes using the `__case` modifier, followed by `.kebab`, `.snake`, or `.pascal`.
 
-Signals beginning with an underscore are considered _local signals_ and are not included in requests to the backend by default. You can include them by setting the [`includeLocal` option](/reference/action_plugins#options) to `true`.
+Signals beginning with an underscore are considered _local signals_ and are not included in requests to the backend by default. You can include them by setting the [`includeLocal`](/reference/action_plugins#options) option to `true`.
 
 #### Modifiers
 
@@ -164,7 +164,7 @@ If the expression evaluates to `true`, the `hidden` class is added to the elemen
 The `data-class` attribute can also be used to add or remove multiple classes from an element using a set of key-value pairs, where the keys represent class names and the values represent expressions.
 
 ```html
-<div data-class="{hidden: $foo, bold: $bar}"></div>
+<div data-class="{hidden: $foo, 'font-bold': $bar}"></div>
 ```
 
 ### `data-on`
