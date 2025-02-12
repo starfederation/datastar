@@ -5,5 +5,5 @@ import (
 )
 
 func TestExampleSignalsChange(t *testing.T) {
-	setupStandardPageTest(t, "tests/signals_change")
+	setupButtonPageTest(t, "tests/signals_change")
 }
