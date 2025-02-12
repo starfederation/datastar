@@ -331,12 +331,12 @@ RSpec.describe Datastar::Dispatcher do
 
   describe '#stream' do
     it 'writes multiple events to socket' do
+      socket = TestSocket.new
       dispatcher.stream do |sse|
         sse.merge_fragments %(<div id="foo">\n<span>hello</span>\n</div>\n)
         sse.merge_signals(foo: 'bar')
       end
 
-      socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
       expect(socket.lines.size).to eq(2)
@@ -373,6 +373,44 @@ RSpec.describe Datastar::Dispatcher do
       end
     end
 
+    specify ':heartbeat enabled' do
+      dispatcher = Datastar.new(request:, response:, heartbeat: 0.001)
+      connected = true
+      block_called = false
+      dispatcher.on_client_disconnect { |conn| connected = false }
+
+      socket = TestSocket.new
+      allow(socket).to receive(:<<).with("\n\n").and_raise(Errno::EPIPE, 'Socket closed')
+
+      dispatcher.stream do |sse|
+        sleep 10
+        block_called = true
+      end
+
+      dispatcher.response.body.call(socket)
+      expect(connected).to be(false)
+      expect(block_called).to be(false)
+    end
+
+    specify ':heartbeat disabled' do
+      dispatcher = Datastar.new(request:, response:, heartbeat: false)
+      connected = true
+      block_called = false
+      dispatcher.on_client_disconnect { |conn| connected = false }
+
+      socket = TestSocket.new
+      allow(socket).to receive(:<<).with("\n\n").and_raise(Errno::EPIPE, 'Socket closed')
+
+      dispatcher.stream do |sse|
+        sleep 0.001
+        block_called = true
+      end
+
+      dispatcher.response.body.call(socket)
+      expect(connected).to be(true)
+      expect(block_called).to be(true)
+    end
+
     specify '#signals' do
       request = build_request(
         %(/events), 
@@ -400,8 +438,6 @@ RSpec.describe Datastar::Dispatcher do
         sse.merge_signals(foo: 'bar')
       end
       socket = TestSocket.new
-      # allow(socket).to receive(:<<).and_raise(Errno::EPIPE, 'Socket closed')
-      #
       dispatcher.response.body.call(socket)
       expect(connected).to be(true)
     end
@@ -417,6 +453,22 @@ RSpec.describe Datastar::Dispatcher do
       end
       socket = TestSocket.new
       allow(socket).to receive(:<<).and_raise(Errno::EPIPE, 'Socket closed')
+      
+      dispatcher.response.body.call(socket)
+      expect(events).to eq([true, false])
+    end
+
+    specify '#check_connection triggers #on_client_disconnect' do
+      events = []
+      dispatcher
+        .on_connect { |conn| events << true }
+        .on_client_disconnect { |conn| events << false }
+
+      dispatcher.stream do |sse|
+        sse.check_connection!
+      end
+      socket = TestSocket.new
+      allow(socket).to receive(:<<).with("\n\n").and_raise(Errno::EPIPE, 'Socket closed')
       
       dispatcher.response.body.call(socket)
       expect(events).to eq([true, false])

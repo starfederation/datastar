@@ -26,6 +26,7 @@ module Datastar
     SSE_CONTENT_TYPE = 'text/event-stream'
     HTTP_ACCEPT = 'HTTP_ACCEPT'
     HTTP1 = 'HTTP/1.1'
+    DEFAULT_HEARTBEAT = 3
 
     attr_reader :request, :response
 
@@ -35,13 +36,15 @@ module Datastar
     # @option executor [Object] the executor object to use for managing threads and queues
     # @option error_callback [Proc] the callback to call when an error occurs
     # @option finalize [Proc] the callback to call when the response is finalized
+    # @option heartbeat [Integer, nil, FalseClass] the heartbeat interval in seconds
     def initialize(
       request:,
       response: nil,
       view_context: nil,
       executor: Datastar.config.executor,
       error_callback: Datastar.config.error_callback,
-      finalize: Datastar.config.finalize
+      finalize: Datastar.config.finalize,
+      heartbeat: DEFAULT_HEARTBEAT
     )
       @on_connect = []
       @on_client_disconnect = []
@@ -61,6 +64,10 @@ module Datastar
       @response.headers['X-Accel-Buffering'] = 'no'
       @response.delete_header 'Content-Length'
       @executor.prepare(@response)
+      raise ArgumentError, ':heartbeat must be a number' if heartbeat && !heartbeat.is_a?(Numeric)
+
+      @heartbeat = heartbeat
+      @heartbeat_on = false
     end
 
     # Check if the request accepts SSE responses
@@ -124,7 +131,7 @@ module Datastar
     # @param fragments [String, #call(view_context: Object) => Object] the HTML fragment or object
     # @param options [Hash] the options to send with the message
     def merge_fragments(fragments, options = BLANK_OPTIONS)
-      stream do |sse|
+      stream_no_heartbeat do |sse|
         sse.merge_fragments(fragments, options)
       end
     end
@@ -138,7 +145,7 @@ module Datastar
     # @param selector [String] a CSS selector for the fragment to remove
     # @param options [Hash] the options to send with the message
     def remove_fragments(selector, options = BLANK_OPTIONS)
-      stream do |sse|
+      stream_no_heartbeat do |sse|
         sse.remove_fragments(selector, options)
       end
     end
@@ -152,7 +159,7 @@ module Datastar
     # @param signals [Hash] signals to merge
     # @param options [Hash] the options to send with the message
     def merge_signals(signals, options = BLANK_OPTIONS)
-      stream do |sse|
+      stream_no_heartbeat do |sse|
         sse.merge_signals(signals, options)
       end
     end
@@ -166,7 +173,7 @@ module Datastar
     # @param paths [Array<String>] object paths to the signals to remove
     # @param options [Hash] the options to send with the message
     def remove_signals(paths, options = BLANK_OPTIONS)
-      stream do |sse|
+      stream_no_heartbeat do |sse|
         sse.remove_signals(paths, options)
       end
     end
@@ -180,7 +187,7 @@ module Datastar
     # @param script [String] the script to execute
     # @param options [Hash] the options to send with the message
     def execute_script(script, options = BLANK_OPTIONS)
-      stream do |sse|
+      stream_no_heartbeat do |sse|
         sse.execute_script(script, options)
       end
     end
@@ -190,7 +197,7 @@ module Datastar
     #
     # @param url [String] the URL or path to redirect to
     def redirect(url)
-      stream do |sse|
+      stream_no_heartbeat do |sse|
         sse.redirect(url)
       end
     end
@@ -237,6 +244,15 @@ module Datastar
     def stream(streamer = nil, &block)
       streamer ||= block
       @streamers << streamer
+      if @heartbeat && !@heartbeat_on
+        @heartbeat_on = true
+        @streamers << proc do |sse|
+          while true
+            sleep @heartbeat
+            sse.check_connection!
+          end
+        end
+      end
 
       body = if @streamers.size == 1
         stream_one(streamer) 
@@ -249,6 +265,14 @@ module Datastar
     end
 
     private
+
+    def stream_no_heartbeat(&block)
+      was = @heartbeat
+      @heartbeat = false
+      stream(&block).tap do
+        @heartbeat = was
+      end
+    end
 
     # Produce a response body for a single stream
     # In this case, the SSE generator can write directly to the socket
@@ -300,11 +324,12 @@ module Datastar
 
         handling_errors(conn_generator, socket) do
           done_count = 0
+          threads_size = @heartbeat_on ? threads.size - 1 : threads.size
 
           while (data = @queue.pop)
             if data == :done
               done_count += 1
-              @queue << nil if done_count == threads.size
+              @queue << nil if done_count == threads_size
             elsif data.is_a?(Exception)
               raise data
             else

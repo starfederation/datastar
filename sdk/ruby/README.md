@@ -274,7 +274,7 @@ From this library's root, run the bundled-in test Rack app:
 bundle puma examples/test.ru
 ```
 
-Now run the test bash scripts in the `test` directory in this repo.
+Now run the test bash scripts in the `sdk/test` directory in this repo.
 
 ```bash
 ./test-all.sh http://localhost:9292
