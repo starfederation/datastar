@@ -8,7 +8,7 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ### Changed
 
-- The `data-on-load` callback is delayed to the next microtask, making it possible to place the `data-indicator` attribute later in the same element.
+- The `data-on-load` callback is now delayed to the next microtask, making it possible to place the `data-indicator` attribute later on the same element.
 
 ### Fixed
 
