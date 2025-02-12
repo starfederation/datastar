@@ -5,5 +5,5 @@ import (
 )
 
 func TestKeyCasing(t *testing.T) {
-	setupButtonPageTest(t, "tests/key_casing")
+	setupLoadPageTest(t, "tests/key_casing")
 }

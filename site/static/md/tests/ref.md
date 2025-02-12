@@ -1,4 +1,4 @@
-## Ref
+# Ref
 
 Tests that `data-ref` is correctly applied.
 

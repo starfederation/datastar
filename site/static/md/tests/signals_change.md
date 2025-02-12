@@ -1,4 +1,4 @@
-## Signals Change
+# Signals Change
 
 Tests that a signal change is detected.
 

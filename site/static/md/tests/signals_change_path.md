@@ -1,4 +1,4 @@
-## Signals Change Path
+# Signals Change Path
 
 Tests that a signal change with a path is detected.
 

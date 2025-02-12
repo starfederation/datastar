@@ -1,4 +1,4 @@
-## On Load
+# On Load
 
 Tests that the on load event is triggered after all other data attributes on the element are loaded, without forcing the user to specify the correct order.
 
