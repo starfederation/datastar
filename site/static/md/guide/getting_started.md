@@ -198,7 +198,7 @@ If the expression evaluates to `true`, the `hidden` class is added to the elemen
 The `data-class` attribute can also be used to add or remove multiple classes from an element using a set of key-value pairs, where the keys represent class names and the values represent expressions.
 
 ```html
-<button data-class="{hidden: $input == '', bold: $input == 1}">Save</button>
+<button data-class="{hidden: $input == '', 'font-bold': $input == 1}">Save</button>
 ```
 
 ### `data-attr`
