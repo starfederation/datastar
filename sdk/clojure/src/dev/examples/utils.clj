@@ -43,8 +43,8 @@
     (swap! !hk-server
            (fn [server]
              (when server
-               (http-kit-run! server))
-             (http-kit-stop! handler
+               (http-kit-stop! server))
+             (http-kit-run! handler
                              {:port 8080
                               :legacy-return-value? false})))))
 

@@ -30,6 +30,7 @@
         (doto ^BufferedWriter @writer
           (sse/write-event! event-type data-lines opts)
           (.flush))
+        :sent
         (catch Exception e
           (throw (ex-info "Error sending SSE event"
                           {:sse-gen this
@@ -42,8 +43,9 @@
     (u/lock! lock
       (when-let [^BufferedWriter w @writer]
         (.close w)
-        (when on-close
-          (on-close this)))))
+        (if on-close
+          (on-close this)
+          nil))))
 
   Closeable
   (close [this]

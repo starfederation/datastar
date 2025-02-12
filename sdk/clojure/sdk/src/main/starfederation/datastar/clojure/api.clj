@@ -415,7 +415,10 @@
   ([sse-gen url]
    (redirect! sse-gen url {}))
   ([sse-gen url opts]
-   (execute-script! sse-gen (str "window.location.href = \""url"\";") opts)))
+   (execute-script! sse-gen
+                    (str "setTimeout(() => window.location.href =\"" url "\")")
+                    opts)))
+
 
 ;; -----------------------------------------------------------------------------
 ;; Misc
