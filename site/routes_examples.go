@@ -95,6 +95,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "replace_url_from_signals"},
 				{ID: "prefetch"},
 				{ID: "debounce_and_throttle"},
+				{ID: "key_casing"},
 			},
 		},
 		{
