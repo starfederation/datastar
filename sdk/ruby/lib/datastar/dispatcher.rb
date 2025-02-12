@@ -26,7 +26,6 @@ module Datastar
     SSE_CONTENT_TYPE = 'text/event-stream'
     HTTP_ACCEPT = 'HTTP_ACCEPT'
     HTTP1 = 'HTTP/1.1'
-    DEFAULT_HEARTBEAT = 3
 
     attr_reader :request, :response
 
@@ -44,7 +43,7 @@ module Datastar
       executor: Datastar.config.executor,
       error_callback: Datastar.config.error_callback,
       finalize: Datastar.config.finalize,
-      heartbeat: DEFAULT_HEARTBEAT
+      heartbeat: Datastar.config.heartbeat
     )
       @on_connect = []
       @on_client_disconnect = []
