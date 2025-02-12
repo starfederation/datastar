@@ -6,6 +6,10 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ## v1.0.0-beta.6
 
+### Changed
+
+- The `data-on-load` callback is delayed to the next microtask, making it possible to place the `data-indicator` attribute later in the same element.
+
 ### Fixed
 
 - Fixed a bug in which the `data-on-signals-change` attribute expression was not being executed when signal values changed ([#641](https://github.com/starfederation/datastar/issues/641)).
