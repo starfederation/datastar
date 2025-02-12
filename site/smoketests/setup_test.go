@@ -65,7 +65,7 @@ func setupPageTest(t *testing.T, subURL string, gen func(runner runnerFn)) {
 	wg.Wait()
 }
 
-func setupStandardPageTest(t *testing.T, subURL string) {
+func setupButtonPageTest(t *testing.T, subURL string) {
 	setupPageTest(t, subURL, func(runner runnerFn) {
 		runner(subURL, func(t *testing.T, page *rod.Page) {
 			result := page.MustElement("#result")
@@ -75,6 +75,18 @@ func setupStandardPageTest(t *testing.T, subURL string) {
 	
 			btn := page.MustElement("button")
 			btn.MustClick()
+			page.MustWaitIdle()
+			after, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, after, "1")
+		})
+	})
+}
+
+func setupLoadPageTest(t *testing.T, subURL string) {
+	setupPageTest(t, subURL, func(runner runnerFn) {
+		runner(subURL, func(t *testing.T, page *rod.Page) {
+			result := page.MustElement("#result")
 			page.MustWaitIdle()
 			after, err := result.Text()
 			assert.NoError(t, err)
