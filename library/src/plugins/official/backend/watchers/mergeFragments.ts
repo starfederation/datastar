@@ -16,6 +16,7 @@ import {
   PluginType,
   type WatcherPlugin,
 } from '../../../../engine/types'
+import { elUniqId, walkDOM } from '../../../../utils/dom'
 import { camel, isBoolString } from '../../../../utils/text'
 import {
   docWithViewTransitionAPI,
@@ -87,31 +88,36 @@ function applyToTargets(
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
         const toApply = new Map<Element, Array<string>>()
-        const result = Idiomorph.morph(
-          modifiedTarget,
-          fragment.cloneNode(true),
-          {
-            restoreFocus: true,
-            callbacks: {
-              beforeAttributeUpdated: (
-                argument: string,
-                el: Element,
-                mode: 'update' | 'remove',
-              ): boolean => {
-                if (mode === 'update' && argument.startsWith('data-')) {
-                  let elAddAttrs = toApply.get(el)
-                  if (!elAddAttrs) {
-                    elAddAttrs = []
-                    toApply.set(el, elAddAttrs)
-                  }
-                  const name = argument.slice('data-'.length)
-                  elAddAttrs.push(camel(name))
+
+        const fragmentWithIDs = fragment.cloneNode(true) as HTMLorSVGElement
+        walkDOM(fragmentWithIDs, (el) => {
+          if (!el.id?.length && Object.keys(el.dataset).length) {
+            el.id = elUniqId(el)
+            console.log(el.id)
+          }
+        })
+
+        const result = Idiomorph.morph(modifiedTarget, fragmentWithIDs, {
+          restoreFocus: true,
+          callbacks: {
+            beforeAttributeUpdated: (
+              argument: string,
+              el: Element,
+              mode: 'update' | 'remove',
+            ): boolean => {
+              if (mode === 'update' && argument.startsWith('data-')) {
+                let elAddAttrs = toApply.get(el)
+                if (!elAddAttrs) {
+                  elAddAttrs = []
+                  toApply.set(el, elAddAttrs)
                 }
-                return true
-              },
+                const name = argument.slice('data-'.length)
+                elAddAttrs.push(camel(name))
+              }
+              return true
             },
           },
-        )
+        })
         if (result?.length) {
           modifiedTarget = result[0] as Element
           for (const [el, attrs] of toApply.entries()) {
