@@ -4,10 +4,10 @@ Implement the [Datastart SSE procotocol](https://data-star.dev/reference/sse_eve
 
 ## Installation
 
-Install the gem and add to the application's Gemfile by executing:
+Add this gem to your `Gemfile`
 
 ```bash
-bundle add datastar
+gem 'datastar'
 ```
 
 Or point your `Gemfile` to the source

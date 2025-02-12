@@ -9,7 +9,7 @@ require 'datastar'
 #   # install dependencies
 #   bundle install
 #   # run this endpoint with Puma server
-#   bundle exec puma examples/threaded.ru
+#   bundle exec puma threads.ru
 #
 #   visit http://localhost:9292
 #
