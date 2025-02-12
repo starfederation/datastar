@@ -80,7 +80,7 @@ function endBatch() {
   batchDepth--
 
   if (hasError) {
-    throw internalErr(from, 'BatchError, error', { error })
+    throw error
   }
 }
 
