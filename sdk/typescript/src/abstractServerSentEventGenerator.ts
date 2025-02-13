@@ -27,7 +27,7 @@ export abstract class ServerSentEventGenerator {
   /**
    * Closes the stream. Must be implemented by concrete classes.
    */
-  public abstract close(): void;
+  public close(): void;
 
   /**
    * Sends a server-sent event (SSE) to the client.
