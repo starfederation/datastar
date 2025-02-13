@@ -10,7 +10,6 @@ import {
 import { initErr } from '../../../../engine/errors'
 import { PluginType, type WatcherPlugin } from '../../../../engine/types'
 import { isBoolString } from '../../../../utils/text'
-import { delay } from '../../../../utils/timing'
 import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
@@ -43,7 +42,7 @@ export const RemoveFragments: WatcherPlugin = {
             target.classList.add(SWAPPING_CLASS)
           }
 
-          delay(() => {
+          setTimeout(() => {
             for (const target of removeTargets) {
               target.remove()
             }

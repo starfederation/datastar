@@ -5,5 +5,5 @@ import (
 )
 
 func TestExampleOnLoad(t *testing.T) {
-	setupLoadPageTest(t, "tests/on_load")
+	setupPageTestOnLoad(t, "tests/on_load")
 }
