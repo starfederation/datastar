@@ -9,32 +9,49 @@ open Microsoft.Extensions.Primitives
 open Microsoft.Net.Http.Headers
 
 /// <summary>
-/// Functions to start a text/event-stream response, send an SSE, and read the signals from a request
+/// Implementation of ISendServerEvent, for sending SSEs to the HttpResponse
 /// </summary>
-module DatastarHttpHandlers =
+type ServerSentEventHttpHandlers (httpResponse:HttpResponse) =
+    let mutable _additionalHeaders : (string * string) list = []
+    let mutable _respondTask = null
 
-    /// <summary>
-    /// Starts the SSE response, 'text/event-stream', so more SSEs can be sent
-    /// </summary>
-    let startResponse (response:HttpResponse) (additionalHeaders:(string*string) seq) = task {
-        let setHeader (response:HttpResponse) (name, content:string) =
-            if response.Headers.ContainsKey(name) |> not then
-                response.Headers.Add(name, StringValues(content))
+    member _.HttpResponse = httpResponse
+    member this.AddHeader header =
+        _additionalHeaders <- _additionalHeaders @ [ header ]
 
-        seq {
-            ("Cache-Control", "no-cache, max-age, must-revalidate, no-store")
-            (HeaderNames.ContentType, "text/event-stream")
-            if (response.HttpContext.Request.Protocol = HttpProtocol.Http11) then
-                ("Connection", "keep-alive")
-            yield! additionalHeaders
-            } |> Seq.iter (setHeader response)
-        do! response.StartAsync()
-        do! response.Body.FlushAsync()
-        }
+    member this.StartResponse () =
+        let respondTask = task {
+            let setHeader (httpResponse:HttpResponse) (name, content:string) =
+                if httpResponse.Headers.ContainsKey(name) |> not then
+                    httpResponse.Headers.Add(name, StringValues(content))
 
-    /// <summary>
-    /// Read the signals, as a string, from the HttpRequest
-    /// </summary>
+            seq {
+                ("Cache-Control", "no-cache, max-age, must-revalidate, no-store")
+                (HeaderNames.ContentType, "text/event-stream")
+                if (httpResponse.HttpContext.Request.Protocol = HttpProtocol.Http11) then
+                    ("Connection", "keep-alive")
+                yield! _additionalHeaders
+                } |> Seq.iter (setHeader httpResponse)
+            do! httpResponse.StartAsync()
+            do! httpResponse.Body.FlushAsync()
+            }
+        _respondTask <- respondTask
+        respondTask :> Task
+
+    interface ISendServerEvent with
+        member this.SendServerEvent sse = task {
+            do! _respondTask  // it is required that StartResponse() has already run
+            let serializedEvent = sse |> ServerSentEvent.serialize
+            let bytes = Encoding.UTF8.GetBytes(serializedEvent)
+            return! httpResponse.BodyWriter.WriteAsync(bytes)
+            }
+
+/// <summary>
+/// Implementation of IReadSignals, for reading the Signals from the HttpRequest
+/// </summary>
+type SignalsHttpHandlers (httpRequest:HttpRequest) =
+    let mutable _cachedSignals : Signals voption voption = ValueNone
+
     let readSignals (httpRequest:HttpRequest) : ValueTask<Signals voption> =
         match httpRequest.Method with
         | System.Net.WebRequestMethods.Http.Get ->
@@ -49,32 +66,6 @@ module DatastarHttpHandlers =
                 return ValueSome str
                 } |> ValueTask<Signals voption>
 
-    /// <summary>
-    /// Sends an SSE to the HttpResponse
-    /// </summary>
-    let sendServerEvent (httpResponse:HttpResponse) (sse:ServerSentEvent) =
-        let serializedEvent = sse |> ServerSentEvent.serialize
-        let bytes = Encoding.UTF8.GetBytes(serializedEvent)
-        httpResponse.BodyWriter.WriteAsync(bytes).AsTask()
-
-/// <summary>
-/// Implementation of ISendServerEvent, for sending SSEs to the HttpResponse
-/// </summary>
-type ServerSentEventHttpHandlers (httpResponse:HttpResponse, additionalHeaders:(string*string) seq) =
-    do
-        let startResponseTask = DatastarHttpHandlers.startResponse httpResponse additionalHeaders
-        startResponseTask.GetAwaiter().GetResult()
-
-    member _.HttpResponse = httpResponse
-
-    interface ISendServerEvent with
-        member this.SendServerEvent (event:ServerSentEvent) = DatastarHttpHandlers.sendServerEvent this.HttpResponse event
-
-/// <summary>
-/// Implementation of IReadSignals, for reading the Signals from the HttpRequest
-/// </summary>
-type SignalsHttpHandlers (httpRequest:HttpRequest) =
-    let mutable _cachedSignals : Signals voption voption = ValueNone
     member _.HttpRequest = httpRequest
 
     interface IReadSignals with
@@ -84,7 +75,7 @@ type SignalsHttpHandlers (httpRequest:HttpRequest) =
                 | ValueSome signals -> task { return signals }
                 | ValueNone ->
                     task {
-                        let! signals = (DatastarHttpHandlers.readSignals this.HttpRequest)
+                        let! signals = (readSignals this.HttpRequest)
                         _cachedSignals <- (ValueSome signals)
                         return signals
                     }
