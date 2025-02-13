@@ -80,15 +80,16 @@ type SignalsHttpHandlers (httpRequest:HttpRequest) =
                         return signals
                     }
             readTask |> ValueTask<Signals voption>
-        member this.ReadSignals<'T> () =
+        member this.ReadSignals<'T> jsonSerializerOptions =
             let readTask = task {
                 let! signals = (this :> IReadSignals).ReadSignals()
                 let ret =
                     match signals with
                     | ValueNone -> ValueNone
                     | ValueSome rs ->
-                        try ValueSome (JsonSerializer.Deserialize<'T>(rs))
+                        try ValueSome (JsonSerializer.Deserialize<'T>(rs, jsonSerializerOptions))
                         with _ -> ValueNone
                 return ret
                 }
             readTask |> ValueTask<'T voption>
+        member this.ReadSignals<'T> () = (this :> IReadSignals).ReadSignals<'T> JsonSerializerOptions.Default
