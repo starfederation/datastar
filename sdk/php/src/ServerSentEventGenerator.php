@@ -58,11 +58,9 @@ class ServerSentEventGenerator
 
         // Sends the response headers only if not already sent.
         if (!headers_sent()) {
-            return;
-        }
-
-        foreach (static::headers() as $name => $value) {
-            header("$name: $value");
+            foreach (static::headers() as $name => $value) {
+                header("$name: $value");
+            }
         }
     }
 

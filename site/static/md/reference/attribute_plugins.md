@@ -68,7 +68,7 @@ Note that `data-*` attributes are case-insensitive. If you want to use uppercase
 
 You can further modify the casing of keys in `data-*` attributes using the `__case` modifier, followed by `.kebab`, `.snake`, or `.pascal`.
 
-Signals beginning with an underscore are considered _local signals_ and are not included in requests to the backend by default. You can include them by setting the [`includeLocal` option](/reference/action_plugins#options) to `true`.
+Signals beginning with an underscore are considered _local signals_ and are not included in requests to the backend by default. You can include them by setting the [`includeLocal`](/reference/action_plugins#options) option to `true`.
 
 #### Modifiers
 
@@ -164,7 +164,7 @@ If the expression evaluates to `true`, the `hidden` class is added to the elemen
 The `data-class` attribute can also be used to add or remove multiple classes from an element using a set of key-value pairs, where the keys represent class names and the values represent expressions.
 
 ```html
-<div data-class="{hidden: $foo, bold: $bar}"></div>
+<div data-class="{hidden: $foo, 'font-bold': $bar}"></div>
 ```
 
 ### `data-on`
@@ -190,7 +190,7 @@ Datastar provides a few special events of its own:
 1. `data-on-load` is triggered when an element is loaded into the DOM.
 2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__duration` modifier.
 3. `data-on-raf` is triggered on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.
-4. `data-on-signals-change` is triggered when any signals change.
+4. `data-on-signals-change` is triggered when any signals change. A key can be provided to only trigger the event when the signal with that key changes (`data-on-signals-change-foo`).
 
 Note that the `evt` variable is _not_ available in the expression when using special events.
 

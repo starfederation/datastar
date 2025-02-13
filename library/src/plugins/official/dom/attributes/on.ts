@@ -79,7 +79,8 @@ export const On: AttributePlugin = {
     if (mods.has('once')) evtListOpts.once = true
 
     if (key === 'load') {
-      callback()
+      // Delay the callback to the next microtask so that indicators can be set
+      setTimeout(() => callback(), 0)
       return () => {}
     }
 

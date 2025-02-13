@@ -95,6 +95,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "replace_url_from_signals"},
 				{ID: "prefetch"},
 				{ID: "debounce_and_throttle"},
+				{ID: "key_casing"},
 			},
 		},
 		{
@@ -107,10 +108,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "click_outside"},
 				{ID: "timing"},
 				{ID: "aliased_data_attributes"},
-				{ID: "merge_fragment"},
-				{ID: "key_casing"},
 				{ID: "signals_ifmissing_onload"},
-				{ID: "signals_change_path"},
 			},
 		},
 	}
@@ -206,7 +204,6 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 			setupExamplesToggleVisibility(examplesRouter),
 			setupExamplesFormData(examplesRouter),
 			setupExamplesCustomValidity(examplesRouter),
-			setupExamplesMergeFragment(examplesRouter),
 		); err != nil {
 			panic(fmt.Sprintf("error setting up examples routes: %s", err))
 		}

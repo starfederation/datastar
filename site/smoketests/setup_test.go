@@ -10,6 +10,7 @@ import (
 	"github.com/delaneyj/toolbelt"
 	"github.com/go-rod/rod"
 	"github.com/starfederation/datastar/site"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -62,4 +63,34 @@ func setupPageTest(t *testing.T, subURL string, gen func(runner runnerFn)) {
 	gen(runner)
 
 	wg.Wait()
+}
+
+func setupPageTestOnClick(t *testing.T, subURL string) {
+	setupPageTest(t, subURL, func(runner runnerFn) {
+		runner(subURL, func(t *testing.T, page *rod.Page) {
+			result := page.MustElement("#result")
+			before, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, before, "0")
+	
+			btn := page.MustElement("button")
+			btn.MustClick()
+			page.MustWaitIdle()
+			after, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, after, "1")
+		})
+	})
+}
+
+func setupPageTestOnLoad(t *testing.T, subURL string) {
+	setupPageTest(t, subURL, func(runner runnerFn) {
+		runner(subURL, func(t *testing.T, page *rod.Page) {
+			result := page.MustElement("#result")
+			page.MustWaitIdle()
+			after, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, after, "1")
+		})
+	})
 }

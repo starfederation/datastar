@@ -4,8 +4,8 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 # WIP Release Notes
 
-## v1.0.0-beta.6
+## v1.0.0-beta.7
 
 ### Fixed
 
-- Fixed a bug in which the `data-on-signals-change` attribute expression was not being executed when signal values changed ([#641](https://github.com/starfederation/datastar/issues/641)).
+- Fixed a bug in which `datastar-remove-fragments` events were not having any effect ([#664](https://github.com/starfederation/datastar/issues/664)).

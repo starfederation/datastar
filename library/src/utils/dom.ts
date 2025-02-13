@@ -1,4 +1,5 @@
 import { DATASTAR } from '../engine/consts'
+import type { HTMLorSVGElement } from '../engine/types'
 
 export class Hash {
   #value = 0
@@ -29,39 +30,43 @@ export function elUniqId(el: Element) {
   const hash = new Hash()
 
   let currentEl = el
-  while (currentEl.parentNode) {
+  while (currentEl) {
     if (currentEl.id) {
       hash.with(currentEl.id)
       break
     }
-    if (currentEl === currentEl.ownerDocument.documentElement) {
+    const p = currentEl?.parentNode
+    if (!p) {
       hash.with(currentEl.tagName)
     } else {
-      for (
-        let i = 1, e = el;
-        e.previousElementSibling;
-        e = e.previousElementSibling, i++
-      ) {
-        hash.with(i)
-      }
+      hash.with([...p.children].indexOf(currentEl))
     }
 
-    currentEl = currentEl.parentNode as Element
+    currentEl = p as Element
   }
   return hash.value
 }
 
-export function onElementRemoved(element: Element, callback: () => void) {
-  const observer = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      for (const removedNode of mutation.removedNodes) {
-        if (removedNode === element) {
-          observer.disconnect()
-          callback()
-          return
-        }
-      }
-    }
-  })
-  observer.observe(element.parentNode as Node, { childList: true })
+export function walkDOM(
+  element: Element | null,
+  callback: (el: HTMLorSVGElement) => void,
+) {
+  if (
+    !element ||
+    !(element instanceof HTMLElement || element instanceof SVGElement)
+  ) {
+    return null
+  }
+  const dataset = element.dataset
+  if ('starIgnore' in dataset) {
+    return null
+  }
+  if (!('starIgnore__self' in dataset)) {
+    callback(element)
+  }
+  let el = element.firstElementChild
+  while (el) {
+    walkDOM(el, callback)
+    el = el.nextElementSibling
+  }
 }

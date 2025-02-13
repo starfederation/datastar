@@ -79,9 +79,7 @@ function endBatch() {
   batchIteration = 0
   batchDepth--
 
-  if (hasError) {
-    throw internalErr(from, 'BatchError, error', { error })
-  }
+  if (hasError) throw error
 }
 
 /**

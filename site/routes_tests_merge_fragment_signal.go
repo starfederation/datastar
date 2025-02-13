@@ -7,10 +7,11 @@ import (
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
 
-func setupExamplesMergeFragment(examplesRouter chi.Router) error {
-	examplesRouter.Get("/merge_fragment/data", func(w http.ResponseWriter, r *http.Request) {
+func setupTestsMergeFragmentSignal(testsRouter chi.Router) error {
+	
+	testsRouter.Get("/merge_fragment_signal/data", func(w http.ResponseWriter, r *http.Request) {
 		sse := datastar.NewSSE(w, r)
-		c := mergeFragmentView()
+		c := mergeFragmentSignalTest()
 		sse.MergeFragmentTempl(c)
 	})
 
