@@ -5,5 +5,5 @@ import (
 )
 
 func TestMergeFragment(t *testing.T) {
-	setupButtonPageTest(t, "tests/merge_fragment")
+	setupPageTestOnClick(t, "tests/merge_fragment")
 }

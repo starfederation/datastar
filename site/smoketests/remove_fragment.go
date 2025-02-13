@@ -5,5 +5,5 @@ import (
 )
 
 func TestRemoveFragment(t *testing.T) {
-	setupButtonPageTest(t, "tests/remove_fragment")
+	setupPageTestOnClick(t, "tests/remove_fragment")
 }
