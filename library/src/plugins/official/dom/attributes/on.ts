@@ -80,7 +80,7 @@ export const On: AttributePlugin = {
 
     if (key === 'load') {
       // Delay the callback to the next microtask so that indicators can be set
-      delay(() => callback(), 0)()
+      setTimeout(() => callback(), 0)
       return () => {}
     }
 

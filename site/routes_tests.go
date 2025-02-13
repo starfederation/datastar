@@ -33,6 +33,7 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 				{ID: "merge_fragment_signal"},
 				{ID: "on_load"},
 				{ID: "ref"},
+				{ID: "remove_fragment"},
 				{ID: "signals_change"},
 				{ID: "signals_change_path"},
 			},
@@ -89,6 +90,7 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 		if err := errors.Join(
 			setupTestsMergeFragmentSignal(testsRouter),
 			setupTestsOnLoad(testsRouter),
+			setupTestsRemoveFragment(testsRouter),
 		); err != nil {
 			panic(fmt.Sprintf("error setting up tests routes: %s", err))
 		}
