@@ -30,6 +30,7 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 			Label: "tests",
 			Links: []*SidebarLink{
 				{ID: "key_casing"},
+				{ID: "merge_fragment"},
 				{ID: "merge_fragment_signal"},
 				{ID: "on_load"},
 				{ID: "ref"},
@@ -88,6 +89,7 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 		})
 
 		if err := errors.Join(
+			setupTestsMergeFragment(testsRouter),
 			setupTestsMergeFragmentSignal(testsRouter),
 			setupTestsOnLoad(testsRouter),
 			setupTestsRemoveFragment(testsRouter),

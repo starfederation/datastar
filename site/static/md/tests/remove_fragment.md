@@ -3,7 +3,7 @@
 Tests that removing a fragment works.
 
 <div>
-  <div id="content" data-signals-result="0"><button data-on-click="@delete('/tests/remove_fragment/data')" class="btn">Remove</button></div>
+  <button data-on-click="@delete('/tests/remove_fragment/data')" class="btn">Remove</button>
   <hr />
   Result:
   <code id="result">1<span id="remove"> I should be removed </span></code>
