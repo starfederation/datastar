@@ -190,7 +190,7 @@ Datastar provides a few special events of its own:
 1. `data-on-load` is triggered when an element is loaded into the DOM.
 2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__duration` modifier.
 3. `data-on-raf` is triggered on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.
-4. `data-on-signals-change` is triggered when any signals change.
+4. `data-on-signals-change` is triggered when any signals change. A key can be provided to only trigger the event when the signal with that key changes (`data-on-signals-change-foo`).
 
 Note that the `evt` variable is _not_ available in the expression when using special events.
 
