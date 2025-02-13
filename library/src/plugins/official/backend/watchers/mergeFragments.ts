@@ -93,7 +93,8 @@ function applyToTargets(
         const fragmentWithIDs = fragment.cloneNode(true) as HTMLorSVGElement
         walkDOM(fragmentWithIDs, (el) => {
           if (!el.id?.length && Object.keys(el.dataset).length) {
-            el.id = elUniqId(el)          }
+            el.id = elUniqId(el)          
+          }
         })
 
         const result = Idiomorph.morph(modifiedTarget, fragmentWithIDs, {
