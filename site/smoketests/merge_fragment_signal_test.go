@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestMergeFragment(t *testing.T) {
-	setupButtonPageTest(t, "tests/merge_fragment_signal")
+func TestMergeFragmentSignal(t *testing.T) {
+	setupPageTestOnClick(t, "tests/merge_fragment_signal")
 }

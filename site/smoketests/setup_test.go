@@ -65,7 +65,7 @@ func setupPageTest(t *testing.T, subURL string, gen func(runner runnerFn)) {
 	wg.Wait()
 }
 
-func setupButtonPageTest(t *testing.T, subURL string) {
+func setupPageTestOnClick(t *testing.T, subURL string) {
 	setupPageTest(t, subURL, func(runner runnerFn) {
 		runner(subURL, func(t *testing.T, page *rod.Page) {
 			result := page.MustElement("#result")
@@ -83,7 +83,7 @@ func setupButtonPageTest(t *testing.T, subURL string) {
 	})
 }
 
-func setupLoadPageTest(t *testing.T, subURL string) {
+func setupPageTestOnLoad(t *testing.T, subURL string) {
 	setupPageTest(t, subURL, func(runner runnerFn) {
 		runner(subURL, func(t *testing.T, page *rod.Page) {
 			result := page.MustElement("#result")

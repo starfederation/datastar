@@ -5,5 +5,5 @@ import (
 )
 
 func TestRef(t *testing.T) {
-	setupLoadPageTest(t, "tests/ref")
+	setupPageTestOnLoad(t, "tests/ref")
 }
