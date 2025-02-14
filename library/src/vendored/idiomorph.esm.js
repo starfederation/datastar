@@ -141,7 +141,7 @@ var Idiomorph = (function () {
       shouldRemove: noOp,
       afterHeadMorphed: noOp,
     },
-    restoreFocus: false,
+    restoreFocus: true,
   };
 
   /**
@@ -1056,19 +1056,19 @@ var Idiomorph = (function () {
      * argument and populates id sets for those nodes and all their parents, generating
      * a set of ids contained within all nodes for the entire hierarchy in the DOM
      *
-     * @param {Element|null} nodeParent
+     * @param {Element|null} root
      * @param {Element[]} nodes
      * @param {Set<string>} persistentIds
      * @param {Map<Node, Set<string>>} idMap
      */
-    function populateIdMapForNode(nodeParent, nodes, persistentIds, idMap) {
+    function populateIdMapForNode(root, nodes, persistentIds, idMap) {
       for (const elt of nodes) {
         if (persistentIds.has(elt.id)) {
           /** @type {Element|null} */
           let current = elt;
           // walk up the parent hierarchy of that element, adding the id
           // of element to the parent's id set
-          while (current && current !== nodeParent) {
+          while (current) {
             let idSet = idMap.get(current);
             // if the id set doesn't exist, create it and insert it in the  map
             if (idSet == null) {
@@ -1076,6 +1076,8 @@ var Idiomorph = (function () {
               idMap.set(current, idSet);
             }
             idSet.add(elt.id);
+
+            if (current === root) break;
             current = current.parentElement;
           }
         }
@@ -1126,18 +1128,16 @@ var Idiomorph = (function () {
 
       /** @type {Map<Node, Set<string>>} */
       let idMap = new Map();
-      populateIdMapForNode(
-        oldContent.parentElement,
-        newElts,
-        persistentIds,
-        idMap,
-      );
-      populateIdMapForNode(
-        newContent.parentElement,
-        oldElts,
-        persistentIds,
-        idMap,
-      );
+      populateIdMapForNode(oldContent, oldElts, persistentIds, idMap);
+
+      let newRoot = newContent;
+      // if newContent is a duck-typed parent, pass its single child node as the root to halt upwards iteration
+      /** @ts-ignore */
+      if (newContent.__idiomorphDummyParent) {
+        newRoot = /** @type {Element} */ (newContent.childNodes[0]);
+      }
+      populateIdMapForNode(newRoot, newElts, persistentIds, idMap);
+
       return { persistentIds, idMap };
     }
 
@@ -1181,7 +1181,28 @@ var Idiomorph = (function () {
         return /** @type {Element} */ (newContent);
       } else if (newContent instanceof Node) {
         if (newContent.parentNode) {
-          return /** @type {Element} */ (newContent.parentNode);
+          // we can't use the parent directly because newContent may have siblings
+          // that we don't want in the morph. we can't reparent either, because we
+          // want to preserve hidden state. so we create a duck-typed parent.
+          return /** @type {Element} */ (
+            /** @type {unknown} */ ({
+              childNodes: [newContent],
+              /** @ts-ignore - cover your eyes for a minute, tsc */
+              querySelectorAll: (s) => {
+                /** @ts-ignore */
+                const elements = newContent.querySelectorAll(s);
+                /** @ts-ignore */
+                return newContent.matches(s)
+                  ? [newContent, ...elements]
+                  : elements;
+              },
+              /** @ts-ignore */
+              insertBefore: (n, r) => newContent.parentNode.insertBefore(n, r),
+              /** @ts-ignore */
+              moveBefore: (n, r) => newContent.parentNode.moveBefore(n, r),
+              __idiomorphDummyParent: true,
+            })
+          );
         } else {
           // a single node is added as a child to a dummy parent
           const dummyParent = document.createElement("div");
