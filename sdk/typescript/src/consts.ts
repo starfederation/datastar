@@ -2,7 +2,7 @@
 
 export const DATASTAR = "datastar" as const;
 export const DATASTAR_REQUEST = "Datastar-Request";
-export const VERSION = "1.0.0-beta.6";
+export const VERSION = "1.0.0-beta.7";
 
 // #region Defaults
 
