@@ -73,8 +73,8 @@ func setupPageTestOnClick(t *testing.T, subURL string) {
 			assert.NoError(t, err)
 			assert.Contains(t, before, "0")
 	
-			btn := page.MustElement("button")
-			btn.MustClick()
+			clickable := page.MustElement("#clickable")
+			clickable.MustClick()
 			page.MustWaitIdle()
 			after, err := result.Text()
 			assert.NoError(t, err)

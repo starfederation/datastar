@@ -135,6 +135,14 @@ export const Bind: AttributePlugin = {
       const current = signals.value(signalName)
       const input = (el as HTMLInputElement) || (el as HTMLElement)
 
+      if (isCheckbox || isRadio) {
+        const checked = input.checked || input.getAttribute('checked') === 'true'
+        const v = checked ? input.value : false
+        signals.setValue(signalName, v)
+
+        return
+      }
+
       if (typeof current === 'number') {
         const v = Number(input.value || input.getAttribute('value'))
         signals.setValue(signalName, v)
@@ -142,13 +150,8 @@ export const Bind: AttributePlugin = {
         const v = input.value || input.getAttribute('value') || ''
         signals.setValue(signalName, v)
       } else if (typeof current === 'boolean') {
-        if (isCheckbox) {
-          const v = input.checked || input.getAttribute('checked') === 'true'
-          signals.setValue(signalName, v)
-        } else {
-          const v = Boolean(input.value || input.getAttribute('value'))
-          signals.setValue(signalName, v)
-        }
+        const v = Boolean(input.value || input.getAttribute('value'))
+        signals.setValue(signalName, v)
       } else if (typeof current === 'undefined') {
       } else if (Array.isArray(current)) {
         // check if the input is a select element
