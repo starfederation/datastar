@@ -123,7 +123,7 @@ The [`data-computed`](/reference/attribute_plugins#data-computed) attribute crea
     <div data-text="$repeated">
         Will be replaced with the contents of the repeated signal
     </div>
-</div>>
+</div>
 ```
 
 This results in the `$repeated` signal's value always being equal to the value of the `$input` signal repeated twice. Computed signals are useful for memoizing expressions containing other signals.
