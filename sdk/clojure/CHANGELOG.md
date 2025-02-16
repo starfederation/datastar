@@ -7,7 +7,7 @@
 - `starfederation.datastar.clojure.adapter.test/->sse-response`. This is a mock
   for a SSE ring response that records the SSE events sent with it.
 - Example snippets for the main site, ie, polling and redirection. These
-  examples are runnable in from the development examples.
+  examples are runnable from the development examples.
 - Development example of the usage of the redirect sugar.
 
 ### Fixed
