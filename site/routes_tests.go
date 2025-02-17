@@ -29,13 +29,15 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 		{
 			Label: "tests",
 			Links: []*SidebarLink{
-				{ID: "checkbox_input_value"},
+				{ID: "checkbox_input_array"},
+				{ID: "checkbox_input_default"},
+				{ID: "checkbox_input_string"},
 				{ID: "key_casing"},
 				{ID: "local_signals"},
 				{ID: "merge_fragment"},
 				{ID: "merge_fragment_signal"},
 				{ID: "on_load"},
-				{ID: "radio_input_value"},
+				{ID: "radio_input"},
 				{ID: "ref"},
 				{ID: "remove_fragment"},
 				{ID: "signals_change"},

@@ -60,12 +60,12 @@ export const Bind: AttributePlugin = {
       const vStr = `${v}`
       if (isCheckbox || isRadio) {
         const input = el as HTMLInputElement
-        if (isCheckbox) {
-          input.checked = !!v || v === 'true'
-        } else if (isRadio) {
-          // evaluate the value as string to handle any type casting
-          // automatically since the attribute has to be a string anyways
+        if (Array.isArray(v)) {
+          input.checked = v.includes(input.value)
+        } else if (typeof v === 'string') {
           input.checked = vStr === input.value
+        } else {
+          input.checked = !!v || v === 'true'
         }
       } else if (isFile) {
         // File input reading from a signal is not supported yet
@@ -134,11 +134,23 @@ export const Bind: AttributePlugin = {
 
       const current = signals.value(signalName)
       const input = (el as HTMLInputElement) || (el as HTMLElement)
+      const checked = input.checked || input.getAttribute('checked') === 'true'
 
-      if (isCheckbox || isRadio) {
-        const checked = input.checked || input.getAttribute('checked') === 'true'
-        const v = checked ? input.value : false
-        signals.setValue(signalName, v)
+      if (isCheckbox) {
+        if (Array.isArray(current)) {
+          const values = new Set(current)
+          if (checked) {
+            values.add(input.value)
+          } else {
+            values.delete(input.value)
+          }
+          signals.setValue(signalName, [...values])
+        } else if (typeof current === 'string') {
+          const value = checked ? input.value : ''
+          signals.setValue(signalName, value)
+        } else {
+          signals.setValue(signalName, checked)
+        }
 
         return
       }
