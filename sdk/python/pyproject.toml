@@ -3,13 +3,14 @@ name = "datastar-py"
 description = "Helper functions and classes for the Datastar library (https://data-star.dev/)"
 readme = "README.md"
 authors = [
-    { name = "Felix Ingram", email = "f.ingram@gmail.com" }
+    { name = "Felix Ingram", email = "f.ingram@gmail.com" },
+    { name = "Lucian Knock", email = "git@lucianknock.com" }
 ]
 requires-python = ">=3.9"
 dependencies = []
 dynamic=["version"]
 license = {text = "MIT"}
-keywords = ["datastar", "django", "fastapi", "flask", "quart", "sanic", "html"]
+keywords = ["datastar", "django", "fastapi", "fasthtml", "flask", "quart", "sanic", "html"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
@@ -36,6 +37,7 @@ build-backend = "hatchling.build"
 dev = [
     "django>=4.2.17",
     "fastapi[standard]>=0.115.4",
+    "fasthtml>=0.12.0",
     "flask[async]>=3.0.3",
     "quart>=0.19.9",
     "sanic>=24.6.0",
