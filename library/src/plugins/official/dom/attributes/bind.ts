@@ -134,9 +134,9 @@ export const Bind: AttributePlugin = {
 
       const current = signals.value(signalName)
       const input = (el as HTMLInputElement) || (el as HTMLElement)
-      const checked = input.checked || input.getAttribute('checked') === 'true'
 
       if (isCheckbox) {
+        const checked = input.checked || input.getAttribute('checked') === 'true'
         if (Array.isArray(current)) {
           const values = new Set(current)
           if (checked) {
