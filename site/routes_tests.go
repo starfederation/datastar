@@ -40,6 +40,8 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 				{ID: "radio_input"},
 				{ID: "ref"},
 				{ID: "remove_fragment"},
+				{ID: "select_multiple"},
+				{ID: "select_single"},
 				{ID: "signals_change"},
 				{ID: "signals_change_path"},
 			},

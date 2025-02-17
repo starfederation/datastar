@@ -67,8 +67,6 @@ export const Bind: AttributePlugin = {
         } else {
           input.checked = !!v || v === 'true'
         }
-      } else if (isFile) {
-        // File input reading from a signal is not supported yet
       } else if (isSelect) {
         const select = el as HTMLSelectElement
         if (select.multiple) {
@@ -85,6 +83,8 @@ export const Bind: AttributePlugin = {
         } else {
           select.value = vStr
         }
+      } else if (isFile) {
+        // File input reading from a signal is not supported
       } else if (hasValue) {
         el.value = vStr
       } else {
@@ -155,18 +155,14 @@ export const Bind: AttributePlugin = {
         return
       }
 
+      const value = input.value || input.getAttribute('value') || ''
       if (typeof current === 'number') {
-        const v = Number(input.value || input.getAttribute('value'))
-        signals.setValue(signalName, v)
+        signals.setValue(signalName, Number(value))
       } else if (typeof current === 'string') {
-        const v = input.value || input.getAttribute('value') || ''
-        signals.setValue(signalName, v)
+        signals.setValue(signalName, value || '')
       } else if (typeof current === 'boolean') {
-        const v = Boolean(input.value || input.getAttribute('value'))
-        signals.setValue(signalName, v)
-      } else if (typeof current === 'undefined') {
+        signals.setValue(signalName, Boolean(value))
       } else if (Array.isArray(current)) {
-        // check if the input is a select element
         if (isSelect) {
           const select = el as HTMLSelectElement
           const selectedOptions = [...select.selectedOptions]
@@ -176,9 +172,9 @@ export const Bind: AttributePlugin = {
           signals.setValue(signalName, selectedValues)
         } else {
           // assume it's a comma-separated string
-          const v = JSON.stringify(input.value.split(','))
-          signals.setValue(signalName, v)
+          signals.setValue(signalName, JSON.stringify(value.split(',')))
         }
+      } else if (typeof current === 'undefined') {
       } else {
         throw runtimeErr('BindUnsupportedSignalType', ctx, {
           signalType: typeof current,
