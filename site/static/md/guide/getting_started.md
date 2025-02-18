@@ -347,21 +347,21 @@ With our backend in place, we can now use the `data-on-click` attribute to trigg
 ```html
 <div
   data-signals="{response: '', answer: ''}"
-  data-computed-correct="$response.toLowerCase() == answer"
+  data-computed-correct="$response.toLowerCase() == $answer"
 >
   <div id="question"></div>
   <button data-on-click="@get('/actions/quiz')">Fetch a question</button>
   <button
-    data-show="answer != ''"
+    data-show="$answer != ''"
     data-on-click="$response = prompt('Answer:') ?? ''"
   >
     BUZZ
   </button>
   <div data-show="$response != ''">
     You answered “<span data-text="$response"></span>”.
-    <span data-show="correct">That is correct ✅</span>
-    <span data-show="!correct">
-      The correct answer is “<span data-text="answer"></span>” 🤷
+    <span data-show="$correct">That is correct ✅</span>
+    <span data-show="!$correct">
+      The correct answer is “<span data-text="$answer"></span>” 🤷
     </span>
   </div>
 </div>
