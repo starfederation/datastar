@@ -130,8 +130,8 @@ type SearchResult struct {
 
 const SearchFromHeaderKey = "X-Search-From-Header"
 
-templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromHeader bool) {
-	<div data-signals={templ.JSONString(signals)} class="w-full">
+templ SiteSearch(fromHeader bool) {
+	<div class="w-full">
 		<div class="flex flex-nowrap w-full relative">
 			<input 
 				class="flex-1 input input-bordered h-10 w-full" 
@@ -142,7 +142,7 @@ templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromH
     				"$siteSearch.length > 1 && @get('/api/search', %s)", 
    					 fmt.Sprintf(`{"headers": {"%s": "%t"}}`, SearchFromHeaderKey, fromHeader),
 				)}
-				data-indicator="$searchFetching"
+				data-indicator="searchFetching"
 				if fromHeader {
 					data-ref-site-search-input
 					data-on-keydown__window="evt.key == 'k' && (evt.metaKey || evt.ctrlKey) && ($siteSearchInput.focus(), evt.preventDefault())"
@@ -152,11 +152,11 @@ templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromH
 				@sseIndicator("searchFetching")
 			</div>
 		</div>
-		@SiteSearchResults(signals, searchResults)
+		<ul id="site_search_results" data-show="false"></ul>
 	</div>
 }
 
-templ SiteSearchResults(signals *SiteSearchSignals, searchResults []SearchResult) {
+templ SiteSearchResults(searchResults []SearchResult) {
 	<ul 
 		id="site_search_results"
 		class={
@@ -167,7 +167,7 @@ templ SiteSearchResults(signals *SiteSearchSignals, searchResults []SearchResult
 			"lg:absolute",
 			templ.KV("lg:-left-full", len(searchResults) > 0) 
 		} 
-		data-signals={templ.JSONString(signals)}
+		data-signals="{openSearchResults: true}"
 		data-on-click__outside="$openSearchResults ? $openSearchResults = false : null"
 		data-on-keydown__window="evt.key == 'Escape' && $openSearchResults ? $openSearchResults = false : null" 
 		data-show="$openSearchResults">
@@ -188,23 +188,15 @@ templ SiteSearchResults(signals *SiteSearchSignals, searchResults []SearchResult
 	</ul>
 }
 
-templ HeaderSiteSearch(signals *SiteSearchSignals, searchResults []SearchResult) {
+templ HeaderSiteSearch() {
 	<div id="header_site_search" class="hidden lg:flex lg:gap-4 relative z-10">
-		@SiteSearch(&SiteSearchSignals{
-			Search: signals.Search,
-			SearchFetching: signals.SearchFetching,
-			OpenSearchResults: signals.OpenSearchResults,
-		}, searchResults, true)
+		@SiteSearch(true)
 	</div>
 }
 
 templ DrawerSiteSearch(signals *SiteSearchSignals, searchResults []SearchResult) {
 	<div id="drawer_site_search" class="flex lg:hidden z-10 p-4 w-80">
-		@SiteSearch(&SiteSearchSignals{
-			Search: signals.Search, 
-			SearchFetching: signals.SearchFetching,
-			OpenSearchResults: signals.OpenSearchResults,
-		}, searchResults, false)
+		@SiteSearch(false)
 	</div>
 }
 
@@ -224,7 +216,7 @@ templ header(r *http.Request) {
 			<div class="hidden lg:text-md lg:text-lg lg:flex lg:gap-4 xl:gap-6 lg:visible ">
 				@headerTopLevelLinks(r)
 			</div>
-			@HeaderSiteSearch(&SiteSearchSignals{SearchFetching: false}, []SearchResult{})
+			@HeaderSiteSearch()
 			<div class="hidden text-xl xl:flex xl:gap-4 xl:visible mt-1">
 				@headerExternalLinks()
 			</div>
