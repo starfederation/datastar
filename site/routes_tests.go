@@ -33,6 +33,7 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 				{ID: "local_signals"},
 				{ID: "merge_fragment"},
 				{ID: "merge_fragment_signal"},
+				{ID: "merge_fragment_whitespace"},
 				{ID: "on_load"},
 				{ID: "ref"},
 				{ID: "remove_fragment"},
@@ -91,6 +92,7 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 
 		if err := errors.Join(
 			setupTestsMergeFragment(testsRouter),
+			setupTestsMergeFragmentWhitespace(testsRouter),
 			setupTestsMergeFragmentSignal(testsRouter),
 			setupTestsOnLoad(testsRouter),
 			setupTestsRemoveFragment(testsRouter),
