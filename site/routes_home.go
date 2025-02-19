@@ -194,10 +194,7 @@ func setupHome(router chi.Router, signals sessions.Store, ns *embeddednats.Serve
 				})
 			}
 
-			signals.SearchFetching = false
-			signals.OpenSearchResults = true
-
-			datastar.NewSSE(w, r).MergeFragmentTempl(SiteSearchResults(signals, results))
+			datastar.NewSSE(w, r).MergeFragmentTempl(SiteSearchResults(results))
 		})
 		apiRouter.Route("/todos", func(todosRouter chi.Router) {
 			todosRouter.Get("/", func(w http.ResponseWriter, r *http.Request) {
