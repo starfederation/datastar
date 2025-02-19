@@ -115,7 +115,7 @@ somewhere and use it later:
      (fn [sse-gen]
        (swap! !connections conj sse-gen))
      :on-close
-     (fn [sse-gen]
+     (fn [sse-gen status]
        (swap! !connections disj sse-gen))}))
 
 
@@ -184,6 +184,7 @@ Ring adapters are not made equals. Here are some the differences for the ones we
 
 ## TODO:
 
+- Consider adding an option to adapter to be able to control the output stream (usefull to enable compression)
 - Streamlined release process (cutting releases and publish jar to a maven repo)
 - Consider uniformizing the adapters behavior on connection closing (throwing in all adapters?)
 - Review the etoin tests, there are some race conditions

@@ -132,7 +132,7 @@ export const sse = async (
             argLines = []
             argsRawLines[key] = argLines
           }
-          const value = line.slice(colonIndex + 1).trim()
+          const value = line.slice(colonIndex + 1)
           argLines.push(value)
         }
 

@@ -1,10 +1,28 @@
 # Release notes for the Clojure SDK
 
+## 2025-02-15
+
+### Added
+
+- `starfederation.datastar.clojure.adapter.test/->sse-response`. This is a mock
+  for a SSE ring response that records the SSE events sent with it.
+- Example snippets for the main site, ie, polling and redirection. These
+  examples are runnable from the development examples.
+- Development example of the usage of the redirect sugar.
+
+### Fixed
+
+- Fixed the main readme example (wrong arity of `:on-close` callback using http-kit)
+- The jetty adapter now returns a harmless value when sending an event. It used
+  to return the write buffer which shouldn't be used directly.
+- The `starfederation.datastar.clojure.api/redirect!` helper function uses a js
+  timeout for redirection
+
 ## 2025-02-03
 
 ### Changed
 
-- The ring adapter for the SKD is now a generic ring adapter. This adapter
+- The ring adapter for the SDK is now a generic ring adapter. This adapter
   depends solely on the ring core protocols, the dependency to the ring
   jetty adapter has been removed.
 

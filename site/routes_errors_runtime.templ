@@ -436,11 +436,10 @@ templ computedError() {
 templ customValidityError() {
 	<p>The <code>data-intersects</code> attribute must <em>only</em> have a value, representing an expression that must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.</p>
 	@sampleCode("Example", "html", `<form>
-	<input data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" 
-		   data-bind-foo
-		   name="foo" 
+	<input data-bind-foo name="foo" />
+	<input data-bind-bar name="bar" 
+		data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" 
 	/>
-	<input data-bind-bar name="bar" />
 	<button>
 		Submit form
 	</button>
