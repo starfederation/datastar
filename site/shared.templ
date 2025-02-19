@@ -152,34 +152,40 @@ templ SiteSearch(signals *SiteSearchSignals, searchResults []SearchResult, fromH
 				@sseIndicator("searchFetching")
 			</div>
 		</div>
-			<ul 
-				class={
-					"search-results", 
-					"w-[90vw]",
-					"lg:w-full",
-					"relative",
-					"lg:absolute",
-					templ.KV("lg:-left-full", len(searchResults) > 0) 
-				} 
-				data-on-click__outside="$openSearchResults ? $openSearchResults = false : null"
-				data-on-keydown__window="evt.key == 'Escape' && $openSearchResults ? $openSearchResults = false : null" 
-				data-show="$openSearchResults">
-				if len(searchResults) > 0 {
-					for _, result := range searchResults {
-						<li>
-							<a href={templ.SafeURL(result.ID)}>
-								<h3 class="border-b-1">{result.Title}</h3>
-								<div class="text-sm">
-									@templ.Raw(result.Fragment)
-								</div>
-							</a>
-						</li>
-					}
-				} else {
-					<p>No results found.</p>
-				}
-			</ul>
+		@SiteSearchResults(signals, searchResults)
 	</div>
+}
+
+templ SiteSearchResults(signals *SiteSearchSignals, searchResults []SearchResult) {
+	<ul 
+		id="site_search_results"
+		class={
+			"search-results", 
+			"w-[90vw]",
+			"lg:w-full",
+			"relative",
+			"lg:absolute",
+			templ.KV("lg:-left-full", len(searchResults) > 0) 
+		} 
+		data-signals={templ.JSONString(signals)}
+		data-on-click__outside="$openSearchResults ? $openSearchResults = false : null"
+		data-on-keydown__window="evt.key == 'Escape' && $openSearchResults ? $openSearchResults = false : null" 
+		data-show="$openSearchResults">
+		if len(searchResults) > 0 {
+			for _, result := range searchResults {
+				<li>
+					<a href={templ.SafeURL(result.ID)}>
+						<h3 class="border-b-1">{result.Title}</h3>
+						<div class="text-sm">
+							@templ.Raw(result.Fragment)
+						</div>
+					</a>
+				</li>
+			}
+		} else {
+			<p>No results found.</p>
+		}
+	</ul>
 }
 
 templ HeaderSiteSearch(signals *SiteSearchSignals, searchResults []SearchResult) {
@@ -201,7 +207,6 @@ templ DrawerSiteSearch(signals *SiteSearchSignals, searchResults []SearchResult)
 		}, searchResults, false)
 	</div>
 }
-
 
 templ header(r *http.Request) {
 	<div class="navbar bg-base-200">
