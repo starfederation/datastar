@@ -24,7 +24,7 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
   /**
    * Closes the ReadableStream
    */
-  public close() {
+  public override close() {
     this.controller.close();
   }
 

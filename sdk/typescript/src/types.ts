@@ -27,6 +27,7 @@ export type EventType = typeof EventTypes[number];
 export interface DatastarEventOptions {
   eventId?: string;
   retryDuration?: number;
+  keepAlive?: boolean;
 }
 
 export interface FragmentOptions extends DatastarEventOptions {
