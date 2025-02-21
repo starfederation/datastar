@@ -36,7 +36,7 @@ ServerSentEventGenerator.stream(req, res, (stream) => {
 
 Follow the links for more complete (and executable) examples
 
-- [NodeJS](./examples/node.ts)
+- [NodeJS](./examples/node.js)
 - [Deno](./examples/deno.ts)
 
 ## Frameworks / Alternate runtimes
