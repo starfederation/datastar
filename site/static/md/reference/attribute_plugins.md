@@ -62,7 +62,7 @@ The `data-signals` attribute can also be used to merge multiple signals using a 
 <div data-signals="{foo: {bar: 1, baz: 2}}"></div>
 ```
 
-The value above is written in Javascript object notation, but JSON, which is a subset and which most templating languages have built-in support for, is also allowed.
+The value above is written in JavaScript object notation, but JSON, which is a subset and which most templating languages have built-in support for, is also allowed.
 
 Note that `data-*` attributes are case-insensitive. If you want to use uppercase characters in signal names, you'll need to kebabize them or use object syntax. So the signal name `mySignal` must be written as `data-signals-my-signal` or `data-signals="{mySignal: 1}"`.
 

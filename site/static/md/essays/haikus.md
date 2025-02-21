@@ -4,7 +4,7 @@
 
 [HTMX](https://htmx.org/) has a wonderful haiku in its footer
 
-> Javascript fatigue
+> JavaScript fatigue
 
 > longing for a hypertext
 
