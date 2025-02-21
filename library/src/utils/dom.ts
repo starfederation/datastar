@@ -9,7 +9,7 @@ export class Hash {
     this.#prefix = prefix
   }
 
-  with(x: number | string): Hash {
+  with(x: number | string) {
     if (typeof x === 'string') {
       for (const c of x.split('')) {
         this.with(c.charCodeAt(0))
@@ -17,7 +17,6 @@ export class Hash {
     } else {
       this.#value = (this.#value << 5) - this.#value + x
     }
-    return this
   }
 
   get value() {
@@ -31,16 +30,13 @@ export function elUniqId(el: Element) {
 
   let currentEl = el
   while (currentEl) {
+    hash.with(currentEl.tagName || '')
     if (currentEl.id) {
       hash.with(currentEl.id)
       break
     }
     const p = currentEl?.parentNode
-    if (!p) {
-      hash.with(currentEl.tagName)
-    } else {
-      hash.with([...p.children].indexOf(currentEl))
-    }
+    if (p) hash.with([...p.children].indexOf(currentEl))
 
     currentEl = p as Element
   }
