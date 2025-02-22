@@ -1,6 +1,6 @@
 import { Hash, elUniqId, walkDOM } from '../utils/dom'
 import { camel } from '../utils/text'
-import { delay } from '../utils/timing'
+import { debounce } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
@@ -85,11 +85,11 @@ export class Engine {
       return a.name.localeCompare(b.name)
     })
 
-    this.#delayedApply()
+    this.#debouncedApply()
   }
 
-  // Delay applying plugins to give them time to load
-  #delayedApply = delay(() => {
+  // Add a debounce so that it is only applyied once, regardless of how many times the load function is called
+  #debouncedApply = debounce(() => {
     this.#apply(document.body)
     this.#observe()
   }, 1)
