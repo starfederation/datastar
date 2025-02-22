@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestSelectSingle(t *testing.T) {
+func TestUnitSelectSingle(t *testing.T) {
 	setupPageTestOnSelect(t, "tests/select_single")
 }
