@@ -1,4 +1,4 @@
-import { Datastar as DS } from '../engine'
+import { load, setAliasPrefix } from '../engine'
 import { DELETE } from '../plugins/official/backend/actions/delete'
 import { GET } from '../plugins/official/backend/actions/get'
 import { PATCH } from '../plugins/official/backend/actions/patch'
@@ -28,7 +28,8 @@ import { Fit } from '../plugins/official/logic/actions/fit'
 import { SetAll } from '../plugins/official/logic/actions/setAll'
 import { ToggleAll } from '../plugins/official/logic/actions/toggleAll'
 
-DS.load(
+setAliasPrefix('ds')
+load(
   // DOM
   Attr,
   Bind,
@@ -62,5 +63,3 @@ DS.load(
   SetAll,
   ToggleAll,
 )
-DS.aliasPrefix = 'ds'
-export const Datastar = DS

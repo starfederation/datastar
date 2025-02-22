@@ -1,4 +1,5 @@
-import { Datastar as DS } from '../engine'
+export { load, setAliasPrefix } from '../engine'
+import { load } from '../engine'
 import { DELETE } from '../plugins/official/backend/actions/delete'
 import { GET } from '../plugins/official/backend/actions/get'
 import { PATCH } from '../plugins/official/backend/actions/patch'
@@ -27,8 +28,7 @@ import { Text } from '../plugins/official/dom/attributes/text'
 import { Fit } from '../plugins/official/logic/actions/fit'
 import { SetAll } from '../plugins/official/logic/actions/setAll'
 import { ToggleAll } from '../plugins/official/logic/actions/toggleAll'
-
-DS.load(
+load(
   // DOM
   Attr,
   Bind,
@@ -62,4 +62,3 @@ DS.load(
   SetAll,
   ToggleAll,
 )
-export const Datastar = DS

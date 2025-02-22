@@ -132,7 +132,7 @@ func setupRoutes(ctx context.Context, router chi.Router) (err error) {
 		setupReferences(ctx, router),
 		setupHowTos(ctx, router),
 		setupExamples(ctx, router, sessionSignals),
-		setupTests(ctx, router, sessionSignals),
+		setupTests(ctx, router),
 		setupEssays(ctx, router),
 		setupErrors(router),
 		setupMemes(router),
@@ -166,8 +166,8 @@ func indexSiteContent(ctx context.Context, index bleve.Index) error {
 			}
 
 			if strings.HasPrefix(relDirName, "tests") {
-                return nil
-            }
+				return nil
+			}
 
 			// log.Printf("Indexing directory: %s", relDirName)
 			dataset, err := markdownRenders(ctx, relDirName)
