@@ -1,0 +1,16 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+jobs:
+  enforce-branch-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce branch policy
+        run: |
+          echo "Pull requests to the main branch are not allowed."
+          exit 1
