@@ -12,7 +12,7 @@ import {
 } from '../../../../engine/types'
 import { tagHas, tagToMs } from '../../../../utils/tags'
 import { camel, modifyCasing } from '../../../../utils/text'
-import { debounce, delay, throttle } from '../../../../utils/timing'
+import { debounce, throttle } from '../../../../utils/timing'
 import { supportsViewTransitions } from '../../../../utils/view-transtions'
 import type { Signal } from '../../../../vendored/preact-core'
 
@@ -43,8 +43,10 @@ export const On: AttributePlugin = {
 
     const delayArgs = mods.get('delay')
     if (delayArgs) {
-      const wait = tagToMs(delayArgs)
-      callback = delay(callback, wait)
+      const delay = tagToMs(delayArgs)
+      setTimeout(() => {
+        callback()
+      }, delay)
     }
 
     const debounceArgs = mods.get('debounce')
