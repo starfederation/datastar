@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestInputValue(t *testing.T) {
+func TestUnitInputValue(t *testing.T) {
 	setupPageTestOnLoad(t, "tests/input_value")
 }

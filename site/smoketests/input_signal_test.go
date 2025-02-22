@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestInputSignal(t *testing.T) {
+func TestUnitInputSignal(t *testing.T) {
 	setupPageTestOnLoad(t, "tests/input_signal")
 }

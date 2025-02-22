@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestMergeFragmentWhitespace(t *testing.T) {
+func TestUnitMergeFragmentWhitespace(t *testing.T) {
 	setupPageTestOnClick(t, "tests/merge_fragment_whitespace")
 }

@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestSelectMultipe(t *testing.T) {
+func TestUnitSelectMultipe(t *testing.T) {
 	setupPageTestOnSelect(t, "tests/select_multiple")
 }
