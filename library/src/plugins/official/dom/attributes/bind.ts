@@ -22,10 +22,6 @@ export const Bind: AttributePlugin = {
   onLoad: (ctx) => {
     const { el, key, mods, signals, value, effect } = ctx
     const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
-
-    let setFromSignal = () => {}
-    let el2sig = () => {}
-
     const tnl = el.tagName.toLowerCase()
     let signalDefault: string | boolean | number | File = ''
     const isInput = tnl.includes('input')
@@ -52,9 +48,7 @@ export const Bind: AttributePlugin = {
       }
     }
 
-    signals.upsertIfMissing(signalName, signalDefault)
-
-    setFromSignal = () => {
+    const setFromSignal = () => {
       const hasValue = 'value' in el
       const v = signals.value(signalName)
       const vStr = `${v}`
@@ -62,10 +56,10 @@ export const Bind: AttributePlugin = {
         const input = el as HTMLInputElement
         if (Array.isArray(v)) {
           input.checked = v.includes(input.value)
-        } else if (typeof v === 'string') {
-          input.checked = vStr === input.value
+        } else if (typeof v === 'boolean') {
+          input.checked = !!v
         } else {
-          input.checked = !!v || v === 'true'
+          input.checked = vStr === input.value
         }
       } else if (isSelect) {
         const select = el as HTMLSelectElement
@@ -92,7 +86,7 @@ export const Bind: AttributePlugin = {
       }
     }
 
-    el2sig = async () => {
+    const el2sig = async () => {
       if (isFile) {
         const files = [...((el as HTMLInputElement)?.files || [])]
         const allContents: string[] = []
@@ -134,6 +128,7 @@ export const Bind: AttributePlugin = {
 
       const current = signals.value(signalName)
       const input = (el as HTMLInputElement) || (el as HTMLElement)
+      const value = input.value || input.getAttribute('value') || ''
 
       if (isCheckbox) {
         const checked = input.checked || input.getAttribute('checked') === 'true'
@@ -145,17 +140,20 @@ export const Bind: AttributePlugin = {
             values.delete(input.value)
           }
           signals.setValue(signalName, [...values])
-        } else if (typeof current === 'string') {
-          const value = checked ? input.value : ''
-          signals.setValue(signalName, value)
         } else {
-          signals.setValue(signalName, checked)
+          // We must test for the attribute value because a checked value defaults to `on`.
+          const attributeValue = input.getAttribute('value')
+          if (attributeValue) {
+            const v = checked ? value : false
+            signals.setValue(signalName, v)
+          } else {
+            signals.setValue(signalName, checked)
+          }
         }
 
         return
       }
 
-      const value = input.value || input.getAttribute('value') || ''
       if (typeof current === 'number') {
         signals.setValue(signalName, Number(value))
       } else if (typeof current === 'string') {
@@ -180,6 +178,13 @@ export const Bind: AttributePlugin = {
           signalType: typeof current,
         })
       }
+    }
+
+    const upsert = signals.upsertIfMissing(signalName, signalDefault)
+
+    // If the signal was inserted, attempt to set the the signal value from the element.
+    if (upsert.inserted) {
+      el2sig()
     }
 
     for (const event of updateEvents) {

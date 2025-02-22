@@ -391,7 +391,7 @@ This can be useful for show a loading spinner, disabling a button, etc.
 The signal name can be specified in the key (as above), or in the value (as below). This can be useful depending on the templating language you are using.
 
 ```html
-<button data-indicator="$fetching"></button>
+<button data-indicator="fetching"></button>
 ```
 
 ## Ignoring Elements

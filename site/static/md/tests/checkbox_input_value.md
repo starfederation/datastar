@@ -1,8 +1,8 @@
-# Checkbox Input String
+# Checkbox Input Value
 
-Tests that a checkbox input's bound signal string is set to its value when checked.
+Tests that a checkbox input's bound signal is set to its value when checked.
 
-<div data-signals-result="''">
+<div>
   <input id="clickable" type="checkbox" data-bind-result value="foo" />
   <span data-text="$result"></span>
   <hr />

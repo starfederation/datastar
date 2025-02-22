@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestExampleOnLoad(t *testing.T) {
+func TestOnLoad(t *testing.T) {
 	setupPageTestOnLoad(t, "tests/on_load")
 }
