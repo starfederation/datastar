@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestExampleSignalsChange(t *testing.T) {
+func TestUnitSignalsChange(t *testing.T) {
 	setupPageTestOnClick(t, "tests/signals_change")
 }

@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestKeyCasing(t *testing.T) {
+func TestUnitKeyCasing(t *testing.T) {
 	setupPageTestOnLoad(t, "tests/key_casing")
 }

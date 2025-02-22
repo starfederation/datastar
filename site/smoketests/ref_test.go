@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestRef(t *testing.T) {
+func TestUnitRef(t *testing.T) {
 	setupPageTestOnLoad(t, "tests/ref")
 }

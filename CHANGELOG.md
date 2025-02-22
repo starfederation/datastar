@@ -20,3 +20,4 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 - Fixed a bug in which `datastar-remove-fragments` events were not having any effect ([#664](https://github.com/starfederation/datastar/issues/664)).
 - Fixed a bug in which `datastarNaN` could be used as an auto-generated element ID ([#679](https://github.com/starfederation/datastar/issues/679)).
+- Fixed a bug in which plugins were being applied to the DOM twice on page load.

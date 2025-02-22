@@ -123,7 +123,7 @@ Allows the usage of signals and expressions to affect the DOM.
 
 ### `data-attr`
 
-Binds the value of any HTML attribute to an expression.
+Sets the value of any HTML attribute to an expression, and keeps it in sync.
 
 ```html
 <div data-attr-title="$foo"></div>
@@ -137,7 +137,9 @@ The `data-attr` attribute can also be used to set the values of multiple attribu
 
 ### `data-bind`
 
-Creates a signal and sets up two-way data binding between it and an element's value. Can be placed on any HTML element on which data can be input or choices selected from (`input`, `textarea`, `select`, `checkbox` and `radio` elements, as well as web components).
+Creates a signal (if one doesn't already exist) and sets up two-way data binding between it and an element's value. This means that the value of the element is updated when the signal changes, and the signal is updated when the value of the element changes.
+
+The `data-bind` attribute be placed on any HTML element on which data can be input or choices selected from (`input`, `select`,`textarea` elements, and web components). Event listeners are added for `change`, `input` and `keydown` events.
 
 ```html
 <input data-bind-foo />
@@ -149,7 +151,28 @@ The signal name can be specified in the key (as above), or in the value (as belo
 <input data-bind="foo" />
 ```
 
-**Note:** Event listeners are added for `change`, `input` and `keydown` events on `input`,`textarea`, `select`, `checkbox` and `radio` elements.
+The initial value of the signal is set to the value of the element, unless a signal has already been defined. So in the example below, `$foo` is set to `bar`.
+
+```html
+<input data-bind-foo value="bar" />
+```
+
+Whereas in the example below, `$foo` inherits the value `baz` of the predefined signal.
+
+```html
+<div data-signals-foo="baz">
+  <input data-bind-foo value="bar" />
+</div>
+```
+
+Multiple checkbox input values can be assigned to a signal by predefining it as an array. So in the example below, `$foo` is set to `['bar', 'baz']` when both checkboxes are checked.
+
+```html
+<div data-signals-foo="[]">
+  <input data-bind-foo type="checkbox" value="bar" />
+  <input data-bind-foo type="checkbox" value="baz" />
+</div>
+```
 
 ### `data-class`
 

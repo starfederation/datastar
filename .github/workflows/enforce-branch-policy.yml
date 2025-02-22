@@ -1,0 +1,19 @@
+name: Enforce Branch Policy
+
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  enforce-branch-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce main branch policy
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Pull requests to the main branch are not allowed."
+          exit 1
+      - name: Enforce develop branch policy
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "Pull requests to the develop branch are allowed."
+          exit 0
