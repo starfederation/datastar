@@ -10,11 +10,10 @@ import (
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-sanitize/sanitize"
-	"github.com/gorilla/sessions"
 	"github.com/samber/lo"
 )
 
-func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) (err error) {
+func setupTests(ctx context.Context, router chi.Router) (err error) {
 	mdDataset, err := markdownRenders(ctx, "tests")
 	if err != nil {
 		return err
