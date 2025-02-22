@@ -121,7 +121,6 @@ export const On: AttributePlugin = {
 
     if (key.startsWith(SIGNALS_CHANGE_PREFIX)) {
       if (key === SIGNALS_CHANGE_PREFIX) {
-        callback()
         const signalFn = (event: CustomEvent<DatastarSignalEvent>) =>
           callback(event)
         document.addEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
