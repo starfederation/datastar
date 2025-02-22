@@ -5,12 +5,10 @@ on:
     branches:
       - develop
     paths:
-      - "**/*.templ"
-      - "**/*.md"
-      - "**/*.go"
-      - "**/*.qtpl"
-      - "**/package.json"
-      - "**/*.ts"
+      - 'bundles/*.js'
+      - 'library/src/**/*.ts'
+      - 'site/smoketests/*.go'
+      - 'site/static/md/tests/*.md'
       - '.github/workflows/tests.yml'
   pull_request:
   workflow_dispatch:
