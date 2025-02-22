@@ -9,17 +9,24 @@ export class Hash {
     this.#prefix = prefix
   }
 
-  with(x: number | string) {
+  with(x: number | string | boolean): Hash {
     if (typeof x === 'string') {
       for (const c of x.split('')) {
         this.with(c.charCodeAt(0))
       }
+    } else if (typeof x === 'boolean') {
+      this.with(1 << (x ? 7 : 3))
     } else {
       this.#value = (this.#value << 5) - this.#value + x
     }
+    return this
   }
 
   get value() {
+    return this.#value
+  }
+
+  get string() {
     return this.#prefix + Math.abs(this.#value).toString(36)
   }
 }
@@ -40,7 +47,11 @@ export function elUniqId(el: Element) {
 
     currentEl = p as Element
   }
-  return hash.value
+  return hash.string
+}
+
+export function attrHash(key: string, val: string) {
+  return new Hash().with(key).with(val).value
 }
 
 export function walkDOM(
