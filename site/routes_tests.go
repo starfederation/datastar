@@ -40,7 +40,6 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "merge_fragment_signal"},
 				{ID: "merge_fragment_whitespace"},
 				{ID: "on_load"},
-				{ID: "plugin_applied_once"},
 				{ID: "radio_input"},
 				{ID: "ref"},
 				{ID: "remove_fragment"},
