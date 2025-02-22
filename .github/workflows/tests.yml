@@ -15,12 +15,15 @@ on:
 jobs:
   enforce-branch-policy:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.base.ref == 'main'
     steps:
       - name: Check target branch
+        if: github.event.pull_request.base.ref == 'main'
         run: |
           echo "Pull requests to the main branch are not allowed."
           exit 1
+      - name: Check passed
+        if: github.event.pull_request.base.ref == 'develop'
+        run: echo "Pull request target branch is allowed."
 
   tests:
     runs-on: ubuntu-latest
