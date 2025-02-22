@@ -216,8 +216,10 @@ var Idiomorph = (function () {
    */
   function saveAndRestoreFocus(ctx, fn) {
     if (!ctx.config.restoreFocus) return fn();
-
-    let activeElement = document.activeElement;
+    let activeElement =
+      /** @type {HTMLInputElement|HTMLTextAreaElement|null} */ (
+        document.activeElement
+      );
 
     // don't bother if the active element is not an input or textarea
     if (
@@ -235,11 +237,9 @@ var Idiomorph = (function () {
 
     if (activeElementId && activeElementId !== document.activeElement?.id) {
       activeElement = ctx.target.querySelector(`#${activeElementId}`);
-      // @ts-ignore we can assume this is focusable
       activeElement?.focus();
     }
-    if (activeElement && selectionStart && selectionEnd) {
-      // @ts-ignore we know this is an input element
+    if (activeElement && !activeElement.selectionEnd && selectionEnd) {
       activeElement.setSelectionRange(selectionStart, selectionEnd);
     }
 
@@ -360,9 +360,11 @@ var Idiomorph = (function () {
      */
     function createNode(oldParent, newChild, insertionPoint, ctx) {
       if (ctx.callbacks.beforeNodeAdded(newChild) === false) return null;
-      if (ctx.idMap.has(newChild) && newChild instanceof Element) {
+      if (ctx.idMap.has(newChild)) {
         // node has children with ids with possible state so create a dummy elt of same type and apply full morph algorithm
-        const newEmptyChild = document.createElement(newChild.tagName);
+        const newEmptyChild = document.createElement(
+          /** @type {Element} */ (newChild).tagName,
+        );
         oldParent.insertBefore(newEmptyChild, insertionPoint);
         morphNode(newEmptyChild, newChild, ctx);
         ctx.callbacks.afterNodeAdded(newEmptyChild);
@@ -429,6 +431,10 @@ var Idiomorph = (function () {
               softMatch = undefined;
             }
           }
+
+          // if the current node contains active element, stop looking for better future matches,
+          // because if one is found, this node will be moved to the pantry, reparenting it and thus losing focus
+          if (cursor.contains(document.activeElement)) break;
 
           cursor = cursor.nextSibling;
         }
@@ -498,7 +504,7 @@ var Idiomorph = (function () {
      */
     function removeNode(ctx, node) {
       // are we going to id set match this later?
-      if (ctx.idMap.has(node) && node instanceof Element) {
+      if (ctx.idMap.has(node)) {
         // skip callbacks and move to pantry
         moveBefore(ctx.pantry, node, null);
       } else {
@@ -980,9 +986,9 @@ var Idiomorph = (function () {
      * @returns {MorphContext}
      */
     function createMorphContext(oldNode, newContent, config) {
-      const mergedConfig = mergeDefaults(config);
       const { persistentIds, idMap } = createIdMaps(oldNode, newContent);
 
+      const mergedConfig = mergeDefaults(config);
       const morphStyle = mergedConfig.morphStyle || "outerHTML";
       if (!["innerHTML", "outerHTML"].includes(morphStyle)) {
         throw `Do not understand how to morph style ${morphStyle}`;
@@ -1040,29 +1046,32 @@ var Idiomorph = (function () {
     }
 
     /**
-     * @param {Element} content
+     * Returns all elements with an ID contained within the root element and its descendants
+     *
+     * @param {Element} root
      * @returns {Element[]}
      */
-    function elementsWithIds(content) {
-      let elements = Array.from(content.querySelectorAll("[id]"));
-      if (content.id) {
-        elements.push(content);
+    function findIdElements(root) {
+      let elements = Array.from(root.querySelectorAll("[id]"));
+      if (root.id) {
+        elements.push(root);
       }
       return elements;
     }
 
     /**
-     * A bottom up algorithm that finds all elements with ids in the node
-     * argument and populates id sets for those nodes and all their parents, generating
-     * a set of ids contained within all nodes for the entire hierarchy in the DOM
+     * A bottom-up algorithm that populates a map of Element -> IdSet.
+     * The idSet for a given element is the set of all IDs contained within its subtree.
+     * As an optimzation, we filter these IDs through the given list of persistent IDs,
+     * because we don't need to bother considering IDed elements that won't be in the new content.
      *
-     * @param {Element|null} root
-     * @param {Element[]} nodes
-     * @param {Set<string>} persistentIds
      * @param {Map<Node, Set<string>>} idMap
+     * @param {Set<string>} persistentIds
+     * @param {Element} root
+     * @param {Element[]} elements
      */
-    function populateIdMapForNode(root, nodes, persistentIds, idMap) {
-      for (const elt of nodes) {
+    function populateIdMapWithTree(idMap, persistentIds, root, elements) {
+      for (const elt of elements) {
         if (persistentIds.has(elt.id)) {
           /** @type {Element|null} */
           let current = elt;
@@ -1070,7 +1079,7 @@ var Idiomorph = (function () {
           // of element to the parent's id set
           while (current) {
             let idSet = idMap.get(current);
-            // if the id set doesn't exist, create it and insert it in the  map
+            // if the id set doesn't exist, create it and insert it in the map
             if (idSet == null) {
               idSet = new Set();
               idMap.set(current, idSet);
@@ -1092,53 +1101,59 @@ var Idiomorph = (function () {
      *
      * @param {Element} oldContent  the old content that will be morphed
      * @param {Element} newContent  the new content to morph to
-     * @returns {IdSets} a map of nodes to id sets for the
+     * @returns {IdSets}
      */
     function createIdMaps(oldContent, newContent) {
-      // Calculate ids that persist between the two contents exculuding duplicates first
-      let oldIdMap = new Map();
-      let dupSet = new Set();
-      const oldElts = elementsWithIds(oldContent);
-      for (const oldElt of oldElts) {
-        const id = oldElt.id;
-        // if already in map then log duplicates to be skipped
-        if (oldIdMap.has(id)) {
-          dupSet.add(id);
-        } else {
-          oldIdMap.set(id, oldElt.tagName);
-        }
-      }
-      let persistentIds = new Set();
-      const newElts = elementsWithIds(newContent);
-      for (const newElt of newElts) {
-        const id = newElt.id;
-        const oldTagName = oldIdMap.get(id);
-        // if already matched skip id as duplicate but also skip if tag types mismatch because it could match later
-        if (
-          persistentIds.has(id) ||
-          (oldTagName && oldTagName !== newElt.tagName)
-        ) {
-          dupSet.add(id);
-          persistentIds.delete(id);
-        }
-        if (oldTagName === newElt.tagName && !dupSet.has(id)) {
-          persistentIds.add(id);
-        }
-      }
+      const oldIdElements = findIdElements(oldContent);
+      const newIdElements = findIdElements(newContent);
+
+      const persistentIds = createPersistentIds(oldIdElements, newIdElements);
 
       /** @type {Map<Node, Set<string>>} */
       let idMap = new Map();
-      populateIdMapForNode(oldContent, oldElts, persistentIds, idMap);
+      populateIdMapWithTree(idMap, persistentIds, oldContent, oldIdElements);
 
-      let newRoot = newContent;
-      // if newContent is a duck-typed parent, pass its single child node as the root to halt upwards iteration
-      /** @ts-ignore */
-      if (newContent.__idiomorphDummyParent) {
-        newRoot = /** @type {Element} */ (newContent.childNodes[0]);
-      }
-      populateIdMapForNode(newRoot, newElts, persistentIds, idMap);
+      /** @ts-ignore - if newContent is a duck-typed parent, pass its single child node as the root to halt upwards iteration */
+      const newRoot = newContent.__idiomorphRoot || newContent;
+      populateIdMapWithTree(idMap, persistentIds, newRoot, newIdElements);
 
       return { persistentIds, idMap };
+    }
+
+    /**
+     * This function computes the set of ids that persist between the two contents excluding duplicates
+     *
+     * @param {Element[]} oldIdElements
+     * @param {Element[]} newIdElements
+     * @returns {Set<string>}
+     */
+    function createPersistentIds(oldIdElements, newIdElements) {
+      let duplicateIds = new Set();
+
+      /** @type {Map<string, string>} */
+      let oldIdTagNameMap = new Map();
+      for (const { id, tagName } of oldIdElements) {
+        if (oldIdTagNameMap.has(id)) {
+          duplicateIds.add(id);
+        } else {
+          oldIdTagNameMap.set(id, tagName);
+        }
+      }
+
+      let persistentIds = new Set();
+      for (const { id, tagName } of newIdElements) {
+        if (persistentIds.has(id)) {
+          duplicateIds.add(id);
+        } else if (oldIdTagNameMap.get(id) === tagName) {
+          persistentIds.add(id);
+        }
+        // skip if tag types mismatch because its not possible to morph one tag into another
+      }
+
+      for (const id of duplicateIds) {
+        persistentIds.delete(id);
+      }
+      return persistentIds;
     }
 
     return createMorphContext;
@@ -1182,27 +1197,9 @@ var Idiomorph = (function () {
       } else if (newContent instanceof Node) {
         if (newContent.parentNode) {
           // we can't use the parent directly because newContent may have siblings
-          // that we don't want in the morph. we can't reparent either, because we
-          // want to preserve hidden state. so we create a duck-typed parent.
-          return /** @type {Element} */ (
-            /** @type {unknown} */ ({
-              childNodes: [newContent],
-              /** @ts-ignore - cover your eyes for a minute, tsc */
-              querySelectorAll: (s) => {
-                /** @ts-ignore */
-                const elements = newContent.querySelectorAll(s);
-                /** @ts-ignore */
-                return newContent.matches(s)
-                  ? [newContent, ...elements]
-                  : elements;
-              },
-              /** @ts-ignore */
-              insertBefore: (n, r) => newContent.parentNode.insertBefore(n, r),
-              /** @ts-ignore */
-              moveBefore: (n, r) => newContent.parentNode.moveBefore(n, r),
-              __idiomorphDummyParent: true,
-            })
-          );
+          // that we don't want in the morph, and reparenting might be expensive (TODO is it?),
+          // so we create a duck-typed parent node instead.
+          return createDuckTypedParent(newContent);
         } else {
           // a single node is added as a child to a dummy parent
           const dummyParent = document.createElement("div");
@@ -1218,6 +1215,36 @@ var Idiomorph = (function () {
         }
         return dummyParent;
       }
+    }
+
+    /**
+     * Creates a fake duck-typed parent element to wrap a single node, without actually reparenting it.
+     * "If it walks like a duck, and quacks like a duck, then it must be a duck!" -- James Whitcomb Riley (1849–1916)
+     *
+     * @param {Node} newContent
+     * @returns {Element}
+     */
+    function createDuckTypedParent(newContent) {
+      return /** @type {Element} */ (
+        /** @type {unknown} */ ({
+          childNodes: [newContent],
+          /** @ts-ignore - cover your eyes for a minute, tsc */
+          querySelectorAll: (s) => {
+            /** @ts-ignore */
+            const elements = newContent.querySelectorAll(s);
+            /** @ts-ignore */
+            return newContent.matches(s) ? [newContent, ...elements] : elements;
+          },
+          /** @ts-ignore */
+          insertBefore: (n, r) => newContent.parentNode.insertBefore(n, r),
+          /** @ts-ignore */
+          moveBefore: (n, r) => newContent.parentNode.moveBefore(n, r),
+          // for later use with populateIdMapWithTree to halt upwards iteration
+          get __idiomorphRoot() {
+            return newContent;
+          },
+        })
+      );
     }
 
     /**

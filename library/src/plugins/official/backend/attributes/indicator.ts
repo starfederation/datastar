@@ -22,7 +22,7 @@ export const Indicator: AttributePlugin = {
   valReq: Requirement.Exclusive,
   onLoad: ({ el, key, mods, signals, value }) => {
     const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
-    const signal = signals.upsertIfMissing(signalName, false)
+    const { signal } = signals.upsertIfMissing(signalName, false)
     const watcher = (event: CustomEvent<DatastarSSEEvent>) => {
       const {
         type,
