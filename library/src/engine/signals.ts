@@ -205,8 +205,7 @@ export class SignalsRoot {
   }
 
   setValue<T>(dotDelimitedPath: string, value: T) {
-    const result = this.upsertIfMissing(dotDelimitedPath, value)
-    const signal = result.signal
+    const { signal } = this.upsertIfMissing(dotDelimitedPath, value)
     const oldValue = signal.value
     signal.value = value
     if (oldValue !== value) {
