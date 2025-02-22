@@ -12,7 +12,7 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ### Changed
 
-- Updated Idiomorph to version [0.7.1](https://github.com/bigskysoftware/idiomorph/blob/main/CHANGELOG.md#071---2025-02-13).
+- Updated Idiomorph to version [0.7.2](https://github.com/bigskysoftware/idiomorph/blob/main/CHANGELOG.md#072---2025-02-20).
 - When using `data-bind` on an element, the signal value now defaults to the element’s `value` attribute, provided the signal has not already been defined ([#685](https://github.com/starfederation/datastar/issues/685)).
 - Whitespace is now maintained in merged fragments ([#658](https://github.com/starfederation/datastar/issues/658)).
 

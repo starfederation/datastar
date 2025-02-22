@@ -7,7 +7,7 @@ Tests that merging a fragment maintains whitespace.
   <button id="clickable" data-on-click="@get('/tests/merge_fragment_whitespace/data')" class="btn">Merge</button>
   <hr />
   Result:
-  <code data-text="$result"></code>
+  <code id="result" data-text="$result"></code>
   <hr />
   Expected result on click: <code>1</code>
 </div>
