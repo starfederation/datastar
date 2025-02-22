@@ -85,14 +85,9 @@ export class Engine {
       return a.name.localeCompare(b.name)
     })
 
-    this.#debouncedApply()
-  }
-
-  // Add a debounce so that it is only applyied once, regardless of how many times the load function is called
-  #debouncedApply = debounce(() => {
     this.#apply(document.body)
     this.#observe()
-  }, 1)
+  }
 
   // Apply all plugins to the element and its children
   #apply(rootElement: Element) {

@@ -9,7 +9,9 @@ export const Star: AttributePlugin = {
   name: 'star',
   keyReq: Requirement.Denied,
   valReq: Requirement.Denied,
-  onLoad: () => {
-    alert('YOU ARE PROBABLY OVERCOMPLICATING IT')
+  onLoad: ({ signals }) => {
+    //alert('YOU ARE PROBABLY OVERCOMPLICATING IT')
+    const value = signals.signal('result')?.value as number
+    signals.setValue('result', value + 1)
   },
 }
