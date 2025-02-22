@@ -10,11 +10,10 @@ import (
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-sanitize/sanitize"
-	"github.com/gorilla/sessions"
 	"github.com/samber/lo"
 )
 
-func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) (err error) {
+func setupTests(ctx context.Context, router chi.Router) (err error) {
 	mdDataset, err := markdownRenders(ctx, "tests")
 	if err != nil {
 		return err
@@ -30,8 +29,11 @@ func setupTests(ctx context.Context, router chi.Router, signals sessions.Store) 
 			Label: "tests",
 			Links: []*SidebarLink{
 				{ID: "checkbox_input_array"},
+				{ID: "checkbox_input_checked"},
 				{ID: "checkbox_input_default"},
-				{ID: "checkbox_input_string"},
+				{ID: "checkbox_input_value"},
+				{ID: "input_signal"},
+				{ID: "input_value"},
 				{ID: "key_casing"},
 				{ID: "local_signals"},
 				{ID: "merge_fragment"},
