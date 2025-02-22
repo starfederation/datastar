@@ -180,10 +180,10 @@ export const Bind: AttributePlugin = {
       }
     }
 
-    const upsert = signals.upsertIfMissing(signalName, signalDefault)
+    const { inserted } = signals.upsertIfMissing(signalName, signalDefault)
 
     // If the signal was inserted, attempt to set the the signal value from the element.
-    if (upsert.inserted) {
+    if (inserted) {
       el2sig()
     }
 
