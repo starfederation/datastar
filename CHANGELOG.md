@@ -9,6 +9,7 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 ### Added
 
 - Added the ability for checkbox input elements to set bound signals to an array of values by predefining the signal as an array ([#664](https://github.com/starfederation/datastar/issues/674)).
+- Added the `__skipinit` modifier to the `data-on-signals-change` attribute that prevents the expression being called when the attribute is first applied ([#682](https://github.com/starfederation/datastar/issues/682)).
 
 ### Changed
 
@@ -20,4 +21,3 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 - Fixed a bug in which `datastar-remove-fragments` events were not having any effect ([#664](https://github.com/starfederation/datastar/issues/664)).
 - Fixed a bug in which `datastarNaN` could be used as an auto-generated element ID ([#679](https://github.com/starfederation/datastar/issues/679)).
-- Fixed a bug in which the expression passed into `data-on-signals-change` was being called each time the attribute was evaluated ([#682](https://github.com/starfederation/datastar/issues/682)).
