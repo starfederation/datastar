@@ -13,6 +13,15 @@ on:
   pull_request:
   workflow_dispatch:
 jobs:
+  enforce-branch-policy:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'main'
+    steps:
+      - name: Check target branch
+        run: |
+          echo "Pull requests to the main branch are not allowed."
+          exit 1
+
   tests:
     runs-on: ubuntu-latest
     steps:
