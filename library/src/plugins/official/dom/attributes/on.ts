@@ -121,8 +121,7 @@ export const On: AttributePlugin = {
 
     if (key.startsWith(SIGNALS_CHANGE_PREFIX)) {
       if (key === SIGNALS_CHANGE_PREFIX) {
-        const skipinit = mods.has('skipinit')
-        if (!skipinit) {
+        if (!mods.has('skipinit')) {
           callback()
         }
         const signalFn = (event: CustomEvent<DatastarSignalEvent>) =>
