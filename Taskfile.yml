@@ -169,6 +169,12 @@ tasks:
     deps:
       - support
     cmds:
+      - go test -v github.com/starfederation/datastar/site/smoketests -run '^TestUnit' -count=1 -timeout=1m
+
+  test-all:
+    deps:
+      - support
+    cmds:
       - go test -v github.com/starfederation/datastar/site/smoketests -count=1 -timeout=1m
 
   default:

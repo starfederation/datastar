@@ -9,11 +9,13 @@ export class Hash {
     this.#prefix = prefix
   }
 
-  with(x: number | string): Hash {
+  with(x: number | string | boolean): Hash {
     if (typeof x === 'string') {
       for (const c of x.split('')) {
         this.with(c.charCodeAt(0))
       }
+    } else if (typeof x === 'boolean') {
+      this.with(1 << (x ? 7 : 3))
     } else {
       this.#value = (this.#value << 5) - this.#value + x
     }
@@ -21,6 +23,10 @@ export class Hash {
   }
 
   get value() {
+    return this.#value
+  }
+
+  get string() {
     return this.#prefix + Math.abs(this.#value).toString(36)
   }
 }
@@ -31,20 +37,21 @@ export function elUniqId(el: Element) {
 
   let currentEl = el
   while (currentEl) {
+    hash.with(currentEl.tagName || '')
     if (currentEl.id) {
       hash.with(currentEl.id)
       break
     }
     const p = currentEl?.parentNode
-    if (!p) {
-      hash.with(currentEl.tagName)
-    } else {
-      hash.with([...p.children].indexOf(currentEl))
-    }
+    if (p) hash.with([...p.children].indexOf(currentEl))
 
     currentEl = p as Element
   }
-  return hash.value
+  return hash.string
+}
+
+export function attrHash(key: string, val: string) {
+  return new Hash().with(key).with(val).value
 }
 
 export function walkDOM(

@@ -88,14 +88,7 @@ function applyToTargets(
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
         const toApply = new Map<Element, Array<string>>()
-
         const fragmentWithIDs = fragment.cloneNode(true) as HTMLorSVGElement
-        walkDOM(fragmentWithIDs, (el) => {
-          if (!el.id?.length && Object.keys(el.dataset).length) {
-            el.id = elUniqId(el)
-          }
-        })
-
         const result = Idiomorph.morph(modifiedTarget, fragmentWithIDs, {
           restoreFocus: true,
           callbacks: {

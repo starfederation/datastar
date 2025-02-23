@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestRadioInput(t *testing.T) {
+func TestUnitRadioInput(t *testing.T) {
 	setupPageTestOnClick(t, "tests/radio_input")
 }

@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestCheckboxInputArray(t *testing.T) {
+func TestUnitCheckboxInputArray(t *testing.T) {
 	setupPageTestOnClick(t, "tests/checkbox_input_array")
 }

@@ -1,6 +1,5 @@
-import { Hash, elUniqId, walkDOM } from '../utils/dom'
+import { Hash, attrHash, elUniqId, walkDOM } from '../utils/dom'
 import { camel } from '../utils/text'
-import { delay } from '../utils/timing'
 import { effect } from '../vendored/preact-core'
 import { DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
@@ -21,8 +20,6 @@ import {
   type WatcherPlugin,
 } from './types'
 
-const removalKey = (k: string, v: string) => `${k}${DSP}${v}`
-
 export class Engine {
   aliasPrefix = ''
   #signals: SignalsRoot = new SignalsRoot()
@@ -32,7 +29,7 @@ export class Engine {
   #mutationObserver: MutationObserver | null = null
 
   // Map of cleanup functions by element, keyed by the dataset key and value
-  #removals = new Map<Element, Map<string, OnRemovalFn>>()
+  #removals = new Map<Element, Map<number, OnRemovalFn>>()
 
   get signals() {
     return this.#signals
@@ -48,7 +45,7 @@ export class Engine {
         effect: (cb: () => void): OnRemovalFn => effect(cb),
         actions: this.#actions,
         plugin,
-        applyAttributePlugin: that.#applyAttributePlugin.bind(that),
+        applyPluginsTo: that.#apply.bind(that),
       }
 
       let globalInitializer: GlobalInitializer | undefined
@@ -85,31 +82,40 @@ export class Engine {
       return a.name.localeCompare(b.name)
     })
 
-    this.#delayedApply()
-  }
-
-  // Delay applying plugins to give them time to load
-  #delayedApply = delay(() => {
-    this.#apply(document.body)
+    this.#apply(document.documentElement)
     this.#observe()
-  }, 1)
+  }
 
   // Apply all plugins to the element and its children
   #apply(rootElement: Element) {
     walkDOM(rootElement, (el) => {
-      // Cleanup any existing removal functions
-      const elRemovals = this.#removals.get(el)
-      if (elRemovals) {
-        for (const [, removalFn] of elRemovals) {
-          removalFn()
-        }
-        this.#removals.delete(el)
-      }
+      // Check if the element has any data attributes already
+      const toApply = new Array<string>()
+      const elCleanups = this.#removals.get(el) || new Map()
+      const toCleanup = new Map<number, OnRemovalFn>([...elCleanups])
+      const hashes = new Map<string, number>()
 
       // Apply the plugins to the element in order of application
       // since DOMStringMap is ordered, we can be deterministic
       for (const datasetKey of Object.keys(el.dataset)) {
-        this.#applyAttributePlugin(el, datasetKey)
+        const datasetValue = el.dataset[datasetKey] || ''
+        const currentHash = attrHash(datasetKey, datasetValue)
+        hashes.set(datasetKey, currentHash)
+
+        // If the hash hasn't changed, ignore
+        // otherwise keep the old cleanup and add new to applys
+        if (elCleanups.has(currentHash)) {
+          toCleanup.delete(currentHash)
+        } else {
+          toApply.push(datasetKey)
+        }
+      }
+
+      // Clean up any old plugins and apply the new ones
+      for (const [_, cleanup] of toCleanup) cleanup()
+      for (const key of toApply) {
+        const h = hashes.get(key)!
+        this.#applyAttributePlugin(el, key, h)
       }
     })
   }
@@ -121,11 +127,12 @@ export class Engine {
     }
 
     this.#mutationObserver = new MutationObserver((mutations) => {
+      const toRemove = new Set<HTMLorSVGElement>()
+      const toApply = new Set<HTMLorSVGElement>()
       for (const {
         target,
         type,
         attributeName,
-        oldValue,
         addedNodes,
         removedNodes,
       } of mutations) {
@@ -133,19 +140,10 @@ export class Engine {
           case 'childList':
             {
               for (const node of removedNodes) {
-                const el = node as HTMLorSVGElement
-                const elRemovals = this.#removals.get(el)
-                if (!elRemovals) continue
-
-                for (const [_, removalFn] of elRemovals) {
-                  removalFn()
-                }
-                this.#removals.delete(el)
+                toRemove.add(node as HTMLorSVGElement)
               }
-
               for (const node of addedNodes) {
-                const el = node as HTMLorSVGElement
-                this.#apply(el)
+                toApply.add(node as HTMLorSVGElement)
               }
             }
             break
@@ -157,34 +155,25 @@ export class Engine {
               if (!attributeName?.startsWith(requiredPrefix)) {
                 break
               }
-
-              const el = target as HTMLorSVGElement
-              const datasetKey = camel(
-                attributeName.slice(datasetPrefix.length),
-              )
-
-              // If the value has changed, clean up the old value
-              if (oldValue !== null && el.dataset[datasetKey] !== oldValue) {
-                const elRemovals = this.#removals.get(el)
-                if (elRemovals) {
-                  const rk = removalKey(datasetKey, oldValue)
-                  const removalFn = elRemovals.get(rk)
-                  if (removalFn) {
-                    removalFn()
-                    elRemovals.delete(rk)
-                  }
-                }
-              }
-
-              // Apply the plugin only if the dataset key exists
-              if (datasetKey in el.dataset) {
-                this.#applyAttributePlugin(el, datasetKey)
-              }
+              toApply.add(target as HTMLorSVGElement)
             }
             break
           }
         }
       }
+      for (const el of toRemove) {
+        const elTracking = this.#removals.get(el)
+        if (elTracking) {
+          for (const [h, cleanup] of elTracking) {
+            cleanup()
+            elTracking.delete(h)
+          }
+          if (elTracking.size === 0) {
+            this.#removals.delete(el)
+          }
+        }
+      }
+      for (const el of toApply) this.#apply(el)
     })
 
     this.#mutationObserver.observe(document.body, {
@@ -195,7 +184,11 @@ export class Engine {
     })
   }
 
-  #applyAttributePlugin(el: HTMLorSVGElement, camelCasedKey: string) {
+  #applyAttributePlugin(
+    el: HTMLorSVGElement,
+    camelCasedKey: string,
+    hash: number,
+  ) {
     // Extract the raw key from the dataset
     const rawKey = camelCasedKey.slice(this.aliasPrefix.length)
 
@@ -204,16 +197,6 @@ export class Engine {
 
     // Skip if no plugin is found
     if (!plugin) return
-
-    const elAttr = this.#removals.get(el)
-    if (elAttr) {
-      for (const [k, removalFn] of elAttr) {
-        if (k.startsWith(camelCasedKey)) {
-          removalFn()
-          elAttr.delete(k)
-        }
-      }
-    }
 
     // Ensure the element has an id
     if (!el.id.length) el.id = elUniqId(el)
@@ -234,7 +217,7 @@ export class Engine {
       get signals() {
         return that.#signals
       },
-      applyAttributePlugin: that.#applyAttributePlugin.bind(that),
+      applyPluginsTo: that.#apply.bind(that),
       effect: (cb: () => void): OnRemovalFn => effect(cb),
       actions: this.#actions,
       genRX: () => this.#genRX(ctx, ...(plugin.argNames || [])),
@@ -281,20 +264,14 @@ export class Engine {
     }
 
     // Load the plugin and store any cleanup functions
-    const removalFn = plugin.onLoad(ctx)
-    if (removalFn) {
-      let elRemovals = this.#removals.get(el)
-      if (!elRemovals) {
-        elRemovals = new Map()
-        this.#removals.set(el, elRemovals)
+    const cleanup = plugin.onLoad(ctx)
+    if (cleanup) {
+      let elTracking = this.#removals.get(el)
+      if (!elTracking) {
+        elTracking = new Map()
+        this.#removals.set(el, elTracking)
       }
-      elRemovals.set(removalKey(camelCasedKey, value), removalFn)
-    }
-
-    // Remove the attribute if required
-    const removeOnLoad = plugin.removeOnLoad
-    if (removeOnLoad && removeOnLoad(rawKey) === true) {
-      delete el.dataset[camelCasedKey]
+      elTracking.set(hash, cleanup)
     }
   }
 
@@ -337,7 +314,7 @@ export class Engine {
     const escapeRe = new RegExp(`(?:${DSP})(.*?)(?:${DSS})`, 'gm')
     for (const match of userExpression.matchAll(escapeRe)) {
       const k = match[1]
-      const v = new Hash('dsEscaped').with(k).value
+      const v = new Hash('dsEscaped').with(k).string
       escaped.set(v, k)
       userExpression = userExpression.replace(DSP + k + DSS, v)
     }
