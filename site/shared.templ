@@ -352,12 +352,13 @@ templ codeSnippetFragment(block CodeSnippetBlock) {
 			<div class="join">
 				for _, snippet := range block.Snippets {
 					<button
-						class="btn px-4 join-item btn-lg flex items-center gap-2"
+						data-on-click={ fmt.Sprintf("$language = '%s'", snippet.Handle) }
 						data-class={ fmt.Sprintf(
 							"{'btn-primary btn-outline z-0': $language == '%s'}",
-							snippet.Extension,
+							snippet.Handle,
 						) }
-						data-on-click={ fmt.Sprintf("$language = '%s'", snippet.Extension) }
+						class="btn px-4 join-item btn-lg flex items-center gap-2"
+						title={ snippet.Name }
 					>
 						<iconify-icon icon={ snippet.Icon } class="text-4xl" noobserver></iconify-icon>
 					</button>
@@ -365,7 +366,7 @@ templ codeSnippetFragment(block CodeSnippetBlock) {
 			</div>
 		</div>
 		for _, snippet := range block.Snippets {
-			<div data-show={ fmt.Sprintf("$language == '%s'", snippet.Extension) }>
+			<div data-show={ fmt.Sprintf("$language == '%s'", snippet.Handle) }>
 				{ snippet.Path.Snake }
 				@templ.Raw(snippet.ContentHighlighted)
 			</div>
