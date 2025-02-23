@@ -6,6 +6,7 @@
     [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response]]))
 
 
+;; Tiny setup for that allows broadcasting events to several curl processes
 
 (defonce !conns (atom #{}))
 

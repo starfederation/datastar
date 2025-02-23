@@ -39,6 +39,7 @@
 
 
 (def dumy-script "console.log('hello')")
+#_{:clj-kondo/ignore true}
 (def thunk-wrong-script-type #(d*/execute-script! sse-gen :test))
 (def thunk-wrong-option-type #(d*/execute-script! sse-gen dumy-script {d*/auto-remove :test}))
 

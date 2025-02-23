@@ -15,6 +15,7 @@
 (d*/merge-signals! sse "{prize: '...'}")
 
 ;; setup
+#_{:clj-kondo/ignore true}
 (comment
   (require
     '[starfederation.datastar.clojure.api :as d*]

@@ -1,3 +1,4 @@
+#_{:clj-kondo/ignore true}
 (ns examples.snippets.polling1
   (:require
     [dev.onionpancakes.chassis.core :refer [html]]
@@ -5,6 +6,7 @@
     [starfederation.datastar.clojure.adapter.test :refer [->sse-response]]))
 
 
+#_{:clj-kondo/ignore true}
 (comment
   (require
     '[starfederation.datastar.clojure.api :as d*]

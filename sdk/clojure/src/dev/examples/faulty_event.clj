@@ -6,6 +6,7 @@
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.adapter.ring :refer [->sse-response]]))
 
+;; Testing several ways exception might be caught when using a ring adapter
 
 (defn faulty-event
   ([req]
