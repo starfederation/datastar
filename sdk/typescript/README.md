@@ -28,9 +28,16 @@ if (!('foo' in reader.signals)) {
 }
 
 ServerSentEventGenerator.stream(req, res, (stream) => {
-     stream.mergeFragments(`<div id="toMerge">Hello ${reader.signals.foo}</div>`);
+     stream.mergeSignals({ foo: reader.signals.foo });
+     stream.mergeFragments(`<div id="toMerge">Hello <span data-text="$foo">${reader.signals.foo}</span></div>`);
 });
 ```
+
+The stream static method can receive an extra `options` object that can contain
+onError and onAbort callbacks as well as the keepalive option. The keepalive
+option will stop the stream from being closed once the onStart callback is
+finished. That means the user is responsible for ending the stream with
+`this.close()`.
 
 ## Examples
 
