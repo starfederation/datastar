@@ -82,7 +82,7 @@ export type InitContext = {
   signals: SignalsRoot
   effect: (fn: EffectFn) => OnRemovalFn
   actions: Readonly<ActionPlugins>
-  apply: (el: HTMLorSVGElement, datasetKey: string) => void
+  applyAttributePlugin: (el: HTMLorSVGElement, datasetKey: string) => void
 }
 
 export type HTMLorSVGElement = Element & (HTMLElement | SVGElement)

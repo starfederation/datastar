@@ -121,7 +121,7 @@ function applyToTargets(
           modifiedTarget = result[0] as Element
           for (const [el, attrs] of toApply.entries()) {
             for (const attr of attrs) {
-              ctx.apply(el as HTMLorSVGElement, attr)
+              ctx.applyAttributePlugin(el as HTMLorSVGElement, attr)
             }
           }
         }
