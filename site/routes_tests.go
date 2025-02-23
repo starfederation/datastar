@@ -28,6 +28,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 		{
 			Label: "tests",
 			Links: []*SidebarLink{
+				{ID: "aliased"},
 				{ID: "attr_false"},
 				{ID: "attr_object_false"},
 				{ID: "checkbox_input_array"},
