@@ -32,22 +32,23 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
    * Initializes the server-sent event generator and executes the streamFunc function.
    *
    * @param onStart - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
-   * @param options? - An object that can contain options for the Response constructor as well as onError and onCancel callbacks.
+   * @param options? - An object that can contain options for the Response constructor onError and onCancel callbacks and a keepalive boolean.
    * The onAbort callback will be called whenever the request is aborted or the stream is cancelled
-   * The onError callback keeps the stream open after an exception  to report the error. If it is not provided it will
-   * cancel the stream and throw the error.
+   * The onError callback will be called whenever an error is met. If provided, the onAbort callback will also be executed.
+   * If an onError callback is not provided, then the stream will be ended and the error will be thrown up.
+   * If responseInit is provided, then it will be passed to the Response constructor along with the default headers.
+   * When keepalive is true (default is false), the stream will be kept open indefinitely,
+   * otherwise it will be closed when the onStart callback finishes.
    *
    * @returns an HTTP Response
    */
   static stream(
     onStart: (stream: ServerSentEventGenerator) => Promise<void> | void,
     options?: Partial<{
-      onError: (
-        stream: ServerSentEventGenerator,
-        error: unknown,
-      ) => Promise<void> | void;
+      onError: (error: unknown) => Promise<void> | void;
       onAbort: (reason: string) => Promise<void> | void;
-      init: ResponseInit;
+      responseInit: ResponseInit;
+      keepalive: boolean;
     }>,
   ): Response {
     const readableStream = new ReadableStream({
@@ -55,21 +56,24 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
         const generator = new ServerSentEventGenerator(controller);
 
         try {
-          const startedStream = onStart(generator);
-          if (startedStream instanceof Promise) await startedStream;
+          const stream = onStart(generator);
+          if (stream instanceof Promise) await stream;
+          if (options?.keepalive) {
+            controller.close();
+          }
         } catch (error) {
-          const abortResult = options && options.onAbort
-            ? options.onAbort(
-              error instanceof Error
-                ? error.message
-                : "onStart callback threw an error",
-            )
+          const errorMsg = error instanceof Error
+            ? error.message
+            : "onStart callback threw an error";
+          const abortResult = options?.onAbort
+            ? options.onAbort(errorMsg)
             : null;
 
           if (abortResult instanceof Promise) await abortResult;
           if (options && options.onError) {
-            const errorStream = options.onError(generator, error);
-            if (errorStream instanceof Promise) await errorStream;
+            const onError = options.onError(error);
+            if (onError instanceof Promise) await onError;
+            controller.close();
           } else {
             controller.close();
             throw error;
@@ -88,7 +92,7 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
       readableStream,
       deepmerge({
         headers: sseHeaders,
-      }, options?.init ?? {}),
+      }, options?.responseInit ?? {}),
     );
   }
 

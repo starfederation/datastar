@@ -44,7 +44,7 @@ export abstract class ServerSentEventGenerator {
 
     const typeLine = [`event: ${event}\n`];
     const idLine = eventId ? [`id: ${eventId}\n`] : [];
-    const retryLine = [
+    const retryLine = !retryDuration || retryDuration === 1000 ? [] : [
       `retry: ${retryDuration ?? DefaultSseRetryDurationMs}\n`,
     ];
 
