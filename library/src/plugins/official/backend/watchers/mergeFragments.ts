@@ -11,7 +11,6 @@ import {
 } from '../../../../engine/consts'
 import { initErr } from '../../../../engine/errors'
 import {
-  type HTMLorSVGElement,
   type InitContext,
   PluginType,
   type WatcherPlugin,
@@ -86,10 +85,7 @@ function applyToTargets(
     const modifiedTarget = initialTarget
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
-        const fragmentWithIDs = fragment.cloneNode(true) as HTMLorSVGElement
-        Idiomorph.morph(modifiedTarget, fragmentWithIDs, {
-          restoreFocus: true,
-        })
+        Idiomorph.morph(modifiedTarget, fragment.cloneNode(true))
         break
       }
       case FragmentMergeModes.Inner:
