@@ -31,10 +31,6 @@ export class Engine {
   // Map of cleanup functions by element, keyed by the dataset key and value
   #removals = new Map<Element, Map<number, OnRemovalFn>>()
 
-  get requiredPrefix() {
-    return `data-${this.aliasPrefix ? `${this.aliasPrefix}-` : ''}`
-  }
-
   get signals() {
     return this.#signals
   }
@@ -99,6 +95,11 @@ export class Engine {
       // Apply the plugins to the element in order of application
       // since DOMStringMap is ordered, we can be deterministic
       for (const datasetKey of Object.keys(el.dataset)) {
+        // Ignore data attributes that don’t start with the alias prefix
+        if (!datasetKey.startsWith(this.aliasPrefix)) {
+          break
+        }
+
         const datasetValue = el.dataset[datasetKey] || ''
         const currentHash = attrHash(datasetKey, datasetValue)
         hashes.set(datasetKey, currentHash)
@@ -135,7 +136,6 @@ export class Engine {
       for (const {
         target,
         type,
-        attributeName,
         addedNodes,
         removedNodes,
       } of mutations) {
@@ -151,9 +151,6 @@ export class Engine {
             }
             break
           case 'attributes': {
-            if (!attributeName?.startsWith(this.requiredPrefix)) {
-              break
-            }
             toApply.add(target as HTMLorSVGElement)
 
             break
@@ -172,7 +169,9 @@ export class Engine {
           }
         }
       }
-      for (const el of toApply) this.apply(el)
+      for (const el of toApply) {
+        this.apply(el)
+      }
     })
 
     this.#mutationObserver.observe(document.body, {
