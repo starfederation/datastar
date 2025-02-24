@@ -58,7 +58,7 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
         try {
           const stream = onStart(generator);
           if (stream instanceof Promise) await stream;
-          if (options?.keepalive) {
+          if (!options?.keepalive) {
             controller.close();
           }
         } catch (error) {
