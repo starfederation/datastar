@@ -16,8 +16,7 @@ import {
   PluginType,
   type WatcherPlugin,
 } from '../../../../engine/types'
-import { elUniqId, walkDOM } from '../../../../utils/dom'
-import { camel, isBoolString } from '../../../../utils/text'
+import { isBoolString } from '../../../../utils/text'
 import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
@@ -87,7 +86,7 @@ function applyToTargets(
     let modifiedTarget = initialTarget
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
-        const toApply = new Map<Element, Array<string>>()
+        const toApply = new Set<HTMLorSVGElement>()
         const fragmentWithIDs = fragment.cloneNode(true) as HTMLorSVGElement
         const result = Idiomorph.morph(modifiedTarget, fragmentWithIDs, {
           restoreFocus: true,
@@ -98,13 +97,7 @@ function applyToTargets(
               mode: 'update' | 'remove',
             ): boolean => {
               if (mode === 'update' && argument.startsWith('data-')) {
-                let elAddAttrs = toApply.get(el)
-                if (!elAddAttrs) {
-                  elAddAttrs = []
-                  toApply.set(el, elAddAttrs)
-                }
-                const name = argument.slice('data-'.length)
-                elAddAttrs.push(camel(name))
+                toApply.add(el as HTMLorSVGElement)
               }
               return true
             },
@@ -112,13 +105,10 @@ function applyToTargets(
         })
         if (result?.length) {
           modifiedTarget = result[0] as Element
-          for (const [el, attrs] of toApply.entries()) {
-            for (const attr of attrs) {
-              ctx.applyAttributePlugin(el as HTMLorSVGElement, attr)
-            }
+          for (const el of toApply) {
+            ctx.apply(el)
           }
         }
-
         break
       }
       case FragmentMergeModes.Inner:

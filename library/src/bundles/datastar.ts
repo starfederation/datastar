@@ -62,4 +62,7 @@ DS.load(
   SetAll,
   ToggleAll,
 )
+
+DS.apply()
+
 export const Datastar = DS

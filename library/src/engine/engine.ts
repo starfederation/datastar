@@ -31,6 +31,10 @@ export class Engine {
   // Map of cleanup functions by element, keyed by the dataset key and value
   #removals = new Map<Element, Map<number, OnRemovalFn>>()
 
+  get requiredPrefix() {
+    return `data-${this.aliasPrefix ? `${this.aliasPrefix}-` : ''}`
+  }
+
   get signals() {
     return this.#signals
   }
@@ -45,7 +49,7 @@ export class Engine {
         effect: (cb: () => void): OnRemovalFn => effect(cb),
         actions: this.#actions,
         plugin,
-        applyPluginsTo: that.#apply.bind(that),
+        apply: that.apply.bind(that),
       }
 
       let globalInitializer: GlobalInitializer | undefined
@@ -81,13 +85,10 @@ export class Engine {
       if (lenDiff !== 0) return lenDiff
       return a.name.localeCompare(b.name)
     })
-
-    this.#apply(document.documentElement)
-    this.#observe()
   }
 
   // Apply all plugins to the element and its children
-  #apply(rootElement: Element) {
+  apply(rootElement: HTMLorSVGElement = document.documentElement) {
     walkDOM(rootElement, (el) => {
       // Check if the element has any data attributes already
       const toApply = new Array<string>()
@@ -118,6 +119,8 @@ export class Engine {
         this.#applyAttributePlugin(el, key, h)
       }
     })
+
+    this.#observe()
   }
 
   // Set up a mutation observer to run plugin removal and apply functions
@@ -148,15 +151,11 @@ export class Engine {
             }
             break
           case 'attributes': {
-            {
-              const datasetPrefix = 'data-'
-              const requiredPrefix =
-                datasetPrefix + (this.aliasPrefix ? `${this.aliasPrefix}-` : '')
-              if (!attributeName?.startsWith(requiredPrefix)) {
-                break
-              }
-              toApply.add(target as HTMLorSVGElement)
+            if (!attributeName?.startsWith(this.requiredPrefix)) {
+              break
             }
+            toApply.add(target as HTMLorSVGElement)
+
             break
           }
         }
@@ -173,7 +172,7 @@ export class Engine {
           }
         }
       }
-      for (const el of toApply) this.#apply(el)
+      for (const el of toApply) this.apply(el)
     })
 
     this.#mutationObserver.observe(document.body, {
@@ -190,7 +189,7 @@ export class Engine {
     hash: number,
   ) {
     // Extract the raw key from the dataset
-    const rawKey = camelCasedKey.slice(this.aliasPrefix.length)
+    const rawKey = camel(camelCasedKey.slice(this.aliasPrefix.length))
 
     // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically. The first match will be the most specific.
     const plugin = this.#plugins.find((p) => rawKey.startsWith(p.name))
@@ -217,7 +216,7 @@ export class Engine {
       get signals() {
         return that.#signals
       },
-      applyPluginsTo: that.#apply.bind(that),
+      apply: that.apply.bind(that),
       effect: (cb: () => void): OnRemovalFn => effect(cb),
       actions: this.#actions,
       genRX: () => this.#genRX(ctx, ...(plugin.argNames || [])),
