@@ -10,7 +10,7 @@ The following example outputs `1` not because `$foo` is defined in the global sc
 </div>
 ```
 
-When Datastar evaluates the expression `$foo`, it first converts it to `ctx.signals.signal('foo').value`, and then evaluates that expression in a sandboxed context, in which `ctx` represents the Datastar context. 
+When Datastar evaluates the expression `$foo`, it first converts it to `ctx.signals.signal('foo').value`, and then evaluates that expression in a sandboxed context, in which `ctx` represents the current [expression context](/reference/expression_context). 
 
 This means that JavaScript can be used in Datastar expressions.
 
@@ -66,4 +66,4 @@ Expressions may span multiple lines, but a semicolon must be used to separate st
 </div>
 ```
 
-See the [Datastar Context reference](/reference/datastar_context) for more advanced usage of Datastar expressions.
+See the [Expression Context reference](/reference/expression_context) for more advanced usage of Datastar expressions.
