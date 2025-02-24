@@ -66,30 +66,4 @@ Expressions may span multiple lines, but a semicolon must be used to separate st
 </div>
 ```
 
-## `ctx.signals`
-
-Every expression is evaluated in the context of `ctx`, which is the Datastar context. This means that `ctx` can be used in expressions to access the `signals` object.
-
-Here is the equivalent of the first example using `ctx.signals`.
-
-```html
-<div data-signals-foo="1">
-  <div data-text="ctx.signals.signal('foo').value"></div>
-</div>
-```
-
-And here is how you can output the existing signals in JSON format.
-
-```html
-<pre data-text="ctx.signals.JSON()"></pre>
-```
-
-## Security
-
-When using a [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) (CSP), `unsafe-eval` must be allowed for scripts, since Datastar evaluates expressions inline. 
-
-```html
-<meta http-equiv="Content-Security-Policy" 
-      content="script-src 'self' 'unsafe-eval';"
->
-```
+See the [Datastar Context reference](/reference/datastar_context) for more advanced usage of Datastar expressions.

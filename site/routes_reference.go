@@ -22,8 +22,8 @@ func setupReferences(ctx context.Context, router chi.Router) error {
 			Links: []*SidebarLink{
 				{ID: "attribute_plugins"},
 				{ID: "action_plugins"},
+				{ID: "datastar_context"},
 				{ID: "sse_events"},
-				{ID: "javascript_api"},
 				{ID: "sdks"},
 			},
 		},
@@ -61,6 +61,11 @@ func setupReferences(ctx context.Context, router chi.Router) error {
 				http.Redirect(w, r, "/reference/attribute_plugins", http.StatusMovedPermanently)
 			})
 		}
+
+		// Redirect legacy “JavaScript APIs” page.
+		referenceRouter.Get("/javascript_api", func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, "/reference/datastar_context", http.StatusMovedPermanently)
+		})
 
 		referenceRouter.Get("/{name}", func(w http.ResponseWriter, r *http.Request) {
 			name := chi.URLParam(r, "name")
