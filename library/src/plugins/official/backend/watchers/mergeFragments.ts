@@ -11,13 +11,11 @@ import {
 } from '../../../../engine/consts'
 import { initErr } from '../../../../engine/errors'
 import {
-  type HTMLorSVGElement,
   type InitContext,
   PluginType,
   type WatcherPlugin,
 } from '../../../../engine/types'
-import { elUniqId, walkDOM } from '../../../../utils/dom'
-import { camel, isBoolString } from '../../../../utils/text'
+import { isBoolString } from '../../../../utils/text'
 import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
@@ -84,41 +82,10 @@ function applyToTargets(
   for (const initialTarget of capturedTargets) {
     initialTarget.classList.add(SWAPPING_CLASS)
     const originalHTML = initialTarget.outerHTML
-    let modifiedTarget = initialTarget
+    const modifiedTarget = initialTarget
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
-        const toApply = new Map<Element, Array<string>>()
-        const fragmentWithIDs = fragment.cloneNode(true) as HTMLorSVGElement
-        const result = Idiomorph.morph(modifiedTarget, fragmentWithIDs, {
-          restoreFocus: true,
-          callbacks: {
-            beforeAttributeUpdated: (
-              argument: string,
-              el: Element,
-              mode: 'update' | 'remove',
-            ): boolean => {
-              if (mode === 'update' && argument.startsWith('data-')) {
-                let elAddAttrs = toApply.get(el)
-                if (!elAddAttrs) {
-                  elAddAttrs = []
-                  toApply.set(el, elAddAttrs)
-                }
-                const name = argument.slice('data-'.length)
-                elAddAttrs.push(camel(name))
-              }
-              return true
-            },
-          },
-        })
-        if (result?.length) {
-          modifiedTarget = result[0] as Element
-          for (const [el, attrs] of toApply.entries()) {
-            for (const attr of attrs) {
-              ctx.applyAttributePlugin(el as HTMLorSVGElement, attr)
-            }
-          }
-        }
-
+        Idiomorph.morph(modifiedTarget, fragment.cloneNode(true))
         break
       }
       case FragmentMergeModes.Inner:

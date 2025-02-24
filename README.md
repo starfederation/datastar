@@ -10,7 +10,7 @@
 
 Datastar helps you build reactive web applications with the simplicity of server-side rendering and the power of a full-stack SPA framework.
 
-Getting started is as easy as adding a single 14.5 KiB script tag to your HTML.
+Getting started is as easy as adding a single 14.4 KiB script tag to your HTML.
 
 ```html
 <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.7/bundles/datastar.js"></script>

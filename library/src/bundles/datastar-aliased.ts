@@ -28,6 +28,8 @@ import { Fit } from '../plugins/official/logic/actions/fit'
 import { SetAll } from '../plugins/official/logic/actions/setAll'
 import { ToggleAll } from '../plugins/official/logic/actions/toggleAll'
 
+DS.aliasPrefix = 'ds'
+
 DS.load(
   // DOM
   Attr,
@@ -62,5 +64,7 @@ DS.load(
   SetAll,
   ToggleAll,
 )
-DS.aliasPrefix = 'ds'
+
+DS.apply()
+
 export const Datastar = DS
