@@ -83,32 +83,13 @@ function applyToTargets(
   for (const initialTarget of capturedTargets) {
     initialTarget.classList.add(SWAPPING_CLASS)
     const originalHTML = initialTarget.outerHTML
-    let modifiedTarget = initialTarget
+    const modifiedTarget = initialTarget
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
-        const toApply = new Set<HTMLorSVGElement>()
         const fragmentWithIDs = fragment.cloneNode(true) as HTMLorSVGElement
-        const result = Idiomorph.morph(modifiedTarget, fragmentWithIDs, {
+        Idiomorph.morph(modifiedTarget, fragmentWithIDs, {
           restoreFocus: true,
-          callbacks: {
-            beforeAttributeUpdated: (
-              argument: string,
-              el: Element,
-              mode: 'update' | 'remove',
-            ): boolean => {
-              if (mode === 'update' && argument.startsWith('data-')) {
-                toApply.add(el as HTMLorSVGElement)
-              }
-              return true
-            },
-          },
         })
-        if (result?.length) {
-          modifiedTarget = result[0] as Element
-          for (const el of toApply) {
-            ctx.apply(el)
-          }
-        }
         break
       }
       case FragmentMergeModes.Inner:
