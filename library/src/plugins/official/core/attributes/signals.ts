@@ -8,7 +8,6 @@ import { jsStrToObject, modifyCasing } from '../../../../utils/text'
 export const Signals: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'signals',
-  removeOnLoad: () => true,
   onLoad: (ctx) => {
     const { key, mods, signals, value, genRX } = ctx
     const ifMissing = mods.has('ifmissing')
