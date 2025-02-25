@@ -25,9 +25,9 @@ const plugins: AttributePlugin[] = []
 const actions: ActionPlugins = {}
 const watchers: WatcherPlugin[] = []
 
-let aliasPrefix = ''
-export function setAlias(prefix: string) {
-  aliasPrefix = prefix
+let alias = ''
+export function setAlias(value: string) {
+  alias = value
 }
 let mutationObserver: MutationObserver | null = null
 
@@ -93,8 +93,8 @@ export function apply(
     // Apply the plugins to the element in order of application
     // since DOMStringMap is ordered, we can be deterministic
     for (const datasetKey of Object.keys(el.dataset)) {
-      // Ignore data attributes that don’t start with the alias prefix
-      if (!datasetKey.startsWith(aliasPrefix)) {
+      // Ignore data attributes that don’t start with the alias
+      if (!datasetKey.startsWith(alias)) {
         break
       }
 
@@ -181,7 +181,7 @@ function applyAttributePlugin(
   hash: number,
 ) {
   // Extract the raw key from the dataset
-  const rawKey = camel(camelCasedKey.slice(aliasPrefix.length))
+  const rawKey = camel(camelCasedKey.slice(alias.length))
 
   // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically. The first match will be the most specific.
   const plugin = plugins.find((p) => rawKey.startsWith(p.name))
