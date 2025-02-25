@@ -129,8 +129,8 @@ export abstract class ServerSentEventGenerator {
   /**
    * Sends a merge signals event.
    *
-   * @param data - Data object that will be merged into the client's signals.
-   * @param options - Additional options for merging.
+   * @param data - Data object or json string that will be merged into the client's signals.
+   * @param [options] - Additional options for merging.
    */
   public mergeSignals(
     data: Record<string, Jsonifiable> | string,
@@ -152,8 +152,8 @@ export abstract class ServerSentEventGenerator {
   /**
    * Sends a remove signals event.
    *
-   * @param paths - Array of paths to remove from the client's signals
-   * @param options - Additional options for removing signals.
+   * @param paths - An array of paths or a string containing space separated paths.
+   * @param [options] - Additional options for removing signals.
    */
   public removeSignals(
     paths: string[] | string,
@@ -173,7 +173,7 @@ export abstract class ServerSentEventGenerator {
    * Executes a script on the client-side.
    *
    * @param script - Script code to execute.
-   * @param options - Additional options for execution.
+   * @param [options] - Additional options for execution.
    */
   public executeScript(
     script: string,
