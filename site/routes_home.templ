@@ -9,7 +9,7 @@ import (
 
 templ Home() {
 	{{
-		cdnText := `<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.3/bundles/datastar.js"></script>`
+		cdnText := fmt.Sprintf(`<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@%s/bundles/datastar.js"></script>`, datastar.Version)
 	}}
 	{{
 		usageSample := `<input data-bind-title />
@@ -58,11 +58,11 @@ templ Home() {
 					<span class="text-lg font-bold text-primary">
 						{ humanize.CommafWithDigits( datastar.VersionClientByteSizeGzip / 1024.0, 1) } KiB
 					</span>
-					file and start adding reactivity to your frontend immediately. Write your backend in the language of your choice!  Official <a href="/reference/sdks" class="font-bold text-primary">SDKs</a> are available to help you get up and running even faster, with more languages on the way.
+					file and start adding reactivity to your frontend immediately. Write your backend in the language of your choice!  Official <a href="/reference/sdks" class="font-bold text-primary">SDKs</a> are available to help you get up and running even faster, or you can send <a href="/reference/sse_events" class="font-bold text-primary">SSE events</a> directly from your backend.
 					<div class="flex flex-wrap justify-center gap-6 mx-auto">
 						for _, lang := range build.Consts.SDKLanguages {
 							<a href={ templ.SafeURL(lang.SdkUrl) } class="flex flex-col justify-center items-center">
-								@icon(lang.Icon, "class", "text-9xl")
+								@icon(lang.Icon, "class", "text-8xl")
 								<div class="uppercase text-sm font-bold">{ lang.Name }</div>
 							</a>
 						}
@@ -71,9 +71,9 @@ templ Home() {
 				<p>Getting started is as easy as adding a single script tag to your HTML.</p>
 				<div class="w-full shadow-xl card bg-base-100">
 					<div class="card-body">
-						<div class="flex items-center gap-4">
+						<div class="flex items-center gap-4 -my-4">
 							<code
-								class="flex-1 overflow-auto text-primary text-ellipsis"
+								class="flex-1 overflow-auto text-primary text-ellipsis py-6"
 							>
 								<pre>{ cdnText }</pre>
 							</code>
@@ -101,29 +101,29 @@ templ Home() {
 				<p>Get involved with the community and help shape the future of Datastar!</p>
 				<div class="flex flex-wrap w-full gap-4">
 					<a
-						class="flex items-center justify-center flex-1 btn bg-discord"
+						class="flex items-center justify-center flex-1 min-w-[200px] p-2 h-auto btn bg-discord"
 						href="https://discord.gg/bnRNgZjgPh"
 					>
 						@icon("simple-icons:discord")
 						Discuss on Discord
 					</a>
 					<a
-						class="flex items-center justify-center flex-1 btn bg-youtube"
+						class="flex items-center justify-center flex-1 min-w-[200px] p-2 h-auto btn bg-youtube"
 						href="https://www.youtube.com/@data-star"
 					>
 						@icon("simple-icons:youtube")
 						Watch the Videos
 					</a>
 					<a
-						class="flex items-center justify-center flex-1 btn bg-github"
-						href="https://github.com/starfederation/datastar/tree/main/library"
+						class="flex items-center justify-center flex-1 min-w-[200px] p-2 h-auto btn bg-github"
+						href="https://github.com/starfederation/datastar/tree/main"
 					>
 						@icon("simple-icons:github")
 						View the Source Code
 					</a>
 				</div>
 				<p>
-					At only { humanize.CommafWithDigits( datastar.VersionClientByteSizeGzip / 1024.0, 1) } KiB, Datastar is smaller than Alpine.js and htmx, yet it provides the functionality of both libraries combined. The package size is not <em>just</em> a vanity metric. By embracing simplicity, and building on first principles, everything becomes cleaner and leaner. But don’t take our word for it – <a href="https://github.com/starfederation/datastar/tree/main/library">explore the source code</a> and see for yourself!
+					At only { humanize.CommafWithDigits( datastar.VersionClientByteSizeGzip / 1024.0, 1) } KiB, Datastar is smaller than Alpine.js and htmx, yet provides the functionality of both libraries combined. The package size is not <em>just</em> a vanity metric. By embracing simplicity, and building on first principles, everything becomes cleaner and leaner. But don’t take our word for it – <a href="https://github.com/starfederation/datastar/tree/main">explore the source code</a> and see for yourself!
 				</p>
 				<img class="w-full" src="/chart"/>
 				<div

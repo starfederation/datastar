@@ -1,0 +1,4 @@
+stream.mergeFragments('<div id="question">...</div>');
+stream.mergeFragments('<div id="instructions">...</div>');
+stream.mergeSignals({'answer': '...'});
+stream.mergeSignals({'prize': '...'});

@@ -6,6 +6,7 @@ export const SWAPPING_CLASS = `${DATASTAR}-swapping`
 export const STARTED = 'started'
 export const FINISHED = 'finished'
 export const ERROR = 'error'
+export const RETRYING = 'retrying'
 
 export interface DatastarSSEEvent {
   type: string
@@ -36,7 +37,6 @@ declare global {
 }
 
 export function datastarSSEEventWatcher(
-  // ctx: InitContext,
   eventType: string,
   fn: (argsRaw: Record<string, string>) => void,
 ) {

@@ -7,7 +7,7 @@ serve(async (req: Request) => {
 
   if (url.pathname === "/") {
     return new Response(
-      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
+      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.7/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
       {
         headers: { "Content-Type": "text/html" },
       },
@@ -19,14 +19,16 @@ serve(async (req: Request) => {
       if (isEventArray(events)) {
         return ServerSentEventGenerator.stream((stream) => {
           testEvents(stream, events);
+          stream.close();
         });
       }
     }
   } else if (url.pathname.includes("await")) {
     return ServerSentEventGenerator.stream(async (stream) => {
       stream.mergeFragments('<div id="toMerge">Merged</div>');
-      await delay(10000);
-      stream.mergeFragments('<div id="toMerge">After 10 seconds</div>');
+      await delay(5000);
+      stream.mergeFragments('<div id="toMerge">After 5 seconds</div>');
+      stream.close();
     });
   }
 

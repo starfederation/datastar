@@ -1,4 +1,4 @@
-# Typescript SDK for Datastar
+# TypeScript SDK for Datastar
 
 Implements the [SDK spec](../README.md) and exposes an abstract
 ServerSentEventGenerator class that can be used to implement runtime specific
@@ -28,22 +28,29 @@ if (!('foo' in reader.signals)) {
 }
 
 ServerSentEventGenerator.stream(req, res, (stream) => {
-     stream.mergeFragments(`<div id="toMerge">Hello ${reader.signals.foo}</div>`);
+     stream.mergeSignals({ foo: reader.signals.foo });
+     stream.mergeFragments(`<div id="toMerge">Hello <span data-text="$foo">${reader.signals.foo}</span></div>`);
 });
 ```
+
+The stream static method can receive an extra `options` object that can contain
+onError and onAbort callbacks as well as the keepalive option. The keepalive
+option will stop the stream from being closed once the onStart callback is
+finished. That means the user is responsible for ending the stream with
+`this.close()`.
 
 ## Examples
 
 Follow the links for more complete (and executable) examples
 
-- [NodeJS](./examples/node.ts)
+- [NodeJS](./examples/node.js)
 - [Deno](./examples/deno.ts)
 
 ## Frameworks / Alternate runtimes
 
-If you can't simply use the node / web versions, then you can extend the abstract
-class in `./src/abstractServerSentEventGenerator.ts`. You will need to provide
-implementations of the `constructor`, `readSignals`, `stream` and `send`
+If you can't simply use the node / web versions, then you can extend the
+abstract class in `./src/abstractServerSentEventGenerator.ts`. You will need to
+provide implementations of the `constructor`, `readSignals`, `stream` and `send`
 methods.
 
 ## Testing

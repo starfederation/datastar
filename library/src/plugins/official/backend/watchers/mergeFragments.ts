@@ -20,7 +20,7 @@ import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
 } from '../../../../utils/view-transtions'
-import { idiomorph } from '../../../../vendored/idiomorph'
+import { Idiomorph } from '../../../../vendored/idiomorph.esm'
 import {
   SETTLING_CLASS,
   SWAPPING_CLASS,
@@ -59,7 +59,7 @@ export const MergeFragments: WatcherPlugin = {
             throw initErr('NoTargetsFound', ctx, { selectorOrID })
           }
 
-          if (supportsViewTransitions && useViewTransition) {
+          if (useViewTransition && supportsViewTransitions) {
             docWithViewTransitionAPI.startViewTransition(() =>
               applyToTargets(ctx, mergeMode, settleDuration, fragment, targets),
             )
@@ -82,14 +82,10 @@ function applyToTargets(
   for (const initialTarget of capturedTargets) {
     initialTarget.classList.add(SWAPPING_CLASS)
     const originalHTML = initialTarget.outerHTML
-    let modifiedTarget = initialTarget
+    const modifiedTarget = initialTarget
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
-        const result = idiomorph(modifiedTarget, fragment)
-        if (!result?.length) {
-          throw initErr('MorphFailed', ctx)
-        }
-        modifiedTarget = result[0] as Element
+        Idiomorph.morph(modifiedTarget, fragment.cloneNode(true))
         break
       }
       case FragmentMergeModes.Inner:
@@ -128,18 +124,16 @@ function applyToTargets(
     }
 
     const cl = modifiedTarget.classList
-    cl.add(SWAPPING_CLASS)
-
-    // ctx.apply(document.body)
+    cl?.add(SWAPPING_CLASS)
 
     setTimeout(() => {
       initialTarget.classList.remove(SWAPPING_CLASS)
-      cl.remove(SWAPPING_CLASS)
+      cl?.remove(SWAPPING_CLASS)
     }, settleDuration)
 
     const revisedHTML = modifiedTarget.outerHTML
 
-    if (originalHTML !== revisedHTML) {
+    if (cl && originalHTML !== revisedHTML) {
       cl.add(SETTLING_CLASS)
       setTimeout(() => {
         cl.remove(SETTLING_CLASS)

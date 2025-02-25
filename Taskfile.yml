@@ -103,6 +103,11 @@ tasks:
       - curl https://purge.jsdelivr.net/gh/starfederation/datastar/sdk/typescript/npm/esm/node/serverSentEventGenerator.js
       - git push origin --tags
 
+  idiomorph:
+    dir: library/src/vendored
+    cmds:
+      - wget -O idiomorph.esm.js https://raw.githubusercontent.com/bigskysoftware/idiomorph/refs/heads/main/dist/idiomorph.esm.js
+      - npx -p typescript tsc *.js --declaration --allowJs --emitDeclarationOnly --outDir .
   css:
     dir: site
     sources:
@@ -161,11 +166,16 @@ tasks:
       - fly deploy --local-only
 
   test:
-    dir: site/smoketests
     deps:
       - support
     cmds:
-      - go test -v
+      - go test -v github.com/starfederation/datastar/site/smoketests -run '^TestUnit' -count=1 -timeout=1m
+
+  test-all:
+    deps:
+      - support
+    cmds:
+      - go test -v github.com/starfederation/datastar/site/smoketests -count=1 -timeout=1m
 
   default:
     cmds:

@@ -67,8 +67,9 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "merge_options"},
 				{ID: "redirects"},
 				{ID: "view_transition_api"},
+				{ID: "view_transition_on_click"},
 				{ID: "title_update_backend"},
-				{ID: "signals_changed"},
+				{ID: "signals_change"},
 				{ID: "csrf"},
 				{ID: "multiline_signals"},
 				{ID: "multi_select"},
@@ -94,6 +95,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "replace_url_from_signals"},
 				{ID: "prefetch"},
 				{ID: "debounce_and_throttle"},
+				{ID: "key_casing"},
 			},
 		},
 		{
@@ -106,6 +108,7 @@ func setupExamples(ctx context.Context, router chi.Router, signals sessions.Stor
 				{ID: "click_outside"},
 				{ID: "timing"},
 				{ID: "aliased_data_attributes"},
+				{ID: "signals_ifmissing_onload"},
 			},
 		},
 	}

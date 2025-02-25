@@ -1,0 +1,7 @@
+import ServerSentEventGenerator
+import ServerSentEventGenerator.Server.Snap -- or whatever is appropriate
+
+send (withDefaults mergeFragments "<div id=\"hello\">Hello, world!</div>" def def def def)
+send (withDefaults mergeSignals   "{foo: {bar: 1}}" def def)
+send (withDefaults executeScript  "console.log('Success!')" def def def)
+

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Haskell + Datastar Example</title>
+    <script type="module"
+       src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.3/bundles/datastar.js">
+    </script>
+  </head>
+  <body>
+    <h2>Haskell + Datastar Example</h2>
+    <main class="container" id="main" >
+      <div data-signals="{key1: {one: 1, two: 2}, key2: 'string'}"></div>
+      <button data-on-click="@get('signals')">signals with get</button>
+      <button data-on-click="@post('signals')">signals with post</button>
+      <button data-on-click="@patch('signals')">signals with patch</button>
+      <button data-on-click="@delete('signals')">signals with delete</button>
+      <button data-on-click="@put('signals')">signals with put</button>
+      <button data-on-click="@get('clear')">clear the signals below</button>
+      <div id="signals">signals output goes here</div>
+      <div><b>
+        If you want see see what is being sent to the browser, edit
+        the Snap.hs file and set the debug constant to True
+      </b></div>
+      <button data-on-click="@get('/feed')">Feed with morph</button>
+      <div id="explain">
+        When you click on the "Feed with morph button,
+        <br/>There is an empty div below whose text will be replaced
+        <br/>with the current time 10 times
+        <br/>after that we will sleep for 70 seconds, during which time
+        <br/>the pings will continue so we don't time out. Then we will again
+        <br/>replace the div with the current time 10 times. After that this
+        <br/>text will be removed with a RemoveFragments command
+        <br/>after a "settleDuration" of 5 seconds
+      </div>
+      <br/>
+      <div id="feed"><b>feed goes here</b></div>
+      <br/>
+      <div>
+        When you click the John Keats button, his beautiful
+        <i>Ode to a Nightingale</i>
+        <br/>Will be slowly printed below, as if someone were typing it
+        <br/>on a keyboard.
+      </div>
+      <button data-on-click="@get('/keats')">John Keats</button>
+      <div id="keats">
+        <b>Ode to a Nightingale goes here</b>
+      </div>
+    </main>
+  </body>
+</html>

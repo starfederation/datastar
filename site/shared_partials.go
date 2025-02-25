@@ -33,7 +33,8 @@ var (
 
 type CodeSnippet struct {
 	Path               toolbelt.CasedString
-	Extension          string
+	Handle             string
+	Name               string
 	Icon               string
 	Content            string
 	ContentHighlighted string
@@ -186,7 +187,7 @@ func markdownRenders(ctx context.Context, staticMdPath string) (MarkdownDataset,
 					continue
 				}
 
-				ext := strings.TrimSuffix(filepath.Ext(name), "snippet")[1:] // remove the dot
+				handle := strings.TrimSuffix(filepath.Ext(name), "snippet")[1:] // remove the dot
 
 				codeSnippetRaw, err := staticFS.ReadFile(fileFullPath)
 				if err != nil {
@@ -197,13 +198,15 @@ func markdownRenders(ctx context.Context, staticMdPath string) (MarkdownDataset,
 				buf := bytebufferpool.Get()
 				defer bytebufferpool.Put(buf)
 
-				if err := htmlHighlight(buf, codeSnippet, ext, ""); err != nil {
+				if err := htmlHighlight(buf, codeSnippet, handle, ""); err != nil {
 					return nil, fmt.Errorf("error highlighting code snippet %s: %w", fileFullPath, err)
 				}
 
+				name = ""
 				icon := ""
 				for _, lang := range build.Consts.SDKLanguages {
-					if lang.FileExtension == ext {
+					if lang.Handle == handle {
+						name = lang.Name
 						icon = lang.Icon
 						break
 					}
@@ -213,7 +216,8 @@ func markdownRenders(ctx context.Context, staticMdPath string) (MarkdownDataset,
 				}
 
 				snippet := CodeSnippet{
-					Extension:          ext,
+					Handle:             handle,
+					Name:               name,
 					Icon:               icon,
 					Content:            codeSnippet,
 					ContentHighlighted: buf.String(),
@@ -221,7 +225,7 @@ func markdownRenders(ctx context.Context, staticMdPath string) (MarkdownDataset,
 				snippetBlock.Snippets = append(snippetBlock.Snippets, snippet)
 			}
 			slices.SortFunc(snippetBlock.Snippets, func(a, b CodeSnippet) int {
-				return strings.Compare(a.Extension, b.Extension)
+				return strings.Compare(a.Handle, b.Handle)
 			})
 			buf := bytebufferpool.Get()
 			defer bytebufferpool.Put(buf)

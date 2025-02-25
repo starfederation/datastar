@@ -3,33 +3,51 @@ package smoketests
 import (
 	"context"
 	"fmt"
+	"os"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/delaneyj/toolbelt"
 	"github.com/go-rod/rod"
 	"github.com/starfederation/datastar/site"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-type runnerFn func(name string, fn func(t *testing.T, page *rod.Page))
+var (
+	baseURL string
+	browser *rod.Browser
+)
 
-func setupPageTest(t *testing.T, subURL string, gen func(runner runnerFn)) {
-	t.Parallel()
-	browser := rod.New().MustConnect()
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
+func TestMain(m *testing.M) {
+	if err := os.Chdir("../../"); err != nil {
+		panic(fmt.Errorf("could not change the working directory: %w", err))
+	}
+
+	ctx := context.Background()
 
 	port, err := toolbelt.FreePort()
-	require.NoError(t, err)
+	if err != nil {
+		panic(fmt.Errorf("could not obtain a free port: %w", err))
+	}
 
-	baseURL := fmt.Sprintf("http://localhost:%d", port)
+	baseURL = fmt.Sprintf("http://localhost:%d", port)
 
 	readyCh := make(chan struct{})
 	go site.RunBlocking(port, readyCh)(ctx)
 	<-readyCh
 
+	browser = rod.New().MustConnect()
+
+	m.Run()
+
+	ctx.Done()
+}
+
+type runnerFn func(name string, fn func(t *testing.T, page *rod.Page))
+
+func setupPageTest(t *testing.T, subURL string, gen func(runner runnerFn)) {
+	t.Parallel()
 	page := browser.MustIncognito().MustPage(fmt.Sprintf("%s/%s", baseURL, subURL))
 	require.NotNil(t, page)
 	t.Cleanup(page.MustClose)
@@ -45,4 +63,52 @@ func setupPageTest(t *testing.T, subURL string, gen func(runner runnerFn)) {
 	gen(runner)
 
 	wg.Wait()
+}
+
+func setupPageTestOnLoad(t *testing.T, subURL string) {
+	setupPageTest(t, subURL, func(runner runnerFn) {
+		runner(subURL, func(t *testing.T, page *rod.Page) {
+			result := page.MustElement("#result")
+			page.MustWaitIdle()
+			after, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, after, "1")
+		})
+	})
+}
+
+func setupPageTestOnClick(t *testing.T, subURL string) {
+	setupPageTest(t, subURL, func(runner runnerFn) {
+		runner(subURL, func(t *testing.T, page *rod.Page) {
+			result := page.MustElement("#result")
+			before, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, before, "0")
+	
+			clickable := page.MustElement("#clickable")
+			clickable.MustClick()
+			page.MustWaitIdle()
+			after, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, after, "1")
+		})
+	})
+}
+
+func setupPageTestOnSelect(t *testing.T, subURL string) {
+	setupPageTest(t, subURL, func(runner runnerFn) {
+		runner(subURL, func(t *testing.T, page *rod.Page) {
+			result := page.MustElement("#result")
+			before, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, before, "0")
+	
+			selectable := page.MustElement("#selectable")
+			selectable.MustSelect("bar")
+			page.MustWaitIdle()
+			after, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, after, "1")
+		})
+	})
 }

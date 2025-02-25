@@ -74,6 +74,24 @@
     {}
     (:drivers custom-config)))
 
+
+(defn install-shutdown-hooks! []
+  (.addShutdownHook (Runtime/getRuntime)
+                    (Thread. (fn []
+                               ; Killing web drivers
+                               (println "Killing web drivers")
+                               (doseq [d (vals drivers)]
+                                 (when (realized? d)
+                                   (try
+                                     (ea/quit @d)
+                                     (catch Exception _
+                                       (println "Exception killing webdriver")))))
+
+                               ; Killing agents
+                               (println "Killing agents")
+                               (shutdown-agents)))))
+
+(install-shutdown-hooks!)
 ;; -----------------------------------------------------------------------------
 ;; Generic counters tests
 ;; -----------------------------------------------------------------------------

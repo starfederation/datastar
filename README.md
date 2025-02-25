@@ -1,6 +1,6 @@
-![Version](https://img.shields.io/github/package-json/v/starfederation/datastar?filename=library/package.json)
-![License](https://img.shields.io/github/license/starfederation/datastar)
-![Stars](https://img.shields.io/github/stars/starfederation/datastar?style=flat)
+[![Version](https://img.shields.io/github/package-json/v/starfederation/datastar?filename=library/package.json)](https://github.com/starfederation/datastar/releases)
+[![License](https://img.shields.io/github/license/starfederation/datastar)](https://github.com/starfederation/datastar/blob/main/LICENSE)
+[![Stars](https://img.shields.io/github/stars/starfederation/datastar?style=flat)](https://github.com/starfederation/datastar/stargazers)
 
 <p align="center"><img width="200" src="https://data-star.dev/static/images/rocket.webp"></p>
 
@@ -10,10 +10,10 @@
 
 Datastar helps you build reactive web applications with the simplicity of server-side rendering and the power of a full-stack SPA framework.
 
-Getting started is as easy as adding a single 13.3 KiB script tag to your HTML.
+Getting started is as easy as adding a single 14.3 KiB script tag to your HTML.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.3/bundles/datastar.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.7/bundles/datastar.js"></script>
 ```
 
 Then start adding frontend reactivity using declarative <code>data-*</code> attributes.
@@ -25,6 +25,8 @@ Then start adding frontend reactivity using declarative <code>data-*</code> attr
 ```
 
 Visit the [Datastar Website »](https://data-star.dev/)
+
+Watch the [Videos »](https://www.youtube.com/@data-star)
 
 Join the [Discord Server »](https://discord.com/channels/1296224603642925098/1296224603642925102)
 
@@ -44,7 +46,7 @@ You can manually add your own plugins to the core:
 <script type="importmap">
 {
     "imports": {
-      "datastar": "https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.3/bundles/datastar.js"
+      "datastar": "https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.7/bundles/datastar.js"
     }
 }
 </script>

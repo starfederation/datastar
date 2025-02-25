@@ -5,7 +5,7 @@ use {
     },
     async_stream::stream,
     core::time::Duration,
-    futures::Stream,
+    futures_util::Stream,
     serde::Deserialize,
     serde_json::Value,
 };

@@ -82,7 +82,12 @@ function mergeNested(
           }
         }
 
-        target[key] = new Signal(value)
+        const s = new Signal(value)
+        s._onChange = () => {
+          dispatchSignalEvent({ updated: [key] })
+        }
+        target[key] = s
+
         evt.added.push(key)
       }
     }
@@ -200,9 +205,9 @@ export class SignalsRoot {
   }
 
   setValue<T>(dotDelimitedPath: string, value: T) {
-    const s = this.upsertIfMissing(dotDelimitedPath, value)
-    const oldValue = s.value
-    s.value = value
+    const { signal } = this.upsertIfMissing(dotDelimitedPath, value)
+    const oldValue = signal.value
+    signal.value = value
     if (oldValue !== value) {
       dispatchSignalEvent({ updated: [dotDelimitedPath] })
     }
@@ -222,15 +227,18 @@ export class SignalsRoot {
 
     const current = subSignals[last]
     if (current instanceof Signal) {
-      return current as Signal<T>
+      return { signal: current as Signal<T>, inserted: false }
     }
 
     const signal = new Signal(defaultValue)
+    signal._onChange = () => {
+      dispatchSignalEvent({ updated: [dotDelimitedPath] })
+    }
     subSignals[last] = signal
 
     dispatchSignalEvent({ added: [dotDelimitedPath] })
 
-    return signal
+    return { signal: signal, inserted: true }
   }
 
   remove(...dotDelimitedPaths: string[]) {

@@ -62,9 +62,13 @@ The `data-signals` attribute can also be used to merge multiple signals using a 
 <div data-signals="{foo: {bar: 1, baz: 2}}"></div>
 ```
 
-The value above is written in Javascript object notation, but JSON, which is a subset and which most templating languages have built-in support for, is also allowed.
+The value above is written in JavaScript object notation, but JSON, which is a subset and which most templating languages have built-in support for, is also allowed.
 
-Note that `data-*` attributes are case-insensitive. If you want to use uppercase characters in signal names, you’ll need to kebabize them or use the object syntax. So the signal name `mySignal` must be written as `data-signals-my-signal` or `data-signals="{mySignal: 1}"`.
+Note that `data-*` attributes are case-insensitive. If you want to use uppercase characters in signal names, you'll need to kebabize them or use object syntax. So the signal name `mySignal` must be written as `data-signals-my-signal` or `data-signals="{mySignal: 1}"`.
+
+You can further modify the casing of keys in `data-*` attributes using the `__case` modifier, followed by `.kebab`, `.snake`, or `.pascal`.
+
+Signals beginning with an underscore are considered _local signals_ and are not included in requests to the backend by default. You can include them by setting the [`includeLocal`](/reference/action_plugins#options) option to `true`.
 
 #### Modifiers
 
@@ -119,7 +123,7 @@ Allows the usage of signals and expressions to affect the DOM.
 
 ### `data-attr`
 
-Binds the value of any HTML attribute to an expression.
+Sets the value of any HTML attribute to an expression, and keeps it in sync.
 
 ```html
 <div data-attr-title="$foo"></div>
@@ -133,7 +137,9 @@ The `data-attr` attribute can also be used to set the values of multiple attribu
 
 ### `data-bind`
 
-Creates a signal and sets up two-way data binding between it and an element's value. Can be placed on any HTML element on which data be be input or choices selected from (`input`, `textarea`, `select`, `checkbox` and `radio` elements, as well as web components).
+Creates a signal (if one doesn't already exist) and sets up two-way data binding between it and an element's value. This means that the value of the element is updated when the signal changes, and the signal is updated when the value of the element changes.
+
+The `data-bind` attribute be placed on any HTML element on which data can be input or choices selected from (`input`, `select`,`textarea` elements, and web components). Event listeners are added for `change`, `input` and `keydown` events.
 
 ```html
 <input data-bind-foo />
@@ -145,7 +151,28 @@ The signal name can be specified in the key (as above), or in the value (as belo
 <input data-bind="foo" />
 ```
 
-**Note:** Event listeners are added for `change`, `input` and `keydown` events on `input`,`textarea`, `select`, `checkbox` and `radio` elements.
+The initial value of the signal is set to the value of the element, unless a signal has already been defined. So in the example below, `$foo` is set to `bar`.
+
+```html
+<input data-bind-foo value="bar" />
+```
+
+Whereas in the example below, `$foo` inherits the value `baz` of the predefined signal.
+
+```html
+<div data-signals-foo="baz">
+  <input data-bind-foo value="bar" />
+</div>
+```
+
+Multiple checkbox input values can be assigned to a signal by predefining it as an array. So in the example below, `$foo` is set to `['bar', 'baz']` when both checkboxes are checked.
+
+```html
+<div data-signals-foo="[]">
+  <input data-bind-foo type="checkbox" value="bar" />
+  <input data-bind-foo type="checkbox" value="baz" />
+</div>
+```
 
 ### `data-class`
 
@@ -160,7 +187,7 @@ If the expression evaluates to `true`, the `hidden` class is added to the elemen
 The `data-class` attribute can also be used to add or remove multiple classes from an element using a set of key-value pairs, where the keys represent class names and the values represent expressions.
 
 ```html
-<div data-class="{hidden: $foo, bold: $bar}"></div>
+<div data-class="{hidden: $foo, 'font-bold': $bar}"></div>
 ```
 
 ### `data-on`
@@ -177,14 +204,18 @@ An `evt` variable that represents the event object is available in the expressio
 <div data-on-myevent="$foo = evt.detail"></div>
 ```
 
-The `data-on` attribute matches DOM events, however there are currently a few special cases for custom events.
+The `data-on` attribute works with [built-in events](https://developer.mozilla.org/en-US/docs/Web/Events) and [custom events](https://developer.mozilla.org/en-US/docs/Web/Events/Creating_and_triggering_events). Note that the `data-on-submit` event listener prevents the default submission behavior of forms.
+
+#### Special Events
+
+Datastar provides a few special events of its own:
 
 1. `data-on-load` is triggered when an element is loaded into the DOM.
 2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__duration` modifier.
 3. `data-on-raf` is triggered on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.
-4. `data-on-signals-change` is triggered when any signals change.
+4. `data-on-signals-change` is triggered when any signals change. A key can be provided to only trigger the event when the signal with that key changes (`data-on-signals-change-foo`).
 
-Note that the `data-on-submit` event listener prevents the default submission behavior of forms.
+Note that the `evt` variable is _not_ available in the expression when using special events.
 
 #### Modifiers
 
@@ -210,12 +241,13 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
   - `.500ms` - Interval duration of 500 milliseconds.
   - `.1s` - Interval duration of 1 second.
   - `.leading` - Execute the first interval immediately.
+- `__viewtransition` - Wraps the expression in `document.startViewTransition()` when the View Transition API is available.
 - `__window` - Attaches the event listener to the `window` element.
 - `__outside` - Triggers when the event is outside the element.
 - `__prevent` - Calls `preventDefault` on the event listener.
 - `__stop` - Calls `stopPropagation` on the event listener.
 
-\* Only works on native events.
+\* Only works on built-in events.
 
 ```html
 <div data-on-click__window__debounce.500ms.leading="$foo = ''"></div>
@@ -279,12 +311,10 @@ Allows you to add custom validity to an element using an expression. The express
 
 ```html
 <form>
-  <input
-    data-bind-foo
-    data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'"
-    name="foo"
+  <input data-bind-foo name="foo" />
+  <input data-bind-bar name="bar"
+    data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" 
   />
-  <input data-bind-bar name="bar" />
   <button>Submit form</button>
 </form>
 ```
@@ -384,14 +414,14 @@ This can be useful for show a loading spinner, disabling a button, etc.
 The signal name can be specified in the key (as above), or in the value (as below). This can be useful depending on the templating language you are using.
 
 ```html
-<button data-indicator="$fetching"></button>
+<button data-indicator="fetching"></button>
 ```
 
 ## Ignoring Elements
 
 ### `data-star-ignore`
 
-Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element and its descendants by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries.
+Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element and its descendants by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries, or when you are unable to [escape user input](/reference/security#escape-user-input).
 
 ```html
 <div data-star-ignore data-show-thirdpartylib>

@@ -1,6 +1,7 @@
 namespace StarFederation.Datastar
 
 open System
+open System.Text.Json
 open System.Text.RegularExpressions
 open System.Threading.Tasks
 
@@ -49,11 +50,12 @@ type ExecuteScriptOptions =
 type EventOptions = { EventId: string voption; Retry: TimeSpan }
 
 /// <summary>
-///
+/// Read the signals from the request
 /// </summary>
 type IReadSignals =
     abstract ReadSignals: unit -> ValueTask<Signals voption>
     abstract ReadSignals<'T>: unit -> ValueTask<'T voption>
+    abstract ReadSignals<'T>: JsonSerializerOptions -> ValueTask<'T voption>
 
 /// <summary>
 /// Can send SSEs to the client

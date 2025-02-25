@@ -1,11 +1,12 @@
 {:paths ["src/main" "resources"]
  
  :deps {
-        starfederation.datastar/sdk {:local/root "../../../sdk/clojure/sdk"}
-        starfederation.datastar/ring-jetty {:local/root "../../../sdk/clojure/adapter-jetty"}
-        metosin/reitit                 {:mvn/version "0.7.2"}
-        dev.onionpancakes/chassis      {:mvn/version "1.0.365"}
-        com.cnuernber/charred          {:mvn/version "1.034"}}
+        starfederation.datastar/sdk  {:local/root "../../../sdk/clojure/sdk"}
+        starfederation.datastar/ring {:local/root "../../../sdk/clojure/adapter-ring"}
+        ring/ring-jetty-adapter      {:mvn/version "1.13.0"}
+        metosin/reitit               {:mvn/version "0.7.2"}
+        dev.onionpancakes/chassis    {:mvn/version "1.0.365"}
+        com.cnuernber/charred        {:mvn/version "1.034"}}
  
  :aliases
  {:repl {:extra-paths ["src/dev"]
