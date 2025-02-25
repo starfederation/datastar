@@ -20,6 +20,7 @@
 
      <pre
           class="border-2 border-accent bg-base-200 text-accent text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+          data-text="ctx.signals.JSON()"
           data-on-signals-change="ctx.el.textContent = ctx.signals.JSON()"
      >
           Stuff in signals
