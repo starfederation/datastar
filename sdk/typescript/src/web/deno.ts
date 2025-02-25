@@ -19,7 +19,6 @@ serve(async (req: Request) => {
       if (isEventArray(events)) {
         return ServerSentEventGenerator.stream((stream) => {
           testEvents(stream, events);
-          stream.close();
         });
       }
     }
@@ -28,7 +27,6 @@ serve(async (req: Request) => {
       stream.mergeFragments('<div id="toMerge">Merged</div>');
       await delay(5000);
       stream.mergeFragments('<div id="toMerge">After 5 seconds</div>');
-      stream.close();
     });
   }
 
