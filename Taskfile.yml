@@ -97,7 +97,7 @@ tasks:
       - git tag sdktsv{{.VERSION}}
       - git push origin --tags
       - deno run -A build.ts {{.VERSION}}
-      - npm publish --access public
+      - cd npm && npm publish --access public
       - curl https://purge.jsdelivr.net/gh/starfederation/datastar/sdk/typescript/npm/esm/web/serverSentEventGenerator.js
       - curl https://purge.jsdelivr.net/gh/starfederation/datastar/sdk/typescript/npm/esm/abstractServerSentEventGenerator.js
       - curl https://purge.jsdelivr.net/gh/starfederation/datastar/sdk/typescript/npm/esm/node/serverSentEventGenerator.js
@@ -166,6 +166,12 @@ tasks:
       - fly deploy --local-only
 
   test:
+    deps:
+      - support
+    cmds:
+      - go test -v github.com/starfederation/datastar/site/smoketests -run '^TestUnit' -count=1 -timeout=1m
+
+  test-all:
     deps:
       - support
     cmds:

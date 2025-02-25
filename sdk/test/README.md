@@ -1,6 +1,6 @@
 # Datastar SDK testing suite
 
-This test suite uses curl(1), cat(1) and sh(1) to test that a server respects the SDK spec found in `../README.md`.
+This test suite uses curl(1), cat(1), sh(1), and awk(1) to test that a server respects the SDK spec found in `../README.md`.
 
 It expects a server to expose a `/test` endpoint that accepts all HTTP methods. The server should then use ReadSignals
 to extract the `events` array. It must then loop through the array of events and use `event.type` to decide which server sent event to use. If the output of the server differs from the expected output, then an error will be printed to the terminal.
@@ -17,8 +17,6 @@ Processing POST cases...
 If nothing else is output then all tests passed!
 
 Results of the test can be found in `./get_cases/$case_name/testOutput.txt` (or `post_cases` depending on the test).
-
-Take note that these tests are stricter about data line ordering then the SDK spec is, but unless that becomes an actual problem I dont intend to fix it, since it would add complexity.
 
  ## Adding new cases
 

@@ -22,10 +22,6 @@ export const Bind: AttributePlugin = {
   onLoad: (ctx) => {
     const { el, key, mods, signals, value, effect } = ctx
     const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
-
-    let setFromSignal = () => {}
-    let el2sig = () => {}
-
     const tnl = el.tagName.toLowerCase()
     let signalDefault: string | boolean | number | File = ''
     const isInput = tnl.includes('input')
@@ -52,23 +48,19 @@ export const Bind: AttributePlugin = {
       }
     }
 
-    signals.upsertIfMissing(signalName, signalDefault)
-
-    setFromSignal = () => {
+    const setFromSignal = () => {
       const hasValue = 'value' in el
       const v = signals.value(signalName)
       const vStr = `${v}`
       if (isCheckbox || isRadio) {
         const input = el as HTMLInputElement
-        if (isCheckbox) {
-          input.checked = !!v || v === 'true'
-        } else if (isRadio) {
-          // evaluate the value as string to handle any type casting
-          // automatically since the attribute has to be a string anyways
+        if (Array.isArray(v)) {
+          input.checked = v.includes(input.value)
+        } else if (typeof v === 'boolean') {
+          input.checked = !!v
+        } else {
           input.checked = vStr === input.value
         }
-      } else if (isFile) {
-        // File input reading from a signal is not supported yet
       } else if (isSelect) {
         const select = el as HTMLSelectElement
         if (select.multiple) {
@@ -85,6 +77,8 @@ export const Bind: AttributePlugin = {
         } else {
           select.value = vStr
         }
+      } else if (isFile) {
+        // File input reading from a signal is not supported
       } else if (hasValue) {
         el.value = vStr
       } else {
@@ -92,7 +86,7 @@ export const Bind: AttributePlugin = {
       }
     }
 
-    el2sig = async () => {
+    const el2sig = async () => {
       if (isFile) {
         const files = [...((el as HTMLInputElement)?.files || [])]
         const allContents: string[] = []
@@ -134,24 +128,39 @@ export const Bind: AttributePlugin = {
 
       const current = signals.value(signalName)
       const input = (el as HTMLInputElement) || (el as HTMLElement)
+      const value = input.value || input.getAttribute('value') || ''
+
+      if (isCheckbox) {
+        const checked = input.checked || input.getAttribute('checked') === 'true'
+        if (Array.isArray(current)) {
+          const values = new Set(current)
+          if (checked) {
+            values.add(input.value)
+          } else {
+            values.delete(input.value)
+          }
+          signals.setValue(signalName, [...values])
+        } else {
+          // We must test for the attribute value because a checked value defaults to `on`.
+          const attributeValue = input.getAttribute('value')
+          if (attributeValue) {
+            const v = checked ? value : false
+            signals.setValue(signalName, v)
+          } else {
+            signals.setValue(signalName, checked)
+          }
+        }
+
+        return
+      }
 
       if (typeof current === 'number') {
-        const v = Number(input.value || input.getAttribute('value'))
-        signals.setValue(signalName, v)
+        signals.setValue(signalName, Number(value))
       } else if (typeof current === 'string') {
-        const v = input.value || input.getAttribute('value') || ''
-        signals.setValue(signalName, v)
+        signals.setValue(signalName, value || '')
       } else if (typeof current === 'boolean') {
-        if (isCheckbox) {
-          const v = input.checked || input.getAttribute('checked') === 'true'
-          signals.setValue(signalName, v)
-        } else {
-          const v = Boolean(input.value || input.getAttribute('value'))
-          signals.setValue(signalName, v)
-        }
-      } else if (typeof current === 'undefined') {
+        signals.setValue(signalName, Boolean(value))
       } else if (Array.isArray(current)) {
-        // check if the input is a select element
         if (isSelect) {
           const select = el as HTMLSelectElement
           const selectedOptions = [...select.selectedOptions]
@@ -161,14 +170,21 @@ export const Bind: AttributePlugin = {
           signals.setValue(signalName, selectedValues)
         } else {
           // assume it's a comma-separated string
-          const v = JSON.stringify(input.value.split(','))
-          signals.setValue(signalName, v)
+          signals.setValue(signalName, JSON.stringify(value.split(',')))
         }
+      } else if (typeof current === 'undefined') {
       } else {
         throw runtimeErr('BindUnsupportedSignalType', ctx, {
           signalType: typeof current,
         })
       }
+    }
+
+    const { inserted } = signals.upsertIfMissing(signalName, signalDefault)
+
+    // If the signal was inserted, attempt to set the the signal value from the element.
+    if (inserted) {
+      el2sig()
     }
 
     for (const event of updateEvents) {

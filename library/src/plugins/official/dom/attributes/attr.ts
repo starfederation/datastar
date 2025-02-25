@@ -20,8 +20,12 @@ export const Attr: AttributePlugin = {
     if (key === '') {
       return effect(async () => {
         const binds = rx<NestedValues>()
-        for (const [attr, val] of Object.entries(binds)) {
-          el.setAttribute(attr, val)
+        for (const [key, val] of Object.entries(binds)) {
+          if (val === false) {
+            el.removeAttribute(key)
+          } else {
+            el.setAttribute(key, val)
+          }
         }
       })
     }

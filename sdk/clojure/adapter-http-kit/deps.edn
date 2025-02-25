@@ -1,4 +1,4 @@
 ;; NOTE: Track the next release of http-kit to switch to maven dep
 {:paths ["src/main"]
- :deps {http-kit/http-kit  {:git/url "https://github.com/http-kit/http-kit" :git/sha "76b869fc34536ad0c43afa9a98d971a0fc32c644"}}}
+ :deps {http-kit/http-kit {:mvn/version "2.9.0-alpha2"}}}
 

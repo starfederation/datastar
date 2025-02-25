@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestMergeFragment(t *testing.T) {
+func TestUnitMergeFragment(t *testing.T) {
 	setupPageTestOnClick(t, "tests/merge_fragment")
 }

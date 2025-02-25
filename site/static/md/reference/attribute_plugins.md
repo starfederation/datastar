@@ -62,7 +62,7 @@ The `data-signals` attribute can also be used to merge multiple signals using a 
 <div data-signals="{foo: {bar: 1, baz: 2}}"></div>
 ```
 
-The value above is written in Javascript object notation, but JSON, which is a subset and which most templating languages have built-in support for, is also allowed.
+The value above is written in JavaScript object notation, but JSON, which is a subset and which most templating languages have built-in support for, is also allowed.
 
 Note that `data-*` attributes are case-insensitive. If you want to use uppercase characters in signal names, you'll need to kebabize them or use object syntax. So the signal name `mySignal` must be written as `data-signals-my-signal` or `data-signals="{mySignal: 1}"`.
 
@@ -123,7 +123,7 @@ Allows the usage of signals and expressions to affect the DOM.
 
 ### `data-attr`
 
-Binds the value of any HTML attribute to an expression.
+Sets the value of any HTML attribute to an expression, and keeps it in sync.
 
 ```html
 <div data-attr-title="$foo"></div>
@@ -137,7 +137,9 @@ The `data-attr` attribute can also be used to set the values of multiple attribu
 
 ### `data-bind`
 
-Creates a signal and sets up two-way data binding between it and an element's value. Can be placed on any HTML element on which data can be input or choices selected from (`input`, `textarea`, `select`, `checkbox` and `radio` elements, as well as web components).
+Creates a signal (if one doesn't already exist) and sets up two-way data binding between it and an element's value. This means that the value of the element is updated when the signal changes, and the signal is updated when the value of the element changes.
+
+The `data-bind` attribute be placed on any HTML element on which data can be input or choices selected from (`input`, `select`,`textarea` elements, and web components). Event listeners are added for `change`, `input` and `keydown` events.
 
 ```html
 <input data-bind-foo />
@@ -149,7 +151,28 @@ The signal name can be specified in the key (as above), or in the value (as belo
 <input data-bind="foo" />
 ```
 
-**Note:** Event listeners are added for `change`, `input` and `keydown` events on `input`,`textarea`, `select`, `checkbox` and `radio` elements.
+The initial value of the signal is set to the value of the element, unless a signal has already been defined. So in the example below, `$foo` is set to `bar`.
+
+```html
+<input data-bind-foo value="bar" />
+```
+
+Whereas in the example below, `$foo` inherits the value `baz` of the predefined signal.
+
+```html
+<div data-signals-foo="baz">
+  <input data-bind-foo value="bar" />
+</div>
+```
+
+Multiple checkbox input values can be assigned to a signal by predefining it as an array. So in the example below, `$foo` is set to `['bar', 'baz']` when both checkboxes are checked.
+
+```html
+<div data-signals-foo="[]">
+  <input data-bind-foo type="checkbox" value="bar" />
+  <input data-bind-foo type="checkbox" value="baz" />
+</div>
+```
 
 ### `data-class`
 
@@ -391,14 +414,14 @@ This can be useful for show a loading spinner, disabling a button, etc.
 The signal name can be specified in the key (as above), or in the value (as below). This can be useful depending on the templating language you are using.
 
 ```html
-<button data-indicator="$fetching"></button>
+<button data-indicator="fetching"></button>
 ```
 
 ## Ignoring Elements
 
 ### `data-star-ignore`
 
-Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element and its descendants by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries.
+Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element and its descendants by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries, or when you are unable to [escape user input](/reference/security#escape-user-input).
 
 ```html
 <div data-star-ignore data-show-thirdpartylib>
@@ -411,3 +434,14 @@ Datastar walks the entire DOM and applies plugins to each element it encounters.
 #### Modifiers
 
 - `__self` - Only ignore the element itself, not its descendants.
+
+
+## Aliasing Data Attributes
+
+It is possible to alias `data-*` attributes to a custom alias (`data-foo-*`, for example) using the [bundler](/bundler). A custom alias should _only_ be used if you have a conflict with a legacy library and [`data-star-ignore`](#data-star-ignore) cannot be used.
+
+We maintain a `data-ds-*` aliased version that can be included as follows.
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.8/bundles/datastar-aliased.js"></script>
+```
