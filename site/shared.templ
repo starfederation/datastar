@@ -37,7 +37,7 @@ templ Page(title, description string, uri string) {
 			<meta name="twitter:site" content="@DelaneyGillilan"/>
 			<meta name="twitter:creator" content="@DelaneyGillilan"/>
 			<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
-			if uri == "/tests/aliased" || uri == "/examples/aliased_data_attributes" {
+			if uri == "/tests/aliased" {
 				<script type="module" src={ staticPath("js/datastar-aliased.js") }></script>
 			} else {
 				<script type="module" src={ staticPath("js/datastar.js") }></script>
