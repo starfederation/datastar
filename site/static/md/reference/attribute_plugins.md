@@ -443,5 +443,5 @@ It is possible to alias `data-*` attributes to a custom alias (`data-foo-*`, for
 We maintain a `data-ds-*` aliased version that can be included as follows.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.7/bundles/datastar-aliased.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.8/bundles/datastar-aliased.js"></script>
 ```
