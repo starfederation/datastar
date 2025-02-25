@@ -17,7 +17,8 @@ export class Hash {
     } else if (typeof x === 'boolean') {
       this.with(1 << (x ? 7 : 3))
     } else {
-      this.#value = (this.#value << 5) - this.#value + x
+      // use djb2 favored by bernstein http://www.cse.yorku.ca/~oz/hash.html
+      this.#value = (this.#value * 33) ^ x
     }
     return this
   }
