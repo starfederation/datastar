@@ -2,11 +2,17 @@ name: Enforce Branch Policy
 
 on:
   pull_request:
+  push:
   workflow_dispatch:
 jobs:
   enforce-branch-policy:
     runs-on: ubuntu-latest
     steps:
+      - name: Check for push event
+        if: github.event_name == 'push'
+        run: |
+          echo "Push events allowed."
+          exit 0
       - name: Enforce main branch policy
         if: github.ref == 'refs/heads/main'
         run: |
