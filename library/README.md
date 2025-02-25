@@ -56,7 +56,6 @@ You can manually add your own plugins to the core:
     load(
         // Look ma’, I made a plugin!
     )
-    
     apply()
 </script>
 ```
