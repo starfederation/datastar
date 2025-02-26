@@ -116,7 +116,9 @@ function applyToElement(rootElement: HTMLorSVGElement) {
     }
 
     // Clean up any old plugins and apply the new ones
-    for (const [_, cleanup] of toCleanup) cleanup()
+    for (const [_, cleanup] of toCleanup) {
+      cleanup()
+    }
     for (const key of toApply) {
       const h = hashes.get(key)!
       applyAttributePlugin(el, key, h)
@@ -249,22 +251,23 @@ function applyAttributePlugin(
     ctx.mods.set(camel(label), new Set(mod.map((t) => t.toLowerCase())))
   }
 
-  // Load the plugin and store any cleanup functions
-  const cleanup = plugin.onLoad(ctx)
-  if (cleanup) {
-    let elTracking = removals.get(el)
-    if (!elTracking) {
-      elTracking = new Map()
-      removals.set(el, elTracking)
-    }
-    elTracking.set(hash, cleanup)
-  }
+  // Load the plugin
+  const cleanup = plugin.onLoad(ctx) ?? (() => {})
+  const removeOnLoad = plugin.removeOnLoad
 
   // Remove the attribute if required
-  const removeOnLoad = plugin.removeOnLoad
   if (removeOnLoad && removeOnLoad(rawKey) === true) {
     delete el.dataset[camelCasedKey]
+    return;
   }
+
+  // Store the cleanup function
+  let elTracking = removals.get(el)
+  if (!elTracking) {
+    elTracking = new Map()
+    removals.set(el, elTracking)
+  }
+  elTracking.set(hash, cleanup)
 }
 
 function genRX(
