@@ -12,18 +12,12 @@ jobs:
   enforce-branch-policy:
     runs-on: ubuntu-latest
     steps:
-      - name: Check for push event
-        if: github.event_name == 'push'
-        run: |
-          echo "Push events allowed."
-          exit 0
-      - name: Enforce main branch policy
-        if: github.ref == 'refs/heads/main'
+      - name: Enforce main branch pull request policy
+        if: github.event_name == 'pull_request' && github.ref == 'refs/heads/main'
         run: |
           echo "Pull requests to the main branch are not allowed."
           exit 1
-      - name: Enforce develop branch policy
-        if: github.ref != 'refs/heads/main'
+      - name: Enforce main branch push policy
         run: |
-          echo "Pull requests to the develop branch are allowed."
+          echo "Push events to the main branch are allowed."
           exit 0
