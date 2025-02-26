@@ -125,9 +125,3 @@ class MyComponent extends HTMLElement {
 
 customElements.define('my-component', MyComponent);
 ```
-
-## Third-Party Libraries
-
-Datastar is a tiny self-contained framework that can help liberate you from "dependency hell". If, for some reason, you absolutely _must_ use a third-party library, you should continue using the _props down, events up_ pattern whenever possible.
-
-For edge-cases in which you find yourself having to change the DOM without involving Datastar, you can import Datastar and apply it to any part of the DOM. for more details, see the [JavaScript API](/reference/javascript_api).
