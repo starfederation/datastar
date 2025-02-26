@@ -11,7 +11,7 @@ func setupTestsMergeFragmentContainingOnEvent(testsRouter chi.Router) error {
 	
 	testsRouter.Get("/merge_fragment_containing_on_event/data", func(w http.ResponseWriter, r *http.Request) {
 		sse := datastar.NewSSE(w, r)
-		sse.MergeFragments(`<div id="content" data-signals-hidden="false" data-show="!$hidden"><button data-on-click="$hidden = true" class="btn">Hide</button></div>`)
+		sse.MergeFragments(`<div id="content" data-signals-hidden="false" data-show="!$hidden"><button data-on-click="$hidden = true" class="btn">Hide</button><input data-bind-name data-on-input="@get('/tests/merge_fragment_containing_on_event/data')" /></div>`)
 	})
 
 	return nil
