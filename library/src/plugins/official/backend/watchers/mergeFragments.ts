@@ -11,10 +11,12 @@ import {
 } from '../../../../engine/consts'
 import { initErr } from '../../../../engine/errors'
 import {
+  type HTMLorSVGElement,
   type InitContext,
   PluginType,
   type WatcherPlugin,
 } from '../../../../engine/types'
+import { elUniqId, walkDOM } from '../../../../utils/dom'
 import { isBoolString } from '../../../../utils/text'
 import {
   docWithViewTransitionAPI,
@@ -85,6 +87,13 @@ function applyToTargets(
     const modifiedTarget = initialTarget
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
+
+        const fragmentWithIDs = fragment.cloneNode(true) as HTMLorSVGElement
+        walkDOM(fragmentWithIDs, (el) => {
+          if (!el.id?.length && Object.keys(el.dataset).length) {
+            el.id = elUniqId(el)
+          }
+        })
         Idiomorph.morph(modifiedTarget, fragment.cloneNode(true))
         break
       }
