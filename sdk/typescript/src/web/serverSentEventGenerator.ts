@@ -22,23 +22,20 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
   }
 
   /**
-   * Closes the ReadableStream
-   */
-  public close() {
-    this.controller.close();
-  }
-
-  /**
-   * Initializes the server-sent event generator and executes the streamFunc function.
+   * Initializes the server-sent event generator and executes the onStart callback.
    *
    * @param onStart - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
    * @param options? - An object that can contain options for the Response constructor onError and onCancel callbacks and a keepalive boolean.
    * The onAbort callback will be called whenever the request is aborted or the stream is cancelled
+   *
    * The onError callback will be called whenever an error is met. If provided, the onAbort callback will also be executed.
    * If an onError callback is not provided, then the stream will be ended and the error will be thrown up.
+   *
    * If responseInit is provided, then it will be passed to the Response constructor along with the default headers.
-   * When keepalive is true (default is false), the stream will be kept open indefinitely,
-   * otherwise it will be closed when the onStart callback finishes.
+   *
+   * The stream is always closed after the onStart callback ends.
+   * If onStart is non blocking, but you still need the stream to stay open after it is called,
+   * then the keepalive option will maintain it open until the request is aborted by the client.
    *
    * @returns an HTTP Response
    */
@@ -58,7 +55,7 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
         try {
           const stream = onStart(generator);
           if (stream instanceof Promise) await stream;
-          if (options?.keepalive) {
+          if (!options?.keepalive) {
             controller.close();
           }
         } catch (error) {
