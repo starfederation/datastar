@@ -103,7 +103,7 @@ fn send(
     try self.writer.writeAll("\n\n");
 }
 
-/// `ExecuteScript` executes JavaScript in the browser
+/// `executeScript` executes JavaScript in the browser
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-execute-script) for more information.
 pub fn executeScript(
@@ -113,6 +113,7 @@ pub fn executeScript(
     options: ExecuteScriptOptions,
 ) !void {
     var data = std.ArrayList([]const u8).init(self.allocator);
+    errdefer data.deinit();
     const writer = data.writer();
 
     if (options.attributes.len != 1 or !std.mem.eql(
@@ -159,7 +160,7 @@ pub fn executeScript(
     );
 }
 
-/// `MergeFragments` merges one or more fragments into the DOM. By default,
+/// `mergeFragments` merges one or more fragments into the DOM. By default,
 /// Datastar merges fragments using Idiomorph, which matches top level elements based on their ID.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-merge-fragments) for more information.
@@ -170,6 +171,7 @@ pub fn mergeFragments(
     options: MergeFragmentsOptions,
 ) !void {
     var data = std.ArrayList([]const u8).init(self.allocator);
+    errdefer data.deinit();
     const writer = data.writer();
 
     if (options.selector) |selector| {
@@ -228,7 +230,7 @@ pub fn mergeFragments(
     );
 }
 
-/// `MergeSignals` sends one or more signals to the browser to be merged into the signals.
+/// `mergeSignals` sends one or more signals to the browser to be merged into the signals.
 /// This function takes in `anytype` as the signals to merge, which can be any type that can be serialized to JSON.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-merge-signals) for more information.
@@ -238,6 +240,7 @@ pub fn mergeSignals(
     options: MergeSignalsOptions,
 ) !void {
     var data = std.ArrayList([]const u8).init(self.allocator);
+    errdefer data.deinit();
     const writer = data.writer();
 
     if (options.only_if_missing != consts.default_merge_signals_only_if_missing) {
@@ -262,7 +265,7 @@ pub fn mergeSignals(
     );
 }
 
-/// `RemoveFragments` sends a selector to the browser to remove HTML fragments from the DOM.
+/// `removeFragments` sends a selector to the browser to remove HTML fragments from the DOM.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-remove-fragments) for more information.
 pub fn removeFragments(
@@ -271,6 +274,7 @@ pub fn removeFragments(
     options: RemoveFragmentsOptions,
 ) !void {
     var data = std.ArrayList([]const u8).init(self.allocator);
+    errdefer data.deinit();
     const writer = data.writer();
 
     if (options.settle_duration != consts.default_fragments_settle_duration) {
@@ -308,7 +312,7 @@ pub fn removeFragments(
     );
 }
 
-/// `RemoveSignals` sends signals to the browser to be removed from the signals.
+/// `removeSignals` sends signals to the browser to be removed from the signals.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-remove-signals) for more information.
 pub fn removeSignals(
@@ -317,6 +321,7 @@ pub fn removeSignals(
     options: RemoveSignalsOptions,
 ) !void {
     var data = std.ArrayList([]const u8).init(self.allocator);
+    errdefer data.deinit();
     const writer = data.writer();
 
     for (paths) |path| {
@@ -336,4 +341,19 @@ pub fn removeSignals(
             .retry_duration = options.retry_duration,
         },
     );
+}
+
+/// `redirect` sends an `executeScript` event to redirect to the user to a new URL.
+pub fn redirect(
+    self: *@This(),
+    url: []const u8,
+    options: ExecuteScriptOptions,
+) !void {
+    const script = try std.fmt.allocPrint(
+        self.allocator,
+        "setTimeout(() => window.location.href = '{s}')",
+        .{url},
+    );
+    errdefer self.allocator.free(script);
+    try self.executeScript(script, options);
 }
