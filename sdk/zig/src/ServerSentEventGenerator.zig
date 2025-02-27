@@ -346,7 +346,7 @@ pub fn removeSignals(
     );
 }
 
-/// `redirect` sends an `executeScript` event to redirect to the user to a new URL.
+/// `redirect` sends an `executeScript` event to redirect the user to a new URL.
 pub fn redirect(
     self: *@This(),
     url: []const u8,
