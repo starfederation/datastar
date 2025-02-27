@@ -27,4 +27,4 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ### Removed
 
-- Removed the ability to import the Datastar class. The `setAlias`, `load`, and `apply` functions are exported instead.
+- Removed the ability to import the Datastar class. The `apply`, `load`, and `setAlias` functions are exported instead.

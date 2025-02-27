@@ -434,3 +434,14 @@ Datastar walks the entire DOM and applies plugins to each element it encounters.
 #### Modifiers
 
 - `__self` - Only ignore the element itself, not its descendants.
+
+
+## Aliasing Data Attributes
+
+It is possible to alias `data-*` attributes to a custom alias (`data-foo-*`, for example) using the [bundler](/bundler). A custom alias should _only_ be used if you have a conflict with a legacy library and [`data-star-ignore`](#data-star-ignore) cannot be used.
+
+We maintain a `data-ds-*` aliased version that can be included as follows.
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.8/bundles/datastar-aliased.js"></script>
+```

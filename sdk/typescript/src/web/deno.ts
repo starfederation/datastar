@@ -1,13 +1,15 @@
+import { VERSION } from "../consts.ts";
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
 import { ServerSentEventGenerator } from "./serverSentEventGenerator.ts";
 import type { Jsonifiable } from "npm:type-fest";
 
+// This server is used for testing the web standard based sdk
 serve(async (req: Request) => {
   const url = new URL(req.url);
 
   if (url.pathname === "/") {
     return new Response(
-      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.7/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
+      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v${VERSION}/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
       {
         headers: { "Content-Type": "text/html" },
       },
@@ -19,7 +21,6 @@ serve(async (req: Request) => {
       if (isEventArray(events)) {
         return ServerSentEventGenerator.stream((stream) => {
           testEvents(stream, events);
-          stream.close();
         });
       }
     }
@@ -28,7 +29,6 @@ serve(async (req: Request) => {
       stream.mergeFragments('<div id="toMerge">Merged</div>');
       await delay(5000);
       stream.mergeFragments('<div id="toMerge">After 5 seconds</div>');
-      stream.close();
     });
   }
 
