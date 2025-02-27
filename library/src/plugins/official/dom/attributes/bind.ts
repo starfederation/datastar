@@ -184,7 +184,7 @@ export const Bind: AttributePlugin = {
             .filter((opt) => opt.selected)
             .map((opt) => opt.value)
         } else {
-          v = selectedOptions[0]?.value || ''
+          v = selectedOptions[0]?.value || signalDefault
         }
       } else if (typeof current === 'boolean') {
         v = Boolean(value)

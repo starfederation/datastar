@@ -9,7 +9,6 @@ import (
 
 func TestExampleClickToEdit(t *testing.T) {
 	setupPageTest(t, "examples/click_to_edit", func(runner runnerFn) {
-		t.Skip("skipping test because it's flaky to timing issues")
 		runner("click to edit", func(t *testing.T, page *rod.Page) {
 			editBtn := page.MustElement("#contact_1 > div > button:nth-of-type(1)")
 			editBtn.MustClick()
