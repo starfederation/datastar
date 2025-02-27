@@ -1,6 +1,6 @@
 .{
     .name = "datastar",
-    .version = "1.0.0-beta.2",
+    .version = "1.0.0-beta.3",
     .dependencies = .{
         .httpz = .{
             .url = "git+https://github.com/karlseguin/http.zig?ref=master#f16b296a2772be97e48a57259c004aa6584a02c6",
