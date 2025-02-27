@@ -4,7 +4,7 @@
     .dependencies = .{
         .tokamak = .{
             .url = "git+https://github.com/cztomsik/tokamak#857fa78a6fc77c4effa235ef049b8a6461120e5d",
-            .hash = "1220ddbe12aa69b3293f0abd7078ff93c309b4f4383e18cbe24b163e4ee4b2befa49",
+            .hash = "122071c2c0adaa3fa3a27a872fdc0b2e762db515e3ef8c5b2225332141500e13f110",
         },
         .datastar = .{
             .path = "../../../../sdk/zig",
