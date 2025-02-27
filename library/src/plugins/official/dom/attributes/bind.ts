@@ -128,7 +128,7 @@ export const Bind: AttributePlugin = {
 
       const current = signals.value(signalName)
       const input = (el as HTMLInputElement) || (el as HTMLElement)
-      const value = input.value || input.getAttribute('value') || ''
+      const value = input.value || ''
 
       if (isCheckbox) {
         const checked = input.checked || input.getAttribute('checked') === 'true'
