@@ -190,7 +190,7 @@ export const Bind: AttributePlugin = {
     for (const event of updateEvents) {
       el.addEventListener(event, el2sig)
     }
-    const elSigClean = effect(() => setFromSignal())
+
     /*
      * The signal value needs to be updated after the "pageshow" event.
      * Sometimes, the browser might populate inputs with previous values
@@ -200,11 +200,14 @@ export const Bind: AttributePlugin = {
      * https://web.dev/articles/bfcache
      */
     const onPageshow = (ev: PageTransitionEvent) => {
-      if (!ev.persisted) return
-      el2sig()
+      if (ev.persisted) {
+        el2sig()
+      }
     }
     window.addEventListener("pageshow", onPageshow)
 
+    const elSigClean = effect(() => setFromSignal())
+    
     return () => {
       elSigClean()
       for (const event of updateEvents) {
