@@ -31,6 +31,8 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    tests.root_module.addOptions("config", options);
+
     tests.root_module.addImport("httpz", httpz);
     tests.root_module.addImport("tokamak", tokamak);
 
