@@ -80,7 +80,7 @@ pub const RemoveSignalsOptions = struct {
 fn send(
     self: *@This(),
     event: consts.EventType,
-    data: []const []const u8,
+    data: []const u8,
     options: struct {
         event_id: ?[]const u8 = null,
         retry_duration: u32 = consts.default_sse_retry_duration,
@@ -96,7 +96,9 @@ fn send(
         try self.writer.print("retry: {d}\n", .{options.retry_duration});
     }
 
-    for (data) |line| {
+    var iter = std.mem.splitScalar(u8, data, '\n');
+    while (iter.next()) |line| {
+        if (line.len == 0) continue;
         try self.writer.print("data: {s}\n", .{line});
     }
 
@@ -112,7 +114,7 @@ pub fn executeScript(
     script: []const u8,
     options: ExecuteScriptOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.allocator);
+    var data = std.ArrayList(u8).init(self.allocator);
     errdefer data.deinit();
     const writer = data.writer();
 
@@ -123,7 +125,7 @@ pub fn executeScript(
     )) {
         for (options.attributes) |attribute| {
             try writer.print(
-                consts.attributes_dataline_literal ++ " {s}",
+                consts.attributes_dataline_literal ++ " {s}\n",
                 .{
                     attribute,
                 },
@@ -133,7 +135,7 @@ pub fn executeScript(
 
     if (options.auto_remove != consts.default_execute_script_auto_remove) {
         try writer.print(
-            consts.auto_remove_dataline_literal ++ " {}",
+            consts.auto_remove_dataline_literal ++ " {}\n",
             .{
                 options.auto_remove,
             },
@@ -143,7 +145,7 @@ pub fn executeScript(
     var iter = std.mem.splitScalar(u8, script, '\n');
     while (iter.next()) |elem| {
         try writer.print(
-            consts.script_dataline_literal ++ " {s}",
+            consts.script_dataline_literal ++ " {s}\n",
             .{
                 elem,
             },
@@ -170,13 +172,13 @@ pub fn mergeFragments(
     fragments: []const u8,
     options: MergeFragmentsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.allocator);
+    var data = std.ArrayList(u8).init(self.allocator);
     errdefer data.deinit();
     const writer = data.writer();
 
     if (options.selector) |selector| {
         try writer.print(
-            consts.selector_dataline_literal ++ " {s}",
+            consts.selector_dataline_literal ++ " {s}\n",
             .{
                 selector,
             },
@@ -185,7 +187,7 @@ pub fn mergeFragments(
 
     if (options.merge_mode != consts.default_fragment_merge_mode) {
         try writer.print(
-            consts.merge_mode_dataline_literal ++ " {}",
+            consts.merge_mode_dataline_literal ++ " {}\n",
             .{
                 options.merge_mode,
             },
@@ -194,7 +196,7 @@ pub fn mergeFragments(
 
     if (options.settle_duration != consts.default_fragments_settle_duration) {
         try writer.print(
-            consts.settle_duration_dataline_literal ++ " {d}",
+            consts.settle_duration_dataline_literal ++ " {d}\n",
             .{
                 options.settle_duration,
             },
@@ -203,7 +205,7 @@ pub fn mergeFragments(
 
     if (options.use_view_transition != consts.default_fragments_use_view_transitions) {
         try writer.print(
-            consts.use_view_transition_dataline_literal ++ " {}",
+            consts.use_view_transition_dataline_literal ++ " {}\n",
             .{
                 options.use_view_transition,
             },
@@ -213,7 +215,7 @@ pub fn mergeFragments(
     var iter = std.mem.splitScalar(u8, fragments, '\n');
     while (iter.next()) |elem| {
         try writer.print(
-            consts.fragments_dataline_literal ++ " {s}",
+            consts.fragments_dataline_literal ++ " {s}\n",
             .{
                 elem,
             },
@@ -239,21 +241,22 @@ pub fn mergeSignals(
     signals: anytype,
     options: MergeSignalsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.allocator);
+    var data = std.ArrayList(u8).init(self.allocator);
     errdefer data.deinit();
     const writer = data.writer();
 
     if (options.only_if_missing != consts.default_merge_signals_only_if_missing) {
         try writer.print(
-            consts.only_if_missing_dataline_literal ++ " {}",
+            consts.only_if_missing_dataline_literal ++ " {}\n",
             .{
                 options.only_if_missing,
             },
         );
     }
 
-    try writer.writeAll(consts.signals_dataline_literal ++ " ", .{});
+    try writer.writeAll(consts.signals_dataline_literal ++ " ");
     try std.json.stringify(signals, .{}, writer);
+    try writer.writeByte('\n');
 
     try self.send(
         .merge_signals,
@@ -273,13 +276,13 @@ pub fn removeFragments(
     selector: []const u8,
     options: RemoveFragmentsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.allocator);
+    var data = std.ArrayList(u8).init(self.allocator);
     errdefer data.deinit();
     const writer = data.writer();
 
     if (options.settle_duration != consts.default_fragments_settle_duration) {
         try writer.print(
-            consts.settle_duration_dataline_literal ++ " {d}",
+            consts.settle_duration_dataline_literal ++ " {d}\n",
             .{
                 options.settle_duration,
             },
@@ -288,7 +291,7 @@ pub fn removeFragments(
 
     if (options.use_view_transition != consts.default_fragments_use_view_transitions) {
         try writer.print(
-            consts.use_view_transition_dataline_literal ++ " {}",
+            consts.use_view_transition_dataline_literal ++ " {}\n",
             .{
                 options.use_view_transition,
             },
@@ -296,7 +299,7 @@ pub fn removeFragments(
     }
 
     try writer.print(
-        consts.selector_dataline_literal ++ " {s}",
+        consts.selector_dataline_literal ++ " {s}\n",
         .{
             selector,
         },
@@ -320,13 +323,13 @@ pub fn removeSignals(
     paths: []const []const u8,
     options: RemoveSignalsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.allocator);
+    var data = std.ArrayList(u8).init(self.allocator);
     errdefer data.deinit();
     const writer = data.writer();
 
     for (paths) |path| {
         try writer.print(
-            consts.paths_dataline_literal ++ " {s}",
+            consts.paths_dataline_literal ++ " {s}\n",
             .{
                 path,
             },
