@@ -25,21 +25,22 @@ const plugins: AttributePlugin[] = []
 const actions: ActionPlugins = {}
 const watchers: WatcherPlugin[] = []
 
+// Map of cleanup functions by element ID, keyed by a dataset key-value hash
+const removals = new Map<string, Map<number, OnRemovalFn>>()
+
 let alias = ''
 export function setAlias(value: string) {
   alias = value
 }
 
-// Map of cleanup functions by element, keyed by the dataset key and value
-const removals = new Map<Element, Map<number, OnRemovalFn>>()
-
 export function load(...pluginsToLoad: DatastarPlugin[]) {
   for (const plugin of pluginsToLoad) {
     const ctx: InitContext = {
+      plugin,
       signals,
       effect: (cb: () => void): OnRemovalFn => effect(cb),
-      actions: actions,
-      plugin,
+      actions,
+      removals,
       applyToElement,
     }
 
@@ -90,7 +91,7 @@ function applyToElement(rootElement: HTMLorSVGElement) {
   walkDOM(rootElement, (el) => {
     // Check if the element has any data attributes already
     const toApply = new Array<string>()
-    const elCleanups = removals.get(el) || new Map()
+    const elCleanups = removals.get(el.id) || new Map()
     const toCleanup = new Map<number, OnRemovalFn>([...elCleanups])
     const hashes = new Map<string, number>()
 
@@ -207,7 +208,8 @@ function applyAttributePlugin(
     signals,
     applyToElement,
     effect: (cb: () => void): OnRemovalFn => effect(cb),
-    actions: actions,
+    actions,
+    removals,
     genRX: () => genRX(ctx, ...(plugin.argNames || [])),
     plugin,
     el,
@@ -262,10 +264,10 @@ function applyAttributePlugin(
   }
 
   // Store the cleanup function
-  let elTracking = removals.get(el)
+  let elTracking = removals.get(el.id)
   if (!elTracking) {
     elTracking = new Map()
-    removals.set(el, elTracking)
+    removals.set(el.id, elTracking)
   }
   elTracking.set(hash, cleanup)
 }

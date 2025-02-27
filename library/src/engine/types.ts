@@ -82,6 +82,7 @@ export type InitContext = {
   signals: SignalsRoot
   effect: (fn: EffectFn) => OnRemovalFn
   actions: Readonly<ActionPlugins>
+  removals: Map<string, Map<number, OnRemovalFn>>
   applyToElement: (el: HTMLorSVGElement) => void
 }
 
