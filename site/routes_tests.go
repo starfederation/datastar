@@ -31,6 +31,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "aliased"},
 				{ID: "attr_false"},
 				{ID: "attr_object_false"},
+				{ID: "strings_input_array"},
 				{ID: "checkbox_input_array"},
 				{ID: "checkbox_input_checked"},
 				{ID: "checkbox_input_default"},

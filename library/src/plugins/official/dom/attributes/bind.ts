@@ -21,7 +21,10 @@ export const Bind: AttributePlugin = {
   valReq: Requirement.Exclusive,
   onLoad: (ctx) => {
     const { el, key, mods, signals, value, effect } = ctx
-    const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
+    const input = el as HTMLInputElement
+    const signalName = key
+      ? modifyCasing(key, mods)
+      : trimDollarSignPrefix(value)
     const tnl = el.tagName.toLowerCase()
     let signalDefault: string | boolean | number | File = ''
     const isInput = tnl.includes('input')
@@ -48,12 +51,32 @@ export const Bind: AttributePlugin = {
       }
     }
 
+    const { signal, inserted } = signals.upsertIfMissing(
+      signalName,
+      signalDefault,
+    )
+    let arrayIndex = -1
+    if (Array.isArray(signal.value)) {
+      el.setAttribute('multiple', '')
+      if (el.getAttribute('name') === null) {
+        el.setAttribute('name', signalName)
+      }
+      arrayIndex = [
+        ...document.querySelectorAll(`[name="${signalName}"]`),
+      ].findIndex((el) => el === ctx.el)
+    }
+    const isArray = arrayIndex >= 0
+    const signalArr = () => [...(signals.value(signalName) as any[])]
+
     const setFromSignal = () => {
       const hasValue = 'value' in el
-      const v = signals.value(signalName)
+      let v = signals.value(signalName)
+      if (isArray && !isSelect) {
+        // may be undefined if the array is shorter than the index
+        v = (v as any)[arrayIndex] || signalDefault
+      }
       const vStr = `${v}`
       if (isCheckbox || isRadio) {
-        const input = el as HTMLInputElement
         if (Array.isArray(v)) {
           input.checked = v.includes(input.value)
         } else if (typeof v === 'boolean') {
@@ -64,15 +87,11 @@ export const Bind: AttributePlugin = {
       } else if (isSelect) {
         const select = el as HTMLSelectElement
         if (select.multiple) {
+          if (!isArray) throw runtimeErr('BindSelectMultiple', ctx)
           for (const opt of select.options) {
             if (opt?.disabled) return
-            if (Array.isArray(v) || typeof v === 'string') {
-              opt.selected = v.includes(opt.value)
-            } else if (typeof v === 'number') {
-              opt.selected = v === Number(opt.value)
-            } else {
-              opt.selected = v as boolean
-            }
+            const incoming = isNumber ? Number(opt.value) : opt.value
+            opt.selected = (v as any[]).includes(incoming)
           }
         } else {
           select.value = vStr
@@ -87,8 +106,28 @@ export const Bind: AttributePlugin = {
     }
 
     const el2sig = async () => {
+      let current = signals.value(signalName)
+      if (isArray) {
+        const currentArray = current as any[]
+        while (arrayIndex >= currentArray.length) {
+          currentArray.push(signalDefault)
+        }
+        current = currentArray[arrayIndex] || signalDefault
+      }
+      const value = input.value || input.getAttribute('value') || ''
+
+      const update = (signalName: string, value: any) => {
+        let v = value
+        if (isArray && !isSelect) {
+          v = signalArr()
+          v[arrayIndex] = value
+        }
+        signals.setValue(signalName, v)
+      }
+
+      // Files are a special flower
       if (isFile) {
-        const files = [...((el as HTMLInputElement)?.files || [])]
+        const files = [...(input?.files || [])]
         const allContents: string[] = []
         const allMimes: string[] = []
         const allNames: string[] = []
@@ -118,69 +157,48 @@ export const Bind: AttributePlugin = {
             })
           }),
         )
-
-        signals.setValue(signalName, allContents)
-        signals.setValue(`${signalName}Mimes`, allMimes)
-        signals.setValue(`${signalName}Names`, allNames)
-
+        update(signalName, allContents)
+        update(`${signalName}Mimes`, allMimes)
+        update(`${signalName}Names`, allNames)
         return
       }
 
-      const current = signals.value(signalName)
-      const input = (el as HTMLInputElement) || (el as HTMLElement)
-      const value = input.value || input.getAttribute('value') || ''
+      let v: any
 
       if (isCheckbox) {
-        const checked = input.checked || input.getAttribute('checked') === 'true'
-        if (Array.isArray(current)) {
-          const values = new Set(current)
-          if (checked) {
-            values.add(input.value)
-          } else {
-            values.delete(input.value)
-          }
-          signals.setValue(signalName, [...values])
+        const checked =
+          input.checked || input.getAttribute('checked') === 'true'
+
+        // We must test for the attribute value because a checked value defaults to `on`.
+        const attributeValue = input.getAttribute('value')
+        if (attributeValue) {
+          v = checked ? value : false
         } else {
-          // We must test for the attribute value because a checked value defaults to `on`.
-          const attributeValue = input.getAttribute('value')
-          if (attributeValue) {
-            const v = checked ? value : false
-            signals.setValue(signalName, v)
-          } else {
-            signals.setValue(signalName, checked)
-          }
+          v = checked
         }
-
-        return
-      }
-
-      if (typeof current === 'number') {
-        signals.setValue(signalName, Number(value))
-      } else if (typeof current === 'string') {
-        signals.setValue(signalName, value || '')
-      } else if (typeof current === 'boolean') {
-        signals.setValue(signalName, Boolean(value))
-      } else if (Array.isArray(current)) {
-        if (isSelect) {
-          const select = el as HTMLSelectElement
-          const selectedOptions = [...select.selectedOptions]
-          const selectedValues = selectedOptions
+      } else if (isSelect) {
+        const select = el as HTMLSelectElement
+        const selectedOptions = [...select.selectedOptions]
+        if (isArray) {
+          v = selectedOptions
             .filter((opt) => opt.selected)
             .map((opt) => opt.value)
-          signals.setValue(signalName, selectedValues)
         } else {
-          // assume it's a comma-separated string
-          signals.setValue(signalName, JSON.stringify(value.split(',')))
+          v = selectedOptions[0]?.value || ''
         }
-      } else if (typeof current === 'undefined') {
+      } else if (typeof current === 'boolean') {
+        v = Boolean(value)
+      } else if (typeof current === 'string') {
+        v = value || ''
+      } else if (typeof current === 'number') {
+        v = Number(value)
       } else {
         throw runtimeErr('BindUnsupportedSignalType', ctx, {
           signalType: typeof current,
         })
       }
+      update(signalName, v)
     }
-
-    const { inserted } = signals.upsertIfMissing(signalName, signalDefault)
 
     // If the signal was inserted, attempt to set the the signal value from the element.
     if (inserted) {
@@ -203,14 +221,14 @@ export const Bind: AttributePlugin = {
       if (!ev.persisted) return
       el2sig()
     }
-    window.addEventListener("pageshow", onPageshow)
+    window.addEventListener('pageshow', onPageshow)
 
     return () => {
       elSigClean()
       for (const event of updateEvents) {
         el.removeEventListener(event, el2sig)
       }
-      window.removeEventListener("pageshow", onPageshow)
+      window.removeEventListener('pageshow', onPageshow)
     }
   },
 }
