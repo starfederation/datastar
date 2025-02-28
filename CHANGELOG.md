@@ -10,4 +10,5 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 - Fixed a bug in which `data-signals` was being reapplied each time any attribute changed on an element ([#709](https://github.com/starfederation/datastar/issues/709)).
 - Fixed a bug in which focus was not being restored to input elements after merging fragments ([#710](https://github.com/starfederation/datastar/issues/710)).
+- Fixed a bug in which the `__delay` modifier was being ignored ([#720](https://github.com/starfederation/datastar/issues/720)).
 - Fixed a bug in which signals bound to text input elements with a `value` attribute were being reset to the value when the entered value was empty.
