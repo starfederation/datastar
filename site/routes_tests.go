@@ -35,8 +35,6 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "checkbox_input_checked"},
 				{ID: "checkbox_input_default"},
 				{ID: "checkbox_input_value"},
-				{ID: "input_signal"},
-				{ID: "input_value"},
 				{ID: "key_casing"},
 				{ID: "local_signals"},
 				{ID: "merge_fragment"},
@@ -52,6 +50,9 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "signals_change"},
 				{ID: "signals_change_path"},
 				{ID: "signals_change_path_once"},
+				{ID: "text_input_array"},
+				{ID: "text_input_signal"},
+				{ID: "text_input_value"},
 			},
 		},
 	}
