@@ -7,7 +7,4 @@ var sse = try datastar.ServerSentEventGenerator.init(res);
 try sse.mergeFragments("<div id='question'>What do you put in a toaster?</div>", .{});
 
 // Merges signals into the signals.
-try sse.mergeSignals(
-    .{ .response = "", .answer = "bread" },
-    {},
-);
+try sse.mergeSignals(.{ .response = "", .answer = "bread" }, .{});
