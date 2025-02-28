@@ -33,6 +33,8 @@ export function setAlias(value: string) {
   alias = value
 }
 
+let mutationObserver: MutationObserver | null = null
+
 export function load(...pluginsToLoad: DatastarPlugin[]) {
   for (const plugin of pluginsToLoad) {
     const ctx: InitContext = {
@@ -129,7 +131,11 @@ function applyToElement(rootElement: HTMLorSVGElement) {
 
 // Set up a mutation observer to run plugin removal and apply functions
 function observe() {
-  const mutationObserver = new MutationObserver((mutations) => {
+  if (mutationObserver) {
+    return
+  }
+
+  mutationObserver = new MutationObserver((mutations) => {
     const toRemove = new Set<HTMLorSVGElement>()
     const toApply = new Set<HTMLorSVGElement>()
     for (const { target, type, addedNodes, removedNodes } of mutations) {
