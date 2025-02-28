@@ -40,8 +40,8 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "key_casing"},
 				{ID: "local_signals"},
 				{ID: "merge_fragment"},
-				{ID: "merge_fragment_containing_on_event"},
-				{ID: "merge_fragment_signal"},
+				{ID: "merge_fragment_on_load"},
+				{ID: "merge_fragment_signals"},
 				{ID: "merge_fragment_whitespace"},
 				{ID: "on_load"},
 				{ID: "radio_input"},
@@ -105,9 +105,9 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 
 		if err := errors.Join(
 			setupTestsMergeFragment(testsRouter),
-			setupTestsMergeFragmentContainingOnEvent(testsRouter),
+			setupTestsMergeFragmentOnLoad(testsRouter),
+			setupTestsMergeFragmentSignals(testsRouter),
 			setupTestsMergeFragmentWhitespace(testsRouter),
-			setupTestsMergeFragmentSignal(testsRouter),
 			setupTestsOnLoad(testsRouter),
 			setupTestsRemoveFragment(testsRouter),
 		); err != nil {
