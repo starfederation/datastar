@@ -152,14 +152,14 @@ function observe() {
       }
     }
     for (const el of toRemove) {
-      const elTracking = removals.get(el)
+      const elTracking = removals.get(el.id)
       if (elTracking) {
-        for (const [h, cleanup] of elTracking) {
+        for (const [hash, cleanup] of elTracking) {
           cleanup()
-          elTracking.delete(h)
+          elTracking.delete(hash)
         }
         if (elTracking.size === 0) {
-          removals.delete(el)
+          removals.delete(el.id)
         }
       }
     }
