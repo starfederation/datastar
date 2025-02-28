@@ -1,11 +1,11 @@
 ## Demo
 
 <div data-signals="{namespace: {test1: 'foo', test2: 'bar', test3: 'baz'}}" data-persist-foo="namespace.test1 namespace.test3">
-    <input id="keyInput" class="input input-bordered" data-bind="namespace.test1"/>
+    <input data-bind="namespace.test1" class="input input-bordered" />
     <br>
-    <input id="keyInput" class="input input-bordered" data-bind="namespace.test2"/>
+    <input data-bind="namespace.test2" class="input input-bordered" />
     <br>
-    <input id="keyInput" class="input input-bordered" data-bind="namespace.test3"/>
+    <input data-bind="namespace.test3" class="input input-bordered" />
     <pre data-text="ctx.signals.JSON()">Replace me</pre>
 </div>
 
@@ -16,9 +16,9 @@
   data-signals="{namespace: {test1: 'foo', test2: 'bar', test3: 'baz'}}"
   data-persist-foo="namespace.test1 namespace.test3"
 >
-  <input class="input input-bordered" data-bind="namespace.test1" />
-  <input class="input input-bordered" data-bind="namespace.test2" />
-  <input class="input input-bordered" data-bind="namespace.test3" />
+  <input data-bind="namespace.test1" />
+  <input data-bind="namespace.test2" />
+  <input data-bind="namespace.test3" />
   <pre data-text="ctx.signals.JSON()">Replace me</pre>
 </div>
 ```
