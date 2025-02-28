@@ -28,12 +28,12 @@ const watchers: WatcherPlugin[] = []
 // Map of cleanup functions by element ID, keyed by a dataset key-value hash
 const removals = new Map<string, Map<number, OnRemovalFn>>()
 
+let mutationObserver: MutationObserver | null = null
+
 let alias = ''
 export function setAlias(value: string) {
   alias = value
 }
-
-let mutationObserver: MutationObserver | null = null
 
 export function load(...pluginsToLoad: DatastarPlugin[]) {
   for (const plugin of pluginsToLoad) {
