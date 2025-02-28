@@ -1,6 +1,6 @@
-# Input Signal
+# Text Input Signal
 
-Tests that a input's bound signal is not set to its value when a signal is defined.
+Tests that a text input's bound signal is not set to its value when a signal is defined.
 
 <div data-signals-result="'foo'">
   <input type="text" data-bind-result value="bar" class="input input-bordered" />

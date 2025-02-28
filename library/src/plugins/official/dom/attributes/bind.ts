@@ -114,7 +114,7 @@ export const Bind: AttributePlugin = {
         }
         current = currentArray[arrayIndex] || signalDefault
       }
-      const value = input.value || input.getAttribute('value') || ''
+      const value = input.value || ''
 
       const update = (signalName: string, value: any) => {
         let v = value

@@ -1,11 +1,11 @@
-# Strings Input Array
+# Text Input Array
 
 Tests that a text input's value is added to a bound signal array when changed.
 
 <div data-signals-result="['foo']">
   <input class="input input-bordered" type="text" data-bind-result  /> foo
   <br>
-  <input class="input input-bordered" type="text" data-bind-result id="clickable" /> bar
+  <input class="input input-bordered" type="text" data-bind-result id="populatable" /> bar
   <pre data-text="JSON.stringify($result)"></pre>
   <hr />
   Result:

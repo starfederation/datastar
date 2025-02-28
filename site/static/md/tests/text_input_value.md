@@ -1,6 +1,6 @@
-# Input Value
+# Text Input Value
 
-Tests that a input's bound signal is set to its value when non-empty and no signal is defined.
+Tests that a text input's bound signal is set to its value when non-empty and no signal is defined.
 
 <div>
   <input type="text" data-bind-result value="foo" class="input input-bordered" />
