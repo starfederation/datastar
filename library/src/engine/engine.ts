@@ -25,23 +25,25 @@ const plugins: AttributePlugin[] = []
 const actions: ActionPlugins = {}
 const watchers: WatcherPlugin[] = []
 
+// Map of cleanup functions by element ID, keyed by a dataset key-value hash
+const removals = new Map<string, Map<number, OnRemovalFn>>()
+
+let mutationObserver: MutationObserver | null = null
+
 let alias = ''
 export function setAlias(value: string) {
   alias = value
 }
-let mutationObserver: MutationObserver | null = null
-
-// Map of cleanup functions by element, keyed by the dataset key and value
-const removals = new Map<Element, Map<number, OnRemovalFn>>()
 
 export function load(...pluginsToLoad: DatastarPlugin[]) {
   for (const plugin of pluginsToLoad) {
     const ctx: InitContext = {
+      plugin,
       signals,
       effect: (cb: () => void): OnRemovalFn => effect(cb),
-      actions: actions,
-      plugin,
-      apply,
+      actions,
+      removals,
+      applyToElement,
     }
 
     let globalInitializer: GlobalInitializer | undefined
@@ -79,14 +81,19 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
   })
 }
 
+// Apply all plugins to all elements in the DOM
+export function apply() {
+  applyToElement(document.documentElement)
+
+  observe()
+}
+
 // Apply all plugins to the element and its children
-export function apply(
-  rootElement: HTMLorSVGElement = document.documentElement,
-) {
+function applyToElement(rootElement: HTMLorSVGElement) {
   walkDOM(rootElement, (el) => {
     // Check if the element has any data attributes already
     const toApply = new Array<string>()
-    const elCleanups = removals.get(el) || new Map()
+    const elCleanups = removals.get(el.id) || new Map()
     const toCleanup = new Map<number, OnRemovalFn>([...elCleanups])
     const hashes = new Map<string, number>()
 
@@ -112,14 +119,14 @@ export function apply(
     }
 
     // Clean up any old plugins and apply the new ones
-    for (const [_, cleanup] of toCleanup) cleanup()
+    for (const [_, cleanup] of toCleanup) {
+      cleanup()
+    }
     for (const key of toApply) {
       const h = hashes.get(key)!
       applyAttributePlugin(el, key, h)
     }
   })
-
-  observe()
 }
 
 // Set up a mutation observer to run plugin removal and apply functions
@@ -151,19 +158,19 @@ function observe() {
       }
     }
     for (const el of toRemove) {
-      const elTracking = removals.get(el)
+      const elTracking = removals.get(el.id)
       if (elTracking) {
-        for (const [h, cleanup] of elTracking) {
+        for (const [hash, cleanup] of elTracking) {
           cleanup()
-          elTracking.delete(h)
+          elTracking.delete(hash)
         }
         if (elTracking.size === 0) {
-          removals.delete(el)
+          removals.delete(el.id)
         }
       }
     }
     for (const el of toApply) {
-      apply(el)
+      applyToElement(el)
     }
   })
 
@@ -205,9 +212,10 @@ function applyAttributePlugin(
   // Create the runtime context
   const ctx: RuntimeContext = {
     signals,
-    apply,
+    applyToElement,
     effect: (cb: () => void): OnRemovalFn => effect(cb),
-    actions: actions,
+    actions,
+    removals,
     genRX: () => genRX(ctx, ...(plugin.argNames || [])),
     plugin,
     el,
@@ -251,16 +259,16 @@ function applyAttributePlugin(
     ctx.mods.set(camel(label), new Set(mod.map((t) => t.toLowerCase())))
   }
 
-  // Load the plugin and store any cleanup functions
-  const cleanup = plugin.onLoad(ctx)
-  if (cleanup) {
-    let elTracking = removals.get(el)
-    if (!elTracking) {
-      elTracking = new Map()
-      removals.set(el, elTracking)
-    }
-    elTracking.set(hash, cleanup)
+  // Load the plugin
+  const cleanup = plugin.onLoad(ctx) ?? (() => {})
+  
+  // Store the cleanup function
+  let elTracking = removals.get(el.id)
+  if (!elTracking) {
+    elTracking = new Map()
+    removals.set(el.id, elTracking)
   }
+  elTracking.set(hash, cleanup)
 }
 
 function genRX(
