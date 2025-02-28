@@ -165,7 +165,7 @@ Whereas in the example below, `$foo` inherits the value `baz` of the predefined 
 </div>
 ```
 
-Multiple checkbox input values can be assigned to a signal by predefining it as an array. So in the example below, `$foo` is set to `['bar', 'baz']` when both checkboxes are checked.
+Multiple input values can be assigned to a single signal by predefining the signal as an array. So in the example below, `$foo` is set to `['bar', 'baz']` when both checkboxes are checked.
 
 ```html
 <div data-signals-foo="[]">
