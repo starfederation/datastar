@@ -25,12 +25,14 @@ export const Bind: AttributePlugin = {
     const signalName = key
       ? modifyCasing(key, mods)
       : trimDollarSignPrefix(value)
+      
     const tnl = el.tagName.toLowerCase()
-    let signalDefault: string | boolean | number | File = ''
     const isInput = tnl.includes('input')
+    const isSelect = tnl.includes('select')
     const type = el.getAttribute('type')
-    const isCheckbox =
-      tnl.includes('checkbox') || (isInput && type === 'checkbox')
+
+    let signalDefault: string | boolean | number | File = ''
+    const isCheckbox = isInput && type === 'checkbox'
     if (isCheckbox) {
       signalDefault = false
     }
@@ -38,23 +40,21 @@ export const Bind: AttributePlugin = {
     if (isNumber) {
       signalDefault = 0
     }
-    const isSelect = tnl.includes('select')
-    const isRadio = tnl.includes('radio') || (isInput && type === 'radio')
-    const isFile = isInput && type === 'file'
-    if (isFile) {
-      // can't set a default value for a file input, yet
-    }
+    const isRadio = isInput && type === 'radio'
     if (isRadio) {
       const name = el.getAttribute('name')
       if (!name?.length) {
         el.setAttribute('name', signalName)
       }
     }
+    // Can't set a default value for a file input, yet
+    const isFile = isInput && type === 'file'
 
     const { signal, inserted } = signals.upsertIfMissing(
       signalName,
       signalDefault,
     )
+
     let arrayIndex = -1
     if (Array.isArray(signal.value)) {
       el.setAttribute('multiple', '')
@@ -72,7 +72,7 @@ export const Bind: AttributePlugin = {
       const hasValue = 'value' in el
       let v = signals.value(signalName)
       if (isArray && !isSelect) {
-        // may be undefined if the array is shorter than the index
+        // May be undefined if the array is shorter than the index
         v = (v as any)[arrayIndex] || signalDefault
       }
       const vStr = `${v}`
@@ -188,15 +188,12 @@ export const Bind: AttributePlugin = {
         }
       } else if (typeof current === 'boolean') {
         v = Boolean(value)
-      } else if (typeof current === 'string') {
-        v = value || ''
       } else if (typeof current === 'number') {
         v = Number(value)
       } else {
-        throw runtimeErr('BindUnsupportedSignalType', ctx, {
-          signalType: typeof current,
-        })
+        v = value || ''
       }
+
       update(signalName, v)
     }
 
