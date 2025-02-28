@@ -255,14 +255,7 @@ function applyAttributePlugin(
 
   // Load the plugin
   const cleanup = plugin.onLoad(ctx) ?? (() => {})
-  const removeOnLoad = plugin.removeOnLoad
-
-  // Remove the attribute if required
-  if (removeOnLoad && removeOnLoad(rawKey) === true) {
-    delete el.dataset[camelCasedKey]
-    return;
-  }
-
+  
   // Store the cleanup function
   let elTracking = removals.get(el.id)
   if (!elTracking) {

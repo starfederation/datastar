@@ -1,7 +1,7 @@
 ## Demo
 
 <div data-signals="{namespace: {test1: 'foo', test2: 'bar', test3: 'baz'}}" data-persist-foo="namespace.test1 namespace.test3">
-    <input data-bind="namespace.test1" class="input input-bordered" />
+    <input id="keyInput1" data-bind="namespace.test1" class="input input-bordered" />
     <br>
     <input data-bind="namespace.test2" class="input input-bordered" />
     <br>

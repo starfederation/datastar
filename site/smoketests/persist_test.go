@@ -29,7 +29,7 @@ func TestExamplePersist(t *testing.T) {
 
 			page.MustWaitIdle()
 
-			input := page.MustElement("#keyInput")
+			input := page.MustElement("#keyInput1")
 
 			revisedExpected := "This is a test"
 			input.MustInput(revisedExpected)
