@@ -6,7 +6,7 @@ authors = [
     { name = "Felix Ingram", email = "f.ingram@gmail.com" },
     { name = "Lucian Knock", email = "git@lucianknock.com" }
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = []
 dynamic=["version"]
 license = {text = "MIT"}
@@ -37,11 +37,12 @@ build-backend = "hatchling.build"
 dev = [
     "django>=4.2.17",
     "fastapi[standard]>=0.115.4",
-    "fasthtml>=0.12.0",
+    "python-fasthtml==0.12.0",
     "flask[async]>=3.0.3",
     "quart>=0.19.9",
     "sanic>=24.6.0",
     "uvicorn>=0.32.1",
+    "bump-my-version>=0.32.0",
 ]
 
 [tool.hatch.version]
@@ -51,7 +52,7 @@ path = "src/datastar_py/__about__.py"
 filename = "src/datastar_py/__about__.py"
 
 [tool.bumpversion]
-current_version = "0.4.2"
+current_version = "0.4.3"
 parse = """(?x)
     (?P<major>\\d+)\\.
     (?P<minor>\\d+)\\.
