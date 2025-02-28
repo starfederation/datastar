@@ -6,6 +6,10 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ## v1.0.0-beta.9
 
+### Added
+
+- Added the ability for input elements to set bound signals to an array of values by predefining the signal as an array.
+
 ### Fixed
 
 - Fixed a bug in which `data-signals` was being reapplied each time any attribute changed on an element ([#709](https://github.com/starfederation/datastar/issues/709)).
