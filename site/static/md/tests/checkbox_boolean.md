@@ -1,4 +1,4 @@
-# Checkbox Input Boolean
+# Checkbox Boolean
 
 Tests that a checkbox input's bound signal is set to `false` when unchecked and `true` when checked.
 

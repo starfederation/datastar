@@ -1,4 +1,4 @@
-# Checkbox Input Value
+# Checkbox Value
 
 Tests that a checkbox input's bound signal is set to an empty string when unchecked and its value when checked.
 

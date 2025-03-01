@@ -1,4 +1,4 @@
-# Checkbox Input Array
+# Checkbox Array
 
 Tests that a checkbox input's value is added to a bound signal array when checked.
 

@@ -1,4 +1,4 @@
-# Text Input Array
+# Input Array
 
 Tests that a text input's value is added to a bound signal array when changed.
 

@@ -1,4 +1,4 @@
-# Radio Input
+# Radio Value
 
 Tests that a radio input's bound signal is assigned to the value when checked.
 

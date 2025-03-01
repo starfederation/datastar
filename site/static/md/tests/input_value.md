@@ -1,4 +1,4 @@
-# Text Input Value
+# Input Value
 
 Tests that a text input's bound signal is set to its value when non-empty and no signal is defined.
 

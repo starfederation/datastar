@@ -1,4 +1,4 @@
-# Checkbox Input Value Checked
+# Checkbox Value Checked
 
 Tests that a checkbox input's bound signal is initially set to its value when initially checked.
 
