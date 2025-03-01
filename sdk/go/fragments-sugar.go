@@ -32,6 +32,14 @@ func WithMergeMorph() MergeFragmentOption {
 	return WithMergeMode(FragmentMergeModeMorph)
 }
 
+func WithMergeInner() MergeFragmentOption {
+	return WithMergeMode(FragmentMergeModeInner)
+}
+
+func WithMergeOuter() MergeFragmentOption {
+	return WithMergeMode(FragmentMergeModeOuter)
+}
+
 func WithMergePrepend() MergeFragmentOption {
 	return WithMergeMode(FragmentMergeModePrepend)
 }

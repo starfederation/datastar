@@ -18,6 +18,7 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 - Whitespace is now maintained in merged fragments ([#658](https://github.com/starfederation/datastar/issues/658)).
 - Attribute plugins now define a hash of their contents, preventing duplicate applies ([#691](https://github.com/starfederation/datastar/issues/691)).
 - Attribute plugins are now applied to the `html` element instead of the `body` element ([#691](https://github.com/starfederation/datastar/issues/691)).
+- Add missing go merge helpers ([#726](https://github.com/starfederation/datastar/issues/726)).
 
 ### Fixed
 
