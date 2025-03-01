@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/delaneyj/toolbelt"
 	"github.com/go-rod/rod"
@@ -77,6 +78,19 @@ func setupPageTestOnLoad(t *testing.T, subURL string) {
 	})
 }
 
+func setupPageTestOnDelay(t *testing.T, subURL string) {
+	setupPageTest(t, subURL, func(runner runnerFn) {
+		runner(subURL, func(t *testing.T, page *rod.Page) {
+			result := page.MustElement("#result")
+			page.WaitStable(100 * time.Millisecond)
+			page.MustWaitIdle()
+			after, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, after, "1")
+		})
+	})
+}
+
 func setupPageTestOnClick(t *testing.T, subURL string) {
 	setupPageTest(t, subURL, func(runner runnerFn) {
 		runner(subURL, func(t *testing.T, page *rod.Page) {
@@ -87,6 +101,24 @@ func setupPageTestOnClick(t *testing.T, subURL string) {
 	
 			clickable := page.MustElement("#clickable")
 			clickable.MustClick()
+			page.MustWaitIdle()
+			after, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, after, "1")
+		})
+	})
+}
+
+func setupPageTestOnPopulate(t *testing.T, subURL string, value string) {
+	setupPageTest(t, subURL, func(runner runnerFn) {
+		runner(subURL, func(t *testing.T, page *rod.Page) {
+			result := page.MustElement("#result")
+			before, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, before, "0")
+	
+			populatable := page.MustElement("#populatable")
+			populatable.MustInput(value)
 			page.MustWaitIdle()
 			after, err := result.Text()
 			assert.NoError(t, err)

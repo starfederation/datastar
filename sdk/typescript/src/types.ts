@@ -95,7 +95,7 @@ type ScriptAttributes = {
 
 export interface ExecuteScriptOptions extends DatastarEventOptions {
   [DatastarDatalineAutoRemove]?: boolean;
-  [DatastarDatalineAttributes]?: ScriptAttributes;
+  [DatastarDatalineAttributes]?: ScriptAttributes | string[];
 }
 
 export interface ExecuteScriptEvent {

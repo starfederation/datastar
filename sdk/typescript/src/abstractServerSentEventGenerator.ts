@@ -8,9 +8,10 @@ import {
   MergeSignalsOptions,
 } from "./types.ts";
 
-import { DefaultExecuteScriptAttributes } from "./consts.ts";
-
-import { DefaultSseRetryDurationMs } from "./consts.ts";
+import {
+  DefaultExecuteScriptAttributes,
+  DefaultSseRetryDurationMs,
+} from "./consts.ts";
 
 import type { Jsonifiable } from "npm:type-fest";
 
@@ -78,10 +79,6 @@ export abstract class ServerSentEventGenerator {
   }
 
   private hasDefaultValue(key: string, val: unknown): boolean {
-    if (key === DefaultExecuteScriptAttributes.split(" ")[0]) {
-      return val === DefaultExecuteScriptAttributes.split(" ")[1];
-    }
-
     if (key in DefaultMapping) {
       return val === DefaultMapping[key as keyof typeof DefaultMapping];
     }
@@ -132,17 +129,19 @@ export abstract class ServerSentEventGenerator {
   /**
    * Sends a merge signals event.
    *
-   * @param data - Data object that will be merged into the client's signals.
-   * @param options - Additional options for merging.
+   * @param data - Data object or json string that will be merged into the client's signals.
+   * @param [options] - Additional options for merging.
    */
   public mergeSignals(
-    data: Record<string, Jsonifiable>,
+    data: Record<string, Jsonifiable> | string,
     options?: MergeSignalsOptions,
   ): ReturnType<typeof this.send> {
     const { eventId, retryDuration, ...eventOptions } = options ||
       {} as Partial<MergeSignalsOptions>;
+
+    const signals = typeof data === "string" ? data : JSON.stringify(data);
     const dataLines = this.eachOptionIsADataLine(eventOptions)
-      .concat(this.eachNewlineIsADataLine("signals", JSON.stringify(data)));
+      .concat(this.eachNewlineIsADataLine("signals", signals));
 
     return this.send("datastar-merge-signals", dataLines, {
       eventId,
@@ -153,17 +152,19 @@ export abstract class ServerSentEventGenerator {
   /**
    * Sends a remove signals event.
    *
-   * @param paths - Array of paths to remove from the client's signals
-   * @param options - Additional options for removing signals.
+   * @param paths - An array of paths or a string containing space separated paths.
+   * @param [options] - Additional options for removing signals.
    */
   public removeSignals(
-    paths: string[],
+    paths: string[] | string,
     options?: DatastarEventOptions,
   ): ReturnType<typeof this.send> {
     const eventOptions = options || {} as DatastarEventOptions;
-    const dataLines = paths.flatMap((path) => path.split(" ")).map((path) =>
-      `paths ${path}`
-    );
+    const pathsArray = typeof paths === "string"
+      ? paths.split(" ")
+      : paths.flatMap((path) => path.split(" "));
+
+    const dataLines = pathsArray.map((path) => `paths ${path}`);
 
     return this.send("datastar-remove-signals", dataLines, eventOptions);
   }
@@ -172,7 +173,7 @@ export abstract class ServerSentEventGenerator {
    * Executes a script on the client-side.
    *
    * @param script - Script code to execute.
-   * @param options - Additional options for execution.
+   * @param [options] - Additional options for execution.
    */
   public executeScript(
     script: string,
@@ -184,9 +185,18 @@ export abstract class ServerSentEventGenerator {
       attributes,
       ...eventOptions
     } = options || {} as Partial<ExecuteScriptOptions>;
+    const attributesArray = attributes instanceof Array
+      ? attributes
+      : this.eachOptionIsADataLine(attributes ?? {});
 
-    const attributesDataLines = this.eachOptionIsADataLine(attributes ?? {})
-      .map((line) => `attributes ${line}`);
+    const attributesDataLines = attributesArray.filter((line) => {
+      const parts = line.split(" ");
+      const defaultParts = DefaultExecuteScriptAttributes.split(" ");
+      if (parts[0] === defaultParts[0] && parts[1]) {
+        return parts[1] !== defaultParts[1];
+      }
+      return true;
+    }).map((line) => `attributes ${line}`);
 
     const dataLines = attributesDataLines.concat(
       this.eachOptionIsADataLine(eventOptions),

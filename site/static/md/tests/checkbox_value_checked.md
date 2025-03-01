@@ -1,4 +1,4 @@
-# Checkbox Input Checked
+# Checkbox Value Checked
 
 Tests that a checkbox input's bound signal is initially set to its value when initially checked.
 
@@ -7,7 +7,7 @@ Tests that a checkbox input's bound signal is initially set to its value when in
   <span data-text="$result"></span>
   <hr />
   Result:
-  <code id="result" data-text="$result === 'foo' ? 1 : 0"></code>
+  <code id="result" data-text="$result === '' ? 1 : ($result === 'foo' ? 0 : -1)"></code>
   <hr />
   Expected result on click: <code>1</code>
 </div>

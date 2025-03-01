@@ -21,74 +21,113 @@ export const Bind: AttributePlugin = {
   valReq: Requirement.Exclusive,
   onLoad: (ctx) => {
     const { el, key, mods, signals, value, effect } = ctx
-    const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
+    const input = el as HTMLInputElement
+    const signalName = key
+      ? modifyCasing(key, mods)
+      : trimDollarSignPrefix(value)
+      
     const tnl = el.tagName.toLowerCase()
-    let signalDefault: string | boolean | number | File = ''
     const isInput = tnl.includes('input')
+    const isSelect = tnl.includes('select')
     const type = el.getAttribute('type')
-    const isCheckbox =
-      tnl.includes('checkbox') || (isInput && type === 'checkbox')
+    const hasValueAttribute = el.hasAttribute('value')
+
+    let signalDefault: string | boolean | number | File = ''
+    const isCheckbox = isInput && type === 'checkbox'
     if (isCheckbox) {
-      signalDefault = false
+      signalDefault = hasValueAttribute ? '' : false
     }
     const isNumber = isInput && type === 'number'
     if (isNumber) {
       signalDefault = 0
     }
-    const isSelect = tnl.includes('select')
-    const isRadio = tnl.includes('radio') || (isInput && type === 'radio')
-    const isFile = isInput && type === 'file'
-    if (isFile) {
-      // can't set a default value for a file input, yet
-    }
+    const isRadio = isInput && type === 'radio'
     if (isRadio) {
       const name = el.getAttribute('name')
       if (!name?.length) {
         el.setAttribute('name', signalName)
       }
     }
+    // Can't set a default value for a file input, yet
+    const isFile = isInput && type === 'file'
 
-    const setFromSignal = () => {
-      const hasValue = 'value' in el
-      const v = signals.value(signalName)
-      const vStr = `${v}`
+    const { signal, inserted } = signals.upsertIfMissing(
+      signalName,
+      signalDefault,
+    )
+
+    let arrayIndex = -1
+    if (Array.isArray(signal.value)) {
+      if (el.getAttribute('name') === null) {
+        el.setAttribute('name', signalName)
+      }
+      arrayIndex = [
+        ...document.querySelectorAll(`[name="${signalName}"]`),
+      ].findIndex((el) => el === ctx.el)
+    }
+    const isArray = arrayIndex >= 0
+
+    const signalArray = () => [...(signals.value(signalName) as any[])]
+
+    const setElementFromSignal = () => {
+      let value = signals.value(signalName)
+      if (isArray && !isSelect) {
+        // May be undefined if the array is shorter than the index
+        value = (value as any)[arrayIndex] || signalDefault
+      }
+      const stringValue = `${value}`
       if (isCheckbox || isRadio) {
-        const input = el as HTMLInputElement
-        if (Array.isArray(v)) {
-          input.checked = v.includes(input.value)
-        } else if (typeof v === 'boolean') {
-          input.checked = !!v
+        if (typeof value === 'boolean') {
+          input.checked = value
         } else {
-          input.checked = vStr === input.value
+          input.checked = stringValue === input.value
         }
       } else if (isSelect) {
         const select = el as HTMLSelectElement
         if (select.multiple) {
+          if (!isArray) {
+            throw runtimeErr('BindSelectMultiple', ctx)
+          }
           for (const opt of select.options) {
             if (opt?.disabled) return
-            if (Array.isArray(v) || typeof v === 'string') {
-              opt.selected = v.includes(opt.value)
-            } else if (typeof v === 'number') {
-              opt.selected = v === Number(opt.value)
-            } else {
-              opt.selected = v as boolean
-            }
+            const incoming = isNumber ? Number(opt.value) : opt.value
+            opt.selected = (value as any[]).includes(incoming)
           }
         } else {
-          select.value = vStr
+          select.value = stringValue
         }
       } else if (isFile) {
         // File input reading from a signal is not supported
-      } else if (hasValue) {
-        el.value = vStr
+      } else if ('value' in el) {
+        el.value = stringValue
       } else {
-        el.setAttribute('value', vStr)
+        el.setAttribute('value', stringValue)
       }
     }
 
-    const el2sig = async () => {
+    const setSignalFromElement = async () => {
+      let currentValue = signals.value(signalName)
+      if (isArray) {
+        // Push as many default signal values onto the array as necessary to reach the index
+        const currentArray = currentValue as any[]
+        while (arrayIndex >= currentArray.length) {
+          currentArray.push(signalDefault)
+        }
+        currentValue = currentArray[arrayIndex] || signalDefault
+      }
+
+      const update = (signalName: string, value: any) => {
+        let newValue = value
+        if (isArray && !isSelect) {
+          newValue = signalArray()
+          newValue[arrayIndex] = value
+        }
+        signals.setValue(signalName, newValue)
+      }
+
+      // Files are a special flower
       if (isFile) {
-        const files = [...((el as HTMLInputElement)?.files || [])]
+        const files = [...(input?.files || [])]
         const allContents: string[] = []
         const allMimes: string[] = []
         const allNames: string[] = []
@@ -118,79 +157,55 @@ export const Bind: AttributePlugin = {
             })
           }),
         )
-
-        signals.setValue(signalName, allContents)
-        signals.setValue(`${signalName}Mimes`, allMimes)
-        signals.setValue(`${signalName}Names`, allNames)
-
+        update(signalName, allContents)
+        update(`${signalName}Mimes`, allMimes)
+        update(`${signalName}Names`, allNames)
         return
       }
 
-      const current = signals.value(signalName)
-      const input = (el as HTMLInputElement) || (el as HTMLElement)
-      const value = input.value || input.getAttribute('value') || ''
+      const value = input.value || ''
+      let newValue: any
 
       if (isCheckbox) {
-        const checked = input.checked || input.getAttribute('checked') === 'true'
-        if (Array.isArray(current)) {
-          const values = new Set(current)
-          if (checked) {
-            values.add(input.value)
-          } else {
-            values.delete(input.value)
-          }
-          signals.setValue(signalName, [...values])
+        const checked =
+          input.checked || input.getAttribute('checked') === 'true'
+
+        // We must check for an attribute value because a checked value defaults to `on`.
+        if (hasValueAttribute) {
+          newValue = checked ? value : ''
         } else {
-          // We must test for the attribute value because a checked value defaults to `on`.
-          const attributeValue = input.getAttribute('value')
-          if (attributeValue) {
-            const v = checked ? value : false
-            signals.setValue(signalName, v)
-          } else {
-            signals.setValue(signalName, checked)
-          }
+          newValue = checked
         }
-
-        return
-      }
-
-      if (typeof current === 'number') {
-        signals.setValue(signalName, Number(value))
-      } else if (typeof current === 'string') {
-        signals.setValue(signalName, value || '')
-      } else if (typeof current === 'boolean') {
-        signals.setValue(signalName, Boolean(value))
-      } else if (Array.isArray(current)) {
-        if (isSelect) {
-          const select = el as HTMLSelectElement
-          const selectedOptions = [...select.selectedOptions]
-          const selectedValues = selectedOptions
+      } else if (isSelect) {
+        const select = el as HTMLSelectElement
+        const selectedOptions = [...select.selectedOptions]
+        if (isArray) {
+          newValue = selectedOptions
             .filter((opt) => opt.selected)
             .map((opt) => opt.value)
-          signals.setValue(signalName, selectedValues)
         } else {
-          // assume it's a comma-separated string
-          signals.setValue(signalName, JSON.stringify(value.split(',')))
+          newValue = selectedOptions[0]?.value || signalDefault
         }
-      } else if (typeof current === 'undefined') {
+      } else if (typeof currentValue === 'boolean') {
+        newValue = Boolean(value)
+      } else if (typeof currentValue === 'number') {
+        newValue = Number(value)
       } else {
-        throw runtimeErr('BindUnsupportedSignalType', ctx, {
-          signalType: typeof current,
-        })
+        newValue = value || ''
       }
-    }
 
-    const { inserted } = signals.upsertIfMissing(signalName, signalDefault)
+      update(signalName, newValue)
+    }
 
     // If the signal was inserted, attempt to set the the signal value from the element.
     if (inserted) {
-      el2sig()
+      setSignalFromElement()
     }
 
     for (const event of updateEvents) {
-      el.addEventListener(event, el2sig)
+      el.addEventListener(event, setSignalFromElement)
     }
-    const elSigClean = effect(() => setFromSignal())
+
     /*
      * The signal value needs to be updated after the "pageshow" event.
      * Sometimes, the browser might populate inputs with previous values
@@ -201,16 +216,20 @@ export const Bind: AttributePlugin = {
      */
     const onPageshow = (ev: PageTransitionEvent) => {
       if (!ev.persisted) return
-      el2sig()
+      setSignalFromElement()
     }
-    window.addEventListener("pageshow", onPageshow)
+    window.addEventListener('pageshow', onPageshow)
+
+    const reset = effect(() => setElementFromSignal())
 
     return () => {
-      elSigClean()
+      reset()
+
       for (const event of updateEvents) {
-        el.removeEventListener(event, el2sig)
+        el.removeEventListener(event, setSignalFromElement)
       }
-      window.removeEventListener("pageshow", onPageshow)
+      
+      window.removeEventListener('pageshow', onPageshow)
     }
   },
 }

@@ -82,6 +82,5 @@ export const ScrollIntoView: AttributePlugin = {
     }
 
     delete el.dataset[rawKey]
-    return () => {}
   },
 }

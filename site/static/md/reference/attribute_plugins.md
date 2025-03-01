@@ -165,7 +165,7 @@ Whereas in the example below, `$foo` inherits the value `baz` of the predefined 
 </div>
 ```
 
-Multiple checkbox input values can be assigned to a signal by predefining it as an array. So in the example below, `$foo` is set to `['bar', 'baz']` when both checkboxes are checked.
+Multiple input values can be assigned to a single signal by predefining the signal as an array. So in the example below, `$foo` is set to `['bar', 'baz']` when both checkboxes are checked.
 
 ```html
 <div data-signals-foo="[]">
@@ -443,5 +443,5 @@ It is possible to alias `data-*` attributes to a custom alias (`data-foo-*`, for
 We maintain a `data-ds-*` aliased version that can be included as follows.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.8/bundles/datastar-aliased.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.9/bundles/datastar-aliased.js"></script>
 ```

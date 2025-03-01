@@ -51,7 +51,7 @@ export function elUniqId(el: Element) {
   return hash.string
 }
 
-export function attrHash(key: string, val: string) {
+export function attrHash(key: number | string, val: number | string) {
   return new Hash().with(key).with(val).value
 }
 

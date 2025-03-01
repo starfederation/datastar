@@ -12,7 +12,7 @@ import {
 } from '../../../../engine/types'
 import { tagHas, tagToMs } from '../../../../utils/tags'
 import { camel, modifyCasing } from '../../../../utils/text'
-import { debounce, throttle } from '../../../../utils/timing'
+import { debounce, delay, throttle } from '../../../../utils/timing'
 import { supportsViewTransitions } from '../../../../utils/view-transtions'
 import type { Signal } from '../../../../vendored/preact-core'
 
@@ -42,10 +42,8 @@ export const On: AttributePlugin = {
 
     const delayArgs = mods.get('delay')
     if (delayArgs) {
-      const delay = tagToMs(delayArgs)
-      setTimeout(() => {
-        callback()
-      }, delay)
+      const wait = tagToMs(delayArgs)
+      callback = delay(callback, wait)
     }
 
     const debounceArgs = mods.get('debounce')
@@ -81,7 +79,7 @@ export const On: AttributePlugin = {
 
     if (key === 'load') {
       // Delay the callback to the next microtask so that indicators can be set
-      setTimeout(() => callback(), 0)
+      setTimeout(callback, 0)
       return () => {}
     }
 
@@ -92,9 +90,6 @@ export const On: AttributePlugin = {
         duration = tagToMs(durationArgs)
         const leading = tagHas(durationArgs, 'leading', false)
         if (leading) {
-          // Remove `.leading` from the dataset so the callback is only ever called on page load
-          el.dataset[rawKey.replace('.leading', '')] = value
-          delete el.dataset[rawKey]
           callback()
         }
       }
