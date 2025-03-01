@@ -30,11 +30,12 @@ export const Bind: AttributePlugin = {
     const isInput = tnl.includes('input')
     const isSelect = tnl.includes('select')
     const type = el.getAttribute('type')
+    const hasValueAttribute = el.hasAttribute('value')
 
     let signalDefault: string | boolean | number | File = ''
     const isCheckbox = isInput && type === 'checkbox'
     if (isCheckbox) {
-      signalDefault = false
+      signalDefault = hasValueAttribute ? '' : false
     }
     const isNumber = isInput && type === 'number'
     if (isNumber) {
@@ -57,7 +58,6 @@ export const Bind: AttributePlugin = {
 
     let arrayIndex = -1
     if (Array.isArray(signal.value)) {
-      el.setAttribute('multiple', '')
       if (el.getAttribute('name') === null) {
         el.setAttribute('name', signalName)
       }
@@ -66,23 +66,21 @@ export const Bind: AttributePlugin = {
       ].findIndex((el) => el === ctx.el)
     }
     const isArray = arrayIndex >= 0
-    const signalArr = () => [...(signals.value(signalName) as any[])]
+
+    const signalArray = () => [...(signals.value(signalName) as any[])]
 
     const setFromSignal = () => {
-      const hasValue = 'value' in el
-      let v = signals.value(signalName)
+      let value = signals.value(signalName)
       if (isArray && !isSelect) {
         // May be undefined if the array is shorter than the index
-        v = (v as any)[arrayIndex] || signalDefault
+        value = (value as any)[arrayIndex] || signalDefault
       }
-      const vStr = `${v}`
+      const stringValue = `${value}`
       if (isCheckbox || isRadio) {
-        if (Array.isArray(v)) {
-          input.checked = v.includes(input.value)
-        } else if (typeof v === 'boolean') {
-          input.checked = !!v
+        if (typeof value === 'boolean') {
+          input.checked = value
         } else {
-          input.checked = vStr === input.value
+          input.checked = stringValue === input.value
         }
       } else if (isSelect) {
         const select = el as HTMLSelectElement
@@ -93,38 +91,38 @@ export const Bind: AttributePlugin = {
           for (const opt of select.options) {
             if (opt?.disabled) return
             const incoming = isNumber ? Number(opt.value) : opt.value
-            opt.selected = (v as any[]).includes(incoming)
+            opt.selected = (value as any[]).includes(incoming)
           }
         } else {
-          select.value = vStr
+          select.value = stringValue
         }
       } else if (isFile) {
         // File input reading from a signal is not supported
-      } else if (hasValue) {
-        el.value = vStr
+      } else if ('value' in el) {
+        el.value = stringValue
       } else {
-        el.setAttribute('value', vStr)
+        el.setAttribute('value', stringValue)
       }
     }
 
-    const el2sig = async () => {
-      let current = signals.value(signalName)
+    const setFromElement = async () => {
+      let currentValue = signals.value(signalName)
       if (isArray) {
-        const currentArray = current as any[]
+        // Push as many default signal values onto the array as necessary to reach the index
+        const currentArray = currentValue as any[]
         while (arrayIndex >= currentArray.length) {
           currentArray.push(signalDefault)
         }
-        current = currentArray[arrayIndex] || signalDefault
+        currentValue = currentArray[arrayIndex] || signalDefault
       }
-      const value = input.value || ''
 
       const update = (signalName: string, value: any) => {
-        let v = value
+        let newValue = value
         if (isArray && !isSelect) {
-          v = signalArr()
-          v[arrayIndex] = value
+          newValue = signalArray()
+          newValue[arrayIndex] = value
         }
-        signals.setValue(signalName, v)
+        signals.setValue(signalName, newValue)
       }
 
       // Files are a special flower
@@ -165,49 +163,49 @@ export const Bind: AttributePlugin = {
         return
       }
 
-      let v: any
+      const value = input.value || ''
+      let newValue: any
 
       if (isCheckbox) {
         const checked =
           input.checked || input.getAttribute('checked') === 'true'
 
-        // We must test for the attribute value because a checked value defaults to `on`.
-        const attributeValue = input.getAttribute('value')
-        if (attributeValue) {
-          v = checked ? value : false
+        // We must check for an attribute value because a checked value defaults to `on`.
+        if (hasValueAttribute) {
+          newValue = checked ? value : ''
         } else {
-          v = checked
+          newValue = checked
         }
       } else if (isSelect) {
         const select = el as HTMLSelectElement
         const selectedOptions = [...select.selectedOptions]
         if (isArray) {
-          v = selectedOptions
+          newValue = selectedOptions
             .filter((opt) => opt.selected)
             .map((opt) => opt.value)
         } else {
-          v = selectedOptions[0]?.value || signalDefault
+          newValue = selectedOptions[0]?.value || signalDefault
         }
-      } else if (typeof current === 'boolean') {
-        v = Boolean(value)
-      } else if (typeof current === 'number') {
-        v = Number(value)
+      } else if (typeof currentValue === 'boolean') {
+        newValue = Boolean(value)
+      } else if (typeof currentValue === 'number') {
+        newValue = Number(value)
       } else {
-        v = value || ''
+        newValue = value || ''
       }
 
-      update(signalName, v)
+      update(signalName, newValue)
     }
 
     // If the signal was inserted, attempt to set the the signal value from the element.
     if (inserted) {
-      el2sig()
+      setFromElement()
     }
 
     for (const event of updateEvents) {
-      el.addEventListener(event, el2sig)
+      el.addEventListener(event, setFromElement)
     }
-    const elSigClean = effect(() => setFromSignal())
+
     /*
      * The signal value needs to be updated after the "pageshow" event.
      * Sometimes, the browser might populate inputs with previous values
@@ -218,15 +216,19 @@ export const Bind: AttributePlugin = {
      */
     const onPageshow = (ev: PageTransitionEvent) => {
       if (!ev.persisted) return
-      el2sig()
+      setFromElement()
     }
     window.addEventListener('pageshow', onPageshow)
 
+    const reset = effect(() => setFromSignal())
+
     return () => {
-      elSigClean()
+      reset()
+
       for (const event of updateEvents) {
-        el.removeEventListener(event, el2sig)
+        el.removeEventListener(event, setFromElement)
       }
+      
       window.removeEventListener('pageshow', onPageshow)
     }
   },
