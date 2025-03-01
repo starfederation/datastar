@@ -9,7 +9,7 @@ Tests that a text input's value is added to a bound signal array when changed.
   <pre data-text="JSON.stringify($result)"></pre>
   <hr />
   Result:
-  <code id="result" data-text="$result.includes('foo') && $result.includes('bar') ? 1 : 0"></code>
+  <code id="result" data-text="JSON.stringify($result) === JSON.stringify(['foo','bar']) ? 1 : 0"></code>
   <hr />
   Expected result after typing 'bar' in second input: <code>1</code>
 </div>
