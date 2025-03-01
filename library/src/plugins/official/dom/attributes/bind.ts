@@ -87,7 +87,9 @@ export const Bind: AttributePlugin = {
       } else if (isSelect) {
         const select = el as HTMLSelectElement
         if (select.multiple) {
-          if (!isArray) throw runtimeErr('BindSelectMultiple', ctx)
+          if (!isArray) {
+            throw runtimeErr('BindSelectMultiple', ctx)
+          }
           for (const opt of select.options) {
             if (opt?.disabled) return
             const incoming = isNumber ? Number(opt.value) : opt.value

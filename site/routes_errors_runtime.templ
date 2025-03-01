@@ -24,6 +24,13 @@ templ BindKeyOrValueRequired(name string, info *RuntimeErrorInfo) {
 	}
 }
 
+templ BindSelectMultiple(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The <code>data-bind</code> attribute was added to a <code>select</code> element with a <code>multiple</code> attribute. For this to work, the signal must be predefined as an array.</p>
+		@attributeDocs("bind")
+	}
+}
+
 templ BindUnsupportedSignalType(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		<p>The <code>data-bind</code> attribute was bound to a signal that is unsupported. The <code>data-bind</code> attribute may only be used with signals of the following type: <code>number</code>, <code>string</code>, <code>boolean</code>, <code>array</code>.</p>

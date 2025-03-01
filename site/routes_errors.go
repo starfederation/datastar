@@ -130,6 +130,7 @@ func setupErrors(router chi.Router) error {
 		"attr_value_required":                runtimeFn(AttrValueRequired),
 		"bind_key_and_value_provided":        runtimeFn(BindKeyAndValueProvided),
 		"bind_key_or_value_required":         runtimeFn(BindKeyOrValueRequired),
+		"bind_select_multiple":		          runtimeFn(BindSelectMultiple),
 		"bind_unsupported_signal_type":       runtimeFn(BindUnsupportedSignalType),
 		"class_value_required":               runtimeFn(ClassValueRequired),
 		"clipboard_not_available":            runtimeFn(ClipboardNotAvailable),
