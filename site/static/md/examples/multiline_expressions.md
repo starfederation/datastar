@@ -30,6 +30,6 @@
 </div>
 ```
 
-Simple example showing the use of a multiline expression in a `data-*` attribute expression. While you want to long expressions, they can aid in [locality of behavior](https://htmx.org/essays/locality-of-behaviour/).
+Simple example showing the use of a multiline expression in a `data-*` attribute expression. While you don't want to long expressions, they can aid in [locality of behavior](https://htmx.org/essays/locality-of-behaviour/).
 
 **Note:** The `data-on-raf` attribute updating every frame but if you look at the DOM in devtools you'll see it only updates the text every second. Signals allow for optimized updates as they only update the DOM when the value changes.
