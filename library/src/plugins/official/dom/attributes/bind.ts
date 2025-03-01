@@ -69,7 +69,7 @@ export const Bind: AttributePlugin = {
 
     const signalArray = () => [...(signals.value(signalName) as any[])]
 
-    const setFromSignal = () => {
+    const setElementFromSignal = () => {
       let value = signals.value(signalName)
       if (isArray && !isSelect) {
         // May be undefined if the array is shorter than the index
@@ -105,7 +105,7 @@ export const Bind: AttributePlugin = {
       }
     }
 
-    const setFromElement = async () => {
+    const setSignalFromElement = async () => {
       let currentValue = signals.value(signalName)
       if (isArray) {
         // Push as many default signal values onto the array as necessary to reach the index
@@ -199,11 +199,11 @@ export const Bind: AttributePlugin = {
 
     // If the signal was inserted, attempt to set the the signal value from the element.
     if (inserted) {
-      setFromElement()
+      setSignalFromElement()
     }
 
     for (const event of updateEvents) {
-      el.addEventListener(event, setFromElement)
+      el.addEventListener(event, setSignalFromElement)
     }
 
     /*
@@ -216,17 +216,17 @@ export const Bind: AttributePlugin = {
      */
     const onPageshow = (ev: PageTransitionEvent) => {
       if (!ev.persisted) return
-      setFromElement()
+      setSignalFromElement()
     }
     window.addEventListener('pageshow', onPageshow)
 
-    const reset = effect(() => setFromSignal())
+    const reset = effect(() => setElementFromSignal())
 
     return () => {
       reset()
 
       for (const event of updateEvents) {
-        el.removeEventListener(event, setFromElement)
+        el.removeEventListener(event, setSignalFromElement)
       }
       
       window.removeEventListener('pageshow', onPageshow)
