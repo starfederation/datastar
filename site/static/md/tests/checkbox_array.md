@@ -13,5 +13,5 @@ Tests that a checkbox input's value is added to a bound signal array when checke
   Result:
   <code id="result" data-text="JSON.stringify($result) === JSON.stringify(['foo','','baz']) ? 1 : (JSON.stringify($result) === JSON.stringify(['foo']) ? 0 : -1)"></code>
   <hr />
-  Expected result on click: <code>1</code>
+  Expected result on clicking `baz`: <code>1</code>
 </div>
