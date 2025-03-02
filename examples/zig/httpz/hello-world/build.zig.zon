@@ -1,10 +1,11 @@
 .{
-    .name = "hello-world",
+    .name = .hello_world,
+    .fingerprint = 0xf73eae91535aa5fa,
     .version = "0.0.0",
     .dependencies = .{
         .httpz = .{
-            .url = "git+https://github.com/karlseguin/http.zig?ref=master#f16b296a2772be97e48a57259c004aa6584a02c6",
-            .hash = "1220e524a72c18aa2585f326902066fda544c5df0cf6618eea885b04041204dc5d7f",
+            .url = "git+https://github.com/karlseguin/http.zig?ref=master#652748bda080d673f016517edd6bd6132afefee8",
+            .hash = "httpz-0.0.0-PNVzrLqsBgBqtJP2Cn89yA48LuP_TZk7Of2neX8KWh12",
         },
         .datastar = .{
             .path = "../../../../sdk/zig/",

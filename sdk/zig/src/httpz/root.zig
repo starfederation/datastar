@@ -43,7 +43,7 @@ test sdk {
         server.deinit();
     }
 
-    var router = server.router(.{});
+    var router = try server.router(.{});
 
     router.get("/test", sdk, .{});
     router.post("/test", sdk, .{});
