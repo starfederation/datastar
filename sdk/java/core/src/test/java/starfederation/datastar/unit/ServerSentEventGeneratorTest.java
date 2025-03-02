@@ -66,7 +66,6 @@ class ServerSentEventGeneratorTest {
         String expectedOutput = """
                 event: datastar-merge-fragments
                 id: 0
-                retry: 1000
                 data: selector #test
                 data: fragments <div>test</div>
                 
@@ -87,7 +86,6 @@ class ServerSentEventGeneratorTest {
         String expectedOutput = """
                 event: datastar-merge-fragments
                 id: custom-id
-                retry: 1000
                 data: selector #test
                 data: fragments <div>test</div>
                 
@@ -114,13 +112,11 @@ class ServerSentEventGeneratorTest {
         String expectedOutput = """
                 event: datastar-merge-fragments
                 id: 0
-                retry: 1000
                 data: selector #test1
                 data: fragments <div>test1</div>
                 
                 event: datastar-merge-fragments
                 id: 1
-                retry: 1000
                 data: selector #test2
                 data: fragments <div>test2</div>
                 

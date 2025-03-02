@@ -54,8 +54,9 @@ public class ServerSentEventGenerator implements Closeable {
         // Write the event type
         output.append("event: ").append(event.getEventType()).append("\n");
         output.append("id: ").append(id).append("\n");
-        output.append("retry: ").append(retry).append("\n");
-
+        if(retry > 0) {
+            output.append("retry: ").append(retry).append("\n");
+        }
         // Write the data lines
         for (String line : event.getDataLines()) {
             output.append("data: ").append(line).append("\n");
@@ -76,7 +77,7 @@ public class ServerSentEventGenerator implements Closeable {
      * @param event the event to send
      */
     public synchronized void send(AbstractDatastarEvent event) {
-        send(event, String.valueOf(counter.incrementAndGet()), DEFAULT_SSE_RETRY_DURATION);
+        send(event, String.valueOf(counter.incrementAndGet()), -1);
     }
 
     /**
@@ -87,7 +88,7 @@ public class ServerSentEventGenerator implements Closeable {
      * @param id    the event id
      */
     public synchronized void send(AbstractDatastarEvent event, String id) {
-        send(event, id, DEFAULT_SSE_RETRY_DURATION);
+        send(event, id, -1);
     }
 
     /**
