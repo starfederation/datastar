@@ -4,8 +4,8 @@ class ReverseComponent extends HTMLElement {
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        const reversed = newValue.split('').reverse().join('');
-        this.dispatchEvent(new CustomEvent('reverse', {detail: {reversed}}));
+        const value = newValue.split('').reverse().join('');
+        this.dispatchEvent(new CustomEvent('reverse', {detail: {value}}));
     }
 }
 
