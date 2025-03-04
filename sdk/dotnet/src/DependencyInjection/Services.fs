@@ -12,8 +12,8 @@ type IDatastarServerSentEventService =
     abstract RemoveFragmentsAsync: selector:Selector * options:ServerSentEventRemoveFragmentsOptions -> Task
     abstract MergeSignalsAsync: dataSignals:Signals -> Task
     abstract MergeSignalsAsync: dataSignals:Signals * options:ServerSentEventMergeSignalsOptions -> Task
-    abstract RemoveSignalsAsync: paths:SignalsPath seq -> Task
-    abstract RemoveSignalsAsync: paths:SignalsPath seq * options:ServerSentEventOptions -> Task
+    abstract RemoveSignalsAsync: paths:SignalPath seq -> Task
+    abstract RemoveSignalsAsync: paths:SignalPath seq * options:ServerSentEventOptions -> Task
     abstract ExecuteScriptAsync: script:string -> Task
     abstract ExecuteScriptAsync: script:string * options:ServerSentEventExecuteScriptOptions -> Task
 
@@ -36,16 +36,16 @@ and ServerSentEventService (handler:ISendServerEvent) =
     with
     interface IDatastarServerSentEventService with
         member this.Handler = this.Handler
-        member this.MergeFragmentsAsync(fragment) = ServerSentEventGenerator.mergeFragments this.Handler fragment
-        member this.MergeFragmentsAsync(fragment, options) = ServerSentEventGenerator.mergeFragmentsWithOptions options.AsOptions this.Handler fragment
-        member this.MergeSignalsAsync(dataSignals) = ServerSentEventGenerator.mergeSignals this.Handler dataSignals
-        member this.MergeSignalsAsync(dataSignals, options:ServerSentEventMergeSignalsOptions): Task = ServerSentEventGenerator.mergeSignalsWithOptions options.AsOptions this.Handler dataSignals
-        member this.RemoveFragmentsAsync(selector) = ServerSentEventGenerator.removeFragments this.Handler selector
-        member this.RemoveFragmentsAsync(selector, options: ServerSentEventRemoveFragmentsOptions) = ServerSentEventGenerator.removeFragmentsWithOptions options.AsOptions this.Handler selector
-        member this.RemoveSignalsAsync(paths) = ServerSentEventGenerator.removeSignals this.Handler paths
-        member this.RemoveSignalsAsync(paths, options) = ServerSentEventGenerator.removeSignalsWithOptions options.AsOptions this.Handler paths
-        member this.ExecuteScriptAsync(script) = ServerSentEventGenerator.executeScript this.Handler script
-        member this.ExecuteScriptAsync(script, options) = ServerSentEventGenerator.executeScriptWithOptions options.AsOptions this.Handler script
+        member this.MergeFragmentsAsync(fragment) = ServerSentEventGenerator.mergeFragments (this.Handler, fragment)
+        member this.MergeFragmentsAsync(fragments, options) = ServerSentEventGenerator.mergeFragments (this.Handler, fragments, options.AsOptions)
+        member this.MergeSignalsAsync(dataSignals) = ServerSentEventGenerator.mergeSignals(this.Handler, dataSignals)
+        member this.MergeSignalsAsync(dataSignals, options:ServerSentEventMergeSignalsOptions): Task = ServerSentEventGenerator.mergeSignals (this.Handler, dataSignals, options.AsOptions)
+        member this.RemoveFragmentsAsync(selector) = ServerSentEventGenerator.removeFragments(this.Handler, selector)
+        member this.RemoveFragmentsAsync(selector, options: ServerSentEventRemoveFragmentsOptions) = ServerSentEventGenerator.removeFragments (this.Handler, selector, options.AsOptions)
+        member this.RemoveSignalsAsync(paths) = ServerSentEventGenerator.removeSignals(this.Handler, paths)
+        member this.RemoveSignalsAsync(paths, options) = ServerSentEventGenerator.removeSignals (this.Handler, paths, options.AsOptions)
+        member this.ExecuteScriptAsync(script) = ServerSentEventGenerator.executeScript(this.Handler, script)
+        member this.ExecuteScriptAsync(script, options) = ServerSentEventGenerator.executeScript (this.Handler, script, options.AsOptions)
 
 and SignalsReaderService (handler:IReadSignals) =
     member _.Handler = handler
