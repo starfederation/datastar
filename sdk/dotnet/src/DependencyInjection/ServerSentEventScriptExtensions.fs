@@ -8,8 +8,8 @@ type ServerSentEventScriptExtensions() =
 
     [<Extension>]
     static member Redirect (sse:IDatastarServerSentEventService, url:string) =
-        Redirect.redirect sse.Handler url
+        Redirect.redirect (sse.Handler, url)
 
     [<Extension>]
     static member BrowserConsoleAction (sse:IDatastarServerSentEventService, consoleAction:BrowserConsoleAction) =
-        BrowserConsole.browserConsoleAction sse.Handler consoleAction
+        BrowserConsole.browserConsoleAction (sse.Handler, consoleAction)

@@ -20,13 +20,12 @@ type ServerSentEventHttpHandlers (httpResponse:HttpResponse) =
         _additionalHeaders <- _additionalHeaders @ [ header ]
 
     member this.StartResponse () =
-        let respondTask = task {
+        let respondTask = backgroundTask {
             let setHeader (httpResponse:HttpResponse) (name, content:string) =
                 if httpResponse.Headers.ContainsKey(name) |> not then
                     httpResponse.Headers.Add(name, StringValues(content))
 
             seq {
-                ("Cache-Control", "no-cache, max-age, must-revalidate, no-store")
                 (HeaderNames.ContentType, "text/event-stream")
                 if (httpResponse.HttpContext.Request.Protocol = HttpProtocol.Http11) then
                     ("Connection", "keep-alive")
@@ -40,7 +39,7 @@ type ServerSentEventHttpHandlers (httpResponse:HttpResponse) =
 
     interface ISendServerEvent with
         member this.SendServerEvent sse = task {
-            do! _respondTask  // it is required that StartResponse() has already run
+            do! _respondTask  // it is required that StartResponse() was already run
             let serializedEvent = sse |> ServerSentEvent.serialize
             let bytes = Encoding.UTF8.GetBytes(serializedEvent)
             return! httpResponse.BodyWriter.WriteAsync(bytes)
@@ -50,46 +49,41 @@ type ServerSentEventHttpHandlers (httpResponse:HttpResponse) =
 /// Implementation of IReadSignals, for reading the Signals from the HttpRequest
 /// </summary>
 type SignalsHttpHandlers (httpRequest:HttpRequest) =
-    let mutable _cachedSignals : Signals voption voption = ValueNone
+    do
+        httpRequest.EnableBuffering()
 
-    let readSignals (httpRequest:HttpRequest) : ValueTask<Signals voption> =
+    let readRawSignals : Task<string voption> =
         match httpRequest.Method with
         | System.Net.WebRequestMethods.Http.Get ->
-            match httpRequest.Query.TryGetValue(Consts.DatastarKey) with
-            | true, json when json.Count > 0 -> ValueSome json[0]
-            | _ -> ValueNone
-            |> ValueTask.FromResult
+            task {
+                return
+                    match httpRequest.Query.TryGetValue(Consts.DatastarKey) with
+                    | true, json when json.Count > 0 -> ValueSome json[0]
+                    | _ -> ValueNone
+                }
         | _ ->
             task {
-                use readResult = new StreamReader(httpRequest.BodyReader.AsStream())
+                httpRequest.Body.Position <- 0
+                use readResult = new StreamReader(httpRequest.Body, leaveOpen = true)
                 let! str = readResult.ReadToEndAsync()
-                return ValueSome str
-                } |> ValueTask<Signals voption>
+                return (ValueSome str)
+                }
 
     member _.HttpRequest = httpRequest
 
     interface IReadSignals with
         member this.ReadSignals () =
-            let readTask =
-                match _cachedSignals with
-                | ValueSome signals -> task { return signals }
-                | ValueNone ->
-                    task {
-                        let! signals = (readSignals this.HttpRequest)
-                        _cachedSignals <- (ValueSome signals)
-                        return signals
-                    }
-            readTask |> ValueTask<Signals voption>
-        member this.ReadSignals<'T> jsonSerializerOptions =
-            let readTask = task {
-                let! signals = (this :> IReadSignals).ReadSignals()
-                let ret =
-                    match signals with
-                    | ValueNone -> ValueNone
-                    | ValueSome rs ->
-                        try ValueSome (JsonSerializer.Deserialize<'T>(rs, jsonSerializerOptions))
-                        with _ -> ValueNone
-                return ret
-                }
-            readTask |> ValueTask<'T voption>
+            readRawSignals
+
+        member this.ReadSignals<'T> jsonSerializerOptions = task {
+            let! signals = readRawSignals
+            let ret =
+                match signals with
+                | ValueNone -> ValueNone
+                | ValueSome rs ->
+                    try ValueSome (JsonSerializer.Deserialize<'T>(rs, jsonSerializerOptions))
+                    with _ -> ValueNone
+            return ret
+            }
+
         member this.ReadSignals<'T> () = (this :> IReadSignals).ReadSignals<'T> JsonSerializerOptions.Default

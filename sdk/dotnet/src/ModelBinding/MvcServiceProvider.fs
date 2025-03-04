@@ -4,7 +4,6 @@ open Microsoft.Extensions.DependencyInjection
 open StarFederation.Datastar.DependencyInjection
 open System.Linq
 open System.Runtime.CompilerServices
-open System.Text.Json
 
 [<Extension>]
 type ServiceCollectionExtensionMethods() =
