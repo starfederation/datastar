@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 
 from fasthtml.common import *
-from datastar_py import DatastarFastHTMLResponse
+from datastar_py.responses import DatastarFastHTMLResponse
 
 app, rt = fast_app(
     live=True,
