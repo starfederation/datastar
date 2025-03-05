@@ -13,6 +13,7 @@ import asyncio
 import json
 from datetime import datetime
 from functools import cache
+from pathlib import Path
 
 from fasthtml.common import *
 from datastar_py.responses import DatastarFastHTMLResponse
@@ -36,15 +37,14 @@ from great_tables.data import reactions
 # - Great Tables: https://posit-dev.github.io/great-tables/articles/intro.html    #
 ###################################################################################
 
+repo_root = next(p for p in Path(__file__).parents if (p / ".git").exists())
 
 app, rt = fast_app(
-    hdrs=(
-        Script(
-            type="module",
-            src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js",
-        ),
-    ),
-    debug=True,
+    htmx=False,
+    surreal=False,
+    live=True,
+    static_path=str(repo_root),
+    hdrs=(Script(type="module", src="/bundles/datastar.js"),),
 )
 
 default_pattern = "aldehyde"

@@ -1,18 +1,19 @@
 import asyncio
 import json
 from datetime import datetime
+from pathlib import Path
 
 from fasthtml.common import *
 from datastar_py.responses import DatastarFastHTMLResponse
 
+repo_root = next(p for p in Path(__file__).parents if (p / ".git").exists())
+
 app, rt = fast_app(
+    htmx=False,
+    surreal=False,
     live=True,
-    hdrs=(
-        Script(
-            type="module",
-            src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js",
-        ),
-    ),
+    static_path=str(repo_root),
+    hdrs=(Script(type="module", src="/bundles/datastar.js"),),
 )
 
 example_style = Style(
