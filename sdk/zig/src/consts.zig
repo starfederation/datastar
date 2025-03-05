@@ -131,6 +131,13 @@ pub const EventType = enum {
     }
 };
 
+/// The type of encoding to use with the SSE response
+pub const Encoding = enum {
+    // use brotli encoding
+    br,
+    // use gzip encoding
+    gzip,
+};
 
 // #endregion
 

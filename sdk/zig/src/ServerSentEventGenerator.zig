@@ -1,10 +1,21 @@
 const std = @import("std");
 const consts = @import("consts.zig");
+const Brotli = @import("brotli");
+const br = Brotli.init(Brotli.Settings{});
 
 const default_execute_script_attributes: []const []const u8 = &[_][]const u8{consts.default_execute_script_attributes};
 
 allocator: std.mem.Allocator,
 writer: std.net.Stream.Writer,
+encoding: ?consts.Encoding = null,
+data: std.ArrayList(u8) = undefined,
+
+pub const InitOptions = struct {
+    /// If an `encoding` is selected, all the merge/remove/execute commands will be concatenated,
+    /// encoded, and then sent to the client.
+    /// Using 'encoding' requires the use of the function `sse.sendEncoded()` after all those commands
+    encoding: ?consts.Encoding = null,
+};
 
 pub const ExecuteScriptOptions = struct {
     /// `event_id` can be used by the backend to replay events.
@@ -77,32 +88,78 @@ pub const RemoveSignalsOptions = struct {
     retry_duration: u32 = consts.default_sse_retry_duration,
 };
 
+pub const SendOptions = struct {
+    /// `event_id` can be used by the backend to replay events.
+    /// This is part of the SSE spec and is used to tell the browser how to handle the event.
+    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
+    event_id: ?[]const u8 = null,
+    /// `retry_duration` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
+    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
+    retry_duration: u32 = consts.default_sse_retry_duration,
+};
+
 fn send(
     self: *@This(),
     event: consts.EventType,
     data: []const u8,
-    options: struct {
-        event_id: ?[]const u8 = null,
-        retry_duration: u32 = consts.default_sse_retry_duration,
-    },
+    options: SendOptions,
 ) !void {
-    try self.writer.print("event: {}\n", .{event});
+    if (self.encoding) |_|
+        try write(
+            self.data.writer(),
+            event,
+            data,
+            options,
+        )
+    else
+        try write(
+            self.writer,
+            event,
+            data,
+            options,
+        );
+}
+
+/// Write data to sse stream or self.data according to encoding
+fn write(
+    writer: anytype,
+    event: consts.EventType,
+    data: []const u8,
+    options: SendOptions,
+) !void {
+    try writer.print("event: {}\n", .{event});
 
     if (options.event_id) |id| {
-        try self.writer.print("id: {s}\n", .{id});
+        try writer.print("id: {s}\n", .{id});
     }
 
     if (options.retry_duration != consts.default_sse_retry_duration) {
-        try self.writer.print("retry: {d}\n", .{options.retry_duration});
+        try writer.print("retry: {d}\n", .{options.retry_duration});
     }
 
     var iter = std.mem.splitScalar(u8, data, '\n');
     while (iter.next()) |line| {
         if (line.len == 0) continue;
-        try self.writer.print("data: {s}\n", .{line});
+        try writer.print("data: {s}\n", .{line});
     }
 
-    try self.writer.writeAll("\n\n");
+    try writer.writeAll("\n\n");
+}
+
+/// Send encoded msg to the browser
+pub fn sendEncoded(
+    self: *@This(),
+) !void {
+    if (self.encoding) |encoding| switch (encoding) {
+        .br => {
+            const encoded = try br.encode(self.allocator, try self.data.toOwnedSlice());
+            try self.writer.writeAll(encoded);
+        },
+        .gzip => {
+            var fbs = std.io.fixedBufferStream(try self.data.toOwnedSlice());
+            try std.compress.gzip.compress(fbs.reader(), self.writer, .{});
+        },
+    };
 }
 
 /// `executeScript` executes JavaScript in the browser

@@ -7,12 +7,14 @@ pub fn build(b: *std.Build) void {
 
     const httpz = b.dependency("httpz", dep_opts).module("httpz");
     const tokamak = b.dependency("tokamak", dep_opts).module("tokamak");
+    const brotli = b.dependency("brotli", dep_opts).module("brotli");
 
     const datastar = b.addModule("datastar", .{
         .root_source_file = b.path("src/root.zig"),
         .imports = &.{
             .{ .name = "httpz", .module = httpz },
             .{ .name = "tokamak", .module = tokamak },
+            .{ .name = "brotli", .module = brotli },
         },
     });
 

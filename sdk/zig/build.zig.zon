@@ -10,6 +10,11 @@
             .url = "git+https://github.com/cztomsik/tokamak#88b6875782fa03b9a8408a80e142883968a59788",
             .hash = "122071c2c0adaa3fa3a27a872fdc0b2e762db515e3ef8c5b2225332141500e13f110",
         },
+        // brotli encoding
+        .brotli = .{
+            .url = "git+https://github.com/0x546F6D/zig-brotli#ea0625f498a516159d089513157c762abc2155df",
+            .hash = "brotli-0.0.0-Sq2e40oqAAANfzOA11s-qtGEGE_zjOVDO6-tQC4UIdTk",
+        },
     },
     .paths = .{
         "build.zig",
