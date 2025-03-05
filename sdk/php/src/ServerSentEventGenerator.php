@@ -163,7 +163,7 @@ class ServerSentEventGenerator
     }
 
     /**
-     * Sends an event.
+     * Sends an event and flushes the output buffer.
      */
     protected function sendEvent(EventInterface $event): void
     {
