@@ -128,32 +128,15 @@ class ServerSentEventGenerator
     }
 
     /**
-     * Sends an event.
+     * Returns the output for the event.
      */
-    protected function sendEvent(EventInterface $event): void
+    public function getEventOutput(EventInterface $event): string
     {
-        $this->send(
+        $options = $event->getOptions();
+
+        $eventData = new ServerSentEventData(
             $event->getEventType(),
             $event->getDataLines(),
-            $event->getOptions(),
-        );
-    }
-
-    /**
-     * Sends a Datastar event.
-     *
-     * @param EventType $eventType
-     * @param string[] $dataLines
-     * @param array{
-     *     eventId?: string|null,
-     *     retryDuration?: int|null,
-     * } $options
-     */
-    protected function send(EventType $eventType, array $dataLines, array $options = []): void
-    {
-        $eventData = new ServerSentEventData(
-            $eventType,
-            $dataLines,
             $options['eventId'] ?? null,
             $options['retryDuration'] ?? Consts::DEFAULT_SSE_RETRY_DURATION,
         );
@@ -176,7 +159,15 @@ class ServerSentEventGenerator
             $output[] = $line;
         }
 
-        echo implode("\n", $output) . "\n\n";
+        return implode("\n", $output) . "\n\n";
+    }
+
+    /**
+     * Sends an event.
+     */
+    protected function sendEvent(EventInterface $event): void
+    {
+        echo $this->getEventOutput($event);
 
         if (ob_get_contents()) {
             ob_end_flush();
