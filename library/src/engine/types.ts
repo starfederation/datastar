@@ -89,7 +89,6 @@ export type HTMLorSVGElement = Element & (HTMLElement | SVGElement)
 export type Modifiers = Map<string, Set<string>> // mod name -> tags
 
 export type RuntimeContext = InitContext & {
-  plugin: DatastarPlugin // The name of the plugin
   el: HTMLorSVGElement // The element the attribute is on
   rawKey: Readonly<string> // no parsing data-* key
   key: Readonly<string> // data-* key without the prefix or tags

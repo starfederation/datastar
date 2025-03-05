@@ -351,10 +351,10 @@ function genRX(
   ctx.fnContent = fnContent
 
   try {
-    const fn = new Function('ctx', ...argNames, fnContent)
+    const fn = new Function('el', 'signals', ...argNames, fnContent)
     return (...args: any[]) => {
       try {
-        return fn(ctx, ...args)
+        return fn(ctx.el, ctx.signals, ...args)
       } catch (error: any) {
         throw runtimeErr('ExecuteExpression', ctx, {
           error: error.message,
