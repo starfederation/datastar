@@ -10,7 +10,7 @@ app, rt = fast_app(
     hdrs=(
         Script(
             type="module",
-            src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.5/bundles/datastar.js",
+            src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js",
         ),
     ),
 )
