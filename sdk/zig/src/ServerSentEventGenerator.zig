@@ -7,7 +7,8 @@ const default_execute_script_attributes: []const []const u8 = &[_][]const u8{con
 
 allocator: std.mem.Allocator,
 writer: std.net.Stream.Writer,
-encoding: ?consts.Encoding = null,
+res: *@import("httpz").Response,
+options: InitOptions,
 data: std.ArrayList(u8) = undefined,
 
 pub const InitOptions = struct {
@@ -15,6 +16,9 @@ pub const InitOptions = struct {
     /// encoded, and then sent to the client.
     /// Using 'encoding' requires the use of the function `sse.sendEncoded()` after all those commands
     encoding: ?consts.Encoding = null,
+    /// Minimum size for the datastar sse response to trigger encoding.
+    /// Responses with size below this treshold will be sent as plain text without being encoded
+    enc_min_size: u16 = 256,
 };
 
 pub const ExecuteScriptOptions = struct {
@@ -104,7 +108,7 @@ fn send(
     data: []const u8,
     options: SendOptions,
 ) !void {
-    if (self.encoding) |_|
+    if (self.options.encoding) |_|
         try write(
             self.data.writer(),
             event,
@@ -150,16 +154,26 @@ fn write(
 pub fn sendEncoded(
     self: *@This(),
 ) !void {
-    if (self.encoding) |encoding| switch (encoding) {
-        .br => {
-            const encoded = try br.encode(self.allocator, try self.data.toOwnedSlice());
-            try self.writer.writeAll(encoded);
-        },
-        .gzip => {
-            var fbs = std.io.fixedBufferStream(try self.data.toOwnedSlice());
-            try std.compress.gzip.compress(fbs.reader(), self.writer, .{});
-        },
-    };
+    if (self.options.encoding) |encoding| {
+        if (self.data.items.len > self.options.enc_min_size) {
+            self.res.header("Content-Encoding", @tagName(encoding));
+            try self.res.write();
+
+            switch (encoding) {
+                .br => {
+                    const encoded = try br.encode(self.allocator, try self.data.toOwnedSlice());
+                    try self.writer.writeAll(encoded);
+                },
+                .gzip => {
+                    var fbs = std.io.fixedBufferStream(try self.data.toOwnedSlice());
+                    try std.compress.gzip.compress(fbs.reader(), self.writer, .{});
+                },
+            }
+        } else {
+            try self.res.write();
+            try self.writer.writeAll(self.data.items);
+        }
+    }
 }
 
 /// `executeScript` executes JavaScript in the browser

@@ -7,19 +7,11 @@ pub fn init(res: *tk.Response, options: ServerSentEventGenerator.InitOptions) !S
     res.content_type = .EVENTS;
     res.header("Cache-Control", "no-cache");
 
-    var data: std.ArrayList(u8) = undefined;
-    if (options.encoding) |encoding| {
-        res.header("Content-Encoding", @tagName(encoding));
-
-        data = std.ArrayList(u8).init(res.arena);
-        errdefer data.deinit();
-    }
-
     if (config.http1) {
         res.header("Connection", "keep-alive");
     }
 
-    try res.write();
+    if (options.encoding) |_| {} else try res.write();
 
     const conn = res.conn;
     conn.handover = .close;
@@ -27,7 +19,9 @@ pub fn init(res: *tk.Response, options: ServerSentEventGenerator.InitOptions) !S
     return .{
         .allocator = res.arena,
         .writer = conn.stream.writer(),
-        .encoding = options.encoding,
-        .data = data,
+        .res = res,
+        // .encoding = options.encoding,
+        .options = options,
+        .data = if (options.encoding) |_| std.ArrayList(u8).init(res.arena) else undefined,
     };
 }
