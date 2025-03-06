@@ -51,10 +51,11 @@ You can manually add your own plugins to the core:
 }
 </script>
 <script type="module">
-    import { load } from 'datastar'
+    import { apply, load } from 'datastar'
 
     load(
         // Look ma’, I made a plugin!
     )
+    apply()
 </script>
 ```
