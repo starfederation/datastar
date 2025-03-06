@@ -1,0 +1,23 @@
+use starfederation\datastar\enums\FragmentMergeMode;
+use starfederation\datastar\ServerSentEventGenerator;
+
+$signals = ServerSentEventGenerator::readSignals();
+
+$max = 5;
+$limit = 1;
+$offset = $signals['offset'] ?? 1;
+
+$sse = new ServerSentEventGenerator();
+
+if ($offset < $max) {
+    $newOffset = $offset + $limit;
+    $sse->mergeFragments(`<div>Item $newOffset</div>`, [
+        'selector' => '#list',
+        'mergeMode' => FragmentMergeMode::Append,
+    ]);
+    if (newOffset < $max) {
+        $sse->mergeSignals(['offset' => $newOffset]);
+    } else {
+        $sse->removeFragments('#load-more');
+    }
+}
