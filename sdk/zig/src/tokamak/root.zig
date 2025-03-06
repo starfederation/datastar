@@ -33,7 +33,7 @@ fn sdk(req: *tk.Request, res: *tk.Response) !void {
 }
 
 const App = struct {
-    server: *tk.Server,
+    server: tk.Server,
     routes: []const tk.Route = &.{
         .get("/test", sdk),
         .post0("/test", sdk),
