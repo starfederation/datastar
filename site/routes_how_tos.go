@@ -23,6 +23,7 @@ func setupHowTos(ctx context.Context, router chi.Router) error {
 			Label: "How Tos",
 			Links: []*SidebarLink{
 				{ID: "how_to_bind_keydown_events_to_specific_keys"},
+				{ID: "how_to_load_more_list_items"},
 				{ID: "how_to_poll_the_backend_at_regular_intervals"},
 				{ID: "how_to_redirect_the_page_from_the_backend"},
 			},
@@ -76,8 +77,9 @@ func setupHowTos(ctx context.Context, router chi.Router) error {
 		})
 
 		if err := errors.Join(
+			setupHowTosLoadMore(howTosRouter),
 			setupHowTosPolling(howTosRouter),
-			setupHowTosRedirects(howTosRouter),
+			setupHowTosRedirect(howTosRouter),
 		); err != nil {
 			panic(fmt.Sprintf("error setting up examples routes: %s", err))
 		}

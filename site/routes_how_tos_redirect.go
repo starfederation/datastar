@@ -8,7 +8,7 @@ import (
 	datastar "github.com/starfederation/datastar/sdk/go"
 )
 
-func setupHowTosRedirects(howTosRedirect chi.Router) error {
+func setupHowTosRedirect(howTosRedirect chi.Router) error {
 
 	howTosRedirect.Route("/redirect/data", func(dataRouter chi.Router) {
 

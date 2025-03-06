@@ -34,7 +34,7 @@ event: datastar-execute-script
 data: script window.location.href = "/guide"
 ```
 
-Here's how it would look using the SDKs.
+Here's how it might look using the SDKs.
 
 !!!CODE_SNIPPET:how_tos/redirect_1!!!
 
