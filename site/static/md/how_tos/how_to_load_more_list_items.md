@@ -54,7 +54,7 @@ event: datastar-merge-signals
 data: signals {offset: 2)
 ```
 
-In the case when all five listems have been shown, we'll remove the button from the DOM entirely.
+In the case when all five list items have been shown, we'll remove the button from the DOM entirely.
 
 ```
 event: datastar-remove-fragments
