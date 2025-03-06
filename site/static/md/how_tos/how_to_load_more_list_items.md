@@ -2,7 +2,7 @@
 
 ## Intro
 
-Loading more list items into the DOM from the backend is a common alternative to pagination. What's makes it different is that we need to append the new items to the existing list, rather than replace them.
+Loading more list items into the DOM from the backend is a common alternative to pagination. What makes it different is that we need to append the new items to the existing list, rather than replace them.
 
 ## Goal
 
@@ -54,7 +54,7 @@ event: datastar-merge-signals
 data: signals {offset: 2)
 ```
 
-In the case when the incoming offset is `2`, we'll remove the button from the DOM entirely.
+In the case when all five listems have been shown, we'll remove the button from the DOM entirely.
 
 ```
 event: datastar-remove-fragments
