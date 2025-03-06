@@ -30,15 +30,17 @@ func setupHowTosLoadMore(howTosRedirect chi.Router) error {
 
 			if offset < max {
 				newOffset := offset + limit
+				if newOffset < max {
+					sse.MergeSignals([]byte(fmt.Sprintf(`{offset: %d}`, newOffset)))
+				} else {
+					// TODO: set settle duration back to `0` or remove entirely
+					sse.RemoveFragments(`#load-more`, datastar.WithRemoveSettleDuration(1))
+				}
+			
 				sse.MergeFragments(fmt.Sprintf(`<div class="text-primary font-bold">Item %d</div>`, newOffset),
 					datastar.WithSelectorID("list"),
 					datastar.WithMergeMode(datastar.FragmentMergeModeAppend),
 				)
-				if newOffset < max {
-					sse.MergeSignals([]byte(fmt.Sprintf(`{offset: %d}`, newOffset)))
-				} else {
-					sse.RemoveFragments(`#load-more`)
-				}
 			}
 		})
 	})
