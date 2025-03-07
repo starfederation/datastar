@@ -42,4 +42,9 @@ interface EventInterface
      * Returns multiple data lines.
      */
     public function getMultiDataLines(string $literal, string $data): array;
+
+    /**
+     * Returns the final event output.
+     */
+    public function getOutput(): string;
 }
