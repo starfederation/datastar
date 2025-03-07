@@ -5,7 +5,6 @@
 
 namespace starfederation\datastar;
 
-use starfederation\datastar\enums\EventType;
 use starfederation\datastar\enums\FragmentMergeMode;
 use starfederation\datastar\events\EventInterface;
 use starfederation\datastar\events\ExecuteScript;

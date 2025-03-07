@@ -6,6 +6,7 @@
 namespace starfederation\datastar\events;
 
 use starfederation\datastar\Consts;
+use starfederation\datastar\ServerSentEventData;
 
 trait EventTrait
 {
