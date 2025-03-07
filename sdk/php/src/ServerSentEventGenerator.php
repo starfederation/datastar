@@ -128,46 +128,11 @@ class ServerSentEventGenerator
     }
 
     /**
-     * Returns the output for the event.
-     */
-    public function getEventOutput(EventInterface $event): string
-    {
-        $options = $event->getOptions();
-
-        $eventData = new ServerSentEventData(
-            $event->getEventType(),
-            $event->getDataLines(),
-            $options['eventId'] ?? null,
-            $options['retryDuration'] ?? Consts::DEFAULT_SSE_RETRY_DURATION,
-        );
-
-        foreach ($options as $key => $value) {
-            $eventData->$key = $value;
-        }
-
-        $output = ['event: ' . $eventData->eventType->value];
-
-        if ($eventData->eventId !== null) {
-            $output[] = 'id: ' . $eventData->eventId;
-        }
-
-        if ($eventData->retryDuration !== Consts::DEFAULT_SSE_RETRY_DURATION) {
-            $output[] = 'retry: ' . $eventData->retryDuration;
-        }
-
-        foreach ($eventData->data as $line) {
-            $output[] = $line;
-        }
-
-        return implode("\n", $output) . "\n\n";
-    }
-
-    /**
      * Sends an event and flushes the output buffer.
      */
     protected function sendEvent(EventInterface $event): void
     {
-        echo $this->getEventOutput($event);
+        echo $event->getOutput();
 
         if (ob_get_contents()) {
             ob_end_flush();
