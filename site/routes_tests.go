@@ -36,6 +36,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "checkbox_boolean_checked"},
 				{ID: "checkbox_value"},
 				{ID: "checkbox_value_checked"},
+				{ID: "custom_plugin"},
 				{ID: "input_array"},
 				{ID: "input_signal"},
 				{ID: "input_value"},

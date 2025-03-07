@@ -9,3 +9,7 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 ### Changed
 
 - Updated Idiomorph to version [0.7.3](https://github.com/bigskysoftware/idiomorph/releases/tag/v0.7.3).
+
+### Fixed
+
+- Fixed the applying of plugins to give custom plugins a chance to load ([#740](https://github.com/starfederation/datastar/issues/740)).

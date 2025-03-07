@@ -83,9 +83,11 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
 
 // Apply all plugins to all elements in the DOM
 export function apply() {
-  applyToElement(document.documentElement)
-
-  observe()
+  // Delay applying plugins to give custom plugins a chance to load
+  queueMicrotask(() => {
+    applyToElement(document.documentElement)
+    observe()
+  })
 }
 
 // Apply all plugins to the element and its children
