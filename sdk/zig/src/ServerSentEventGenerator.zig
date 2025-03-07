@@ -1,5 +1,6 @@
 const std = @import("std");
 const consts = @import("consts.zig");
+const ArrayList = std.ArrayListUnmanaged;
 
 const default_execute_script_attributes: []const []const u8 = &[_][]const u8{consts.default_execute_script_attributes};
 
@@ -114,8 +115,8 @@ pub fn executeScript(
     script: []const u8,
     options: ExecuteScriptOptions,
 ) !void {
-    var data = std.ArrayList(u8).init(self.allocator);
-    errdefer data.deinit();
+    var data = ArrayList(u8).empty;
+    errdefer data.deinit(self.allocator);
     const writer = data.writer();
 
     if (options.attributes.len != 1 or !std.mem.eql(
@@ -172,8 +173,8 @@ pub fn mergeFragments(
     fragments: []const u8,
     options: MergeFragmentsOptions,
 ) !void {
-    var data = std.ArrayList(u8).init(self.allocator);
-    errdefer data.deinit();
+    var data = ArrayList(u8).empty;
+    errdefer data.deinit(self.allocator);
     const writer = data.writer();
 
     if (options.selector) |selector| {
@@ -241,8 +242,8 @@ pub fn mergeSignals(
     signals: anytype,
     options: MergeSignalsOptions,
 ) !void {
-    var data = std.ArrayList(u8).init(self.allocator);
-    errdefer data.deinit();
+    var data = ArrayList(u8).empty;
+    errdefer data.deinit(self.allocator);
     const writer = data.writer();
 
     if (options.only_if_missing != consts.default_merge_signals_only_if_missing) {
@@ -276,8 +277,8 @@ pub fn removeFragments(
     selector: []const u8,
     options: RemoveFragmentsOptions,
 ) !void {
-    var data = std.ArrayList(u8).init(self.allocator);
-    errdefer data.deinit();
+    var data = ArrayList(u8).empty;
+    errdefer data.deinit(self.allocator);
     const writer = data.writer();
 
     if (options.settle_duration != consts.default_fragments_settle_duration) {
@@ -323,8 +324,8 @@ pub fn removeSignals(
     paths: []const []const u8,
     options: RemoveSignalsOptions,
 ) !void {
-    var data = std.ArrayList(u8).init(self.allocator);
-    errdefer data.deinit();
+    var data = ArrayList(u8).empty;
+    errdefer data.deinit(self.allocator);
     const writer = data.writer();
 
     for (paths) |path| {

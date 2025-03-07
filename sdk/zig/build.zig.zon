@@ -1,7 +1,7 @@
 .{
     .name = .datastar,
     .fingerprint = 0xc03ca25b47dce68f,
-    .version = "1.0.0-beta.4",
+    .version = "1.0.0-beta.5",
     .dependencies = .{
         .httpz = .{
             .url = "git+https://github.com/karlseguin/http.zig?ref=master#56258131ef4505543fef5484451867c13c5ff322",
