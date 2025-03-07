@@ -136,8 +136,8 @@ tasks:
   templ:
     env:
       TEMPL_EXPERIMENT: rawgo
-    deps:
-      - library
+    # deps:
+    #   - library
     generates:
       - "**/*_templ.go"
     sources:
