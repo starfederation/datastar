@@ -1,15 +1,22 @@
 # Datastar Zig SDK
 
-An implementation of the Datastar SDK in Zig with framework integration for http.zig and tokamak.
+The Datastar SDK in Zig, with support for http.zig and tokamak.
 
-## Testing
+## Installation
 
-Run `zig build test`.
+Install with `zig fetch --save git+https://github.com/starfederation/datastar-zig` and add datastar as a dependency.
+
+```zig
+const datastar = b.dependency("datastar", .{
+    .target = target,
+    .optimize = optimize,
+    .framework = .httpz, // or .tokamak
+}).module("datastar");
+
+exe.root_module.addImport("datastar", datastar);
+```
 
 ## Usage
-
-Install with `zig fetch --save git+https://github.com/starfederation/datastar-zig`
-
 ```zig
 const datastar = @import("datastar").httpz;
 

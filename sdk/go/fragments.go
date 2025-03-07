@@ -74,7 +74,7 @@ func (sse *ServerSentEventGenerator) MergeFragments(fragment string, opts ...Mer
 	if options.MergeMode != FragmentMergeModeMorph {
 		dataRows = append(dataRows, MergeModeDatalineLiteral+string(options.MergeMode))
 	}
-	if options.SettleDuration > 0 && options.SettleDuration != DefaultFragmentsSettleDuration {
+	if options.SettleDuration >= 0 && options.SettleDuration != DefaultFragmentsSettleDuration {
 		settleDuration := strconv.Itoa(int(options.SettleDuration.Milliseconds()))
 		dataRows = append(dataRows, SettleDurationDatalineLiteral+settleDuration)
 	}
@@ -149,7 +149,7 @@ func (sse *ServerSentEventGenerator) RemoveFragments(selector string, opts ...Re
 	}
 
 	dataRows := []string{SelectorDatalineLiteral + selector}
-	if options.SettleDuration > 0 && options.SettleDuration != DefaultFragmentsSettleDuration {
+	if options.SettleDuration >= 0 && options.SettleDuration != DefaultFragmentsSettleDuration {
 		settleDuration := strconv.Itoa(int(options.SettleDuration.Milliseconds()))
 		dataRows = append(dataRows, SettleDurationDatalineLiteral+settleDuration)
 	}

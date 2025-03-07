@@ -24,7 +24,11 @@ pub fn build(b: *std.Build) void {
     run_step.dependOn(&run_cmd.step);
 
     const tokamak = b.dependency("tokamak", dep_opts).module("tokamak");
-    const datastar = b.dependency("datastar", dep_opts).module("datastar");
+    const datastar = b.dependency("datastar", .{
+        .target = target,
+        .optimize = optimize,
+        .framework = .tokamak,
+    }).module("datastar");
 
     exe.root_module.addImport("tokamak", tokamak);
     exe.root_module.addImport("datastar", datastar);

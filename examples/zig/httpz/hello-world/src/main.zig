@@ -17,7 +17,7 @@ pub fn main() !void {
         server.deinit();
     }
 
-    var router = server.router(.{});
+    var router = try server.router(.{});
 
     router.get("/", index, .{});
     router.get("/hello-world", helloWorld, .{});

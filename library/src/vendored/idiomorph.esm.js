@@ -187,14 +187,6 @@ var Idiomorph = (function () {
    */
   function morphOuterHTML(ctx, oldNode, newNode) {
     const oldParent = normalizeParent(oldNode);
-
-    // basis for calulating which nodes were morphed
-    // since there may be unmorphed sibling nodes
-    let childNodes = Array.from(oldParent.childNodes);
-    const index = childNodes.indexOf(oldNode);
-    // how many elements are to the right of the oldNode
-    const rightMargin = childNodes.length - (index + 1);
-
     morphChildren(
       ctx,
       oldParent,
@@ -203,10 +195,8 @@ var Idiomorph = (function () {
       oldNode, // start point for iteration
       oldNode.nextSibling, // end point for iteration
     );
-
-    // return just the morphed nodes
-    childNodes = Array.from(oldParent.childNodes);
-    return childNodes.slice(index, childNodes.length - rightMargin);
+    // this is safe even with siblings, because normalizeParent returns a SlicedParentNode if needed.
+    return Array.from(oldParent.childNodes);
   }
 
   /**
@@ -236,7 +226,7 @@ var Idiomorph = (function () {
     const results = fn();
 
     if (activeElementId && activeElementId !== document.activeElement?.id) {
-      activeElement = ctx.target.querySelector(`#${activeElementId}`);
+      activeElement = ctx.target.querySelector(`[id="${activeElementId}"]`);
       activeElement?.focus();
     }
     if (activeElement && !activeElement.selectionEnd && selectionEnd) {
@@ -548,8 +538,9 @@ var Idiomorph = (function () {
       const target =
         /** @type {Element} - will always be found */
         (
-          ctx.target.querySelector(`#${id}`) ||
-            ctx.pantry.querySelector(`#${id}`)
+          (ctx.target.id === id && ctx.target) ||
+            ctx.target.querySelector(`[id="${id}"]`) ||
+            ctx.pantry.querySelector(`[id="${id}"]`)
         );
       removeElementFromAncestorsIdMaps(target, ctx);
       moveBefore(parentNode, target, after);
@@ -1198,8 +1189,9 @@ var Idiomorph = (function () {
         if (newContent.parentNode) {
           // we can't use the parent directly because newContent may have siblings
           // that we don't want in the morph, and reparenting might be expensive (TODO is it?),
-          // so we create a duck-typed parent node instead.
-          return createDuckTypedParent(newContent);
+          // so instead we create a fake parent node that only sees a slice of its children.
+          /** @type {Element} */
+          return /** @type {any} */ (new SlicedParentNode(newContent));
         } else {
           // a single node is added as a child to a dummy parent
           const dummyParent = document.createElement("div");
@@ -1218,33 +1210,78 @@ var Idiomorph = (function () {
     }
 
     /**
-     * Creates a fake duck-typed parent element to wrap a single node, without actually reparenting it.
+     * A fake duck-typed parent element to wrap a single node, without actually reparenting it.
+     * This is useful because the node may have siblings that we don't want in the morph, and it may also be moved
+     * or replaced with one or more elements during the morph. This class effectively allows us a window into
+     * a slice of a node's children.
      * "If it walks like a duck, and quacks like a duck, then it must be a duck!" -- James Whitcomb Riley (1849–1916)
-     *
-     * @param {Node} newContent
-     * @returns {Element}
      */
-    function createDuckTypedParent(newContent) {
-      return /** @type {Element} */ (
-        /** @type {unknown} */ ({
-          childNodes: [newContent],
-          /** @ts-ignore - cover your eyes for a minute, tsc */
-          querySelectorAll: (s) => {
-            /** @ts-ignore */
-            const elements = newContent.querySelectorAll(s);
-            /** @ts-ignore */
-            return newContent.matches(s) ? [newContent, ...elements] : elements;
-          },
-          /** @ts-ignore */
-          insertBefore: (n, r) => newContent.parentNode.insertBefore(n, r),
-          /** @ts-ignore */
-          moveBefore: (n, r) => newContent.parentNode.moveBefore(n, r),
-          // for later use with populateIdMapWithTree to halt upwards iteration
-          get __idiomorphRoot() {
-            return newContent;
-          },
-        })
-      );
+    class SlicedParentNode {
+      /** @param {Node} node */
+      constructor(node) {
+        this.originalNode = node;
+        this.realParentNode = /** @type {Element} */ (node.parentNode);
+        this.previousSibling = node.previousSibling;
+        this.nextSibling = node.nextSibling;
+      }
+
+      /** @returns {Node[]} */
+      get childNodes() {
+        // return slice of realParent's current childNodes, based on previousSibling and nextSibling
+        const nodes = [];
+        let cursor = this.previousSibling
+          ? this.previousSibling.nextSibling
+          : this.realParentNode.firstChild;
+        while (cursor && cursor != this.nextSibling) {
+          nodes.push(cursor);
+          cursor = cursor.nextSibling;
+        }
+        return nodes;
+      }
+
+      /**
+       * @param {string} selector
+       * @returns {Element[]}
+       */
+      querySelectorAll(selector) {
+        return this.childNodes.reduce((results, node) => {
+          if (node instanceof Element) {
+            if (node.matches(selector)) results.push(node);
+            const nodeList = node.querySelectorAll(selector);
+            for (let i = 0; i < nodeList.length; i++) {
+              results.push(nodeList[i]);
+            }
+          }
+          return results;
+        }, /** @type {Element[]} */ ([]));
+      }
+
+      /**
+       * @param {Node} node
+       * @param {Node} referenceNode
+       * @returns {Node}
+       */
+      insertBefore(node, referenceNode) {
+        return this.realParentNode.insertBefore(node, referenceNode);
+      }
+
+      /**
+       * @param {Node} node
+       * @param {Node} referenceNode
+       * @returns {Node}
+       */
+      moveBefore(node, referenceNode) {
+        // @ts-ignore - use new moveBefore feature
+        return this.realParentNode.moveBefore(node, referenceNode);
+      }
+
+      /**
+       * for later use with populateIdMapWithTree to halt upwards iteration
+       * @returns {Node}
+       */
+      get __idiomorphRoot() {
+        return this.originalNode;
+      }
     }
 
     /**
