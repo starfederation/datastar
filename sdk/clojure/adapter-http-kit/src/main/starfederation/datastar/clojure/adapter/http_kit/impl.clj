@@ -70,7 +70,9 @@
     (u/lock! lock
       (try
         (send! event-type data-lines opts)
-        (catch IOException _ false)
+        (catch IOException _
+          (p/close-sse! this)
+          false)
         (catch Exception e
           (throw (ex-info "Error sending SSE event"
                           {:sse-gen this
