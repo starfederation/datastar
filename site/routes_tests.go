@@ -37,6 +37,8 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "checkbox_value"},
 				{ID: "checkbox_value_checked"},
 				{ID: "custom_plugin"},
+				{ID: "indicator"},
+				{ID: "indicator_element_removed"},
 				{ID: "input_array"},
 				{ID: "input_signal"},
 				{ID: "input_value"},
@@ -108,6 +110,8 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 		})
 
 		if err := errors.Join(
+			setupTestsIndicator(testsRouter),
+			setupTestsIndicatorElementRemoved(testsRouter),
 			setupTestsMergeFragment(testsRouter),
 			setupTestsMergeFragmentOnLoad(testsRouter),
 			setupTestsMergeFragmentSignals(testsRouter),

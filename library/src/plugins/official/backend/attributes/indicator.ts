@@ -41,6 +41,9 @@ export const Indicator: AttributePlugin = {
     document.addEventListener(DATASTAR_SSE_EVENT, watcher)
 
     return () => {
+      // Reset the signal
+      signal.value = false
+      
       document.removeEventListener(DATASTAR_SSE_EVENT, watcher)
     }
   },
