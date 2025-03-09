@@ -1,6 +1,6 @@
 # SSE, Buffering, Design considerations
 
-There some design work to do when using SSE, particularly around buffering.
+There is some design work to do when using SSE, particularly around buffering.
 
 When using a [ring](https://github.com/ring-clojure/ring) compliant adapter our
 SSE connection is a `java.io.OutputStream`. There are several considerations
