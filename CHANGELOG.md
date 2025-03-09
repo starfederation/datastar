@@ -13,3 +13,4 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 ### Fixed
 
 - Fixed the applying of plugins to give custom plugins a chance to load ([#740](https://github.com/starfederation/datastar/issues/740)).
+- Fixed a bug in which the indicator signal was not being reset when the element it was on was removed from the DOM ([#749](https://github.com/starfederation/datastar/issues/749)).
