@@ -1,6 +1,6 @@
 # Custom Builds
 
-Datastar consists of a core library and a set of plugins that provide the functionality that makes up the framework. The plugins have been curated to give you everything you need to build a modern web application, while avoiding bloat.
+Datastar consists of a core library and a set of plugins that provide the functionality that makes up the official framework. These plugins have been carefully curated to provided everything required to build modern web applications, while avoiding unnecessary bloat (don't expect the kitchen sink!).
 
 ## Custom Builds
 
