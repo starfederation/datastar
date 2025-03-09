@@ -108,7 +108,7 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 				{{
 					suggestedSignals := []string{}
 					for _, signal := range info.Expression.ValidSignals {
-						if strings.HasPrefix(signal, signalMatch) {
+						if signal == signalMatch || strings.HasPrefix(signal, signalMatch + ".") {
 							suggestedSignals = append(suggestedSignals, signal)
 						}
 					}
