@@ -26,6 +26,7 @@ func setupReferences(ctx context.Context, router chi.Router) error {
 				{ID: "sse_events"},
 				{ID: "sdks"},
 				{ID: "security"},
+				{ID: "custom_builds"},
 			},
 		},
 	}
