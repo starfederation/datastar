@@ -1,6 +1,6 @@
 # Indicator Element Removed
 
-Tests that the indicator signal is set to `false` when the element it was on is removed from the DOM.
+Tests that the indicator signal is set to `false` when a request completes and the element it was on is removed from the DOM.
 
 <div>
   <div id="content" data-signals-result="0"><button id="clickable" data-on-click="@get('/tests/indicator_element_removed/data')" data-indicator-fetching class="btn">Fetch</button></div>
