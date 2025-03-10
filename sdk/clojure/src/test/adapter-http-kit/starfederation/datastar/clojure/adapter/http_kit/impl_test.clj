@@ -14,6 +14,7 @@
                     !ch-open?
                     !on-close]
   hk-server/Channel
+  ;; websocket stuff
   (open? [_] @!ch-open?)
   (websocket? [_] false)
 
@@ -38,7 +39,7 @@
   (send! [this data close-after-send?]
     (cond
       (string? data)
-      (let [^OutputStreamWriter osw (ac/->os-writer baos {})]
+      (let [^OutputStreamWriter osw (ac/->os-writer baos)]
         (doto osw
           (.append (str data))
           (.flush)))
@@ -80,20 +81,18 @@
 
 
 (defdescribe simple-test
-  (it "We can send events with a using temp buffers"
+  (it "We can send events using a temp buffer"
     (send-SSE-event {}))
  
-  (it "We can send events with a using a persistent buffered reader"
-    (send-SSE-event {ac/hold-write-buff? true}))
+  (it "We can send events using a persistent buffered reader"
+    (send-SSE-event {ac/write-profile ac/buffered-writer-profile}))
    
-  (it "We can send gziped events with a using temp buffers"
-    (send-SSE-event {ac/gzip? true}))
+  (it "We can send gziped events using a temp buffer"
+    (send-SSE-event {ac/write-profile ac/gzip-profile :gzip? true}))
  
-  (it "We can send gziped events with a using a persistent buffered reader"
-    (send-SSE-event {ac/gzip? true
-                     ac/hold-write-buff? true})))
+  (it "We can send gziped events using a persistent buffered reader"
+    (send-SSE-event {ac/write-profile ac/gzip-buffered-writer-profile :gzip? true})))
  
-
 
 (comment
   (require '[lazytest.repl :as ltr])

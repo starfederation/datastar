@@ -32,7 +32,7 @@
   (-> ba
       ->ba
       (ByteArrayInputStream.)
-      (cond-> (ac/gzip? opts) (GZIPInputStream.))
+      (cond-> (:gzip? opts) (GZIPInputStream.))
       (->input-stream-reader)
       (BufferedReader.)
       (slurp)))
@@ -50,10 +50,14 @@
 ;; -----------------------------------------------------------------------------
 ;; Test helpers
 ;; -----------------------------------------------------------------------------
-(defn ->machinery [opts]
-  (let [^ByteArrayOutputStream baos (ByteArrayOutputStream.)]
-    (assoc (ac/->write-machinery baos opts)
-           :baos baos)))
+(defn ->machinery [write-profile]
+  (let [^ByteArrayOutputStream baos (ByteArrayOutputStream.)
+        {write! ac/write-to-buffered-writer!
+         wrap   ac/wrap-output-stream} write-profile
+        writer (wrap baos)]
+    {:write! write!
+     :writer writer
+     :baos baos}))
 
 (defn get-baos ^ByteArrayOutputStream [machinery]
   (:baos machinery))
@@ -72,14 +76,14 @@
 ;; -----------------------------------------------------------------------------
 ;; Tests
 ;; -----------------------------------------------------------------------------
-(defn simple-round-trip [opts]
+(defn simple-round-trip [write-profile]
   (let [!res (atom nil)
-        machinery (->machinery opts)
+        machinery (->machinery write-profile)
         baos (get-baos machinery)]
     (with-open [_baos baos
                 writer (get-writer machinery)]
       (append-then-flush writer "some text"))
-    (reset! !res (-> baos .toByteArray (read-bytes opts)))
+    (reset! !res (-> baos .toByteArray (read-bytes write-profile)))
     (expect (= @!res "some text"))))
 
 
@@ -90,10 +94,10 @@
                 writer (get-writer machinery)]
 
       (append-then-flush writer "some text")
-      (swap! !res conj (-> baos .toByteArray (read-bytes {})))
+      (swap! !res conj (-> baos .toByteArray (read-bytes opts)))
 
       (append-then-flush writer "some other text")
-      (swap! !res conj (-> baos .toByteArray (read-bytes {}))))
+      (swap! !res conj (-> baos .toByteArray (read-bytes opts))))
 
     (expect (= @!res ["some text" "some textsome other text"]))))
 
@@ -105,42 +109,43 @@
                 writer (get-writer machinery)]
 
       (append-then-flush writer "some text")
-      (swap! !res conj (-> baos .toByteArray (read-bytes {})))
+      (swap! !res conj (-> baos .toByteArray (read-bytes opts)))
 
       (.reset baos)
 
       (append-then-flush writer "some other text")
-      (swap! !res conj (-> baos .toByteArray (read-bytes {}))))
+      (swap! !res conj (-> baos .toByteArray (read-bytes opts))))
     (expect (= @!res ["some text" "some other text"]))))
 
 
 (defdescribe normal
   (describe "Writing of text without compression"
     (specify "We can do a simple round trip"
-      (simple-round-trip {}))
+      (simple-round-trip ac/basic-profile))
 
 
     (describe "We need to be careful about reseting the ouput stream"
       (specify "Without reset"
-        (resetless-writes {}))
+        (resetless-writes ac/basic-profile))
 
       (specify "With reset"
-        (writes {})))))
+        (writes ac/basic-profile)))))
 
 
 (defdescribe gzip
   (describe "Writing of text with compression"
     (specify "We can do a simple round trip"
-      (simple-round-trip {ac/gzip? true}))
+      (simple-round-trip (assoc ac/gzip-profile
+                                :gzip? true)))
 
     (specify "We can compress several messages"
-      (let [machinery (->machinery {ac/gzip? true})
+      (let [machinery (->machinery ac/gzip-profile)
             baos (get-baos machinery)
             !res (atom [])]
           (with-open [writer (get-writer machinery)]
             (append-then-flush writer "some text")
             (append-then-flush writer "some other text"))
-          (reset! !res (-> baos .toByteArray (read-bytes {ac/gzip? true})))
+          (reset! !res (-> baos .toByteArray (read-bytes {:gzip? true})))
           (expect (= @!res "some textsome other text"))))))
 
 

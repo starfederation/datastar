@@ -65,8 +65,8 @@ Here are some solutions for buffering the writes:
 | 3        | no direct support in the jvm, gc _recycling_ maybe be better, needs to be tuned |
 
 > [!note]
-> When it comes to compression the `java.util.zip.GZIPOutputStream` is
-> another buffer
+> An `OutputStream` compression wrapper comes with an internal buffer and a
+> context window that will both allocate and retain memory.
 
 > [!important]
 > A `ByteArrayOutputStream` is also another buffer, it doesn't shrink in size
@@ -76,16 +76,11 @@ Here are some solutions for buffering the writes:
 
 ### Considerations
 
-There is too much ground to cover for a generic API. Some ring adapters are
-partially compliant and provide us with other mechanisms than an
-`OutputStream`. Buffer pooling isn't really part of the SDK, it would mean
-adding a dependency to the SDK and I haven't found a ready made solution anyway.
-
-The good news is since we separate the SDK's public API from the ring specific
-implementations with a protocol, a user can make adapters that fit exactly
-their needs.
-
-The SDK will provide some tools to help do this as well as sensible defaults.
+There is too much ground to cover for a truly generic API. Some ring adapters
+are partially compliant with the ring spec and provide us with other mechanisms
+than an `OutputStream` to materialize the SSE connection. Buffer pooling isn't
+really part of the SDK. Going that route would mean adding a dependency to the
+SDK and I haven't found a ready made solution anyway.
 
 ### Current SDK implementation
 
@@ -105,85 +100,85 @@ Datastar's specific SSE events.
 
 ##### `starfederation.datastar.clojure.adapter.common`
 
-This namespace provides the tools to implement the adapters IO logic using
-the persistent buffer solution or the temporary buffer one. Here a permanent
-buffer is a `BufferedWriter` that will be kept around for as long as the SSE
-connection is open. A temporary buffer is a `StringBuilder` that is used to
-assemble the event's text and is discarded as soon as the event's text is done
-being concatenated.
+This namespace provides helpers we use to build the SSE machinery for ring
+adapters. It mainly provides a mechanims called "writer profiles" to allow
+a user to configure the way the SSE connections should behave with regards
+to Buffering and compression.
+
+Let's say we want to have a handler using gzip compression with a temporary
+write buff strategy.
+
+We can use the functions provided by in this namespace to make such a
+write profile:
+
+```clojure
+(require
+  '[starfederation.datastar.clojure.adapter.common :as ac])
+
+(def my-write-profile
+  {ac/wrap-output-stream (fn [os] (-> os ac/->gzip-os ac/->os-writer))
+   ac/write! (ac/->write-with-temp-buffer!)
+   ac/content-encoding ac/gzip-content-encoding})
+
+```
+
+Then when using the `->sse-response` function we can do:
+
+```clojure
+(require
+  '[starfederation.datastar.clojure.api :as d*]
+  '[starfederation.datastar.clojure.adapter.ring :refer [->sse-response]])
+
+(defn handler [req]
+  (->sse-response req
+    {ac/write-profile my-write-profile ;; note the use of the write profile here
+     :on-open
+     (fn [sse]
+       (d*/with-open-sse sse
+         (d*/merge-fragment! sse "some big fragment")))}))
+```
+
+Now to specify buffer sizes we can make a profile like this:
+
+```clojure
+
+(def my-specific-write-profile
+  {ac/wrap-output-stream
+   (fn [os] (-> os
+                (ac/->gzip-os 1024) ;; changing the gzip os buffer size
+                ac/->os-writer))
+
+   ac/write! (ac/->write-with-temp-buffer! 16384);; initial size of the StringBuilder
+   ac/content-encoding ac/gzip-content-encoding})
+
+```
+
+This also allows for plugable compression algorithms as long as they work like
+java's `java.util.zip.GZIPOutputStream`.
+
+#### SDK provided write profiles
+
+The SDK tries to provide sensible defaults. There are write profiles provided:
+
+| profile                      | buffering strategy | compression | write! helper               |
+| ---------------------------- | ------------------ | ----------- | --------------------------- |
+| basic-profile                | 2                  | no          | `->write-with-temp-buffer!` |
+| buffered-writer-profile      | 1                  | yes         | `write-to-buffered-writer!` |
+| gzip-profile                 | 2                  | no          | `->write-with-temp-buffer!` |
+| gzip-buffered-writer-profile | 1                  | yes         | `write-to-buffered-writer!` |
+
+The `StringBuilder` default size is modeled after java's `BufferedWriter`,
+that is 8192 bytes. The rest of the buffer sizes are java's defaults.
 
 > [!note]
-> In all cases we hold onto the `GZIPOuputStream` when using compression.
-> In other words, compression means at least 1 permanent buffer per connection.
-
-The main function used by adapters is `->write-machinery`. It takes an
-`OutputStream` and a map of options. It returns a map of 2 keys:
-
-| returned key |                                                                                            |
-| ------------ | ------------------------------------------------------------------------------------------ |
-| `:writer`    | the wrapped outputstream depending on the options                                          |
-| `:write!`    | a function that writes a SSE event to an output stream using a specific buffering strategy |
-
-The options of the `->write-machinery` functions are:
-
-|                    |                                                                   |
-| ------------------ | ----------------------------------------------------------------- |
-| `buffer-size`      | Size of the `java.lang.Appendable` used to write the event's text |
-| `hold-write-buff?` | Whether to use a persistent buffer (true) or a temp one (false)   |
-| `charset`          | the encoding for the SSE stream                                   |
-| `gzip?`            | whether to gzip the stream                                        |
-| `gzip-buffer-size` | buffer size for the GZIPOuputStream used under the hood           |
-
-These options are available in the `->sse-response` function for of each
-adapter. Each adapter can interpret these options a bit differently though.
-
-#### Adapters specific implementations
-
-##### Ring
-
-With the generic ring adapter we always work with an `OutputStream`.
-The implementation is straight forward. Depending on the options we wrap the
-provided `OutputStream` with:
-
-- a `GZIPOuputStream`: if `gzip?` is `true`, the buffer size can be controlled
-  with `gzip-buffer-size`
-- an `OutputStreamWriter` with a UTF-8 encoding or the provided `charset`
-- a `BufferedWriter` if `hold-write-buff?` is `true`, its size can be set with
-  `buffer-size`
-
-For the generated `write!` function we write to the `BufferedWriter`
-if `hold-write-buff?` is true. If not we assemble the event's text in a
-`StringBuilder` (initial capacity can be determined with `buffer-size`) and
-write the result in the `OutputStreamWriter` directly.
-
-> [!note]
-> The wrapped `OutputStreamWriter` lives as long as the SSE generator.
-> `hold-write-buff?` determines if we use a the persistent or the temporary
-> buffer solution.
-
-##### Http-kit
-
-Http-kit doesn't use an `OutputStream` as it's IO primitive. Our adapter is
-then implemented in 2 ways depending on the value of the `gzip?` option.
-
-- when `gzip?` is `false`, we concatenate event with using `StringBuilder` and
-  send it with `org.http-kit.server/send!`.
-  - `charset` has no effect, jvm default charset is used
-  - `hold-write-buff?` has no effect
-  - `buffer-size` controls the initial capacity of the `StringBuilder`
-- when `gzip?` is `true` we wrap a `ByteArrayOutputStream` with a
-  `GZIPOuputStream` and a `OutputStreamWriter`. When an event is written the
-  compressed data is taken from the `ByteArrayOutputStream` and sent via
-  Http-kit sending function.
-  Here the options work similarly to the ring adapter:
-  - `buffer-size` sets the size of the `BufferedWriter` or the `StringBuilder`
-  - `hold-write-buff?` dictates whether we use a `BufferedWriter` or not
-  - `gzip-buffer-size` sets the size of the `GZIPOuputStream`'s buffer
-  - `charset` sets the encoding used for the `OutputStreamWriter`
+> Http-kit doesn't use an `OutputStream` as its IO primitive, the SDK implement
+> the basic profile a bit differently.
 
 ## Beyond the SDK
 
-The SDK tries to provide sensible defaults. Still the strategies provided may
-not be optimal for your use case. The hope is that the source code and the docs
-provide sufficient material for implementing other strategies in your own
-adapters.
+If the write profile system doesn't provide enough control there is still
+the possibility to implement adapters using the
+`starfederation.datastar.clojure.protocols/SSEGenerator` and control everything.
+
+The hope is that there is enough material between the documentation and the
+source code to make this relatively easy.

@@ -1,10 +1,60 @@
-(ns ^{:doc "
-Namespace containing the shared code for each adapter.
+(ns starfederation.datastar.clojure.adapter.common
+  "
+  Namespace containing the shared code for each adapter.
 
-It contains helpers for working with output streams and assembling SSE sending
-function following several strategies.
-      "}
-  starfederation.datastar.clojure.adapter.common
+  It contains helpers for working with [[OutputStreams]] and assembling SSE
+  sending function using several strategies and managing exceptions in the
+  adapters.
+
+  The main concept here is what we call \"write profiles\". A write profile is
+  a map of 3 keys:
+  - [[wrap-output-stream]]
+  - [[write!]]
+  - [[content-encoding]]
+
+  With this 3 keys we can control buffering aspects of our SSE connction and
+  and compression functionality.
+
+  Here is an example profile which uses gzip and temporary buffers to
+  concatenate SSE event text:
+
+  ```clojure
+  (def gzip-profile
+    {wrap-output-stream (fn[^OutputStream os] (-> os ->gzip-os ->os-writer))
+     content-encoding gzip-content-encoding
+     write! (->write-with-temp-buffer!)})
+  ```
+
+  The `wrap-output-stream` function will use a [[GZIPOutputStream]] and an
+  [[OutputStreamWriter]] constructed with the [[->gzip-os]] and [[->os-writer]]
+  helpers.
+
+  To go with this we use a `write!` function constructed with
+  [[->write-with-temp-buffer!]].
+
+  If we wanted specific buffer sizes we could do:
+
+  ```clojure
+  (def gzip-profile
+    {wrap-output-stream (fn[^OutputStream os]
+                          (-> os
+                              (->gzip-os 1024)
+                              ->os-writer))
+     content-encoding gzip-content-encoding
+     write! (->write-with-temp-buffer! 4096)})
+  ```
+
+  The output stream wrapping helpers are:
+  - [[->gzip-os]]
+  - [[->os-writer]]
+  - [[->buffered-writer]]
+
+  The write function helper to go with them are:
+  - [[->write-with-temp-buffer!]]
+  - [[write-to-buffered-writer!]]
+
+  See the rest of the docstrings for more details.
+"
   (:refer-clojure :exclude [flush])
   (:require
     [starfederation.datastar.clojure.api.sse :as sse]
@@ -18,164 +68,151 @@ function following several strategies.
 ;; -----------------------------------------------------------------------------
 ;; Advanced SSE options
 ;; -----------------------------------------------------------------------------
-(def buffer-size
-  "SSE option:
+(def write-profile
+  "SSE option key:
 
-  Size of the [[BufferedWriter]] buffer or initial size for the StringBuilder
-  constructing the SSE event's text (see [[hold-write-buff?]])
-
-  Defaults to either java's default for [[BufferedWriter]]
-  or [[default-write-buffer-size]] for initial StringBuilder capacity."
-  :d*.sse/buffer-size)
-
-
-(def hold-write-buff?
-  "SSE option:
-
-  Whether to keep a write buffer around
-  - if true: the constructed `write!` fn hold onto a [[BufferedWriter]] for the
-    duration of the SSE connection and writes all events to it.
-  - if false: for each event sent a [[StringBuilder]] is used to write the
-    event. This builder is then discarded when the event is sent.
-
-  Defaults to false."
-  :d*.sse/hold-write-buff?)
-
-
-(def charset
-  "SSE option:
-  [[Charset]] controling the encoding of the SSE stream.
-
-  Defaults to [[StandardCharsets/UTF_8]]"
-  :d*.sse/charset)
-
-
-
-(def gzip?
-  "SSE option:
-
-  Whether to compress the SSE event stream."
-  :d*.sse/gzip?)
-
-
-(def gzip-buffer-size
-  "SSE option:
-  Size of the buffer used by [[GZIPOutputStream]]
- 
-  Default to the GZIPOutputStream's default
+  This option allows a user to control the way SSE events are assembled and
+  sent. It take a write profile which is a map whose keys are:
+  - [[wrap-output-stream]]
+  - [[write!]]
+  - [[content-encoding]] (optional if you don't use compression)
   "
-  :d*.sse/gzip-buffer-size)
+  :d*.sse/write-profile)
+
+
+(def wrap-output-stream
+  "SSE write profile key:
+
+  A function that wraps an OutputStream like:
+  `(fn [os] (clojure.java.io/writer os))`
+
+  This function will be used to wrap the [[OutputStream]] used for a SSE
+  connection.
+
+  It allows you to add compression and buffering to suit you needs.
+
+  The SDK provides utilities to implement such a wrapping function, see:
+  - [[->gzip-os]]
+  - [[->os-writer]]
+  - [[->buffered-writer]]
+  "
+  :d*.sse.write-profile/wrap-output-stream)
+
+
+(def write!
+  "SSE write profile option:
+
+  A function that writes to a [[java.lang.Appendable]]. It should go in tandem
+  with the way you wrap the [[OutputStream]].
+
+  The SDK provide pre-made write function, see:
+  - [[->write-with-temp-buffer!]]
+  - [[write-to-buffered-writer!]]
+  "
+  :d*.sse.write-profile/write!)
+
+
+(def content-encoding
+  "SSE write profile option:
+
+  A string value for the Content-Encoding HTTP header. When using gzip
+  compression the value should be [[gzip-content-encoding]].
+  "
+  :d*.sse.write-profile/content-encoding)
 
 
 ;; -----------------------------------------------------------------------------
 ;; HTTP headers helper
 ;; -----------------------------------------------------------------------------
 (defn headers
-  " Same as [[sse/headers]] with the added responsibility to add the 
-  Content-Encoding header when the `gzip?` option is true.
-  "
+  "Same as [[sse/headers]] with the added responsibility to add the
+  Content-Encoding header based on a write profile."
   [ring-request & {:as opts}]
-  (-> (transient {})
-      (u/merge-transient! sse/base-SSE-headers)
-      (cond->
-        (sse/http1? ring-request) (assoc! "Connection"       "keep-alive",)
-        (gzip? opts)              (assoc! "Content-Encoding" "gzip"))
-      (u/merge-transient! (:headers opts))
-      persistent!))
+  (let [encoding (-> opts write-profile content-encoding)]
+    (-> (transient {})
+        (u/merge-transient! sse/base-SSE-headers)
+        (cond->
+          (sse/http1? ring-request) (assoc! "Connection"       "keep-alive",)
+          encoding                  (assoc! "Content-Encoding" encoding))
+        (u/merge-transient! (:headers opts))
+        persistent!)))
 
 
 (comment
   (headers {:protocol "HTTP/2"} {})
-  (headers {:protocol "HTTP/2"} {gzip? true}))
+  (headers {:protocol "HTTP/2"} {write-profile {content-encoding "br"}}))
 
 ;; -----------------------------------------------------------------------------
-;; OutputStream wrapping
+;; Utilities for wrapping an OutputStream
 ;; -----------------------------------------------------------------------------
 (defn ->gzip-os
-  "Make a [[GZIPOutputStream]] an [[OutputStream]] `os`.
+  "Make a GZIPOutputStream from an OutputStream `os` and an optional
+  `buffer-size`. The syncFlush always set to true.
 
-  Opts keys:
-  - see [[gzip?]], if false returns `os`
-  - see [[gzip-buffer-size]]"
-  [^OutputStream os opts]
-  (if-let [s (gzip-buffer-size opts)]
-    (GZIPOutputStream. os s true)
-    (GZIPOutputStream. os true)))
+  Default buffer-size is the GZIPOutputStream's own.
+  "
+  ([^OutputStream os]
+   (GZIPOutputStream. os true))
+  ([^OutputStream os buffer-size]
+   (GZIPOutputStream. os buffer-size true)))
 
 
 (defn ->os-writer
-  "Make a [[OutputStreamWriter]] from another [[OutputStreamWriter]] `os`.
+  "Make an OutputStreamWriter from an OutputStream `os` and an optional
+  [[Charset]] `charset`.
 
-  Opts:
-  - see [[charset]]
+  Defaut charset is [[StandardCharsets/UTF_8]]
   "
-  [^OutputStream os opts]
-  (if-let [^Charset c (charset opts)]
-    (OutputStreamWriter. os c)
-    (OutputStreamWriter. os StandardCharsets/UTF_8)))
+  ([^OutputStream os]
+   (OutputStreamWriter. os StandardCharsets/UTF_8))
+  ([^OutputStream os ^Charset charset]
+   (OutputStreamWriter. os charset)))
 
 
 (defn ->buffered-writer
-  "Make a [[BufferedWriter]] from an [[OutputStreamWriter]] `osw`.
-  Opts
-  - see [[buffer-size]]
+  "Make an BufferedWriter from an OutputStreamWriter `osw` and an optional
+  `buffer-size`.
+
+  Default buffer-size is the BufferedWriter's own.
   "
-  [osw opts]
-  (if-let [s (buffer-size opts)]
-    (BufferedWriter. osw s)
-    (BufferedWriter. osw)))
+  ([osw]
+   (BufferedWriter. osw))
+  ([osw buffer-size]
+   (BufferedWriter. osw buffer-size)))
 
-
-(defn wrap-output-stream
-  "Wrap the outputstream use for an SSE connections with the following:
-
-  - [[->gzip-os]]
-  - [[->os-writer]]
-  - [[->buffered-writer]]
-
-  The options in the map control buffer size and wheter some wrapper is applied.
-  See
-  - [[gzip?]]
-  - [[gzip-buffer-size]]
-  - [[charset]]
-  - [[hold-write-buff?]]
-  - [[buffer-size]]
-  "
-  [os opts]
-  (cond-> os
-      (gzip? opts)            (->gzip-os opts)
-      true                    (->os-writer opts)
-      (hold-write-buff? opts) (->buffered-writer opts)))
 
 ;; -----------------------------------------------------------------------------
 ;; Writing utilities
 ;; -----------------------------------------------------------------------------
-(defn build-event-str
-  "Build the SSE event string using a [[StringBuilder]]."
-  ^String [buffer-size event-type data-lines opts]
-  (-> (StringBuilder. (int buffer-size))
-      (sse/write-event! event-type data-lines opts)
-      str))
-
-
 (def default-write-buffer-size 8192)
+
+
+(defn ->build-event-str
+  "Make a function that will assemble a SSE event using a StringBuiler and
+  return the concatenated string."
+  ([]
+   (->build-event-str default-write-buffer-size))
+  ([buffer-size]
+   (fn build-event-str [event-type data-lines opts]
+     (-> (StringBuilder. (int buffer-size))
+         (sse/write-event! event-type data-lines opts)
+         str))))
+
 
 (defn ->write-with-temp-buffer!
   "Make a function that will assemble a SSE event using a [[StringBuilder]] and
-  then will write the resulting string to an [[OutputStreamWriter]].
-
-  Flushes immediately after writing the event."
-  [->sse-response-opts]
-  (let [buffer-size (buffer-size ->sse-response-opts default-write-buffer-size)]
-    (fn write-with-temp-buffer! [^Writer writer event-type data-lines opts]
-      (let [event-str (build-event-str buffer-size event-type data-lines opts)]
-        (.append writer event-str)))))
+  then will write the resulting string to an [[OutputStreamWriter]]. "
+  ([]
+   (->write-with-temp-buffer! default-write-buffer-size))
+  ([buffer-size]
+   (let [build-event (->build-event-str buffer-size)]
+     (fn write-with-temp-buffer! [^Writer writer event-type data-lines opts]
+       (let [event-str (build-event event-type data-lines opts)]
+         (.append writer ^String event-str))))))
 
 
 (defn write-to-buffered-writer!
-  "Write a SSE event to a stream using a [[BufferedWriter]].
-
-  Flushes immediately after writing the event."
+  "Write a SSE event to a stream using a [[BufferedWriter]]."
   [^BufferedWriter writer event-type data-lines opts]
   (sse/write-event! writer event-type data-lines opts))
 
@@ -185,29 +222,37 @@ function following several strategies.
   [^Flushable f]
   (.flush f))
 
+;; -----------------------------------------------------------------------------
+;; SDK provided write profiles
+;; -----------------------------------------------------------------------------
+(def gzip-content-encoding "gzip")
 
-(defn ->write-machinery
-  "Return a map containing the machinery to write SSE event based on an
-  [[OutputStream]] `os` and a map of option.
+(def basic-profile
+  "Basic write profile using temporary [[StringBuilder]]s and no compression."
+  {wrap-output-stream (fn[^OutputStream os] (-> os ->os-writer))
+   write! (->write-with-temp-buffer!)})
 
-  Option keys:
-  - [[gzip?]]
-  - [[gzip-buffer-size]]
-  - [[charset]]
-  - [[hold-write-buff?]]
-  - [[buffer-size]]
+(def buffered-writer-profile
+  "Write profile using a permanent [[BufferedWriter]] and no compression."
+  {wrap-output-stream (fn[^OutputStream os] (-> os ->os-writer ->buffered-writer))
+   write! (->write-with-temp-buffer!)})
 
-  The returned map has 2 keys:
-  - `:writer` the wrapped `os` using the [[wrap-output-stream]] fn.
-  - `:write!` a function that know how to write to the wrapped stream.
-  "
-  [os ->sse-response-opts]
-  {:writer (wrap-output-stream os ->sse-response-opts)
-   :write! (if (hold-write-buff? ->sse-response-opts)
-             write-to-buffered-writer!
-             (->write-with-temp-buffer! ->sse-response-opts))})
+(def gzip-profile
+  "Write profile using temporary [[StringBuilder]]s and gzip compression."
+  {wrap-output-stream (fn[^OutputStream os] (-> os ->gzip-os ->os-writer))
+   content-encoding gzip-content-encoding
+   write! (->write-with-temp-buffer!)})
+
+(def gzip-buffered-writer-profile
+  "Write profile using a permanent [[BufferedWriter]] and gzip compression."
+  {wrap-output-stream (fn[^OutputStream os] (-> os ->gzip-os ->os-writer ->buffered-writer))
+   content-encoding gzip-content-encoding
+   write! write-to-buffered-writer!})
 
 
+;; -----------------------------------------------------------------------------
+;; Exception handling / Closing sse helpers
+;; -----------------------------------------------------------------------------
 (defn try-closing
   "Run a thunk `f` that closes some resources. Catches exceptions and returns
   them wrapped in a [[ex-info]] with the message `error-msg`."

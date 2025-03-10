@@ -6,18 +6,21 @@
     [starfederation.datastar.clojure.utils :refer [def-clone]]))
 
 
-(def-clone buffer-size ac/buffer-size)
-(def-clone hold-write-buff? ac/hold-write-buff?)
-(def-clone gzip? ac/gzip?)
-(def-clone gzip-buffer-size ac/gzip-buffer-size)
-(def-clone charset ac/charset)
+(def-clone write-profile ac/write-profile)
+
+
+(def-clone basic-profile                impl/basic-profile)
+(def-clone buffered-writer-profile      ac/buffered-writer-profile)
+(def-clone gzip-profile                 ac/gzip-profile)
+(def-clone gzip-buffered-writer-profile ac/gzip-buffered-writer-profile)
+
 
 
 (defn ->sse-response
-  "Make a Ring like response that works with Http-kit.
+  "Make a Ring like response that will start a SSE stream.
 
-  An empty response containing a 200 status code, the the SSE specific headers
-  are sent automatically before `on-open` is called.
+  The status code and the the SSE specific headers are sent automatically
+  before `on-open` is called.
 
   Note that the SSE connection stays opened util you close it.
 
@@ -28,21 +31,17 @@
     generator is ready to send.
   - `:on-close`: callback `(fn [sse-gen status-code]...)` called when the
     underlying Http-kit AsyncChannel is closed.
+  - [[write-profile]]: write profile for the connection
+    defaults to [[basic-profile]]
 
+  When it comes to write profiles, the SDK provides:
+  - [[basic-profile]]
+  - [[buffered-writer-profile]]
+  - [[gzip-profile]]
+  - [[gzip-buffered-writer-profile]]
 
-  SSE advanced options:
-  see:
-  - [[buffer-size]]
-  - [[hold-write-buff?]]
-  - [[gzip?]]
-  - [[gzip-buffer-size]]
-  - [[charset]]
-
-  Note that [hold-write-buff?]] only works when [[gzip?]] is true. It is always
-  considered false otherwise.
-
-  Same for [[charset]], outside of compression the encoding
-  of the events will be the default encoding of java strings.
+  You can also take a look at the `starfederation.datastar.clojure.adapter.common`
+  namespace if you want to write your own profiles.
   "
   [ring-request {:keys [on-open on-close] :as opts}]
   (let [future-send! (promise)

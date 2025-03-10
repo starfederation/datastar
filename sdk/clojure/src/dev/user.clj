@@ -22,6 +22,11 @@
     (flush)))
 
 
+(defmacro force-out [& body]
+  `(binding [*out* (java.io.OutputStreamWriter. System/out)]
+     ~@body))
+ 
+
 (comment
   (mdev/start! {:exception true})
   (mdev/stop!)

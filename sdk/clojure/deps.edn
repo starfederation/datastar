@@ -1,7 +1,8 @@
 {:paths ["sdk/src/main"]
  
- :deps {io.github.paintparty/fireworks {:mvn/version "0.10.4"}
-        com.taoensso/telemere          {:mvn/version "1.0.0-RC3"}}
+ :deps {io.github.paintparty/fireworks      {:mvn/version "0.10.4"}
+        com.taoensso/telemere               {:mvn/version "1.0.0-RC3"}
+        com.aayushatharva.brotli4j/brotli4j {:mvn/version "1.18.0"}}
 
  :aliases
  {:repl {:extra-paths ["src/dev"]

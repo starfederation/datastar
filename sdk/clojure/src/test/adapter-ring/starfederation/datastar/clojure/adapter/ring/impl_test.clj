@@ -115,15 +115,15 @@
 ;; -----------------------------------------------------------------------------
 ;; Basic sending of a SSE event without any server
 ;; -----------------------------------------------------------------------------
-(defn send-SSE-event [request]
+(defn send-SSE-event [response]
   (let [baos (ByteArrayOutputStream.)]
-    (with-open [sse-gen (impl/->sse-gen (fn [& _]))
+    (with-open [sse-gen (impl/->sse-gen)
                 baos baos]
-      (p/write-body-to-stream sse-gen request baos)
+      (p/write-body-to-stream sse-gen response baos)
       (d*/merge-fragment! sse-gen "msg" {}))
 
     (expect
-      (= (read-bytes baos (::impl/opts request))
+      (= (read-bytes baos (::impl/opts response))
          "event: datastar-merge-fragments\ndata: fragments msg\n\n\n"))))
 
 
@@ -132,14 +132,15 @@
     (send-SSE-event {}))
  
   (it "can send events with a using a persistent buffered reader"
-    (send-SSE-event {::impl/opts {ac/hold-write-buff? true}}))
+    (send-SSE-event {::impl/opts {ac/write-profile ac/buffered-writer-profile}}))
   
   (it "can send gziped events with a using temp buffers"
-    (send-SSE-event {::impl/opts {ac/gzip? true}}))
+    (send-SSE-event {::impl/opts {ac/write-profile ac/gzip-profile
+                                  :gzip? true}}))
  
   (it "can send gziped events with a using a persistent buffered reader"
-    (send-SSE-event {::impl/opts {ac/gzip? true
-                                  ac/hold-write-buff? true}})))
+    (send-SSE-event {::impl/opts {ac/write-profile ac/gzip-buffered-writer-profile
+                                  :gzip? true}})))
  
 
 

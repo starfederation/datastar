@@ -9,6 +9,10 @@
     [java.io ByteArrayOutputStream Closeable IOException]))
 
 
+(def basic-profile
+  {ac/write! (ac/->build-event-str)})
+
+
 ;; -----------------------------------------------------------------------------
 ;; Sending the headers
 ;; -----------------------------------------------------------------------------
@@ -24,13 +28,12 @@
 ;; -----------------------------------------------------------------------------
 ;; Sending events machinery
 ;; -----------------------------------------------------------------------------
-(defn ->send-simple [ch opts]
-  (let [buffer-size (or (ac/buffer-size opts)
-                        ac/default-write-buffer-size)]
+(defn ->send-simple [ch write-profile]
+  (let [write! (ac/write! write-profile)]
     (fn
       ([])
       ([event-type data-lines opts]
-       (let [event (ac/build-event-str buffer-size event-type data-lines opts)]
+       (let [event (write! event-type data-lines opts)]
          (hk-server/send! ch event false))))))
 
 
@@ -40,9 +43,11 @@
     (hk-server/send! ch msg false)))
 
 
-(defn ->send-gzip [ch opts]
+(defn ->send-with-output-stream [ch write-profile]
   (let [^ByteArrayOutputStream baos (ByteArrayOutputStream.)
-        {:keys [writer write!]} (ac/->write-machinery baos opts)]
+        {wrap-os ac/wrap-output-stream
+         write! ac/write!} write-profile
+        writer (wrap-os baos)]
     (fn
       ([]
        ;; Close the writer first to finish the gzip process
@@ -56,10 +61,11 @@
 
 
 (defn ->send! [ch opts]
-  (if (or (ac/gzip? opts)
-          (ac/hold-write-buff? opts))
-    (->send-gzip ch opts)
-    (->send-simple ch opts)))
+  (let [write-profile (or (ac/write-profile opts)
+                          basic-profile)]
+    (if (ac/wrap-output-stream write-profile)
+      (->send-with-output-stream ch write-profile)
+      (->send-simple ch write-profile))))
 
 ;; -----------------------------------------------------------------------------
 ;; SSE gen

@@ -9,8 +9,13 @@
     java.util.concurrent.locks.ReentrantLock))
 
 
+(def default-write-profile ac/basic-profile)
+
+
 (defn ->send [os opts]
-  (let [{:keys [writer write!]} (ac/->write-machinery os opts)]
+  (let [{wrap ac/wrap-output-stream
+         write! ac/write!} (ac/write-profile opts default-write-profile)
+        writer (wrap os)]
     (fn
       ([]
        (.close ^Closeable writer))
@@ -27,7 +32,7 @@
                        ^ReentrantLock lock
                        ^:unsynchronized-mutable on-close]
   rp/StreamableResponseBody
-  (write-body-to-stream [this request output-stream]
+  (write-body-to-stream [this response output-stream]
     (.lock lock)
 
     ;; already initialized, unlock and throw, we are out
@@ -38,7 +43,9 @@
     (let [!error (volatile! nil)]
       (try
         ;; initializing the writing machinery
-        (set! send! (->send output-stream (::opts request)))
+        (set! send! (->send output-stream (::opts response)))
+        (when-let [cb (-> response ::opts :on-close)]
+          (set! on-close cb))
 
         ;; flushing the HTTP headers
         (.flush ^OutputStream output-stream)
@@ -56,7 +63,7 @@
           (if-let [e @!error]
             (throw e) ;; if error throw, the lock is already released
             ;; if all is ok call on-open, it can safely throw...
-            (when-let [on-open (-> request ::opts :on-open)]
+            (when-let [on-open (-> response ::opts :on-open)]
               (on-open this)))))))
  
   p/SSEGenerator
@@ -108,8 +115,8 @@
     (p/close-sse! this)))
 
 
-(defn ->sse-gen [on-close]
+(defn ->sse-gen []
   (SSEGenerator. nil
                  (ReentrantLock.)
-                 on-close))
+                 nil))
 

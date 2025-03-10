@@ -106,11 +106,10 @@
 
 
 
-(def handler-hk (->handler hk-gen/->sse-response hk-gen/gzip? true))
-(def handler-ring (->handler ring-gen/->sse-response ring-gen/gzip? true))
+(def handler-hk (->handler hk-gen/->sse-response  hk-gen/gzip-profile))
+(def handler-ring (->handler ring-gen/->sse-response ring-gen/gzip-profile))
 
 (comment
-  (user/reload!)
   :dbg
   :rec
   (u/clear-terminal!)
