@@ -7,7 +7,8 @@
 
 
 ;; This is a small experiment to determine the behaviour of
-;; ring jetty in the face of the client disconnecting
+;; Http-kit in the face of the client disconnecting
+;; Http-kit somehow detects closed connections on it's own
 
 (def !conn (atom nil))
 
@@ -47,9 +48,8 @@
 (comment
   (-> !conn deref d*/close-sse!)
   (send-tiny-event!)
-  (d*/console-log! @!conn "'toto'"))
+  (d*/console-log! @!conn "'toto'")
 
-(comment
   (u/clear-terminal!)
   (u/reboot-hk-server! #'handler))
 

@@ -42,12 +42,36 @@
     [starfederation.datastar.clojure.api.signals :as signals]
     [starfederation.datastar.clojure.api.scripts :as scripts]
     [starfederation.datastar.clojure.consts :as consts]
-    [starfederation.datastar.clojure.protocols :as p]))
-
+    [starfederation.datastar.clojure.protocols :as p]
+    [starfederation.datastar.clojure.utils :as u]))
 
 ;; -----------------------------------------------------------------------------
 ;; SSE generator management
 ;; -----------------------------------------------------------------------------
+(defmacro lock-sse!
+  "Hold onto the lock of a `sse-gen` while executing `body`. This allows for
+  preventing concurent sending of sse events. Sse generators use
+  [[java.util.concurrent.locks.ReentrantLock]] under the hood.
+
+  Ex:
+  ```clojure
+  (lock-sse! my-sse-gen
+             (merge-fragment! sse frags)
+             (merge-signals! sse signals))
+  ```
+  "
+  [sse-gen & body]
+  `(u/lock! (p/get-lock ~sse-gen) ~@body))
+
+
+(comment
+  (macroexpand-1
+    (macroexpand-1
+      '(lock-sse! my-sse-gen
+                  (merge-fragment! sse frags)
+                  (merge-signals! sse signals)))))
+
+
 (defn close-sse!
   "Close the connection of a sse generator."
   [sse-gen]
@@ -305,6 +329,11 @@
 
 (defn get-signals
   "Returns the signals json string from a ring request map.
+
+  The Datastar signals are read from:
+  - the `:query-params` key of of the ring request map for HTTP get requests
+  - the body of the request for other HTTP methods
+
   (Bring your own json parsing)"
   [ring-request]
   (signals/get-signals ring-request))

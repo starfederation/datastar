@@ -16,7 +16,10 @@
         (sse/write-event! event-type data-lines opts)
         str))
 
-  (close-sse! [_]))
+  (get-lock [_])
+
+  (close-sse! [_])
+  (sse-gen? [_] true))
 
 
 
@@ -34,15 +37,18 @@
                             (sse/write-event! event-type data-lines opts)
                             str))))
 
+  (get-lock [_] lock)
+
   (close-sse! [_]
     (u/lock! lock
       (vreset! !open? false)))
+
+  (sse-gen? [_] true)
 
   Closeable
   (close [this]
     (p/close-sse! this)))
 
-(java.util.ArrayList. 1)
 
 (defn ->sse-response
   "Fake a sse-response, the events sent with sse-gen during the
@@ -57,5 +63,4 @@
     {:status (or status 200)
      :headers (merge headers (sse/headers req))
      :body !rec}))
-
 

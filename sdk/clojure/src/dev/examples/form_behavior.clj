@@ -13,6 +13,8 @@
     [starfederation.datastar.clojure.api :as d*]))
 
 
+;; Trying out several way we might rightly and wrongly use html forms
+
 (defn button [form action-fn]
   (let [method (if (= action-fn d*/sse-get)
                  "get"

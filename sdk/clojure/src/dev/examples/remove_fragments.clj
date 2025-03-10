@@ -11,6 +11,8 @@
     [starfederation.datastar.clojure.consts :as consts]))
 
 
+;; Appending and removing fragments with the D* api
+
 (def page
   (h/html
     (c/page-scaffold
@@ -22,8 +24,6 @@
         "Send input"]
        [:br]
        [:ul {:id "list"}]])))
-
-
 
 
 (defn home [_]

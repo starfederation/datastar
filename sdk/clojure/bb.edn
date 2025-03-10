@@ -16,6 +16,7 @@
                         :malli-schemas]
                        [:test.paths/core-sdk
                         :test.paths/malli-schemas
+                        :test.paths/adapter-ring
                         :test.paths/adapter-http-kit
                         :test.paths/adapter-ring-jetty])
   
