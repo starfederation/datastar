@@ -41,7 +41,7 @@
       "signals {some other json}"]
 
   (->merge-signals "{some json}\n{some other json}"
-                   {common/only-if-missing :toto})
+                   {common/only-if-missing true})
   := ["onlyIfMissing true"
       "signals {some json}"
       "signals {some other json}"])
@@ -73,7 +73,6 @@
 (defn ->remove-signals [paths]
   (u/transient-> []
     (add-remove-signals-paths! paths)))
-
 
 (comment
   (->remove-signals ["foo.bar" "foo.baz" "bar"])

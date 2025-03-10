@@ -8,6 +8,7 @@
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response]]))
 
+;; Redirection example
 
 (def home-page
   (html

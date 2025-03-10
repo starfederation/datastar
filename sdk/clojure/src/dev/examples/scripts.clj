@@ -9,6 +9,7 @@
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.adapter.http-kit :as hk-gen]))
 
+;; Sending scripts and playing with auto-remove
 
 (def page
   (h/html
@@ -44,8 +45,6 @@
   (rr/ring-handler router
                    default-handler
                    {:middleware [reitit-params/parameters-middleware]}))
-
-
 
 
 (comment

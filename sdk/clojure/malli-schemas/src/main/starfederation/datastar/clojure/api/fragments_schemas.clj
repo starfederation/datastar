@@ -13,5 +13,5 @@
       [:-> cs/fragments-schema cs/merge-fragment-options-schemas cs/data-lines-schema])
 
 
-(m/=> starfederation.datastar.clojure.api.fragments/remove-fragment!
+(m/=> starfederation.datastar.clojure.api.fragments/->remove-fragment
       [:-> cs/selector-schema cs/remove-fragments-options-schemas cs/data-lines-schema])

@@ -18,6 +18,7 @@
 (def ^:dynamic *ctx* nil)
 
 
+#_{:clj-kondo/ignore true}
 (defn with-server-f
   "Http server around fixture.
 
@@ -165,9 +166,10 @@
      :handler handler}))
 
 
+#_{:clj-kondo/ignore true}
 (defn persistent-sse-f
   "Fixture for the persistent sse test. A server is set up and the state
-  needed to rung the test (see [setup-persistent-see-state])."
+  needed to run the test (see [[setup-persistent-see-state]])."
   [->sse-response server-opts]
   (lt/around [f]
     (let [{:keys [get-port]} server-opts
@@ -199,8 +201,9 @@
   (lt/expect (= (:status response) 200)))
 
 
-(def SSE-headers-1   (update-keys sse/SSE-headers-1  (comp keyword string/lower-case)))
-(def SSE-headers-2+ (update-keys sse/SSE-headers-2+ (comp keyword string/lower-case)))
+(def SSE-headers-1   (update-keys (sse/headers {})  (comp keyword string/lower-case)))
+#_{:clj-kondo/ignore true}
+(def SSE-headers-2+ (update-keys (sse/headers {:protocol "2"}) (comp keyword string/lower-case)))
 
 (defn p-sse-http1-headers-ok? [response]
   (lt/expect (mc/match? SSE-headers-1 (:headers response))))

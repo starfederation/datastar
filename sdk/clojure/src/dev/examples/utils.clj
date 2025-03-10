@@ -14,6 +14,11 @@
     (flush)))
 
 
+(defmacro force-out [& body]
+  `(binding [*out* (java.io.OutputStreamWriter. System/out)]
+     ~@body))
+ 
+
 (def ^:private bufSize 1024)
 (def read-json (charred/parse-json-fn {:async? false :bufsize bufSize}))
 

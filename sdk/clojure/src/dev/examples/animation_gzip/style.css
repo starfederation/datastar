@@ -1,0 +1,51 @@
+#main-content {
+  width: 70%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+}
+
+#right-pane {
+  width: 40%;
+}
+
+#controls {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+}
+
+h2 {
+  width: 50%;
+}
+
+.pseudo-canvas {
+  display: grid;
+  gap: 0px;
+  border: 1px dotted black;
+}
+
+.pseudo-pixel {
+  min-width: 10px;
+  width: 10px;
+  height: 10px;
+  min-height: 10px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.stack > * + * {
+  margin-block-start: 1rem;
+}
+
+.center {
+  box-sizing: content-box;
+  margin-inline: auto;
+  max-inline-size: var(--measure);
+}

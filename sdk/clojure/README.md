@@ -138,30 +138,30 @@ Ring adapters are not made equals. Here are some the differences for the ones we
 
 | Adapter  | return values from the SDK event sending functions |
 | -------- | -------------------------------------------------- |
-| ring     | irrelevant                                         |
+| ring     | boolean                                            |
 | http-kit | boolean, from `org.http-kit.server/send!`          |
 
 > [!note]
 > The SDK's event sending functions return whatever the adapter's implementation of
 > `starfederation.datastar.clojure.protocols/send-event!` returns.
 
-| Adapter  | connection lifetime in ring sync mode                                  |
-| -------- | ---------------------------------------------------------------------- |
-| ring     | same as the thread creating the sse response                           |
-| http-kit | alive until the client or the server explicitely closes the connection |
+| Adapter  | connection lifetime in ring sync mode (when holding onto the connection somewhere) |
+| -------- | ---------------------------------------------------------------------------------- |
+| ring     | same as the thread creating the sse response                                       |
+| http-kit | alive until the client or the server explicitely closes the connection             |
 
 > [!note]
 > You may keep the connection open in ring-jetty sync mode by somehow blocking the thread
-> handling the request.
+> handling the request. This is a valid strategy when using virtual threads.
 
 | Adapter  | connection lifetime in ring async mode                                 |
 | -------- | ---------------------------------------------------------------------- |
 | ring     | alive until the client or the server explicitely closes the connection |
 | http-kit | alive until the client or the server explicitely closes the connection |
 
-| Adapter  | sending an event on closed connection              |
+| Adapter  | sending an event on a closed connection            |
 | -------- | -------------------------------------------------- |
-| ring     | exception thrown                                   |
+| ring     | fn returns false                                   |
 | http-kit | fn returns false, from `org.http-kit.server/send!` |
 
 > [!note]
@@ -182,10 +182,13 @@ Ring adapters are not made equals. Here are some the differences for the ones we
 | ring-jetty | `[sse-gen]`                     |
 | http-kit   | `[sse-gen status-code]`         |
 
+| Adapter    | When is `:on-close` callback called?                                                      |
+| ---------- | ----------------------------------------------------------------------------------------- |
+| ring-jetty | when calling `d*/close-sse!` or when 2 small or 1 big event fails to go through           |
+| http-kit   | when calling `d*/close-sse!` or as soon as Http-kit detects that the connection is broken |
+
 ## TODO:
 
-- Consider adding an option to adapter to be able to control the output stream (usefull to enable compression)
 - Streamlined release process (cutting releases and publish jar to a maven repo)
-- Consider uniformizing the adapters behavior on connection closing (throwing in all adapters?)
-- Review the etoin tests, there are some race conditions
+- Review the etaoin tests, there are some race conditions
 - More official examples

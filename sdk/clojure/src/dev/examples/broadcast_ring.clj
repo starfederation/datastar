@@ -1,10 +1,13 @@
 (ns examples.broadcast-ring
   (:require
+    [clojure.string :as string]
     [examples.utils :as u]
     [reitit.ring :as rr]
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.adapter.ring :refer [->sse-response]]))
 
+
+;; Tiny setup for that allows broadcasting events to several curl processes
 
 (defonce !conns (atom #{}))
 
@@ -50,6 +53,18 @@
         (println "closing connection")))))
 
 
+(defn broadcast-lines! [n]
+  (doseq [conn @!conns]
+    (try
+      (d*/merge-fragment! conn (->> (range 0 n)
+                                    (map (fn [x]
+                                           (str "-----------------" x "-------------")))
+                                    (string/join "\n")))
+      (catch Exception _
+        (d*/close-sse! conn)
+        (println "closing connection")))))
+
+
 
 ;; open several clients:
 ;; curl -vv http://localhost:8081/persistent
@@ -57,7 +72,10 @@
   (-> !conns deref first d*/close-sse!)
   (reset! !conns #{})
   (broadcast-number! (rand-int 25))
+  (broadcast-lines! 1000)
   (u/clear-terminal!)
+  (u/reboot-jetty-server! #'handler {:async? true :output-buffer-size 64})
   (u/reboot-jetty-server! #'handler {:async? true})
+
   (u/reboot-rj9a-server! #'handler {:async? true}))
 
