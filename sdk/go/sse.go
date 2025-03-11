@@ -10,24 +10,93 @@ import (
 	"sync"
 	"time"
 
+	"github.com/CAFxX/httpcompression/contrib/andybalholm/brotli"
+	"github.com/CAFxX/httpcompression/contrib/compress/gzip"
+	"github.com/CAFxX/httpcompression/contrib/compress/zlib"
+	"github.com/CAFxX/httpcompression/contrib/klauspost/zstd"
 	"github.com/valyala/bytebufferpool"
 )
 
 type ServerSentEventGenerator struct {
 	ctx             context.Context
 	mu              *sync.Mutex
-	w               http.ResponseWriter
+	w               io.Writer
 	rc              *http.ResponseController
 	shouldLogPanics bool
+	encoding        string
 }
 
-func NewSSE(w http.ResponseWriter, r *http.Request) *ServerSentEventGenerator {
+type SSEOption func(*ServerSentEventGenerator)
+
+func WithDeflate(level int) SSEOption {
+	return func(sse *ServerSentEventGenerator) {
+		comp, _ := zlib.New(zlib.Options{Level: level})
+		sse.w = comp.Get(sse.w)
+		sse.encoding = zlib.Encoding
+	}
+}
+
+func WithGzip(level int) SSEOption {
+	return func(sse *ServerSentEventGenerator) {
+		comp, _ := gzip.New(gzip.Options{Level: level})
+		sse.w = comp.Get(sse.w)
+		sse.encoding = gzip.Encoding
+	}
+}
+
+func WithBrotli(level int) SSEOption {
+	return func(sse *ServerSentEventGenerator) {
+		comp, _ := brotli.New(brotli.Options{Quality: level})
+		sse.w = comp.Get(sse.w)
+		sse.encoding = brotli.Encoding
+	}
+}
+
+func WithZstd() SSEOption {
+	return func(sse *ServerSentEventGenerator) {
+		comp, _ := zstd.New()
+		sse.w = comp.Get(sse.w)
+		sse.encoding = zstd.Encoding
+	}
+}
+
+func WithDefaultGzip() SSEOption {
+	return WithGzip(gzip.DefaultCompression)
+}
+
+func WithDefaultBrotli() SSEOption {
+	return WithBrotli(brotli.DefaultCompression)
+}
+
+func WithDefaultDeflate() SSEOption {
+	return WithDeflate(zlib.DefaultCompression)
+}
+
+func NewSSE(w http.ResponseWriter, r *http.Request, opts ...SSEOption) *ServerSentEventGenerator {
 	rc := http.NewResponseController(w)
 
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Content-Type", "text/event-stream")
 	if r.ProtoMajor == 1 {
 		w.Header().Set("Connection", "keep-alive")
+	}
+
+	sseHandler := &ServerSentEventGenerator{
+		ctx:             r.Context(),
+		mu:              &sync.Mutex{},
+		w:               w,
+		rc:              rc,
+		shouldLogPanics: true,
+	}
+
+	// Apply options
+	for _, opt := range opts {
+		opt(sseHandler)
+	}
+
+	// set compression encoding
+	if sseHandler.encoding != "" {
+		w.Header().Set("Content-Encoding", sseHandler.encoding)
 	}
 
 	// flush headers
@@ -39,13 +108,6 @@ func NewSSE(w http.ResponseWriter, r *http.Request) *ServerSentEventGenerator {
 		panic(fmt.Sprintf("response writer failed to flush: %v", err))
 	}
 
-	sseHandler := &ServerSentEventGenerator{
-		ctx:             r.Context(),
-		mu:              &sync.Mutex{},
-		w:               w,
-		rc:              rc,
-		shouldLogPanics: true,
-	}
 	return sseHandler
 }
 
@@ -159,7 +221,13 @@ func (sse *ServerSentEventGenerator) Send(eventType EventType, dataLines []strin
 		return fmt.Errorf("failed to write to response writer: %w", err)
 	}
 
-	// flush the buffer
+	// flush the write if its a compressing writer
+	if f, ok := sse.w.(flusher); ok {
+		if err := f.Flush(); err != nil {
+			return fmt.Errorf("failed to flush compressing writer: %w", err)
+		}
+	}
+
 	if err := sse.rc.Flush(); err != nil {
 		return fmt.Errorf("failed to flush data: %w", err)
 	}
