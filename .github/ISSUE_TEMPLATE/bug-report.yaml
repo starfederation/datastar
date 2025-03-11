@@ -21,6 +21,7 @@ body:
       description: Please provide a clear and concise description of the bug.
     validations:
       required: true
+  - type: input
     id: version
     attributes:
       label: Datastar Version
