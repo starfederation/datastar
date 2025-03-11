@@ -16,7 +16,7 @@ For now the SDK and adapters are distributed as git dependencies using a `deps.e
 ## Usage
 
 Require the namespaces for which you want schema and/or instrumentation. Then
-use malli's intrumentation facilities.
+use malli's instrumentation facilities.
 
 Notable schema namespaces:
 

@@ -31,19 +31,19 @@ To your `deps.edn` file you can add the following coordinates:
 - SDK
 
 ```clojure
-datastar/sdk {:git/url "https://github.com/starfederation/datastar/"
-              :git/sha "LATEST_SHA"
-              :deps/root "sdk/clojure/sdk"}
+{datastar/sdk {:git/url "https://github.com/starfederation/datastar/"
+               :git/sha "LATEST_SHA"
+               :deps/root "sdk/clojure/sdk"}}
 ```
 
 - ring implementation
 
 ```clojure
-datastar/ring {:git/url "https://github.com/starfederation/datastar/"
-               :git/sha "LATEST_SHA"
-               :deps/root "sdk/clojure/adapter-ring"}}
+{datastar/ring {:git/url "https://github.com/starfederation/datastar/"
+                :git/sha "LATEST_SHA"
+                :deps/root "sdk/clojure/adapter-ring"}
 
-ring-compliant/adapter "Coordinate for the ring compliant adater you wanna use."
+ ring-compliant/adapter "Coordinate for the ring compliant adater you want to use."}
 ```
 
 > [!important]
@@ -54,17 +54,17 @@ ring-compliant/adapter "Coordinate for the ring compliant adater you wanna use."
 - http-kit implementation
 
 ```clojure
-datastar/http-kit {:git/url "https://github.com/starfederation/datastar/"
-                   :git/sha "LATEST_SHA"
-                   :deps/root "sdk/clojure/adapter-http-kit"}}
+{datastar/http-kit {:git/url "https://github.com/starfederation/datastar/"
+                    :git/sha "LATEST_SHA"
+                    :deps/root "sdk/clojure/adapter-http-kit"}}
 ```
 
 - Malli schemas:
 
 ```clojure
-datastar/malli-schemas {:git/url "https://github.com/starfederation/datastar/"
-                        :git/sha "LATEST_SHA"
-                        :deps/root "sdk/clojure/malli-schemas"}}
+{datastar/malli-schemas {:git/url "https://github.com/starfederation/datastar/"
+                         :git/sha "LATEST_SHA"
+                         :deps/root "sdk/clojure/malli-schemas"}}
 ```
 
 ## Usage
