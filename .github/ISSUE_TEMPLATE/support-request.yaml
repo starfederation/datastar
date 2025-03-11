@@ -1,0 +1,24 @@
+name: Support Request
+description: Ask a question about Datastar.
+labels:
+  - question
+body:
+  - type: markdown
+    attributes:
+      value: |
+        So you have a question about Datastar? To ensure your question hasn’t already been answered, please first search [existing issues](https://github.com/starfederation/datastar/issues?q=is%3Aissue). The `#help` channel in the [Discord server](https://discord.gg/bnRNgZjgPh) is also a great place to ask questions.
+        
+        If your question is still unanswered, please provide a clear and concise description. Note that we are diligent about documentation, so please check whether your question is answered in the [guide](https://data-star.dev/guide) or the [reference](https://data-star.dev/reference/attribute_plugins) docs before submitting.
+  - type: textarea
+    id: body
+    attributes:
+      label: Support Request
+      description: Please provide a clear and concise question.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Datastar Version
+      description: Provide the Datastar version that this relates to, ideally the [latest release](https://github.com/starfederation/datastar/releases).
+      placeholder: v1.0.0-beta.9

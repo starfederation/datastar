@@ -1,0 +1,26 @@
+name: Feature Request
+description: Suggest a new feature for Datastar.
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        So you have a feature request for Datastar? To ensure this isn’t already on our radar, please first search [existing issues](https://github.com/starfederation/datastar/issues?q=is%3Aissue). The `#general` channel in the [Discord server](https://discord.gg/bnRNgZjgPh) is also a great place to suggest features.
+
+        If you still believe you have a new suggestion, please provide a clear and concise description, including:
+        - What problem you believe your feature request can solve.
+        - Any alternative solutions or features you have already considered.
+  - type: textarea
+    id: body
+    attributes:
+      label: Feature Request
+      description: Please provide a clear and concise suggestion for a feature.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Datastar Version
+      description: Provide the Datastar version that this relates to, ideally the [latest release](https://github.com/starfederation/datastar/releases).
+      placeholder: v1.0.0-beta.9
