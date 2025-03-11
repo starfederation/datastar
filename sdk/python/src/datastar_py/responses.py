@@ -16,8 +16,8 @@ except ImportError:
 
 
 try:
-    from fasthtml.responses import StreamingResponse as FastHTMLStreamingResponse
-    from fasthtml.xml import to_xml
+    from fasthtml.starlette import StreamingResponse as FastHTMLStreamingResponse
+    from fastcore.xml import to_xml
 except ImportError:
 
     class FastHTMLStreamingResponse: ...
