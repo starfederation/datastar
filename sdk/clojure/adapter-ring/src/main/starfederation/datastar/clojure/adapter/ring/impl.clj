@@ -5,7 +5,7 @@
     [starfederation.datastar.clojure.utils :as u]
     [ring.core.protocols :as rp])
   (:import
-    [java.io  Closeable IOException OutputStream]
+    [java.io  Closeable OutputStream]
     java.util.concurrent.locks.ReentrantLock))
 
 
@@ -30,7 +30,8 @@
 ;; Also the on-close not being nil means the callback hasn't been called yet.
 (deftype SSEGenerator [^:unsynchronized-mutable send!
                        ^ReentrantLock lock
-                       ^:unsynchronized-mutable on-close]
+                       ^:unsynchronized-mutable on-close
+                       ^:unsynchronized-mutable on-exception]
   rp/StreamableResponseBody
   (write-body-to-stream [this response output-stream]
     (.lock lock)
@@ -43,9 +44,12 @@
     (let [!error (volatile! nil)]
       (try
         ;; initializing the writing machinery
-        (set! send! (->send output-stream (::opts response)))
-        (when-let [cb (-> response ::opts :on-close)]
-          (set! on-close cb))
+        (let [opts (::opts response)]
+          (set! send! (->send output-stream opts))
+          (set! on-exception (or (ac/on-exception opts)
+                                 ac/default-on-exception))
+          (when-let [cb (:on-close opts)]
+            (set! on-close cb)))
 
         ;; flushing the HTTP headers
         (.flush ^OutputStream output-stream)
@@ -73,23 +77,14 @@
         (try
           (send! event-type data-lines opts)
           true ;; successful send
-          (catch IOException _
-            ;; IOException means the connection is broken/closed,
-            ;; we remove send! to let go of the writing machinery.
-            ;; Also that way we don't try to close it again which would throw.
-            (set! send! nil)
-            ;; This exception is silenced, we make sure to call the closing fn
-            ;; that will call the on-close callback
-            (p/close-sse! this)
-            false) ;; the event wasn't sent
           (catch Exception e
-            ;; other exceptions should go through
-            (throw (ex-info "Error sending SSE event"
-                            {:sse-gen this
-                             :event-type event-type
-                             :data-lines data-lines
-                             :opts opts}
-                            e))))
+            (when (on-exception this e {:sse-gen this
+                                        :event-type event-type
+                                        :data-lines data-lines
+                                        :opts opts})
+              (set! send! nil)
+              (p/close-sse! this))
+            false)) ;; the event wasn't sent
         false))) ; closed return false
 
   (get-lock [_] lock)
@@ -118,5 +113,6 @@
 (defn ->sse-gen []
   (SSEGenerator. nil
                  (ReentrantLock.)
+                 nil
                  nil))
 

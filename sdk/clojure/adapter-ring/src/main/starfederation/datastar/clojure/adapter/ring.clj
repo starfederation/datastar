@@ -5,6 +5,10 @@
     [starfederation.datastar.clojure.utils :refer [def-clone]]))
 
 
+(def-clone on-exception ac/on-exception)
+(def-clone default-on-exception ac/default-on-exception)
+
+
 (def-clone write-profile ac/write-profile)
 
 (def-clone basic-profile                ac/basic-profile)
@@ -31,6 +35,7 @@
     is ready to send.
   - `:on-close`: callback (fn [sse-gen] ...) called right after the generator
     has closed it's connection.
+  - [[on-exception]]: callback called when sending a SSE event throws
   - [[write-profile]]: write profile for the connection
     defaults to [[basic-profile]]
 

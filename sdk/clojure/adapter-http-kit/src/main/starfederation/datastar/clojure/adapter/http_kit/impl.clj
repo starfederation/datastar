@@ -6,7 +6,7 @@
     [org.httpkit.server :as hk-server])
   (:import
     [java.util.concurrent.locks ReentrantLock]
-    [java.io ByteArrayOutputStream Closeable IOException]))
+    [java.io ByteArrayOutputStream Closeable]))
 
 
 (def basic-profile
@@ -70,22 +70,19 @@
 ;; -----------------------------------------------------------------------------
 ;; SSE gen
 ;; -----------------------------------------------------------------------------
-(deftype SSEGenerator [ch lock send!]
+(deftype SSEGenerator [ch lock send! on-exception]
   p/SSEGenerator
   (send-event! [this event-type data-lines opts]
     (u/lock! lock
       (try
         (send! event-type data-lines opts)
-        (catch IOException _
-          (p/close-sse! this)
-          false)
         (catch Exception e
-          (throw (ex-info "Error sending SSE event"
-                          {:sse-gen this
-                           :event-type event-type
-                           :data-lines data-lines
-                           :opts opts}
-                          e))))))
+          (when (on-exception this e {:sse-gen this
+                                      :event-type event-type
+                                      :data-lines data-lines
+                                      :opts opts})
+            (p/close-sse! this))
+          false))))
 
   (get-lock [_] lock)
 
@@ -99,5 +96,9 @@
     (p/close-sse! this)))
 
 
-(defn ->sse-gen [ch send!]
-  (SSEGenerator. ch (ReentrantLock.) send!))
+(defn ->sse-gen
+  ([ch send!]
+   (->sse-gen ch send! {}))
+  ([ch send! opts]
+   (SSEGenerator. ch (ReentrantLock.) send! (or (ac/on-exception opts)
+                                                ac/default-on-exception))))

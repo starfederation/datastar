@@ -182,7 +182,7 @@ Ring adapters are not made equals. Here are some the differences for the ones we
 | ring-jetty | `[sse-gen]`                     |
 | http-kit   | `[sse-gen status-code]`         |
 
-| Adapter    | When is `:on-close` callback called?                                                      |
+| Adapter    | When is the `:on-close` callback called?                                                  |
 | ---------- | ----------------------------------------------------------------------------------------- |
 | ring-jetty | when calling `d*/close-sse!` or when 2 small or 1 big event fails to go through           |
 | http-kit   | when calling `d*/close-sse!` or as soon as Http-kit detects that the connection is broken |
@@ -191,4 +191,3 @@ Ring adapters are not made equals. Here are some the differences for the ones we
 
 - Streamlined release process (cutting releases and publish jar to a maven repo)
 - Review the etaoin tests, there are some race conditions
-- More official examples

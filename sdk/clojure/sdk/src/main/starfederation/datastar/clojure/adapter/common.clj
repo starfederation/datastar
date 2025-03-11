@@ -58,9 +58,12 @@
   (:refer-clojure :exclude [flush])
   (:require
     [starfederation.datastar.clojure.api.sse :as sse]
+    [starfederation.datastar.clojure.protocols :as p]
     [starfederation.datastar.clojure.utils :as u])
   (:import
-    [java.io BufferedWriter Flushable OutputStream OutputStreamWriter Writer]
+    [java.io
+     BufferedWriter Flushable IOException
+     OutputStream OutputStreamWriter Writer]
     [java.nio.charset Charset StandardCharsets]
     java.util.zip.GZIPOutputStream))
 
@@ -281,4 +284,30 @@
       (ex-info "Error closing the sse-gen." {:errors errors})
       true)))
 
+
+(def on-exception
+  "SSE option key:
+
+  Callback that will be called when an exception is thrown sending an event.
+  The signature must be (fn on-exception [sse e ctx]).
+  Args:
+  - `sse-gen`: the SSEGenrator
+  - `e`: the exception
+  - `ctx`: context information about the exception.
+
+  The return value determines the behavior of the generator, a truthy value
+  will tell the genrator to close itself.
+
+  Defaults to [[default-on-exception]] which will close the `sse-gen` on
+  IOException and rethrow otherwise."
+  :on-exception)
+
+
+(defn default-on-exception
+  "Default on-exception callback, it returns true on [[IOException]] which
+  closes,the generator. It rethrows otherwise."
+  [_sse e ctx]
+  (if (instance? IOException e)
+    true
+    (throw (ex-info "Error sending SSE event." ctx e))))
 
