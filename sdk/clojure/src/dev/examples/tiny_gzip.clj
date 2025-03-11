@@ -2,6 +2,7 @@
   (:require
     [examples.common :as c]
     [examples.utils :as u]
+    [examples.animation-gzip.brotli :as brotli]
     [dev.onionpancakes.chassis.core :as h]
     [ring.util.response :as ruresp]
     [reitit.ring :as rr]
@@ -106,8 +107,10 @@
 
 
 
-(def handler-hk (->handler hk-gen/->sse-response  hk-gen/gzip-profile))
-(def handler-ring (->handler ring-gen/->sse-response ring-gen/gzip-profile))
+(def handler-hk (->handler hk-gen/->sse-response
+                           hk-gen/write-profile hk-gen/gzip-profile))
+(def handler-ring (->handler ring-gen/->sse-response
+                             ring-gen/write-profile ring-gen/gzip-profile))
 
 (comment
   :dbg
