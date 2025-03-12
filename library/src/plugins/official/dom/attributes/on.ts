@@ -109,7 +109,23 @@ export const On: AttributePlugin = {
       rafId = requestAnimationFrame(raf)
 
       return () => {
-        if (rafId) cancelAnimationFrame(rafId)
+        if (rafId) {
+          cancelAnimationFrame(rafId)
+        }
+      }
+    }
+
+    if (key === 'resize') {
+      let resizeObserver: ResizeObserver | null = new ResizeObserver(() => {
+        callback()
+      })
+      resizeObserver.observe(el)
+
+      return () => {
+        if (resizeObserver) {
+          resizeObserver.disconnect()
+          resizeObserver = null
+        }
       }
     }
 
