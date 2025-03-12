@@ -2,6 +2,14 @@
 
 ## 2025-03-11
 
+### Deprecated
+
+- the use of `:on-open` and `:on-close` keywords for the `->sse-response`
+  function is deprecated and will be removed in a future release. See the
+  docstring of the `->sse-response` for the replacement.
+
+## 2025-03-11
+
 ### Added
 
 - Added a "write profile" mechanism that allows user to use compression of

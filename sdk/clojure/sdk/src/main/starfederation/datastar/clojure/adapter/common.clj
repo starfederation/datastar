@@ -58,7 +58,6 @@
   (:refer-clojure :exclude [flush])
   (:require
     [starfederation.datastar.clojure.api.sse :as sse]
-    [starfederation.datastar.clojure.protocols :as p]
     [starfederation.datastar.clojure.utils :as u])
   (:import
     [java.io
@@ -262,52 +261,162 @@
   [f error-msg]
   (try
     (f)
-    (catch Exception e
-      (ex-info error-msg {} e))))
+    (catch Throwable t
+      (ex-info error-msg {} t))))
+
+
+(def closing-exceptions
+  "Exceptions caught while closing a sse generator using [[close-sse!]]
+  are grouped under this key in the ex-info's data that is returned."
+  :d*.sse/closing-exceptions)
+
+
+(defn- group-exceptions [closing-results]
+  (group-by (fn [v] (cond
+                      (instance? Exception v) :exceptions
+                      (instance? Throwable v) :throwables
+                      :else                   :irrelevant))
+            closing-results))
+
+(comment
+  (group-exceptions [(Error.) (ex-info "" {})])
+  (group-exceptions [:a (ex-info "" {})])
+  (group-exceptions [:a (Error.)]))
 
 
 (defn close-sse!
   "Closing a sse-gen is a 2 steps process.
-  1. close io resources calling the `close-io!` thunk.
+  1. close IO resources calling the `close-io!` thunk.
   2. call the sse-gen's `on-close` callback by calling the `on-close!` thunk.
 
-  Both thunk are called using [[try-closing]] to capture exceptions.
-  This function returns either true when all thunks are exceptions free or an 
+  Both thunks are called using [[try-closing]] to capture exceptions.
+
+  This function rethrows the first `java.lang.Throwable` encountered. Otherwise
+  it returns either `true` when all thunks are exceptions free or an
   exception created with [[ex-info]] that contains the thunks exceptions in it's
-  data."
+  data under the key [[closing-exceptions]]."
   [close-io! on-close!]
-  (let [io-close-res (try-closing close-io! "Error closing the output stream")
-        on-close-res (try-closing on-close! "Error calling the on close callback.")
-        errors (filterv #(instance? Exception %)
-                        [io-close-res on-close-res])]
-    (if (seq errors)
-      (ex-info "Error closing the sse-gen." {:errors errors})
-      true)))
+  (let [results [(try-closing close-io! "Error closing the output stream.")
+                 (try-closing on-close! "Error calling the on close callback.")]
+
+        {:keys [throwables exceptions]} (group-exceptions results)
+        throwable (some identity throwables)]
+    (cond
+      throwable        (throw throwable)
+      (seq exceptions) (ex-info "Error closing the sse-gen."
+                                {closing-exceptions exceptions})
+      :else            true)))
+
+
+(defn get-closing-exceptions
+  "Extract the exceptions in the `ex-data` of a ex-info thrown during the
+  closing of a sse generator."
+  [e]
+  (-> e ex-data closing-exceptions))
+
+
+(comment
+  (-> (ex-info "msg" {closing-exceptions [:e1 :e2]})
+      get-closing-exceptions))
+
+
+(def on-open
+  "SSE option key:
+
+  Mandatory callback `(fn [sse-gen] ...)` called when the SSE connection is
+  open.
+
+  It is called synchronously as soon as the connection is ready. This means
+  that you can block the webserver's thread from here.
+
+  Args:
+  - `sse-gen`: the SSE generator, ready to send events
+
+  Return value:
+  The return value isn't used.
+
+  Exception behavior:
+  Exception thrown here aren't caught.
+  "
+  :d*.sse/on-open)
+
+
+(def on-close
+  "SSE option key:
+
+  Callback `(fn [sse-gen & args] ...)` called just after the SSE connection is
+  closed. More specifically this callback is called when:
+  - [[starfederation.datastar.clojure.api/close-sse!]] is called explicitely
+  - the sse-gen detects that the connection is closed by the client. This
+    detection depends on the ring adapter being used. Http-kit AsyncChannel
+    detects a broken connection by itself and calls on-close. With the ring
+    generic adapter, the default behavior is to close the connection when a
+    [[java.io.IOException]] is thrown sending an event.
+
+  When this callback is called it is already not possible to send events
+  anymore. It is called synchronously in the same thread that initiates the
+  closing process.
+
+  Args:
+  - `sse-gen`: the closed SSE generator
+  - Depending on the adapter used other arguments may be passed, see doc for
+    the adapter you are using.
+
+  Return value:
+  The return value isn't used.
+
+  Exception behavior:
+  While closing the `sse-gen` several exceptions may be caught:
+  - one while closing the underlying output stream
+  - one executing this callback
+
+  These exceptions are rethrown wrapped in an `ex-info`. To get at these see
+  [[get-closing-exceptions]]."
+  :d*.sse/on-close)
 
 
 (def on-exception
   "SSE option key:
 
-  Callback that will be called when an exception is thrown sending an event.
-  The signature must be (fn on-exception [sse e ctx]).
+  Callback `(fn [sse-gen e ctx] ...)` that will be called when an exception is
+  thrown sending an event.
+
   Args:
   - `sse-gen`: the SSEGenrator
   - `e`: the exception
-  - `ctx`: context information about the exception.
+  - `ctx`: context information about the exception, a map whose keys are:
+    - `:sse-gen`: the sse generator throwing
+    - `:event-type`: type of the event that failed
+    - `:data-lines`: data lines for this event
+    - `:opts`: options used when sending
 
-  The return value determines the behavior of the generator, a truthy value
-  will tell the genrator to close itself.
+  Returned value:
+  A truthy value means the sse-gen must close itself.
+
+  Exception behavior:
+  Exception thrown here aren't caught.
 
   Defaults to [[default-on-exception]] which will close the `sse-gen` on
-  IOException and rethrow otherwise."
-  :on-exception)
+  IOException or rethrow otherwise."
+  :d*.sse/on-exception)
 
 
 (defn default-on-exception
-  "Default on-exception callback, it returns true on [[IOException]] which
-  closes,the generator. It rethrows otherwise."
+  "Default [[on-exception]] callback, it returns `true` on [[IOException]] which
+  closes, the generator. It rethrows the exception wrapped with `ex-infor`
+  otherwise."
   [_sse e ctx]
   (if (instance? IOException e)
     true
     (throw (ex-info "Error sending SSE event." ctx e))))
+
+
+;; TODO: remove next version
+(defn get-on-open [opts]
+  (or (on-open opts) (:on-open opts)))
+
+(defn get-on-close [opts]
+  (or (on-close opts) (:on-close opts)))
+
+
 

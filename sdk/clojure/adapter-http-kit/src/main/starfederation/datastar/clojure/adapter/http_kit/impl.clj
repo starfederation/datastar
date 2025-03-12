@@ -10,6 +10,8 @@
 
 
 (def basic-profile
+  "Basic write profile using temporary [[StringBuilder]]s, no output stream and
+  no compression."
   {ac/write! (ac/->build-event-str)})
 
 

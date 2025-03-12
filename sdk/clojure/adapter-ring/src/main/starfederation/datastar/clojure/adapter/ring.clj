@@ -5,6 +5,8 @@
     [starfederation.datastar.clojure.utils :refer [def-clone]]))
 
 
+(def-clone on-open ac/on-open)
+(def-clone on-close ac/on-close)
 (def-clone on-exception ac/on-exception)
 (def-clone default-on-exception ac/default-on-exception)
 
@@ -26,18 +28,21 @@
   `ring.core.protocols/StreamableResponseBody`.
 
   In sync mode, the connection is closed automatically when the handler is
-  done running.
+  done running. You need to explicitely close it in rinc async.
 
   Opts:
   - `:status`: status for the HTTP response, defaults to 200
   - `:headers`: Ring headers map to add to the response
-  - `:on-open`: Mandatory callback (fn [sse-gen] ...) called when the generator
+  - [[on-open]]: Mandatory callback (fn [sse-gen] ...) called when the generator
     is ready to send.
-  - `:on-close`: callback (fn [sse-gen] ...) called right after the generator
+  - [[on-close]]: callback (fn [sse-gen] ...) called right after the generator
     has closed it's connection.
   - [[on-exception]]: callback called when sending a SSE event throws
   - [[write-profile]]: write profile for the connection
     defaults to [[basic-profile]]
+
+  - `:on-open`: deprecated in favor of [[on-open]]
+  - `:on-close`: deprecated in favor of [[on-close]]
 
   When it comes to write profiles, the SDK provides:
   - [[basic-profile]]
