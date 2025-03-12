@@ -9,6 +9,7 @@
     [reitit.ring.middleware.parameters :as reitit-params]
     [starfederation.datastar.clojure.adapter.http-kit :as hk-gen]
     [starfederation.datastar.clojure.adapter.ring :as ring-gen]
+    [starfederation.datastar.clojure.adapter.common  :as ac]
     [starfederation.datastar.clojure.api :as d*]))
 
 
@@ -67,7 +68,7 @@
            input-val (get signals "input")]
        (->sse-response req
          {:status 204
-          :on-open
+          ac/on-open
           (fn [sse]
             (d*/with-open-sse sse
               (reset! !current-val input-val)))})))
@@ -80,10 +81,10 @@
     ([req]
      (->sse-response req
        (merge opts
-         {:on-open
+         {ac/on-open
           (fn [sse]
             (swap! !sses conj sse))
-          :on-close
+          ac/on-close
           (fn [sse & _args]
             (swap! !sses disj sse))})))
     ([req respond _raise]

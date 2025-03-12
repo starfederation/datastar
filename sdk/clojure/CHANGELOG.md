@@ -5,8 +5,8 @@
 ### Deprecated
 
 - the use of `:on-open` and `:on-close` keywords for the `->sse-response`
-  function is deprecated and will be removed in a future release. See the
-  docstring of the `->sse-response` for the replacement.
+  function is deprecated and will be removed in a future release.
+  See `->sse-response`'s docstring.
 
 ## 2025-03-11
 

@@ -3,7 +3,7 @@
     [examples.utils :as u]
     [reitit.ring :as rr]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response on-open on-close]]))
 
 
 ;; This is a small experiment to determine the behaviour of
@@ -14,11 +14,11 @@
 
 (defn long-connection [req]
   (->sse-response req
-    {:on-open
+    {on-open
      (fn [sse]
        (reset! !conn sse)
        (d*/console-log! sse "'connected'"))
-     :on-close
+     on-close
      (fn on-close [_ status-code]
        (println "-----------------")
        (println "Connection closed status: " status-code)

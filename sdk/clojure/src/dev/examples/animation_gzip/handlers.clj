@@ -3,7 +3,8 @@
     [examples.animation-gzip.rendering :as rendering]
     [examples.animation-gzip.state :as state]
     [ring.util.response :as ruresp]
-    [starfederation.datastar.clojure.api :as d*]))
+    [starfederation.datastar.clojure.api :as d*]
+    [starfederation.datastar.clojure.adapter.common :as ac]))
 
 
 (defn home-handler
@@ -20,10 +21,10 @@
    ([req]
     (->sse-response req
       (merge opts
-        {:on-open
+        {ac/on-open
          (fn [sse]
            (state/add-conn! sse))
-         :on-close
+         ac/on-close
          (fn on-close
            ([sse]
             (state/remove-conn! sse))
@@ -51,7 +52,7 @@
     ([req]
      (->sse-response req
        {:status 204
-        :on-open
+        ac/on-open
         (fn [sse]
           (d*/with-open-sse sse
             (when-let [coords (recover-coords req)]
@@ -66,7 +67,7 @@
     ([req]
      (->sse-response req
        {:status 204
-        :on-open
+        ac/on-open
         (fn [sse]
           (d*/with-open-sse sse
             (state/add-random-pings!)))}))
@@ -80,7 +81,7 @@
     ([req]
      (->sse-response req
        {:status 204
-        :on-open
+        ac/on-open
         (fn [sse]
           (d*/with-open-sse sse
             (state/reset-state!)))}))
@@ -94,7 +95,7 @@
     ([req]
      (->sse-response req
        {:status 204
-        :on-open
+        ac/on-open
         (fn [sse]
           (d*/with-open-sse sse
             (state/start-animating!)))}))
@@ -108,7 +109,7 @@
     ([req]
      (->sse-response req
        {:status 204
-        :on-open
+        ac/on-open
         (fn [sse]
           (d*/with-open-sse sse
             (state/stop-animating!)))}))
@@ -122,7 +123,7 @@
     ([req]
      (->sse-response req
        (merge opts
-         {:on-open
+         {ac/on-open
           (fn [sse]
             (d*/with-open-sse sse
               (d*/merge-fragment! sse

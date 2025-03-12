@@ -3,7 +3,7 @@
     [examples.utils :as u]
     [reitit.ring :as rr]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response on-open on-close]]))
 
 
 ;; This is a small experiment to determine the behaviour of
@@ -27,11 +27,11 @@
   (try
     (respond
       (->sse-response req
-        {:on-open
+        {on-open
          (fn [sse]
            (reset! !conn sse)
            (d*/console-log! sse "'connected'"))
-         :on-close
+         on-close
          (fn [_sse]
            (println "Connection lost detected")
            (reset! !conn nil))}))

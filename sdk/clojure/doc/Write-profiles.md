@@ -39,12 +39,12 @@ When using the `->sse-response` function we can do:
 ```clojure
 (require
   '[starfederation.datastar.clojure.api :as d*]
-  '[starfederation.datastar.clojure.adapter.ring :refer [->sse-response]])
+  '[starfederation.datastar.clojure.adapter.ring :refer [->sse-response on-open]])
 
 (defn handler [req]
   (->sse-response req
     {ac/write-profile my-write-profile ;; note the use of the write profile here
-     :on-open
+     on-open
      (fn [sse]
        (d*/with-open-sse sse
          (d*/merge-fragment! sse "some big fragment")))}))

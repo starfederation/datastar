@@ -25,7 +25,7 @@
 
 (defn endpoint [req]
   (hk-gen/->sse-response req
-    {:on-open
+    {hk-gen/on-open
      (fn [sse]
        (d*/with-open-sse sse
          (d*/execute-script! sse

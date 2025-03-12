@@ -7,6 +7,7 @@
     [reitit.ring.middleware.parameters :as reitit-params]
     [ring.util.response :as ruresp]
     [starfederation.datastar.clojure.api :as d*]
+    [starfederation.datastar.clojure.adapter.common :as ac]
     [starfederation.datastar.clojure.adapter.http-kit :as hk-gen]
     [starfederation.datastar.clojure.adapter.ring :as ring-gen]))
 
@@ -42,11 +43,10 @@
    (let [signals (u/get-signals req)
          input-val (get signals "input")]
      (->sse-response req
-       {:on-open
+       {ac/on-open
         (fn [sse]
           (d*/with-open-sse sse
-            (println "plural")
-           (d*/merge-fragments! sse (->fragments input-val))))}))))
+            (d*/merge-fragments! sse (->fragments input-val))))}))))
 
 
 (defn ->router [->sse-response]
@@ -72,6 +72,7 @@
 (comment
   :dbg
   :rec
+  (u/clear-terminal!)
   (u/reboot-hk-server! handler-hk)
   (u/reboot-rj9a-server! #'handler-ring))
 

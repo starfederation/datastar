@@ -93,7 +93,7 @@ Using the adapter you create ring responses for your handlers:
 ```clojure
 (defn sse-handler [request]
   (hk-gen/->sse-response request
-    {:on-open
+    {hk-gen/on-open
      (fn [sse-gen]
        (d*/merge-fragment! sse-gen "<div>test</div>")
        (d*/close-sse! sse-gen))}))
@@ -111,10 +111,11 @@ somewhere and use it later:
 
 (defn sse-handler [request]
   (hk-gen/->sse-response request
-    {:on-open
+    {hk-gen/on-open
      (fn [sse-gen]
        (swap! !connections conj sse-gen))
-     :on-close
+
+     hk-gen/on-close
      (fn [sse-gen status]
        (swap! !connections disj sse-gen))}))
 

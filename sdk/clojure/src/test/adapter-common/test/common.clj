@@ -8,6 +8,7 @@
     [lazytest.extensions.matcher-combinators :as mc]
     [org.httpkit.client :as http]
     [starfederation.datastar.clojure.adapter.test :as test-gen]
+    [starfederation.datastar.clojure.adapter.common :as ac]
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.api.sse :as sse]
     [test.utils :as u])
@@ -146,9 +147,9 @@
   (fn handler
     ([req]
      (->sse-response req
-       {:on-open (fn [sse-gen]
-                   (reset! !conn sse-gen)
-                   (.countDown latch))}))
+       {ac/on-open (fn [sse-gen]
+                     (reset! !conn sse-gen)
+                     (.countDown latch))}))
     ([req respond _raise]
      (respond (handler req)))))
 

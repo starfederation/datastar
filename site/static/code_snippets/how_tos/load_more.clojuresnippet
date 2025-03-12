@@ -1,7 +1,6 @@
 (require
-  '[charred.api :as charred]
   '[starfederation.datastar.clojure.api :as d*]
-  '[starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response]]
+  '[starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response on-open]]
   '[some.hiccup.library :refer [html]]
   '[some.json.library :refer [read-json-str write-json-str]]))
 
@@ -10,7 +9,7 @@
 
 (defn handler [ring-request]
   (->sse-response ring-request
-    {:on-open
+    {on-open
      (fn [sse]
        (let [d*-signals (-> ring-request d*/get-signals read-json-str)
              offset (get d*-signals "offset")

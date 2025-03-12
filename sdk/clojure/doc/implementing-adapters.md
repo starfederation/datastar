@@ -101,11 +101,14 @@ This function takes 2 arguments:
 - a map whose keys are:
   - `:status`: the HTTP status for the response
   - `:headers`: a map of `str -> str`, HTTP headers to add to the response.
-  - `:on-open`: a mandatory callback that must be called when the SSE connection is opened.
+  - `:d*.sse/on-open`: a mandatory callback that must be called when the SSE connection is opened.
     It has 1 argument, the SSE Generator.
-  - `:on-close`: A callback called when the SSE connection is closed.
+  - `:d*.sse/on-close`: A callback called when the SSE connection is closed.
     Each adapter may have a different parameters list for this callback, depending on what
     is relevant. Still the first parameter should be the SSE generator.
+  - `:d*.sse/on-exception`: A callback called when an exception is thrown sending an event.
+    It takes 3 arguments: the sse-gen, the exception and a context map
+  - `:d*.sse/write-profile`: a map that allows the configuration of the SSE connection.
   - other options you want to add to your generator
 
 It has 2 responsibilities:

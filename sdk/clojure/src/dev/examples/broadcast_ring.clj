@@ -4,7 +4,7 @@
     [examples.utils :as u]
     [reitit.ring :as rr]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response on-open on-close]]))
 
 
 ;; Tiny setup for that allows broadcasting events to several curl processes
@@ -16,14 +16,14 @@
   ([req respond _raise]
    (respond
      (->sse-response req
-       {:on-open
+       {on-open
         (fn [sse]
           (swap! !conns conj sse)
           (try
             (d*/console-log! sse "'connected with jetty!'")
             (catch Exception _
               (d*/close-sse! sse))))
-        :on-close
+        on-close
         (fn on-close [sse]
           (swap! !conns disj sse)
           (println "Removed connection from pool"))}))))

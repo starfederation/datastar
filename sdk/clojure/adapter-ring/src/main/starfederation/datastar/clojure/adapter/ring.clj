@@ -53,8 +53,8 @@
   You can also take a look at the `starfederation.datastar.clojure.adapter.common`
   namespace if you want to write your own profiles.
   "
-  [ring-request {:keys [status on-open] :as opts}]
-  {:pre [(identity on-open)]}
+  [ring-request {:keys [status] :as opts}]
+  {:pre [(ac/get-on-open opts)]}
   (let [sse-gen (impl/->sse-gen)]
     {:status (or status 200)
      :headers (ac/headers ring-request opts)

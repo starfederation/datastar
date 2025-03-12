@@ -103,10 +103,10 @@
 (def ->sse-response-callbacks-options-schema
   (mu/optional-keys
     [:map
-     [:on-open fn?]
-     [:on-close fn?]
+     [ac/on-open fn?]
+     [ac/on-close fn?]
      [ac/on-exception fn?]]
-    [:on-close ac/on-exception]))
+    [ac/on-close ac/on-exception]))
 
 
 (def ->sse-response-options-schema
