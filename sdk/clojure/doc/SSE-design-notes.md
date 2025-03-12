@@ -101,78 +101,11 @@ Datastar's specific SSE events.
 ##### `starfederation.datastar.clojure.adapter.common`
 
 This namespace provides helpers we use to build the SSE machinery for ring
-adapters. It mainly provides a mechanims called "writer profiles" to allow
+adapters. It mainly provides a mechanism called "write profiles" to allow
 a user to configure the way the SSE connections should behave with regards
 to Buffering and compression.
 
-Let's say we want to have a handler using gzip compression with a temporary
-write buff strategy.
-
-We can use the functions provided by in this namespace to make such a
-write profile:
-
-```clojure
-(require
-  '[starfederation.datastar.clojure.adapter.common :as ac])
-
-(def my-write-profile
-  {ac/wrap-output-stream (fn [os] (-> os ac/->gzip-os ac/->os-writer))
-   ac/write! (ac/->write-with-temp-buffer!)
-   ac/content-encoding ac/gzip-content-encoding})
-
-```
-
-Then when using the `->sse-response` function we can do:
-
-```clojure
-(require
-  '[starfederation.datastar.clojure.api :as d*]
-  '[starfederation.datastar.clojure.adapter.ring :refer [->sse-response]])
-
-(defn handler [req]
-  (->sse-response req
-    {ac/write-profile my-write-profile ;; note the use of the write profile here
-     :on-open
-     (fn [sse]
-       (d*/with-open-sse sse
-         (d*/merge-fragment! sse "some big fragment")))}))
-```
-
-Now to specify buffer sizes we can make a profile like this:
-
-```clojure
-
-(def my-specific-write-profile
-  {ac/wrap-output-stream
-   (fn [os] (-> os
-                (ac/->gzip-os 1024) ;; changing the gzip os buffer size
-                ac/->os-writer))
-
-   ac/write! (ac/->write-with-temp-buffer! 16384);; initial size of the StringBuilder
-   ac/content-encoding ac/gzip-content-encoding})
-
-```
-
-This also allows for plugable compression algorithms as long as they work like
-java's `java.util.zip.GZIPOutputStream`.
-
-#### SDK provided write profiles
-
-The SDK tries to provide sensible defaults. There are write profiles provided:
-
-| profile                      | buffering strategy | compression | write! helper               |
-| ---------------------------- | ------------------ | ----------- | --------------------------- |
-| basic-profile                | 2                  | no          | `->write-with-temp-buffer!` |
-| buffered-writer-profile      | 1                  | yes         | `write-to-buffered-writer!` |
-| gzip-profile                 | 2                  | no          | `->write-with-temp-buffer!` |
-| gzip-buffered-writer-profile | 1                  | yes         | `write-to-buffered-writer!` |
-
-The `StringBuilder` default size is modeled after java's `BufferedWriter`,
-that is 8192 bytes. The rest of the buffer sizes are java's defaults.
-
-> [!note]
-> Http-kit doesn't use an `OutputStream` as its IO primitive, the SDK implement
-> the basic profile a bit differently.
+See the [write profiles doc](./Write-profiles.md).
 
 ## Beyond the SDK
 

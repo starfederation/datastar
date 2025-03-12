@@ -232,23 +232,23 @@
 
 (def basic-profile
   "Basic write profile using temporary [[StringBuilder]]s and no compression."
-  {wrap-output-stream (fn[^OutputStream os] (-> os ->os-writer))
+  {wrap-output-stream (fn[os] (-> os ->os-writer))
    write! (->write-with-temp-buffer!)})
 
 (def buffered-writer-profile
   "Write profile using a permanent [[BufferedWriter]] and no compression."
-  {wrap-output-stream (fn[^OutputStream os] (-> os ->os-writer ->buffered-writer))
+  {wrap-output-stream (fn[os] (-> os ->os-writer ->buffered-writer))
    write! (->write-with-temp-buffer!)})
 
 (def gzip-profile
   "Write profile using temporary [[StringBuilder]]s and gzip compression."
-  {wrap-output-stream (fn[^OutputStream os] (-> os ->gzip-os ->os-writer))
+  {wrap-output-stream (fn[os] (-> os ->gzip-os ->os-writer))
    content-encoding gzip-content-encoding
    write! (->write-with-temp-buffer!)})
 
 (def gzip-buffered-writer-profile
   "Write profile using a permanent [[BufferedWriter]] and gzip compression."
-  {wrap-output-stream (fn[^OutputStream os] (-> os ->gzip-os ->os-writer ->buffered-writer))
+  {wrap-output-stream (fn[os] (-> os ->gzip-os ->os-writer ->buffered-writer))
    content-encoding gzip-content-encoding
    write! write-to-buffered-writer!})
 
