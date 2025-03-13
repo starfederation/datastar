@@ -378,6 +378,12 @@ Show or hides an element based on whether an expression evaluates to `true` or `
 <div data-show="$foo"></div>
 ```
 
+To prevent flickering of the element before Datastar has processed the DOM, you can add a `display: none` style to the element to hide it initially.
+
+```html
+<div data-show="$foo" style="display: none"></div>
+```
+
 ### `data-view-transition`
 
 Sets the `view-transition-name` style attribute explicitly.
