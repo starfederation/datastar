@@ -2,15 +2,15 @@
 
 This is where the code for the Generic SDK lives.
 
-## Instalation
+## Installation
 
 For now the SDK and adapters are distributed as git dependencies using a `deps.edn` file.
 If you roll your own adapter you only need:
 
 ```clojure
 {datastar/sdk {:git/url "https://github.com/starfederation/datastar/tree/develop"
-              :git/sha "LATEST SHA"
-              :deps/root "sdk/clojure/sdk"}}
+               :git/sha "LATEST SHA"
+               :deps/root "sdk/clojure/sdk"}}
 ```
 
 > [!important]

@@ -6,8 +6,9 @@
     [reitit.ring :as rr]
     [ring.util.response :as ruresp]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response on-open]]))
 
+;; Redirection example
 
 (def home-page
   (html
@@ -35,7 +36,7 @@
 
 (defn redirect-handler [ring-request]
   (->sse-response ring-request
-    {:on-open
+    {on-open
       (fn [sse]
         (d*/merge-fragment! sse
           (html [:div#indicator "Redirecting in 3 seconds..."]))

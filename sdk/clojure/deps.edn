@@ -1,13 +1,25 @@
 {:paths ["sdk/src/main"]
  
- :deps {io.github.paintparty/fireworks {:mvn/version "0.10.4"}}
- 
+ :deps {io.github.paintparty/fireworks      {:mvn/version "0.10.4"}
+        com.taoensso/telemere               {:mvn/version "1.0.0-RC3"}
+        com.aayushatharva.brotli4j/brotli4j {:mvn/version "1.18.0"}}
+
  :aliases
  {:repl {:extra-paths ["src/dev"]
          :extra-deps  {org.clojure/clojure         {:mvn/version "1.12.0"}
                        nrepl/nrepl                 {:mvn/version "1.3.0"}
                        cider/cider-nrepl           {:mvn/version "0.50.2"}
-                       io.github.tonsky/clj-reload {:mvn/version "0.7.1"}}}
+                       io.github.tonsky/clj-reload {:mvn/version "0.7.1"}
+                       dom-top/dom-top             {:mvn/version "1.0.9"}}}
+
+  :debug {:classpath-overrides {org.clojure/clojure nil}
+          :extra-deps {com.github.flow-storm/clojure        {:mvn/version "1.12.0-4"}
+                       com.github.flow-storm/flow-storm-dbg {:mvn/version "4.2.0"}
+                       com.github.flow-storm/flow-storm-web-plugin {:mvn/version "1.0.0-beta"}}
+          :jvm-opts ["-Dclojure.storm.instrumentEnable=true"
+                     "-Dflowstorm.plugins.namespaces=flow-storm.plugins.web.all"
+                     "-Dclojure.storm.instrumentOnlyPrefixes=test.,reitit.,examples.,starfederation.,ring.adapter.jetty,org.httpkit.server"]}
+
 
   
   :test {:extra-paths ["test-resources/"
