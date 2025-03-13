@@ -259,7 +259,6 @@ export interface FetchEventSourceInit extends RequestInit {
 }
 
 export function fetchEventSource(
-  ctx: RuntimeContext,
   input: RequestInfo,
   {
     signal: inputSignal,
@@ -363,11 +362,11 @@ export function fetchEventSource(
             if (retries >= retryMaxCount) {
               // we should not retry anymore:
               dispose()
-              // Max retries hit, check your server or network connection
-              reject(runtimeErr('SseMaxRetries', ctx, { retryMaxCount }))
+              // Max retries reached, check your server or network connection
+              reject('Max retries reached.')
             } else {
               console.error(
-                `Datastar failed to reach ${rest.method}: ${input.toString()} retry in ${interval}ms`,
+                `Datastar failed to reach ${input.toString()} retrying in ${interval}ms.`,
               )
             }
           } catch (innerErr) {
