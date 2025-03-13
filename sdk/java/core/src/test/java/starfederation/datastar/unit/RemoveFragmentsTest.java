@@ -12,13 +12,11 @@ class RemoveFragmentsTest {
     void builderShouldGenerateCorrectEvent() {
         RemoveFragments event = RemoveFragments.builder()
                 .selector("#feed")
-                .settleDuration(500)
                 .useViewTransition(true)
                 .build();
 
         String[] expectedDataLines = {
                 "selector #feed",
-                "settleDuration 500",
                 "useViewTransition true"
         };
 

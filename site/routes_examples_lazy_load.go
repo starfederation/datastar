@@ -18,7 +18,6 @@ func setupExamplesLazyLoad(examplesRouter chi.Router) error {
 		time.Sleep(2 * time.Second)
 		datastar.NewSSE(w, r).MergeFragmentTempl(
 			lazyLoadGraph(),
-			datastar.WithSettleDuration(1*time.Second),
 		)
 	})
 

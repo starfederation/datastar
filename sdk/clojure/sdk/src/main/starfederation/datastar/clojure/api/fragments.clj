@@ -40,19 +40,6 @@
 
 
 ;; -----------------------------------------------------------------------------
-;; Settle duration helpers
-(defn- add-settle-duration? [d]
-  (and d (> d consts/default-fragments-settle-duration)))
-
-
-(defn- add-settle-duration?! [data-lines! d]
-  (common/add-opt-line!
-    data-lines!
-    add-settle-duration?
-    consts/settle-duration-dataline-literal
-    d))
-
-;; -----------------------------------------------------------------------------
 ;; View transition helpers
 (defn add-view-transition? [val]
   (common/add-boolean-option? consts/default-fragments-use-view-transitions
@@ -81,7 +68,6 @@
   (u/transient-> []
     (add-selector?!            (common/selector opts))
     (add-fragment-merge-mode?! (common/merge-mode opts))
-    (add-settle-duration?!     (common/settle-duration opts))
     (add-view-transition?!     (common/use-view-transition opts))
     (add-merge-fragment!       fragment)))
 
@@ -93,11 +79,9 @@
   (->merge-fragment "<div>hello</div> \n<div>world!!!</div>"
                     {common/selector "#toto"
                      common/merge-mode consts/fragment-merge-mode-after
-                     common/settle-duration 500
                      common/use-view-transition :toto})
   := ["selector #toto"
       "mergeMode after"
-      "settleDuration 500"
       "useViewTransition true"
       "fragments <div>hello</div> "
       "fragments <div>world!!!</div>"])
@@ -131,7 +115,6 @@
   (u/transient-> []
     (add-selector?!            (common/selector opts))
     (add-fragment-merge-mode?! (common/merge-mode opts))
-    (add-settle-duration?!     (common/settle-duration opts))
     (add-view-transition?!     (common/use-view-transition opts))
     (add-merge-fragments!      fragments)))
 
@@ -158,11 +141,9 @@
   (->merge-fragments ["<div>hello</div> \n<div>world!!!</div>" "<div>world!!!</div>"]
                      {common/selector "#toto"
                       common/merge-mode consts/fragment-merge-mode-after
-                      common/settle-duration 500
                       common/use-view-transition true})
   := ["selector #toto"
       "mergeMode after"
-      "settleDuration 500"
       "useViewTransition true"
       "fragments <div>hello</div> "
       "fragments <div>world!!!</div>"
@@ -174,16 +155,14 @@
 ;; -----------------------------------------------------------------------------
 (defn ->remove-fragment [selector opts]
   (u/transient-> []
-    (add-settle-duration?! (common/settle-duration opts))
     (add-view-transition?! (common/use-view-transition opts))
     (add-selector! selector)))
 
 
 (comment
   (->remove-fragment "#titi"
-                     {common/settle-duration 500
-                      common/use-view-transition true})
-  := ["selector #titi" "settleDuration 500" "useViewTransition true"])
+                     {common/use-view-transition true})
+  := ["selector #titi" "useViewTransition true"])
 
 
 (defn remove-fragment! [sse-gen selector opts]

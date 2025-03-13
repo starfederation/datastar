@@ -14,7 +14,6 @@ These function take options map whose keys are:
 - [[retry-duration]]
 - [[selector]]
 - [[merge-mode]]
-- [[settle-duration]]
 - [[use-view-transition]]
 - [[only-if-missing]]
 - [[auto-remove]]
@@ -155,16 +154,6 @@ Some scripts are provided:
   "
   common/merge-mode)
 
-(def settle-duration
-  "[[merge-fragment!]] / [[remove-fragment!]] option, number:
-
-  Used to control the amount of time that a fragment
-  should take before removing any CSS related to settling. It is used to allow
-  for animations in the browser via the Datastar client. If provided the value must
-  be a positive integer of the number of milliseconds to allow for settling. If none
-  is provided, the default value of 300 milliseconds will be used."
-  common/settle-duration)
-
 (def use-view-transition
   "[[merge-fragment!]] / [[remove-fragment!]  option, boolean:
 
@@ -247,7 +236,6 @@ Some scripts are provided:
   - [[retry-duration]]
   - [[selector]]
   - [[merge-mode]]
-  - [[settle-duration]]
   - [[use-view-transition]]
 
   Return value:
@@ -282,7 +270,6 @@ Some scripts are provided:
   Options keys:
   - [[id]]
   - [[retry-duration]]
-  - [[settle-duration]]
   - [[use-view-transition]]
 
   Return value:

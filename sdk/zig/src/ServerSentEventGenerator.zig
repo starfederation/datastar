@@ -34,9 +34,6 @@ pub const MergeFragmentsOptions = struct {
     selector: ?[]const u8 = null,
     /// The mode to use when merging the fragment into the DOM.
     merge_mode: consts.FragmentMergeMode = consts.default_fragment_merge_mode,
-    /// The amount of time that a fragment should take before removing any CSS related to settling.
-    /// `settle_duration` is used to allow for animations in the browser via the Datastar client.
-    settle_duration: u32 = consts.default_fragments_settle_duration,
     /// Whether to use view transitions.
     use_view_transition: bool = consts.default_fragments_use_view_transitions,
 };
@@ -61,9 +58,6 @@ pub const RemoveFragmentsOptions = struct {
     /// `retry_duration` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
     /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
     retry_duration: u32 = consts.default_sse_retry_duration,
-    /// The amount of time that a fragment should take before removing any CSS related to settling.
-    /// `settle_duration` is used to allow for animations in the browser via the Datastar client.
-    settle_duration: u32 = consts.default_fragments_settle_duration,
     /// Whether to use view transitions.
     use_view_transition: bool = consts.default_fragments_use_view_transitions,
 };
@@ -195,15 +189,6 @@ pub fn mergeFragments(
         );
     }
 
-    if (options.settle_duration != consts.default_fragments_settle_duration) {
-        try writer.print(
-            consts.settle_duration_dataline_literal ++ " {d}\n",
-            .{
-                options.settle_duration,
-            },
-        );
-    }
-
     if (options.use_view_transition != consts.default_fragments_use_view_transitions) {
         try writer.print(
             consts.use_view_transition_dataline_literal ++ " {}\n",
@@ -280,15 +265,6 @@ pub fn removeFragments(
     var data = ArrayList(u8).empty;
     errdefer data.deinit(self.allocator);
     const writer = data.writer();
-
-    if (options.settle_duration != consts.default_fragments_settle_duration) {
-        try writer.print(
-            consts.settle_duration_dataline_literal ++ " {d}\n",
-            .{
-                options.settle_duration,
-            },
-        );
-    }
 
     if (options.use_view_transition != consts.default_fragments_use_view_transitions) {
         try writer.print(

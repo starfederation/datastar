@@ -101,7 +101,6 @@ instance Prompt MergeMode where
    prompt UpsertAttributes = cUpsertAttributes
 
 data FragmentOptions = FO {
-    settleDuration    :: Int
   , useViewTransition :: Bool
   } deriving (Show)
 
@@ -109,13 +108,11 @@ data FragmentOptions = FO {
 
 instance Default FragmentOptions where
   def = FO {
-    settleDuration     = cDefaultFragmentsSettleDuration
-  , useViewTransition  = cDefaultFragmentsUseViewTransitions
+    useViewTransition  = cDefaultFragmentsUseViewTransitions
   }
 
 instance Prompt FragmentOptions where
   prompt (FO a b) = mconcat . buildLines $ [
-      withDefault cSettleDuration    (prompt cDefaultFragmentsSettleDuration)   (prompt a)
     , withDefault cUseViewTransition (prompt cDefaultFragmentsUseViewTransitions)  (prompt b)
     ]
 
