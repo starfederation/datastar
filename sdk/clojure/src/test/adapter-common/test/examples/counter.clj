@@ -4,6 +4,7 @@
     [dev.onionpancakes.chassis.core :as h]
     [dev.onionpancakes.chassis.compiler :as hc]
     [ring.util.response :as rur]
+    [starfederation.datastar.clojure.adapter.common :as ac]
     [starfederation.datastar.clojure.api :as d*]
     [test.utils :as u]))
 
@@ -101,10 +102,10 @@
 
 
 (defn ->update-signal [->sse-response]
-  (fn hk-update-signal [req f & args]
+  (fn update-signal [req f & args]
     (->sse-response req
-      {:on-open (fn [sse-gen]
-                  (d*/merge-signals! sse-gen (apply update-signal* req f args))
-                  (d*/close-sse! sse-gen))})))
+      {ac/on-open (fn [sse-gen]
+                    (d*/merge-signals! sse-gen (apply update-signal* req f args))
+                    (d*/close-sse! sse-gen))})))
 
 

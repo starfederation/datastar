@@ -1,5 +1,6 @@
 (ns starfederation.datastar.clojure.adapter.test
   (:require
+    [starfederation.datastar.clojure.adapter.common :as ac]
     [starfederation.datastar.clojure.api.sse :as sse]
     [starfederation.datastar.clojure.protocols :as p]
     [starfederation.datastar.clojure.utils :as u])
@@ -16,7 +17,10 @@
         (sse/write-event! event-type data-lines opts)
         str))
 
-  (close-sse! [_]))
+  (get-lock [_])
+
+  (close-sse! [_])
+  (sse-gen? [_] true))
 
 
 
@@ -34,22 +38,27 @@
                             (sse/write-event! event-type data-lines opts)
                             str))))
 
+  (get-lock [_] lock)
+
   (close-sse! [_]
     (u/lock! lock
       (vreset! !open? false)))
+
+  (sse-gen? [_] true)
 
   Closeable
   (close [this]
     (p/close-sse! this)))
 
-(java.util.ArrayList. 1)
 
 (defn ->sse-response
   "Fake a sse-response, the events sent with sse-gen during the
   `on-open` callback are recorded in a vector stored in an atom returned as the
   body of the response."
-  [req {:keys [status headers on-open]}]
-  (let [!rec (volatile! [])
+  [req {on-open ac/on-open
+        :keys [status headers]}]
+  (let [
+        !rec (volatile! [])
         sse-gen (->RecordMsgGen (ReentrantLock.)
                                 !rec
                                 (volatile! true))]
@@ -57,5 +66,4 @@
     {:status (or status 200)
      :headers (merge headers (sse/headers req))
      :body !rec}))
-
 

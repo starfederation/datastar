@@ -3,6 +3,9 @@
     [starfederation.datastar.clojure.consts :as consts]
     [starfederation.datastar.clojure.api :as d*]))
 
+;; Examples of how one might want to build a higher level api
+;; on top of the SDK
+
 (def example
   {:event ::merge-fragments
    :fragments ["<div>hello</div>"]

@@ -13,12 +13,24 @@ Also, for the library as a whole we try to stay close to the
 An SSE generator is made by implementing the
 `starfederation.datastar.clojure.protocols/SSEGenerator` protocol.
 
-There are 2 functions to implement:
+There are 4 functions to implement:
 
 - `(send-event! [this event-type data-lines opts] )`
   This function must contain the logic to actually send a SSE event.
+- `(get-lock [this])`
+  This function mus return the lock used by the sse-gen. It enables the
+  `starfederation.datastar.clojure/lock-sse!` macro.
 - `(close-sse! [this] "Close connection.")`
   This function must close the connection use by the `SSEGenerator`.
+- `(sse-gen? [this])`
+  This function should return true. It allows us not to use
+  `clojure.core/satisfies` when testing for a generator in schemas for instance.
+
+### Implementing `get-lock`
+
+As specified in the ADR for SDKs, the sending of events is protected by a lock.
+You need to use a `java.util.concurrent.locks.ReentrantLock` for this.
+This function should return the lock the SSE generator is using.
 
 ### Implementing `send-event!`
 
@@ -55,11 +67,11 @@ of sending it looks like:
 ```
 
 As per the design doc that all Datastar SDKs follow, we use a lock in this
-function (`java.util.concurrent.locks.ReentrantLock`) to protect
-from several threads concurrently writing any underlying buffer before flushing.
+function to protect from several threads concurrently writing any underlying
+buffer before flushing.
 
-See `starfederation.datastar.clojure.utils/lock!` for a helper with the
-Reentrant locks.
+See `starfederation.datastar.clojure.utils/lock!`, it is a helper macro similar
+to the clojure's `locking` but for Reentrant locks.
 
 > [!note]
 > The lock is not needed in this example, since the buffer is created for each call.
@@ -68,9 +80,11 @@ Reentrant locks.
 ### Implementing `close-sse!`
 
 Just close whatever constitutes a connection for your particular adapter.
+This function's body should be protected using the SSE generator's lock.
 
-If you follow the conventions detailed below, you must call an `on-close`
-callback in this function.
+### Implementing `sse-gen?`
+
+This function should return true.
 
 ## Conventions followed in the provided adapters
 
@@ -87,11 +101,15 @@ This function takes 2 arguments:
 - a map whose keys are:
   - `:status`: the HTTP status for the response
   - `:headers`: a map of `str -> str`, HTTP headers to add to the response.
-  - `:on-open`: a mandatory callback that must be called when the SSE connection is opened.
+  - `:d*.sse/on-open`: a mandatory callback that must be called when the SSE connection is opened.
     It has 1 argument, the SSE Generator.
-  - `:on-close`: A callback called when the SSE connection is closed.
+  - `:d*.sse/on-close`: A callback called when the SSE connection is closed.
     Each adapter may have a different parameters list for this callback, depending on what
     is relevant. Still the first parameter should be the SSE generator.
+  - `:d*.sse/on-exception`: A callback called when an exception is thrown sending an event.
+    It takes 3 arguments: the sse-gen, the exception and a context map
+  - `:d*.sse/write-profile`: a map that allows the configuration of the SSE connection.
+  - other options you want to add to your generator
 
 It has 2 responsibilities:
 
@@ -106,6 +124,6 @@ The implementation must call the `on-open` callback when the underlying connecti
 
 ### The `close-sse!` function
 
-This function must call the `on-close` callback provided when using the `->sse-response`
-function. Here the lock used when writing an event is reused when closing the underlying
-connection.
+Beyond closing the connection object used by your adapter, This function must call
+the `on-close` callback provided when using the `->sse-response`
+function. Note that the callback should be protected by using the SSE generator's lock.

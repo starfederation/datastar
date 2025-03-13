@@ -1,4 +1,4 @@
-(ns test.api-test
+(ns starfederation.datastar.clojure.api-test
   (:require
     [clojure.string :as string]
     [clojure.template :as ct]
@@ -22,7 +22,7 @@
 ;; -----------------------------------------------------------------------------
 ;; Basic event
 ;; -----------------------------------------------------------------------------
-(defn event-begining
+(defn event-beginning
   "Alternate, simplified implementation of
   [starfederation.datastar.clojure.api.sse/write-event!]"
   [event-type & {id             d*/id
@@ -42,7 +42,7 @@
 
 (defn event [event-type data-lines & {:as opts}]
   (string/join \newline
-    (concat (event-begining event-type opts)
+    (concat (event-beginning event-type opts)
             data-lines
             event-end)))
 

@@ -1,14 +1,14 @@
 ;; Import the SDK's api and your adapter
 (require
   '[starfederation.datastar.clojure.api :as d*]
-  '[starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response]])
+  '[starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response on-open]])
 
 
 ;; in a ring handler
 (defn handler [request]
   ;; Create a SSE response
   (->sse-response request
-   {:on-open
+   {on-open
     (fn [sse]
       ;; Merge html fragments into the DOM
       (d*/merge-fragment! sse
