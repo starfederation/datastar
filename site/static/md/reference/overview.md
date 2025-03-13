@@ -83,7 +83,7 @@ Datastar uses Server-Sent Events (SSE) to communicate from the server to the cli
 
 | Event Type | Description |
 |------------|-------------|
-| [`datastar-merge-fragments`](/reference/sse_events#datastar-merge-fragments) | Merges HTML fragments into the DOM with various merge strategies. |
+| [`datastar-merge-fragments`](/reference/sse_events#datastar-merge-fragments) | Merges HTML fragments into the DOM. |
 | [`datastar-merge-signals`](/reference/sse_events#datastar-merge-signals) | Updates signals with new values. |
 | [`datastar-remove-fragments`](/reference/sse_events#datastar-remove-fragments) | Removes HTML fragments matching selectors. |
 | [`datastar-remove-signals`](/reference/sse_events#datastar-remove-signals) | Removes signals matching specific paths. |
@@ -115,8 +115,8 @@ Security guidelines for using Datastar expressions safely:
 | Consideration | Description |
 |---------------|-------------|
 | Escape User Input | Always escape user input to prevent XSS attacks when using Datastar expressions. |
-| Avoid Sensitive Data | Signal values are visible in source code and can be modified, avoid using sensitive data. |
-| data-star-ignore | Use this attribute to ignore unsafe content that cannot be escaped. |
+| Avoid Sensitive Data | Signal values are visible in source code and can be modified, avoid leaking sensitive data. |
+| Ignore Unsafe Input | Use `data-star-ignore` to ignore unsafe content that cannot be escaped. |
 | Content Security Policy | Requires 'unsafe-eval' for script sources since Datastar evaluates expressions using IIFE. |
 
 View the [security reference](/reference/security).
