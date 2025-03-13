@@ -20,6 +20,7 @@ func setupReferences(ctx context.Context, router chi.Router) error {
 		{
 			Label: "Reference",
 			Links: []*SidebarLink{
+				{ID: "index"},
 				{ID: "attribute_plugins"},
 				{ID: "action_plugins"},
 				{ID: "expression_context"},
