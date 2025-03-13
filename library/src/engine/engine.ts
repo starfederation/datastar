@@ -349,7 +349,7 @@ function genRX(
     userExpression = userExpression.replace(k, v)
   }
 
-  const fnContent = `return (()=> {\n${userExpression}\n})()` // Wrap in IIFE
+  const fnContent = `return (() => {\n${userExpression}\n})()` // Wrap in IIFE
   ctx.fnContent = fnContent
 
   try {
