@@ -22,6 +22,7 @@ function dispatchSSE(el: HTMLorSVGElement, type: string, argsRaw: Record<string,
   el.dispatchEvent(
     new CustomEvent<DatastarSSEEvent>(DATASTAR_SSE_EVENT, {
       detail: { type, argsRaw },
+      bubbles: true,
     }),
   )
 }
