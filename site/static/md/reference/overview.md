@@ -1,4 +1,4 @@
-# Datastar API Reference
+# Overview
 
 - [Attribute Plugins](#attribute-plugins)
 - [Action Plugins](#action-plugins)
@@ -95,7 +95,7 @@ View the [SSE events reference](/reference/sse_events).
 
 Officially supported SDKs for generating Datastar-specific SSE events:
 - [Clojure](/reference/sdks#clojure)
-- [dotnet](/reference/sdks#dotnet)
+- [.NET](/reference/sdks#net)
 - [Go](/reference/sdks#go)
 - [Haskell](/reference/sdks#haskell)
 - [Java](/reference/sdks#java)
