@@ -18,24 +18,6 @@
   ],
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./plugins": {
-      "import": "./dist/plugins/index.js",
-      "types": "./dist/plugins/index.d.ts"
-    },
-    "./types": {
-      "import": "./dist/engine/types.js",
-      "types": "./dist/engine/types.d.ts"
-    },
-    "./bundles/*": {
-      "import": "./dist/bundles/*.js",
-      "types": "./dist/bundles/*.d.ts"
-    }
-  },
   "scripts": {
     "build": "tsc"
   },
