@@ -359,7 +359,7 @@ export function fetchEventSource(
             retryInterval *= retryScaler // exponential backoff
             retryInterval = Math.min(retryInterval, retryMaxWaitMs)
             retries++
-            if (retries >= retryMaxCount) {
+            if (retries > retryMaxCount) {
               // we should not retry anymore:
               dispose()
               // Max retries reached, check your server or network connection
