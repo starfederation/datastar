@@ -5,28 +5,28 @@
 - [Expression Context](#expression-context)
 - [Server-Sent Events](#server-sent-events)
 - [SDKs](#sdks)
-- [Custom Builds](#custom-builds)
 - [Security](#security)
+- [Custom Builds](#custom-builds)
 
 ## Attribute Plugins
 
-Attribute plugins are data-* attributes that add dynamic behavior to HTML elements.
+Attribute plugins are `data-*` attributes that add reactive behavior to HTML elements.
 
 ### Core Plugins
 
 | Plugin | Description |
 |--------|-------------|
-| [`data-signals`](/reference/attribute_plugins#data-signals) | Merges one or more signals into existing signals. |
+| [`data-signals`](/reference/attribute_plugins#data-signals) | Merges one or more signals into the existing signals. |
 | [`data-computed`](/reference/attribute_plugins#data-computed) | Creates a read-only signal computed from an expression. |
-| [`data-ref`](/reference/attribute_plugins#data-ref) | Creates a signal reference to the current DOM element. |
-| [`data-star-ignore`](/reference/attribute_plugins#data-star-ignore) | Tells Datastar to ignore an element and its descendants when processing. |
+| [`data-ref`](/reference/attribute_plugins#data-ref) | Creates a signal reference to the DOM element. |
+| [`data-star-ignore`](/reference/attribute_plugins#data-star-ignore) | Ignores an element and its descendants when processing. |
 
 ### DOM Plugins
 
 | Plugin | Description |
 |--------|-------------|
 | [`data-attr`](/reference/attribute_plugins#data-attr) | Sets any HTML attribute value using expressions. |
-| [`data-bind`](/reference/attribute_plugins#data-bind) | Creates two-way data binding between an element's value and a signal. |
+| [`data-bind`](/reference/attribute_plugins#data-bind) | Creates two-way data binding between a signal and an element's value. |
 | [`data-class`](/reference/attribute_plugins#data-class) | Adds or removes CSS classes based on expressions. |
 | [`data-on`](/reference/attribute_plugins#data-on) | Attaches event listeners that execute expressions. |
 | [`data-persist`](/reference/attribute_plugins#data-persist) | Persists signals in Local Storage or Session Storage. |
@@ -37,11 +37,11 @@ Attribute plugins are data-* attributes that add dynamic behavior to HTML elemen
 
 | Plugin | Description |
 |--------|-------------|
-| [`data-custom-validity`](/reference/attribute_plugins#data-custom-validity) | Adds custom form validation messages. |
+| [`data-custom-validity`](/reference/attribute_plugins#data-custom-validity) | Adds custom validation to elements. |
 | [`data-intersects`](/reference/attribute_plugins#data-intersects) | Runs expressions when elements intersect the viewport. |
 | [`data-scroll-into-view`](/reference/attribute_plugins#data-scroll-into-view) | Scrolls elements into view with various options. |
 | [`data-show`](/reference/attribute_plugins#data-show) | Shows or hides elements based on expressions. |
-| [`data-view-transition`](/reference/attribute_plugins#data-view-transition) | Sets view-transition-name for View Transitions API. |
+| [`data-view-transition`](/reference/attribute_plugins#data-view-transition) | Sets `view-transition-name` for View Transitions API. |
 
 ### Backend Plugins
 
@@ -49,11 +49,11 @@ Attribute plugins are data-* attributes that add dynamic behavior to HTML elemen
 |--------|-------------|
 | [`data-indicator`](/reference/attribute_plugins#data-indicator) | Creates signals that indicate when SSE requests are in flight. |
 
-[View full attribute plugins documentation](/reference/attribute_plugins)
+View the [attribute plugins reference](/reference/attribute_plugins).
 
 ## Action Plugins
 
-Action plugins are used in Datastar expressions to trigger specific behaviors.
+Action plugins are used in Datastar expressions to perform specific actions.
 
 | Plugin | Description |
 |--------|-------------|
@@ -67,16 +67,15 @@ Action plugins are used in Datastar expressions to trigger specific behaviors.
 | [`@toggleAll()`](/reference/action_plugins#toggleall) | Toggles all signals that start with a given prefix. |
 | [`@fit()`](/reference/action_plugins#fit) | Makes a value linearly interpolate from an original range to a new one. |
 
-[View full action plugins documentation](/reference/action_plugins)
+View the [action plugins reference](/reference/action_plugins).
 
 ## Expression Context
 
 Datastar expressions have access to a context object (`ctx`) providing:
-- Current element reference
-- Current plugin reference
-- Signals root object for accessing and modifying signals
+- Current element reference (`ctx.el`)
+- Signals root object for accessing and modifying signals (`ctx.signals`)
 
-[View full expression context documentation](/reference/expression_context)
+View the [expression context reference](/reference/expression_context)
 
 ## Server-Sent Events
 
@@ -90,13 +89,13 @@ Datastar uses Server-Sent Events (SSE) to communicate from the server to the cli
 | [`datastar-remove-signals`](/reference/sse_events#datastar-remove-signals) | Removes signals matching specific paths. |
 | [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) | Executes JavaScript in the browser. |
 
-[View full SSE events documentation](/reference/sse_events)
+View the [SSE events reference](/reference/sse_events).
 
 ## SDKs
 
 Officially supported SDKs for generating Datastar-specific SSE events:
 - [Clojure](/reference/sdks#clojure)
-- [.NET](/reference/sdks#net)
+- [dotnet](/reference/sdks#dotnet)
 - [Go](/reference/sdks#go)
 - [Haskell](/reference/sdks#haskell)
 - [Java](/reference/sdks#java)
@@ -107,7 +106,7 @@ Officially supported SDKs for generating Datastar-specific SSE events:
 - [TypeScript](/reference/sdks#typescript)
 - [Zig](/reference/sdks#zig)
 
-[View full SDK documentation](/reference/sdks)
+View the [SDK reference](/reference/sdks).
 
 ## Security
 
@@ -120,7 +119,7 @@ Security guidelines for using Datastar expressions safely:
 | data-star-ignore | Use this attribute to ignore unsafe content that cannot be escaped. |
 | Content Security Policy | Requires 'unsafe-eval' for script sources since Datastar evaluates expressions using IIFE. |
 
-[View full security documentation](/reference/security)
+View the [security reference](/reference/security).
 
 ## Custom Builds
 
@@ -131,4 +130,4 @@ Key features:
 - Create aliased builds (data-ds-*) to resolve conflicts with legacy libraries
 - Use the NPM package to create custom builds programmatically
 
-[View full custom builds documentation](/reference/custom_builds)
+View the [custom builds reference](/reference/custom_builds).
