@@ -22,30 +22,32 @@
   <repositories>
     <repository>
       <id>github</id>
-      <url>https://maven.pkg.github.com/starfederation/datastar</url>
+      <name>GitHub rphumulock Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/rphumulock/datastar</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
     </repository>
   </repositories>
 
   <dependencies>
     <dependency>
-      <groupId>StarFederation.Datastar</groupId>
-      <artifactId>datastar-java</artifactId>
-      <version>1.0.1</version>
+      <groupId>com.starfederation</groupId>
+      <artifactId>datastar-java-sdk-core</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.starfederation</groupId>
+      <artifactId>datastar-java-sdk-jaxrs</artifactId>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.4.14</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-      <version>${jetty.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
-      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>
