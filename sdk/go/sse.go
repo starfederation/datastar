@@ -10,13 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/CAFxX/httpcompression/contrib/andybalholm/brotli"
-	"github.com/CAFxX/httpcompression/contrib/compress/gzip"
-	"github.com/CAFxX/httpcompression/contrib/compress/zlib"
-	"github.com/CAFxX/httpcompression/contrib/klauspost/zstd"
 	"github.com/valyala/bytebufferpool"
-
-	zstd_opts "github.com/klauspost/compress/zstd"
 )
 
 type ServerSentEventGenerator struct {
@@ -26,101 +20,10 @@ type ServerSentEventGenerator struct {
 	rc              *http.ResponseController
 	shouldLogPanics bool
 	encoding        string
+	acceptEncoding  string
 }
 
 type SSEOption func(*ServerSentEventGenerator)
-
-type GzipOption func(*gzip.Options)
-
-func WithGzipLevel(level int) GzipOption {
-	return func(opts *gzip.Options) {
-		opts.Level = level
-	}
-}
-
-func WithGzip(opts ...GzipOption) SSEOption {
-	return func(sse *ServerSentEventGenerator) {
-		// set default options
-		options := gzip.Options{
-			Level: gzip.DefaultCompression,
-		}
-		// Apply all provided options.
-		for _, opt := range opts {
-			opt(&options)
-		}
-		comp, _ := gzip.New(options)
-		sse.w = comp.Get(sse.w)
-		sse.encoding = gzip.Encoding
-	}
-}
-
-type DeflateOption func(*zlib.Options)
-
-func WithDeflateLevel(level int) DeflateOption {
-	return func(opts *zlib.Options) {
-		opts.Level = level
-	}
-}
-
-func WithDeflateDictionary(dict []byte) DeflateOption {
-	return func(opts *zlib.Options) {
-		opts.Dictionary = dict
-	}
-}
-
-func WithDeflate(opts ...DeflateOption) SSEOption {
-	return func(sse *ServerSentEventGenerator) {
-		options := zlib.Options{
-			Level: zlib.DefaultCompression,
-		}
-
-		for _, opt := range opts {
-			opt(&options)
-		}
-
-		comp, _ := zlib.New(options)
-		sse.w = comp.Get(sse.w)
-		sse.encoding = zlib.Encoding
-	}
-}
-
-type brotliOption func(*brotli.Options)
-
-func WithBrotliLevel(level int) brotliOption {
-	return func(opts *brotli.Options) {
-		opts.Quality = level
-	}
-}
-
-func WithBrotliLGWin(lgwin int) brotliOption {
-	return func(opts *brotli.Options) {
-		opts.LGWin = lgwin
-	}
-}
-
-func WithBrotli(opts ...brotliOption) SSEOption {
-	return func(sse *ServerSentEventGenerator) {
-		options := brotli.Options{
-			Quality: brotli.DefaultCompression,
-		}
-
-		for _, opt := range opts {
-			opt(&options)
-		}
-
-		comp, _ := brotli.New(options)
-		sse.w = comp.Get(sse.w)
-		sse.encoding = brotli.Encoding
-	}
-}
-
-func WithZstd(opts ...zstd_opts.EOption) SSEOption {
-	return func(sse *ServerSentEventGenerator) {
-		comp, _ := zstd.New(opts...)
-		sse.w = comp.Get(sse.w)
-		sse.encoding = zstd.Encoding
-	}
-}
 
 func NewSSE(w http.ResponseWriter, r *http.Request, opts ...SSEOption) *ServerSentEventGenerator {
 	rc := http.NewResponseController(w)
@@ -137,6 +40,7 @@ func NewSSE(w http.ResponseWriter, r *http.Request, opts ...SSEOption) *ServerSe
 		w:               w,
 		rc:              rc,
 		shouldLogPanics: true,
+		acceptEncoding:  r.Header.Get("Accept-Encoding"),
 	}
 
 	// Apply options
