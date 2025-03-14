@@ -9,7 +9,7 @@ import {
   type NestedValues,
   PluginType,
 } from '../../../../engine/types'
-import { trimDollarSignPrefix } from '../../../../utils/text'
+import { modifyCasing, trimDollarSignPrefix } from '../../../../utils/text'
 
 const SESSION = 'session'
 
@@ -17,10 +17,12 @@ export const Persist: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'persist',
   mods: new Set([SESSION]),
-  onLoad: ({ key, value, signals, effect, mods }) => {
+  onLoad: ({ key, effect, mods, signals, value }) => {
+    key = modifyCasing(key, mods)
     if (key === '') {
       key = DATASTAR
     }
+
     const storage = mods.has(SESSION) ? sessionStorage : localStorage
     let paths = value.split(/\s+/).filter((p) => p !== '')
     paths = paths.map((p) => trimDollarSignPrefix(p))

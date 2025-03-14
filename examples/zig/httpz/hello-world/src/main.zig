@@ -1,9 +1,9 @@
 const std = @import("std");
 const httpz = @import("httpz");
-const datastar = @import("datastar");
+const datastar = @import("datastar").httpz;
 
 pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    var gpa = std.heap.DebugAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
@@ -17,7 +17,7 @@ pub fn main() !void {
         server.deinit();
     }
 
-    var router = server.router(.{});
+    var router = try server.router(.{});
 
     router.get("/", index, .{});
     router.get("/hello-world", helloWorld, .{});

@@ -9,24 +9,30 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import { kebabize } from '../../../../utils/text'
+import { kebab } from '../../../../utils/text'
 
 export const Attr: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'attr',
   valReq: Requirement.Must,
-  onLoad: ({ el, genRX, key, effect }) => {
+  onLoad: ({ el, key, effect, genRX }) => {
     const rx = genRX()
     if (key === '') {
       return effect(async () => {
         const binds = rx<NestedValues>()
-        for (const [attr, val] of Object.entries(binds)) {
-          el.setAttribute(attr, val)
+        for (const [key, val] of Object.entries(binds)) {
+          if (val === false) {
+            el.removeAttribute(key)
+          } else {
+            el.setAttribute(key, val)
+          }
         }
       })
     }
 
-    key = kebabize(key)
+    // Attributes are always kebab-case
+    key = kebab(key)
+
     return effect(async () => {
       let value = false
       try {

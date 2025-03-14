@@ -1,0 +1,21 @@
+{-# LANGUAGE QuasiQuotes #-}
+import ServerSentEventGenerator
+import ServerSentEventGenerator.Server.Snap -- or whatever is appropriate
+import Data.Time ( getCurrentTime )
+import Data.Time.Format
+import Data.Text ( pack, unpack )
+import NeatInterpolation
+
+now <- getCurrentTime
+let
+  formatted = pack $ formatTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" now
+  seconds   = formatTime defaultTimeLocale "%S" now
+  duration  = pack $ if seconds < "50" then "5" else "1"
+  message x y   =
+    [trimming|
+      <div id="time" data-on-interval__duration.${x}s="@get('/endpoint')">
+        ${y}
+       </div>
+    |]
+send $ mergeFragments (message duration formatted) def def def def
+

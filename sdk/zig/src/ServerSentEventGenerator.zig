@@ -1,11 +1,11 @@
 const std = @import("std");
 const consts = @import("consts.zig");
+const ArrayList = std.ArrayListUnmanaged;
 
 const default_execute_script_attributes: []const []const u8 = &[_][]const u8{consts.default_execute_script_attributes};
 
 allocator: std.mem.Allocator,
 writer: std.net.Stream.Writer,
-mutex: std.Thread.Mutex = .{},
 
 pub const ExecuteScriptOptions = struct {
     /// `event_id` can be used by the backend to replay events.
@@ -81,31 +81,32 @@ pub const RemoveSignalsOptions = struct {
 fn send(
     self: *@This(),
     event: consts.EventType,
-    data: []const []const u8,
+    data: []const u8,
     options: struct {
         event_id: ?[]const u8 = null,
         retry_duration: u32 = consts.default_sse_retry_duration,
     },
 ) !void {
-    self.mutex.lock();
-    defer self.mutex.unlock();
-
     try self.writer.print("event: {}\n", .{event});
 
     if (options.event_id) |id| {
         try self.writer.print("id: {s}\n", .{id});
     }
 
-    try self.writer.print("retry: {d}\n", .{options.retry_duration});
+    if (options.retry_duration != consts.default_sse_retry_duration) {
+        try self.writer.print("retry: {d}\n", .{options.retry_duration});
+    }
 
-    for (data) |line| {
+    var iter = std.mem.splitScalar(u8, data, '\n');
+    while (iter.next()) |line| {
+        if (line.len == 0) continue;
         try self.writer.print("data: {s}\n", .{line});
     }
 
     try self.writer.writeAll("\n\n");
 }
 
-/// `ExecuteScript` executes JavaScript in the browser
+/// `executeScript` executes JavaScript in the browser
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-execute-script) for more information.
 pub fn executeScript(
@@ -114,51 +115,42 @@ pub fn executeScript(
     script: []const u8,
     options: ExecuteScriptOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.allocator);
+    var data = ArrayList(u8).empty;
+    errdefer data.deinit(self.allocator);
+    const writer = data.writer();
 
-    if (!std.meta.eql(
-        default_execute_script_attributes,
-        options.attributes,
+    if (options.attributes.len != 1 or !std.mem.eql(
+        u8,
+        default_execute_script_attributes[0],
+        options.attributes[0],
     )) {
         for (options.attributes) |attribute| {
-            const line = try std.fmt.allocPrint(
-                self.allocator,
-                "{s} {s}",
+            try writer.print(
+                consts.attributes_dataline_literal ++ " {s}\n",
                 .{
-                    consts.attributes_dataline_literal,
                     attribute,
                 },
             );
-
-            try data.append(line);
         }
     }
 
     if (options.auto_remove != consts.default_execute_script_auto_remove) {
-        const line = try std.fmt.allocPrint(
-            self.allocator,
-            "{s} {s}",
+        try writer.print(
+            consts.auto_remove_dataline_literal ++ " {}\n",
             .{
-                consts.auto_remove_dataline_literal,
-                if (options.auto_remove) "true" else "false",
+                options.auto_remove,
             },
         );
-
-        try data.append(line);
     }
 
     var iter = std.mem.splitScalar(u8, script, '\n');
     while (iter.next()) |elem| {
-        const line = try std.fmt.allocPrint(
-            self.allocator,
-            "{s} {s}",
+        try writer.print(
+            consts.script_dataline_literal ++ " {s}\n",
             .{
-                consts.script_dataline_literal,
                 elem,
             },
         );
-
-        try data.append(line);
     }
 
     try self.send(
@@ -171,7 +163,7 @@ pub fn executeScript(
     );
 }
 
-/// `MergeFragments` merges one or more fragments into the DOM. By default,
+/// `mergeFragments` merges one or more fragments into the DOM. By default,
 /// Datastar merges fragments using Idiomorph, which matches top level elements based on their ID.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-merge-fragments) for more information.
@@ -181,72 +173,54 @@ pub fn mergeFragments(
     fragments: []const u8,
     options: MergeFragmentsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.allocator);
+    var data = ArrayList(u8).empty;
+    errdefer data.deinit(self.allocator);
+    const writer = data.writer();
 
     if (options.selector) |selector| {
-        const line = try std.fmt.allocPrint(
-            self.allocator,
-            "{s} {s}",
+        try writer.print(
+            consts.selector_dataline_literal ++ " {s}\n",
             .{
-                consts.selector_dataline_literal,
                 selector,
             },
         );
-
-        try data.append(line);
     }
 
     if (options.merge_mode != consts.default_fragment_merge_mode) {
-        const line = try std.fmt.allocPrint(
-            self.allocator,
-            "{s} {}",
+        try writer.print(
+            consts.merge_mode_dataline_literal ++ " {}\n",
             .{
-                consts.merge_mode_dataline_literal,
                 options.merge_mode,
             },
         );
-
-        try data.append(line);
     }
 
     if (options.settle_duration != consts.default_fragments_settle_duration) {
-        const line = try std.fmt.allocPrint(
-            self.allocator,
-            "{s} {d}",
+        try writer.print(
+            consts.settle_duration_dataline_literal ++ " {d}\n",
             .{
-                consts.settle_duration_dataline_literal,
                 options.settle_duration,
             },
         );
-
-        try data.append(line);
     }
 
     if (options.use_view_transition != consts.default_fragments_use_view_transitions) {
-        const line = try std.fmt.allocPrint(
-            self.allocator,
-            "{s} {}",
+        try writer.print(
+            consts.use_view_transition_dataline_literal ++ " {}\n",
             .{
-                consts.use_view_transition_dataline_literal,
                 options.use_view_transition,
             },
         );
-
-        try data.append(line);
     }
 
     var iter = std.mem.splitScalar(u8, fragments, '\n');
     while (iter.next()) |elem| {
-        const line = try std.fmt.allocPrint(
-            self.allocator,
-            "{s} {s}",
+        try writer.print(
+            consts.fragments_dataline_literal ++ " {s}\n",
             .{
-                consts.fragments_dataline_literal,
                 elem,
             },
         );
-
-        try data.append(line);
     }
 
     try self.send(
@@ -259,39 +233,31 @@ pub fn mergeFragments(
     );
 }
 
-/// `MergeSignals` sends one or more signals to the browser to be merged into the signals.
+/// `mergeSignals` sends one or more signals to the browser to be merged into the signals.
+/// This function takes in `anytype` as the signals to merge, which can be any type that can be serialized to JSON.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-merge-signals) for more information.
 pub fn mergeSignals(
     self: *@This(),
-    signals: []const u8,
+    signals: anytype,
     options: MergeSignalsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.allocator);
+    var data = ArrayList(u8).empty;
+    errdefer data.deinit(self.allocator);
+    const writer = data.writer();
 
     if (options.only_if_missing != consts.default_merge_signals_only_if_missing) {
-        const line = try std.fmt.allocPrint(
-            self.allocator,
-            "{s} {}",
+        try writer.print(
+            consts.only_if_missing_dataline_literal ++ " {}\n",
             .{
-                consts.only_if_missing_dataline_literal,
                 options.only_if_missing,
             },
         );
-
-        try data.append(line);
     }
 
-    const line = try std.fmt.allocPrint(
-        self.allocator,
-        "{s} {s}",
-        .{
-            consts.signals_dataline_literal,
-            signals,
-        },
-    );
-
-    try data.append(line);
+    try writer.writeAll(consts.signals_dataline_literal ++ " ");
+    try std.json.stringify(signals, .{}, writer);
+    try writer.writeByte('\n');
 
     try self.send(
         .merge_signals,
@@ -303,7 +269,7 @@ pub fn mergeSignals(
     );
 }
 
-/// `RemoveFragments` sends a selector to the browser to remove HTML fragments from the DOM.
+/// `removeFragments` sends a selector to the browser to remove HTML fragments from the DOM.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-remove-fragments) for more information.
 pub fn removeFragments(
@@ -311,44 +277,34 @@ pub fn removeFragments(
     selector: []const u8,
     options: RemoveFragmentsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.allocator);
+    var data = ArrayList(u8).empty;
+    errdefer data.deinit(self.allocator);
+    const writer = data.writer();
 
     if (options.settle_duration != consts.default_fragments_settle_duration) {
-        const line = try std.fmt.allocPrint(
-            self.allocator,
-            "{s} {d}",
+        try writer.print(
+            consts.settle_duration_dataline_literal ++ " {d}\n",
             .{
-                consts.settle_duration_dataline_literal,
                 options.settle_duration,
             },
         );
-
-        try data.append(line);
     }
 
     if (options.use_view_transition != consts.default_fragments_use_view_transitions) {
-        const line = try std.fmt.allocPrint(
-            self.allocator,
-            "{s} {}",
+        try writer.print(
+            consts.use_view_transition_dataline_literal ++ " {}\n",
             .{
-                consts.use_view_transition_dataline_literal,
                 options.use_view_transition,
             },
         );
-
-        try data.append(line);
     }
 
-    const line = try std.fmt.allocPrint(
-        self.allocator,
-        "{s} {s}",
+    try writer.print(
+        consts.selector_dataline_literal ++ " {s}\n",
         .{
-            consts.selector_dataline_literal,
             selector,
         },
     );
-
-    try data.append(line);
 
     try self.send(
         .remove_fragments,
@@ -360,7 +316,7 @@ pub fn removeFragments(
     );
 }
 
-/// `RemoveSignals` sends signals to the browser to be removed from the signals.
+/// `removeSignals` sends signals to the browser to be removed from the signals.
 ///
 /// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-remove-signals) for more information.
 pub fn removeSignals(
@@ -368,19 +324,17 @@ pub fn removeSignals(
     paths: []const []const u8,
     options: RemoveSignalsOptions,
 ) !void {
-    var data = std.ArrayList([]const u8).init(self.allocator);
+    var data = ArrayList(u8).empty;
+    errdefer data.deinit(self.allocator);
+    const writer = data.writer();
 
     for (paths) |path| {
-        const line = try std.fmt.allocPrint(
-            self.allocator,
-            "{s} {s}",
+        try writer.print(
+            consts.paths_dataline_literal ++ " {s}\n",
             .{
-                consts.paths_dataline_literal,
                 path,
             },
         );
-
-        try data.append(line);
     }
 
     try self.send(
@@ -391,4 +345,19 @@ pub fn removeSignals(
             .retry_duration = options.retry_duration,
         },
     );
+}
+
+/// `redirect` sends an `executeScript` event to redirect the user to a new URL.
+pub fn redirect(
+    self: *@This(),
+    url: []const u8,
+    options: ExecuteScriptOptions,
+) !void {
+    const script = try std.fmt.allocPrint(
+        self.allocator,
+        "setTimeout(() => window.location.href = '{s}')",
+        .{url},
+    );
+    errdefer self.allocator.free(script);
+    try self.executeScript(script, options);
 }

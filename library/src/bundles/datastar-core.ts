@@ -1,3 +1,5 @@
-import { Datastar as DS } from '../engine'
+import { apply, load, setAlias } from '../engine'
 
-export const Datastar = DS
+apply()
+
+export { apply, load, setAlias }

@@ -25,27 +25,62 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
     this.res = res;
 
     this.res.writeHead(200, sseHeaders);
-    this.req.on("close", () => {
-      this.res.end();
-    });
   }
 
   /**
-   * Initializes the server-sent event generator and executes the streamFunc function.
+   * Initializes the server-sent event generator and executes the onStart callback.
    *
    * @param req - The NodeJS request object.
    * @param res - The NodeJS response object.
-   * @param streamFunc - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
+   * @param onStart - A function that will be passed the initialized ServerSentEventGenerator class as it's first parameter.
+   * @param options? - An object that can contain onError and onCancel callbacks as well as a keepalive boolean.
+   * The onAbort callback will be called whenever the request is aborted
+   *
+   * The onError callback will be called whenever an error is met. If provided, the onAbort callback will also be executed.
+   * If an onError callback is not provided, then the stream will be ended and the error will be thrown up.
+   *
+   * The stream is always closed after the onStart callback ends.
+   * If onStart is non blocking, but you still need the stream to stay open after it is called,
+   * then the keepalive option will maintain it open until the request is aborted by the client.
    */
   static async stream(
     req: IncomingMessage,
     res: ServerResponse,
-    streamFunc: (stream: ServerSentEventGenerator) => Promise<void> | void,
+    onStart: (stream: ServerSentEventGenerator) => Promise<void> | void,
+    options?: Partial<{
+      onError: (error: unknown) => Promise<void> | void;
+      onAbort: () => Promise<void> | void;
+      keepalive: boolean;
+    }>,
   ): Promise<void> {
-    const stream = streamFunc(new ServerSentEventGenerator(req, res));
-    if (stream instanceof Promise) await stream;
+    const generator = new ServerSentEventGenerator(req, res);
 
-    res.end();
+    req.on("close", async () => {
+      const onAbort = options?.onAbort ? options.onAbort() : null;
+      if (onAbort instanceof Promise) await onAbort;
+
+      res.end();
+    });
+
+    try {
+      const stream = onStart(generator);
+      if (stream instanceof Promise) await stream;
+      if (!options?.keepalive) {
+        res.end();
+      }
+    } catch (error: unknown) {
+      const onAbort = options?.onAbort ? options.onAbort() : null;
+      if (onAbort instanceof Promise) await onAbort;
+
+      if (options?.onError) {
+        const onError = options.onError(error);
+        if (onError instanceof Promise) await onError;
+        res.end();
+      } else {
+        res.end();
+        throw error;
+      }
+    }
   }
 
   protected override send(

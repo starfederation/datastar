@@ -1,0 +1,2 @@
+{:paths ["src/main"]
+ :deps {org.ring-clojure/ring-core-protocols {:mvn/version "1.13.0"}}}

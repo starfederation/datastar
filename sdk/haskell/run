@@ -1,0 +1,1 @@
+cabal run exe:datastar-demo 2>&1

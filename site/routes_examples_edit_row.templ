@@ -85,7 +85,7 @@ templ EditRowContact(contacts []*ContactEdit, i int, isEditingRow, isEditingAnyR
 templ EditRowContacts(contacts []*ContactEdit, signals *EditRowSignals) {
 	<div
 		id="edit_row"
-		class="flex flex-col"
+		class="flex flex-col overflow-scroll"
 		data-signals={ templ.JSONString(signals) }
 	>
 		<table class="table w-full">

@@ -30,7 +30,7 @@ func setupExamplesSignalsChanged(examplesRouter chi.Router, signals sessions.Sto
 		}
 
 		datastar.NewSSE(w, r).MergeFragmentf(
-			`<div id="from_server">Lifetime server updates %d</div>`,
+			`<div id="from_server">Lifetime server updates: %d</div>`,
 			totalUpdates,
 		)
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func setupReferenceRoutes(ctx context.Context, router chi.Router) error {
+func setupReferences(ctx context.Context, router chi.Router) error {
 	mdDataset, err := markdownRenders(ctx, "reference")
 	if err != nil {
 		return err
@@ -20,11 +20,14 @@ func setupReferenceRoutes(ctx context.Context, router chi.Router) error {
 		{
 			Label: "Reference",
 			Links: []*SidebarLink{
+				{ID: "overview"},
 				{ID: "attribute_plugins"},
 				{ID: "action_plugins"},
+				{ID: "expression_context"},
 				{ID: "sse_events"},
-				{ID: "javascript_api"},
 				{ID: "sdks"},
+				{ID: "security"},
+				{ID: "custom_builds"},
 			},
 		},
 	}
@@ -61,6 +64,11 @@ func setupReferenceRoutes(ctx context.Context, router chi.Router) error {
 				http.Redirect(w, r, "/reference/attribute_plugins", http.StatusMovedPermanently)
 			})
 		}
+
+		// Redirect legacy “JavaScript APIs” page.
+		referenceRouter.Get("/javascript_api", func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, "/reference/expression_context", http.StatusMovedPermanently)
+		})
 
 		referenceRouter.Get("/{name}", func(w http.ResponseWriter, r *http.Request) {
 			name := chi.URLParam(r, "name")

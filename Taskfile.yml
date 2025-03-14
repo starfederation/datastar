@@ -70,18 +70,31 @@ tasks:
       - rm -rf site/static/librarySource/*
       - cp -r library/src/* site/static/librarySource/
 
+  library:
+    dir: library
+    requires:
+      vars: [VERSION]
+    sources:
+      - "**/*.ts"
+      - "**/*.js"
+      - "**/*.json"
+    generates:
+      - "dist/**/*"
+    cmds:
+      - pnpm i
+      - pnpm build
+
   libpub:
     dir: library
     requires:
       vars: [VERSION]
     deps:
       - build
+      - library
     cmds:
       - git push origin
       - git tag v{{.VERSION}}
       - git push origin --tags
-      - pnpm i
-      - pnpm build
       - npm publish --access public
       - curl https://purge.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js
       - git push origin --tags
@@ -97,12 +110,17 @@ tasks:
       - git tag sdktsv{{.VERSION}}
       - git push origin --tags
       - deno run -A build.ts {{.VERSION}}
-      - npm publish --access public
+      - cd npm && npm publish --access public
       - curl https://purge.jsdelivr.net/gh/starfederation/datastar/sdk/typescript/npm/esm/web/serverSentEventGenerator.js
       - curl https://purge.jsdelivr.net/gh/starfederation/datastar/sdk/typescript/npm/esm/abstractServerSentEventGenerator.js
       - curl https://purge.jsdelivr.net/gh/starfederation/datastar/sdk/typescript/npm/esm/node/serverSentEventGenerator.js
       - git push origin --tags
 
+  idiomorph:
+    dir: library/src/vendored
+    cmds:
+      - wget -O idiomorph.esm.js https://raw.githubusercontent.com/bigskysoftware/idiomorph/refs/heads/main/dist/idiomorph.esm.js
+      - npx -p typescript tsc *.js --declaration --allowJs --emitDeclarationOnly --outDir .
   css:
     dir: site
     sources:
@@ -118,6 +136,8 @@ tasks:
   templ:
     env:
       TEMPL_EXPERIMENT: rawgo
+    # deps:
+    #   - library
     generates:
       - "**/*_templ.go"
     sources:
@@ -161,11 +181,16 @@ tasks:
       - fly deploy --local-only
 
   test:
-    dir: site/smoketests
     deps:
       - support
     cmds:
-      - go test -v
+      - go test -v github.com/starfederation/datastar/site/smoketests -run '^TestUnit' -count=1 -timeout=1m
+
+  test-all:
+    deps:
+      - support
+    cmds:
+      - go test -v github.com/starfederation/datastar/site/smoketests -count=1 -timeout=1m
 
   default:
     cmds:

@@ -1,13 +1,14 @@
 .{
-    .name = "hello-world",
+    .name = .hello_world,
+    .fingerprint = 0xf73eae91cce00cf1,
     .version = "0.0.0",
     .dependencies = .{
         .tokamak = .{
-            .url = "git+https://github.com/cztomsik/tokamak#b1c5d41533eb10d064d6c65d5e4e63f9fafa84de",
-            .hash = "1220f64b4f83d842ce370ea3b41a04f1d1355e80aaadffad02e044f55fb17f4251a4",
+            .url = "git+https://github.com/cztomsik/tokamak#c9491b312eabbd5683bc236950fd2455c7b07752",
+            .hash = "tokamak-2.0.0-FbnSeSbfAQAIiCUmj1RRpAio0RAHWvRoMFozHcnbeeMb",
         },
-        .datastar_tokamak = .{
-            .path = "../../../../sdk/zig/tokamak",
+        .datastar = .{
+            .path = "../../../../sdk/zig",
         },
     },
     .paths = .{

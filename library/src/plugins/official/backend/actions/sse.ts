@@ -14,6 +14,7 @@ import {
   type DatastarSSEEvent,
   ERROR,
   FINISHED,
+  RETRYING,
   STARTED,
 } from '../shared'
 
@@ -131,7 +132,7 @@ export const sse = async (
             argLines = []
             argsRawLines[key] = argLines
           }
-          const value = line.slice(colonIndex + 1).trim()
+          const value = line.slice(colonIndex + 1)
           argLines.push(value)
         }
 
@@ -141,7 +142,6 @@ export const sse = async (
         }
 
         // if you aren't seeing your event you can debug by using this line in the console
-        // document.addEventListener("datastar-sse",(e) => console.log(e));
         dispatchSSE(type, argsRaw)
       },
       onerror: (error) => {
@@ -152,6 +152,7 @@ export const sse = async (
         // do nothing and it will retry
         if (error) {
           console.error(error.message)
+          dispatchSSE(RETRYING, { message: error.message })
         }
       },
     }
@@ -203,7 +204,7 @@ export const sse = async (
     urlInstance.search = queryParams.toString()
 
     try {
-      await fetchEventSource(ctx, urlInstance.toString(), req)
+      await fetchEventSource(urlInstance.toString(), req)
     } catch (error) {
       if (!isWrongContent(error)) {
         throw runtimeErr('SseFetchFailed', ctx, { method, url, error })

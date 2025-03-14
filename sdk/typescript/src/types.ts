@@ -10,6 +10,12 @@ import {
   DatastarDatalineSettleDuration,
   DatastarDatalineSignals,
   DatastarDatalineUseViewTransition,
+  DefaultExecuteScriptAttributes,
+  DefaultExecuteScriptAutoRemove,
+  DefaultFragmentMergeMode,
+  DefaultFragmentsSettleDurationMs,
+  DefaultFragmentsUseViewTransitions,
+  DefaultMergeSignalsOnlyIfMissing,
   EventTypes,
   FragmentMergeModes,
 } from "./consts.ts";
@@ -89,7 +95,7 @@ type ScriptAttributes = {
 
 export interface ExecuteScriptOptions extends DatastarEventOptions {
   [DatastarDatalineAutoRemove]?: boolean;
-  [DatastarDatalineAttributes]?: ScriptAttributes;
+  [DatastarDatalineAttributes]?: ScriptAttributes | string[];
 }
 
 export interface ExecuteScriptEvent {
@@ -108,15 +114,29 @@ export type MultilineDatalinePrefix =
   | typeof DatastarDatalineScript
   | typeof DatastarDatalineFragments
   | typeof DatastarDatalineSignals;
+
 export type DatastarEventOptionsUnion =
   | MergeFragmentsOptions
   | FragmentOptions
   | MergeSignalsOptions
   | DatastarEventOptions
   | ExecuteScriptOptions;
+
 export type DatastarEvent =
   | MergeFragmentsEvent
   | RemoveFragmentsEvent
   | MergeSignalsEvent
   | RemoveSignalsEvent
   | ExecuteScriptEvent;
+
+export const DefaultMapping = {
+  [DatastarDatalineMergeMode]: DefaultFragmentMergeMode,
+  [DatastarDatalineSettleDuration]: DefaultFragmentsSettleDurationMs,
+  [DatastarDatalineUseViewTransition]: DefaultFragmentsUseViewTransitions,
+  [DatastarDatalineOnlyIfMissing]: DefaultMergeSignalsOnlyIfMissing,
+  [DatastarDatalineAttributes]: {
+    [DefaultExecuteScriptAttributes.split(" ")[0]]:
+      DefaultExecuteScriptAttributes.split(" ")[1],
+  },
+  [DatastarDatalineAutoRemove]: DefaultExecuteScriptAutoRemove,
+} as const;

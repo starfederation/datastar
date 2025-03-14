@@ -1,4 +1,5 @@
 import { DATASTAR } from '../engine/consts'
+import type { HTMLorSVGElement } from '../engine/types'
 
 export class Hash {
   #value = 0
@@ -8,18 +9,25 @@ export class Hash {
     this.#prefix = prefix
   }
 
-  with(x: number | string): Hash {
+  with(x: number | string | boolean): Hash {
     if (typeof x === 'string') {
       for (const c of x.split('')) {
         this.with(c.charCodeAt(0))
       }
+    } else if (typeof x === 'boolean') {
+      this.with(1 << (x ? 7 : 3))
     } else {
-      this.#value = (this.#value << 5) - this.#value + x
+      // use djb2 favored by bernstein http://www.cse.yorku.ca/~oz/hash.html
+      this.#value = (this.#value * 33) ^ x
     }
     return this
   }
 
   get value() {
+    return this.#value
+  }
+
+  get string() {
     return this.#prefix + Math.abs(this.#value).toString(36)
   }
 }
@@ -29,39 +37,44 @@ export function elUniqId(el: Element) {
   const hash = new Hash()
 
   let currentEl = el
-  while (currentEl.parentNode) {
+  while (currentEl) {
+    hash.with(currentEl.tagName || '')
     if (currentEl.id) {
       hash.with(currentEl.id)
       break
     }
-    if (currentEl === currentEl.ownerDocument.documentElement) {
-      hash.with(currentEl.tagName)
-    } else {
-      for (
-        let i = 1, e = el;
-        e.previousElementSibling;
-        e = e.previousElementSibling, i++
-      ) {
-        hash.with(i)
-      }
-    }
+    const p = currentEl?.parentNode
+    if (p) hash.with([...p.children].indexOf(currentEl))
 
-    currentEl = currentEl.parentNode as Element
+    currentEl = p as Element
   }
-  return hash.value
+  return hash.string
 }
 
-export function onElementRemoved(element: Element, callback: () => void) {
-  const observer = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      for (const removedNode of mutation.removedNodes) {
-        if (removedNode === element) {
-          observer.disconnect()
-          callback()
-          return
-        }
-      }
-    }
-  })
-  observer.observe(element.parentNode as Node, { childList: true })
+export function attrHash(key: number | string, val: number | string) {
+  return new Hash().with(key).with(val).value
+}
+
+export function walkDOM(
+  element: Element | null,
+  callback: (el: HTMLorSVGElement) => void,
+) {
+  if (
+    !element ||
+    !(element instanceof HTMLElement || element instanceof SVGElement)
+  ) {
+    return null
+  }
+  const dataset = element.dataset
+  if ('starIgnore' in dataset) {
+    return null
+  }
+  if (!('starIgnore__self' in dataset)) {
+    callback(element)
+  }
+  let el = element.firstElementChild
+  while (el) {
+    walkDOM(el, callback)
+    el = el.nextElementSibling
+  }
 }

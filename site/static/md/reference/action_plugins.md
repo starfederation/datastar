@@ -22,31 +22,6 @@ By default, all requests are sent with a `{datastar: *}` object containing the c
 
 It is possible to send form encoded requests by setting the `contentType` option to `form`. This sends GET requests using `application/x-www-form-urlencoded` encoding and non-GET requests using `multipart/form-data` encoding. See the [form data example](/examples/form_data).
 
-#### Options
-
-The `@get()` action takes a second argument of options.
-
-- `contentType` - The type of content to send. A value of `json` sends all signals in a JSON request. A value of `form` tells the action to look for the closest form to the element on which it is placed (unless a `selector` option is provided), perform validation on the form elements, and send them to the backend using a form request (no signals are sent). Defaults to `json`.
-- `includeLocal` - Whether to include local signals (those beggining with an underscore) in the request. Defaults to `false`.
-- `selector` - Optionally specifies a form to send when the `contentType` option is set to `form`. If the value is `null`, the closest form is used. Defaults to `null`.
-- `headers` - An object containing headers to send with the request.
-- `openWhenHidden` - Whether to keep the connection open with the page is hidden. Useful for dashboards but can cause a drain on battery life and other resources when enabled. Defaults to `false`
-- `retryInterval` - The retry interval in milliseconds. Defaults to `1000` (1 second).
-- `retryScaler` - A numeric multiplier applied to scale retry wait times. Defaults to `2`.
-- `retryMaxWaitMs` - The maximum allowable wait time in milliseconds between retries. Defaults to `30000` (30 seconds).
-- `retryMaxCount` - The maximum number of retry attempts. Defaults to `10`.
-- `abort` - An [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) object that can be used to cancel the request.
-
-```html
-<div data-on-click="@get('/endpoint', {
-  includeLocal: true,
-  headers: {
-    'X-Csrf-Token': 'JImikTbsoCYQ9oGOcvugov0Awc5LbqFsZW6ObRCxuqFHDdPbuFyc4ksPVVa9+EB4Ag+VU6rpc680edNFswIRwg==',
-  },
-  openWhenHidden: true,
-})"></div>
-```
-
 ### `@post()`
 
 Arguments: `@post(url: string, options={})`
@@ -85,6 +60,44 @@ Works the same as `@get()` but sends a `DELETE` request to the backend.
 
 ```html
 <button data-on-click="@delete('/endpoint')"></button>
+```
+
+### Options
+
+All of the actions above take a second argument of options.
+
+- `contentType` - The type of content to send. A value of `json` sends all signals in a JSON request. A value of `form` tells the action to look for the closest form to the element on which it is placed (unless a `selector` option is provided), perform validation on the form elements, and send them to the backend using a form request (no signals are sent). Defaults to `json`.
+- `includeLocal` - Whether to include local signals (those beggining with an underscore) in the request. Defaults to `false`.
+- `selector` - Optionally specifies a form to send when the `contentType` option is set to `form`. If the value is `null`, the closest form is used. Defaults to `null`.
+- `headers` - An object containing headers to send with the request.
+- `openWhenHidden` - Whether to keep the connection open when the page is hidden. Useful for dashboards but can cause a drain on battery life and other resources when enabled. Defaults to `false`.
+- `retryInterval` - The retry interval in milliseconds. Defaults to `1000` (1 second).
+- `retryScaler` - A numeric multiplier applied to scale retry wait times. Defaults to `2`.
+- `retryMaxWaitMs` - The maximum allowable wait time in milliseconds between retries. Defaults to `30000` (30 seconds).
+- `retryMaxCount` - The maximum number of retry attempts. Defaults to `10`.
+- `abort` - An [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) object that can be used to cancel the request.
+
+```html
+<div data-on-click="@get('/endpoint', {
+  includeLocal: true,
+  headers: {
+    'X-Csrf-Token': 'JImikTbsoCYQ9oGOcvugov0Awc5LbqFsZW6ObRCxuqFHDdPbuFyc4ksPVVa9+EB4Ag+VU6rpc680edNFswIRwg==',
+  },
+  openWhenHidden: true,
+})"></div>
+```
+
+### Events
+
+All of the actions above trigger `datastar-sse` events during the SSE request lifecycle. The event type determines the stage of the request.
+
+- `started` - Triggered when the SSE request is started.
+- `finished` - Triggered when the SSE request is finished.
+- `error` - Triggered when the SSE request encounters an error.
+- `retrying` - Triggered when the SSE request is retrying.
+
+```html
+<div data-on-datastar-sse="evt.detail.type == 'error' && console.log('SSE error encountered')"></div>
 ```
 
 ## Browser Plugins

@@ -1,0 +1,9 @@
+use datastar::prelude::*;
+use async_stream::stream;
+use core::time::Duration;
+
+Sse(stream! {
+    yield MergeFragments::new("<div id='indicator'>Redirecting in 3 seconds...</div>").into();
+    tokio::time::sleep(core::time::Duration::from_secs(3)).await;
+    yield ExecuteScript::new("setTimeout(() => window.location = '/guide')").into();
+});

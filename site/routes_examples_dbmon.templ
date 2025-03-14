@@ -9,7 +9,7 @@ import (
 templ pageDBmon(dbs []*DbmonDatabase, mutationRate float64, renderTime time.Duration) {
 	<div
 		id="contents"
-		class="flex flex-col gap-4 p-4 w-full"
+		class="flex flex-col gap-4 p-4 w-full overflow-scroll"
 		data-signals={ fmt.Sprintf("{mutationRate: %d}", int(100*mutationRate)) }
 		data-on-load={ datastar.GetSSE("/examples/dbmon/updates") }
 	>

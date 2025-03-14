@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 templ PageBundler(r *http.Request, manifest PluginManifest, store *BundlerStore) {
@@ -102,9 +103,12 @@ templ PageBundler(r *http.Request, manifest PluginManifest, store *BundlerStore)
 				</div>
 				<label class="form-control w-full">
 					<div class="label">
-						<span class="label-text">Alias Prefix</span>
+						<span class="label-text">Alias</span>
 						<div class="label-text">
-							Only use this if you have some conflict with a legacy library.
+							{{
+								cdnUrl := templ.SafeURL(fmt.Sprintf("https://cdn.jsdelivr.net/gh/starfederation/datastar@%s/bundles/datastar-aliased.js", manifest.Version))
+							}}
+							We maintain a  <a href={ cdnUrl }><code>data-ds-*</code> aliased version here</a>.
 						</div>
 					</div>
 					<input type="text" class="input input-bordered w-full lowercase" data-bind-alias/>
@@ -125,42 +129,38 @@ templ PageBundler(r *http.Request, manifest PluginManifest, store *BundlerStore)
 }
 
 templ bundlerResultsFragment(results BundleResults) {
-	<div id="results" class="flex gap-8">
-		<table class="table w-full">
-			<thead>
-				<tr>
-					<th>Hash</th>
-					<th>Compile Time</th>
-					<th>Source Size Gzipped</th>
-					<th>Fast 4G</th>
-					<th>Slow 4G</th>
-					<th>3G</th>
-					<th class="text-right">Download</th>
-				</tr>
-			</thead>
-			<tbody>
-				{{
+	{{
 					srcBitsF := float64(8 * results.SourceSizeGzipped)
 					srcTime := func(mbps float64) string {
 						srcSecsF := srcBitsF / (mbps * 1024 * 1024)
 						return fmt.Sprintf("%0.1fms", srcSecsF*1000)
 					}
-				}}
-				<tr>
-					<td>{ results.Hash }</td>
-					<td>{ results.CompileTime.String() }</td>
-					<td>{ humanize.Comma(int64( results.SourceSizeGzipped)) } ({ humanize.IBytes(results.SourceSizeGzipped) }) </td>
-					<td>{ srcTime(9) }</td>
-					<td>{ srcTime(1.6) }</td>
-					<td>{ srcTime(0.5) }</td>
-					<td class="text-right">
-						<a class="btn btn-success" href={ templ.SafeURL(results.DownloadURL) }>
-							@icon("material-symbols:folder-zip")
-							{ results.Name }.zip
-						</a>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+	}}
+	<div id="results" class="flex flex-col gap-8">
+		<a class="btn btn-success btn-lg" href={ templ.SafeURL(results.DownloadURL) }>
+			@icon("material-symbols:folder-zip")
+			{ results.Name }.zip
+		</a>
+		<div class="flex flex-wrap gap-4">
+			<div class="stats stats-vertical shadow flex-1">
+				@bundleStat("mdi:rabbit", "Fast 4G", srcTime(9))
+				@bundleStat("fluent:animal-turtle-16-filled", "Slow 3G", srcTime(1.6))
+				@bundleStat("f7:slowmo", "3G", srcTime(0.5))
+			</div>
+			<div class="stats stats-vertical shadow flex-1">
+				@bundleStat("simple-icons:compilerexplorer", "Compile Time", fmt.Sprintf("%0.2fms", float64(results.CompileTime)/float64(time.Millisecond)))
+				@bundleStat("material-symbols:folder-zip", "Source Size", fmt.Sprintf("%d bytes %s", results.SourceSizeGzipped, humanize.IBytes(results.SourceSizeGzipped)))
+			</div>
+		</div>
+	</div>
+}
+
+templ bundleStat(iconName, label, value string) {
+	<div class="stat">
+		<div class="stat-figure text-success text-3xl">
+			@icon(iconName)
+		</div>
+		<div class="stat-title">{ label }</div>
+		<div class="stat-value">{ value }</div>
 	</div>
 }

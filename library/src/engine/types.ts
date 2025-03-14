@@ -54,7 +54,6 @@ export interface AttributePlugin extends DatastarPlugin {
   type: PluginType.Attribute
   onGlobalInit?: (ctx: InitContext) => void // Called once on registration of the plugin
   onLoad: (ctx: RuntimeContext) => OnRemovalFn | void // Return a function to be called on removal
-  removeOnLoad?: (rawKey: string) => boolean // Return whether the attribute key should be removed after onLoad (useful for plugin attributes you don’t want reapplied)
   mods?: Set<string> // If not provided, all modifiers are allowed
   keyReq?: Requirement // The rules for the key requirements
   valReq?: Requirement // The rules for the value requirements
@@ -76,13 +75,14 @@ export interface ActionPlugin extends DatastarPlugin {
 }
 
 export type GlobalInitializer = (ctx: InitContext) => void
-// export type RemovalEntry = { id: string; fns: Array<OnRemovalFn> }
 
 export type InitContext = {
   plugin: DatastarPlugin
   signals: SignalsRoot
   effect: (fn: EffectFn) => OnRemovalFn
   actions: Readonly<ActionPlugins>
+  removals: Map<string, Map<number, OnRemovalFn>>
+  applyToElement: (el: HTMLorSVGElement) => void
 }
 
 export type HTMLorSVGElement = Element & (HTMLElement | SVGElement)

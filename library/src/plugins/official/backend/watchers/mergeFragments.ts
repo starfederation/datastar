@@ -11,16 +11,18 @@ import {
 } from '../../../../engine/consts'
 import { initErr } from '../../../../engine/errors'
 import {
+  type HTMLorSVGElement,
   type InitContext,
   PluginType,
   type WatcherPlugin,
 } from '../../../../engine/types'
+import { attrHash, elUniqId, walkDOM } from '../../../../utils/dom'
 import { isBoolString } from '../../../../utils/text'
 import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
 } from '../../../../utils/view-transtions'
-import { idiomorph } from '../../../../vendored/idiomorph'
+import { Idiomorph } from '../../../../vendored/idiomorph.esm'
 import {
   SETTLING_CLASS,
   SWAPPING_CLASS,
@@ -59,7 +61,7 @@ export const MergeFragments: WatcherPlugin = {
             throw initErr('NoTargetsFound', ctx, { selectorOrID })
           }
 
-          if (supportsViewTransitions && useViewTransition) {
+          if (useViewTransition && supportsViewTransitions) {
             docWithViewTransitionAPI.startViewTransition(() =>
               applyToTargets(ctx, mergeMode, settleDuration, fragment, targets),
             )
@@ -82,14 +84,28 @@ function applyToTargets(
   for (const initialTarget of capturedTargets) {
     initialTarget.classList.add(SWAPPING_CLASS)
     const originalHTML = initialTarget.outerHTML
-    let modifiedTarget = initialTarget
+    const modifiedTarget = initialTarget
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
-        const result = idiomorph(modifiedTarget, fragment)
-        if (!result?.length) {
-          throw initErr('MorphFailed', ctx)
-        }
-        modifiedTarget = result[0] as Element
+        const fragmentWithIDs = fragment.cloneNode(true) as HTMLorSVGElement
+        walkDOM(fragmentWithIDs, (el) => {
+          if (!el.id?.length && Object.keys(el.dataset).length) {
+            el.id = elUniqId(el)
+          }
+          // Rehash the cleanup functions for this element to ensure that plugins are cleaned up and reapplied after merging.
+          const elTracking = ctx.removals.get(el.id)
+          if (elTracking) {
+            const newElTracking = new Map()
+            for (const [key, cleanup] of elTracking) {
+              const newKey = attrHash(key, key)
+              newElTracking.set(newKey, cleanup)
+              elTracking.delete(key)
+            }
+            ctx.removals.set(el.id, newElTracking)
+          }
+        })
+
+        Idiomorph.morph(modifiedTarget, fragmentWithIDs)
         break
       }
       case FragmentMergeModes.Inner:
@@ -128,18 +144,16 @@ function applyToTargets(
     }
 
     const cl = modifiedTarget.classList
-    cl.add(SWAPPING_CLASS)
-
-    // ctx.apply(document.body)
+    cl?.add(SWAPPING_CLASS)
 
     setTimeout(() => {
       initialTarget.classList.remove(SWAPPING_CLASS)
-      cl.remove(SWAPPING_CLASS)
+      cl?.remove(SWAPPING_CLASS)
     }, settleDuration)
 
     const revisedHTML = modifiedTarget.outerHTML
 
-    if (originalHTML !== revisedHTML) {
+    if (cl && originalHTML !== revisedHTML) {
       cl.add(SETTLING_CLASS)
       setTimeout(() => {
         cl.remove(SETTLING_CLASS)

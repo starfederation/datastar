@@ -10,22 +10,23 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import { onElementRemoved } from '../../../../utils/dom'
 import { tagHas, tagToMs } from '../../../../utils/tags'
-import { kebabize } from '../../../../utils/text'
+import { camel, modifyCasing } from '../../../../utils/text'
 import { debounce, delay, throttle } from '../../../../utils/timing'
-
-const lastSignalsMarshalled = new Map<string, any>()
+import { supportsViewTransitions } from '../../../../utils/view-transtions'
+import type { Signal } from '../../../../vendored/preact-core'
 
 const EVT = 'evt'
+const SIGNALS_CHANGE_PREFIX = 'signalsChange'
+const signalChangeKeyLength = SIGNALS_CHANGE_PREFIX.length
+
 export const On: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'on',
   keyReq: Requirement.Must,
   valReq: Requirement.Must,
   argNames: [EVT],
-  removeOnLoad: (rawKey: string) => rawKey.startsWith('onLoad'),
-  onLoad: ({ el, rawKey, key, value, genRX, mods }) => {
+  onLoad: ({ el, key, mods, signals, effect, genRX }) => {
     const rx = genRX()
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
@@ -61,6 +62,12 @@ export const On: AttributePlugin = {
       callback = throttle(callback, wait, leading, trailing)
     }
 
+    if (mods.has('viewtransition') && supportsViewTransitions) {
+      const cb = callback // I hate javascript
+      callback = (...args: any[]) =>
+        document.startViewTransition(() => cb(...args))
+    }
+
     const evtListOpts: AddEventListenerOptions = {
       capture: true,
       passive: false,
@@ -70,80 +77,105 @@ export const On: AttributePlugin = {
     if (mods.has('passive')) evtListOpts.passive = true
     if (mods.has('once')) evtListOpts.once = true
 
-    const eventName = kebabize(key).toLowerCase()
-    switch (eventName) {
-      case 'load': {
-        callback()
-        return () => {}
-      }
+    if (key === 'load') {
+      // Delay the callback to the next microtask so that indicators can be set
+      setTimeout(callback, 0)
+      return () => {}
+    }
 
-      case 'interval': {
-        let duration = 1000
-        const durationArgs = mods.get('duration')
-        if (durationArgs) {
-          duration = tagToMs(durationArgs)
-          const leading = tagHas(durationArgs, 'leading', false)
-          if (leading) {
-            // Remove `.leading` from the dataset so the callback is only ever called on page load
-            el.dataset[rawKey.replace('.leading', '')] = value
-            delete el.dataset[rawKey]
-            callback()
-          }
-        }
-        const intervalId = setInterval(callback, duration)
-
-        return () => {
-          clearInterval(intervalId)
-        }
-      }
-
-      case 'raf': {
-        let rafId: number | undefined
-        const raf = () => {
+    if (key === 'interval') {
+      let duration = 1000
+      const durationArgs = mods.get('duration')
+      if (durationArgs) {
+        duration = tagToMs(durationArgs)
+        const leading = tagHas(durationArgs, 'leading', false)
+        if (leading) {
           callback()
-          rafId = requestAnimationFrame(raf)
-        }
-        rafId = requestAnimationFrame(raf)
-
-        return () => {
-          if (rafId) cancelAnimationFrame(rafId)
         }
       }
+      const intervalId = setInterval(callback, duration)
 
-      case 'signals-change': {
-        onElementRemoved(el, () => {
-          lastSignalsMarshalled.delete(el.id)
-        })
+      return () => {
+        clearInterval(intervalId)
+      }
+    }
 
+    if (key === 'raf') {
+      let rafId: number | undefined
+      const raf = () => {
         callback()
-        const signalFn = (event: CustomEvent<DatastarSignalEvent>) => {
-          callback(event)
+        rafId = requestAnimationFrame(raf)
+      }
+      rafId = requestAnimationFrame(raf)
+
+      return () => {
+        if (rafId) {
+          cancelAnimationFrame(rafId)
         }
+      }
+    }
+
+    if (key === 'resize') {
+      let resizeObserver: ResizeObserver | null = new ResizeObserver(() => {
+        callback()
+      })
+      resizeObserver.observe(el)
+
+      return () => {
+        if (resizeObserver) {
+          resizeObserver.disconnect()
+          resizeObserver = null
+        }
+      }
+    }
+
+    if (key.startsWith(SIGNALS_CHANGE_PREFIX)) {
+      if (key === SIGNALS_CHANGE_PREFIX) {
+        const signalFn = (event: CustomEvent<DatastarSignalEvent>) =>
+          callback(event)
         document.addEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
         return () => {
           document.removeEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
         }
       }
 
-      default: {
-        const testOutside = mods.has('outside')
-        if (testOutside) {
-          target = document
-          const cb = callback
-          const targetOutsideCallback = (e?: Event) => {
-            const targetHTML = e?.target as HTMLElement
-            if (!el.contains(targetHTML)) {
-              cb(e)
-            }
-          }
-          callback = targetOutsideCallback
+      const signalPath = modifyCasing(
+        camel(key.slice(signalChangeKeyLength)),
+        mods,
+      )
+      const signalValues = new Map<Signal, any>()
+      signals.walk((path, signal) => {
+        if (path.startsWith(signalPath)) {
+          signalValues.set(signal, signal.value)
         }
+      })
+      return effect(() => {
+        for (const [signal, prev] of signalValues) {
+          if (prev !== signal.value) {
+            callback()
+            signalValues.set(signal, signal.value)
+          }
+        }
+      })
+    }
 
-        target.addEventListener(eventName, callback, evtListOpts)
-        return () => {
-          target.removeEventListener(eventName, callback)
+    const testOutside = mods.has('outside')
+    if (testOutside) {
+      target = document
+      const cb = callback
+      const targetOutsideCallback = (e?: Event) => {
+        const targetHTML = e?.target as HTMLElement
+        if (!el.contains(targetHTML)) {
+          cb(e)
         }
       }
+      callback = targetOutsideCallback
+    }
+
+    const eventName = modifyCasing(key, mods)
+    target.addEventListener(eventName, callback, evtListOpts)
+    return () => {
+      target.removeEventListener(eventName, callback)
     }
   },
 }

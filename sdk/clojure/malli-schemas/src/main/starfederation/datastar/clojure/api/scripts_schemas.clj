@@ -5,5 +5,5 @@
     [starfederation.datastar.clojure.api.scripts]))
 
 (m/=> starfederation.datastar.clojure.api.scripts/->script
-      [:-> cs/script-content-schema cs/data-lines-schema])
+      [:-> cs/script-content-schema cs/execute-script-options-schemas cs/data-lines-schema])
 

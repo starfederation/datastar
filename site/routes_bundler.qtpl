@@ -1,5 +1,5 @@
 {% func bundlerContent(manifest PluginManifest) %}
-import { Datastar as DS } from "../engine"
+import { apply, load, setAlias } from '../engine'
 {%- for _, p := range manifest.Plugins -%}
 import { {%s p.Name %} } from "{%s p.Path %}"
 {%- endfor -%}
@@ -7,13 +7,15 @@ import { {%s p.Name %} } from "{%s p.Path %}"
 {%- if manifest.Alias != "" -%}
 // You included an alias in your manifest
 // Please use this as a last resort as you will have to convert any issues or errors back to the original form before reporting them if you want help.
-DS.aliasPrefix = "{%s manifest.Alias %}"
+setAlias('{%s manifest.Alias %}')
 {%- endif -%}
 
-DS.load(
+load(
 {%- for _, p := range manifest.Plugins -%}
     {%s p.Name %},
 {%- endfor -%}
 )
-export const Datastar = DS
+
+apply()
+export { apply, load, setAlias }
 {% endfunc %}

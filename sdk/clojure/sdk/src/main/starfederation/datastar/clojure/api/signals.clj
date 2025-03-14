@@ -41,7 +41,7 @@
       "signals {some other json}"]
 
   (->merge-signals "{some json}\n{some other json}"
-                   {common/only-if-missing :toto})
+                   {common/only-if-missing true})
   := ["onlyIfMissing true"
       "signals {some json}"
       "signals {some other json}"])
@@ -74,7 +74,6 @@
   (u/transient-> []
     (add-remove-signals-paths! paths)))
 
-
 (comment
   (->remove-signals ["foo.bar" "foo.baz" "bar"])
   := ["paths foo.bar"
@@ -101,10 +100,6 @@
 ;; -----------------------------------------------------------------------------
 ;; Read signals
 ;; -----------------------------------------------------------------------------
-(defn datastar-request? [request]
-  (= "true" (get-in request [:headers "datastar-request"])))
-
- 
 (defn get-signals
   "Returns the signals json string. You need to use some middleware
   that adds the :query-params key to the request for this function

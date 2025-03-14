@@ -3,11 +3,11 @@
 ## Demo
 
 <div class="flex flex-col gap-4">
-  <div class="flex gap-2" data-signals-fetching>
-    <div class="loading-dots text-primary" data-class="{'loading ml-4': $fetching}"></div>
+  <div class="flex gap-2">
     <button class="flex-1 btn btn-primary" data-indicator-fetching data-on-click="@get('/examples/fetch_indicator/greet')" data-attr-disabled="$fetching" >
       Click me for a greeting
     </button>
+    <div class="loading-dots text-primary" data-class="{'loading ml-4': $fetching}"></div>
   </div>
   <div id="greeting"></div>
 </div>
@@ -25,12 +25,6 @@
         transition: opacity 300ms ease-in;
     }
 </style>
-<div
-  class="indicator"
-  data-class="{loading: $fetching}"
->
-    Loading Indicator
-</div>
 <button
   id="greetingBtn"
   data-indicator-fetching
@@ -39,6 +33,12 @@
 >
   Click me for a greeting
 </button>
+<div
+  class="indicator"
+  data-class="{loading: $fetching}"
+>
+    Loading Indicator
+</div>
 <div id="greeting"></div>
 ```
 

@@ -10,7 +10,7 @@ The following example outputs `1` not because `$foo` is defined in the global sc
 </div>
 ```
 
-When Datastar evaluates the expression `$foo`, it first converts it to `ctx.signals.signal('foo').value`, and then evaluates that expression in a sandboxed context, in which `ctx` represents the Datastar context. 
+When Datastar evaluates the expression `$foo`, it first converts it to `ctx.signals.signal('foo').value`, and then evaluates that expression in a sandboxed context, in which `ctx` represents the current [expression context](/reference/expression_context). 
 
 This means that JavaScript can be used in Datastar expressions.
 
@@ -66,12 +66,4 @@ Expressions may span multiple lines, but a semicolon must be used to separate st
 </div>
 ```
 
-### Security
-
-When using a [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) (CSP), `unsafe-eval` must be allowed for scripts, since Datastar evaluates expressions inline. 
-
-```html
-<meta http-equiv="Content-Security-Policy" 
-      content="script-src 'self' 'unsafe-eval';"
->
-```
+See the [Expression Context reference](/reference/expression_context) for more advanced usage of Datastar expressions.

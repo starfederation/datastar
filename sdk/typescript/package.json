@@ -1,9 +1,11 @@
 {
   "name": "@starfederation/datastar-sdk",
   "version": "0.0.1",
-  "description": "Typescript SDK for Datastar",
+  "description": "TypeScript SDK for Datastar",
   "scripts": {
-    "tsc": "tsc"
+    "check": "deno lint && deno check src/node/node.ts && deno check src/web/deno.ts",
+    "serve-deno": "deno run -A src/web/deno.ts",
+    "serve-node": "deno run -A build.ts && node npm/esm/node/node.js"
   },
   "type": "module",
   "repository": {
@@ -17,10 +19,11 @@
   },
   "homepage": "https://github.com/starfederation/datastar#readme",
   "dependencies": {
-    "@types/node": "^22.10.2",
-    "type-fest": "^4.32.0"
+    "deepmerge-ts": "^7.1.4"
   },
   "devDependencies": {
-    "typescript": "~5.6.2"
+    "typescript": "~5.6.2",
+    "@types/node": "^22.10.2",
+    "type-fest": "^4.32.0"
   }
 }

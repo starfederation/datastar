@@ -4,25 +4,26 @@
     [examples.utils :as u]
     [reitit.ring :as rr]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.ring-jetty :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response on-open on-close]]))
 
+;; Testing several ways exception might be caught when using a ring adapter
 
 (defn faulty-event
   ([req]
    (->sse-response req
-     {:on-open
+     {on-open
       (fn [sse]
         (d*/with-open-sse sse
           (try
             (d*/console-log! sse
                              "dummy val"
                              {d*/retry-duration :faulty-value})
-            (catch Exception e
-              (println e)))))}))
+            (catch Exception _
+              (println "Caught the faulty event when sending in sync mode")))))}))
   ([req respond raise]
    (respond
      (->sse-response req
-       {:on-open
+       {on-open
         (fn [sse]
           (d*/with-open-sse sse
             (try
@@ -55,10 +56,7 @@
                                    (pp/pprint %)
                                    %))
                        #(do
-                          (println "--------")
-                          (println "captured")
-                          (println %)
-                          (println "--------")
+                          (println "captured the faulty event with raise in async mode")
                           (raise %))))))})
 
 
@@ -73,5 +71,7 @@
 (comment
   (u/clear-terminal!)
   (u/reboot-jetty-server! #'handler)
-  (u/reboot-jetty-server! #'handler {:async? true}))
+  (u/reboot-jetty-server! #'handler {:async? true})
+  (u/reboot-rj9a-server! #'handler)
+  (u/reboot-rj9a-server! #'handler {:async? true}))
 
