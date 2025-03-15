@@ -13,7 +13,8 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 ### Changed
 
 - Updated Idiomorph to version [0.7.3](https://github.com/bigskysoftware/idiomorph/releases/tag/v0.7.3).
-- Renamed the SSE event to `datastarSse`, which is now dispatched on the element itself ([#761](https://github.com/starfederation/datastar/issues/761)).
+- Events used in `data-on-*` attributes now default to camel-case ([#761](https://github.com/starfederation/datastar/issues/761)).
+- The `datastar-sse` event is now dispatched on the element itself ([#761](https://github.com/starfederation/datastar/issues/761)).
 - The NPM package now also exports all official plugins and bundles ([#742](https://github.com/starfederation/datastar/issues/742)).
 
 ### Fixed

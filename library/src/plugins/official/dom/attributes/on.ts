@@ -11,7 +11,7 @@ import {
   Requirement,
 } from '../../../../engine/types'
 import { tagHas, tagToMs } from '../../../../utils/tags'
-import { camel, modifyCasing } from '../../../../utils/text'
+import { camel, kebab, modifyCasing } from '../../../../utils/text'
 import { debounce, delay, throttle } from '../../../../utils/timing'
 import { supportsViewTransitions } from '../../../../utils/view-transtions'
 import type { Signal } from '../../../../vendored/preact-core'
@@ -172,7 +172,10 @@ export const On: AttributePlugin = {
       callback = targetOutsideCallback
     }
 
-    const eventName = modifyCasing(key, mods)
+    // Default to kebab-case and allow modifying
+    let eventName = kebab(key)
+    eventName = modifyCasing(eventName, mods)
+
     target.addEventListener(eventName, callback, evtListOpts)
     return () => {
       target.removeEventListener(eventName, callback)

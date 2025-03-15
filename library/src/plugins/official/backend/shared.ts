@@ -1,6 +1,6 @@
 import { DATASTAR } from '../../../engine/consts'
 
-export const DATASTAR_SSE_EVENT = `${DATASTAR}Sse`
+export const DATASTAR_SSE_EVENT = `${DATASTAR}-sse`
 export const SETTLING_CLASS = `${DATASTAR}-settling`
 export const SWAPPING_CLASS = `${DATASTAR}-swapping`
 export const STARTED = 'started'
