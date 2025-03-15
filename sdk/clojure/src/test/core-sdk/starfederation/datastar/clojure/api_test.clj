@@ -115,10 +115,6 @@
 (def merge-mode-line
   (->data-line consts/merge-mode-dataline-literal test-merge-mode))
 
-(def test-settle-duration 500)
-(def settle-duration-line
-  (->data-line consts/settle-duration-dataline-literal test-settle-duration))
-
 
 (def use-view-transition-line
   (->data-line consts/use-view-transition-dataline-literal true))
@@ -156,13 +152,6 @@
         (expect-merge-fragment gen {d*/merge-mode test-merge-mode}
                                    (list* merge-mode-line div-data)))
 
-      (it "handles settle duration"
-        (expect-merge-fragment gen {d*/settle-duration test-settle-duration}
-                                   (list* settle-duration-line div-data))
-        (expect-merge-fragment gen {d*/settle-duration consts/default-fragments-settle-duration}
-                                   div-data))
-
- 
       (it "handles view transitions"
         (expect-merge-fragment gen {d*/use-view-transition true}
                                    (list* use-view-transition-line div-data))
@@ -172,11 +161,9 @@
       (it "handles all options"
         (expect-merge-fragment gen {d*/selector basic-selector
                                     d*/merge-mode test-merge-mode
-                                    d*/settle-duration test-settle-duration
                                     d*/use-view-transition true}
                                    (list* selector-line
                                           merge-mode-line
-                                          settle-duration-line
                                           use-view-transition-line
                                           div-data))))))
 
@@ -221,13 +208,6 @@
         (expect-merge-fragments gen {d*/merge-mode test-merge-mode}
                                     (list* merge-mode-line multi-data)))
 
-      (it "handles settle duration"
-        (expect-merge-fragments gen {d*/settle-duration test-settle-duration}
-                                    (list* settle-duration-line multi-data))
-        (expect-merge-fragments gen {d*/settle-duration consts/default-fragments-settle-duration}
-                                    multi-data))
-
- 
       (it "handles view transitions"
         (expect-merge-fragments gen {d*/use-view-transition true}
                                     (list* use-view-transition-line multi-data))
@@ -239,11 +219,9 @@
       (it "handles all options"
         (expect-merge-fragments gen {d*/selector basic-selector
                                      d*/merge-mode test-merge-mode
-                                     d*/settle-duration test-settle-duration
                                      d*/use-view-transition true}
                                     (list* selector-line
                                            merge-mode-line
-                                           settle-duration-line
                                            use-view-transition-line
                                            multi-data))))))
 
@@ -266,13 +244,6 @@
       (it "Throws on no selector"
         (expect (lt/throws? clojure.lang.ExceptionInfo #(d*/remove-fragment! gen "" {}))))
 
-      (it "handles settle duration"
-        (expect-remove-fragment gen {d*/settle-duration test-settle-duration}
-                                    [settle-duration-line selector-line])
-        (expect-remove-fragment gen {d*/settle-duration consts/default-fragments-settle-duration}
-                                    [selector-line]))
-
-
       (it "handles view transitions"
         (expect-remove-fragment gen {d*/use-view-transition true}
                                 [use-view-transition-line selector-line])
@@ -282,10 +253,8 @@
                                     [selector-line]))
 
       (it "handles all options"
-        (expect-remove-fragment gen {d*/settle-duration test-settle-duration
-                                     d*/use-view-transition true}
-                                    [settle-duration-line
-                                     use-view-transition-line
+        (expect-remove-fragment gen {d*/use-view-transition true}
+                                    [use-view-transition-line
                                      selector-line])))))
 
 ;; -----------------------------------------------------------------------------

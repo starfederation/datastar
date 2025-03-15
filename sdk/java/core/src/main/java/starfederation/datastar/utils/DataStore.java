@@ -64,6 +64,17 @@ public class DataStore {
     }
 
     /**
+     * Gets the underlying ConcurrentMap store.
+     * Note: This provides direct access to the internal store.
+     * Use with caution as it bypasses type checking.
+     *
+     * @return The underlying ConcurrentMap store.
+     */
+    public ConcurrentMap<String, Object> getStore() {
+        return store;
+    }
+
+    /**
      * Serializes the store to a JSON string.
      *
      * @return The JSON representation of the store.

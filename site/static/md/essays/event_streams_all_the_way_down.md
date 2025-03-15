@@ -12,7 +12,6 @@ This means every data fragment is an OOB in HTMX terms.
 event: datastar-merge-fragments
 id: 92680296792588350
 data: mergeMode morph
-data: settleDuration 0
 data: fragment
 <div id="lazy_tabs">
   <div class="tabs tabs-bordered">

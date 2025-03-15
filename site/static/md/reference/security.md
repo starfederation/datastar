@@ -4,11 +4,11 @@
 
 ## Escape User Input
 
-The golden rule of security is to never trust user input. This is especially true when using Datastar expressions, which can execute arbitrary JavaScript. 
+The golden rule of security is to never trust user input. This is especially true when using Datastar expressions, which can execute arbitrary JavaScript. When using Datastar expressions, you should always escape user input. This is to prevent, among other issues, Cross Site Scripting (XSS) attacks.
 
-When using Datastar expressions, you should always escape user input. This is to prevent, among other issues, Cross Site Scripting (XSS) attacks.
+## Avoid Sensitive Data
 
-Keep in mind that signal values are visible in the source code in plain text, and can be modified by the user before being sent in requests. For that reason, you should avoid using sensitive data in signals and always implement backend validation.
+Keep in mind that signal values are visible in the source code in plain text, and can be modified by the user before being sent in requests. For that reason, you should avoid leaking sensitive data in signals and always implement backend validation.
 
 ## Ignore Unsafe Input
 

@@ -32,7 +32,6 @@ type Selector = string
 type MergeFragmentsOptions =
     { Selector: Selector voption
       MergeMode: FragmentMergeMode
-      SettleDuration: TimeSpan
       UseViewTransition: bool
       EventId: string voption
       Retry: TimeSpan }
@@ -41,8 +40,7 @@ type MergeSignalsOptions =
       EventId: string voption
       Retry: TimeSpan }
 type RemoveFragmentsOptions =
-    { SettleDuration: TimeSpan
-      UseViewTransition: bool
+    { UseViewTransition: bool
       EventId: string voption
       Retry: TimeSpan }
 type ExecuteScriptOptions =
@@ -133,7 +131,6 @@ module MergeFragmentsOptions =
     let defaults =
         { Selector = ValueNone
           MergeMode = Consts.DefaultFragmentMergeMode
-          SettleDuration = Consts.DefaultFragmentsSettleDuration
           UseViewTransition = Consts.DefaultFragmentsUseViewTransitions
           EventId = ValueNone
           Retry = Consts.DefaultSseRetryDuration }
@@ -146,8 +143,7 @@ module MergeSignalsOptions =
 
 module RemoveFragmentsOptions =
     let defaults =
-        { SettleDuration = Consts.DefaultFragmentsSettleDuration
-          UseViewTransition = Consts.DefaultFragmentsUseViewTransitions
+        { UseViewTransition = Consts.DefaultFragmentsUseViewTransitions
           EventId = ValueNone
           Retry = Consts.DefaultSseRetryDuration }
 
