@@ -35,10 +35,10 @@ class DatastarDjangoResponse(DjangoStreamingHttpResponse):
         super().__init__(generator(ServerSentEventGenerator), *args, **kwargs)
 
 
-class DatastarFastAPIResponse(FastAPIStreamingResponse):
-    def __init__(self, generator, *args, **kwargs):
+class DatastarFastAPIResponse(FastAPIStreamingResponse, ServerSentEventGenerator):
+    def __init__(self, *args, **kwargs):
         kwargs["headers"] = SSE_HEADERS
-        super().__init__(generator(ServerSentEventGenerator), *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class DatastarFastHTMLResponse(FastHTMLStreamingResponse):
