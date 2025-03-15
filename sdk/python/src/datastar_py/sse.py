@@ -41,7 +41,6 @@ class ServerSentEventGenerator:
         fragments: list[str],
         selector: Optional[str] = None,
         merge_mode: Optional[consts.FragmentMergeMode] = None,
-        settle_duration: Optional[int] = None,
         use_view_transition: bool = consts.DefaultFragmentsUseViewTransitions,
         event_id: Optional[int] = None,
         retry_duration: int = consts.DefaultSseRetryDuration,
@@ -55,10 +54,6 @@ class ServerSentEventGenerator:
             data_lines.append(f"data: {consts.UseViewTransitionDatalineLiteral} true")
         else:
             data_lines.append(f"data: {consts.UseViewTransitionDatalineLiteral} false")
-        if settle_duration:
-            data_lines.append(
-                f"data: {consts.SettleDurationDatalineLiteral} {settle_duration}"
-            )
 
         data_lines.extend(
             f"data: {consts.FragmentsDatalineLiteral} {x}"
@@ -77,7 +72,6 @@ class ServerSentEventGenerator:
     def remove_fragments(
         cls,
         selector: Optional[str] = None,
-        settle_duration: Optional[int] = None,
         use_view_transition: bool = True,
         event_id: Optional[int] = None,
         retry_duration: int = consts.DefaultSseRetryDuration,
@@ -89,10 +83,6 @@ class ServerSentEventGenerator:
             data_lines.append(f"data: {consts.UseViewTransitionDatalineLiteral} true")
         else:
             data_lines.append(f"data: {consts.UseViewTransitionDatalineLiteral} false")
-        if settle_duration:
-            data_lines.append(
-                f"data: {consts.SettleDurationDatalineLiteral} {settle_duration}"
-            )
 
         return ServerSentEventGenerator._send(
             consts.EventType.EventTypeRemoveFragments,

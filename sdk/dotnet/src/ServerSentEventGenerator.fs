@@ -16,8 +16,7 @@ type ServerSentEventGenerator =
           Retry = options.Retry
           DataLines = [|
             if (options.Selector |> ValueOption.isSome) then $"{Consts.DatastarDatalineSelector} {options.Selector |> ValueOption.get |> Selector.value}"
-            if (options.MergeMode <> Consts.DefaultFragmentMergeMode) then $"{Consts.DatastarDatalineMergeMode} {options.MergeMode |> Consts.FragmentMergeMode.toString}"
-            if (options.SettleDuration <> Consts.DefaultFragmentsSettleDuration) then $"{Consts.DatastarDatalineSettleDuration} {options.SettleDuration.Milliseconds}"
+            if (options.MergeMode <> Consts.DefaultFragmentMergeMode) then $"{Consts.DatastarDatalineMergeMode} {options.MergeMode |> Consts.FragmentMergeMode.toString}"            
             if (options.UseViewTransition <> Consts.DefaultFragmentsUseViewTransitions) then $"{Consts.DatastarDatalineUseViewTransition} %A{options.UseViewTransition}"
             yield! (fragments |> String.split String.newLines |> Seq.map (fun fragmentLine -> $"{Consts.DatastarDatalineFragments} %s{fragmentLine}"))
             |] }
@@ -30,7 +29,6 @@ type ServerSentEventGenerator =
           Retry = options.Retry
           DataLines = [|
             $"{Consts.DatastarDatalineSelector} {selector |> Selector.value}"
-            if (options.SettleDuration <> Consts.DefaultFragmentsSettleDuration) then $"{Consts.DatastarDatalineSettleDuration} {options.SettleDuration.Milliseconds}"
             if (options.UseViewTransition <> Consts.DefaultFragmentsUseViewTransitions) then $"{Consts.DatastarDatalineUseViewTransition} %A{options.UseViewTransition}"
             |] }
         |> ServerSentEventGenerator.send sseHandler

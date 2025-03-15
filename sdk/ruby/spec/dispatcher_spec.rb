@@ -75,26 +75,24 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.merge_fragments(
         %(<div id="foo">\n<span>hello</span>\n</div>\n),
         id: 72,
-        retry_duration: 2000,
-        settle_duration: 1000
+        retry_duration: 2000
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: settleDuration 1000\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n)])
     end
 
     it 'omits retry if using default value' do
       dispatcher.merge_fragments(
         %(<div id="foo">\n<span>hello</span>\n</div>\n),
         id: 72,
-        retry_duration: 1000,
-        settle_duration: 1000
+        retry_duration: 1000
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\ndata: settleDuration 1000\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n)])
     end
 
     it 'works with #call(view_context:) interfaces' do
@@ -105,12 +103,11 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.merge_fragments(
         template_class,
         id: 72,
-        retry_duration: 2000,
-        settle_duration: 1000
+        retry_duration: 2000
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: settleDuration 1000\ndata: fragments <div id="foo">\ndata: fragments <span>#{view_context}</span>\ndata: fragments </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: fragments <div id="foo">\ndata: fragments <span>#{view_context}</span>\ndata: fragments </div>\n\n\n)])
     end
 
     it 'works with #render_in(view_context, &) interfaces' do
@@ -121,12 +118,11 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.merge_fragments(
         template_class,
         id: 72,
-        retry_duration: 2000,
-        settle_duration: 1000
+        retry_duration: 2000
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: settleDuration 1000\ndata: fragments <div id="foo">\ndata: fragments <span>#{view_context}</span>\ndata: fragments </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: fragments <div id="foo">\ndata: fragments <span>#{view_context}</span>\ndata: fragments </div>\n\n\n)])
     end
   end
 
@@ -140,11 +136,11 @@ RSpec.describe Datastar::Dispatcher do
     end
 
     it 'takes D* options' do
-      dispatcher.remove_fragments('#list-item-1', id: 72, settle_duration: 1000)
+      dispatcher.remove_fragments('#list-item-1', id: 72)
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-remove-fragments\nid: 72\ndata: settleDuration 1000\ndata: selector #list-item-1\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-remove-fragments\nid: 72\ndata: selector #list-item-1\n\n\n)])
     end
   end
 

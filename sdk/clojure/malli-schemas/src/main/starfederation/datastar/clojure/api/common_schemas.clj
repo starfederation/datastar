@@ -59,7 +59,6 @@
       [:map
        [common/selector :string]
        [common/merge-mode merge-modes-schema]
-       [common/settle-duration number?]
        [common/use-view-transition :boolean]])))
 
 ;; -----------------------------------------------------------------------------
@@ -70,7 +69,6 @@
     sse-options-schema
     (mu/optional-keys
       [:map
-       [common/settle-duration number?]
        [common/use-view-transition :boolean]])))
 
 

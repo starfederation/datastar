@@ -11,10 +11,6 @@
 ;; -----------------------------------------------------------------------------
 ;; Default durations
 ;; -----------------------------------------------------------------------------
-(def default-fragments-settle-duration
-  "The default duration for settling during fragment merges. Allows for CSS transitions to complete."
-  300)
-
 (def default-sse-retry-duration
   "The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE."
   1000)
@@ -36,7 +32,6 @@
 ;; -----------------------------------------------------------------------------
 (def selector-dataline-literal "selector ")
 (def merge-mode-dataline-literal "mergeMode ")
-(def settle-duration-dataline-literal "settleDuration ")
 (def fragments-dataline-literal "fragments ")
 (def use-view-transition-dataline-literal "useViewTransition ")
 (def signals-dataline-literal "signals ")

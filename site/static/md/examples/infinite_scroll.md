@@ -23,13 +23,11 @@ This last element contains a listener which, when scrolled into view, will trigg
 event: datastar-merge-fragments
 data: selector #more_btn
 data: mergeMode morph
-data: settleDuration 500
 data: fragments <div data-intersects="$offset=10;$limit=10;@get('/examples/infinite_scroll/data')" id="more_btn"><div>Loading...</div></div>
 
 event: datastar-merge-fragments
 data: selector #click_to_load_rows
 data: mergeMode append
-data: settleDuration 500
 data: fragments <tr id=\"agent_60\"><td>Agent Smith 3c</td><td>void61@null.org</td><td class=\"uppercase\">39b02fcf39c047c5</td></tr>"
 
 ....More rows to be appended
@@ -37,7 +35,7 @@ data: fragments <tr id=\"agent_60\"><td>Agent Smith 3c</td><td>void61@null.org</
 
 ## Demo
 
-Don't scroll too far, there are consequences
+Don't scroll too far, there are consequences.
 
 <div>
 <div

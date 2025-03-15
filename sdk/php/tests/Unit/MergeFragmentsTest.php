@@ -24,14 +24,12 @@ test('Options are correctly output', function() {
     $event = new MergeFragments($content, [
         'selector' => 'selector',
         'mergeMode' => FragmentMergeMode::Append,
-        'settleDuration' => 1000,
         'useViewTransition' => true,
     ]);
     expect($event->getDataLines())
         ->toBe([
             'data: selector selector',
             'data: mergeMode append',
-            'data: settleDuration 1000',
             'data: useViewTransition true',
             'data: fragments ' . $content,
         ]);
@@ -42,7 +40,6 @@ test('Default options are not output', function() {
     $event = new MergeFragments($content, [
         'selector' => '',
         'mergeMode' => FragmentMergeMode::Morph,
-        'settleDuration' => Consts::DEFAULT_FRAGMENTS_SETTLE_DURATION,
         'useViewTransition' => false,
     ]);
     expect($event->getDataLines())

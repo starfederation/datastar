@@ -7,7 +7,6 @@
       "retryDuration": 2000,
       "selector": "div",
       "mergeMode": "append",
-      "settleDuration": 1000,
       "useViewTransition": true
     }
   ]

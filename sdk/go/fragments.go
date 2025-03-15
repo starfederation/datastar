@@ -12,7 +12,6 @@ type MergeFragmentOptions struct {
 	RetryDuration      time.Duration
 	Selector           string
 	MergeMode          FragmentMergeMode
-	SettleDuration     time.Duration
 	UseViewTransitions bool
 }
 
@@ -35,12 +34,6 @@ func WithMergeMode(merge FragmentMergeMode) MergeFragmentOption {
 	}
 }
 
-func WithSettleDuration(d time.Duration) MergeFragmentOption {
-	return func(o *MergeFragmentOptions) {
-		o.SettleDuration = d
-	}
-}
-
 func WithUseViewTransitions(useViewTransition bool) MergeFragmentOption {
 	return func(o *MergeFragmentOptions) {
 		o.UseViewTransitions = useViewTransition
@@ -53,7 +46,6 @@ func (sse *ServerSentEventGenerator) MergeFragments(fragment string, opts ...Mer
 		RetryDuration:  DefaultSseRetryDuration,
 		Selector:       "",
 		MergeMode:      FragmentMergeModeMorph,
-		SettleDuration: DefaultFragmentsSettleDuration,
 	}
 	for _, opt := range opts {
 		opt(options)
@@ -73,10 +65,6 @@ func (sse *ServerSentEventGenerator) MergeFragments(fragment string, opts ...Mer
 	}
 	if options.MergeMode != FragmentMergeModeMorph {
 		dataRows = append(dataRows, MergeModeDatalineLiteral+string(options.MergeMode))
-	}
-	if options.SettleDuration >= 0 && options.SettleDuration != DefaultFragmentsSettleDuration {
-		settleDuration := strconv.Itoa(int(options.SettleDuration.Milliseconds()))
-		dataRows = append(dataRows, SettleDurationDatalineLiteral+settleDuration)
 	}
 	if options.UseViewTransitions {
 		dataRows = append(dataRows, UseViewTransitionDatalineLiteral+"true")
@@ -103,7 +91,6 @@ func (sse *ServerSentEventGenerator) MergeFragments(fragment string, opts ...Mer
 type RemoveFragmentsOptions struct {
 	EventID            string
 	RetryDuration      time.Duration
-	SettleDuration     time.Duration
 	UseViewTransitions *bool
 }
 
@@ -121,12 +108,6 @@ func WithRemoveRetryDuration(d time.Duration) RemoveFragmentsOption {
 	}
 }
 
-func WithRemoveSettleDuration(d time.Duration) RemoveFragmentsOption {
-	return func(o *RemoveFragmentsOptions) {
-		o.SettleDuration = d
-	}
-}
-
 func WithRemoveUseViewTransitions(useViewTransition bool) RemoveFragmentsOption {
 	return func(o *RemoveFragmentsOptions) {
 		o.UseViewTransitions = &useViewTransition
@@ -141,7 +122,6 @@ func (sse *ServerSentEventGenerator) RemoveFragments(selector string, opts ...Re
 	options := &RemoveFragmentsOptions{
 		EventID:            "",
 		RetryDuration:      DefaultSseRetryDuration,
-		SettleDuration:     DefaultFragmentsSettleDuration,
 		UseViewTransitions: nil,
 	}
 	for _, opt := range opts {
@@ -149,10 +129,6 @@ func (sse *ServerSentEventGenerator) RemoveFragments(selector string, opts ...Re
 	}
 
 	dataRows := []string{SelectorDatalineLiteral + selector}
-	if options.SettleDuration >= 0 && options.SettleDuration != DefaultFragmentsSettleDuration {
-		settleDuration := strconv.Itoa(int(options.SettleDuration.Milliseconds()))
-		dataRows = append(dataRows, SettleDurationDatalineLiteral+settleDuration)
-	}
 	if options.UseViewTransitions != nil {
 		dataRows = append(dataRows, UseViewTransitionDatalineLiteral+strconv.FormatBool(*options.UseViewTransitions))
 	}

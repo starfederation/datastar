@@ -115,7 +115,6 @@ data: fragments line 2
 event: datastar-merge-fragments
 data: selector #id
 data: mergeMode inner
-data: settleDuration 1
 data: fragments line 1
 data: fragments line 2
 <BLANKLINE>
@@ -124,7 +123,6 @@ id: abc123
 retry: 10
 data: selector #id
 data: mergeMode inner
-data: settleDuration 1
 data: useViewTransition true
 data: fragments line 1
 data: fragments line 2
@@ -157,18 +155,15 @@ data: selector #id
 <BLANKLINE>
 event: datastar-remove-fragments
 data: selector #id
-data: settleDuration 1
 <BLANKLINE>
 event: datastar-remove-fragments
 data: selector #id
-data: settleDuration 1
 data: useViewTransition true
 <BLANKLINE>
 event: datastar-remove-fragments
 id: abc123
 retry: 10
 data: selector #id
-data: settleDuration 1
 <BLANKLINE>
 -}
 

@@ -42,7 +42,6 @@
    "selector" d*/selector
    "mergeMode" d*/merge-mode
    "useViewTransition" d*/use-view-transition
-   "settleDuration" d*/settle-duration
 
    "onlyIfMissing" d*/only-if-missing
    "autoRemove" d*/auto-remove

@@ -149,11 +149,6 @@ var Consts = &ConstTemplateData{
 	},
 	DefaultDurations: []*DefaultDuration{
 		{
-			Name:        toolbelt.ToCasedString("fragmentsSettleDuration"),
-			Description: "The default duration for settling during fragment merges. Allows for CSS transitions to complete.",
-			Duration:    300 * time.Millisecond,
-		},
-		{
 			Name:        toolbelt.ToCasedString("sseRetryDuration"),
 			Description: "The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.",
 			Duration:    1 * time.Second,
@@ -172,7 +167,6 @@ var Consts = &ConstTemplateData{
 
 		// MergeFragments
 		toolbelt.ToCasedString("mergeMode"),
-		toolbelt.ToCasedString("settleDuration"),
 		toolbelt.ToCasedString("fragments"),
 		toolbelt.ToCasedString("useViewTransition"),
 

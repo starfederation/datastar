@@ -11,7 +11,6 @@
    :fragments ["<div>hello</div>"]
    d*/selector "foo"
    d*/merge-mode d*/mm-append
-   d*/settle-duration 500
    d*/use-view-transition true})
 
 
@@ -31,7 +30,6 @@
 (sse-event example)
 ; ["selector foo"
 ;  "mergeMode append"
-;  "settleDuration 500"
 ;  "useViewTransition true"
 ;  "fragments <div>hello</div>"]
 
@@ -60,7 +58,6 @@
 ; retry: 1000\n
 ; data: selector foo\n
 ; data: mergeMode append\n
-; data: settleDuration 500\n
 ; data: useViewTransition true\n
 ; data: fragments <div>hello</div>\n\n\n"
 
@@ -84,6 +81,5 @@
 ; retry: 1000\n
 ; data: selector foo\n
 ; data: mergeMode append\n
-; data: settleDuration 500\n
 ; data: useViewTransition true\n
 ; data: fragments <div>hello</div>\n\n\n"

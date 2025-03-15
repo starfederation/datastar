@@ -4,12 +4,6 @@
 
 ## Demo
 
-<style>
-.datastar-settling  {
-  opacity: 0;
-}
-</style>
-
 <div id="lazy_load" data-on-load="@get('/examples/lazy_load/data')">
 </div>
 
@@ -23,10 +17,4 @@ This example shows how to lazily load an element on a page. We start with an ini
 </div>
 ```
 
-Which shows a progress indicator as we are loading the graph. The graph is then loaded and faded gently into view via a settling CSS transition:
-
-```css
-.datastar-settling {
-  opacity: 0;
-}
-```
+Which shows a progress indicator as we are loading the graph. The graph is then loaded.

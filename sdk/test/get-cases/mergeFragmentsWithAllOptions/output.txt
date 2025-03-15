@@ -3,7 +3,6 @@ id: event1
 retry: 2000
 data: selector div
 data: mergeMode append
-data: settleDuration 1000
 data: useViewTransition true
 data: fragments <div>Merge</div>
 

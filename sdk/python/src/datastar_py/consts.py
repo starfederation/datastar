@@ -55,8 +55,6 @@ VERSION                   = "1.0.0-beta.9"
 
 #region Default durations
 
-# The default duration for settling during fragment merges. Allows for CSS transitions to complete.
-DefaultFragmentsSettleDuration = 300
 # The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
 DefaultSseRetryDuration = 1000
 
@@ -72,7 +70,6 @@ DefaultExecuteScriptAttributes = "type module"
 #region Dataline literals
 SelectorDatalineLiteral = "selector"
 MergeModeDatalineLiteral = "mergeMode"
-SettleDurationDatalineLiteral = "settleDuration"
 FragmentsDatalineLiteral = "fragments"
 UseViewTransitionDatalineLiteral = "useViewTransition"
 SignalsDatalineLiteral = "signals"

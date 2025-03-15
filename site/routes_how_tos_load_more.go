@@ -33,8 +33,7 @@ func setupHowTosLoadMore(howTosRedirect chi.Router) error {
 				if newOffset < max {
 					sse.MergeSignals([]byte(fmt.Sprintf(`{offset: %d}`, newOffset)))
 				} else {
-					// TODO: set settle duration back to `0` or remove entirely
-					sse.RemoveFragments(`#load-more`, datastar.WithRemoveSettleDuration(1))
+					sse.RemoveFragments(`#load-more`)
 				}
 			
 				sse.MergeFragments(fmt.Sprintf(`<div class="text-primary font-bold">Item %d</div>`, newOffset),

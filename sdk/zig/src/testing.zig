@@ -20,7 +20,6 @@ const MergeFragments = struct {
     retryDuration: ?u32 = null,
     selector: ?[]const u8 = null,
     mergeMode: ?consts.FragmentMergeMode = null,
-    settleDuration: ?u32 = null,
     useViewTransition: ?bool = null,
 };
 
@@ -35,7 +34,6 @@ const RemoveFragments = struct {
     selector: []const u8,
     eventId: ?[]const u8 = null,
     retryDuration: ?u32 = null,
-    settleDuration: ?u32 = null,
     useViewTransition: ?bool = null,
 };
 
@@ -118,7 +116,6 @@ pub fn sdk(sse: *ServerSentEventGenerator, signals: Signals) !void {
                     .retry_duration = ev.retryDuration orelse consts.default_sse_retry_duration,
                     .selector = ev.selector,
                     .merge_mode = ev.mergeMode orelse consts.default_fragment_merge_mode,
-                    .settle_duration = ev.settleDuration orelse consts.default_fragments_settle_duration,
                     .use_view_transition = ev.useViewTransition orelse consts.default_fragments_use_view_transitions,
                 },
             );
@@ -157,7 +154,6 @@ pub fn sdk(sse: *ServerSentEventGenerator, signals: Signals) !void {
                 .{
                     .event_id = ev.eventId,
                     .retry_duration = ev.retryDuration orelse consts.default_sse_retry_duration,
-                    .settle_duration = ev.settleDuration orelse consts.default_fragments_settle_duration,
                     .use_view_transition = ev.useViewTransition orelse consts.default_fragments_use_view_transitions,
                 },
             );

@@ -87,7 +87,6 @@ ServerSentEventGenerator.MergeFragments(
     options?: {
         selector?: string,
         mergeMode?: FragmentMergeMode,
-        settleDuration?: durationInMilliseconds,
         useViewTransition?: boolean,
         eventId?: string,
         retryDuration?: durationInMilliseconds
@@ -113,7 +112,6 @@ event: datastar-merge-fragments
 id: 123
 retry: 2000
 data: selector #feed
-data: settleDuration 10
 data: useViewTransition true
 data: fragments <div id="feed">
 data: fragments     <span>1</span>
@@ -143,16 +141,14 @@ Valid values should match the [FragmentMergeMode](#FragmentMergeMode) and curren
 ##### Options
 * `selector` (string) The CSS selector to use to insert the fragments.  If not provided or empty, Datastar **will** default to using the `id` attribute of the fragment.
 * `mergeMode` (FragmentMergeMode) The mode to use when merging the fragment into the DOM.  If not provided the Datastar client side ***will*** default to `morph`.
-* `settleDuration` is used to control the amount of time that a fragment should take before removing any CSS related to settling.  It is used to allow for animations in the browser via the Datastar client.  If provided the value ***must*** be a positive integer of the number of milliseconds to allow for settling.  If none is provided, the default value of `300` milliseconds will be used.
 * `useViewTransition` Whether to use view transitions, if not provided the Datastar client side ***will*** default to `false`.
 
 #### Logic
 When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-merge-fragments` event type.
 1. If `selector` is provided, the function ***must*** include the selector in the event data in the format `selector SELECTOR\n`, ***unless*** the selector is empty.
 2. If `mergeMode` is provided, the function ***must*** include the merge mode in the event data in the format `merge MERGE_MODE\n`, ***unless*** the value is the default of `morph`.
-3. If `settleDuration` is provided, the function ***must*** include the settle duration in the event data in the format `settleDuration SETTLE_DURATION\n`, ***unless*** the value is the default of `300` milliseconds.
-4. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
-5. The function ***must*** include the fragments in the event data, with each line prefixed with `fragments `. This ***should*** be output after all other event data.
+3. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
+4. The function ***must*** include the fragments in the event data, with each line prefixed with `fragments `. This ***should*** be output after all other event data.
 
 ### `ServerSentEventGenerator.RemoveFragments`
 
@@ -160,7 +156,6 @@ When called the function ***must*** call `ServerSentEventGenerator.send` with th
 ServerSentEventGenerator.RemoveFragments(
     selector: string,
     options?: {
-        settleDuration?: durationInMilliseconds,
         useViewTransition?: boolean,
         eventId?: string,
         retryDuration?: durationInMilliseconds
@@ -184,7 +179,6 @@ event: datastar-remove-fragments
 id: 123
 retry: 2000
 data: selector #target
-data: settleDuration 200
 data: useViewTransition true
 ```
 
@@ -196,14 +190,12 @@ data: useViewTransition true
 
 ##### Options
 
-* `settleDuration` is used to control the amount of time that a fragment should take before removing any CSS related to settling.  It is used to allow for animations in the browser via the Datastar client.  If provided the value ***must*** be a positive integer of the number of milliseconds to allow for settling.  If none is provided, the default value of `300` milliseconds will be used.
 * `useViewTransition` Whether to use view transitions, if not provided the Datastar client side ***will*** default to `false`.
 
 #### Logic
 1. When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-remove-fragments` event type.
 2. The function ***must*** include the selector in the event data in the format `selector SELECTOR\n`.
-3. If `settleDuration` is provided, the function ***must*** include the settle duration in the event data in the format `settleDuration SETTLE_DURATION\n`, ***unless*** the value is the default of `300` milliseconds.
-4. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
+3. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
 
 
 ### `ServerSentEventGenerator.MergeSignals`

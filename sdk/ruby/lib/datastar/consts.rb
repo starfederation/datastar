@@ -6,9 +6,6 @@ module Datastar
     DATASTAR_KEY = 'datastar'
     VERSION = '1.0.0-beta.9'
 
-    # The default duration for settling during fragment merges. Allows for CSS transitions to complete.
-    DEFAULT_FRAGMENTS_SETTLE_DURATION = 300
-
     # The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     DEFAULT_SSE_RETRY_DURATION = 1000
 
@@ -57,7 +54,6 @@ module Datastar
     # Dataline literals.
     SELECTOR_DATALINE_LITERAL = 'selector'
     MERGE_MODE_DATALINE_LITERAL = 'mergeMode'
-    SETTLE_DURATION_DATALINE_LITERAL = 'settleDuration'
     FRAGMENTS_DATALINE_LITERAL = 'fragments'
     USE_VIEW_TRANSITION_DATALINE_LITERAL = 'useViewTransition'
     SIGNALS_DATALINE_LITERAL = 'signals'

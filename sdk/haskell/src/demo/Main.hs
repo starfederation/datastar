@@ -91,7 +91,7 @@ handlerFeed = do
       threadDelay (1 * 1000 * 1000)
     writeBoth x w = putStrLn (T.unpack x) >> sendInApp (feedDstar x) w
     sleeping = "Sleeping for 70 seconds, but continuing to ping"
-    allDone  = "All Done, the settleDuration to remove the div is 5 seconds"
+    allDone  = "All Done"
     feedDstar :: Text -> Text
     feedDstar x = mergeFragments ("<div id=\"feed\"><b>" <> x <> "</b></div>") def def def def
     removeDstar :: Text
