@@ -89,7 +89,7 @@ All of the actions above take a second argument of options.
 
 ### Events
 
-All of the actions above trigger `datastarSse` events during the SSE request lifecycle. The event type determines the stage of the request.
+All of the actions above trigger `datastar-sse` events during the SSE request lifecycle. The event type determines the stage of the request.
 
 - `started` - Triggered when the SSE request is started.
 - `finished` - Triggered when the SSE request is finished.
