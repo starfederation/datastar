@@ -51,16 +51,16 @@ async def read_root():
     )
 
 
-async def time_updates(sse):
+async def time_updates():
     while True:
-        yield sse.merge_fragments(
+        yield DatastarFastAPIResponse.merge_fragments(
             [f"""<span id="currentTime">{datetime.now().isoformat()}"""]
         )
         await asyncio.sleep(1)
-        yield sse.merge_signals({"currentTime": f"{datetime.now().isoformat()}"})
+        yield DatastarFastAPIResponse.merge_signals({"currentTime": f"{datetime.now().isoformat()}"})
         await asyncio.sleep(1)
 
 
 @app.get("/updates")
 async def updates():
-    return DatastarFastAPIResponse(time_updates)
+    return DatastarFastAPIResponse(time_updates())
