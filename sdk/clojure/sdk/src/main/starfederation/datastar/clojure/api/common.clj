@@ -11,7 +11,6 @@
 ;; Merge fragment opts
 (def selector            :d*.fragments/selector)
 (def merge-mode          :d*.fragments/merge-mode)
-(def settle-duration     :d*.fragments/settle-duration)
 (def use-view-transition :d*.fragments/use-view-transition)
 
 ;;Signals opts

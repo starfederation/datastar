@@ -25,17 +25,11 @@ public final class RemoveFragments extends AbstractDatastarEvent {
 
     public static final class Builder extends AbstractBuilder<RemoveFragments> {
         private String selector;
-        private int settleDuration = DEFAULT_FRAGMENTS_SETTLE_DURATION; // Default
         private boolean useViewTransition = DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS; // Default
         private Builder() {
         }
         public Builder selector(String selector) {
             this.selector = selector;
-            return this;
-        }
-
-        public Builder settleDuration(int settleDuration) {
-            this.settleDuration = settleDuration;
             return this;
         }
 
@@ -54,11 +48,6 @@ public final class RemoveFragments extends AbstractDatastarEvent {
 
             // Add selector
             dataLines.add(SELECTOR_DATALINE_LITERAL + selector.trim());
-
-            // Add settleDuration if not default
-            if (settleDuration != DEFAULT_FRAGMENTS_SETTLE_DURATION) {
-                dataLines.add(SETTLE_DURATION_DATALINE_LITERAL + settleDuration);
-            }
 
             // Add useViewTransition if true
             if (useViewTransition != DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS) {

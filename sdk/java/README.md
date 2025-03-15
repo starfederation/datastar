@@ -91,14 +91,12 @@ This event is used to merge fragments into the DOM. The data is a string that re
 
 - `selector` (string) The CSS selector to use to insert the fragments. If not provided or empty, Datastar **will** default to using the `id` attribute of the fragment.
 - `mergeMode` (FragmentMergeMode) The mode to use when merging the fragment into the DOM. If not provided the Datastar client side **_will_** default to `morph`.
-- `settleDuration` is used to control the amount of time that a fragment should take before removing any CSS related to settling. It is used to allow for animations in the browser via the Datastar client. If provided the value **_must_** be a positive integer of the number of milliseconds to allow for settling. If none is provided, the default value of `300` milliseconds will be used.
 - `useViewTransition` Whether to use view transitions, if not provided the Datastar client side **_will_** default to `false`.
 
 ```java
 MergeFragments event = MergeFragments.builder()
         .selector("#feed")
         .mergeMode(FragmentMergeMode.Append)
-        .settleDuration(500)
         .useViewTransition(true)
         .data("<div id=\"feed\">\n<span>1</span>\n</div>")
         .build();
@@ -111,13 +109,11 @@ This event is used to remove fragments from the DOM.
 ##### Options
 
 - `selector` (string) The CSS selector to use to insert the fragments. If not provided or empty, Datastar **will** default to using the `id` attribute of the fragment.
-- `settleDuration` is used to control the amount of time that a fragment should take before removing any CSS related to settling. It is used to allow for animations in the browser via the Datastar client. If provided the value **_must_** be a positive integer of the number of milliseconds to allow for settling. If none is provided, the default value of `300` milliseconds will be used.
 - `useViewTransition` Whether to use view transitions, if not provided the Datastar client side **_will_** default to `false`.
 
 ```java
 RemoveFragments event = RemoveFragments.builder()
         .selector("#feed")
-        .settleDuration(500)
         .useViewTransition(true)
         .build();
 ```
