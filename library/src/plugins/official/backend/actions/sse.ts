@@ -114,7 +114,7 @@ export const sse = async (
       onopen: async (response: Response) => {
         if (response.status >= 400) {
           const status = response.status.toString()
-          dispatchSSE(ERROR, { status })
+          dispatchSSE(el, ERROR, { status })
         }
       },
       onmessage: (evt) => {
