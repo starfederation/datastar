@@ -21,9 +21,8 @@ import {
 } from './types'
 
 const signals: SignalsRoot = new SignalsRoot()
-const plugins: AttributePlugin[] = []
 const actions: ActionPlugins = {}
-const watchers: WatcherPlugin[] = []
+const plugins: AttributePlugin[] = []
 
 // Map of cleanup functions by element ID, keyed by a dataset key-value hash
 const removals = new Map<string, Map<number, OnRemovalFn>>()
@@ -48,12 +47,6 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
 
     let globalInitializer: GlobalInitializer | undefined
     switch (plugin.type) {
-      case PluginType.Watcher: {
-        const wp = plugin as WatcherPlugin
-        watchers.push(wp)
-        globalInitializer = wp.onGlobalInit
-        break
-      }
       case PluginType.Action: {
         actions[plugin.name] = plugin as ActionPlugin
         break
@@ -62,6 +55,11 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
         const ap = plugin as AttributePlugin
         plugins.push(ap)
         globalInitializer = ap.onGlobalInit
+        break
+      }
+      case PluginType.Watcher: {
+        const wp = plugin as WatcherPlugin
+        globalInitializer = wp.onGlobalInit
         break
       }
       default: {
