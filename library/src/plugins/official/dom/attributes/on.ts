@@ -115,20 +115,6 @@ export const On: AttributePlugin = {
       }
     }
 
-    if (key === 'resize') {
-      let resizeObserver: ResizeObserver | null = new ResizeObserver(() => {
-        callback()
-      })
-      resizeObserver.observe(el)
-
-      return () => {
-        if (resizeObserver) {
-          resizeObserver.disconnect()
-          resizeObserver = null
-        }
-      }
-    }
-
     if (key.startsWith(SIGNALS_CHANGE_PREFIX)) {
       if (key === SIGNALS_CHANGE_PREFIX) {
         const signalFn = (event: CustomEvent<DatastarSignalEvent>) =>
