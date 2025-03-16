@@ -12,15 +12,15 @@
 import asyncio
 import json
 from datetime import datetime
-from functools import cache
 from pathlib import Path
 
-from fasthtml.common import *
-from datastar_py.responses import DatastarFastHTMLResponse
 
 import polars as pl
+from fasthtml.common import *
 from great_tables import GT, html
 from great_tables.data import reactions
+
+from datastar_py.fasthtml import DatastarStreamingResponse
 
 ######################################################################################################
 # This demo shows how FastHTML can be integrated with Datastar for server-driven interaction with a  #
@@ -92,10 +92,10 @@ def GreatTable(pattern=default_pattern):
 # rendered table into the DOM with the request's 'filter' value
 @app.post
 async def table(filter: str):
-    async def _(sse):
-        yield sse.merge_fragments([GreatTable(filter)])
+    async def _():
+        yield DatastarStreamingResponse.merge_fragments([GreatTable(filter)])
 
-    return DatastarFastHTMLResponse(_)
+    return DatastarStreamingResponse(_())
 
 
 # Define default route which returns a FastTag from a GET request.
@@ -148,26 +148,26 @@ def index():
 
 
 # Define an async function that yields a merge_fragments command every second
-async def clock(sse):
+async def clock():
     while True:
         now = datetime.isoformat(datetime.now())
-        yield sse.merge_fragments([Span(id="currentTime")(now)])
+        yield DatastarStreamingResponse.merge_fragments([Span(id="currentTime")(now)])
         await asyncio.sleep(1)
 
 
 @rt
 async def time():
-    return DatastarFastHTMLResponse(clock)
+    return DatastarStreamingResponse(clock())
 
 
 @rt
 async def hello():
-    async def _(sse):
+    async def _():
         # Simulate load time
         await asyncio.sleep(1)
-        yield sse.merge_fragments([HELLO_BUTTON])
+        yield DatastarStreamingResponse.merge_fragments([HELLO_BUTTON])
 
-    return DatastarFastHTMLResponse(_)
+    return DatastarStreamingResponse(_())
 
 
 @rt

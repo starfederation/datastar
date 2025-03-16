@@ -6,7 +6,7 @@ from sanic.response import html
 
 from datastar_py import ServerSentEventGenerator as SSE
 from datastar_py.consts import FragmentMergeMode
-from datastar_py.responses import make_datastar_sanic_response
+from datastar_py.sanic import make_datastar_response
 
 app = Sanic("DataStarApp")
 
@@ -54,7 +54,7 @@ async def hello_world(request):
 
 @app.get("/add_signal")
 async def add_signal(request):
-    response = await make_datastar_sanic_response(request)
+    response = await make_datastar_response(request)
 
     await response.send(
         SSE.merge_fragments(
@@ -75,7 +75,7 @@ async def add_signal(request):
 
 @app.get("/add_fragment")
 async def add_fragment(request):
-    response = await make_datastar_sanic_response(request)
+    response = await make_datastar_response(request)
 
     await response.send(
         SSE.merge_fragments(
@@ -96,7 +96,7 @@ async def add_fragment(request):
 
 @app.get("/updates")
 async def updates(request):
-    response = await make_datastar_sanic_response(request)
+    response = await make_datastar_response(request)
 
     while True:
         await response.send(
