@@ -192,7 +192,7 @@ function applyAttributePlugin(
 
   // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically. The first match will be the most specific.
   const plugin = plugins.find((p) => {
-    // Ignore keys with the plugin name as a prefix (ignore `data-classxyz`)
+    // Ignore keys with the plugin name as a prefix (ignores `classes` but not `classBold`)
     const regex = new RegExp(`^${p.name}([A-Z]|_|$)`)
     return regex.test(rawKey)
   })
