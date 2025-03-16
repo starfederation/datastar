@@ -191,7 +191,11 @@ function applyAttributePlugin(
   const rawKey = camel(camelCasedKey.slice(alias.length))
 
   // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically. The first match will be the most specific.
-  const plugin = plugins.find((p) => rawKey.startsWith(p.name))
+  const plugin = plugins.find((p) => {
+    // Ignore keys with the plugin name as a prefix (ignore `data-classxyz`)
+    const regex = new RegExp(`^${p.name}([A-Z]|_|$)`)
+    return regex.test(rawKey)
+  })
 
   // Skip if no plugin is found
   if (!plugin) return
@@ -261,7 +265,7 @@ function applyAttributePlugin(
 
   // Load the plugin
   const cleanup = plugin.onLoad(ctx) ?? (() => {})
-  
+
   // Store the cleanup function
   let elTracking = removals.get(el.id)
   if (!elTracking) {
