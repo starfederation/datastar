@@ -1,3 +1,6 @@
+import functools
+from typing import override
+
 from .sse import SSE_HEADERS, ServerSentEventGenerator
 
 try:
@@ -35,6 +38,7 @@ class DatastarDjangoResponse(DjangoStreamingHttpResponse):
 
 
 class DatastarFastAPIResponse(FastAPIStreamingResponse, ServerSentEventGenerator):
+    @functools.wraps(FastAPIStreamingResponse.__init__)
     def __init__(self, *args, **kwargs):
         kwargs["headers"] = {**SSE_HEADERS, **kwargs.get("headers", {})}
         super().__init__(*args, **kwargs)
