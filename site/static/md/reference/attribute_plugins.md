@@ -120,6 +120,10 @@ Modifiers allow you to modify behavior when defining computed signals.
   - `.snake` - Snake case: `my_signal`
   - `.pascal` - Pascal case: `MySignal`
 
+```html
+<div data-computed-my-signal__case.kebab="$bar + $baz"></div>
+```
+
 ### `data-ref`
 
 Creates a new signal that is a reference to the element on which the data attribute is placed.
@@ -142,13 +146,17 @@ The signal value can then be used to reference the element.
 
 #### Modifiers
 
-Modifiers allow you to modify behavior when defining reference signals.
+Modifiers allow you to modify behavior when defining references.
 
 - `__case` - Converts the casing of the signal name.
   - `.camel` - Camel case: `mySignal` (default)
   - `.kebab` - Kebab case: `my-signal`
   - `.snake` - Snake case: `my_signal`
   - `.pascal` - Pascal case: `MySignal`
+
+```html
+<div data-ref-my-signal__case.kebab></div>
+```
 
 ## DOM Plugins
 
@@ -219,6 +227,10 @@ Modifiers allow you to modify behavior when binding signals.
   - `.snake` - Snake case: `my_signal`
   - `.pascal` - Pascal case: `MySignal`
 
+```html
+<input data-bind-my-signal__case.kebab />
+```
+
 ### `data-class`
 
 Adds or removes a class to or from an element based on an expression.
@@ -233,6 +245,20 @@ The `data-class` attribute can also be used to add or remove multiple classes fr
 
 ```html
 <div data-class="{hidden: $foo, 'font-bold': $bar}"></div>
+```
+
+#### Modifiers
+
+Modifiers allow you to modify behavior defining a class name.
+
+- `__case` - Converts the casing of the class.
+  - `.camel` - Camel case: `myClass`
+  - `.kebab` - Kebab case: `my-class` (default)
+  - `.snake` - Snake case: `my_class`
+  - `.pascal` - Pascal case: `MyClass`
+
+```html
+<div data-class-my-class__case.camel="$foo"></div>
 ```
 
 ### `data-on`
@@ -271,10 +297,10 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 - `__passive` \* - Do not call `preventDefault` on the event listener.
 - `__capture` \* - Use a capture event listener.
 - `__case` - Converts the casing of the event.
-  - `.camel` - Camel case: `mySignal`
-  - `.kebab` - Kebab case: `my-signal` (default)
-  - `.snake` - Snake case: `my_signal`
-  - `.pascal` - Pascal case: `MySignal`
+  - `.camel` - Camel case: `myEvent`
+  - `.kebab` - Kebab case: `my-event` (default)
+  - `.snake` - Snake case: `my_event`
+  - `.pascal` - Pascal case: `MyEvent`
 - `__delay` - Delay the event listener.
   - `.500ms` - Delay for 500 milliseconds.
   - `.1s` - Delay for 1 second.
@@ -301,7 +327,9 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 \* Only works on built-in events.
 
 ```html
-<div data-on-click__window__debounce.500ms.leading="$foo = ''"></div>
+<div data-on-click__window__debounce.500ms.leading="$foo = ''"
+     data-on-my-event__case.camel="$foo = ''"
+></div>
 ```
 
 ### `data-persist`
@@ -329,14 +357,14 @@ If a key is provided, it will be used as the key when saving in storage, otherwi
 Modifiers allow you to modify the key and storage target.
 
 - `__case` - Converts the casing of the key.
-  - `.camel` - Camel case: `mySignal` (default)
-  - `.kebab` - Kebab case: `my-signal`
-  - `.snake` - Snake case: `my_signal`
-  - `.pascal` - Pascal case: `MySignal`
+  - `.camel` - Camel case: `myKey` (default)
+  - `.kebab` - Kebab case: `my-key`
+  - `.snake` - Snake case: `my_key`
+  - `.pascal` - Pascal case: `MyKey`
 - `__session` - Persists signals in Session Storage.
 
 ```html
-<div data-persist__session></div>
+<div data-persist-my-key__case.kebab__session></div>
 ```
 
 ### `data-replace-url`
