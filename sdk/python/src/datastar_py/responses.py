@@ -1,5 +1,4 @@
 from .sse import SSE_HEADERS, ServerSentEventGenerator
-from typing import override
 
 try:
     from django.http import StreamingHttpResponse as DjangoStreamingHttpResponse
@@ -37,7 +36,7 @@ class DatastarDjangoResponse(DjangoStreamingHttpResponse):
 
 class DatastarFastAPIResponse(FastAPIStreamingResponse, ServerSentEventGenerator):
     def __init__(self, *args, **kwargs):
-        kwargs["headers"] = SSE_HEADERS
+        kwargs["headers"] = {**SSE_HEADERS, **kwargs.get("headers", {})}
         super().__init__(*args, **kwargs)
 
 
