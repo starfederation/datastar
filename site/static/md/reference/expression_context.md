@@ -10,6 +10,10 @@ You should use `ctx` sparingly, and only when you can't achieve the desired beha
 
 The current element being processed.
 
+```html
+<button data-on-click="ctx.el.disabled = true"></button>
+```
+
 ### `ctx.signals`
 
 The signals root object that contains functions for accessing and modifying signals. Signals can be accessed using the `signal` method. The following is the equivalent of an expression containing only `$foo`.

@@ -13,8 +13,7 @@ Consider this imperative (non-declarative) way of conditionally placing a class 
 ```js
 if (foo == 1) {
   document.getElementById('myelement').classList.add('bold');
-}
-else {
+} else {
   document.getElementById('myelement').classList.remove('bold');
 }
 ```
@@ -27,14 +26,14 @@ Datastar allows us to write this logic declaratively while embracing locality-of
 
 ### 2. Signals
 
-Datastar uses signals, provided by [Preact Signals](https://preactjs.com/guide/v10/signals/), to manage state. You can think of signals as reactive variables that automatically track and propagate changes in expressions.
+Datastar uses [signals](https://github.com/tc39/proposal-signals?tab=readme-ov-file) to manage frontend state. You can think of signals as reactive variables that automatically track and propagate changes in expressions.
 
 Signals can be created and modified using `data-*` attributes on the frontend, or events sent from the backend. They can also be used in [Datastar expressions](/guide/datastar_expressions).
 
 ```html
-<div data-signals-foo="hello"></div>
+<div data-signals-foo=""></div>
 <div data-text="$foo"></div>
-<button data-on-click="$foo = ''"></button>
+<button data-on-click="$foo = 'hello'"></button>
 ```
 
 Behind the scenes, Datastar converts `$foo` to `ctx.signals.signal('foo').value`, and then evaluates the expression in a sandboxed context. This means that JavaScript can be used in Datastar expressions.
