@@ -21,4 +21,4 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ### Removed
 
-- Removed settling entirely from SSE events, since it has become redundant ([#764](https://github.com/starfederation/datastar/issues/764)).
+- Removed settling from SSE events, which has become redundant ([#764](https://github.com/starfederation/datastar/issues/764)).
