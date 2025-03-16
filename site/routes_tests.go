@@ -59,6 +59,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "signals_change"},
 				{ID: "signals_change_path"},
 				{ID: "signals_change_path_once"},
+				{ID: "sse_events"},
 			},
 		},
 	}
@@ -119,6 +120,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 			setupTestsMergeFragmentWhitespace(testsRouter),
 			setupTestsOnLoad(testsRouter),
 			setupTestsRemoveFragment(testsRouter),
+			setupTestsSseEvents(testsRouter),
 		); err != nil {
 			panic(fmt.Sprintf("error setting up tests routes: %s", err))
 		}
