@@ -28,7 +28,7 @@ import { Fit } from '../plugins/official/logic/actions/fit'
 import { SetAll } from '../plugins/official/logic/actions/setAll'
 import { ToggleAll } from '../plugins/official/logic/actions/toggleAll'
 
-setAlias('ds')
+setAlias('star')
 
 load(
   // DOM
