@@ -1,9 +1,8 @@
 import { Hash, attrHash, elUniqId, walkDOM } from '../utils/dom'
 import { camel } from '../utils/text'
-import { type Dependency, effect } from '../vendored/rocket'
 import { DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
-import { SignalsRoot } from './signals'
+import { type Dependency, SignalsRoot, effect } from './signals'
 import {
   type ActionPlugin,
   type ActionPlugins,

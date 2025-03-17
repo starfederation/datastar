@@ -13,7 +13,7 @@ export const Computed: AttributePlugin = {
   valReq: Requirement.Must,
   onLoad: ({ key, mods, signals, genRX }) => {
     key = modifyCasing(key, mods)
-    const rx = genRX()
-    signals.setComputed(key, rx)
+    const { deps, rxFn } = genRX()
+    signals.setComputed(key, deps, rxFn)
   },
 }

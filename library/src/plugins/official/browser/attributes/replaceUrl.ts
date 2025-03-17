@@ -15,9 +15,9 @@ export const ReplaceUrl: AttributePlugin = {
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
   onLoad: ({ effect, genRX }) => {
-    const rx = genRX()
-    return effect(() => {
-      const url = rx<string>()
+    const { deps, rxFn } = genRX()
+    return effect(deps, () => {
+      const url = rxFn<string>()
       const baseUrl = window.location.href
       const fullUrl = new URL(url, baseUrl).toString()
       window.history.replaceState({}, '', fullUrl)

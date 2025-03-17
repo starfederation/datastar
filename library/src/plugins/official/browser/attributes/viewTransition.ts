@@ -37,9 +37,9 @@ export const ViewTransition: AttributePlugin = {
       console.error('Browser does not support view transitions')
       return
     }
-    const rx = genRX()
-    return effect(() => {
-      const name = rx<string>()
+    const { deps, rxFn } = genRX()
+    return effect(deps, () => {
+      const name = rxFn<string>()
       if (!name?.length) return
       const elVTASTyle = el.style as unknown as CSSStyleDeclaration
       elVTASTyle.viewTransitionName = name

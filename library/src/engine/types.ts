@@ -1,6 +1,5 @@
-import type { Dependency, EffectFn } from '../vendored/rocket'
 import { DATASTAR } from './consts'
-import type { SignalsRoot } from './signals'
+import type { Dependency, EffectFn, SignalsRoot } from './signals'
 
 export type OnRemovalFn = () => void
 

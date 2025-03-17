@@ -24,11 +24,11 @@ export const Intersects: AttributePlugin = {
     if (mods.has(FULL)) options.threshold = 1
     else if (mods.has(HALF)) options.threshold = 0.5
 
-    const rx = genRX()
+    const { rxFn } = genRX()
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
-          rx()
+          rxFn()
           if (mods.has(ONCE)) {
             observer.disconnect()
             delete el.dataset[rawKey]

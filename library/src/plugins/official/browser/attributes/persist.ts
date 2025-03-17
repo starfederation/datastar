@@ -6,10 +6,17 @@
 import { DATASTAR } from '../../../../engine/consts'
 import {
   type AttributePlugin,
+  DATASTAR_SIGNAL_EVENT,
+  type DatastarSignalEvent,
   type NestedValues,
   PluginType,
 } from '../../../../engine/types'
-import { modifyCasing, trimDollarSignPrefix } from '../../../../utils/text'
+import {
+  camel,
+  modifyCasing,
+  trimDollarSignPrefix,
+} from '../../../../utils/text'
+import { SIGNALS_CHANGE_PREFIX } from '../../dom/attributes/on'
 
 const SESSION = 'session'
 
@@ -17,7 +24,7 @@ export const Persist: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'persist',
   mods: new Set([SESSION]),
-  onLoad: ({ key, effect, mods, signals, value }) => {
+  onLoad: ({ key, mods, signals, value }) => {
     key = modifyCasing(key, mods)
     if (key === '') {
       key = DATASTAR
@@ -43,9 +50,28 @@ export const Persist: AttributePlugin = {
       storage.setItem(key, JSON.stringify(nv))
     }
 
-    storageToSignals()
-    return effect(() => {
+    const hasPrefix = key !== SIGNALS_CHANGE_PREFIX
+    const signalPath = modifyCasing(
+      camel(key.slice(SIGNALS_CHANGE_PREFIX.length)),
+      mods,
+    )
+    const signalFn = (event: CustomEvent<DatastarSignalEvent>) => {
+      if (hasPrefix) {
+        const { added, removed, updated } = event.detail
+        if (
+          ![...added, ...removed, ...updated].some((d) =>
+            d.startsWith(signalPath),
+          )
+        ) {
+          return
+        }
+      }
       signalsToStorage()
-    })
+    }
+    document.addEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
+    storageToSignals()
+    return () => {
+      document.removeEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
+    }
   },
 }

@@ -17,12 +17,18 @@ export const CustomValidity: AttributePlugin = {
   valReq: Requirement.Must,
   onLoad: (ctx) => {
     const { el, genRX, effect } = ctx
-    if (!(el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement)) {
+    if (
+      !(
+        el instanceof HTMLInputElement ||
+        el instanceof HTMLSelectElement ||
+        el instanceof HTMLTextAreaElement
+      )
+    ) {
       throw runtimeErr('CustomValidityInvalidElement', ctx)
     }
-    const rx = genRX()
-    return effect(() => {
-      const result = rx<string>()
+    const { deps, rxFn } = genRX()
+    return effect(deps, () => {
+      const result = rxFn<string>()
       if (typeof result !== 'string') {
         throw runtimeErr('CustomValidityInvalidExpression', ctx, { result })
       }
