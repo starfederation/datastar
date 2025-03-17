@@ -50,6 +50,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "merge_fragment_whitespace"},
 				{ID: "on_load"},
 				{ID: "on_load_delay"},
+				{ID: "plugin_name_prefix"},
 				{ID: "radio_value"},
 				{ID: "ref"},
 				{ID: "remove_fragment"},
