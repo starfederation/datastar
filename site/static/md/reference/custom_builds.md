@@ -12,7 +12,7 @@ The easiest way to create a custom build is to use the [bundler](/bundler), whic
 
 It is possible to alias `data-*` attributes to a custom alias (`data-foo-*`, for example) using the [bundler](/bundler). A custom alias should _only_ be used if you have a conflict with a legacy library and [`data-star-ignore`](#data-star-ignore) cannot be used.
 
-We maintain a `data-ds-*` aliased version that can be included as follows.
+We maintain a `data-star-*` aliased version that can be included as follows.
 
 ```html
 <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.9/bundles/datastar-aliased.js"></script>

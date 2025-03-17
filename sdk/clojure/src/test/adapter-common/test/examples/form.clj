@@ -5,6 +5,7 @@
     [dev.onionpancakes.chassis.compiler :as hc]
     [ring.middleware.multipart-params]
     [ring.util.response :as rur]
+    [starfederation.datastar.clojure.adapter.common :as ac]
     [starfederation.datastar.clojure.api :as d*]))
 
 
@@ -67,7 +68,7 @@
 (defn process-endpoint [request ->sse-response]
   (let [input-val (get-in request [:params "input-1"])]
     (->sse-response request
-      {:on-open
+      {ac/on-open
        (fn [sse-gen]
          (d*/with-open-sse sse-gen
            (d*/merge-fragment! sse-gen (h/html (result-area input-val)))))})))

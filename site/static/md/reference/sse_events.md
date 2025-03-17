@@ -1,6 +1,6 @@
 # SSE Events
 
-Responses to [backend plugin actions](/reference/action_plugins#backend-plugins) must contain zero or more Datastar SSE events.
+Responses to [backend plugin actions](/reference/action_plugins#backend-plugins) must contain zero or more Datastar [SSE](https://en.wikipedia.org/wiki/Server-sent_events) events.
 
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
@@ -33,7 +33,6 @@ Additional `data` lines can be added to the response to override the default beh
 | `data: mergeMode before`           | Inserts the fragment before the target as a sibling.                                                                    |
 | `data: mergeMode after`            | Inserts the fragment after the target as a sibling.                                                                     |
 | `data: mergeMode upsertAttributes` | Merges attributes from the fragment into the target – useful for updating a signals.                                      |
-| `data: settleDuration 500`         | Settles the element after 500ms, useful for transitions. Defaults to `300`.                                             |
 | `data: useViewTransition true`     | Whether to use view transitions when merging into the DOM. Defaults to `false`.                                         |
 | `data: fragments`                  | The HTML fragments to merge into the DOM.                                                                               |
 
@@ -43,7 +42,6 @@ Sample output showing all options:
 event: datastar-merge-fragments
 data: selector #foo
 data: mergeMode append
-data: settleDuration 500
 data: useViewTransition true
 data: fragments <div>
 data: fragments Hello, world!

@@ -1,10 +1,10 @@
 # Datastar ring adapter
 
-Datastar sdk adapter for [ring](https://github.com/ring-clojure/ring). It is currently
+Datastar SDK adapter for [ring](https://github.com/ring-clojure/ring). It is currently
 tested with
 [ring-jetty-adapter](https://github.com/ring-clojure/ring/tree/master/ring-jetty-adapter)
 
-This sdk adapter is based on the `ring.core.protocols/StreamableResponseBody` protocol.
+This SDK adapter is based on the `ring.core.protocols/StreamableResponseBody` protocol.
 Any ring adapter using this protocol should work with this library.
 
 ## Installation

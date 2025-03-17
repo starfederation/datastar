@@ -9,9 +9,11 @@
     [reitit.ring :as rr]
     [reitit.ring.middleware.parameters :as params]
     [reitit.ring.middleware.multipart :as mpparams]
-    [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response]]
+    [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response on-open]]
     [starfederation.datastar.clojure.api :as d*]))
 
+
+;; Trying out several way we might rightly and wrongly use html forms
 
 (defn button [form action-fn]
   (let [method (if (= action-fn d*/sse-get)
@@ -81,7 +83,7 @@
         signals (u/get-signals request)
         val (or input-val (get signals "input-1"))]
     (->sse-response request
-      {:on-open
+      {on-open
        (fn [sse-gen]
          (u/clear-terminal!)
          (? (dissoc request :reitit.core/match :reitit.core/router))

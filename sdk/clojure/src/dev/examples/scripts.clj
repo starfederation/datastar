@@ -9,6 +9,7 @@
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.adapter.http-kit :as hk-gen]))
 
+;; Sending scripts and playing with auto-remove
 
 (def page
   (h/html
@@ -24,7 +25,7 @@
 
 (defn endpoint [req]
   (hk-gen/->sse-response req
-    {:on-open
+    {hk-gen/on-open
      (fn [sse]
        (d*/with-open-sse sse
          (d*/execute-script! sse
@@ -44,8 +45,6 @@
   (rr/ring-handler router
                    default-handler
                    {:middleware [reitit-params/parameters-middleware]}))
-
-
 
 
 (comment

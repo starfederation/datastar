@@ -22,6 +22,8 @@ By default, all requests are sent with a `{datastar: *}` object containing the c
 
 It is possible to send form encoded requests by setting the `contentType` option to `form`. This sends GET requests using `application/x-www-form-urlencoded` encoding and non-GET requests using `multipart/form-data` encoding. See the [form data example](/examples/form_data).
 
+Note that when a page is hidden (in a background tab, for example), the default behavior is for the SSE connection to be closed, and reopened when the page becomes visible again. To keep the connection open when the page is hidden, set the [`openWhenHidden`](#options) option to `true`.
+
 ### `@post()`
 
 Arguments: `@post(url: string, options={})`

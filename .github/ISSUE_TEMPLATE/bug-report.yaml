@@ -1,0 +1,31 @@
+name: Bug Report
+description: Create a bug report for Datastar.
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        So you think you’ve discovered a bug in Datastar? To ensure this hasn’t already been reported, please first search [existing issues](https://github.com/starfederation/datastar/issues?q=is%3Aissue) and ensure you’re running the [latest release](https://github.com/starfederation/datastar/releases). The `#bug-report` channel in the [Discord server](https://discord.gg/bnRNgZjgPh) is also a great place to report bugs.
+
+        To rule out that this isn’t a setup or configuration issue, please read the [guide](https://data-star.dev/guide) and the [reference](https://data-star.dev/reference/attribute_plugins) docs.
+        
+        If you still believe you’ve found a bug, please provide a clear and concise description, including:
+        - What is happening and what you expected to happen.
+        - Steps to reproduce the issue.
+        - Screenshots, if applicable.
+  - type: textarea
+    id: body
+    attributes:
+      label: Bug Report
+      description: Please provide a clear and concise description of the bug.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Datastar Version
+      description: Provide the Datastar version that this relates to, ideally the [latest release](https://github.com/starfederation/datastar/releases).
+      placeholder: v1.0.0-beta.9
+    validations:
+      required: true

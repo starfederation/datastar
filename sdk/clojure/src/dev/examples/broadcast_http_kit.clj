@@ -3,19 +3,20 @@
     [examples.utils :as u]
     [reitit.ring :as rr]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response on-open on-close]]))
 
 
+;; Tiny setup for that allows broadcasting events to several curl processes
 
 (defonce !conns (atom #{}))
 
 (defn long-connection [req]
   (->sse-response req
-    {:on-open
+    {on-open
      (fn [sse]
        (swap! !conns conj sse)
        (d*/console-log! sse "'connected'"))
-     :on-close
+     on-close
      (fn on-close [sse status-code]
        (swap! !conns disj sse)
        (println "Connection closed status: " status-code)

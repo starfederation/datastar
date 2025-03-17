@@ -9,7 +9,7 @@
     [reitit.ring :as rr]
     [ring.util.response :as ruresp]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response on-open]]))
 
 
 (def home-page
@@ -42,7 +42,7 @@
 (defn hello-world [request]
   (let [d (-> request u/get-signals (get "delay") int)]
     (->sse-response request
-      {:on-open
+      {on-open
        (fn [sse]
          (d*/with-open-sse sse
            (dotimes [i msg-count]

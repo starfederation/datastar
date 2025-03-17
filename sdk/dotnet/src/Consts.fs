@@ -39,8 +39,6 @@ module Consts =
     let [<Literal>] DatastarKey               = "datastar"
     let [<Literal>] Version                   = "1.0.0-beta.9"
 
-    /// Default: TimeSpan.FromMilliseconds 300
-    let DefaultFragmentsSettleDuration = TimeSpan.FromMilliseconds 300
     /// Default: TimeSpan.FromMilliseconds 1000
     let DefaultSseRetryDuration = TimeSpan.FromMilliseconds 1000
 
@@ -56,7 +54,6 @@ module Consts =
 
     let [<Literal>] DatastarDatalineSelector = "selector"
     let [<Literal>] DatastarDatalineMergeMode = "mergeMode"
-    let [<Literal>] DatastarDatalineSettleDuration = "settleDuration"
     let [<Literal>] DatastarDatalineFragments = "fragments"
     let [<Literal>] DatastarDatalineUseViewTransition = "useViewTransition"
     let [<Literal>] DatastarDatalineSignals = "signals"

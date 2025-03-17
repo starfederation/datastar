@@ -11,6 +11,8 @@
     [starfederation.datastar.clojure.consts :as consts]))
 
 
+;; Appending and removing fragments with the D* api
+
 (def page
   (h/html
     (c/page-scaffold
@@ -22,8 +24,6 @@
         "Send input"]
        [:br]
        [:ul {:id "list"}]])))
-
-
 
 
 (defn home [_]
@@ -50,7 +50,7 @@
   (let [signals (u/get-signals req)
         input-val (get signals "input")]
     (hk-gen/->sse-response req
-      {:on-open
+      {hk-gen/on-open
        (fn [sse]
          (d*/with-open-sse sse
           (d*/merge-fragment! sse (->fragment (id!) input-val)
@@ -61,7 +61,7 @@
 (defn remove-fragment [req]
   (let [id (-> req :path-params :id)]
     (hk-gen/->sse-response req
-      {:on-open
+      {hk-gen/on-open
        (fn [sse-gen]
          (d*/remove-fragment! sse-gen (str "#" id)))})))
 

@@ -8,7 +8,7 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import { modifyCasing } from '../../../../utils/text'
+import { kebab, modifyCasing } from '../../../../utils/text'
 
 export const Class: AttributePlugin = {
   type: PluginType.Attribute,
@@ -29,12 +29,15 @@ export const Class: AttributePlugin = {
           }
         }
       } else {
-        key = modifyCasing(key, mods)
+        // Default to kebab-case and allow modifying
+        let className = kebab(key)
+        className = modifyCasing(className, mods)
+
         const shouldInclude = rxFn<boolean>()
         if (shouldInclude) {
-          cl.add(key)
+          cl.add(className)
         } else {
-          cl.remove(key)
+          cl.remove(className)
         }
       }
     })

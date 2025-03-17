@@ -13,7 +13,6 @@ class RemoveFragments implements EventInterface
     use EventTrait;
 
     public string $selector;
-    public int $settleDuration = Consts::DEFAULT_FRAGMENTS_SETTLE_DURATION;
     public bool $useViewTransition = Consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS;
 
     public function __construct(string $selector, array $options = [])
@@ -41,10 +40,6 @@ class RemoveFragments implements EventInterface
         $dataLines = [
             $this->getDataLine(Consts::SELECTOR_DATALINE_LITERAL, $this->selector),
         ];
-
-        if ($this->settleDuration !== Consts::DEFAULT_FRAGMENTS_SETTLE_DURATION) {
-            $dataLines[] = $this->getDataLine(Consts::SETTLE_DURATION_DATALINE_LITERAL, $this->settleDuration);
-        }
 
         if ($this->useViewTransition !== Consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS) {
             $dataLines[] = $this->getDataLine(Consts::USE_VIEW_TRANSITION_DATALINE_LITERAL, $this->getBooleanAsString($this->useViewTransition));

@@ -14,7 +14,6 @@ class MergeFragmentsTest {
         MergeFragments event = MergeFragments.builder()
                 .selector("#feed")
                 .mergeMode(FragmentMergeMode.Append)
-                .settleDuration(500)
                 .useViewTransition(true)
                 .data("<div id=\"feed\">\n<span>1</span>\n</div>")
                 .build();
@@ -22,7 +21,6 @@ class MergeFragmentsTest {
         String[] expectedDataLines = {
                 "selector #feed",
                 "mergeMode append",
-                "settleDuration 500",
                 "useViewTransition true",
                 "fragments <div id=\"feed\">",
                 "fragments <span>1</span>",

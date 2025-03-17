@@ -34,6 +34,14 @@ Note that `data-*` attributes are evaluated in the order they appear in the DOM.
 <div data-signals-foo="1"></div>
 ```
 
+### Attribute Casing
+
+Note that `data-*` attributes are [case-insensitive](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*). The keys used in attribute plugins that define signals, such as `data-signals-*`, are converted to [camelCase](https://developer.mozilla.org/en-US/docs/Glossary/Camel_case) (`data-signals-my-signal` defines a signal named `mySignal`). 
+
+The keys used by all other attribute plugins are are converted to [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case) (`data-class-text-blue-700` adds or removes the class `text-blue-700`). 
+
+You can use the `__case` modifier to convert between camelCase, kebab-case, snake_case, and PascalCase, or alternatively use object syntax when available.
+
 ## Core Plugins
 
 [Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/core/attributes)
@@ -64,20 +72,27 @@ The `data-signals` attribute can also be used to merge multiple signals using a 
 
 The value above is written in JavaScript object notation, but JSON, which is a subset and which most templating languages have built-in support for, is also allowed.
 
-Note that `data-*` attributes are case-insensitive. If you want to use uppercase characters in signal names, you'll need to kebabize them or use object syntax. So the signal name `mySignal` must be written as `data-signals-my-signal` or `data-signals="{mySignal: 1}"`.
-
-You can further modify the casing of keys in `data-*` attributes using the `__case` modifier, followed by `.kebab`, `.snake`, or `.pascal`.
+Keys used in `data-signals-*` are converted to camel case, so the signal name `mySignal` must be written as `data-signals-my-signal` or `data-signals="{mySignal: 1}"`.
 
 Signals beginning with an underscore are considered _local signals_ and are not included in requests to the backend by default. You can include them by setting the [`includeLocal`](/reference/action_plugins#options) option to `true`.
+
+Signal names cannot begin or contain double underscores (`__`), due to its use as a modifer delimiter.
 
 #### Modifiers
 
 Modifiers allow you to modify behavior when merging signals.
 
+- `__case` - Converts the casing of the signal name.
+  - `.camel` - Camel case: `mySignal` (default)
+  - `.kebab` - Kebab case: `my-signal`
+  - `.snake` - Snake case: `my_signal`
+  - `.pascal` - Pascal case: `MySignal`
 - `__ifmissing` - Only merges signals if their keys do not already exist. This is useful for setting defaults without overwriting existing values.
 
 ```html
-<div data-signals-foo__ifmissing="1"></div>
+<div data-signals-my-signal__case.kebab="1" 
+     data-signals-foo__ifmissing="1"
+></div>
 ```
 
 ### `data-computed`
@@ -93,6 +108,20 @@ Computed signals are useful for memoizing expressions containing other signals. 
 ```html
 <div data-computed-foo="$bar + $baz"></div>
 <div data-text="$foo"></div>
+```
+
+#### Modifiers
+
+Modifiers allow you to modify behavior when defining computed signals.
+
+- `__case` - Converts the casing of the signal name.
+  - `.camel` - Camel case: `mySignal` (default)
+  - `.kebab` - Kebab case: `my-signal`
+  - `.snake` - Snake case: `my_signal`
+  - `.pascal` - Pascal case: `MySignal`
+
+```html
+<div data-computed-my-signal__case.kebab="$bar + $baz"></div>
 ```
 
 ### `data-ref`
@@ -113,6 +142,20 @@ The signal value can then be used to reference the element.
 
 ```html
 `foo` holds a <span data-text="$foo.tagName"></span> element.
+```
+
+#### Modifiers
+
+Modifiers allow you to modify behavior when defining references.
+
+- `__case` - Converts the casing of the signal name.
+  - `.camel` - Camel case: `mySignal` (default)
+  - `.kebab` - Kebab case: `my-signal`
+  - `.snake` - Snake case: `my_signal`
+  - `.pascal` - Pascal case: `MySignal`
+
+```html
+<div data-ref-my-signal__case.kebab></div>
 ```
 
 ## DOM Plugins
@@ -174,6 +217,20 @@ Multiple input values can be assigned to a single signal by predefining the sign
 </div>
 ```
 
+#### Modifiers
+
+Modifiers allow you to modify behavior when binding signals.
+
+- `__case` - Converts the casing of the signal name.
+  - `.camel` - Camel case: `mySignal` (default)
+  - `.kebab` - Kebab case: `my-signal`
+  - `.snake` - Snake case: `my_signal`
+  - `.pascal` - Pascal case: `MySignal`
+
+```html
+<input data-bind-my-signal__case.kebab />
+```
+
 ### `data-class`
 
 Adds or removes a class to or from an element based on an expression.
@@ -188,6 +245,20 @@ The `data-class` attribute can also be used to add or remove multiple classes fr
 
 ```html
 <div data-class="{hidden: $foo, 'font-bold': $bar}"></div>
+```
+
+#### Modifiers
+
+Modifiers allow you to modify behavior defining a class name.
+
+- `__case` - Converts the casing of the class.
+  - `.camel` - Camel case: `myClass`
+  - `.kebab` - Kebab case: `my-class` (default)
+  - `.snake` - Snake case: `my_class`
+  - `.pascal` - Pascal case: `MyClass`
+
+```html
+<div data-class-my-class__case.camel="$foo"></div>
 ```
 
 ### `data-on`
@@ -224,6 +295,11 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 - `__once` \* - Only trigger the event listener once.
 - `__passive` \* - Do not call `preventDefault` on the event listener.
 - `__capture` \* - Use a capture event listener.
+- `__case` - Converts the casing of the event.
+  - `.camel` - Camel case: `myEvent`
+  - `.kebab` - Kebab case: `my-event` (default)
+  - `.snake` - Snake case: `my_event`
+  - `.pascal` - Pascal case: `MyEvent`
 - `__delay` - Delay the event listener.
   - `.500ms` - Delay for 500 milliseconds.
   - `.1s` - Delay for 1 second.
@@ -250,7 +326,9 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 \* Only works on built-in events.
 
 ```html
-<div data-on-click__window__debounce.500ms.leading="$foo = ''"></div>
+<div data-on-click__window__debounce.500ms.leading="$foo = ''"
+     data-on-my-event__case.camel="$foo = ''"
+></div>
 ```
 
 ### `data-persist`
@@ -275,12 +353,17 @@ If a key is provided, it will be used as the key when saving in storage, otherwi
 
 #### Modifiers
 
-Modifiers allow you to modify the storage target.
+Modifiers allow you to modify the key and storage target.
 
+- `__case` - Converts the casing of the key.
+  - `.camel` - Camel case: `myKey` (default)
+  - `.kebab` - Kebab case: `my-key`
+  - `.snake` - Snake case: `my_key`
+  - `.pascal` - Pascal case: `MyKey`
 - `__session` - Persists signals in Session Storage.
 
 ```html
-<div data-persist__session></div>
+<div data-persist-my-key__case.kebab__session></div>
 ```
 
 ### `data-replace-url`
@@ -376,6 +459,12 @@ Show or hides an element based on whether an expression evaluates to `true` or `
 <div data-show="$foo"></div>
 ```
 
+To prevent flickering of the element before Datastar has processed the DOM, you can add a `display: none` style to the element to hide it initially.
+
+```html
+<div data-show="$foo" style="display: none"></div>
+```
+
 ### `data-view-transition`
 
 Sets the `view-transition-name` style attribute explicitly.
@@ -417,6 +506,16 @@ The signal name can be specified in the key (as above), or in the value (as belo
 <button data-indicator="fetching"></button>
 ```
 
+#### Modifiers
+
+Modifiers allow you to modify behavior when defining indicator signals.
+
+- `__case` - Converts the casing of the signal name.
+  - `.camel` - Camel case: `mySignal` (default)
+  - `.kebab` - Kebab case: `my-signal`
+  - `.snake` - Snake case: `my_signal`
+  - `.pascal` - Pascal case: `MySignal`
+
 ## Ignoring Elements
 
 ### `data-star-ignore`
@@ -440,7 +539,7 @@ Datastar walks the entire DOM and applies plugins to each element it encounters.
 
 It is possible to alias `data-*` attributes to a custom alias (`data-foo-*`, for example) using the [bundler](/bundler). A custom alias should _only_ be used if you have a conflict with a legacy library and [`data-star-ignore`](#data-star-ignore) cannot be used.
 
-We maintain a `data-ds-*` aliased version that can be included as follows.
+We maintain a `data-star-*` aliased version that can be included as follows.
 
 ```html
 <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.9/bundles/datastar-aliased.js"></script>
