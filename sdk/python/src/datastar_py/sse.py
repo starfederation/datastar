@@ -20,7 +20,7 @@ class ServerSentEventGenerator:
         event_type: consts.EventType,
         data_lines: list[str],
         event_id: Optional[int] = None,
-        retry_duration: int = consts.DefaultSseRetryDuration,
+        retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ) -> str:
         prefix = []
         if event_id:
@@ -41,28 +41,28 @@ class ServerSentEventGenerator:
         fragments: list[str],
         selector: Optional[str] = None,
         merge_mode: Optional[consts.FragmentMergeMode] = None,
-        use_view_transition: bool = consts.DefaultFragmentsUseViewTransitions,
+        use_view_transition: bool = consts.DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
         event_id: Optional[int] = None,
-        retry_duration: int = consts.DefaultSseRetryDuration,
+        retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         data_lines = []
         if merge_mode:
-            data_lines.append(f"data: {consts.MergeModeDatalineLiteral} {merge_mode}")
+            data_lines.append(f"data: {consts.MERGE_MODE_DATALINE_LITERAL} {merge_mode}")
         if selector:
-            data_lines.append(f"data: {consts.SelectorDatalineLiteral} {selector}")
+            data_lines.append(f"data: {consts.SELECTOR_DATALINE_LITERAL} {selector}")
         if use_view_transition:
-            data_lines.append(f"data: {consts.UseViewTransitionDatalineLiteral} true")
+            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} true")
         else:
-            data_lines.append(f"data: {consts.UseViewTransitionDatalineLiteral} false")
+            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} false")
 
         data_lines.extend(
-            f"data: {consts.FragmentsDatalineLiteral} {x}"
+            f"data: {consts.FRAGMENTS_DATALINE_LITERAL} {x}"
             for fragment in fragments
             for x in fragment.splitlines()
         )
 
         return ServerSentEventGenerator._send(
-            consts.EventType.EventTypeMergeFragments,
+            consts.EventType.MERGE_FRAGMENTS,
             data_lines,
             event_id,
             retry_duration,
@@ -74,18 +74,18 @@ class ServerSentEventGenerator:
         selector: Optional[str] = None,
         use_view_transition: bool = True,
         event_id: Optional[int] = None,
-        retry_duration: int = consts.DefaultSseRetryDuration,
+        retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         data_lines = []
         if selector:
-            data_lines.append(f"data: {consts.SelectorDatalineLiteral} {selector}")
+            data_lines.append(f"data: {consts.SELECTOR_DATALINE_LITERAL} {selector}")
         if use_view_transition:
-            data_lines.append(f"data: {consts.UseViewTransitionDatalineLiteral} true")
+            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} true")
         else:
-            data_lines.append(f"data: {consts.UseViewTransitionDatalineLiteral} false")
+            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} false")
 
         return ServerSentEventGenerator._send(
-            consts.EventType.EventTypeRemoveFragments,
+            consts.EventType.REMOVE_FRAGMENTS,
             data_lines,
             event_id,
             retry_duration,
@@ -97,19 +97,19 @@ class ServerSentEventGenerator:
         signals: dict,
         event_id: Optional[int] = None,
         only_if_missing: bool = False,
-        retry_duration: int = consts.DefaultSseRetryDuration,
+        retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         data_lines = []
         if only_if_missing:
-            data_lines.append(f"data: {consts.OnlyIfMissingDatalineLiteral} true")
+            data_lines.append(f"data: {consts.ONLY_IF_MISSING_DATALINE_LITERAL} true")
 
         data_lines.extend(
-            f"data: {consts.SignalsDatalineLiteral} {signalLine}"
+            f"data: {consts.SIGNALS_DATALINE_LITERAL} {signalLine}"
             for signalLine in json.dumps(signals, indent=2).splitlines()
         )
 
         return ServerSentEventGenerator._send(
-            consts.EventType.EventTypeMergeSignals, data_lines, event_id, retry_duration
+            consts.EventType.MERGE_SIGNALS, data_lines, event_id, retry_duration
         )
 
     @classmethod
@@ -117,16 +117,16 @@ class ServerSentEventGenerator:
         cls,
         paths: list[str],
         event_id: Optional[int] = None,
-        retry_duration: int = consts.DefaultSseRetryDuration,
+        retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         data_lines = []
 
         data_lines.extend(
-            f"data: {consts.PathsDatalineLiteral} {path}" for path in paths
+            f"data: {consts.PATHS_DATALINE_LITERAL} {path}" for path in paths
         )
 
         return ServerSentEventGenerator._send(
-            consts.EventType.EventTypeRemoveSignals,
+            consts.EventType.REMOVE_SIGNALS,
             data_lines,
             event_id,
             retry_duration,
@@ -139,25 +139,25 @@ class ServerSentEventGenerator:
         auto_remove: bool = True,
         attributes: Optional[list[str]] = None,
         event_id: Optional[int] = None,
-        retry_duration: int = consts.DefaultSseRetryDuration,
+        retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         data_lines = []
-        data_lines.append(f"data: {consts.AutoRemoveDatalineLiteral} {auto_remove}")
+        data_lines.append(f"data: {consts.AUTO_REMOVE_DATALINE_LITERAL} {auto_remove}")
 
         if attributes:
             data_lines.extend(
-                f"data: {consts.AttributesDatalineLiteral} {attribute}"
+                f"data: {consts.ATTRIBUTES_DATALINE_LITERAL} {attribute}"
                 for attribute in attributes
-                if attribute.strip() != consts.DefaultExecuteScriptAttributes
+                if attribute.strip() != consts.DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES
             )
 
         data_lines.extend(
-            f"data: {consts.ScriptDatalineLiteral} {script_line}"
+            f"data: {consts.SCRIPT_DATALINE_LITERAL} {script_line}"
             for script_line in script.splitlines()
         )
 
         return ServerSentEventGenerator._send(
-            consts.EventType.EventTypeExecuteScript,
+            consts.EventType.EXECUTE_SCRIPT,
             data_lines,
             event_id,
             retry_duration,
