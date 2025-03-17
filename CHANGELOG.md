@@ -14,6 +14,7 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 - The `datastar-sse` event is now dispatched on the element itself ([#761](https://github.com/starfederation/datastar/issues/761)).
 - The NPM package now also exports all official plugins and bundles ([#742](https://github.com/starfederation/datastar/issues/742)).
 - Data attributes with plugin names in their prefix are no longer processed ([#771](https://github.com/starfederation/datastar/issues/771)).
+- The alias used in the aliased bundle has been renamed to `star` (`data-star-*`) ([#772](https://github.com/starfederation/datastar/issues/772)).
 
 ### Fixed
 

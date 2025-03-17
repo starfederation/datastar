@@ -125,9 +125,4 @@ View the [security reference](/reference/security).
 
 Datastar is built using a modular architecture that allows you to create custom builds with only the plugins you need, useful for reducing the framework's footprint.
 
-Key features:
-- Use the [bundler](/bundler) web interface to select only needed plugins
-- Create aliased builds (data-ds-*) to resolve conflicts with legacy libraries
-- Use the NPM package to create custom builds programmatically
-
 View the [custom builds reference](/reference/custom_builds).
