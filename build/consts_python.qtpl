@@ -4,6 +4,10 @@
 # {%s data.DoNotEdit %}
 from enum import StrEnum
 
+
+# region Enums
+
+
 {%- for _, enum := range data.Enums -%}
 # region {%s= enum.Description %}
 class {%s enum.Name.Pascal %}(StrEnum):
@@ -12,7 +16,9 @@ class {%s enum.Name.Pascal %}(StrEnum):
     {%s entry.Name.ScreamingSnake %} = "{%s entry.Value %}"
 
 {%- endfor -%}
+
 # endregion {%s enum.Name.Pascal %}
+
 
 {%- endfor -%}
 # endregion Enums
@@ -52,7 +58,5 @@ DEFAULT_{%s b.Name.ScreamingSnake %} = {%s strings.Title(fmt.Sprintf("%v", b.Val
 
 {%- endfor -%}
 # endregion Default booleans
-
-# region Enums
 
 {%- endfunc -%}
