@@ -25,7 +25,7 @@ export const Bind: AttributePlugin = {
     const signalName = key
       ? modifyCasing(key, mods)
       : trimDollarSignPrefix(value)
-      
+
     const tnl = el.tagName.toLowerCase()
     const isInput = tnl.includes('input')
     const isSelect = tnl.includes('select')
@@ -220,7 +220,9 @@ export const Bind: AttributePlugin = {
     }
     window.addEventListener('pageshow', onPageshow)
 
-    const reset = effect(() => setElementFromSignal())
+    const reset = effect([signal], () => {
+      setElementFromSignal()
+    })
 
     return () => {
       reset()
@@ -228,7 +230,7 @@ export const Bind: AttributePlugin = {
       for (const event of updateEvents) {
         el.removeEventListener(event, setSignalFromElement)
       }
-      
+
       window.removeEventListener('pageshow', onPageshow)
     }
   },

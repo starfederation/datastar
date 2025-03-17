@@ -18,9 +18,9 @@ export const Show: AttributePlugin = {
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
   onLoad: ({ el: { style: s }, genRX, effect }) => {
-    const rx = genRX()
-    return effect(async () => {
-      const shouldShow = rx<boolean>()
+    const { deps, rxFn } = genRX()
+    return effect(deps, async () => {
+      const shouldShow = rxFn<boolean>()
       if (shouldShow) {
         if (s.display === NONE) {
           s.removeProperty(DISPLAY)

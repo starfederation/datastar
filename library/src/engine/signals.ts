@@ -1,9 +1,14 @@
-import { type Computed, Signal, computed } from '../vendored/preact-core'
+import {
+  Dependency,
+  type DerivedFn,
+  Signal,
+  computed,
+} from '../vendored/rocket'
 import { internalErr } from './errors'
 import {
   DATASTAR_SIGNAL_EVENT,
   type DatastarSignalEvent,
-  type NestedSignal,
+  type NestedSignal as NestedDependency,
   type NestedValues,
 } from './types'
 
@@ -16,9 +21,10 @@ const dispatchSignalEvent = (evt: Partial<DatastarSignalEvent>) => {
     }),
   )
 }
+
 // If onlyPublic is true, only signals not starting with an underscore are included
 function nestedValues(
-  signal: NestedSignal,
+  signal: NestedDependency,
   onlyPublic = false,
 ): Record<string, any> {
   const kv: Record<string, any> = {}
@@ -28,7 +34,7 @@ function nestedValues(
         continue
       }
       const value = signal[key]
-      if (value instanceof Signal) {
+      if (value instanceof Dependency) {
         kv[key] = value.value
       } else {
         kv[key] = nestedValues(value)
@@ -41,6 +47,7 @@ function nestedValues(
 function mergeNested(
   target: NestedValues,
   values: NestedValues,
+  pathPrefix: string,
   onlyIfMissing = false,
 ) {
   const evt: DatastarSignalEvent = {
@@ -53,7 +60,7 @@ function mergeNested(
       if (key.match(/\_\_+/)) {
         throw internalErr(from, 'InvalidSignalKey', { key })
       }
-
+      const path = pathPrefix ? `${pathPrefix}.${key}` : key
       const value = values[key]
       if (value instanceof Object && !Array.isArray(value)) {
         if (!target[key]) {
@@ -62,11 +69,12 @@ function mergeNested(
         const subEvt = mergeNested(
           target[key] as NestedValues,
           value as NestedValues,
+          path,
           onlyIfMissing,
         )
-        evt.added.push(...subEvt.added.map((k) => `${key}.${k}`))
-        evt.removed.push(...subEvt.removed.map((k) => `${key}.${k}`))
-        evt.updated.push(...subEvt.updated.map((k) => `${key}.${k}`))
+        evt.added.push(...subEvt.added.map((k) => `${path}.${k}`))
+        evt.removed.push(...subEvt.removed.map((k) => `${path}.${k}`))
+        evt.updated.push(...subEvt.updated.map((k) => `${path}.${k}`))
       } else {
         const hasKey = Object.hasOwn(target, key)
         if (hasKey) {
@@ -76,19 +84,16 @@ function mergeNested(
             const oldValue = t.value
             t.value = value
             if (oldValue !== value) {
-              evt.updated.push(key)
+              evt.updated.push(path)
             }
             continue
           }
         }
-
-        const s = new Signal(value)
-        s._onChange = () => {
-          dispatchSignalEvent({ updated: [key] })
-        }
+        const s = new Signal(value, () =>
+          dispatchSignalEvent({ updated: [path] }),
+        )
         target[key] = s
-
-        evt.added.push(key)
+        evt.added.push(path)
       }
     }
   }
@@ -96,13 +101,13 @@ function mergeNested(
 }
 
 function walkNestedSignal(
-  signal: NestedSignal,
-  cb: (dotDeliminatedPath: string, signal: Signal<any>) => void,
+  signal: NestedDependency,
+  cb: (dotDeliminatedPath: string, dep: Dependency) => void,
 ): void {
   for (const key in signal) {
     if (Object.hasOwn(signal, key)) {
       const value = signal[key]
-      if (value instanceof Signal) {
+      if (value instanceof Dependency) {
         cb(key, value)
       } else {
         walkNestedSignal(value, (path, value) => {
@@ -157,30 +162,30 @@ export function walkNestedValues(
 }
 
 export class SignalsRoot {
-  #signals: NestedSignal = {}
+  #signals: NestedDependency = {}
 
   exists(dotDelimitedPath: string): boolean {
     return !!this.signal(dotDelimitedPath)
   }
 
-  signal<T>(dotDelimitedPath: string): Signal<T> | null {
+  signal(dotDelimitedPath: string): Dependency | null {
     const parts = dotDelimitedPath.split('.')
-    let subSignals = this.#signals
+    let subDeps = this.#signals
     for (let i = 0; i < parts.length - 1; i++) {
       const part = parts[i]
-      if (!subSignals[part]) {
+      if (!subDeps[part]) {
         return null
       }
-      subSignals = subSignals[part] as NestedSignal
+      subDeps = subDeps[part] as NestedDependency
     }
     const last = parts[parts.length - 1]
-    const signal = subSignals[last]
-    if (!signal)
+    const dep = subDeps[last]
+    if (!dep)
       throw internalErr(from, 'SignalNotFound', { path: dotDelimitedPath })
-    return signal as Signal<T>
+    return dep as Dependency
   }
 
-  setSignal<T extends Signal<T>>(dotDelimitedPath: string, signal: T) {
+  setSignal(dotDelimitedPath: string, signal: Dependency) {
     const parts = dotDelimitedPath.split('.')
     let subSignals = this.#signals
     for (let i = 0; i < parts.length - 1; i++) {
@@ -188,20 +193,20 @@ export class SignalsRoot {
       if (!subSignals[part]) {
         subSignals[part] = {}
       }
-      subSignals = subSignals[part] as NestedSignal
+      subSignals = subSignals[part] as NestedDependency
     }
     const last = parts[parts.length - 1]
     subSignals[last] = signal
   }
 
-  setComputed<T>(dotDelimitedPath: string, fn: () => T) {
-    const signal = computed(() => fn()) as Computed
+  setComputed<T>(dotDelimitedPath: string, args: any[], fn: DerivedFn<T>) {
+    const signal = computed(args, fn)
     this.setSignal(dotDelimitedPath, signal)
   }
 
   value<T>(dotDelimitedPath: string): T {
-    const signal = this.signal(dotDelimitedPath) as Signal<T>
-    return signal?.value
+    const signal = this.signal(dotDelimitedPath) as Dependency
+    return signal?.value as T
   }
 
   setValue<T>(dotDelimitedPath: string, value: T) {
@@ -221,7 +226,7 @@ export class SignalsRoot {
       if (!subSignals[part]) {
         subSignals[part] = {}
       }
-      subSignals = subSignals[part] as NestedSignal
+      subSignals = subSignals[part] as NestedDependency
     }
     const last = parts[parts.length - 1]
 
@@ -231,7 +236,7 @@ export class SignalsRoot {
     }
 
     const signal = new Signal(defaultValue)
-    signal._onChange = () => {
+    signal.onChange = () => {
       dispatchSignalEvent({ updated: [dotDelimitedPath] })
     }
     subSignals[last] = signal
@@ -255,7 +260,7 @@ export class SignalsRoot {
         if (!subSignals[part]) {
           return
         }
-        subSignals = subSignals[part] as NestedSignal
+        subSignals = subSignals[part] as NestedDependency
       }
       const last = parts[parts.length - 1]
       delete subSignals[last]
@@ -265,7 +270,7 @@ export class SignalsRoot {
   }
 
   merge(other: NestedValues, onlyIfMissing = false) {
-    const evt = mergeNested(this.#signals, other, onlyIfMissing)
+    const evt = mergeNested(this.#signals, other, '', onlyIfMissing)
     if (evt.added.length || evt.removed.length || evt.updated.length) {
       dispatchSignalEvent(evt)
     }
@@ -275,7 +280,7 @@ export class SignalsRoot {
     return nestedSubset(this.values(), ...keys)
   }
 
-  walk(cb: (name: string, signal: Signal<any>) => void) {
+  walk(cb: (name: string, signal: Dependency) => void) {
     walkNestedSignal(this.#signals, cb)
   }
 

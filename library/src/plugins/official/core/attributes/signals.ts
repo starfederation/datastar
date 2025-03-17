@@ -11,10 +11,10 @@ export const Signals: AttributePlugin = {
   onLoad: (ctx) => {
     const { key, mods, signals, value, genRX } = ctx
     const ifMissing = mods.has('ifmissing')
-
+    const { rxFn } = genRX()
     if (key !== '') {
       const k = modifyCasing(key, mods)
-      const v = value === '' ? value : genRX()()
+      const v = value === '' ? value : rxFn()
       if (ifMissing) {
         signals.upsertIfMissing(k, v)
       } else {
@@ -23,8 +23,7 @@ export const Signals: AttributePlugin = {
     } else {
       const obj = jsStrToObject(ctx.value)
       ctx.value = JSON.stringify(obj)
-      const rx = genRX()
-      const nv = rx<NestedValues>()
+      const nv = rxFn<NestedValues>()
       signals.merge(nv, ifMissing)
     }
   },

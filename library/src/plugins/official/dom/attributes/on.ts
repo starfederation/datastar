@@ -14,7 +14,6 @@ import { tagHas, tagToMs } from '../../../../utils/tags'
 import { camel, modifyCasing } from '../../../../utils/text'
 import { debounce, delay, throttle } from '../../../../utils/timing'
 import { supportsViewTransitions } from '../../../../utils/view-transtions'
-import type { Signal } from '../../../../vendored/preact-core'
 
 const EVT = 'evt'
 const SIGNALS_CHANGE_PREFIX = 'signalsChange'
@@ -27,7 +26,7 @@ export const On: AttributePlugin = {
   valReq: Requirement.Must,
   argNames: [EVT],
   onLoad: ({ el, key, mods, signals, effect, genRX }) => {
-    const rx = genRX()
+    const { deps, rxFn } = genRX()
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
 
@@ -37,7 +36,7 @@ export const On: AttributePlugin = {
         if (mods.has('prevent') || key === 'submit') evt.preventDefault()
         if (mods.has('stop')) evt.stopPropagation()
       }
-      rx(evt)
+      rxFn(evt)
     }
 
     const delayArgs = mods.get('delay')
@@ -114,33 +113,28 @@ export const On: AttributePlugin = {
     }
 
     if (key.startsWith(SIGNALS_CHANGE_PREFIX)) {
-      if (key === SIGNALS_CHANGE_PREFIX) {
-        const signalFn = (event: CustomEvent<DatastarSignalEvent>) =>
-          callback(event)
-        document.addEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
-        return () => {
-          document.removeEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
-        }
-      }
-
+      const hasPrefix = key !== SIGNALS_CHANGE_PREFIX
       const signalPath = modifyCasing(
         camel(key.slice(signalChangeKeyLength)),
         mods,
       )
-      const signalValues = new Map<Signal, any>()
-      signals.walk((path, signal) => {
-        if (path.startsWith(signalPath)) {
-          signalValues.set(signal, signal.value)
-        }
-      })
-      return effect(() => {
-        for (const [signal, prev] of signalValues) {
-          if (prev !== signal.value) {
-            callback()
-            signalValues.set(signal, signal.value)
+      const signalFn = (event: CustomEvent<DatastarSignalEvent>) => {
+        if (hasPrefix) {
+          const { added, removed, updated } = event.detail
+          if (
+            ![...added, ...removed, ...updated].some((d) =>
+              d.startsWith(signalPath),
+            )
+          ) {
+            return
           }
         }
-      })
+        callback(event)
+      }
+      document.addEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
+      return () => {
+        document.removeEventListener(DATASTAR_SIGNAL_EVENT, signalFn)
+      }
     }
 
     const testOutside = mods.has('outside')

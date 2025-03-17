@@ -6,7 +6,7 @@ Tests that a signal change with a path is detected and the expression is called 
   <button id="clickable" data-on-click="$foo.bar = 1" class="btn">Change</button>
   <hr />
   Result:
-  <code id="result" data-text="$result"></code>
+  <code id="result" data-text="$result">FOO</code>
   <hr />
   Expected result on click: <code>1</code>
 </div>

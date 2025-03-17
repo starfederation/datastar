@@ -1,6 +1,6 @@
 import { Hash, attrHash, elUniqId, walkDOM } from '../utils/dom'
 import { camel } from '../utils/text'
-import { effect } from '../vendored/preact-core'
+import { type Dependency, effect } from '../vendored/rocket'
 import { DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
 import { SignalsRoot } from './signals'
@@ -40,7 +40,7 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
     const ctx: InitContext = {
       plugin,
       signals,
-      effect: (cb: () => void): OnRemovalFn => effect(cb),
+      effect: (args: any[], cb: () => void): OnRemovalFn => effect(args, cb),
       actions,
       removals,
       applyToElement,
@@ -215,7 +215,7 @@ function applyAttributePlugin(
   const ctx: RuntimeContext = {
     signals,
     applyToElement,
-    effect: (cb: () => void): OnRemovalFn => effect(cb),
+    effect: (args: any[], cb: () => void): OnRemovalFn => effect(args, cb),
     actions,
     removals,
     genRX: () => genRX(ctx, ...(plugin.argNames || [])),
@@ -263,7 +263,7 @@ function applyAttributePlugin(
 
   // Load the plugin
   const cleanup = plugin.onLoad(ctx) ?? (() => {})
-  
+
   // Store the cleanup function
   let elTracking = removals.get(el.id)
   if (!elTracking) {
@@ -276,7 +276,11 @@ function applyAttributePlugin(
 function genRX(
   ctx: RuntimeContext,
   ...argNames: string[]
-): RuntimeExpressionFunction {
+): {
+  deps: Dependency[]
+  rxFn: RuntimeExpressionFunction
+} {
+  const deps = new Array<Dependency>()
   let userExpression = ''
 
   // This regex allows Datastar expressions to support nested
@@ -338,6 +342,13 @@ function genRX(
   if (signalNames.length) {
     // Match any valid `$signalName` followed by a non-word character or end of string
     const signalsRe = new RegExp(`\\$(${signalNames.join('|')})(\\W|$)`, 'gm')
+    for (const match of userExpression.matchAll(signalsRe)) {
+      const signalName = match[1]
+      const signal = ctx.signals.signal(signalName)
+      if (signal) {
+        deps.push(signal)
+      }
+    }
     userExpression = userExpression.replaceAll(
       signalsRe,
       `ctx.signals.signal('$1').value$2`,
@@ -354,14 +365,17 @@ function genRX(
 
   try {
     const fn = new Function('ctx', ...argNames, fnContent)
-    return (...args: any[]) => {
-      try {
-        return fn(ctx, ...args)
-      } catch (error: any) {
-        throw runtimeErr('ExecuteExpression', ctx, {
-          error: error.message,
-        })
-      }
+    return {
+      deps,
+      rxFn: (...args: any[]) => {
+        try {
+          return fn(ctx, ...args)
+        } catch (error: any) {
+          throw runtimeErr('ExecuteExpression', ctx, {
+            error: error.message,
+          })
+        }
+      },
     }
   } catch (error: any) {
     throw runtimeErr('GenerateExpression', ctx, {

@@ -16,10 +16,10 @@ export const Attr: AttributePlugin = {
   name: 'attr',
   valReq: Requirement.Must,
   onLoad: ({ el, key, effect, genRX }) => {
-    const rx = genRX()
+    const { deps, rxFn } = genRX()
     if (key === '') {
-      return effect(async () => {
-        const binds = rx<NestedValues>()
+      return effect(deps, async () => {
+        const binds = rxFn<NestedValues>()
         for (const [key, val] of Object.entries(binds)) {
           if (val === false) {
             el.removeAttribute(key)
@@ -33,10 +33,10 @@ export const Attr: AttributePlugin = {
     // Attributes are always kebab-case
     key = kebab(key)
 
-    return effect(async () => {
+    return effect(deps, async () => {
       let value = false
       try {
-        value = rx()
+        value = rxFn()
       } catch (e) {} //
       let v: string
       if (typeof value === 'string') {

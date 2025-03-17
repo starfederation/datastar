@@ -16,10 +16,10 @@ export const Class: AttributePlugin = {
   valReq: Requirement.Must,
   onLoad: ({ el, key, mods, effect, genRX }) => {
     const cl = el.classList
-    const rx = genRX()
-    return effect(() => {
+    const { deps, rxFn } = genRX()
+    return effect(deps, () => {
       if (key === '') {
-        const classes = rx<Record<string, boolean>>()
+        const classes = rxFn<Record<string, boolean>>()
         for (const [k, v] of Object.entries(classes)) {
           const classNames = k.split(/\s+/)
           if (v) {
@@ -30,7 +30,7 @@ export const Class: AttributePlugin = {
         }
       } else {
         key = modifyCasing(key, mods)
-        const shouldInclude = rx<boolean>()
+        const shouldInclude = rxFn<boolean>()
         if (shouldInclude) {
           cl.add(key)
         } else {

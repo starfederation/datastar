@@ -17,12 +17,12 @@ export const Text: AttributePlugin = {
   valReq: Requirement.Must,
   onLoad: (ctx) => {
     const { el, effect, genRX } = ctx
-    const rx = genRX()
+    const { deps, rxFn } = genRX()
     if (!(el instanceof HTMLElement)) {
       runtimeErr('TextInvalidElement', ctx)
     }
-    return effect(() => {
-      const res = rx(ctx)
+    return effect(deps, () => {
+      const res = rxFn(ctx)
       el.textContent = `${res}`
     })
   },

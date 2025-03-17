@@ -1,4 +1,4 @@
-import type { EffectFn, Signal } from '../vendored/preact-core'
+import type { Dependency, EffectFn } from '../vendored/rocket'
 import { DATASTAR } from './consts'
 import type { SignalsRoot } from './signals'
 
@@ -79,7 +79,7 @@ export type GlobalInitializer = (ctx: InitContext) => void
 export type InitContext = {
   plugin: DatastarPlugin
   signals: SignalsRoot
-  effect: (fn: EffectFn) => OnRemovalFn
+  effect: EffectFn
   actions: Readonly<ActionPlugins>
   removals: Map<string, Map<number, OnRemovalFn>>
   applyToElement: (el: HTMLorSVGElement) => void
@@ -95,13 +95,16 @@ export type RuntimeContext = InitContext & {
   key: Readonly<string> // data-* key without the prefix or tags
   value: Readonly<string> // value of data-* attribute
   mods: Modifiers // the tags and their arguments
-  genRX: () => <T>(...args: any[]) => T // a reactive expression
+  genRX: () => {
+    deps: Dependency[]
+    rxFn: <T>(...args: any[]) => T // a reactive expression
+  }
   fnContent?: string // the content of the function
 }
 
 export type NestedValues = { [key: string]: NestedValues | any }
 export type NestedSignal = {
-  [key: string]: NestedSignal | Signal<any>
+  [key: string]: NestedSignal | Dependency
 }
 
 export type RuntimeExpressionFunction = (
