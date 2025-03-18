@@ -348,12 +348,12 @@ function genRX(
       const signal = ctx.signals.signal(signalName)
       if (signal) {
         deps.push(signal)
+        userExpression = userExpression.replaceAll(
+          `$${signalName}`,
+          `ctx.signals.signal('${signalName}').value`,
+        )
       }
     }
-    userExpression = userExpression.replaceAll(
-      signalsRe,
-      `ctx.signals.signal('$1').value$2`,
-    )
   }
 
   // Replace any escaped values

@@ -59,6 +59,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "signals_change"},
 				{ID: "signals_change_path"},
 				{ID: "signals_change_path_once"},
+				{ID: "signals_json"},
 				{ID: "sse_events"},
 			},
 		},
