@@ -281,10 +281,8 @@ function genRX(
   deps: Dependency[]
   rxFn: RuntimeExpressionFunction
 } {
+  const deps = new Array<Dependency>()
   let userExpression = ''
-
-  // Use a set to ensure unique dependencies
-  const depSignalNames = new Set<string>()
 
   // This regex allows Datastar expressions to support nested
   // regex and strings that contain ; without breaking.
@@ -352,23 +350,11 @@ function genRX(
     // Add dependencies for signal value usages
     const signalValueRe = /ctx.signals.signal\('(.+?)'\).value/gm
     for (const match of userExpression.matchAll(signalValueRe)) {
-      depSignalNames.add(match[1])
-    }
-    // Add dependencies for `signals.JSON()` usage
-    if (userExpression.includes('ctx.signals.JSON()')) {
-      for (const signalName of ctx.signals.paths()) {
-        depSignalNames.add(signalName)
+      const signalName = match[1]
+      const signal = ctx.signals.signal(signalName)
+      if (signal) {
+        deps.push(signal)
       }
-    }
-  }
-
-
-  // Add signal dependencies
-  const deps = new Array<Dependency>()
-  for (const signalName of depSignalNames) {
-    const signal = ctx.signals.signal(signalName)
-    if (signal) {
-      deps.push(signal)
     }
   }
 
