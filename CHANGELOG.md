@@ -6,6 +6,10 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ## v1.0.0-beta.10
 
+### Added 
+
+- Added the `data-json` attribute that sets the text content of an element to a reactive JSON stringified version of all signals ([#775](https://github.com/starfederation/datastar/issues/775)).
+
 ### Changed
 
 - Replaced the Preact Signals library with our own “rocket” signals, which is between 70% and 6113% faster ([#775](https://github.com/starfederation/datastar/issues/775)).

@@ -226,6 +226,28 @@ templ InvalidFileResultType(name string, info *RuntimeErrorInfo) {
 	}
 }
 
+templ JsonInvalidElement(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		<p>The <code>data-json</code> attribute was placed on an invalid element. It may only be placed on an HTML element.</p>
+		@sampleCode("Example", "html", `<pre data-json></pre>`)
+		@attributeDocs("json")
+	}
+}
+
+templ JsonKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("json", info.Expression.Key)
+		@jsonError()
+	}
+}
+
+templ JsonValueNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueNotAllowed("json", info.Expression.Value)
+		@jsonError()
+	}
+}
+
 templ OnKeyRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@keyRequired("on")
@@ -465,6 +487,12 @@ templ intersectsError() {
 	<p>The <code>data-intersects</code> attribute must <em>only</em> have a value, representing an expression to run when the element intersects with the viewport.</p>
 	@sampleCode("Example", "html", `<div data-intersects="console.log('I am intersecting!')"></div>`)
 	@attributeDocs("intersects")
+}
+
+templ jsonError() {
+	<p> The <code>data-json</code> attribute must <em>not</em> have a key <em>nor</em> a value.</p>
+	@sampleCode("Example", "html", `<pre data-json></pre>`)
+	@attributeDocs("json")
 }
 
 templ onError() {

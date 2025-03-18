@@ -261,6 +261,14 @@ Modifiers allow you to modify behavior defining a class name.
 <div data-class-my-class__case.camel="$foo"></div>
 ```
 
+### `data-json`
+
+Sets the text content of an element to a reactive JSON stringified version of all signals. Useful when troubleshooting an issue.
+
+```html
+<pre data-json></pre>
+```
+
 ### `data-on`
 
 Attaches an event listener to an element, executing an expression whenever the event is triggered.

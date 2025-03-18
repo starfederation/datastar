@@ -21,6 +21,7 @@ import { ViewTransition } from '../plugins/official/browser/attributes/viewTrans
 import { Attr } from '../plugins/official/dom/attributes/attr'
 import { Bind } from '../plugins/official/dom/attributes/bind'
 import { Class } from '../plugins/official/dom/attributes/class'
+import { Json } from '../plugins/official/dom/attributes/json'
 import { On } from '../plugins/official/dom/attributes/on'
 import { Ref } from '../plugins/official/dom/attributes/ref'
 import { Text } from '../plugins/official/dom/attributes/text'

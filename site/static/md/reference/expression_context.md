@@ -23,9 +23,3 @@ The signals root object that contains functions for accessing and modifying sign
   <div data-text="ctx.signals.signal('foo').value"></div>
 </div>
 ```
-
-Here is how you can output the existing signals in JSON format, which can be useful when troubleshooting an issue.
-
-```html
-<pre data-text="ctx.signals.JSON()"></pre>
-```
