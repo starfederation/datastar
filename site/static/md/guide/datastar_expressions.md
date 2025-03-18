@@ -2,13 +2,11 @@
 
 Datastar expressions are strings that are evaluated by Datastar attributes and actions. While they are very similar to JavaScript, there are some important differences that make them more powerful for declarative hypermedia applications.
 
-- [Datastar Expressions](#datastar-expressions)
-  - [Basic Usage](#basic-usage)
-  - [Namespaced Signals](#namespaced-signals)
-  - [Multiple Statements and Formatting](#multiple-statements-and-formatting)
-  - [Event Context](#event-context)
-  - [Summary](#expression-summary)
-
+- [Basic Usage](#basic-usage)
+- [Namespaced Signals](#namespaced-signals)
+- [Multiple Statements and Formatting](#multiple-statements-and-formatting)
+- [Event Context](#event-context)
+- [Summary](#expression-summary)
 
 ## Basic Usage
 
