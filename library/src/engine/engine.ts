@@ -343,15 +343,26 @@ function genRX(
   if (signalNames.length) {
     // Match any valid `$signalName` followed by a non-word character or end of string
     const signalsRe = new RegExp(`\\$(${signalNames.join('|')})(\\W|$)`, 'gm')
-    for (const match of userExpression.matchAll(signalsRe)) {
+    userExpression = userExpression.replaceAll(
+      signalsRe,
+      `ctx.signals.signal('$1').value$2`,
+    )
+    // Add dependencies for signal value usages
+    const signalValueRe = /ctx.signals.signal\('(.+?)'\).value/gm
+    for (const match of userExpression.matchAll(signalValueRe)) {
       const signalName = match[1]
       const signal = ctx.signals.signal(signalName)
       if (signal) {
         deps.push(signal)
-        userExpression = userExpression.replaceAll(
-          `$${signalName}`,
-          `ctx.signals.signal('${signalName}').value`,
-        )
+      }
+    }
+    // Add dependencies for `signals.JSON()` usage
+    if (userExpression.includes('ctx.signals.JSON()')) {
+      for (const signalName of ctx.signals.paths()) {
+        const signal = ctx.signals.signal(signalName)
+        if (signal) {
+          deps.push(signal)
+        }
       }
     }
   }
