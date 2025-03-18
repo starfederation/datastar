@@ -1,6 +1,6 @@
-# Signals JSON
+# Signal JSON Usage
 
-Tests that signals JSON function reacts to changes in signals.
+Tests that signals JSON usage adds dependencies.
 
 <div data-signals="{result: 0, foo: 0}">
   <pre id="output" data-text="ctx.signals.JSON()"></pre>
