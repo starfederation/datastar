@@ -10,8 +10,10 @@ export const ToggleAll: ActionPlugin = {
   name: 'toggleAll',
   fn: ({ signals }, prefix: string) => {
     signals.walk((path, signal) => {
-      if (!path.startsWith(prefix)) return
-      ;(signal as Signal<any>).value = !signal.value
+      if (!path.startsWith(prefix)) {
+        return
+      }
+      (signal as Signal<any>).value = !signal.value
     })
   },
 }

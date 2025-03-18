@@ -10,8 +10,10 @@ export const SetAll: ActionPlugin = {
   name: 'setAll',
   fn: ({ signals }, prefix: string, newValue) => {
     signals.walk((path, signal) => {
-      if (!path.startsWith(prefix)) return
-      ;(signal as Signal<any>).value = newValue
+      if (!path.startsWith(prefix)) {
+        return
+      }
+      (signal as Signal<any>).value = newValue
     })
   },
 }
