@@ -8,6 +8,7 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ### Changed
 
+- Replaced the Preact Signals library with our own “rocket” signals, which is between 70% and 6113% faster ([#775](https://github.com/starfederation/datastar/issues/775)).
 - Updated Idiomorph to version [0.7.3](https://github.com/bigskysoftware/idiomorph/releases/tag/v0.7.3).
 - Classes used in `data-class-*` attributes now default to kebab-case ([#761](https://github.com/starfederation/datastar/issues/761)).
 - Events used in `data-on-*` attributes now default to kebab-case ([#761](https://github.com/starfederation/datastar/issues/761)).
