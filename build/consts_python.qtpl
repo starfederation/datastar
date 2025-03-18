@@ -4,55 +4,59 @@
 # {%s data.DoNotEdit %}
 from enum import StrEnum
 
+
+# region Enums
+
+
 {%- for _, enum := range data.Enums -%}
-#region {%s= enum.Description %}
+# region {%s= enum.Description %}
 class {%s enum.Name.Pascal %}(StrEnum):
 {%- for _, entry := range enum.Values -%}
     # {%s= entry.Description %}
-    {%s enum.Name.Pascal %}{%s entry.Name.Pascal %} = "{%s entry.Value %}"
+    {%s entry.Name.ScreamingSnake %} = "{%s entry.Value %}"
 
 {%- endfor -%}
-#endregion {%s enum.Name.Pascal %}
+
+# endregion {%s enum.Name.Pascal %}
+
 
 {%- endfor -%}
-#endregion Enums
+# endregion Enums
 
 DATASTAR_KEY = "{%s data.DatastarKey %}"
-VERSION                   = "{%s data.Version %}"
+VERSION = "{%s data.Version %}"
 
-#region Default durations
+# region Default durations
 
 {%- for _, d := range data.DefaultDurations -%}
 # {%s= d.Description %}
-Default{%s d.Name.Pascal %} = {%d durationToMs(d.Duration) %}
+DEFAULT_{%s d.Name.ScreamingSnake %} = {%d durationToMs(d.Duration) %}
 {%- endfor -%}
 
-#endregion Default durations
+# endregion Default durations
 
-#region Default strings
+# region Default strings
 
 {%- for _, s := range data.DefaultStrings -%}
 # {%s= s.Description %}
-Default{%s s.Name.Pascal %} = "{%s s.Value %}"
+DEFAULT_{%s s.Name.ScreamingSnake %} = "{%s s.Value %}"
 {%- endfor -%}
 
-#endregion Default strings
+# endregion Default strings
 
-#region Dataline literals
+# region Dataline literals
 {%- for _, literal := range data.DatalineLiterals -%}
-{%s literal.Pascal %}DatalineLiteral = "{%s literal.Camel %}"
+{%s literal.ScreamingSnake %}_DATALINE_LITERAL = "{%s literal.Camel %}"
 {%- endfor -%}
-#endregion Dataline literals
+# endregion Dataline literals
 
-#region Default booleans
+# region Default booleans
 
 {%- for _, b := range data.DefaultBools -%}
 # {%s= b.Description %}
-Default{%s b.Name.Pascal %} = {%s strings.Title(fmt.Sprintf("%v", b.Value)) %}
+DEFAULT_{%s b.Name.ScreamingSnake %} = {%s strings.Title(fmt.Sprintf("%v", b.Value)) %}
 
 {%- endfor -%}
-#endregion Default booleans
-
-#region Enums
+# endregion Default booleans
 
 {%- endfunc -%}
