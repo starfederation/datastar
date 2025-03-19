@@ -118,6 +118,11 @@ When supplying signals in bulk with object notation, the modifiers still apply t
 <!-- Case modifiers are not necessary
      This defines a kebab cased signal my-signal using object notation -->
 <div data-signals="{'my-signal': 'value'}"></div>
+
+<!-- It is possible to set both data-signals__ifmissing= and data-signals on the same element -->
+<div data-signals="{'my-signal': 'value'}"
+     data-signals__ifmissing="{widgetStatus: 'initial'}">
+</div>
 ```
 
 ### `data-computed`
