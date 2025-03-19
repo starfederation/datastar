@@ -45,7 +45,22 @@ Unlike JavaScript variables, signal names, when kebab cased, can dashes that wou
 
 This works because behind the scenes, Datastar is transforming the datastar expression into the javascript `ctx.signals.signal('user-name').value = "Alice"` - the signal name is passed as a string, not used as a direct JavaScript identifier.
 
-This should help clarify what Datastar is doing behind the scenes, how signals are evaluated in expressions, and also why expressions are limited in scope.
+Normal JavaScript operators are of course available in Datastar expressions. This includes (but isn't limited to) `&&`, `||`, and the ternary operator. These last three can be useful when reacting to signal changes.
+
+For example, the following would only trigger a post action if the signal is logically true.
+
+```html
+<button data-on-click="$landingGearRetracted && @post('/launch')"></div
+
+<!-- or if the signal has a state value --->
+<button data-on-click="$landingGearState == 'retracted' && @post('/launch')"></div
+```
+
+The ternary operator is useful to choose among two options:
+```html
+<div data-attr-class="$theme == 'dark' ? 'bg-black text-white' : 'bg-white text-black'"
+```
+
 
 ## Namespaced Signals
 
