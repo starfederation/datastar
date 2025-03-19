@@ -38,13 +38,20 @@ Elements are evaluated by walking the DOM in a depth-first manner, and attribute
 
 ### Attribute Casing
 
-<em>`data-*` attributes are [case-insensitive](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*)</em>.
+<em>`data-*` attributes have special casing rules.
 
-The keys used in attribute plugins that define signals, such as `data-signals-*`, are converted to [camelCase](https://developer.mozilla.org/en-US/docs/Glossary/Camel_case) (`data-signals-my-signal` defines a signal named `mySignal`).
+[According to the HTML specification](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*)</em>, all `data-*` atttributes (not datastar the framework, but literally any time a data attribute appears in the DOM) are case in-sensitive, but are converted to [camelCase](https://developer.mozilla.org/en-US/docs/Glossary/Camel_case) when accessed from JavaScript by libraries such as datastar.
 
-The keys used by all other attribute plugins are are converted to [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case) (`data-class-text-blue-700` adds or removes the class `text-blue-700`). 
+This fact is a common source of misunderstanding for new datastar users. Datastar handles casing of data attributes in two ways:
 
-You can use the `__case` modifier to convert between camelCase, kebab-case, snake_case, and PascalCase, or alternatively use object syntax when available.
+1. **Signal Names**: the keys used in attribute plugins that define signals (`data-signals-*`, `data-computed-*`, `data-ref-*`, etc), are, by default, converted to camelCase. For example, `data-signals-my-signal` defines a signal named `mySignal`. You would use the signal in a [datastar expression](/guide/datastar_expressions) as `$mySignal`.
+
+2. **All other attribute plugins**: the keys used by all other attribute plugins are, by default, converted to [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case). For example, `data-class-text-blue-700` adds or removes the class `text-blue-700`, and `data-on-rocket-launched` would react to the event named `rocket-launched`.
+
+You can use the [`__case` modifier](#modifiers) to convert between camelCase, kebab-case, snake_case, and PascalCase, or alternatively use object syntax when available.
+
+For example, if a web component exposes an event `widgetLoaded`, you would use `data-on-widget-loaded__case.camel` to react to it. Whereas, if you wanted to use a signal named `my-signal` then you would use the kebab modfier: `data-signals-my-signal__case.kebab`.
+
 
 ## Core Plugins
 
@@ -87,8 +94,8 @@ Signal names cannot begin or contain double underscores (`__`), due to its use a
 Modifiers allow you to modify behavior when merging signals.
 
 - `__case` - Converts the casing of the signal name.
-  - `.camel` - Camel case: `mySignal` (default)
-  - `.kebab` - Kebab case: `my-signal`
+  - `.camel` - Camel case: `mySignal` (default for signal names)
+  - `.kebab` - Kebab case: `my-signal` (default for everything else)
   - `.snake` - Snake case: `my_signal`
   - `.pascal` - Pascal case: `MySignal`
 - `__ifmissing` - Only merges signals if their keys do not already exist. This is useful for setting defaults without overwriting existing values.
