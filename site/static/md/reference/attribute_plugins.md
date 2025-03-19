@@ -11,7 +11,9 @@ Datastar provides the following [`data-*`](https://developer.mozilla.org/en-US/d
 
 ### Attribute Order
 
-Note that `data-*` attributes are evaluated in the order they appear in the DOM. Elements are evaluated by walking the DOM in a depth-first manner, and attributes are processed in the order they appear in the element. This means that if you use a signal in a [Datastar expression](/guide/datastar_expressions), it must be defined _before_ it is used.
+<em>`data-*` attributes are evaluated in the order they appear in the DOM</em>.
+
+Elements are evaluated by walking the DOM in a depth-first manner, and attributes are processed in the order they appear in the element. This means that if you use a signal in a [Datastar expression](/guide/datastar_expressions), it must be defined _before_ it is used.
 
 ```html
 <!-- This works: -->
@@ -36,7 +38,9 @@ Note that `data-*` attributes are evaluated in the order they appear in the DOM.
 
 ### Attribute Casing
 
-Note that `data-*` attributes are [case-insensitive](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*). The keys used in attribute plugins that define signals, such as `data-signals-*`, are converted to [camelCase](https://developer.mozilla.org/en-US/docs/Glossary/Camel_case) (`data-signals-my-signal` defines a signal named `mySignal`). 
+<em>`data-*` attributes are [case-insensitive](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*)</em>.
+
+The keys used in attribute plugins that define signals, such as `data-signals-*`, are converted to [camelCase](https://developer.mozilla.org/en-US/docs/Glossary/Camel_case) (`data-signals-my-signal` defines a signal named `mySignal`).
 
 The keys used by all other attribute plugins are are converted to [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case) (`data-class-text-blue-700` adds or removes the class `text-blue-700`). 
 
