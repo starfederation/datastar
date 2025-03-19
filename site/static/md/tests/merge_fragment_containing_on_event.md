@@ -1,4 +1,4 @@
-# Merge Fregment Containing On Event
+# Merge Fragment Containing On Event
 
 Tests that merging a fragment containing an `on` event works.
 
