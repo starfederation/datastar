@@ -73,10 +73,10 @@ function applyToTargets(
   capturedTargets: Element[],
 ) {
   for (const target of capturedTargets) {
+    const fragmentToMerge = fragment.cloneNode(true) as HTMLorSVGElement
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
-        const fragmentWithIDs = fragment.cloneNode(true) as HTMLorSVGElement
-        walkDOM(fragmentWithIDs, (el) => {
+        walkDOM(fragmentToMerge, (el) => {
           if (!el.id?.length && Object.keys(el.dataset).length) {
             el.id = elUniqId(el)
           }
@@ -93,37 +93,37 @@ function applyToTargets(
           }
         })
 
-        Idiomorph.morph(target, fragmentWithIDs)
+        Idiomorph.morph(target, fragmentToMerge)
         break
       }
       case FragmentMergeModes.Inner:
         // Replace the contents of the target element with the outer HTML of the response
-        target.innerHTML = fragment.outerHTML
+        target.innerHTML = fragmentToMerge.outerHTML
         break
       case FragmentMergeModes.Outer:
         // Replace the entire target element with the response
-        target.replaceWith(fragment)
+        target.replaceWith(fragmentToMerge)
         break
       case FragmentMergeModes.Prepend:
         // Insert the response before the first child of the target element
-        target.prepend(fragment)
+        target.prepend(fragmentToMerge)
         break
       case FragmentMergeModes.Append:
         // Insert the response after the last child of the target element
-        target.append(fragment)
+        target.append(fragmentToMerge)
         break
       case FragmentMergeModes.Before:
         // Insert the response before the target element
-        target.before(fragment)
+        target.before(fragmentToMerge)
         break
       case FragmentMergeModes.After:
         // Insert the response after the target element
-        target.after(fragment)
+        target.after(fragmentToMerge)
         break
       case FragmentMergeModes.UpsertAttributes:
         // Upsert the attributes of the target element
-        for (const attrName of fragment.getAttributeNames()) {
-          const value = fragment.getAttribute(attrName)!
+        for (const attrName of fragmentToMerge.getAttributeNames()) {
+          const value = fragmentToMerge.getAttribute(attrName)!
           target.setAttribute(attrName, value)
         }
         break
