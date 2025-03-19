@@ -106,6 +106,20 @@ Modifiers allow you to modify behavior when merging signals.
 ></div>
 ```
 
+When supplying signals in bulk with object notation, the modifiers still apply to the attribute name:
+
+```html
+<!-- Merges the signal mySignal only if it doesn't exist -->
+<div data-signals__ifmissing="{mySignal: 'init-value'}"></div>
+
+<!-- Merges the signal mySignal unconditionally -->
+<div data-signals="{mySignal: 'value'}"></div>
+
+<!-- Case modifiers are not necessary
+     This defines a kebab cased signal my-signal using object notation -->
+<div data-signals="{'my-signal': 'value'}"></div>
+```
+
 ### `data-computed`
 
 Creates a signal that is computed based on an expression. The computed signal is read-only, and its value is automatically updated when any signals in the expression are updated.
