@@ -73,7 +73,9 @@ function applyToTargets(
   capturedTargets: Element[],
 ) {
   for (const target of capturedTargets) {
+    // Clone the fragment to merge to avoid modifying the original and force browsers to merge the fragment into the DOM
     const fragmentToMerge = fragment.cloneNode(true) as HTMLorSVGElement
+
     switch (mergeMode) {
       case FragmentMergeModes.Morph: {
         walkDOM(fragmentToMerge, (el) => {
