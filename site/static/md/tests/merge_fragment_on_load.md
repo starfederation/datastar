@@ -1,4 +1,4 @@
-# Merge Fregment On Load
+# Merge Fragment On Load
 
 Tests that merging a fragment containing `data-on-load` works.
 

@@ -1,4 +1,4 @@
-# Merge Fregment Signals
+# Merge Fragment Signals
 
 Tests that merging a fragment containing `data-signals-*` works.
 
