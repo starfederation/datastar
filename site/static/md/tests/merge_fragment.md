@@ -1,4 +1,4 @@
-# Merge Fregment
+# Merge Fragment
 
 Tests that merging a fragment works.
 

@@ -1,4 +1,4 @@
-# Merge Fregment Whitespace
+# Merge Fragment Whitespace
 
 Tests that merging a fragment maintains whitespace.
 
