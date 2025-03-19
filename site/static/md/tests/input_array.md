@@ -11,5 +11,5 @@ Tests that a text input's value is added to a bound signal array when changed.
   Result:
   <code id="result" data-text="JSON.stringify($result) === JSON.stringify(['foo','bar']) ? 1 : 0"></code>
   <hr />
-  Expected result on entering `bar` in second input: <code>1</code>
+  Expected result on entering `bar` in the second input: <code>1</code>
 </div>
