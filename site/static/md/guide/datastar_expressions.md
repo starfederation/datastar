@@ -1,6 +1,6 @@
 # Datastar Expressions
 
-Datastar expressions are strings that are evaluated by Datastar attributes and actions. While they are very similar to JavaScript, there are some important differences that make them more powerful for declarative hypermedia applications.
+Datastar expressions are strings that are evaluated by Datastar attributes and actions. While they are similar to JavaScript, there are some important differences that make them more powerful for declarative hypermedia applications.
 
 - [Basic Usage](#basic-usage)
 - [Namespaced Signals](#namespaced-signals)
@@ -34,37 +34,25 @@ return (()=> {
 })()
 ```
 
-Unlike JavaScript variables, signal names, when kebab cased, can dashes that would be invalid in standard JavaScript identifiers:
-
-```html
-<div data-signals-user-name="John">
-  <button data-on-click="$user-name = 'Alice'">Become Alice</button>
-  <!-- This works even though "user-name" would be invalid as a JavaScript variable -->
-</div>
-```
-
-This works because behind the scenes, Datastar is transforming the datastar expression into the javascript `ctx.signals.signal('user-name').value = "Alice"` - the signal name is passed as a string, not used as a direct JavaScript identifier.
-
-Normal JavaScript operators are of course available in Datastar expressions. This includes (but isn't limited to) `&&`, `||`, and the ternary operator. These last three can be useful when reacting to signal changes.
+Normal JavaScript operators are also available in Datastar expressions. This includes (but isn't limited to) `&&`, `||`, and the ternary operator. These last three can be useful when reacting to signal changes.
 
 For example, the following would only trigger a post action if the signal is logically true.
 
 ```html
 <button data-on-click="$landingGearRetracted && @post('/launch')"></div
 
-<!-- or if the signal has a state value --->
 <button data-on-click="$landingGearState == 'retracted' && @post('/launch')"></div
 ```
 
 The ternary operator is useful to choose among two options:
+
 ```html
 <div data-attr-class="$theme == 'dark' ? 'bg-black text-white' : 'bg-white text-black'"
 ```
 
-
 ## Namespaced Signals
 
-The following example is invalid because the namespace `$foo` is _not_ a signal – only the leaf nodes are signals.
+The following example is invalid because the namespace `$foo` is _not_ a signal – only leaf nodes are signals.
 
 ```html
 <div data-signals-foo.bar="1">
@@ -113,8 +101,8 @@ The return value of an expression is often discarded, but depending on which att
 
 ```html
 <button data-on-click="
-      $count++;
-      $message = 'Clicked ' + $count + ' times'
+    $count++;
+    $message = 'Clicked ' + $count + ' times'
 "></button>
 ```
 
@@ -132,12 +120,11 @@ This gives you access to the standard browser event properties and methods insid
 
 For quick reference, here are the key aspects of Datastar expressions:
 
-- **Signal Access:** Signals are accessed using the `$` prefix (e.g., `$count`, `$user-name`, `$items.selected`)
-  - JS global identifiers starting with `$` are not usable in Datastar expressions
-- **Case Sensitivity:** Signal names are case-sensitive, just like in the attribute they were defined in
-- **Actions:** [Actions](/reference/overview#action-plugins) are called using the `@` prefix (e.g., `@post('/api/save')`)
-- **Statement Delimiter:** Statements must be separated by semicolons (`;`), not just line breaks
-- **Implicit Return:** The last statement is automatically returned without needing the `return` keyword
+- **Signals:** Signals are accessed using the `$` prefix (e.g., `$count`, `$userName`, `$items.selected`).
+  - JS global identifiers starting with `$` are not usable in Datastar expressions.
+- **Actions:** [Actions](/reference/action_plugins) are called using the `@` prefix (e.g., `@post('/endpoint')`).
+- **Statement Delimiter:** Statements must be separated by semicolons (`;`), not just line breaks.
+- **Implicit Return:** The last statement is automatically returned without needing the `return` keyword.
 - **Special Variables:**
-  - `evt`: The event object (available in `data-on-*` attributes)
-  - `ctx`: The [expression context](/reference/expression_context) with access to signals and utilities
+  - `evt`: The event object (available in `data-on-*` attributes).
+  - `ctx`: The [expression context](/reference/expression_context) with access to signals and utilities.
