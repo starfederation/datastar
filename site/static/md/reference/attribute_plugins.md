@@ -106,20 +106,19 @@ Modifiers allow you to modify behavior when merging signals.
 ></div>
 ```
 
-When supplying signals in bulk with object notation, the modifiers still apply to the attribute name:
+When supplying signals in bulk with object notation, modifiers can also be used:
 
 ```html
-<!-- Merges the signal mySignal only if it doesn't exist -->
-<div data-signals__ifmissing="{mySignal: 'init-value'}"></div>
-
-<!-- Merges the signal mySignal unconditionally -->
+<!-- Merges the signal `mySignal` -->
 <div data-signals="{mySignal: 'value'}"></div>
 
-<!-- Case modifiers are not necessary
-     This defines a kebab cased signal my-signal using object notation -->
+<!-- Merges the signal `mySignal` only if it doesn't already exist -->
+<div data-signals__ifmissing="{mySignal: 'init-value'}"></div>
+
+<!-- Defines a kebab cased signal `my-signal` using object notation -->
 <div data-signals="{'my-signal': 'value'}"></div>
 
-<!-- It is possible to set both data-signals__ifmissing= and data-signals on the same element -->
+<!-- It is possible to set both `data-signals__ifmissing` and `data-signals` on the same element -->
 <div data-signals="{'my-signal': 'value'}"
      data-signals__ifmissing="{widgetStatus: 'initial'}">
 </div>
