@@ -11,7 +11,7 @@ Datastar provides the following [`data-*`](https://developer.mozilla.org/en-US/d
 
 ### Attribute Order
 
-<em>`data-*` attributes are evaluated in the order they appear in the DOM</em>.
+<em>`data-*` attributes are evaluated in the order they appear in the DOM.</em>
 
 Elements are evaluated by walking the DOM in a depth-first manner, and attributes are processed in the order they appear in the element. This means that if you use a signal in a [Datastar expression](/guide/datastar_expressions), it must be defined _before_ it is used.
 
@@ -38,13 +38,13 @@ Elements are evaluated by walking the DOM in a depth-first manner, and attribute
 
 ### Attribute Casing
 
-<em>`data-*` attributes have special casing rules.
+<em>`data-*` attributes have special casing rules.</em>
 
-[According to the HTML specification](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*)</em>, all `data-*` atttributes (not datastar the framework, but literally any time a data attribute appears in the DOM) are case in-sensitive, but are converted to [camelCase](https://developer.mozilla.org/en-US/docs/Glossary/Camel_case) when accessed from JavaScript by libraries such as datastar.
+[According to the HTML specification](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*)</em>, all `data-*` atttributes (not Datastar the framework, but any time a data attribute appears in the DOM) are case in-sensitive, but are converted to [camelCase](https://developer.mozilla.org/en-US/docs/Glossary/Camel_case) when accessed from JavaScript by Datastar.
 
-This fact is a common source of misunderstanding for new datastar users. Datastar handles casing of data attributes in two ways:
+Datastar handles casing of data attributes in two ways:
 
-1. **Signal Names**: the keys used in attribute plugins that define signals (`data-signals-*`, `data-computed-*`, `data-ref-*`, etc), are, by default, converted to camelCase. For example, `data-signals-my-signal` defines a signal named `mySignal`. You would use the signal in a [datastar expression](/guide/datastar_expressions) as `$mySignal`.
+1. **Signal Names**: the keys used in attribute plugins that define signals (`data-signals-*`, `data-computed-*`, `data-ref-*`, etc), are, by default, converted to camelCase. For example, `data-signals-my-signal` defines a signal named `mySignal`. You would use the signal in a [Datastar expression](/guide/datastar_expressions) as `$mySignal`.
 
 2. **All other attribute plugins**: the keys used by all other attribute plugins are, by default, converted to [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case). For example, `data-class-text-blue-700` adds or removes the class `text-blue-700`, and `data-on-rocket-launched` would react to the event named `rocket-launched`.
 
