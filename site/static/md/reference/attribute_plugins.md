@@ -112,19 +112,19 @@ Computed signals are useful for memoizing expressions containing other signals. 
 
 `data-computed` is a pure reactive function, this has several implications:
 
-1. If a computed signal is not consumed, then the computation will not execute
-2. Computed signals must not be used for side-effects (i.e., changing other signals, actions, JavaScript functions, etc)
+1. If a computed signal is not consumed, then the computation will not execute.
+2. Computed signals must not be used for performing actions (changing other signals, actions, JavaScript functions, etc.).
 
 ```html
 <!-- This computation will never execute because $foo is not used anywhere -->
 <div data-computed-foo="$bar + $baz"></div> <!-- WRONG -->
 
-<!-- computed signals must *not* be used for side effects -->
+<!-- Computed signals must *not* be used for side effects -->
 <div data-computed-qux="@post('/qux'); 'quxed'"></div> <!-- WRONG -->
 <div data-computed-foo="$bar++"></div> <!-- WRONG -->
 ```
 
-If you find yourself wanting to side-effect in reaction to a signal change, refer to the [`data-on-signals-change`](#special-events) special event in the [`data-on` plugin](#data-on)
+If you find yourself wanting to perform some action in reaction to a signal change, refer to the [`data-on-signals-change`](#special-events) attribute in the [`data-on` plugin](#data-on)
 
 #### Modifiers
 
