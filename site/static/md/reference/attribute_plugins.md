@@ -139,6 +139,22 @@ Computed signals are useful for memoizing expressions containing other signals. 
 <div data-text="$foo"></div>
 ```
 
+`data-computed` is a pure reactive function, this has several implications:
+
+1. If a computed signal is not consumed, then the computation will not execute.
+2. Computed signals must not be used for performing actions (changing other signals, actions, JavaScript functions, etc.).
+
+```html
+<!-- This computation will never execute because $foo is not used anywhere -->
+<div data-computed-foo="$bar + $baz"></div> <!-- WRONG -->
+
+<!-- Computed signals must *not* be used for side effects -->
+<div data-computed-qux="@post('/qux'); 'quxed'"></div> <!-- WRONG -->
+<div data-computed-foo="$bar++"></div> <!-- WRONG -->
+```
+
+If you find yourself wanting to perform some action in reaction to a signal change, refer to the [`data-on-signals-change`](#special-events) attribute in the [`data-on` plugin](#data-on)
+
 #### Modifiers
 
 Modifiers allow you to modify behavior when defining computed signals.
@@ -313,7 +329,12 @@ Datastar provides a few special events of its own:
 1. `data-on-load` is triggered when an element is loaded into the DOM.
 2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__duration` modifier.
 3. `data-on-raf` is triggered on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.
-4. `data-on-signals-change` is triggered when any signals change. A key can be provided to only trigger the event when the signal with that key changes (`data-on-signals-change-foo`).
+4. `data-on-signals-change` is triggered when any signals change. This is useful when you need to perform side effects. A key can be provided to only trigger the event when the signal with that key changes (`data-on-signals-change-foo`).
+
+    ```html
+    <!-- Will execute a side effect when $foo changes -->
+    <div data-on-signals-change-foo="doSideEffect($foo)"></div>
+    ```
 
 Note that the `evt` variable is _not_ available in the expression when using special events.
 
