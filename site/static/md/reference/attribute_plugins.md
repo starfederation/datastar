@@ -11,7 +11,9 @@ Datastar provides the following [`data-*`](https://developer.mozilla.org/en-US/d
 
 ### Attribute Order
 
-Note that `data-*` attributes are evaluated in the order they appear in the DOM. Elements are evaluated by walking the DOM in a depth-first manner, and attributes are processed in the order they appear in the element. This means that if you use a signal in a [Datastar expression](/guide/datastar_expressions), it must be defined _before_ it is used.
+<em>`data-*` attributes are evaluated in the order they appear in the DOM.</em>
+
+Elements are evaluated by walking the DOM in a depth-first manner, and attributes are processed in the order they appear in the element. This means that if you use a signal in a [Datastar expression](/guide/datastar_expressions), it must be defined _before_ it is used.
 
 ```html
 <!-- This works: -->
@@ -36,11 +38,20 @@ Note that `data-*` attributes are evaluated in the order they appear in the DOM.
 
 ### Attribute Casing
 
-Note that `data-*` attributes are [case-insensitive](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*). The keys used in attribute plugins that define signals, such as `data-signals-*`, are converted to [camelCase](https://developer.mozilla.org/en-US/docs/Glossary/Camel_case) (`data-signals-my-signal` defines a signal named `mySignal`). 
+<em>`data-*` attributes have special casing rules.</em>
 
-The keys used by all other attribute plugins are are converted to [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case) (`data-class-text-blue-700` adds or removes the class `text-blue-700`). 
+[According to the HTML specification](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*)</em>, all `data-*` atttributes (not Datastar the framework, but any time a data attribute appears in the DOM) are case in-sensitive, but are converted to [camelCase](https://developer.mozilla.org/en-US/docs/Glossary/Camel_case) when accessed from JavaScript by Datastar.
 
-You can use the `__case` modifier to convert between camelCase, kebab-case, snake_case, and PascalCase, or alternatively use object syntax when available.
+Datastar handles casing of data attributes in two ways:
+
+1. **Signal Names**: the keys used in attribute plugins that define signals (`data-signals-*`, `data-computed-*`, `data-ref-*`, etc), are, by default, converted to camelCase. For example, `data-signals-my-signal` defines a signal named `mySignal`. You would use the signal in a [Datastar expression](/guide/datastar_expressions) as `$mySignal`.
+
+2. **All other attribute plugins**: the keys used by all other attribute plugins are, by default, converted to [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case). For example, `data-class-text-blue-700` adds or removes the class `text-blue-700`, and `data-on-rocket-launched` would react to the event named `rocket-launched`.
+
+You can use the [`__case` modifier](#modifiers) to convert between camelCase, kebab-case, snake_case, and PascalCase, or alternatively use object syntax when available.
+
+For example, if a web component exposes an event `widgetLoaded`, you would use `data-on-widget-loaded__case.camel` to react to it. Whereas, if you wanted to use a signal named `my-signal` then you would use the kebab modfier: `data-signals-my-signal__case.kebab`.
+
 
 ## Core Plugins
 
@@ -83,8 +94,8 @@ Signal names cannot begin or contain double underscores (`__`), due to its use a
 Modifiers allow you to modify behavior when merging signals.
 
 - `__case` - Converts the casing of the signal name.
-  - `.camel` - Camel case: `mySignal` (default)
-  - `.kebab` - Kebab case: `my-signal`
+  - `.camel` - Camel case: `mySignal` (default for signal names)
+  - `.kebab` - Kebab case: `my-signal` (default for everything else)
   - `.snake` - Snake case: `my_signal`
   - `.pascal` - Pascal case: `MySignal`
 - `__ifmissing` - Only merges signals if their keys do not already exist. This is useful for setting defaults without overwriting existing values.
@@ -93,6 +104,24 @@ Modifiers allow you to modify behavior when merging signals.
 <div data-signals-my-signal__case.kebab="1" 
      data-signals-foo__ifmissing="1"
 ></div>
+```
+
+When supplying signals in bulk with object notation, modifiers can also be used:
+
+```html
+<!-- Merges the signal `mySignal` -->
+<div data-signals="{mySignal: 'value'}"></div>
+
+<!-- Merges the signal `mySignal` only if it doesn't already exist -->
+<div data-signals__ifmissing="{mySignal: 'init-value'}"></div>
+
+<!-- Defines a kebab cased signal `my-signal` using object notation -->
+<div data-signals="{'my-signal': 'value'}"></div>
+
+<!-- It is possible to set both `data-signals__ifmissing` and `data-signals` on the same element -->
+<div data-signals="{'my-signal': 'value'}"
+     data-signals__ifmissing="{widgetStatus: 'initial'}">
+</div>
 ```
 
 ### `data-computed`
