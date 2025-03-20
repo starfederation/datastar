@@ -11,6 +11,7 @@ import { modifyCasing, trimDollarSignPrefix } from '../../../../utils/text'
 import {
   DATASTAR_SSE_EVENT,
   type DatastarSSEEvent,
+  ERROR,
   FINISHED,
   STARTED,
 } from '../shared'
@@ -23,7 +24,7 @@ export const Indicator: AttributePlugin = {
   onLoad: ({ el, key, mods, signals, value }) => {
     const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
     const { signal } = signals.upsertIfMissing(signalName, false)
-    const watcher = (event: CustomEvent<DatastarSSEEvent>) => {
+    const watcher = ((event: CustomEvent<DatastarSSEEvent>) => {
       const {
         type,
         argsRaw: { elId },
@@ -33,18 +34,20 @@ export const Indicator: AttributePlugin = {
         case STARTED:
           signal.value = true
           break
+        case ERROR:
         case FINISHED:
           signal.value = false
           break
       }
-    }
-    document.addEventListener(DATASTAR_SSE_EVENT, watcher)
+    }) as EventListener
+  
+    el.addEventListener(DATASTAR_SSE_EVENT, watcher)
 
     return () => {
       // Reset the signal
       signal.value = false
       
-      document.removeEventListener(DATASTAR_SSE_EVENT, watcher)
+      el.removeEventListener(DATASTAR_SSE_EVENT, watcher)
     }
   },
 }
