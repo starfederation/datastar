@@ -3,7 +3,7 @@
 Tests merging a fragment containing a bound input value.
 
 <div>
-  <div id="content"><input type="text" data-bind-result class="input input-bordered" /></div>
+  <div id="content"><input id="populatable" type="text" data-bind-result class="input input-bordered" /></div>
   <button id="clickable" data-on-click="@get('/tests/merge_fragment_input_value/data')" class="btn">Merge</button>
   <hr />
   Result:
