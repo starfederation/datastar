@@ -22,7 +22,9 @@ export const Indicator: AttributePlugin = {
   keyReq: Requirement.Exclusive,
   valReq: Requirement.Exclusive,
   onLoad: ({ el, key, mods, signals, value }) => {
-    const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
+    const signalName = key
+      ? modifyCasing(key, mods)
+      : trimDollarSignPrefix(value)
     const { signal } = signals.upsertIfMissing(signalName, false)
     const watcher = ((event: CustomEvent<DatastarSSEEvent>) => {
       const {
@@ -34,20 +36,17 @@ export const Indicator: AttributePlugin = {
         case STARTED:
           signal.value = true
           break
-        case ERROR:
         case FINISHED:
           signal.value = false
           break
       }
     }) as EventListener
-  
+
     el.addEventListener(DATASTAR_SSE_EVENT, watcher)
 
     return () => {
-      // Reset the signal
-      signal.value = false
-      
-      el.removeEventListener(DATASTAR_SSE_EVENT, watcher)
+      // Delay removing the event listener to the next macrotask so that the watcher can set the signal appropriately
+      setTimeout(() => el.removeEventListener(DATASTAR_SSE_EVENT, watcher))
     }
   },
 }
