@@ -73,6 +73,9 @@ function applyToTargets(
   capturedTargets: Element[],
 ) {
   for (const target of capturedTargets) {
+    // Mark the target as a fragment merge target to allow plugins to clean up and reapply
+    (target as HTMLElement).dataset.fragmentMergeTarget = 'true'
+
     // Clone the fragment to merge to avoid modifying the original and force browsers to merge the fragment into the DOM
     const fragmentToMerge = fragment.cloneNode(true) as HTMLorSVGElement
 

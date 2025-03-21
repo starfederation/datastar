@@ -1,6 +1,6 @@
 # Merge Fragment Outer Multiple Targets
 
-Tests  merging a fragment using the `outer` merge mode with multiple targets.
+Tests merging a fragment using the `outer` merge mode with multiple targets.
 
 <div>
   <div id="content" data-signals-result="0"></div>

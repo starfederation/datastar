@@ -1,6 +1,6 @@
 # Custom Plugin
 
-Tests that loading a custom plugin works.
+Tests loading a custom plugin.
 
 <script type="module">
   import { load } from '/static/js/datastar.js'

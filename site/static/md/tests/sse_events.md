@@ -6,7 +6,7 @@ Tests that SSE events are dispatched on the element itself.
   <pre id="events"></pre>
   <hr />
   Result:
-  <code id="result" data-text="$result == 2 ? 1 : 0">0</code>
+  <code id="result" data-text="$result == 2 ? 1 : 0"></code>
   <hr />
   Expected result on load: <code>1</code>
 </div>
