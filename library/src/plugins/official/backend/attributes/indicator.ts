@@ -11,6 +11,7 @@ import { modifyCasing, trimDollarSignPrefix } from '../../../../utils/text'
 import {
   DATASTAR_SSE_EVENT,
   type DatastarSSEEvent,
+  ERROR,
   FINISHED,
   STARTED,
 } from '../shared'
@@ -21,9 +22,11 @@ export const Indicator: AttributePlugin = {
   keyReq: Requirement.Exclusive,
   valReq: Requirement.Exclusive,
   onLoad: ({ el, key, mods, signals, value }) => {
-    const signalName = key ? modifyCasing(key, mods) : trimDollarSignPrefix(value)
+    const signalName = key
+      ? modifyCasing(key, mods)
+      : trimDollarSignPrefix(value)
     const { signal } = signals.upsertIfMissing(signalName, false)
-    const watcher = (event: CustomEvent<DatastarSSEEvent>) => {
+    const watcher = ((event: CustomEvent<DatastarSSEEvent>) => {
       const {
         type,
         argsRaw: { elId },
@@ -37,14 +40,13 @@ export const Indicator: AttributePlugin = {
           signal.value = false
           break
       }
-    }
-    document.addEventListener(DATASTAR_SSE_EVENT, watcher)
+    }) as EventListener
+
+    el.addEventListener(DATASTAR_SSE_EVENT, watcher)
 
     return () => {
-      // Reset the signal
-      signal.value = false
-      
-      document.removeEventListener(DATASTAR_SSE_EVENT, watcher)
+      // Delay removing the event listener to the next macrotask so that the watcher can set the signal appropriately (`queueMicrotask` is insufficient, ask me how I know!)
+      setTimeout(() => el.removeEventListener(DATASTAR_SSE_EVENT, watcher))
     }
   },
 }
