@@ -45,7 +45,7 @@ export const Indicator: AttributePlugin = {
     el.addEventListener(DATASTAR_SSE_EVENT, watcher)
 
     return () => {
-      // Delay removing the event listener to the next macrotask so that the watcher can set the signal appropriately
+      // Delay removing the event listener to the next macrotask so that the watcher can set the signal appropriately (`queueMicrotask` is insufficient, ask me how I know!)
       setTimeout(() => el.removeEventListener(DATASTAR_SSE_EVENT, watcher))
     }
   },
