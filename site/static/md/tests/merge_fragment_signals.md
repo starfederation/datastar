@@ -1,6 +1,6 @@
 # Merge Fragment Signals
 
-Tests that merging a fragment containing `data-signals-*` works.
+Tests merging a fragment containing `data-signals-*`.
 
 <div>
   <div id="content" data-signals-result="0"></div>
