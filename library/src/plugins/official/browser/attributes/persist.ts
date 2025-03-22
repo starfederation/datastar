@@ -9,7 +9,7 @@ import {
   type NestedValues,
   PluginType,
 } from '../../../../engine/types'
-import { modifyCasing, trimDollarSignPrefix } from '../../../../utils/text'
+import { kebab, modifyCasing, trimDollarSignPrefix } from '../../../../utils/text'
 
 const SESSION = 'session'
 
@@ -18,9 +18,12 @@ export const Persist: AttributePlugin = {
   name: 'persist',
   mods: new Set([SESSION]),
   onLoad: ({ key, effect, mods, signals, value }) => {
-    key = modifyCasing(key, mods)
     if (key === '') {
       key = DATASTAR
+    } else {
+      // Default to kebab-case and allow modifying
+      key = kebab(key)
+      key = modifyCasing(key, mods)
     }
 
     const storage = mods.has(SESSION) ? sessionStorage : localStorage

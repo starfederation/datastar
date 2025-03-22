@@ -11,11 +11,11 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 - Updated Idiomorph to version [0.7.3](https://github.com/bigskysoftware/idiomorph/releases/tag/v0.7.3).
 - Classes used in `data-class-*` attributes now default to kebab-case ([#761](https://github.com/starfederation/datastar/issues/761)).
 - Events used in `data-on-*` attributes now default to kebab-case ([#761](https://github.com/starfederation/datastar/issues/761)).
+- Keys used in `data-persist-*` attributes now default to kebab-case.
 - The `datastar-sse` event is now dispatched on the element itself ([#761](https://github.com/starfederation/datastar/issues/761)).
-- The NPM package now also exports all official plugins and bundles ([#742](https://github.com/starfederation/datastar/issues/742)).
+- The NPM package now also exports all plugins and bundles ([#742](https://github.com/starfederation/datastar/issues/742)).
 - Data attributes with plugin names in their prefix are no longer processed ([#771](https://github.com/starfederation/datastar/issues/771)).
 - The alias used in the aliased bundle has been renamed to `star` (`data-star-*`) ([#772](https://github.com/starfederation/datastar/issues/772)).
-- The indicator signal is not set to `false` when an SSE error occurs.
 
 ### Fixed
 

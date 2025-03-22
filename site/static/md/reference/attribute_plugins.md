@@ -406,8 +406,8 @@ If a key is provided, it will be used as the key when saving in storage, otherwi
 Modifiers allow you to modify the key and storage target.
 
 - `__case` - Converts the casing of the key.
-  - `.camel` - Camel case: `myKey` (default)
-  - `.kebab` - Kebab case: `my-key`
+  - `.camel` - Camel case: `myKey`
+  - `.kebab` - Kebab case: `my-key` (default)
   - `.snake` - Snake case: `my_key`
   - `.pascal` - Pascal case: `MyKey`
 - `__session` - Persists signals in Session Storage.
