@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -67,8 +68,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "datastar.wsgi.application"
-
+ASGI_APPLICATION = "datastar.asgi.application"
+# WSGI_APPLICATION = "datastar.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
