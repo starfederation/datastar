@@ -1,10 +1,10 @@
 # Aliased
 
-Tests that the alias `data-star-*` works.
+Tests the `data-star-*` alias.
 
 <div data-star-signals-result="0" data-star-on-load="$result = 1">
   Result:
-  <code id="result" data-star-text="$result">0</code>
+  <code id="result" data-star-text="$result"></code>
   <hr />
   Expected result on load: <code>1</code>
 </div>

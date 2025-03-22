@@ -1,6 +1,6 @@
 # Merge Fragment
 
-Tests that merging a fragment works.
+Tests merging a fragment.
 
 <div>
   <button id="clickable" data-on-click="@get('/tests/merge_fragment/data')" class="btn">Merge</button>

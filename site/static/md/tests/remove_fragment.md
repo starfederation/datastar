@@ -1,6 +1,6 @@
 # Remove Fragment
 
-Tests that removing a fragment works.
+Tests removing a fragment.
 
 <div>
   <button id="clickable" data-on-click="@delete('/tests/remove_fragment/data')" class="btn">Remove</button>
