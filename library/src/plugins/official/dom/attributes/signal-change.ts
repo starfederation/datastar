@@ -1,7 +1,7 @@
 // Authors: Ben Croker
 // Icon: material-symbols:mail
-// Slug: Executes and expression when a signal changes
-// Description: This plugin executes an expression when a signal changes.
+// Slug: Executes and expression on any signal change
+// Description: This plugin executes an expression on any signal change. 
 
 import {
   type AttributePlugin,
@@ -15,9 +15,9 @@ import { modifyTiming } from '../../../../utils/timing'
 import { modifyViewTransition } from '../../../../utils/view-transtions'
 import { effect, type Signal } from '../../../../vendored/preact-core'
 
-export const SignalsChange: AttributePlugin = {
+export const SignalChange: AttributePlugin = {
   type: PluginType.Attribute,
-  name: 'signals-change',
+  name: 'signal-change',
   valReq: Requirement.Must,
   onLoad: ({ key, mods, signals, genRX }) => {
     const rx = genRX()
