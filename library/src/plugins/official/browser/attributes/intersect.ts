@@ -1,7 +1,7 @@
 // Authors: Delaney Gillilan
 // Icon: mdi-light:vector-intersection
-// Slug: Run expression when element intersects with viewport
-// Description: An attribute that runs an expression when the element intersects with the viewport.
+// Slug: Executes an expression on element intersection with viewport
+// Description: An attribute that executes an expression on element intersection with the viewport.
 
 import {
   type AttributePlugin,
@@ -13,9 +13,9 @@ const ONCE = 'once'
 const HALF = 'half'
 const FULL = 'full'
 
-export const Intersects: AttributePlugin = {
+export const Intersect: AttributePlugin = {
   type: PluginType.Attribute,
-  name: 'intersects',
+  name: 'intersect',
   keyReq: Requirement.Denied,
   mods: new Set([ONCE, HALF, FULL]),
   onLoad: ({ el, rawKey, mods, genRX }) => {

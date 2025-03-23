@@ -1,7 +1,7 @@
 // Authors: Ben Croker
 // Icon: material-symbols:mail
 // Slug: Executes and expression on any signal change
-// Description: This plugin executes an expression on any signal change. 
+// Description: This attribute executes an expression on any signal change. 
 
 import {
   type AttributePlugin,
