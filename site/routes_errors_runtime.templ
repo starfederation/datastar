@@ -240,6 +240,15 @@ templ OnValueRequired(name string, info *RuntimeErrorInfo) {
 	}
 }
 
+templ PersistKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("persist", info.Expression.Key)
+		<p>The <code>data-persist</code> attribute must <em>not</em> have a key. If one or more space-separated values are provided as a string, only those signals are persisted.</p>
+		@sampleCode("Example", "html", `<div data-persist="foo bar"></div>`)
+		@attributeDocs("persist")
+	}
+}
+
 templ RefKeyAndValueProvided(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@keyAndValueProvided("ref")
@@ -486,7 +495,7 @@ templ replaceUrlError() {
 }
 
 templ scrollIntoViewError() {
-	<p> The <code>data-scroll-into-view</code> attribute must <em>not</em> have a key <em>nor</em> a value.</p>
+	<p>The <code>data-scroll-into-view</code> attribute must <em>not</em> have a key <em>nor</em> a value.</p>
 	@sampleCode("Example", "html", `<div data-scroll-into-view></div>`)
 	@attributeDocs("scroll-into-view")
 }
