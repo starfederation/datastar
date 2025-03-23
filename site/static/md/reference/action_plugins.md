@@ -2,9 +2,25 @@
 
 Datastar provides the following actions, that can be used in Datastar expressions.
 
-## Backend Plugins
+### Backend Actions
 
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/backend/actions)
+- [`@get()`](#@get)
+- [`@post()`](#@post)
+- [`@put()`](#@put)
+- [`@patch()`](#@patch)
+- [`@delete()`](#@delete)
+
+### Browser Actions
+
+- [`@clipboard()`](#@clipboard)
+
+### Utility Actions
+
+- [`@fit()`](#@fit)
+- [`@setAll()`](#@setall)
+- [`@toggleAll()`](#@toggleall)
+
+## Backend Actions
 
 Allow for the integration of any backend service that supports SSE.
 
@@ -102,11 +118,9 @@ All of the actions above trigger `datastar-sse` events during the SSE request li
 <div data-on-datastar-sse="evt.detail.type == 'error' && console.log('SSE error encountered')"></div>
 ```
 
-## Browser Plugins
+## Browser Actions
 
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/browser/actions)
-
-Provides actions for performing browser operations.
+Actions for performing browser operations.
 
 ### `@clipboard()`
 
@@ -118,11 +132,13 @@ Copies the provided evaluated expression to the clipboard.
 <div data-on-click="@clipboard('Hello, world!')"></div>
 ```
 
-## Logic Plugins
+## Utility Actions
 
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/logic/actions)
+### `@fit()`
 
-Provides actions for performing logic operations.
+Arguments: `@fit(v: number, oldMin: number, oldMax: number, newMin: number, newMax: number, shouldClamp=false, shouldRound=false)`
+
+Make a value linear interpolate from an original range to new one.
 
 ### `@setAll()`
 
@@ -143,9 +159,3 @@ Toggles all the signals that start with the prefix. This is useful for toggling 
 ```html
 <div data-on-click="@toggleAll('foo.')"></div>
 ```
-
-### `@fit()`
-
-Arguments: `@fit(v: number, oldMin: number, oldMax: number, newMin: number, newMax: number, shouldClamp=false, shouldRound=false)`
-
-Make a value linear interpolate from an original range to new one.

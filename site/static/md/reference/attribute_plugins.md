@@ -2,7 +2,36 @@
 
 Datastar provides the following [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) attributes.
 
-<div class="alert alert-info">
+### Core Attributes
+
+- [`data-signals`](#data-signals)
+- [`data-computed`](#data-computed)
+- [`data-star-ignore`](#data-star-ignore)
+
+### DOM Attributes
+
+- [`data-attr`](#data-attr)
+- [`data-bind`](#data-bind)
+- [`data-class`](#data-class)
+- [`data-on`](#data-on)
+- [`data-ref`](#data-ref)
+- [`data-show`](#data-show)
+- [`data-text`](#data-text)
+
+### Backend Attributes
+
+- [`data-indicator`](#data-indicator)
+
+### Browser Attributes
+
+- [`data-custom-validity`](#data-custom-validity)
+- [`data-intersects`](#data-intersects)
+- [`data-persist`](#data-persist)
+- [`data-replace-url`](#data-replace-url)
+- [`data-scroll-into-view`](#data-scroll-into-view)
+- [`data-view-transition`](#data-view-transition)
+
+<div class="alert alert-info my-8">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
     <div>
         The Datastar <a href="https://marketplace.visualstudio.com/items?itemName=starfederation.datastar-vscode">VSCode extension</a> and <a href="https://plugins.jetbrains.com/plugin/26072-datastar-support">IntelliJ plugin</a> provided autocompletion for all <code>data-*</code> attributes.
@@ -44,7 +73,7 @@ Elements are evaluated by walking the DOM in a depth-first manner, and attribute
 
 Datastar handles casing of data attributes in two ways:
 
-1. **Signal Names**: the keys used in attribute plugins that define signals (`data-signals-*`, `data-computed-*`, `data-ref-*`, etc), are, by default, converted to camelCase. For example, `data-signals-my-signal` defines a signal named `mySignal`. You would use the signal in a [Datastar expression](/guide/datastar_expressions) as `$mySignal`.
+1. **Signal names**: the keys used in attribute plugins that define signals (`data-signals-*`, `data-computed-*`, `data-ref-*`, etc), are, by default, converted to camelCase. For example, `data-signals-my-signal` defines a signal named `mySignal`. You would use the signal in a [Datastar expression](/guide/datastar_expressions) as `$mySignal`.
 
 2. **All other attribute plugins**: the keys used by all other attribute plugins are, by default, converted to [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case). For example, `data-class-text-blue-700` adds or removes the class `text-blue-700`, and `data-on-rocket-launched` would react to the event named `rocket-launched`.
 
@@ -52,12 +81,9 @@ You can use the [`__case` modifier](#modifiers) to convert between camelCase, ke
 
 For example, if a web component exposes an event `widgetLoaded`, you would use `data-on-widget-loaded__case.camel` to react to it. Whereas, if you wanted to use a signal named `my-signal` then you would use the kebab modfier: `data-signals-my-signal__case.kebab`.
 
+## Core Attributes
 
-## Core Plugins
-
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/core/attributes)
-
-The core plugins are included in every bundle, and contain the core functionality in Datastar.
+The core attribute plugins are included in every bundle, and contain the core functionality in Datastar.
 
 ### `data-signals`
 
@@ -169,45 +195,25 @@ Modifiers allow you to modify behavior when defining computed signals.
 <div data-computed-my-signal__case.kebab="$bar + $baz"></div>
 ```
 
-### `data-ref`
+### `data-star-ignore`
 
-Creates a new signal that is a reference to the element on which the data attribute is placed.
-
-```html
-<div data-ref-foo></div>
-```
-
-The signal name can be specified in the key (as above), or in the value (as below). This can be useful depending on the templating language you are using.
+Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element and its descendants by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries, or when you are unable to [escape user input](/reference/security#escape-user-input).
 
 ```html
-<div data-ref="foo"></div>
-```
-
-The signal value can then be used to reference the element.
-
-```html
-`$foo` holds a <span data-text="$foo.tagName"></span> element.
+<div data-star-ignore data-show-thirdpartylib>
+  <div data-show-thirdpartylib>
+    These element will not be processed by Datastar.
+  </div>
+</div>
 ```
 
 #### Modifiers
 
-Modifiers allow you to modify behavior when defining references.
+- `__self` - Only ignore the element itself, not its descendants.
 
-- `__case` - Converts the casing of the signal name.
-  - `.camel` - Camel case: `mySignal` (default)
-  - `.kebab` - Kebab case: `my-signal`
-  - `.snake` - Snake case: `my_signal`
-  - `.pascal` - Pascal case: `MySignal`
+## DOM Attributes
 
-```html
-<div data-ref-my-signal__case.kebab></div>
-```
-
-## DOM Plugins
-
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/dom/attributes)
-
-Allows the usage of signals and expressions to affect the DOM.
+Allow the usage of signals and expressions to affect the DOM.
 
 ### `data-attr`
 
@@ -381,113 +387,38 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 ></div>
 ```
 
-### `data-persist`
+### `data-ref`
 
-Persists signals in Local Storage. This is useful for storing values between page loads.
+Creates a new signal that is a reference to the element on which the data attribute is placed.
 
 ```html
-<div data-persist></div>
+<div data-ref-foo></div>
 ```
 
-If one or more space-separated values are provided as a string, only those signals are persisted.
+The signal name can be specified in the key (as above), or in the value (as below). This can be useful depending on the templating language you are using.
 
 ```html
-<div data-persist="foo bar"></div>
+<div data-ref="foo"></div>
 ```
 
-#### Modifiers
-
-Modifiers allow you to modify the storage target.
-
-- `__session` - Persists signals in Session Storage.
+The signal value can then be used to reference the element.
 
 ```html
-<div data-persist__session="foo bar"></div>
-```
-
-### `data-replace-url`
-
-Replaces the URL in the browser without reloading the page. The value can be a relative or absolute URL, and is an evaluated expression.
-
-```html
-<div data-replace-url="`/page${page}`"></div>
-```
-
-### `data-text`
-
-Binds the text content of an element to an expression.
-
-```html
-<div data-text="$foo"></div>
-```
-
-## Browser Plugins
-
-[Source Code](https://github.com/starfederation/datastar/tree/main/library/src/plugins/official/browser/attributes)
-
-Focused on showing and hiding elements based on signals. Most of the time you want to send updates from the server but is useful for things like modals, dropdowns, and other UI elements.
-
-### `data-custom-validity`
-
-Allows you to add custom validity to an element using an expression. The expression must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.
-
-```html
-<form>
-  <input data-bind-foo name="foo" />
-  <input data-bind-bar name="bar"
-    data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" 
-  />
-  <button>Submit form</button>
-</form>
-```
-
-### `data-intersects`
-
-Runs an expression when the element intersects with the viewport.
-
-```html
-<div data-intersects="$intersected = true"></div>
+`$foo` holds a <span data-text="$foo.tagName"></span> element.
 ```
 
 #### Modifiers
 
-Modifiers allow you to modify the element intersection behavior.
+Modifiers allow you to modify behavior when defining references.
 
-- `__once` - Only triggers the event once.
-- `__half` - Triggers when half of the element is visible.
-- `__full` - Triggers when the full element is visible.
-
-```html
-<div data-intersects__once="$intersected = true"></div>
-```
-
-### `data-scroll-into-view`
-
-Scrolls the element into view. Useful when updating the DOM from the backend, and you want to scroll to the new content.
+- `__case` - Converts the casing of the signal name.
+  - `.camel` - Camel case: `mySignal` (default)
+  - `.kebab` - Kebab case: `my-signal`
+  - `.snake` - Snake case: `my_signal`
+  - `.pascal` - Pascal case: `MySignal`
 
 ```html
-<div data-scroll-into-view></div>
-```
-
-#### Modifiers
-
-Modifiers allow you to modify scrolling behavior.
-
-- `__smooth` - Scrolling is animate smoothly.
-- `__instant` - Scrolling is instant.
-- `__auto` - Scrolling is determined by the computed `scroll-behavior` CSS property.
-- `__hstart` - Scrolls to the left of the element.
-- `__hcenter` - Scrolls to the horizontal center of the element.
-- `__hend` - Scrolls to the right of the element.
-- `__hnearest` - Scrolls to the nearest horizontal edge of the element.
-- `__vstart` - Scrolls to the top of the element.
-- `__vcenter` - Scrolls to the vertical center of the element.
-- `__vend` - Scrolls to the bottom of the element.
-- `__vnearest` - Scrolls to the nearest vertical edge of the element.
-- `__focus` - Focuses the element after scrolling.
-
-```html
-<div data-scroll-into-view__smooth></div>
+<div data-ref-my-signal__case.kebab></div>
 ```
 
 ### `data-show`
@@ -504,21 +435,17 @@ To prevent flickering of the element before Datastar has processed the DOM, you 
 <div data-show="$foo" style="display: none"></div>
 ```
 
-### `data-view-transition`
+### `data-text`
 
-Sets the `view-transition-name` style attribute explicitly.
+Binds the text content of an element to an expression.
 
 ```html
-<div data-view-transition="$foo"></div>
+<div data-text="$foo"></div>
 ```
 
-Page level transitions are automatically handled by an injected meta tag. Inter-page elements are automatically transitioned if the [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API) is available in the browser and `useViewTransitions` is `true`.
+## Backend Attributes
 
-## Backend Plugins
-
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/backend/attributes)
-
-Adds integrations with [backend plugin actions](/reference/action_plugins#backend-plugins).
+Add integrations with [backend plugin actions](/reference/action_plugins#backend-plugins).
 
 ### `data-indicator`
 
@@ -555,24 +482,112 @@ Modifiers allow you to modify behavior when defining indicator signals.
   - `.snake` - Snake case: `my_signal`
   - `.pascal` - Pascal case: `MySignal`
 
-## Ignoring Elements
+## Browser Attributes
 
-### `data-star-ignore`
+### `data-custom-validity`
 
-Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element and its descendants by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries, or when you are unable to [escape user input](/reference/security#escape-user-input).
+Allows you to add custom validity to an element using an expression. The expression must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.
 
 ```html
-<div data-star-ignore data-show-thirdpartylib>
-  <div data-show-thirdpartylib>
-    These element will not be processed by Datastar.
-  </div>
-</div>
+<form>
+  <input data-bind-foo name="foo" />
+  <input data-bind-bar name="bar"
+    data-custom-validity="$foo === $bar ? '' : 'Field values must be the same.'" 
+  />
+  <button>Submit form</button>
+</form>
+```
+
+### `data-intersects`
+
+Runs an expression when the element intersects with the viewport.
+
+```html
+<div data-intersects="$intersected = true"></div>
 ```
 
 #### Modifiers
 
-- `__self` - Only ignore the element itself, not its descendants.
+Modifiers allow you to modify the element intersection behavior.
 
+- `__once` - Only triggers the event once.
+- `__half` - Triggers when half of the element is visible.
+- `__full` - Triggers when the full element is visible.
+
+```html
+<div data-intersects__once="$intersected = true"></div>
+```
+
+### `data-persist`
+
+Persists signals in Local Storage. This is useful for storing values between page loads.
+
+```html
+<div data-persist></div>
+```
+
+If one or more space-separated values are provided as a string, only those signals are persisted.
+
+```html
+<div data-persist="foo bar"></div>
+```
+
+#### Modifiers
+
+Modifiers allow you to modify the storage target.
+
+- `__session` - Persists signals in Session Storage.
+
+```html
+<div data-persist__session="foo bar"></div>
+```
+
+### `data-replace-url`
+
+Replaces the URL in the browser without reloading the page. The value can be a relative or absolute URL, and is an evaluated expression.
+
+```html
+<div data-replace-url="`/page${page}`"></div>
+```
+
+### `data-scroll-into-view`
+
+Scrolls the element into view. Useful when updating the DOM from the backend, and you want to scroll to the new content.
+
+```html
+<div data-scroll-into-view></div>
+```
+
+#### Modifiers
+
+Modifiers allow you to modify scrolling behavior.
+
+- `__smooth` - Scrolling is animate smoothly.
+- `__instant` - Scrolling is instant.
+- `__auto` - Scrolling is determined by the computed `scroll-behavior` CSS property.
+- `__hstart` - Scrolls to the left of the element.
+- `__hcenter` - Scrolls to the horizontal center of the element.
+- `__hend` - Scrolls to the right of the element.
+- `__hnearest` - Scrolls to the nearest horizontal edge of the element.
+- `__vstart` - Scrolls to the top of the element.
+- `__vcenter` - Scrolls to the vertical center of the element.
+- `__vend` - Scrolls to the bottom of the element.
+- `__vnearest` - Scrolls to the nearest vertical edge of the element.
+- `__focus` - Focuses the element after scrolling.
+
+```html
+<div data-scroll-into-view__smooth></div>
+```
+
+### `data-view-transition`
+
+Sets the `view-transition-name` style attribute explicitly.
+
+```html
+<div data-view-transition="$foo"></div>
+```
+
+Page level transitions are automatically handled by an injected meta tag. Inter-page elements are automatically transitioned if the [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API) is available in the browser and `useViewTransitions` is `true`.
 
 ## Aliasing Data Attributes
 
@@ -581,5 +596,5 @@ It is possible to alias `data-*` attributes to a custom alias (`data-foo-*`, for
 We maintain a `data-star-*` aliased version that can be included as follows.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.9/bundles/datastar-aliased.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.10/bundles/datastar-aliased.js"></script>
 ```
