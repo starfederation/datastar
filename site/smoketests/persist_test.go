@@ -16,7 +16,7 @@ func TestExamplePersist(t *testing.T) {
 			expected := "foo"
 
 			checkLocalStorage := func() string {
-				fromLocalStorage := page.MustEval(`k => localStorage[k]`, "foo")
+				fromLocalStorage := page.MustEval(`k => localStorage[k]`, "datastar")
 				marshalled := fromLocalStorage.String()
 				c, err := gabs.ParseJSON([]byte(marshalled))
 				assert.NoError(t, err)
