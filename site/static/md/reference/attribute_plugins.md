@@ -186,7 +186,7 @@ The signal name can be specified in the key (as above), or in the value (as belo
 The signal value can then be used to reference the element.
 
 ```html
-`foo` holds a <span data-text="$foo.tagName"></span> element.
+`$foo` holds a <span data-text="$foo.tagName"></span> element.
 ```
 
 #### Modifiers
@@ -395,25 +395,14 @@ If one or more space-separated values are provided as a string, only those signa
 <div data-persist="foo bar"></div>
 ```
 
-If a key is provided, it will be used as the key when saving in storage, otherwise `datastar` will be used.
-
-```html
-<div data-persist-mykey="foo bar"></div>
-```
-
 #### Modifiers
 
-Modifiers allow you to modify the key and storage target.
+Modifiers allow you to modify the storage target.
 
-- `__case` - Converts the casing of the key.
-  - `.camel` - Camel case: `myKey`
-  - `.kebab` - Kebab case: `my-key` (default)
-  - `.snake` - Snake case: `my_key`
-  - `.pascal` - Pascal case: `MyKey`
 - `__session` - Persists signals in Session Storage.
 
 ```html
-<div data-persist-my-key__case.kebab__session></div>
+<div data-persist__session="foo bar"></div>
 ```
 
 ### `data-replace-url`

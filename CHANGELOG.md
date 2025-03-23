@@ -25,4 +25,5 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ### Removed
 
+- Removed the ability to use a key with the `data-persist` attribute.
 - Removed settling from SSE events, which has become redundant ([#764](https://github.com/starfederation/datastar/issues/764)).
