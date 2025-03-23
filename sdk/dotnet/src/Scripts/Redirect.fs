@@ -2,8 +2,8 @@ namespace StarFederation.Datastar.Scripts
 
 open StarFederation.Datastar
 
-module Redirect =
-    let redirectWithOptions (options:EventOptions) env url =
+type Redirect =
+    static member redirect (env, url, ?options:EventOptions) =
+        let options = options |> Option.defaultValue EventOptions.defaults
         let scriptOptions = { ExecuteScriptOptions.defaults with EventId = options.EventId; Retry = options.Retry }
-        ServerSentEventGenerator.executeScriptWithOptions scriptOptions env $"window.location.href = '%s{url}';"
-    let redirect env = redirectWithOptions EventOptions.defaults env
+        ServerSentEventGenerator.executeScript (env, $"window.location.href = '%s{url}';", scriptOptions)

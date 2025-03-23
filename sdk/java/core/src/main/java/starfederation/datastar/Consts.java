@@ -7,10 +7,7 @@ import starfederation.datastar.enums.FragmentMergeMode;
  */
 public final class Consts {
     public static final String DATASTAR_KEY = "datastar";
-    public static final String VERSION = "1.0.0-beta.9";
-
-    // The default duration for settling during fragment merges. Allows for CSS transitions to complete.
-    public static final int DEFAULT_FRAGMENTS_SETTLE_DURATION = 300;
+    public static final String VERSION = "1.0.0-beta.10";
 
     // The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     public static final int DEFAULT_SSE_RETRY_DURATION = 1000;
@@ -33,7 +30,6 @@ public final class Consts {
     // Dataline literals.
     public static final String SELECTOR_DATALINE_LITERAL = "selector ";
     public static final String MERGE_MODE_DATALINE_LITERAL = "mergeMode ";
-    public static final String SETTLE_DURATION_DATALINE_LITERAL = "settleDuration ";
     public static final String FRAGMENTS_DATALINE_LITERAL = "fragments ";
     public static final String USE_VIEW_TRANSITION_DATALINE_LITERAL = "useViewTransition ";
     public static final String SIGNALS_DATALINE_LITERAL = "signals ";

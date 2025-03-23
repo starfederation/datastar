@@ -10,9 +10,9 @@ You should use `ctx` sparingly, and only when you can't achieve the desired beha
 
 The current element being processed.
 
-### `ctx.plugin`
-
-The current plugin being processed.
+```html
+<button data-on-click="ctx.el.disabled = true"></button>
+```
 
 ### `ctx.signals`
 

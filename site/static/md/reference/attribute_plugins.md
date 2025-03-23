@@ -2,7 +2,36 @@
 
 Datastar provides the following [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) attributes.
 
-<div class="alert alert-info">
+### Core Attributes
+
+- [`data-signals`](#data-signals)
+- [`data-computed`](#data-computed)
+- [`data-star-ignore`](#data-star-ignore)
+
+### DOM Attributes
+
+- [`data-attr`](#data-attr)
+- [`data-bind`](#data-bind)
+- [`data-class`](#data-class)
+- [`data-on`](#data-on)
+- [`data-ref`](#data-ref)
+- [`data-show`](#data-show)
+- [`data-text`](#data-text)
+
+### Backend Attributes
+
+- [`data-indicator`](#data-indicator)
+
+### Browser Attributes
+
+- [`data-custom-validity`](#data-custom-validity)
+- [`data-intersects`](#data-intersects)
+- [`data-persist`](#data-persist)
+- [`data-replace-url`](#data-replace-url)
+- [`data-scroll-into-view`](#data-scroll-into-view)
+- [`data-view-transition`](#data-view-transition)
+
+<div class="alert alert-info my-8">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
     <div>
         The Datastar <a href="https://marketplace.visualstudio.com/items?itemName=starfederation.datastar-vscode">VSCode extension</a> and <a href="https://plugins.jetbrains.com/plugin/26072-datastar-support">IntelliJ plugin</a> provided autocompletion for all <code>data-*</code> attributes.
@@ -11,7 +40,9 @@ Datastar provides the following [`data-*`](https://developer.mozilla.org/en-US/d
 
 ### Attribute Order
 
-Note that `data-*` attributes are evaluated in the order they appear in the DOM. Elements are evaluated by walking the DOM in a depth-first manner, and attributes are processed in the order they appear in the element. This means that if you use a signal in a [Datastar expression](/guide/datastar_expressions), it must be defined _before_ it is used.
+<em>`data-*` attributes are evaluated in the order they appear in the DOM.</em>
+
+Elements are evaluated by walking the DOM in a depth-first manner, and attributes are processed in the order they appear in the element. This means that if you use a signal in a [Datastar expression](/guide/datastar_expressions), it must be defined _before_ it is used.
 
 ```html
 <!-- This works: -->
@@ -34,11 +65,25 @@ Note that `data-*` attributes are evaluated in the order they appear in the DOM.
 <div data-signals-foo="1"></div>
 ```
 
-## Core Plugins
+### Attribute Casing
 
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/core/attributes)
+<em>`data-*` attributes have special casing rules.</em>
 
-The core plugins are included in every bundle, and contain the core functionality in Datastar.
+[According to the HTML specification](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*)</em>, all `data-*` atttributes (not Datastar the framework, but any time a data attribute appears in the DOM) are case in-sensitive, but are converted to [camelCase](https://developer.mozilla.org/en-US/docs/Glossary/Camel_case) when accessed from JavaScript by Datastar.
+
+Datastar handles casing of data attributes in two ways:
+
+1. **Signal names**: the keys used in attribute plugins that define signals (`data-signals-*`, `data-computed-*`, `data-ref-*`, etc), are, by default, converted to camelCase. For example, `data-signals-my-signal` defines a signal named `mySignal`. You would use the signal in a [Datastar expression](/guide/datastar_expressions) as `$mySignal`.
+
+2. **All other attribute plugins**: the keys used by all other attribute plugins are, by default, converted to [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case). For example, `data-class-text-blue-700` adds or removes the class `text-blue-700`, and `data-on-rocket-launched` would react to the event named `rocket-launched`.
+
+You can use the [`__case` modifier](#modifiers) to convert between camelCase, kebab-case, snake_case, and PascalCase, or alternatively use object syntax when available.
+
+For example, if a web component exposes an event `widgetLoaded`, you would use `data-on-widget-loaded__case.camel` to react to it. Whereas, if you wanted to use a signal named `my-signal` then you would use the kebab modfier: `data-signals-my-signal__case.kebab`.
+
+## Core Attributes
+
+The core attribute plugins are included in every bundle, and contain the core functionality in Datastar.
 
 ### `data-signals`
 
@@ -64,20 +109,45 @@ The `data-signals` attribute can also be used to merge multiple signals using a 
 
 The value above is written in JavaScript object notation, but JSON, which is a subset and which most templating languages have built-in support for, is also allowed.
 
-Note that `data-*` attributes are case-insensitive. If you want to use uppercase characters in signal names, you'll need to kebabize them or use object syntax. So the signal name `mySignal` must be written as `data-signals-my-signal` or `data-signals="{mySignal: 1}"`.
-
-You can further modify the casing of keys in `data-*` attributes using the `__case` modifier, followed by `.kebab`, `.snake`, or `.pascal`.
+Keys used in `data-signals-*` are converted to camel case, so the signal name `mySignal` must be written as `data-signals-my-signal` or `data-signals="{mySignal: 1}"`.
 
 Signals beginning with an underscore are considered _local signals_ and are not included in requests to the backend by default. You can include them by setting the [`includeLocal`](/reference/action_plugins#options) option to `true`.
+
+Signal names cannot begin or contain double underscores (`__`), due to its use as a modifer delimiter.
 
 #### Modifiers
 
 Modifiers allow you to modify behavior when merging signals.
 
+- `__case` - Converts the casing of the signal name.
+  - `.camel` - Camel case: `mySignal` (default for signal names)
+  - `.kebab` - Kebab case: `my-signal` (default for everything else)
+  - `.snake` - Snake case: `my_signal`
+  - `.pascal` - Pascal case: `MySignal`
 - `__ifmissing` - Only merges signals if their keys do not already exist. This is useful for setting defaults without overwriting existing values.
 
 ```html
-<div data-signals-foo__ifmissing="1"></div>
+<div data-signals-my-signal__case.kebab="1" 
+     data-signals-foo__ifmissing="1"
+></div>
+```
+
+When supplying signals in bulk with object notation, modifiers can also be used:
+
+```html
+<!-- Merges the signal `mySignal` -->
+<div data-signals="{mySignal: 'value'}"></div>
+
+<!-- Merges the signal `mySignal` only if it doesn't already exist -->
+<div data-signals__ifmissing="{mySignal: 'init-value'}"></div>
+
+<!-- Defines a kebab cased signal `my-signal` using object notation -->
+<div data-signals="{'my-signal': 'value'}"></div>
+
+<!-- It is possible to set both `data-signals__ifmissing` and `data-signals` on the same element -->
+<div data-signals="{'my-signal': 'value'}"
+     data-signals__ifmissing="{widgetStatus: 'initial'}">
+</div>
 ```
 
 ### `data-computed`
@@ -95,31 +165,55 @@ Computed signals are useful for memoizing expressions containing other signals. 
 <div data-text="$foo"></div>
 ```
 
-### `data-ref`
+`data-computed` is a pure reactive function, this has several implications:
 
-Creates a new signal that is a reference to the element on which the data attribute is placed.
-
-```html
-<div data-ref-foo></div>
-```
-
-The signal name can be specified in the key (as above), or in the value (as below). This can be useful depending on the templating language you are using.
+1. If a computed signal is not consumed, then the computation will not execute.
+2. Computed signals must not be used for performing actions (changing other signals, actions, JavaScript functions, etc.).
 
 ```html
-<div data-ref="foo"></div>
+<!-- This computation will never execute because $foo is not used anywhere -->
+<div data-computed-foo="$bar + $baz"></div> <!-- WRONG -->
+
+<!-- Computed signals must *not* be used for side effects -->
+<div data-computed-qux="@post('/qux'); 'quxed'"></div> <!-- WRONG -->
+<div data-computed-foo="$bar++"></div> <!-- WRONG -->
 ```
 
-The signal value can then be used to reference the element.
+If you find yourself wanting to perform some action in reaction to a signal change, refer to the [`data-on-signals-change`](#special-events) attribute in the [`data-on` plugin](#data-on)
+
+#### Modifiers
+
+Modifiers allow you to modify behavior when defining computed signals.
+
+- `__case` - Converts the casing of the signal name.
+  - `.camel` - Camel case: `mySignal` (default)
+  - `.kebab` - Kebab case: `my-signal`
+  - `.snake` - Snake case: `my_signal`
+  - `.pascal` - Pascal case: `MySignal`
 
 ```html
-`foo` holds a <span data-text="$foo.tagName"></span> element.
+<div data-computed-my-signal__case.kebab="$bar + $baz"></div>
 ```
 
-## DOM Plugins
+### `data-star-ignore`
 
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/dom/attributes)
+Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element and its descendants by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries, or when you are unable to [escape user input](/reference/security#escape-user-input).
 
-Allows the usage of signals and expressions to affect the DOM.
+```html
+<div data-star-ignore data-show-thirdpartylib>
+  <div data-show-thirdpartylib>
+    These element will not be processed by Datastar.
+  </div>
+</div>
+```
+
+#### Modifiers
+
+- `__self` - Only ignore the element itself, not its descendants.
+
+## DOM Attributes
+
+Allow the usage of signals and expressions to affect the DOM.
 
 ### `data-attr`
 
@@ -174,6 +268,20 @@ Multiple input values can be assigned to a single signal by predefining the sign
 </div>
 ```
 
+#### Modifiers
+
+Modifiers allow you to modify behavior when binding signals.
+
+- `__case` - Converts the casing of the signal name.
+  - `.camel` - Camel case: `mySignal` (default)
+  - `.kebab` - Kebab case: `my-signal`
+  - `.snake` - Snake case: `my_signal`
+  - `.pascal` - Pascal case: `MySignal`
+
+```html
+<input data-bind-my-signal__case.kebab />
+```
+
 ### `data-class`
 
 Adds or removes a class to or from an element based on an expression.
@@ -188,6 +296,20 @@ The `data-class` attribute can also be used to add or remove multiple classes fr
 
 ```html
 <div data-class="{hidden: $foo, 'font-bold': $bar}"></div>
+```
+
+#### Modifiers
+
+Modifiers allow you to modify behavior defining a class name.
+
+- `__case` - Converts the casing of the class.
+  - `.camel` - Camel case: `myClass`
+  - `.kebab` - Kebab case: `my-class` (default)
+  - `.snake` - Snake case: `my_class`
+  - `.pascal` - Pascal case: `MyClass`
+
+```html
+<div data-class-my-class__case.camel="$foo"></div>
 ```
 
 ### `data-on`
@@ -213,7 +335,12 @@ Datastar provides a few special events of its own:
 1. `data-on-load` is triggered when an element is loaded into the DOM.
 2. `data-on-interval` is triggered at a regular interval. The interval duration defaults to 1 second and can be modified using the `__duration` modifier.
 3. `data-on-raf` is triggered on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.
-4. `data-on-signals-change` is triggered when any signals change. A key can be provided to only trigger the event when the signal with that key changes (`data-on-signals-change-foo`).
+4. `data-on-signals-change` is triggered when any signals change. This is useful when you need to perform side effects. A key can be provided to only trigger the event when the signal with that key changes (`data-on-signals-change-foo`).
+
+    ```html
+    <!-- Will execute a side effect when $foo changes -->
+    <div data-on-signals-change-foo="doSideEffect($foo)"></div>
+    ```
 
 Note that the `evt` variable is _not_ available in the expression when using special events.
 
@@ -224,6 +351,11 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 - `__once` \* - Only trigger the event listener once.
 - `__passive` \* - Do not call `preventDefault` on the event listener.
 - `__capture` \* - Use a capture event listener.
+- `__case` - Converts the casing of the event.
+  - `.camel` - Camel case: `myEvent`
+  - `.kebab` - Kebab case: `my-event` (default)
+  - `.snake` - Snake case: `my_event`
+  - `.pascal` - Pascal case: `MyEvent`
 - `__delay` - Delay the event listener.
   - `.500ms` - Delay for 500 milliseconds.
   - `.1s` - Delay for 1 second.
@@ -250,45 +382,57 @@ Modifiers allow you to modify behavior when events are triggered. Some modifiers
 \* Only works on built-in events.
 
 ```html
-<div data-on-click__window__debounce.500ms.leading="$foo = ''"></div>
+<div data-on-click__window__debounce.500ms.leading="$foo = ''"
+     data-on-my-event__case.camel="$foo = ''"
+></div>
 ```
 
-### `data-persist`
+### `data-ref`
 
-Persists signals in Local Storage. This is useful for storing values between page loads.
+Creates a new signal that is a reference to the element on which the data attribute is placed.
 
 ```html
-<div data-persist></div>
+<div data-ref-foo></div>
 ```
 
-If one or more space-separated values are provided as a string, only those signals are persisted.
+The signal name can be specified in the key (as above), or in the value (as below). This can be useful depending on the templating language you are using.
 
 ```html
-<div data-persist="foo bar"></div>
+<div data-ref="foo"></div>
 ```
 
-If a key is provided, it will be used as the key when saving in storage, otherwise `datastar` will be used.
+The signal value can then be used to reference the element.
 
 ```html
-<div data-persist-mykey="foo bar"></div>
+`$foo` holds a <span data-text="$foo.tagName"></span> element.
 ```
 
 #### Modifiers
 
-Modifiers allow you to modify the storage target.
+Modifiers allow you to modify behavior when defining references.
 
-- `__session` - Persists signals in Session Storage.
+- `__case` - Converts the casing of the signal name.
+  - `.camel` - Camel case: `mySignal` (default)
+  - `.kebab` - Kebab case: `my-signal`
+  - `.snake` - Snake case: `my_signal`
+  - `.pascal` - Pascal case: `MySignal`
 
 ```html
-<div data-persist__session></div>
+<div data-ref-my-signal__case.kebab></div>
 ```
 
-### `data-replace-url`
+### `data-show`
 
-Replaces the URL in the browser without reloading the page. The value can be a relative or absolute URL, and is an evaluated expression.
+Show or hides an element based on whether an expression evaluates to `true` or `false`. For anything with custom requirements, use [`data-class`](#data-class) instead.
 
 ```html
-<div data-replace-url="`/page${page}`"></div>
+<div data-show="$foo"></div>
+```
+
+To prevent flickering of the element before Datastar has processed the DOM, you can add a `display: none` style to the element to hide it initially.
+
+```html
+<div data-show="$foo" style="display: none"></div>
 ```
 
 ### `data-text`
@@ -299,11 +443,46 @@ Binds the text content of an element to an expression.
 <div data-text="$foo"></div>
 ```
 
-## Browser Plugins
+## Backend Attributes
 
-[Source Code](https://github.com/starfederation/datastar/tree/main/library/src/plugins/official/browser/attributes)
+Add integrations with [backend plugin actions](/reference/action_plugins#backend-plugins).
 
-Focused on showing and hiding elements based on signals. Most of the time you want to send updates from the server but is useful for things like modals, dropdowns, and other UI elements.
+### `data-indicator`
+
+Creates a signal and sets its value to `true` while an SSE request request is in flight, otherwise `false`. The signal can be used to show a loading indicator.
+
+```html
+<button data-on-click="@get('/endpoint')" data-indicator-fetching></button>
+```
+
+This can be useful for show a loading spinner, disabling a button, etc.
+
+```html
+<button
+  data-on-click="@get('/endpoint')"
+  data-indicator-fetching
+  data-attr-disabled="$fetching"
+></button>
+<div data-show="$fetching">Loading...</div>
+```
+
+The signal name can be specified in the key (as above), or in the value (as below). This can be useful depending on the templating language you are using.
+
+```html
+<button data-indicator="fetching"></button>
+```
+
+#### Modifiers
+
+Modifiers allow you to modify behavior when defining indicator signals.
+
+- `__case` - Converts the casing of the signal name.
+  - `.camel` - Camel case: `mySignal` (default)
+  - `.kebab` - Kebab case: `my-signal`
+  - `.snake` - Snake case: `my_signal`
+  - `.pascal` - Pascal case: `MySignal`
+
+## Browser Attributes
 
 ### `data-custom-validity`
 
@@ -339,6 +518,38 @@ Modifiers allow you to modify the element intersection behavior.
 <div data-intersects__once="$intersected = true"></div>
 ```
 
+### `data-persist`
+
+Persists signals in Local Storage. This is useful for storing values between page loads.
+
+```html
+<div data-persist></div>
+```
+
+If one or more space-separated values are provided as a string, only those signals are persisted.
+
+```html
+<div data-persist="foo bar"></div>
+```
+
+#### Modifiers
+
+Modifiers allow you to modify the storage target.
+
+- `__session` - Persists signals in Session Storage.
+
+```html
+<div data-persist__session="foo bar"></div>
+```
+
+### `data-replace-url`
+
+Replaces the URL in the browser without reloading the page. The value can be a relative or absolute URL, and is an evaluated expression.
+
+```html
+<div data-replace-url="`/page${page}`"></div>
+```
+
 ### `data-scroll-into-view`
 
 Scrolls the element into view. Useful when updating the DOM from the backend, and you want to scroll to the new content.
@@ -368,14 +579,6 @@ Modifiers allow you to modify scrolling behavior.
 <div data-scroll-into-view__smooth></div>
 ```
 
-### `data-show`
-
-Show or hides an element based on whether an expression evaluates to `true` or `false`. For anything with custom requirements, use [`data-class`](#data-class) instead.
-
-```html
-<div data-show="$foo"></div>
-```
-
 ### `data-view-transition`
 
 Sets the `view-transition-name` style attribute explicitly.
@@ -386,62 +589,12 @@ Sets the `view-transition-name` style attribute explicitly.
 
 Page level transitions are automatically handled by an injected meta tag. Inter-page elements are automatically transitioned if the [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API) is available in the browser and `useViewTransitions` is `true`.
 
-## Backend Plugins
-
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/backend/attributes)
-
-Adds integrations with [backend plugin actions](/reference/action_plugins#backend-plugins).
-
-### `data-indicator`
-
-Creates a signal and sets its value to `true` while an SSE request request is in flight, otherwise `false`. The signal can be used to show a loading indicator.
-
-```html
-<button data-on-click="@get('/endpoint')" data-indicator-fetching></button>
-```
-
-This can be useful for show a loading spinner, disabling a button, etc.
-
-```html
-<button
-  data-on-click="@get('/endpoint')"
-  data-indicator-fetching
-  data-attr-disabled="$fetching"
-></button>
-<div data-show="$fetching">Loading...</div>
-```
-
-The signal name can be specified in the key (as above), or in the value (as below). This can be useful depending on the templating language you are using.
-
-```html
-<button data-indicator="fetching"></button>
-```
-
-## Ignoring Elements
-
-### `data-star-ignore`
-
-Datastar walks the entire DOM and applies plugins to each element it encounters. It's possible to tell Datastar to ignore an element and its descendants by placing a `data-star-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries, or when you are unable to [escape user input](/reference/security#escape-user-input).
-
-```html
-<div data-star-ignore data-show-thirdpartylib>
-  <div data-show-thirdpartylib>
-    These element will not be processed by Datastar.
-  </div>
-</div>
-```
-
-#### Modifiers
-
-- `__self` - Only ignore the element itself, not its descendants.
-
-
 ## Aliasing Data Attributes
 
 It is possible to alias `data-*` attributes to a custom alias (`data-foo-*`, for example) using the [bundler](/bundler). A custom alias should _only_ be used if you have a conflict with a legacy library and [`data-star-ignore`](#data-star-ignore) cannot be used.
 
-We maintain a `data-ds-*` aliased version that can be included as follows.
+We maintain a `data-star-*` aliased version that can be included as follows.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.9/bundles/datastar-aliased.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.10/bundles/datastar-aliased.js"></script>
 ```

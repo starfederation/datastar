@@ -1,7 +1,6 @@
 namespace StarFederation.Datastar.DependencyInjection
 
 open System
-open System.Collections.Generic
 open System.Runtime.CompilerServices
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection

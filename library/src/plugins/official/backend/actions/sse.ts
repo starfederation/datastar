@@ -4,7 +4,7 @@
 
 import { DATASTAR, DATASTAR_REQUEST, DefaultSseRetryDurationMs } from '../../../../engine/consts'
 import { runtimeErr } from '../../../../engine/errors'
-import type { RuntimeContext } from '../../../../engine/types'
+import type { HTMLorSVGElement, RuntimeContext } from '../../../../engine/types'
 import {
   type FetchEventSourceInit,
   fetchEventSource,
@@ -18,10 +18,11 @@ import {
   STARTED,
 } from '../shared'
 
-function dispatchSSE(type: string, argsRaw: Record<string, string>) {
-  document.dispatchEvent(
+function dispatchSSE(el: HTMLorSVGElement, type: string, argsRaw: Record<string, string>) {
+  el.dispatchEvent(
     new CustomEvent<DatastarSSEEvent>(DATASTAR_SSE_EVENT, {
       detail: { type, argsRaw },
+      bubbles: true,
     }),
   )
 }
@@ -87,7 +88,7 @@ export const sse = async (
   const action = method.toLowerCase()
   let cleanupFn = (): void => {}
   try {
-    dispatchSSE(STARTED, { elId })
+    dispatchSSE(el, STARTED, { elId })
     if (!url?.length) {
       throw runtimeErr('SseNoUrlProvided', ctx, { action })
     }
@@ -113,7 +114,7 @@ export const sse = async (
       onopen: async (response: Response) => {
         if (response.status >= 400) {
           const status = response.status.toString()
-          dispatchSSE(ERROR, { status })
+          dispatchSSE(el, ERROR, { status })
         }
       },
       onmessage: (evt) => {
@@ -142,7 +143,7 @@ export const sse = async (
         }
 
         // if you aren't seeing your event you can debug by using this line in the console
-        dispatchSSE(type, argsRaw)
+        dispatchSSE(el, type, argsRaw)
       },
       onerror: (error) => {
         if (isWrongContent(error)) {
@@ -152,7 +153,7 @@ export const sse = async (
         // do nothing and it will retry
         if (error) {
           console.error(error.message)
-          dispatchSSE(RETRYING, { message: error.message })
+          dispatchSSE(el, RETRYING, { message: error.message })
         }
       },
     }
@@ -204,7 +205,7 @@ export const sse = async (
     urlInstance.search = queryParams.toString()
 
     try {
-      await fetchEventSource(ctx, urlInstance.toString(), req)
+      await fetchEventSource(urlInstance.toString(), req)
     } catch (error) {
       if (!isWrongContent(error)) {
         throw runtimeErr('SseFetchFailed', ctx, { method, url, error })
@@ -215,7 +216,7 @@ export const sse = async (
       // set the content-type to text/event-stream
     }
   } finally {
-    dispatchSSE(FINISHED, { elId })
+    dispatchSSE(el, FINISHED, { elId })
     cleanupFn()
   }
 }

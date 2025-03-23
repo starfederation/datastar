@@ -2,7 +2,7 @@
   "name": "@starfederation/datastar",
   "author": "Delaney Gillilan",
   "description": "The hypermedia framework.",
-  "version": "1.0.0-beta.9",
+  "version": "1.0.0-beta.10",
   "license": "MIT",
   "private": false,
   "homepage": "https://data-star.dev",
@@ -18,6 +18,24 @@
   ],
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./plugins": {
+      "import": "./dist/plugins/index.js",
+      "types": "./dist/plugins/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/engine/types.js",
+      "types": "./dist/engine/types.d.ts"
+    },
+    "./bundles/*": {
+      "import": "./dist/bundles/*.js",
+      "types": "./dist/bundles/*.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsc"
   },

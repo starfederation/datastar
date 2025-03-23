@@ -11,8 +11,7 @@ func setupTestsMergeFragmentSignals(testsRouter chi.Router) error {
 	
 	testsRouter.Get("/merge_fragment_signals/data", func(w http.ResponseWriter, r *http.Request) {
 		sse := datastar.NewSSE(w, r)
-		sse.MergeFragments(`<div id="content" data-signals-result="1"></div>
-}`)
+		sse.MergeFragments(`<div id="content" data-signals-result="1"></div>`)
 	})
 
 	return nil

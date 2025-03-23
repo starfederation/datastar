@@ -5,7 +5,6 @@
 
 namespace starfederation\datastar;
 
-use starfederation\datastar\enums\EventType;
 use starfederation\datastar\enums\FragmentMergeMode;
 use starfederation\datastar\events\EventInterface;
 use starfederation\datastar\events\ExecuteScript;
@@ -70,7 +69,6 @@ class ServerSentEventGenerator
      * @param array{
      *     selector?: string|null,
      *     mergeMode?: FragmentMergeMode|string|null,
-     *     settleDuration?: int|null,
      *     useViewTransition?: bool|null,
      *     eventId?: string|null,
      *     retryDuration?: int|null,
@@ -128,55 +126,11 @@ class ServerSentEventGenerator
     }
 
     /**
-     * Sends an event.
+     * Sends an event and flushes the output buffer.
      */
     protected function sendEvent(EventInterface $event): void
     {
-        $this->send(
-            $event->getEventType(),
-            $event->getDataLines(),
-            $event->getOptions(),
-        );
-    }
-
-    /**
-     * Sends a Datastar event.
-     *
-     * @param EventType $eventType
-     * @param string[] $dataLines
-     * @param array{
-     *     eventId?: string|null,
-     *     retryDuration?: int|null,
-     * } $options
-     */
-    protected function send(EventType $eventType, array $dataLines, array $options = []): void
-    {
-        $eventData = new ServerSentEventData(
-            $eventType,
-            $dataLines,
-            $options['eventId'] ?? null,
-            $options['retryDuration'] ?? Consts::DEFAULT_SSE_RETRY_DURATION,
-        );
-
-        foreach ($options as $key => $value) {
-            $eventData->$key = $value;
-        }
-
-        $output = ['event: ' . $eventData->eventType->value];
-
-        if ($eventData->eventId !== null) {
-            $output[] = 'id: ' . $eventData->eventId;
-        }
-
-        if ($eventData->retryDuration !== Consts::DEFAULT_SSE_RETRY_DURATION) {
-            $output[] = 'retry: ' . $eventData->retryDuration;
-        }
-
-        foreach ($eventData->data as $line) {
-            $output[] = $line;
-        }
-
-        echo implode("\n", $output) . "\n\n";
+        echo $event->getOutput();
 
         if (ob_get_contents()) {
             ob_end_flush();

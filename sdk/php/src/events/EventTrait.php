@@ -6,6 +6,7 @@
 namespace starfederation\datastar\events;
 
 use starfederation\datastar\Consts;
+use starfederation\datastar\ServerSentEventData;
 
 trait EventTrait
 {
@@ -59,5 +60,39 @@ trait EventTrait
         }
 
         return $dataLines;
+    }
+
+    /**
+     * @inerhitdoc
+     */
+    public function getOutput(): string
+    {
+        $options = $this->getOptions();
+        $eventData = new ServerSentEventData(
+            $this->getEventType(),
+            $this->getDataLines(),
+            $options['eventId'] ?? null,
+            $options['retryDuration'] ?? Consts::DEFAULT_SSE_RETRY_DURATION,
+        );
+
+        foreach ($options as $key => $value) {
+            $eventData->$key = $value;
+        }
+
+        $output = ['event: ' . $eventData->eventType->value];
+
+        if ($eventData->eventId !== null) {
+            $output[] = 'id: ' . $eventData->eventId;
+        }
+
+        if ($eventData->retryDuration !== Consts::DEFAULT_SSE_RETRY_DURATION) {
+            $output[] = 'retry: ' . $eventData->retryDuration;
+        }
+
+        foreach ($eventData->data as $line) {
+            $output[] = $line;
+        }
+
+        return implode("\n", $output) . "\n\n";
     }
 }

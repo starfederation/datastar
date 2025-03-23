@@ -52,7 +52,7 @@ This button swap is happening in the backend.  Each click is causing a transitio
 
 If you want to fade out an element that is going to be removed when the request ends, just send an SSE event with the opacity set to 0 and set a transition duration. This will fade out the element before it is removed.
 
-## Settling Transitions
+## Transitions
 
 ### Fade In On Addition
 
@@ -67,7 +67,6 @@ Building on the last example, we can fade in the new content the same way, start
 One of the nice features for reactivity is to show a spinner when a request is in flight. On any element that is using backend actions you can add a `data-indicator` attribute to show a spinner when the request is in flight. This can be done like so:
 
 ```html
-<div data-show="$fetching">Spinner</div>
 <button
   id="submit_request_in_flight"
   data-on-click="@post('/examples/animations/data/request_in_flight')"
@@ -75,6 +74,7 @@ One of the nice features for reactivity is to show a spinner when a request is i
 >
   Submit
 </button>
+<div data-show="$fetching">Spinner</div>
 ```
 
 This will show the spinner element when the request is in flight and hide it when the request is complete.

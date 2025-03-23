@@ -2,9 +2,25 @@
 
 Datastar provides the following actions, that can be used in Datastar expressions.
 
-## Backend Plugins
+### Backend Actions
 
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/backend/actions)
+- [`@get()`](#@get)
+- [`@post()`](#@post)
+- [`@put()`](#@put)
+- [`@patch()`](#@patch)
+- [`@delete()`](#@delete)
+
+### Browser Actions
+
+- [`@clipboard()`](#@clipboard)
+
+### Utility Actions
+
+- [`@fit()`](#@fit)
+- [`@setAll()`](#@setall)
+- [`@toggleAll()`](#@toggleall)
+
+## Backend Actions
 
 Allow for the integration of any backend service that supports SSE.
 
@@ -21,6 +37,8 @@ Sends a `GET` request to the backend using `fetch`, and merges the response with
 By default, all requests are sent with a `{datastar: *}` object containing the current signals (except for local signals whose keys begin with an underscore). When using a `get` request, the signals are sent as a query parameter, otherwise they are send as a JSON body.
 
 It is possible to send form encoded requests by setting the `contentType` option to `form`. This sends GET requests using `application/x-www-form-urlencoded` encoding and non-GET requests using `multipart/form-data` encoding. See the [form data example](/examples/form_data).
+
+Note that when a page is hidden (in a background tab, for example), the default behavior is for the SSE connection to be closed, and reopened when the page becomes visible again. To keep the connection open when the page is hidden, set the [`openWhenHidden`](#options) option to `true`.
 
 ### `@post()`
 
@@ -100,11 +118,9 @@ All of the actions above trigger `datastar-sse` events during the SSE request li
 <div data-on-datastar-sse="evt.detail.type == 'error' && console.log('SSE error encountered')"></div>
 ```
 
-## Browser Plugins
+## Browser Actions
 
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/browser/actions)
-
-Provides actions for performing browser operations.
+Actions for performing browser operations.
 
 ### `@clipboard()`
 
@@ -116,11 +132,13 @@ Copies the provided evaluated expression to the clipboard.
 <div data-on-click="@clipboard('Hello, world!')"></div>
 ```
 
-## Logic Plugins
+## Utility Actions
 
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/logic/actions)
+### `@fit()`
 
-Provides actions for performing logic operations.
+Arguments: `@fit(v: number, oldMin: number, oldMax: number, newMin: number, newMax: number, shouldClamp=false, shouldRound=false)`
+
+Make a value linear interpolate from an original range to new one.
 
 ### `@setAll()`
 
@@ -141,9 +159,3 @@ Toggles all the signals that start with the prefix. This is useful for toggling 
 ```html
 <div data-on-click="@toggleAll('foo.')"></div>
 ```
-
-### `@fit()`
-
-Arguments: `@fit(v: number, oldMin: number, oldMax: number, newMin: number, newMax: number, shouldClamp=false, shouldRound=false)`
-
-Make a value linear interpolate from an original range to new one.

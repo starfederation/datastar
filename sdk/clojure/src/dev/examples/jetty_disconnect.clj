@@ -3,11 +3,15 @@
     [examples.utils :as u]
     [reitit.ring :as rr]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response on-open on-close]]))
 
 
 ;; This is a small experiment to determine the behaviour of
 ;; ring jetty in the face of the client disconnecting
+
+
+;; 2 tiny events to detect a lost connection or 1 big event
+;; Jetty internal buffer has an impact
 
 (def !conn (atom nil))
 
@@ -23,10 +27,14 @@
   (try
     (respond
       (->sse-response req
-        {:on-open
+        {on-open
          (fn [sse]
            (reset! !conn sse)
-           (d*/console-log! sse "'connected'"))}))
+           (d*/console-log! sse "'connected'"))
+         on-close
+         (fn [_sse]
+           (println "Connection lost detected")
+           (reset! !conn nil))}))
     (catch Exception e
       (raise e))))
 
@@ -57,27 +65,8 @@
 (comment
   (-> !conn deref d*/close-sse!)
   (send-tiny-event!)
-  (d*/console-log! @!conn "'toto'")
+  (send-big-event!)
 
-  (def res
-    (try
-      (send-big-event!)
-      (catch Exception e e)))
-  (-> res
-      (ex-cause)
-      (ex-cause)
-      (ex-cause)); broken pipe
-
-  (def res2
-    (try
-      (send-big-event!)
-      (catch Exception e e)))
-  (-> res2
-      (ex-cause)
-      (ex-cause)
-      (ex-cause))) ;closed
-
-(comment
   (u/clear-terminal!)
   (u/reboot-jetty-server! #'handler {:async? true}))
 

@@ -3,14 +3,12 @@
 const std = @import("std");
 
 pub const datastar_key = "datastar";
-pub const version = "1.0.0-beta.9";
+pub const version = "1.0.0-beta.10";
 
 // #region Defaults
 
 // #region Default durations
 
-/// The default duration for settling during fragment merges. Allows for CSS transitions to complete.
-pub const default_fragments_settle_duration = 300;
 /// The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
 pub const default_sse_retry_duration = 1000;
 
@@ -27,7 +25,6 @@ pub const default_execute_script_attributes = "type module";
 
 pub const selector_dataline_literal = "selector";
 pub const merge_mode_dataline_literal = "mergeMode";
-pub const settle_duration_dataline_literal = "settleDuration";
 pub const fragments_dataline_literal = "fragments";
 pub const use_view_transition_dataline_literal = "useViewTransition";
 pub const signals_dataline_literal = "signals";

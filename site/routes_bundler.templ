@@ -108,7 +108,7 @@ templ PageBundler(r *http.Request, manifest PluginManifest, store *BundlerStore)
 							{{
 								cdnUrl := templ.SafeURL(fmt.Sprintf("https://cdn.jsdelivr.net/gh/starfederation/datastar@%s/bundles/datastar-aliased.js", manifest.Version))
 							}}
-							We maintain a  <a href={ cdnUrl }><code>data-ds-*</code> aliased version here</a>.
+							We maintain a  <a href={ cdnUrl }><code>data-star-*</code> aliased version here</a>.
 						</div>
 					</div>
 					<input type="text" class="input input-bordered w-full lowercase" data-bind-alias/>

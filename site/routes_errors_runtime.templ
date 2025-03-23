@@ -108,7 +108,7 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 				{{
 					suggestedSignals := []string{}
 					for _, signal := range info.Expression.ValidSignals {
-						if strings.HasPrefix(signal, signalMatch) {
+						if signal == signalMatch || strings.HasPrefix(signal, signalMatch + ".") {
 							suggestedSignals = append(suggestedSignals, signal)
 						}
 					}
@@ -237,6 +237,15 @@ templ OnValueRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@valueRequired("on")
 		@onError()
+	}
+}
+
+templ PersistKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("persist", info.Expression.Key)
+		<p>The <code>data-persist</code> attribute must <em>not</em> have a key. If one or more space-separated values are provided as a string, only those signals are persisted.</p>
+		@sampleCode("Example", "html", `<div data-persist="foo bar"></div>`)
+		@attributeDocs("persist")
 	}
 }
 
@@ -486,7 +495,7 @@ templ replaceUrlError() {
 }
 
 templ scrollIntoViewError() {
-	<p> The <code>data-scroll-into-view</code> attribute must <em>not</em> have a key <em>nor</em> a value.</p>
+	<p>The <code>data-scroll-into-view</code> attribute must <em>not</em> have a key <em>nor</em> a value.</p>
 	@sampleCode("Example", "html", `<div data-scroll-into-view></div>`)
 	@attributeDocs("scroll-into-view")
 }

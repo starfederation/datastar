@@ -4,13 +4,14 @@
     [examples.utils :as u]
     [reitit.ring :as rr]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response on-open on-close]]))
 
+;; Testing several ways exception might be caught when using a ring adapter
 
 (defn faulty-event
   ([req]
    (->sse-response req
-     {:on-open
+     {on-open
       (fn [sse]
         (d*/with-open-sse sse
           (try
@@ -22,7 +23,7 @@
   ([req respond raise]
    (respond
      (->sse-response req
-       {:on-open
+       {on-open
         (fn [sse]
           (d*/with-open-sse sse
             (try

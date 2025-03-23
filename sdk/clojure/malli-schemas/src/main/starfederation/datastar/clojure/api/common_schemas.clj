@@ -6,7 +6,9 @@
     [starfederation.datastar.clojure.consts :as consts]
     [starfederation.datastar.clojure.protocols :as p]))
 
-(def sse-gen-schema [:fn #(satisfies? p/SSEGenerator %)])
+(def sse-gen-schema [:fn {:error/message "argument should be a SSEGenerator"}
+                     p/sse-gen?])
+
 
 (def event-type-schema
   [:enum
@@ -57,7 +59,6 @@
       [:map
        [common/selector :string]
        [common/merge-mode merge-modes-schema]
-       [common/settle-duration number?]
        [common/use-view-transition :boolean]])))
 
 ;; -----------------------------------------------------------------------------
@@ -68,12 +69,11 @@
     sse-options-schema
     (mu/optional-keys
       [:map
-       [common/settle-duration number?]
        [common/use-view-transition :boolean]])))
 
 
 ;; -----------------------------------------------------------------------------
-(def signals-schema [:seqable :string])
+(def signals-schema :string)
 
 (def merge-signals-options-schemas
   (mu/merge
@@ -84,7 +84,7 @@
 
 
 ;; -----------------------------------------------------------------------------
-(def signal-paths-schema :string)
+(def signal-paths-schema [:seqable :string])
 
 (def remove-signals-options-schemas sse-options-schema)
 

@@ -36,17 +36,23 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "checkbox_boolean_checked"},
 				{ID: "checkbox_value"},
 				{ID: "checkbox_value_checked"},
+				{ID: "custom_plugin"},
+				{ID: "indicator"},
+				{ID: "indicator_element_removed"},
 				{ID: "input_array"},
 				{ID: "input_signal"},
 				{ID: "input_value"},
 				{ID: "key_casing"},
 				{ID: "local_signals"},
 				{ID: "merge_fragment"},
+				{ID: "merge_fragment_input_value"},
 				{ID: "merge_fragment_on_load"},
+				{ID: "merge_fragment_outer_multiple_targets"},
 				{ID: "merge_fragment_signals"},
 				{ID: "merge_fragment_whitespace"},
 				{ID: "on_load"},
 				{ID: "on_load_delay"},
+				{ID: "plugin_name_prefix"},
 				{ID: "radio_value"},
 				{ID: "ref"},
 				{ID: "remove_fragment"},
@@ -55,6 +61,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "signals_change"},
 				{ID: "signals_change_path"},
 				{ID: "signals_change_path_once"},
+				{ID: "sse_events"},
 			},
 		},
 	}
@@ -107,12 +114,17 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 		})
 
 		if err := errors.Join(
+			setupTestsIndicator(testsRouter),
+			setupTestsIndicatorElementRemoved(testsRouter),
 			setupTestsMergeFragment(testsRouter),
+			setupTestsMergeFragmentInputValue(testsRouter),
 			setupTestsMergeFragmentOnLoad(testsRouter),
+			setupTestsMergeFragmentOuterMuplipleTargets(testsRouter),
 			setupTestsMergeFragmentSignals(testsRouter),
 			setupTestsMergeFragmentWhitespace(testsRouter),
 			setupTestsOnLoad(testsRouter),
 			setupTestsRemoveFragment(testsRouter),
+			setupTestsSseEvents(testsRouter),
 		); err != nil {
 			panic(fmt.Sprintf("error setting up tests routes: %s", err))
 		}

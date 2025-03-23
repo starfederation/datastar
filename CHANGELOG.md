@@ -4,15 +4,26 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 # WIP Release Notes
 
-## v1.0.0-beta.9
+## v1.0.0-beta.10
 
-### Added
+### Changed
 
-- Added the ability for input elements to set bound signals to an array of values by predefining the signal as an array.
+- Updated Idiomorph to version [0.7.3](https://github.com/bigskysoftware/idiomorph/releases/tag/v0.7.3).
+- Classes used in `data-class-*` attributes now default to kebab-case ([#761](https://github.com/starfederation/datastar/issues/761)).
+- Events used in `data-on-*` attributes now default to kebab-case ([#761](https://github.com/starfederation/datastar/issues/761)).
+- Keys used in `data-persist-*` attributes now default to kebab-case.
+- The `datastar-sse` event is now dispatched on the element itself ([#761](https://github.com/starfederation/datastar/issues/761)).
+- The NPM package now also exports all plugins and bundles ([#742](https://github.com/starfederation/datastar/issues/742)).
+- Data attributes with plugin names in their prefix are no longer processed ([#771](https://github.com/starfederation/datastar/issues/771)).
+- The alias used in the aliased bundle has been renamed to `star` (`data-star-*`) ([#772](https://github.com/starfederation/datastar/issues/772)).
 
 ### Fixed
 
-- Fixed a bug in which `data-signals` was being reapplied each time any attribute changed on an element ([#709](https://github.com/starfederation/datastar/issues/709)).
-- Fixed a bug in which focus was not being restored to input elements after merging fragments ([#710](https://github.com/starfederation/datastar/issues/710)).
-- Fixed a bug in which the `__delay` modifier was being ignored ([#720](https://github.com/starfederation/datastar/issues/720)).
-- Fixed a bug in which signals bound to text input elements with a `value` attribute were being reset to the value when the entered value was empty.
+- Fixed the applying of plugins to give custom plugins a chance to load ([#740](https://github.com/starfederation/datastar/issues/740)).
+- Fixed a bug in which the indicator signal was not being reset when the element it was on was removed from the DOM ([#749](https://github.com/starfederation/datastar/issues/749)).
+- Fixed a bug in which merging multiple targets was not working correctly ([#780](https://github.com/starfederation/datastar/issues/780)).
+
+### Removed
+
+- Removed the ability to use a key with the `data-persist` attribute.
+- Removed settling from SSE events, which has become redundant ([#764](https://github.com/starfederation/datastar/issues/764)).

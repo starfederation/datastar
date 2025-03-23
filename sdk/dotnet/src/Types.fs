@@ -1,9 +1,12 @@
 namespace StarFederation.Datastar
 
 open System
+open System.Collections.Generic
 open System.Text.Json
+open System.Text.Json.Nodes
 open System.Text.RegularExpressions
 open System.Threading.Tasks
+open StarFederation.Datastar.Utility
 
 type ServerSentEvent =
     { EventType: EventType
@@ -19,7 +22,7 @@ type Signals = string
 /// <summary>
 /// A dotted path into Signals to access a key/value pair
 /// </summary>
-type SignalsPath = string
+type SignalPath = string
 
 /// <summary>
 /// An HTML selector name
@@ -29,7 +32,6 @@ type Selector = string
 type MergeFragmentsOptions =
     { Selector: Selector voption
       MergeMode: FragmentMergeMode
-      SettleDuration: TimeSpan
       UseViewTransition: bool
       EventId: string voption
       Retry: TimeSpan }
@@ -38,8 +40,7 @@ type MergeSignalsOptions =
       EventId: string voption
       Retry: TimeSpan }
 type RemoveFragmentsOptions =
-    { SettleDuration: TimeSpan
-      UseViewTransition: bool
+    { UseViewTransition: bool
       EventId: string voption
       Retry: TimeSpan }
 type ExecuteScriptOptions =
@@ -53,9 +54,9 @@ type EventOptions = { EventId: string voption; Retry: TimeSpan }
 /// Read the signals from the request
 /// </summary>
 type IReadSignals =
-    abstract ReadSignals: unit -> ValueTask<Signals voption>
-    abstract ReadSignals<'T>: unit -> ValueTask<'T voption>
-    abstract ReadSignals<'T>: JsonSerializerOptions -> ValueTask<'T voption>
+    abstract ReadSignals: unit -> Task<Signals voption>
+    abstract ReadSignals<'T>: unit -> Task<'T voption>
+    abstract ReadSignals<'T>: JsonSerializerOptions -> Task<'T voption>
 
 /// <summary>
 /// Can send SSEs to the client
@@ -79,31 +80,57 @@ module ServerSentEvent =
         } |> String.concat "\n"
 
 module Signals =
-    let value = id
-    let create (signals:string) = Signals signals
-    let tryCreate (signals:string) = ValueSome (Signals signals)
+    let value (signals:Signals) : string = signals.ToString()
+    let create (signalsString:string) = Signals signalsString
+    let tryCreate (signalsString:string) =
+        try
+            let _ = JsonObject.Parse(signalsString)
+            ValueSome (Signals signalsString)
+        with _ -> ValueNone
     let empty = Signals "{ }"
 
-module SignalsPath =
-    let value = id
-    // TODO: Validation on string -> path
-    let create (signalsPath:string) = SignalsPath signalsPath
-    let tryCreate (signalsPath:string) = ValueSome (create signalsPath)
+module SignalPath =
+    let value (signalPath:SignalPath) = signalPath.ToString()
+    let isValidKey (signalPathKey:string) =
+        signalPathKey |> String.IsPopulated && signalPathKey.ToCharArray() |> Seq.forall (fun chr -> Char.IsLetter chr || Char.IsNumber chr || chr = '_')
+    let isValid (signalPathString:string) = signalPathString.Split('.') |> Array.forall isValidKey
+    let tryCreate (signalPathString:string) =
+        if isValid signalPathString
+        then ValueSome (SignalPath signalPathString)
+        else ValueNone
+    let sp (signalPathString:string) =
+        if isValid signalPathString
+        then SignalPath signalPathString
+        else failwith $"{signalPathString} is not a valid signal path"
+    let create = sp
+    let keys signalPath = signalPath |> value |> String.split ["."]
+    let createJsonNodePathToValue<'T> signalPath (signalValue:'T) =
+       signalPath
+        |> keys
+        |> Seq.rev
+        |> Seq.fold (fun json key ->
+            JsonObject([ KeyValuePair<string, JsonNode> (key, json) ]) :> JsonNode
+            ) (JsonValue.Create(signalValue) :> JsonNode)
+
 
 module Selector =
-    let value (selector:Selector) = selector
     let regex = Regex(@"[#.][-_]?[_a-zA-Z]+(?:\w|\\.)*|(?<=\s+|^)(?:\w+|\*)|\[[^\s""'=<>`]+?(?<![~|^$*])([~|^$*]?=(?:['""].*['""]|[^\s""'=<>`]+))?\]|:[\w-]+(?:\(.*\))?", RegexOptions.Compiled)
-    let create (selectorString:string) = Selector selectorString
-    let tryCreate (selector:string) =
-        match regex.IsMatch selector with
-        | true -> ValueSome (create selector)
-        | false -> ValueNone
+    let value (selector:Selector) = selector.ToString()
+    let isValid (selectorString:string) = regex.IsMatch selectorString
+    let tryCreate (selectorString:string) =
+        if isValid selectorString
+        then ValueSome (Selector selectorString)
+        else ValueNone
+    let sel (selectorString:string) =
+        if isValid selectorString
+        then Selector selectorString
+        else failwith $"{selectorString} is not a valid selector"
+    let create = sel
 
 module MergeFragmentsOptions =
     let defaults =
         { Selector = ValueNone
           MergeMode = Consts.DefaultFragmentMergeMode
-          SettleDuration = Consts.DefaultFragmentsSettleDuration
           UseViewTransition = Consts.DefaultFragmentsUseViewTransitions
           EventId = ValueNone
           Retry = Consts.DefaultSseRetryDuration }
@@ -116,8 +143,7 @@ module MergeSignalsOptions =
 
 module RemoveFragmentsOptions =
     let defaults =
-        { SettleDuration = Consts.DefaultFragmentsSettleDuration
-          UseViewTransition = Consts.DefaultFragmentsUseViewTransitions
+        { UseViewTransition = Consts.DefaultFragmentsUseViewTransitions
           EventId = ValueNone
           Retry = Consts.DefaultSseRetryDuration }
 

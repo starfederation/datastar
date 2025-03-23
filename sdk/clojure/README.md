@@ -2,12 +2,12 @@
 
 We provide several libraries for working with [Datastar](https://data-star.dev/):
 
-- A generic SDK to generate and send Datastar event using a SSE generator
-  abstraction defined by the `starfederation.datastar.clojure.protocols/SSEGenerator`
-  protocol. This gives us a common API working for each implementation of the protocol.
-- Libraries containing implementations of the `SSEGenerator` protocol that work
-  with specific ring adapters.
-- A library containing [malli schemas](https://github.com/metosin/malli) for the SDK.
+- A generic SDK to generate and send SSE events formatted for Datastar.
+- A SSE generator abstraction defined by the
+  `starfederation.datastar.clojure.protocols/SSEGenerator` protocol as well as
+  several libraries implementing it to work with specific ring adapters.
+- A library containing [malli schemas](https://github.com/metosin/malli)
+  covering the generic API and our adapter implementations.
 
 There currently are adapter implementations for:
 
@@ -19,8 +19,8 @@ If you want to roll your own adapter implementation, see
 
 ## Installation
 
-For now the libraries are distributed as git dependencies. You need to add a dependency
-for each library you use.
+For now the libraries are distributed as git dependencies. You need to add a
+dependency for each library you use.
 
 > [!important]
 > This project is new and there isn't a release process yet other than using git shas.
@@ -31,56 +31,54 @@ To your `deps.edn` file you can add the following coordinates:
 - SDK
 
 ```clojure
-datastar/sdk {:git/url "https://github.com/starfederation/datastar/"
-              :git/sha "LATEST_SHA"
-              :deps/root "sdk/clojure/sdk"}
+{datastar/sdk {:git/url "https://github.com/starfederation/datastar/"
+               :git/sha "LATEST_SHA"
+               :deps/root "sdk/clojure/sdk"}}
 ```
 
 - ring implementation
 
 ```clojure
-datastar/ring {:git/url "https://github.com/starfederation/datastar/"
-               :git/sha "LATEST_SHA"
-               :deps/root "sdk/clojure/adapter-ring"}}
+{datastar/ring {:git/url "https://github.com/starfederation/datastar/"
+                :git/sha "LATEST_SHA"
+                :deps/root "sdk/clojure/adapter-ring"}
 
-ring-compliant/adapter "Coordinate for the ring compliant adater you wanna use."
+ ring-compliant/adapter "Coordinate for the ring compliant adater you want to use."}
 ```
 
-> [!important]
-> This is library that should work for ring compliant adapters,
-> specifically those that use the `ring.core.protocols/StreamableResponseBody`
-> protocol for their response bodies.
+By ring compliant adapter we mean adapters that are implementing the
+`ring.core.protocols/StreamableResponseBody` protocol to deal with response bodies.
 
 - http-kit implementation
 
 ```clojure
-datastar/http-kit {:git/url "https://github.com/starfederation/datastar/"
-                   :git/sha "LATEST_SHA"
-                   :deps/root "sdk/clojure/adapter-http-kit"}}
+{datastar/http-kit {:git/url "https://github.com/starfederation/datastar/"
+                    :git/sha "LATEST_SHA"
+                    :deps/root "sdk/clojure/adapter-http-kit"}}
 ```
 
 - Malli schemas:
 
 ```clojure
-datastar/malli-schemas {:git/url "https://github.com/starfederation/datastar/"
-                        :git/sha "LATEST_SHA"
-                        :deps/root "sdk/clojure/malli-schemas"}}
+{datastar/malli-schemas {:git/url "https://github.com/starfederation/datastar/"
+                         :git/sha "LATEST_SHA"
+                         :deps/root "sdk/clojure/malli-schemas"}}
 ```
 
 ## Usage
 
-### Concepts
+### Basic Concepts
 
-By convention adapters provide a single `->sse-response` function. This
-function returns a valid ring response tailored to work with the used ring
-adapter. It takes callbacks that receive an implementation of the
-SSE generator as the first argument.
+By convention SDK adapters provide a single `->sse-response` function. This
+function returns a valid ring response tailored to work with the ring
+adapter it is made for. This function will receive an implementation of
+`SSEGenerator` protocol also tailored to the ring adapter used.
 
 You then use the Datastar SDK functions with the SSE generator.
 
 ### Short example
 
-Start by requiring the api and an adapter. With HTTP-Kit for instance:
+Start by requiring the main API and an adapter. With Http-kit for instance:
 
 ```clojure
 (require '[starfederation.datastar.clojure.api :as d*])
@@ -88,12 +86,12 @@ Start by requiring the api and an adapter. With HTTP-Kit for instance:
 
 ```
 
-Using the adapter you create ring responses for your handlers:
+Using the adapter you create ring responses in your handlers:
 
 ```clojure
 (defn sse-handler [request]
   (hk-gen/->sse-response request
-    {:on-open
+    {hk-gen/on-open
      (fn [sse-gen]
        (d*/merge-fragment! sse-gen "<div>test</div>")
        (d*/close-sse! sse-gen))}))
@@ -102,8 +100,8 @@ Using the adapter you create ring responses for your handlers:
 
 In the callback we use the SSE generator `sse-gen` with the Datastar SDK functions.
 
-Depending on the adapter you use, you can keep the SSE generator open, store it
-somewhere and use it later:
+Depending on the adapter you use, you can keep the SSE generator open by storing
+it somewhere and use it later:
 
 ```clojure
 (def !connections (atom #{}))
@@ -111,10 +109,11 @@ somewhere and use it later:
 
 (defn sse-handler [request]
   (hk-gen/->sse-response request
-    {:on-open
+    {hk-gen/on-open
      (fn [sse-gen]
        (swap! !connections conj sse-gen))
-     :on-close
+
+     hk-gen/on-close
      (fn [sse-gen status]
        (swap! !connections disj sse-gen))}))
 
@@ -125,67 +124,67 @@ somewhere and use it later:
 
 ```
 
-> [!important]
-> Check doctrings / Readmes for the specific adapter you use.
+Check the docstrings in the `starfederation.datastar.clojure.api` namespace for
+more details.
 
-> [!note]
-> Check the docstrings in the `starfederation.datastar.clojure.api` namespace for
-> more details on the SDK functions.
+### Advanced features
 
-## Adapter differences:
+This SDK is essentially a tool to manage SSE connections with helpers to format
+events the way the Datastar framework expects them on the front end.
 
-Ring adapters are not made equals. Here are some the differences for the ones we provide:
+It provides advanced functionality for managing several aspects of SSE.
 
-| Adapter  | return values from the SDK event sending functions |
-| -------- | -------------------------------------------------- |
-| ring     | irrelevant                                         |
-| http-kit | boolean, from `org.http-kit.server/send!`          |
+You can find more information in several places:
 
-> [!note]
-> The SDK's event sending functions return whatever the adapter's implementation of
-> `starfederation.datastar.clojure.protocols/send-event!` returns.
+- the docstings for the `->sse-response` function you are using.
+- the [SSE design notes document](/sdk/clojure/doc/SSE-design-notes.md) details
+  what considerations are taken into account in the SDK.
+- the [write profiles document](/sdk/clojure/doc/Write-profiles.md) details the
+  tools the SDK provides to control the buffering behaviors of a SSE stream and
+  how to use compression.
+- the [adapter implementation guide](/sdk/clojure/doc/implementing-adapters.md)
+  lists the conventions by which SDK adapters are implemented if the need to
+  implement your own ever arises.
 
-| Adapter  | connection lifetime in ring sync mode                                  |
+## Adapter behaviors:
+
+Ring adapters are not made equals. This leads to our SSE generators not having
+the exact same behaviors in some cases.
+
+### SSE connection lifetime in ring when trying to store the sse-gen somewhere
+
+#### With ring sync
+
+| Adapter  |                                                                        |
 | -------- | ---------------------------------------------------------------------- |
 | ring     | same as the thread creating the sse response                           |
 | http-kit | alive until the client or the server explicitely closes the connection |
 
-> [!note]
-> You may keep the connection open in ring-jetty sync mode by somehow blocking the thread
-> handling the request.
+You may keep the connection open in ring sync mode by somehow blocking the thread
+handling the request. This is a valid strategy when using java's virtual threads.
 
-| Adapter  | connection lifetime in ring async mode                                 |
-| -------- | ---------------------------------------------------------------------- |
-| ring     | alive until the client or the server explicitely closes the connection |
-| http-kit | alive until the client or the server explicitely closes the connection |
+#### With ring async
 
-| Adapter  | sending an event on closed connection              |
-| -------- | -------------------------------------------------- |
-| ring     | exception thrown                                   |
-| http-kit | fn returns false, from `org.http-kit.server/send!` |
+| Adapter      |                                                                        |
+| ------------ | ---------------------------------------------------------------------- |
+| all adapters | alive until the client or the server explicitely closes the connection |
 
-> [!note]
-> This is one way to detect the connection has been closed by the client.
+### Detecting a closed connection
 
-> [!important]
-> At the moment, the ring-jetty adapter needs to send 2 small messages or 1 big
-> message to detect a closed connection. There must be some buffering happening
-> independent of our implementation.
+| Adapter  |                                                                                                 |
+| -------- | ----------------------------------------------------------------------------------------------- |
+| ring     | Sending events on a closed connection will fail at some point and the sse-gen will close itself |
+| http-kit | Http-kit detects closed connections by itself and closes the sse-gen                            |
 
-| Adapter    | `:on-open` callback parameters |
-| ---------- | ------------------------------ |
-| ring-jetty | `[sse-gen]`                    |
-| http-kit   | `[sse-gen]`                    |
-
-| Adapter    | `:on-close` callback parameters |
-| ---------- | ------------------------------- |
-| ring-jetty | `[sse-gen]`                     |
-| http-kit   | `[sse-gen status-code]`         |
+At this moment, when using the ring adapter and jetty, our SSE generators need
+to send 2 small events or 1 big event to detect a closed connection.
+There must be some buffering happening independent of our implementation.
 
 ## TODO:
 
-- Consider adding an option to adapter to be able to control the output stream (usefull to enable compression)
 - Streamlined release process (cutting releases and publish jar to a maven repo)
-- Consider uniformizing the adapters behavior on connection closing (throwing in all adapters?)
-- Review the etoin tests, there are some race conditions
-- More official examples
+- Review the etaoin tests, there are some race conditions
+
+## License
+
+[![License](https://img.shields.io/github/license/starfederation/datastar)](https://github.com/starfederation/datastar/blob/main/LICENSE)

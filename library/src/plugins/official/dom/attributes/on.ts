@@ -11,7 +11,7 @@ import {
   Requirement,
 } from '../../../../engine/types'
 import { tagHas, tagToMs } from '../../../../utils/tags'
-import { camel, modifyCasing } from '../../../../utils/text'
+import { camel, kebab, modifyCasing } from '../../../../utils/text'
 import { debounce, delay, throttle } from '../../../../utils/timing'
 import { supportsViewTransitions } from '../../../../utils/view-transtions'
 import type { Signal } from '../../../../vendored/preact-core'
@@ -78,8 +78,8 @@ export const On: AttributePlugin = {
     if (mods.has('once')) evtListOpts.once = true
 
     if (key === 'load') {
-      // Delay the callback to the next microtask so that indicators can be set
-      setTimeout(callback, 0)
+      // Delay the callback to the next macrotask so that indicators can be set
+      setTimeout(callback)
       return () => {}
     }
 
@@ -109,7 +109,9 @@ export const On: AttributePlugin = {
       rafId = requestAnimationFrame(raf)
 
       return () => {
-        if (rafId) cancelAnimationFrame(rafId)
+        if (rafId) {
+          cancelAnimationFrame(rafId)
+        }
       }
     }
 
@@ -156,7 +158,10 @@ export const On: AttributePlugin = {
       callback = targetOutsideCallback
     }
 
-    const eventName = modifyCasing(key, mods)
+    // Default to kebab-case and allow modifying
+    let eventName = kebab(key)
+    eventName = modifyCasing(eventName, mods)
+
     target.addEventListener(eventName, callback, evtListOpts)
     return () => {
       target.removeEventListener(eventName, callback)

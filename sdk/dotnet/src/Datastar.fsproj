@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>StarFederation.Datastar</AssemblyName>
-        <Version>1.0.0-beta.3</Version>
+        <Version>1.0.0-beta.4</Version>
         <RootNamespace>StarFederation.Datastar</RootNamespace>
         <Nullable>disabled</Nullable>
 
@@ -53,17 +53,17 @@
         </None>
         <Compile Include="Utility.fs" />
         <Compile Include="Consts.fs" />
-        <Compile Include="DatastarTypes.fs" />
+        <Compile Include="Types.fs" />
         <Compile Include="ServerSentEventGenerator.fs" />
-        <Compile Include="DatastarHttpHandlers.fs" />
+        <Compile Include="HttpHandlers.fs" />
         <Compile Include="Scripts\BrowserConsole.fs" />
         <Compile Include="Scripts\Redirect.fs" />
-        <Compile Include="DependencyInjection\DatastarServices.fs" />
-        <Compile Include="DependencyInjection\DatastarServicesProvider.fs" />
+        <Compile Include="DependencyInjection\Services.fs" />
+        <Compile Include="DependencyInjection\ServicesProvider.fs" />
         <Compile Include="DependencyInjection\ServerSentEventScriptExtensions.fs" />
         <Compile Include="ModelBinding\FromSignalAttribute.fs" />
         <Compile Include="ModelBinding\SignalsModelBinder.fs"/>
-        <Compile Include="ModelBinding\DatastarMvcServiceProvider.fs" />
+        <Compile Include="ModelBinding\MvcServiceProvider.fs" />
     </ItemGroup>
 
 </Project>

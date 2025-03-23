@@ -3,12 +3,9 @@
     [clojure.repl.deps :as crdeps]
     [clj-reload.core :as reload]
     [malli.dev :as mdev]))
-;    [hyperfiddle.rcf :as rcf]))
 
 
 (alter-var-root #'*warn-on-reflection* (constantly true))
-
-;(rcf/enable!)
 
 
 (reload/init
@@ -25,9 +22,13 @@
     (flush)))
 
 
+(defmacro force-out [& body]
+  `(binding [*out* (java.io.OutputStreamWriter. System/out)]
+     ~@body))
+ 
 
 (comment
-  (mdev/start!)
+  (mdev/start! {:exception true})
   (mdev/stop!)
   (reload!)
   *e

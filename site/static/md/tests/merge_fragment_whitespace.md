@@ -1,10 +1,10 @@
-# Merge Fregment Whitespace
+# Merge Fragment Whitespace
 
-Tests that merging a fragment maintains whitespace.
+Tests merging a fragment maintains whitespace.
 
-<div>
-  <pre id="fragment" data-signals-result="0"></pre>
+<div data-signals-result="0">
   <button id="clickable" data-on-click="@get('/tests/merge_fragment_whitespace/data')" class="btn">Merge</button>
+  <pre id="fragment"></pre>
   <hr />
   Result:
   <code id="result" data-text="$result"></code>

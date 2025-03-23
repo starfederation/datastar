@@ -2,14 +2,12 @@
 
 export const DATASTAR = "datastar" as const;
 export const DATASTAR_REQUEST = "Datastar-Request";
-export const VERSION = "1.0.0-beta.9";
+export const VERSION = "1.0.0-beta.10";
 
 // #region Defaults
 
 // #region Default durations
 
-// The default duration for settling during fragment merges. Allows for CSS transitions to complete.
-export const DefaultFragmentsSettleDurationMs = 300;
 // The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
 export const DefaultSseRetryDurationMs = 1000;
 
@@ -41,7 +39,6 @@ export const DefaultExecuteScriptAutoRemove = true;
 
 export const DatastarDatalineSelector = "selector"
 export const DatastarDatalineMergeMode = "mergeMode"
-export const DatastarDatalineSettleDuration = "settleDuration"
 export const DatastarDatalineFragments = "fragments"
 export const DatastarDatalineUseViewTransition = "useViewTransition"
 export const DatastarDatalineSignals = "signals"

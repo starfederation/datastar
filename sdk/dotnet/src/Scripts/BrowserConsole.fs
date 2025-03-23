@@ -14,8 +14,8 @@ module BrowserConsoleAction =
         | Log message -> $"console.log('{escapeMessage message}')"
         | Error message -> $"console.log('{escapeMessage message}')"
 
-module BrowserConsole =
-    let consoleActionWithOptions (options:EventOptions) env consoleAction =
+type BrowserConsole =
+    static member browserConsoleAction (env, consoleAction, ?options:EventOptions) =
+        let options = options |> Option.defaultValue EventOptions.defaults
         let scriptOptions = { ExecuteScriptOptions.defaults with EventId = options.EventId; Retry = options.Retry }
-        ServerSentEventGenerator.executeScriptWithOptions scriptOptions env (consoleAction |> BrowserConsoleAction.toJavaScript)
-    let browserConsoleAction env = consoleActionWithOptions EventOptions.defaults env
+        ServerSentEventGenerator.executeScript (env, consoleAction |> BrowserConsoleAction.toJavaScript, scriptOptions)

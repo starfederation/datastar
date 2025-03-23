@@ -1,6 +1,6 @@
-# Merge Fregment On Load
+# Merge Fragment On Load
 
-Tests that merging a fragment containing `data-on-load` works.
+Tests merging a fragment containing `data-on-load`.
 
 <div>
   <div id="content" data-signals-result="0" data-on-load="$result = 0"></div>

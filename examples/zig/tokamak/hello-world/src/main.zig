@@ -3,7 +3,7 @@ const tk = @import("tokamak");
 const datastar = @import("datastar").tk;
 
 const App = struct {
-    server: *tk.Server,
+    server: tk.Server,
     routes: []const tk.Route = &.{
         .get("/", tk.static.file("hello-world.html")),
         .group("/", &.{.router(routes)}),

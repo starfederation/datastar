@@ -1,6 +1,7 @@
 {:lint-as {fr.jeremyschoffen.datastar.utils/defroutes clojure.core/def
-           starfederation.datastar.clojure.utils/transient-> clojure.core/->}
+           starfederation.datastar.clojure.utils/transient-> clojure.core/->
+           starfederation.datastar.clojure.utils/def-clone clojure.core/def}
  :hooks
  {:analyze-call
-  {test.utils/with-server hooks.test-hooks/with-server}}}
-
+  {test.utils/with-server hooks.test-hooks/with-server}}
+ :linters {:redundant-ignore {:exclude [:clojure-lsp/unused-public-var]}}}
