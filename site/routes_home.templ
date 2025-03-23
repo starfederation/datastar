@@ -128,7 +128,7 @@ templ Home() {
 				<img class="w-full" src="/chart"/>
 				<div
 					id="todosMVC"
-					data-on-load={ datastar.GetSSE("/api/todos") }
+					data-init={ datastar.GetSSE("/api/todos") }
 				>
 					<p>Todos Example</p>
 					<p>If you are seeing this message, please clear your cookies and refresh the page.</p>

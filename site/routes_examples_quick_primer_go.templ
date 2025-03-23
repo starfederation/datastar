@@ -36,7 +36,7 @@ templ QuickPrimerGoView(signals *QuickPrimerGoSignals) {
 				<span>Feed from server: </span>
 				<span
 					id="feed"
-					data-on-load={ datastar.GetSSE("/examples/quick_primer_go/data/feed") }
+					data-init={ datastar.GetSSE("/examples/quick_primer_go/data/feed") }
 				></span>
 			</div>
 		</main>

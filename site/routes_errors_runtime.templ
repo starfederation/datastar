@@ -108,7 +108,7 @@ templ ExecuteExpression(name string, info *RuntimeErrorInfo) {
 				{{
 					suggestedSignals := []string{}
 					for _, signal := range info.Expression.ValidSignals {
-						if signal == signalMatch || strings.HasPrefix(signal, signalMatch + ".") {
+						if signal == signalMatch || strings.HasPrefix(signal, signalMatch+".") {
 							suggestedSignals = append(suggestedSignals, signal)
 						}
 					}
@@ -237,6 +237,76 @@ templ OnValueRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@valueRequired("on")
 		@onError()
+	}
+}
+
+templ OnIntersectKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("on-intersect", info.Expression.Key)
+		@attributeDocs("on-intersect")
+	}
+}
+
+templ OnIntersectValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("on-intersect")
+		@attributeDocs("on-intersect")
+	}
+}
+
+templ OnIntervalKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("on-interval", info.Expression.Key)
+		@attributeDocs("on-interval")
+	}
+}
+
+templ OnIntervalValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("on-interval")
+		@attributeDocs("on-interval")
+	}
+}
+
+templ OnLoadKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("on-load", info.Expression.Key)
+		@attributeDocs("on-load")
+	}
+}
+
+templ OnLoadValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("on-load")
+		@attributeDocs("on-load")
+	}
+}
+
+templ OnRafKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("on-raf", info.Expression.Key)
+		@attributeDocs("on-raf")
+	}
+}
+
+templ OnRafValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("on-raf")
+		@attributeDocs("on-raf")
+	}
+}
+
+templ OnSignalChangeKeyNotAllowed(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@keyNotAllowed("on-signal-change", info.Expression.Key)
+		@attributeDocs("on-signal-change")
+	}
+}
+
+templ OnSignalChangeValueRequired(name string, info *RuntimeErrorInfo) {
+	@RuntimeErrorView(name, info) {
+		@valueRequired("on-signal-change")
+		@attributeDocs("on-signal-change")
 	}
 }
 
@@ -450,7 +520,7 @@ templ computedError() {
 }
 
 templ customValidityError() {
-	<p>The <code>data-intersects</code> attribute must <em>only</em> have a value, representing an expression that must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.</p>
+	<p>The <code>data-intersect</code> attribute must <em>only</em> have a value, representing an expression that must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.</p>
 	@sampleCode("Example", "html", `<form>
 	<input data-bind-foo name="foo" />
 	<input data-bind-bar name="bar" 
@@ -471,8 +541,8 @@ templ indicatorError() {
 }
 
 templ intersectsError() {
-	<p>The <code>data-intersects</code> attribute must <em>only</em> have a value, representing an expression to run when the element intersects with the viewport.</p>
-	@sampleCode("Example", "html", `<div data-intersects="console.log('I am intersecting!')"></div>`)
+	<p>The <code>data-intersect</code> attribute must <em>only</em> have a value, representing an expression to run when the element intersects with the viewport.</p>
+	@sampleCode("Example", "html", `<div data-intersect="console.log('I am intersecting!')"></div>`)
 	@attributeDocs("intersects")
 }
 
@@ -501,7 +571,7 @@ templ scrollIntoViewError() {
 }
 
 templ showError() {
-	<p> The <code>data-show</code> attribute must <em>only</em> have a value, representing an expression evaluating to <code>true</code> or <code>false</code>, which determines whether to show or hide the element, respectively.</p>
+	<p>The <code>data-show</code> attribute must <em>only</em> have a value, representing an expression evaluating to <code>true</code> or <code>false</code>, which determines whether to show or hide the element, respectively.</p>
 	@sampleCode("Example", "html", `<div data-show="$foo"></div>`)
 	@attributeDocs("show")
 }

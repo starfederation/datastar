@@ -1,8 +1,8 @@
-# Signals Change
+# Signal Change
 
 Tests that a signal change is detected.
 
-<div data-signals="{foo: {bar: 0}, result: 0}" data-on-signals-change="$result = $foo.bar">
+<div data-signals="{foo: {bar: 0}, result: 0}" data-on-signal-change="$result = $foo.bar">
   <button id="clickable" data-on-click="$foo.bar = 1" class="btn">Change</button>
   <hr />
   Result:

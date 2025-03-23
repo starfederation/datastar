@@ -3,14 +3,6 @@ import { tagHas, tagToMs } from './tags'
 
 export type TimerHandler = (...args: any[]) => void
 
-export function delay(callback: TimerHandler, wait: number): TimerHandler {
-  return (...args: any[]) => {
-    setTimeout(() => {
-      callback(...args)
-    }, wait)
-  }
-}
-
 export function debounce(
   callback: TimerHandler,
   wait: number,
@@ -66,12 +58,6 @@ export function modifyTiming(
   callback: TimerHandler,
   mods: Modifiers,
 ): TimerHandler {
-  const delayArgs = mods.get('delay')
-  if (delayArgs) {
-    const wait = tagToMs(delayArgs)
-    callback = delay(callback, wait)
-  }
-
   const debounceArgs = mods.get('debounce')
   if (debounceArgs) {
     const wait = tagToMs(debounceArgs)

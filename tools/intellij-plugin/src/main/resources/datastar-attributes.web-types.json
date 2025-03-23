@@ -42,7 +42,7 @@
           "description": "Modify the casing of the signal name"
         }
       ],
-      "datastar-intersects-modifiers": [
+      "datastar-intersect-modifiers": [
         {
           "name": "full",
           "description": "Trigger when the full element is visible"
@@ -399,9 +399,9 @@
           },
           "pattern": {
             "template": [
-              "data-intersects",
+              "data-intersect",
               {
-                "items": "/js/datastar-intersects-modifiers",
+                "items": "/js/datastar-intersect-modifiers",
                 "template": [
                   "__",
                   "$...",

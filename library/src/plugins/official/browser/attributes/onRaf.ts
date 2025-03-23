@@ -1,7 +1,7 @@
 // Authors: Ben Croker
 // Icon: material-symbols:mail
 // Slug: Executes and expression on every animation frame
-// Description: This plugin executes an expression on every animation frame.
+// Description: This attribute executes an expression on every animation frame.
 
 import {
   type AttributePlugin,
@@ -9,18 +9,14 @@ import {
   Requirement,
 } from '../../../../engine/types'
 import { modifyTiming } from '../../../../utils/timing'
-import { modifyViewTransition } from '../../../../utils/view-transtions'
 
-export const Raf: AttributePlugin = {
+export const OnRaf: AttributePlugin = {
   type: PluginType.Attribute,
-  name: 'raf',
+  name: 'onRaf',
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
   onLoad: ({ mods, genRX }) => {
-    const rx = genRX()
-    let callback = () => rx()
-    callback = modifyTiming(callback, mods)
-    callback = modifyViewTransition(callback, mods)
+    const callback = modifyTiming(genRX(), mods)
 
     let rafId: number | undefined
     const raf = () => {

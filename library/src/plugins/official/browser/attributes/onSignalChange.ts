@@ -11,19 +11,14 @@ import {
   Requirement,
 } from '../../../../engine/types'
 import { modifyCasing } from '../../../../utils/text'
-import { modifyTiming } from '../../../../utils/timing'
-import { modifyViewTransition } from '../../../../utils/view-transtions'
 import { effect, type Signal } from '../../../../vendored/preact-core'
 
-export const SignalChange: AttributePlugin = {
+export const OnSignalChange: AttributePlugin = {
   type: PluginType.Attribute,
-  name: 'signal-change',
+  name: 'onSignalChange',
   valReq: Requirement.Must,
   onLoad: ({ key, mods, signals, genRX }) => {
-    const rx = genRX()
-    let callback = (evt?: Event) => rx(evt)
-    callback = modifyTiming(callback, mods)
-    callback = modifyViewTransition(callback, mods)
+    const callback = genRX()
 
     if (key === '') {
       const signalFn = (event: CustomEvent<DatastarSignalEvent>) =>

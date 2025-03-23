@@ -29,7 +29,7 @@ HTML = """\
         <div class="container">
             <div
             class="time"
-            data-on-load="@get('/updates')"
+            data-init="@get('/updates')"
             >
             Current time from fragment: <span id="currentTime">CURRENT_TIME</span>
             </div>

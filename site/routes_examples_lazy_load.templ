@@ -3,7 +3,7 @@ package site
 import datastar "github.com/starfederation/datastar/sdk/go"
 
 templ lazyLoadLoader() {
-	<div id="lazy_load" data-on-load={ datastar.GetSSE("/examples/lazy_load/graph") }>
+	<div id="lazy_load" data-init={ datastar.GetSSE("/examples/lazy_load/graph") }>
 		<div class="flex justify-center gap-2 text-4xl">
 			@icon("svg-spinners:blocks-wave")
 			Loading...

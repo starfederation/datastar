@@ -10,7 +10,7 @@ import {
 } from '../../../../engine/types'
 import { kebab, modifyCasing } from '../../../../utils/text'
 import { modifyTiming } from '../../../../utils/timing'
-import { modifyViewTransition } from '../../../../utils/view-transtions'
+import { supportsViewTransitions } from '../../../../utils/view-transtions'
 
 export const On: AttributePlugin = {
   type: PluginType.Attribute,
@@ -33,7 +33,12 @@ export const On: AttributePlugin = {
     }
 
     callback = modifyTiming(callback, mods)
-    callback = modifyViewTransition(callback, mods)
+    
+    if (mods.has('viewtransition') && supportsViewTransitions) {
+      const cb = callback // I hate javascript
+      callback = (...args: any[]) =>
+        document.startViewTransition(() => cb(...args))
+    }
 
     const evtListOpts: AddEventListenerOptions = {
       capture: true,

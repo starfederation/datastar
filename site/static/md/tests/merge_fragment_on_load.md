@@ -1,9 +1,9 @@
 # Merge Fragment On Load
 
-Tests merging a fragment containing `data-on-load`.
+Tests merging a fragment containing `data-init`.
 
 <div>
-  <div id="content" data-signals-result="0" data-on-load="$result = 0"></div>
+  <div id="content" data-signals-result="0" data-init="$result = 0"></div>
   <button id="clickable" data-on-click="@get('/tests/merge_fragment_on_load/data')" class="btn">Merge</button>
   <hr />
   Result:
