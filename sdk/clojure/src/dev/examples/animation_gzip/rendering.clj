@@ -163,7 +163,7 @@
 (defn page [state]
   (h/html
     (c/page-scaffold
-      [:div {:data-init (d*/sse-get "/updates")}
+      [:div {:data-on-load (d*/sse-get "/updates")}
        [:style css]
        [:h2.center "lets get something fun going"]
        (content state)])))

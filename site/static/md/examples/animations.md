@@ -9,7 +9,7 @@ only CSS and HTML. Below are a few examples of various animation techniques.
 
 Datastar also allows you to use the new View Transitions API for creating animations.
 
-<div id="animations" data-init="@get('/examples/animations/data')"></div>
+<div id="animations" data-on-load="@get('/examples/animations/data')"></div>
 
 ## Basic CSS Animations
 

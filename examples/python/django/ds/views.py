@@ -25,7 +25,7 @@ HTML = """\
         <div class="container">
             <div
             class="time"
-            data-init="@get('/updates')"
+            data-on-load="@get('/updates')"
             >
             Current time from fragment: <span id="currentTime">CURRENT_TIME</span>
             </div>

@@ -4,7 +4,7 @@
 
 ## Demo
 
-<div id="lazy_tabs" data-init="@get('/examples/lazy_tabs/data')">
+<div id="lazy_tabs" data-on-load="@get('/examples/lazy_tabs/data')">
 </div>
 
 ## Explanation

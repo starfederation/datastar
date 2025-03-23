@@ -4,7 +4,7 @@
 
 ## Demo
 
-<div id="edit_row" data-init="@get('/examples/edit_row/data')">
+<div id="edit_row" data-on-load="@get('/examples/edit_row/data')">
 </div>
 
 ## Explanation

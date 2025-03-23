@@ -14,7 +14,7 @@ Tests loading a custom plugin.
   })
 </script>
 
-<div data-init="@test()">
+<div data-on-load="@test()">
   Result:
   <code id="result">0</code>
   <hr />

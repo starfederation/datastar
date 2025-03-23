@@ -31,7 +31,7 @@ HTML = """\
         <div
         id="timers"
         class="container"
-            data-init="@get('/updates')"
+            data-on-load="@get('/updates')"
         >
             <button data-on-click="@get('/add_fragment')">Add fragment timer</button>
             <button data-on-click="@get('/add_signal')">Add signal timer</button>

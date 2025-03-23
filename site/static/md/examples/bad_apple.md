@@ -3,7 +3,8 @@
 ## Demo
 
 <div id="contents" class="flex flex-col gap-4 p-4 w-full"
-  data-signals="{_contents: 'bad apple frames go here', percentage: 0}" data-init="@get('/examples/bad_apple/updates')">
+  data-signals="{_contents: 'bad apple frames go here', percentage: 0}"
+  data-on-load="@get('/examples/bad_apple/updates')">
   <div class="flex gap-4 items-center font-mono">
     <input disabled class="range range-neutral flex-1" type="range" min="1" max="100" data-bind="percentage" />
     <div>
@@ -30,7 +31,7 @@ current frame number.
 
 ```html
 <div id="contents" data-signals="{_contents: 'bad apple frames go here', percentage: 0}"
-  data-init="@get('/examples/bad_apple/updates')">
+  data-on-load="@get('/examples/bad_apple/updates')">
   <div>
     <input type="range" min="1" max="100" data-bind="percentage" disabled />
     <div><span data-text="$percentage.toFixed(2)"></span>%</div>

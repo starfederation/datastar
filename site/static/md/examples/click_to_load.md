@@ -4,7 +4,7 @@
 
 ## Demo
 
-<div id="click_to_load" data-init="@get('/examples/click_to_load/data')">
+<div id="click_to_load" data-on-load="@get('/examples/click_to_load/data')">
 </div>
 
 ## Explanation

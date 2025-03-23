@@ -2,7 +2,7 @@
 
 ## Demo
 
-<div id="update" data-init="@get('/examples/redirects/data')">
+<div id="update" data-on-load="@get('/examples/redirects/data')">
 </div>
 
 ## Explanation

@@ -29,7 +29,7 @@
 (defn page [current-val]
   (h/html
     (c/page-scaffold
-     [:div#page {:data-init (d*/sse-get "/updates")}
+     [:div#page {:data-on-load (d*/sse-get "/updates")}
       [:h1 "Test page"]
       [:input {:type "text"
                :data-bind-input true

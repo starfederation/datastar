@@ -18,4 +18,4 @@ headers: {
 
 ## Demo
 
-<div id="update_me" data-init="@get('/examples/csrf/data')">Update Me</div>
+<div id="update_me" data-on-load="@get('/examples/csrf/data')">Update Me</div>

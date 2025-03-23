@@ -45,7 +45,7 @@ page := []byte(fmt.Sprintf(`
 </head>
 
 <body style="%s">
-	<span id="feed" data-init="%s"></span>
+	<span id="feed" data-on-load="%s"></span>
 </body>
 
 </html>

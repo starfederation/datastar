@@ -45,7 +45,7 @@ data: fragments <tr id=\"agent_60\">
 Don't scroll too far, there are consequences.
 
 <div>
-  <div id="infinite_scroll" data-init="@get('/examples/infinite_scroll/data')">
+  <div id="infinite_scroll" data-on-load="@get('/examples/infinite_scroll/data')">
   </div>
   <div id="more_btn"></div>
 </div>

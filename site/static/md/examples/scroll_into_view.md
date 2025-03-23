@@ -16,4 +16,4 @@ modifier.
 
 ## Demo
 
-<div id="replaceMe" data-init="@get('/examples/scroll_into_view/data')">No session data</div>
+<div id="replaceMe" data-on-load="@get('/examples/scroll_into_view/data')">No session data</div>

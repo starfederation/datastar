@@ -19,11 +19,11 @@ You can use the [`data-on-interval`](/reference/attribute_plugins#data-on) attri
 regular interval. In this example, we are sending a `get` request to the backend that increments the `$count` signal
 every 1 second. Adding `.leading` to the `__duration` modifier executes the first interval immediately.
 
-An alternative approach is use the [`data-init`](/reference/attribute_plugins#data-on) attribute with the `__delay`
+An alternative approach is use the [`data-on-load`](/reference/attribute_plugins#data-on) attribute with the `__delay`
 modifier to control the polling frequency from the backend. Using this method, you can control back-pressure.
 
 ```html
-<div data-signals-count="0" data-init__delay.1s="@get('/endpoint')">
+<div data-signals-count="0" data-on-load__delay.1s="@get('/endpoint')">
   Count: 0
 </div>
 ```

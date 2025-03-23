@@ -2,7 +2,7 @@
 
 ## Demo
 
-<div id="container" data-init="@get('/examples/toggle_visibility/data')"></div>
+<div id="container" data-on-load="@get('/examples/toggle_visibility/data')"></div>
 
 ## Explanation
 

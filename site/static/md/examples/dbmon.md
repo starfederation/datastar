@@ -16,5 +16,5 @@ low for the contents.
 
 ## Demo
 
-<div id="contents" data-init="@get('/examples/dbmon/contents')">
+<div id="contents" data-on-load="@get('/examples/dbmon/contents')">
 </div>

@@ -4,13 +4,13 @@
 
 ## Demo
 
-<div id="progress_bar" data-init="@get('/examples/progress_bar/data',{openWhenHidden:true})">
+<div id="progress_bar" data-on-load="@get('/examples/progress_bar/data',{openWhenHidden:true})">
 </div>
 
 ## Explanation
 
 ```html
-<div id="progress_bar" data-init="@get('/examples/progress_bar/data',{openWhenHidden:true})">
+<div id="progress_bar" data-on-load="@get('/examples/progress_bar/data',{openWhenHidden:true})">
 </div>
 
 ```

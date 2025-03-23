@@ -2,7 +2,7 @@
 
 ## Demo
 
-<div data-init="@get('/examples/replace_url_from_backend/updates')"></div>
+<div data-on-load="@get('/examples/replace_url_from_backend/updates')"></div>
 
 ## Explanation
 

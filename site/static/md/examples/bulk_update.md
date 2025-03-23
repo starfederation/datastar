@@ -4,7 +4,7 @@
 
 ## Demo
 
-<div id="bulk_update" data-init="@get('/examples/bulk_update/data')">
+<div id="bulk_update" data-on-load="@get('/examples/bulk_update/data')">
 </div>
 
 ## Explanation

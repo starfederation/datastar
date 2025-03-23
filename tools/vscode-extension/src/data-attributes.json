@@ -109,14 +109,14 @@
       }
     ]
   },
-  "data-init": {
-    "prefix": "data-init",
-    "body": "data-init=\"${1:expression}\"",
+  "data-on-load": {
+    "prefix": "data-on-load",
+    "body": "data-on-load=\"${1:expression}\"",
     "description": "Executes an expression whenever the element is initialised in the DOM.",
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-init"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-load"
       }
     ]
   },

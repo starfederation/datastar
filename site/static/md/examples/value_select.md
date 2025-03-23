@@ -4,7 +4,7 @@
 
 ## Demo
 
-<div id="value_select" data-init="@get('/examples/value_select/data')">
+<div id="value_select" data-on-load="@get('/examples/value_select/data')">
 </div>
 
 ## Explanation

@@ -11,7 +11,7 @@ templ pageDBmon(dbs []*DbmonDatabase, mutationRate float64, renderTime time.Dura
 		id="contents"
 		class="flex flex-col gap-4 p-4 w-full overflow-scroll"
 		data-signals={ fmt.Sprintf("{mutationRate: %d}", int(100*mutationRate)) }
-		data-init={ datastar.GetSSE("/examples/dbmon/updates") }
+		data-on-load={ datastar.GetSSE("/examples/dbmon/updates") }
 	>
 		@dbmonFPS(renderTime)
 		<div style="display: flex;">

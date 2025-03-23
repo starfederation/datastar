@@ -4,7 +4,7 @@
 
 ## Demo
 
-<div id="dialogs" data-init="@get('/examples/dialogs_browser/data')">
+<div id="dialogs" data-on-load="@get('/examples/dialogs_browser/data')">
 </div>
 
 ## Explanation

@@ -4,7 +4,7 @@
 
 ## Demo
 
-<div id="delete_row" data-init="@get('/examples/delete_row/data')">
+<div id="delete_row" data-on-load="@get('/examples/delete_row/data')">
 </div>
 
 ## Explanation

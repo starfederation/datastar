@@ -2,7 +2,7 @@
 
 ## Demo
 
-<div data-init="@get('/examples/signals_ifmissing/updates')">
+<div data-on-load="@get('/examples/signals_ifmissing/updates')">
   <div>
     Should always be 1234:
     <span id="placeholder"></span>
@@ -12,7 +12,7 @@
 ## Explanation
 
 ```html
-<div id="demo" data-signals="{id: 1234}" data-init="@get('/examples/signals_ifmissing/updates')">
+<div id="demo" data-signals="{id: 1234}" data-on-load="@get('/examples/signals_ifmissing/updates')">
   <div>
     Should always be 1234:
     <span data-text="$id">should be replaced</span>

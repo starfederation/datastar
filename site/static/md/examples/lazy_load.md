@@ -4,7 +4,7 @@
 
 ## Demo
 
-<div id="lazy_load" data-init="@get('/examples/lazy_load/data')">
+<div id="lazy_load" data-on-load="@get('/examples/lazy_load/data')">
 </div>
 
 ## Explanation
@@ -12,7 +12,7 @@
 This example shows how to lazily load an element on a page. We start with an initial state that looks like this:
 
 ```html
-<div data-init="@get('/examples/lazy_load/graph')">
+<div data-on-load="@get('/examples/lazy_load/graph')">
   Loading...
 </div>
 ```
