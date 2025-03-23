@@ -534,4 +534,4 @@ This toggles the values of all signals containing `form.` (to either `true` or `
     </button>
 </div>
 
-View the [attribute plugins reference](/reference/attribute_plugins).
+View the [full reference](/reference/overview).
