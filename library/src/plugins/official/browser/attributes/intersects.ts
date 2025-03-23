@@ -13,7 +13,6 @@ const ONCE = 'once'
 const HALF = 'half'
 const FULL = 'full'
 
-// Run expression when element intersects with viewport
 export const Intersects: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'intersects',

@@ -1,9 +1,9 @@
+import type { Modifiers } from '../engine/types'
+import { tagHas, tagToMs } from './tags'
+
 export type TimerHandler = (...args: any[]) => void
 
-export function delay(
-  callback: TimerHandler,
-  wait: number,
-): TimerHandler {
+export function delay(callback: TimerHandler, wait: number): TimerHandler {
   return (...args: any[]) => {
     setTimeout(() => {
       callback(...args)
@@ -60,4 +60,33 @@ export function throttle(
       }
     }, wait)
   }
+}
+
+export function modifyTiming(
+  callback: TimerHandler,
+  mods: Modifiers,
+): TimerHandler {
+  const delayArgs = mods.get('delay')
+  if (delayArgs) {
+    const wait = tagToMs(delayArgs)
+    callback = delay(callback, wait)
+  }
+
+  const debounceArgs = mods.get('debounce')
+  if (debounceArgs) {
+    const wait = tagToMs(debounceArgs)
+    const leading = tagHas(debounceArgs, 'leading', false)
+    const trailing = !tagHas(debounceArgs, 'notrail', false)
+    callback = debounce(callback, wait, leading, trailing)
+  }
+
+  const throttleArgs = mods.get('throttle')
+  if (throttleArgs) {
+    const wait = tagToMs(throttleArgs)
+    const leading = !tagHas(throttleArgs, 'noleading', false)
+    const trailing = tagHas(throttleArgs, 'trail', false)
+    callback = throttle(callback, wait, leading, trailing)
+  }
+
+  return callback
 }
