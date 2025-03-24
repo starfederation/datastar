@@ -450,7 +450,7 @@ One of the benefits of using SSE is that we can send multiple events (HTML fragm
 
 ## Actions
 
-Actions in Datastar are helper functions that are available in `data-*` attributes and have the syntax `@actionName()`. We already saw the backend plugin actions above. Here are a few other common actions.
+Actions in Datastar are helper functions that are available in `data-*` attributes and have the syntax `@actionName()`. We already saw the backend plugin actions above. Here are a few other useful actions.
 
 ### `@setAll()`
 

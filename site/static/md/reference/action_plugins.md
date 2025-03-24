@@ -4,21 +4,21 @@ Datastar provides the following actions, that can be used in Datastar expression
 
 ### Backend Actions
 
-- [`@get()`](#@get)
-- [`@post()`](#@post)
-- [`@put()`](#@put)
-- [`@patch()`](#@patch)
-- [`@delete()`](#@delete)
+- [`@get()`](#get)
+- [`@post()`](#post)
+- [`@put()`](#put)
+- [`@patch()`](#patch)
+- [`@delete()`](#delete)
 
 ### Browser Actions
 
-- [`@clipboard()`](#@clipboard)
+- [`@clipboard()`](#clipboard)
 
 ### Utility Actions
 
-- [`@fit()`](#@fit)
-- [`@setAll()`](#@setall)
-- [`@toggleAll()`](#@toggleall)
+- [`@setAll()`](#setall)
+- [`@toggleAll()`](#toggleall)
+- [`@fit()`](#fit)
 
 ## Backend Actions
 
@@ -134,12 +134,6 @@ Copies the provided evaluated expression to the clipboard.
 
 ## Utility Actions
 
-### `@fit()`
-
-Arguments: `@fit(v: number, oldMin: number, oldMax: number, newMin: number, newMax: number, shouldClamp=false, shouldRound=false)`
-
-Make a value linear interpolate from an original range to new one.
-
 ### `@setAll()`
 
 Arguments: `@setAll(pathPrefix: string, value: any)`
@@ -159,3 +153,9 @@ Toggles all the signals that start with the prefix. This is useful for toggling 
 ```html
 <div data-on-click="@toggleAll('foo.')"></div>
 ```
+
+### `@fit()`
+
+Arguments: `@fit(v: number, oldMin: number, oldMax: number, newMin: number, newMax: number, shouldClamp=false, shouldRound=false)`
+
+Make a value linear interpolate from an original range to new one.
