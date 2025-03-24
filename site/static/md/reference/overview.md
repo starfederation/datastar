@@ -51,8 +51,7 @@ Attribute plugins are `data-*` attributes that add reactive behavior to HTML ele
 
 | Attribute | Description |
 |-----------|-------------|
-| [`data-indicator`](/reference/attribute_plugins#data-indicator) | Creates signals that indicate when SSE requests are
-in flight. |
+| [`data-indicator`](/reference/attribute_plugins#data-indicator) | Creates signals that indicate when SSE requests are in flight. |
 
 View the [attribute plugins reference](/reference/attribute_plugins)
 
@@ -84,13 +83,6 @@ Action plugins are used in Datastar expressions to perform specific actions.
 
 View the [action plugins reference](/reference/action_plugins)
 
-## Expression Context
-
-Datastar expressions have access to a context object (`ctx`) providing:
-- Current element reference (`ctx.el`)
-
-View the [expression context reference](/reference/expression_context)
-
 ## Server-Sent Events
 
 Datastar uses Server-Sent Events (SSE) to communicate from the server to the client.
@@ -99,10 +91,8 @@ Datastar uses Server-Sent Events (SSE) to communicate from the server to the cli
 |------------|-------------|
 | [`datastar-merge-fragments`](/reference/sse_events#datastar-merge-fragments) | Merges HTML fragments into the DOM. |
 | [`datastar-merge-signals`](/reference/sse_events#datastar-merge-signals) | Updates signals with new values. |
-| [`datastar-remove-fragments`](/reference/sse_events#datastar-remove-fragments) | Removes HTML fragments matching
-selectors. |
-| [`datastar-remove-signals`](/reference/sse_events#datastar-remove-signals) | Removes signals matching specific paths.
-|
+| [`datastar-remove-fragments`](/reference/sse_events#datastar-remove-fragments) | Removes HTML fragments matching selectors. |
+| [`datastar-remove-signals`](/reference/sse_events#datastar-remove-signals) | Removes signals matching specific paths. |
 | [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) | Executes JavaScript in the browser. |
 
 View the [SSE events reference](/reference/sse_events)
