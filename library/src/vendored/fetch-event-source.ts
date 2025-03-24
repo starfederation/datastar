@@ -1,8 +1,5 @@
 import type { HTMLorSVGElement } from '../engine/types'
-import {
-  ALL_RETRIES_FAILED,
-  dispatchSSE,
-} from '../plugins/official/backend/shared'
+import { RETRIES_FAILED, dispatchSSE } from '../plugins/official/backend/shared'
 
 /**
  * Represents a message sent in an event stream
@@ -364,7 +361,7 @@ export function fetchEventSource(
             retryInterval = Math.min(retryInterval, retryMaxWaitMs)
             retries++
             if (retries > retryMaxCount) {
-              dispatchSSE(el, ALL_RETRIES_FAILED, {})
+              dispatchSSE(el, RETRIES_FAILED, {})
 
               // we should not retry anymore:
               dispose()

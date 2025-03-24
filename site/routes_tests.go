@@ -61,6 +61,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "remove_fragment"},
 				{ID: "select_multiple"},
 				{ID: "select_single"},
+				{ID: "sse_error_event"},
 				{ID: "sse_events"},
 			},
 		},
@@ -124,6 +125,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 			setupTestsMergeFragmentWhitespace(testsRouter),
 			setupTestsOnLoad(testsRouter),
 			setupTestsRemoveFragment(testsRouter),
+			setupTestsSseErrorEvent(testsRouter),
 			setupTestsSseEvents(testsRouter),
 		); err != nil {
 			panic(fmt.Sprintf("error setting up tests routes: %s", err))
