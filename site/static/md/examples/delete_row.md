@@ -4,15 +4,13 @@
 
 ## Demo
 
-<div
-    id="delete_row"
-    data-on-load="@get('/examples/delete_row/data')"
->
+<div id="delete_row" data-on-load="@get('/examples/delete_row/data')">
 </div>
 
 ## Explanation
 
-This example shows how to implement a delete button that removes a table row upon completion. First let's look at the table body:
+This example shows how to implement a delete button that removes a table row upon completion. First let's look at the
+table body:
 
 ```html
 <table class="table">
@@ -30,9 +28,7 @@ This example shows how to implement a delete button that removes a table row upo
       <td>joe@smith.org</td>
       <td>Active</td>
       <td>
-        <button
-          data-on-click="confirm('Are you sure?') && @delete('/examples/delete_row/data/0')"
-        >
+        <button data-on-click="confirm('Are you sure?') && @delete('/examples/delete_row/data/0')">
           Delete
         </button>
       </td>
@@ -42,4 +38,5 @@ This example shows how to implement a delete button that removes a table row upo
 </table>
 ```
 
-The row has a normal [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm) to confirm the delete action.
+The row has a normal [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm) to confirm the delete
+action.

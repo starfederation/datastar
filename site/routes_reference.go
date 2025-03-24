@@ -23,7 +23,6 @@ func setupReferences(ctx context.Context, router chi.Router) error {
 				{ID: "overview"},
 				{ID: "attribute_plugins"},
 				{ID: "action_plugins"},
-				{ID: "expression_context"},
 				{ID: "sse_events"},
 				{ID: "sdks"},
 				{ID: "security"},

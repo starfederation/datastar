@@ -1,8 +1,8 @@
-# Signals Change Path Once
+# On Signal Change Path Once
 
 Tests that a signal change with a path is detected and the expression is called once.
 
-<div data-signals="{foo: {bar: 0}, result: 0}" data-on-signals-change-foo="$result++">
+<div data-signals="{foo: {bar: 0}, result: 0}" data-on-signal-change-foo="$result++">
   <button id="clickable" data-on-click="$foo.bar = 1" class="btn">Change</button>
   <hr />
   Result:

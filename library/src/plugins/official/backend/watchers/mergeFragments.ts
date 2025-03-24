@@ -1,4 +1,5 @@
-// Icon: material-symbols:cloud-download
+// Authors: Delaney Gillilan
+// Icon: material-symbols:sim-card-download-outline
 // Slug: Merge fragments into the DOM using a Server-Sent Event
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.
 

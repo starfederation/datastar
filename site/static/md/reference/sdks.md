@@ -9,9 +9,9 @@ If you'd like to contribute an SDK, please follow the [Contribution Guidelines](
 Clojure [SDK](https://github.com/starfederation/datastar/tree/main/sdk/clojure) and [examples](https://github.com/starfederation/datastar/tree/main/examples/clojure).  
 _Author: [Jeremy Schoffen](https://github.com/JeremS)_
 
-## .NET
+## C# (.NET)
 
-.NET [SDK](https://github.com/starfederation/datastar/tree/main/sdk/dotnet) and [examples](https://github.com/starfederation/datastar/tree/main/examples/dotnet).  
+C# (.NET) [SDK](https://github.com/starfederation/datastar/tree/main/sdk/dotnet) and [examples](https://github.com/starfederation/datastar/tree/main/examples/dotnet).  
 _Author: [Greg H](https://github.com/SpiralOSS)_
 
 ## Go

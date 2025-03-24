@@ -10,5 +10,11 @@
     },
     "[json]": {
         "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[html]": {
+        "editor.formatOnSave": false
+    },
+    "[markdown]": {
+        "editor.formatOnSave": false
     }
 }
