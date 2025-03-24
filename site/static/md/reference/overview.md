@@ -101,7 +101,7 @@ View the [SSE events reference](/reference/sse_events)
 
 Officially supported SDKs for generating Datastar-specific SSE events:
 - [Clojure](/reference/sdks#clojure)
-- [.NET](/reference/sdks#net)
+- [C# (.NET)](/reference/sdks#c-net)
 - [Go](/reference/sdks#go)
 - [Haskell](/reference/sdks#haskell)
 - [Java](/reference/sdks#java)
