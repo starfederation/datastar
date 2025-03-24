@@ -34,6 +34,12 @@ Attribute plugins are `data-*` attributes that add reactive behavior to HTML ele
 | [`data-show`](/reference/attribute_plugins#data-show) | Shows or hides elements based on expressions. |
 | [`data-text`](/reference/attribute_plugins#data-text) | Binds text content of an element to an expression. |
 
+### Backend Attributes
+
+| Attribute | Description |
+|-----------|-------------|
+| [`data-indicator`](/reference/attribute_plugins#data-indicator) | Creates signals that indicate when SSE requests are in flight. |
+
 ### Browser Attributes
 
 | Attribute | Description |
@@ -46,12 +52,6 @@ Attribute plugins are `data-*` attributes that add reactive behavior to HTML ele
 | [`data-on-signal-change`](/reference/attribute_plugins#data-on-signal-change) | Runs expressions when signals change. |
 | [`data-scroll-into-view`](/reference/attribute_plugins#data-scroll-into-view) | Scrolls elements into view with various options. |
 | [`data-view-transition`](/reference/attribute_plugins#data-view-transition) | Sets `view-transition-name` for View Transitions API. |
-
-### Backend Attributes
-
-| Attribute | Description |
-|-----------|-------------|
-| [`data-indicator`](/reference/attribute_plugins#data-indicator) | Creates signals that indicate when SSE requests are in flight. |
 
 View the [attribute plugins reference](/reference/attribute_plugins)
 
@@ -77,9 +77,9 @@ Action plugins are used in Datastar expressions to perform specific actions.
 
 | Action | Description |
 |--------|-------------|
-| [`@fit()`](/reference/action_plugins#fit) | Makes a value linearly interpolate from an original range to a new one. |
 | [`@setAll()`](/reference/action_plugins#setall) | Sets all signals with a specific prefix to a provided value. |
 | [`@toggleAll()`](/reference/action_plugins#toggleall) | Toggles all signals that start with a given prefix. |
+| [`@fit()`](/reference/action_plugins#fit) | Makes a value linearly interpolate from an original range to a new one. |
 
 View the [action plugins reference](/reference/action_plugins)
 
