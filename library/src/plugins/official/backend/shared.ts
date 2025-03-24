@@ -5,6 +5,7 @@ export const STARTED = 'started'
 export const FINISHED = 'finished'
 export const ERROR = 'error'
 export const RETRYING = 'retrying'
+export const ALL_RETRIES_FAILED = 'all-retries-failed'
 
 export interface DatastarSSEEvent {
   type: string

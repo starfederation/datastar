@@ -2,7 +2,11 @@
 // Slug: Use a GET request to fetch data from a server using Server-Sent Events matching the Datastar SDK interface
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.
 
-import { DATASTAR, DATASTAR_REQUEST, DefaultSseRetryDurationMs } from '../../../../engine/consts'
+import {
+  DATASTAR,
+  DATASTAR_REQUEST,
+  DefaultSseRetryDurationMs,
+} from '../../../../engine/consts'
 import { runtimeErr } from '../../../../engine/errors'
 import type { HTMLorSVGElement, RuntimeContext } from '../../../../engine/types'
 import {
@@ -10,6 +14,7 @@ import {
   fetchEventSource,
 } from '../../../../vendored/fetch-event-source'
 import {
+  ALL_RETRIES_FAILED,
   DATASTAR_SSE_EVENT,
   type DatastarSSEEvent,
   ERROR,
@@ -18,7 +23,11 @@ import {
   STARTED,
 } from '../shared'
 
-function dispatchSSE(el: HTMLorSVGElement, type: string, argsRaw: Record<string, string>) {
+function dispatchSSE(
+  el: HTMLorSVGElement,
+  type: string,
+  argsRaw: Record<string, string>,
+) {
   el.dispatchEvent(
     new CustomEvent<DatastarSSEEvent>(DATASTAR_SSE_EVENT, {
       detail: { type, argsRaw },
@@ -209,6 +218,10 @@ export const sse = async (
     } catch (error) {
       if (!isWrongContent(error)) {
         throw runtimeErr('SseFetchFailed', ctx, { method, url, error })
+      }
+      if (error === 'Max retries reached.') {
+        dispatchSSE(el, ALL_RETRIES_FAILED, { message: error })
+        console.error(error)
       }
       // exit gracefully and do nothing if the content-type is wrong
       // this can happen if the client is sending a request
