@@ -120,14 +120,14 @@
       }
     ]
   },
-  "data-intersect": {
-    "prefix": "data-intersect",
-    "body": "data-intersect=\"${1:expression}\"",
+  "data-on-intersect": {
+    "prefix": "data-on-intersect",
+    "body": "data-on-intersect=\"${1:expression}\"",
     "description": "Executes an expression on intersection with the viewport.",
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-intersect"
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-intersect"
       }
     ]
   },

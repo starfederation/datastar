@@ -42,7 +42,7 @@ reload. |
 | Attribute | Description |
 |-----------|-------------|
 | [`data-custom-validity`](/reference/attribute_plugins#data-custom-validity) | Adds custom validation to elements. |
-| [`data-intersect`](/reference/attribute_plugins#data-intersect) | Runs expressions when elements intersect the
+| [`data-on-intersect`](/reference/attribute_plugins#data-on-intersect) | Runs expressions when elements intersect the
 viewport. |
 | [`data-scroll-into-view`](/reference/attribute_plugins#data-scroll-into-view) | Scrolls elements into view with
 various options. |

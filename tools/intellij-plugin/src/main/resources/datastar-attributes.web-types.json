@@ -388,10 +388,10 @@
           }
         },
         {
-          "name": "data-intersect",
+          "name": "data-on-intersect",
           "virtual": true,
           "description": "Executes an expression on intersection with the viewport.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-intersect",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-intersect",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -399,7 +399,7 @@
           },
           "pattern": {
             "template": [
-              "data-intersect",
+              "data-on-intersect",
               {
                 "items": "/js/datastar-intersect-modifiers",
                 "template": [

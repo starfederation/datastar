@@ -186,20 +186,6 @@ templ IndicatorKeyOrValueRequired(name string, info *RuntimeErrorInfo) {
 	}
 }
 
-templ IntersectsKeyNotAllowed(name string, info *RuntimeErrorInfo) {
-	@RuntimeErrorView(name, info) {
-		@keyNotAllowed("intersects", info.Expression.Key)
-		@intersectsError()
-	}
-}
-
-templ IntersectsValueRequired(name string, info *RuntimeErrorInfo) {
-	@RuntimeErrorView(name, info) {
-		@valueRequired("intersects")
-		@intersectsError()
-	}
-}
-
 templ InvalidContentType(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		if info.URL == "" {
@@ -243,70 +229,70 @@ templ OnValueRequired(name string, info *RuntimeErrorInfo) {
 templ OnIntersectKeyNotAllowed(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@keyNotAllowed("on-intersect", info.Expression.Key)
-		@attributeDocs("on-intersect")
+		@onIntersectError()
 	}
 }
 
 templ OnIntersectValueRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@valueRequired("on-intersect")
-		@attributeDocs("on-intersect")
+		@onIntersectError()
 	}
 }
 
 templ OnIntervalKeyNotAllowed(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@keyNotAllowed("on-interval", info.Expression.Key)
-		@attributeDocs("on-interval")
+		@onIntervalError()
 	}
 }
 
 templ OnIntervalValueRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@valueRequired("on-interval")
-		@attributeDocs("on-interval")
+		@onIntervalError()
 	}
 }
 
 templ OnLoadKeyNotAllowed(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@keyNotAllowed("on-load", info.Expression.Key)
-		@attributeDocs("on-load")
+		@onLoadError()
 	}
 }
 
 templ OnLoadValueRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@valueRequired("on-load")
-		@attributeDocs("on-load")
+		@onLoadError()
 	}
 }
 
 templ OnRafKeyNotAllowed(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@keyNotAllowed("on-raf", info.Expression.Key)
-		@attributeDocs("on-raf")
+		@onRafError()
 	}
 }
 
 templ OnRafValueRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@valueRequired("on-raf")
-		@attributeDocs("on-raf")
+		@onRafError()
 	}
 }
 
 templ OnSignalChangeKeyNotAllowed(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@keyNotAllowed("on-signal-change", info.Expression.Key)
-		@attributeDocs("on-signal-change")
+		@onSignalChangeError()
 	}
 }
 
 templ OnSignalChangeValueRequired(name string, info *RuntimeErrorInfo) {
 	@RuntimeErrorView(name, info) {
 		@valueRequired("on-signal-change")
-		@attributeDocs("on-signal-change")
+		@onSignalChangeError()
 	}
 }
 
@@ -520,7 +506,7 @@ templ computedError() {
 }
 
 templ customValidityError() {
-	<p>The <code>data-intersect</code> attribute must <em>only</em> have a value, representing an expression that must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.</p>
+	<p>The <code>data-on-intersect</code> attribute must <em>only</em> have a value, representing an expression that must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.</p>
 	@sampleCode("Example", "html", `<form>
 	<input data-bind-foo name="foo" />
 	<input data-bind-bar name="bar" 
@@ -540,16 +526,40 @@ templ indicatorError() {
 	@attributeDocs("indicator")
 }
 
-templ intersectsError() {
-	<p>The <code>data-intersect</code> attribute must <em>only</em> have a value, representing an expression to run when the element intersects with the viewport.</p>
-	@sampleCode("Example", "html", `<div data-intersect="console.log('I am intersecting!')"></div>`)
-	@attributeDocs("intersects")
-}
-
 templ onError() {
 	<p>The <code>data-on</code> attribute <em>must</em> have a key representing the event listener to attach to the element, and a value representing an expression to execute when the event listener is triggered.</p>
 	@sampleCode("Example", "html", `<button data-on-click="alert($foo)">Click Me</button>`)
 	@attributeDocs("on")
+}
+
+templ onIntersectError() {
+	<p>The <code>data-on-intersect</code> attribute must <em>only</em> have a value, representing an expression to run when the element intersects with the viewport.</p>
+	@sampleCode("Example", "html", `<div data-on-intersect="console.log('I am intersecting!')"></div>`)
+	@attributeDocs("on-intersect")
+}
+
+templ onIntervalError() {
+	<p>The <code>data-on-interval</code> attribute must <em>only</em> have a value, representing an expression to run at a regular interval.</p>
+	@sampleCode("Example", "html", `<div data-on-interval="$count++"></div>`)
+	@attributeDocs("on-interval")
+}
+
+templ onLoadError() {
+	<p>The <code>data-on-load</code> attribute must <em>only</em> have a value, representing an expression to run when the element intersects with the viewport.</p>
+	@sampleCode("Example", "html", `<div data-on-load="$count = 1"></div>`)
+	@attributeDocs("on-load")
+}
+
+templ onRafError() {
+	<p>The <code>data-on-raf</code> attribute must <em>only</em> have a value, representing an expression to run on every <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame" target="_blank"><code>requestAnimationFrame</code></a> event.</p>
+	@sampleCode("Example", "html", `<div data-on-raf="$count++"></div>`)
+	@attributeDocs("on-raf")
+}
+
+templ onSignalChangeError() {
+	<p>The <code>data-on-signal-change</code> attribute must <em>only</em> have a value, representing an expression to run whenever a signal changes.</p>
+	@sampleCode("Example", "html", `<div data-on-signal-change="$count++"></div>`)
+	@attributeDocs("on-signal-change")
 }
 
 templ refError() {

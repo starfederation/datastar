@@ -9,14 +9,14 @@ The infinite scroll pattern provides a way to load content dynamically on user s
 Let’s focus on the final row (or the last element of your content):
 
 ```html
-<div data-intersect="$offset=0;$limit=10;@get('/examples/infinite_scroll/data')" id="more_btn">
+<div data-on-intersect="$offset=0;$limit=10;@get('/examples/infinite_scroll/data')" id="more_btn">
   <div>Loading...</div>
 </div>
 ```
 
 This last element contains a listener which, when scrolled into view, will trigger a request. The result is then
 appended after it. The last element of the results will itself contain the listener to load the next page of results,
-and so on. `data-intersect` is a custom attribute that triggers a request when the element is scrolled into view. The
+and so on. `data-on-intersect` is a custom attribute that triggers a request when the element is scrolled into view. The
 `offset` and `limit` parameters are used to control the pagination of the results. The server sends back a new
 `more_btn` element with a new offset and the results to be appended.
 
@@ -24,7 +24,7 @@ and so on. `data-intersect` is a custom attribute that triggers a request when t
 event: datastar-merge-fragments
 data: selector #more_btn
 data: mergeMode morph
-data: fragments <div data-intersect="$offset=10;$limit=10;@get('/examples/infinite_scroll/data')" id="more_btn">
+data: fragments <div data-on-intersect="$offset=10;$limit=10;@get('/examples/infinite_scroll/data')" id="more_btn">
   <div>Loading...</div>
 </div>
 
