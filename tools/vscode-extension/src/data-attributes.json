@@ -109,43 +109,10 @@
       }
     ]
   },
-  "data-on-load": {
-    "prefix": "data-on-load",
-    "body": "data-on-load=\"${1:expression}\"",
-    "description": "Executes an expression whenever the element is initialised in the DOM.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on-load"
-      }
-    ]
-  },
-  "data-on-intersect": {
-    "prefix": "data-on-intersect",
-    "body": "data-on-intersect=\"${1:expression}\"",
-    "description": "Executes an expression on intersection with the viewport.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on-intersect"
-      }
-    ]
-  },
-  "data-on-interval": {
-    "prefix": "data-on-interval",
-    "body": "data-on-interval=\"${1:expression}\"",
-    "description": "Executes an expression at a regular interval.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on-interval"
-      }
-    ]
-  },
   "data-on": {
     "prefix": "data-on-*",
     "body": "data-on-${1:name}=\"${2:expression}\"",
-    "description": "Executes an expression whenever an event is triggered on an element.",
+    "description": "Runs an expression whenever an event is triggered on an element.",
     "references": [
       {
         "name": "Documentation",
@@ -156,7 +123,7 @@
   "data-on-click": {
     "prefix": "data-on-click",
     "body": "data-on-click=\"${1:expression}\"",
-    "description": "Executes an expression whenever the element is clicked.",
+    "description": "Runs an expression whenever the element is clicked.",
     "references": [
       {
         "name": "Documentation",
@@ -167,11 +134,77 @@
   "data-on-keydown": {
     "prefix": "data-on-keydown",
     "body": "data-on-keydown=\"${1:expression}\"",
-    "description": "Executes an expression whenever a key is pressed.",
+    "description": "Runs an expression whenever a key is pressed.",
     "references": [
       {
         "name": "Documentation",
         "url": "https://data-star.dev/reference/attribute_plugins#data-on"
+      }
+    ]
+  },
+  "data-on-intersect": {
+    "prefix": "data-on-intersect",
+    "body": "data-on-intersect=\"${1:expression}\"",
+    "description": "Runs an expression on intersection with the viewport.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-intersect"
+      }
+    ]
+  },
+  "data-on-interval": {
+    "prefix": "data-on-interval",
+    "body": "data-on-interval=\"${1:expression}\"",
+    "description": "Runs an expression at a regular interval.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-interval"
+      }
+    ]
+  },
+  "data-on-load": {
+    "prefix": "data-on-load",
+    "body": "data-on-load=\"${1:expression}\"",
+    "description": "Runs an expression whenever the element is initialised.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-load"
+      }
+    ]
+  },
+  "data-on-raf": {
+    "prefix": "data-on-raf",
+    "body": "data-on-raf=\"${1:expression}\"",
+    "description": "Runs an expression on every `requestAnimationFrame` event.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-raf"
+      }
+    ]
+  },
+  "data-on-signal-change": {
+    "prefix": "data-on-signal-change",
+    "body": "data-on-signal-change=\"${1:expression}\"",
+    "description": "Runs an expression whenever any signal changes.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-signal-change"
+      }
+    ]
+  },
+  "data-on-signal-change-*": {
+    "prefix": "data-on-signal-change-*",
+    "body": "data-on-signal-change-${1:name}=\"${2:expression}\"",
+    "description": "Runs an expression whenever a specific signal changes.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-signal-change"
       }
     ]
   },
@@ -183,28 +216,6 @@
       {
         "name": "Documentation",
         "url": "https://data-star.dev/reference/attribute_plugins#data-persist"
-      }
-    ]
-  },
-  "data-persist-*": {
-    "prefix": "data-persist-*",
-    "body": "data-persist-${1:name}=\"${2:expression}\"",
-    "description": "Persists signals in local storage with the provided name.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-persist"
-      }
-    ]
-  },
-  "data-on-raf": {
-    "prefix": "data-on-raf",
-    "body": "data-on-raf=\"${1:expression}\"",
-    "description": "Executes an expression on every `requestAnimationFrame` event.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on-raf"
       }
     ]
   },
@@ -282,17 +293,6 @@
       {
         "name": "Documentation",
         "url": "https://data-star.dev/reference/attribute_plugins#data-signals"
-      }
-    ]
-  },
-  "data-on-signal-change": {
-    "prefix": "data-on-signal-change",
-    "body": "data-on-signal-change=\"${1:expression}\"",
-    "description": "Executes an expression on any signal change.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on-signal-change"
       }
     ]
   },

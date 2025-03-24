@@ -7,17 +7,6 @@
   "default-icon": "datastar-icon.png",
   "contributions": {
     "js": {
-      "events": [
-        {
-          "name": "interval"
-        },
-        {
-          "name": "signals-change"
-        },
-        {
-          "name": "raf"
-        }
-      ],
       "datastar-bind-modifiers": [
         {
           "name": "case",
@@ -40,20 +29,6 @@
         {
           "name": "case",
           "description": "Modify the casing of the signal name"
-        }
-      ],
-      "datastar-intersect-modifiers": [
-        {
-          "name": "full",
-          "description": "Trigger when the full element is visible"
-        },
-        {
-          "name": "half",
-          "description": "Trigger when half of the element is visible"
-        },
-        {
-          "name": "once",
-          "description": "Only trigger the event once"
         }
       ],
       "datastar-on-modifiers": [
@@ -86,22 +61,6 @@
           "description": "Debounce without trailing edge"
         },
         {
-          "name": "delay",
-          "description": "Delay the event listener"
-        },
-        {
-          "name": "delay.1s",
-          "description": "Delay for 1 second"
-        },
-        {
-          "name": "duration",
-          "description": "The interval duration"
-        },
-        {
-          "name": "duration.500ms",
-          "description": "Set an interval duration of 500 milliseconds"
-        },
-        {
           "name": "once",
           "description": "Only trigger the event listener once"
         },
@@ -126,11 +85,11 @@
           "description": "Throttle for 1 second"
         },
         {
-          "name": "throttle.nolead",
+          "name": "throttle.noleading",
           "description": "Throttle without leading edge"
         },
         {
-          "name": "throttle.notrail",
+          "name": "throttle.trail",
           "description": "Throttle without trailing edge"
         },
         {
@@ -142,11 +101,83 @@
           "description": "Attaches the event listener to the `window` element"
         }
       ],
-      "datastar-persist-modifiers": [
+      "datastar-on-intersect-modifiers": [
         {
-          "name": "case",
-          "description": "Modify the casing of the key"
+          "name": "full",
+          "description": "Trigger when the full element is visible"
         },
+        {
+          "name": "half",
+          "description": "Trigger when half of the element is visible"
+        },
+        {
+          "name": "once",
+          "description": "Only trigger the event once"
+        }
+      ],
+      "datastar-on-interval-modifiers": [
+        {
+          "name": "duration",
+          "description": "The interval duration"
+        },
+        {
+          "name": "duration.500ms",
+          "description": "Set an interval duration of 500 milliseconds"
+        }
+      ],
+      "datastar-on-load-modifiers": [
+        {
+          "name": "delay",
+          "description": "Delay the event listener"
+        },
+        {
+          "name": "delay.1s",
+          "description": "Delay for 1 second"
+        }
+      ],
+      "datastar-on-raf-modifiers": [
+        {
+          "name": "debounce",
+          "description": "Debounce the event listener"
+        },
+        {
+          "name": "debounce.500ms",
+          "description": "Debounce for 1000 milliseconds"
+        },
+        {
+          "name": "debounce.1s",
+          "description": "Debounce for 1 second"
+        },
+        {
+          "name": "debounce.leading",
+          "description": "Debounce with leading edge"
+        },
+        {
+          "name": "debounce.notrail",
+          "description": "Debounce without trailing edge"
+        },
+        {
+          "name": "throttle",
+          "description": "Throttle the event listener"
+        },
+        {
+          "name": "throttle.500ms",
+          "description": "Throttle for 500 milliseconds"
+        },
+        {
+          "name": "throttle.1s",
+          "description": "Throttle for 1 second"
+        },
+        {
+          "name": "throttle.noleading",
+          "description": "Throttle without leading edge"
+        },
+        {
+          "name": "throttle.trail",
+          "description": "Throttle without trailing edge"
+        }
+      ],
+      "datastar-persist-modifiers": [
         {
           "name": "session",
           "description": "Persists signals values in Session Storage"
@@ -388,36 +419,9 @@
           }
         },
         {
-          "name": "data-on-intersect",
-          "virtual": true,
-          "description": "Executes an expression on intersection with the viewport.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-intersect",
-          "value": {
-            "kind": "expression",
-            "type": "string",
-            "required": true
-          },
-          "pattern": {
-            "template": [
-              "data-on-intersect",
-              {
-                "items": "/js/datastar-intersect-modifiers",
-                "template": [
-                  "__",
-                  "$...",
-                  "#item:modifier"
-                ],
-                "required": false,
-                "repeat": true
-              }
-            ],
-            "priority": "normal"
-          }
-        },
-        {
           "name": "data-on-*",
           "virtual": true,
-          "description": "Executes an expression whenever an event is triggered on an element.",
+          "description": "Runs an expression whenever an event is triggered on an element.",
           "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on",
           "value": {
             "kind": "expression",
@@ -442,6 +446,144 @@
                     "required": false,
                     "repeat": true
                   }
+                ],
+                "priority": "normal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "data-on-intersect",
+          "virtual": true,
+          "description": "Runs an expression on intersection with the viewport.",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-intersect",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-on-intersect",
+              {
+                "items": "/js/datastar-on-intersect-modifiers",
+                "template": [
+                  "__",
+                  "$...",
+                  "#item:modifier"
+                ],
+                "required": false,
+                "repeat": true
+              }
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-on-interval",
+          "virtual": true,
+          "description": "Runs an expression at a regular interval.",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-interval",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-on-interval",
+              {
+                "items": "/js/datastar-on-interval-modifiers",
+                "template": [
+                  "__",
+                  "$...",
+                  "#item:modifier"
+                ],
+                "required": false,
+                "repeat": true
+              }
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-on-load",
+          "virtual": true,
+          "description": "Runs an expression whenever the element is initialised.",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-load",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-on-load",
+              {
+                "items": "/js/datastar-on-load-modifiers",
+                "template": [
+                  "__",
+                  "$...",
+                  "#item:modifier"
+                ],
+                "required": false,
+                "repeat": true
+              }
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-on-raf",
+          "virtual": true,
+          "description": "Runs an expression on every `requestAnimationFrame` event.",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-raf",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-on-raf",
+              {
+                "items": "/js/datastar-on-raf-modifiers",
+                "template": [
+                  "__",
+                  "$...",
+                  "#item:modifier"
+                ],
+                "required": false,
+                "repeat": true
+              }
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-on-signal-change-*",
+          "virtual": true,
+          "description": "Runs an expression whenever any signal changes.",
+          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-signal-change",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "or": [
+              {
+                "template": [
+                  "data-on-signal-change-",
+                  {
+                    "regex": "[-a-z0-9]+"
+                  }
+                ],
+                "priority": "normal"
+              },
+              {
+                "template": [
+                  "data-on-signal-change"
                 ],
                 "priority": "normal"
               }
