@@ -10,7 +10,7 @@ With Datastar, you can build any UI that a full-stack framework like React, Vue.
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
     <div>
-        We're so confident that Datastar can be used as a JavaScript framework replacement that we challenge anyone to find a use-case for a web app that Datastar <em>cannot</em> realistically be used to build!
+        We're so confident that Datastar can be used as a JavaScript framework replacement that we challenge anyone to find a use-case for a web app that Datastar <em>cannot</em> be used to build!
     </div>
 </div>
 
