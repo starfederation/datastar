@@ -1,5 +1,8 @@
-import { runtimeErr } from '../engine/errors'
-import type { RuntimeContext } from '../engine/types'
+import type { HTMLorSVGElement } from '../engine/types'
+import {
+  ALL_RETRIES_FAILED,
+  dispatchSSE,
+} from '../plugins/official/backend/shared'
 
 /**
  * Represents a message sent in an event stream
@@ -259,6 +262,7 @@ export interface FetchEventSourceInit extends RequestInit {
 }
 
 export function fetchEventSource(
+  el: HTMLorSVGElement,
   input: RequestInfo,
   {
     signal: inputSignal,
@@ -360,6 +364,8 @@ export function fetchEventSource(
             retryInterval = Math.min(retryInterval, retryMaxWaitMs)
             retries++
             if (retries > retryMaxCount) {
+              dispatchSSE(el, ALL_RETRIES_FAILED, {})
+
               // we should not retry anymore:
               dispose()
               // Max retries reached, check your server or network connection
