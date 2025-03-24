@@ -150,7 +150,8 @@ Modifiers allow you to modify behavior when merging signals.
 - `.kebab` - Kebab case: `my-signal`
 - `.snake` - Snake case: `my_signal`
 - `.pascal` - Pascal case: `MySignal`
-- `__ifmissing` - Only merges signals if their keys do not already exist. This is useful for setting defaults without overwriting existing values.
+- `__ifmissing` - Only merges signals if their keys do not already exist. This is useful for setting defaults without
+overwriting existing values.
 
 ```html
 <div data-signals-my-signal__case.kebab="1" data-signals-foo__ifmissing="1"></div>
@@ -391,7 +392,8 @@ behavior.
 - `.1s` - Throttle for 1 second.
 - `.noleading` - Throttle without leading edge.
 - `.trail` - Throttle with trailing edge.
-- `__viewtransition` - Wraps the expression in `document.startViewTransition()` when the View Transition API is available.
+- `__viewtransition` - Wraps the expression in `document.startViewTransition()` when the View Transition API is
+available.
 - `__window` - Attaches the event listener to the `window` element.
 - `__outside` - Triggers when the event is outside the element.
 - `__prevent` - Calls `preventDefault` on the event listener.
@@ -537,7 +539,8 @@ Modifiers allow you to modify the element intersection behavior.
 
 ### `data-on-interval`
 
-Runs an expression at a regular interval. The interval duration defaults to 1 second and can be modified using the `__duration` modifier.
+Runs an expression at a regular interval. The interval duration defaults to 1 second and can be modified using the
+`__duration` modifier.
 
 ```html
 <div data-on-interval="$count++"></div>
@@ -569,8 +572,8 @@ Runs an expression when the element is loaded into the DOM.
 Modifiers allow you to add a delay to the event listener.
 
 - `__delay` - Delay the event listener.
-  - `.500ms` - Delay for 500 milliseconds.
-  - `.1s` - Delay for 1 second.
+- `.500ms` - Delay for 500 milliseconds.
+- `.1s` - Delay for 1 second.
 
 ```html
 <div data-on-load__delay.500ms="$count = 1"></div>
@@ -605,13 +608,13 @@ Modifiers allow you to modify the timing of the event listener.
 
 ### `data-on-signal-change`
 
-Runs an expression whenever any signal changes.
+Runs an expression whenever a signal changes.
 
 ```html
 <div data-on-signal-change="$count++"></div>
 ```
 
-A key can be provided to only trigger the event when the signal with that key change.
+A key can be provided to only trigger the event when a specific signal changes.
 
 ```html
 <div data-on-signal-change-foo="$fooCount++"></div>

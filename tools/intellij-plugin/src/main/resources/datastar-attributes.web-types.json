@@ -563,7 +563,7 @@
         {
           "name": "data-on-signal-change-*",
           "virtual": true,
-          "description": "Runs an expression whenever any signal changes.",
+          "description": "Runs an expression whenever a signal changes.",
           "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-signal-change",
           "value": {
             "kind": "expression",

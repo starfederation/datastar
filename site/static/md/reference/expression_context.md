@@ -13,19 +13,3 @@ The current element being processed.
 ```html
 <button data-on-click="ctx.el.disabled = true"></button>
 ```
-
-### `ctx.signals`
-
-The signals root object that contains functions for accessing and modifying signals. Signals can be accessed using the `signal` method. The following is the equivalent of an expression containing only `$foo`.
-
-```html
-<div data-signals-foo="1">
-  <div data-text="ctx.signals.signal('foo').value"></div>
-</div>
-```
-
-Here is how you can output the existing signals in JSON format, which can be useful when troubleshooting an issue.
-
-```html
-<pre data-text="ctx.signals.JSON()"></pre>
-```
