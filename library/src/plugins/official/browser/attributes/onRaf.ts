@@ -1,7 +1,7 @@
 // Authors: Ben Croker
-// Icon: material-symbols:mail
-// Slug: Executes and expression on every animation frame
-// Description: This attribute executes an expression on every animation frame.
+// Icon: material-symbols:animated-images-outline
+// Slug: Runs an expression on every animation frame
+// Description: This attribute runs an expression on every animation frame.
 
 import {
   type AttributePlugin,

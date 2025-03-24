@@ -1,7 +1,7 @@
 // Authors: Ben Croker
-// Icon: material-symbols:mail
-// Slug: Executes and expression on an interval
-// Description: This attribute executes an expression on an interval. The interval can be set to a specific duration, and can be set to trigger immediately.
+// Icon: material-symbols:timer-outline
+// Slug: Runs an expression on an interval
+// Description: This attribute runs an expression on an interval. The interval can be set to a specific duration, and can be set to trigger immediately.
 
 import {
   type AttributePlugin,

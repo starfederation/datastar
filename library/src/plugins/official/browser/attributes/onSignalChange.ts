@@ -1,7 +1,7 @@
 // Authors: Ben Croker
-// Icon: material-symbols:mail
-// Slug: Executes and expression on any signal change
-// Description: This attribute executes an expression on any signal change. 
+// Icon: material-symbols:bigtop-updates
+// Slug: Runs an expression whenever a signal changes
+// Description: This attribute runs an expression whenever a signal changes. 
 
 import {
   type AttributePlugin,

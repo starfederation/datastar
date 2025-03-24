@@ -1,4 +1,5 @@
-// Icon: material-symbols:settings-input-antenna
+// Authors: Delaney Gillilan
+// Icon: material-symbols:variable-remove-outline
 // Slug: Remove signals using a Server-Sent Event
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.
 

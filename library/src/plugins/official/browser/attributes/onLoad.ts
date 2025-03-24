@@ -1,7 +1,7 @@
 // Authors: Ben Croker
-// Icon: material-symbols:mail
-// Slug: Executes and expression when the element is loaded
-// Description: This attribute executes an expression when the element is loaded.
+// Icon: material-symbols:timer-play-outline
+// Slug: Runs an expression when the element is loaded
+// Description: This attribute runs an expression when the element is loaded.
 
 import {
   type AttributePlugin,
