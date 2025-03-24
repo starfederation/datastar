@@ -1,5 +1,5 @@
 // Authors: Delaney Gillilan
-// Icon: akar-icons:edit-attributes-outline
+// Icon: material-symbols:edit-attributes-outline
 // Slug: Bind attributes to expressions
 // Description: Any attribute can be bound to an expression. The attribute will be updated reactively whenever the expression signal changes.
 
