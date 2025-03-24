@@ -573,7 +573,7 @@ Modifiers allow you to add a delay to the event listener.
   - `.1s` - Delay for 1 second.
 
 ```html
-<div data-on-load__debounce.500ms="$count = 1"></div>
+<div data-on-load__delay.500ms="$count = 1"></div>
 ```
 
 ### `data-on-raf`
