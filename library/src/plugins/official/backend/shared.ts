@@ -1,4 +1,5 @@
 import { DATASTAR } from '../../../engine/consts'
+import type { HTMLorSVGElement } from '../../../engine/types'
 
 export const DATASTAR_SSE_EVENT = `${DATASTAR}-sse`
 export const STARTED = 'started'
@@ -46,5 +47,18 @@ export function datastarSSEEventWatcher(
       const { argsRaw } = event.detail
       fn(argsRaw)
     },
+  )
+}
+
+export function dispatchSSE(
+  el: HTMLorSVGElement,
+  type: string,
+  argsRaw: Record<string, string>,
+) {
+  el.dispatchEvent(
+    new CustomEvent<DatastarSSEEvent>(DATASTAR_SSE_EVENT, {
+      detail: { type, argsRaw },
+      bubbles: true,
+    }),
   )
 }
