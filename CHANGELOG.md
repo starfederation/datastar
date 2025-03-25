@@ -6,6 +6,10 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ## v1.0.0-beta.10
 
+### Added
+
+- Added a `retries-failed` event type that is dispatched when the SSE plugin fails after retrying ([#785](https://github.com/starfederation/datastar/issues/785)).
+
 ### Changed
 
 - Updated Idiomorph to version [0.7.3](https://github.com/bigskysoftware/idiomorph/releases/tag/v0.7.3).
