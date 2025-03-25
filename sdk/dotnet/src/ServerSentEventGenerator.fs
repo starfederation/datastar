@@ -5,11 +5,13 @@ open StarFederation.Datastar.Utility
 /// <summary>
 /// Converts requests into SSEs, serializes, and sends to sseHandler handlers
 /// </summary>
+[<AbstractClass; Sealed>]
 type ServerSentEventGenerator =
+    static member inline private send (seeHandler: ISendServerEvent) sse = seeHandler.SendServerEvent sse
 
-    static member send (sseHandler:ISendServerEvent) sse = sseHandler.SendServerEvent sse
+    static member Send (sse, sseHandler:ISendServerEvent) = ServerSentEventGenerator.send sseHandler sse
 
-    static member mergeFragments (sseHandler, fragments, ?options:MergeFragmentsOptions) =
+    static member MergeFragments (sseHandler, fragments, ?options:MergeFragmentsOptions) =
         let options = defaultArg options MergeFragmentsOptions.defaults
         { EventType = MergeFragments
           Id = options.EventId
@@ -22,7 +24,7 @@ type ServerSentEventGenerator =
             |] }
         |> ServerSentEventGenerator.send sseHandler
 
-    static member removeFragments (sseHandler, selector, ?options:RemoveFragmentsOptions) =
+    static member RemoveFragments (sseHandler, selector, ?options:RemoveFragmentsOptions) =
         let options = defaultArg options RemoveFragmentsOptions.defaults
         { EventType = RemoveFragments
           Id = options.EventId
@@ -33,7 +35,7 @@ type ServerSentEventGenerator =
             |] }
         |> ServerSentEventGenerator.send sseHandler
 
-    static member mergeSignals (sseHandler, mergeSignals, ?options:MergeSignalsOptions) =
+    static member MergeSignals (sseHandler, mergeSignals, ?options:MergeSignalsOptions) =
         let options = defaultArg options MergeSignalsOptions.defaults
         { EventType = MergeSignals
           Id = options.EventId
@@ -44,7 +46,7 @@ type ServerSentEventGenerator =
             |] }
        |> ServerSentEventGenerator.send sseHandler
 
-    static member removeSignals (sseHandler, paths, ?options:EventOptions) =
+    static member RemoveSignals (sseHandler, paths, ?options:EventOptions) =
         let options = defaultArg options EventOptions.defaults
         let paths' = paths |> Seq.map SignalPath.value |> String.concat " "
         { EventType = RemoveSignals
@@ -53,7 +55,7 @@ type ServerSentEventGenerator =
           DataLines = [| $"{Consts.DatastarDatalinePaths} {paths'}" |] }
         |> ServerSentEventGenerator.send sseHandler
 
-    static member executeScript (sseHandler, script, ?options:ExecuteScriptOptions) =
+    static member ExecuteScript (sseHandler, script, ?options:ExecuteScriptOptions) =
         let options = defaultArg options ExecuteScriptOptions.defaults
         { EventType = ExecuteScript
           Id = options.EventId

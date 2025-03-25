@@ -5,8 +5,8 @@ open StarFederation.Datastar.DependencyInjection
 open System.Linq
 open System.Runtime.CompilerServices
 
-[<Extension>]
-type ServiceCollectionExtensionMethods() =
+[<AbstractClass; Sealed; Extension>]
+type ServiceCollectionExtensionMethods =
     [<Extension>]
     static member AddDatastarMvc (serviceCollection:IServiceCollection) =
         // check that AddDatastar has been run
