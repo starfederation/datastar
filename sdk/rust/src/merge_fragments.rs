@@ -25,7 +25,6 @@ use {
 ///     yield MergeFragments::new("<h1>Hello, world!</h1>")
 ///         .selector("body")
 ///         .merge_mode(FragmentMergeMode::Append)
-///         .settle_duration(Duration::from_millis(1000))
 ///         .use_view_transition(true)
 ///         .into();
 /// });
@@ -47,9 +46,6 @@ pub struct MergeFragments {
     /// The mode to use when merging the fragment into the DOM.
     /// If not provided the Datastar client side will default to [`FragmentMergeMode::Morph`].
     pub merge_mode: FragmentMergeMode,
-    /// The amount of time that a fragment should take before removing any CSS related to settling.
-    /// `settle_duration` is used to allow for animations in the browser via the Datastar client.
-    pub settle_duration: Duration,
     /// Whether to use view transitions, if not provided the Datastar client side will default to `false`.
     pub use_view_transition: bool,
 }
@@ -63,7 +59,6 @@ impl MergeFragments {
             fragments: fragments.into(),
             selector: None,
             merge_mode: FragmentMergeMode::default(),
-            settle_duration: Duration::from_millis(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION),
             use_view_transition: consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
         }
     }
@@ -92,12 +87,6 @@ impl MergeFragments {
         self
     }
 
-    /// Sets the `settle_duration` of the [`MergeFragments`] event.
-    pub fn settle_duration(mut self, settle_duration: Duration) -> Self {
-        self.settle_duration = settle_duration;
-        self
-    }
-
     /// Sets the `use_view_transition` of the [`MergeFragments`] event.
     pub fn use_view_transition(mut self, use_view_transition: bool) -> Self {
         self.use_view_transition = use_view_transition;
@@ -122,14 +111,6 @@ impl From<MergeFragments> for DatastarEvent {
                 "{} {}",
                 consts::MERGE_MODE_DATALINE_LITERAL,
                 val.merge_mode.as_str()
-            ));
-        }
-
-        if val.settle_duration.as_millis() != consts::DEFAULT_FRAGMENTS_SETTLE_DURATION as u128 {
-            data.push(format!(
-                "{} {}",
-                consts::SETTLE_DURATION_DATALINE_LITERAL,
-                val.settle_duration.as_millis()
             ));
         }
 

@@ -28,7 +28,6 @@ public final class MergeFragments extends AbstractDatastarEvent {
     public static final class Builder extends AbstractBuilder<MergeFragments> {
         private String selector;
         private FragmentMergeMode mergeMode = DEFAULT_FRAGMENT_MERGE_MODE; // Default
-        private int settleDuration = DEFAULT_FRAGMENTS_SETTLE_DURATION; // Default
         private boolean useViewTransition = DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS; // Default
         private String rawData;
 
@@ -42,11 +41,6 @@ public final class MergeFragments extends AbstractDatastarEvent {
 
         public Builder mergeMode(FragmentMergeMode mergeMode) {
             this.mergeMode = mergeMode;
-            return this;
-        }
-
-        public Builder settleDuration(int settleDuration) {
-            this.settleDuration = settleDuration;
             return this;
         }
 
@@ -76,11 +70,6 @@ public final class MergeFragments extends AbstractDatastarEvent {
             // Add mergeMode if not default
             if (mergeMode != DEFAULT_FRAGMENT_MERGE_MODE) {
                 dataLines.add(MERGE_MODE_DATALINE_LITERAL + mergeMode);
-            }
-
-            // Add settleDuration if not default
-            if (settleDuration != DEFAULT_FRAGMENTS_SETTLE_DURATION) {
-                dataLines.add(SETTLE_DURATION_DATALINE_LITERAL + settleDuration);
             }
 
             // Add useViewTransition if true

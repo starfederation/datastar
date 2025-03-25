@@ -2,9 +2,7 @@
 
 ## Demo
 
-<div
-  data-on-load="@get('/examples/signals_ifmissing/updates')"
->
+<div data-on-load="@get('/examples/signals_ifmissing/updates')">
   <div>
     Should always be 1234:
     <span id="placeholder"></span>
@@ -14,11 +12,7 @@
 ## Explanation
 
 ```html
-<div
-  id="demo"
-  data-signals="{id: 1234}"
-  data-on-load="@get('/examples/signals_ifmissing/updates')"
->
+<div id="demo" data-signals="{id: 1234}" data-on-load="@get('/examples/signals_ifmissing/updates')">
   <div>
     Should always be 1234:
     <span data-text="$id">should be replaced</span>
@@ -26,7 +20,8 @@
 </div>
 ```
 
-The `data-signals` attribute is used to set the initial state of the signals. You can check your browser's Network Devtools to see the `updates` endpoint alternates between sending fragments and direct signal merges like the following:
+The `data-signals` attribute is used to set the initial state of the signals. You can check your browser's Network
+Devtools to see the `updates` endpoint alternates between sending fragments and direct signal merges like the following:
 
 ```md
 ...
@@ -54,4 +49,5 @@ data: signals {id:77}
 ...
 ```
 
-Since the signals is already set, the `data-signals__ifmissing` attribute will not overwrite the existing value in either case.
+Since the signals is already set, the `data-signals__ifmissing` attribute will not overwrite the existing value in
+either case.

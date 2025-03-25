@@ -4,17 +4,7 @@
 
 ## Demo
 
-<style>
-tr.datastar-swapping td {
-  opacity: 0;
-  transition: opacity 1s ease-out;
-}
-</style>
-
-<div
-    id="delete_row"
-    data-on-load="@get('/examples/delete_row/data')"
->
+<div id="delete_row" data-on-load="@get('/examples/delete_row/data')">
 </div>
 
 ## Explanation
@@ -38,9 +28,7 @@ table body:
       <td>joe@smith.org</td>
       <td>Active</td>
       <td>
-        <button
-          data-on-click="confirm('Are you sure?') && @delete('/examples/delete_row/data/0')"
-        >
+        <button data-on-click="confirm('Are you sure?') && @delete('/examples/delete_row/data/0')">
           Delete
         </button>
       </td>
@@ -50,13 +38,5 @@ table body:
 </table>
 ```
 
-The row has a normal [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm) to confirm the delete action. We also use the following CSS to fade out.
-
-```css
-tr.datastar-swapping td {
-  opacity: 0;
-  transition: opacity 1s ease-out;
-}
-```
-
-To fade the row out before it is swapped/removed.
+The row has a normal [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm) to confirm the delete
+action.

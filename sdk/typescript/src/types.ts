@@ -7,13 +7,11 @@ import {
   DatastarDatalinePaths,
   DatastarDatalineScript,
   DatastarDatalineSelector,
-  DatastarDatalineSettleDuration,
   DatastarDatalineSignals,
   DatastarDatalineUseViewTransition,
   DefaultExecuteScriptAttributes,
   DefaultExecuteScriptAutoRemove,
   DefaultFragmentMergeMode,
-  DefaultFragmentsSettleDurationMs,
   DefaultFragmentsUseViewTransitions,
   DefaultMergeSignalsOnlyIfMissing,
   EventTypes,
@@ -31,7 +29,6 @@ export interface DatastarEventOptions {
 
 export interface FragmentOptions extends DatastarEventOptions {
   [DatastarDatalineUseViewTransition]?: boolean;
-  [DatastarDatalineSettleDuration]?: number;
 }
 
 export interface MergeFragmentsOptions extends FragmentOptions {
@@ -131,7 +128,6 @@ export type DatastarEvent =
 
 export const DefaultMapping = {
   [DatastarDatalineMergeMode]: DefaultFragmentMergeMode,
-  [DatastarDatalineSettleDuration]: DefaultFragmentsSettleDurationMs,
   [DatastarDatalineUseViewTransition]: DefaultFragmentsUseViewTransitions,
   [DatastarDatalineOnlyIfMissing]: DefaultMergeSignalsOnlyIfMissing,
   [DatastarDatalineAttributes]: {

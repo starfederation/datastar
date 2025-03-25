@@ -1,5 +1,5 @@
-import { runtimeErr } from '../engine/errors'
-import type { RuntimeContext } from '../engine/types'
+import type { HTMLorSVGElement } from '../engine/types'
+import { RETRIES_FAILED, dispatchSSE } from '../plugins/official/backend/shared'
 
 /**
  * Represents a message sent in an event stream
@@ -259,7 +259,7 @@ export interface FetchEventSourceInit extends RequestInit {
 }
 
 export function fetchEventSource(
-  ctx: RuntimeContext,
+  el: HTMLorSVGElement,
   input: RequestInfo,
   {
     signal: inputSignal,
@@ -360,14 +360,16 @@ export function fetchEventSource(
             retryInterval *= retryScaler // exponential backoff
             retryInterval = Math.min(retryInterval, retryMaxWaitMs)
             retries++
-            if (retries >= retryMaxCount) {
+            if (retries > retryMaxCount) {
+              dispatchSSE(el, RETRIES_FAILED, {})
+
               // we should not retry anymore:
               dispose()
-              // Max retries hit, check your server or network connection
-              reject(runtimeErr('SseMaxRetries', ctx, { retryMaxCount }))
+              // Max retries reached, check your server or network connection
+              reject('Max retries reached.')
             } else {
               console.error(
-                `Datastar failed to reach ${rest.method}: ${input.toString()} retry in ${interval}ms`,
+                `Datastar failed to reach ${input.toString()} retrying in ${interval}ms.`,
               )
             }
           } catch (innerErr) {

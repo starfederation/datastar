@@ -14,12 +14,10 @@
     <name>Datastar Java SDK Core</name>
     <description>The core library for the Datastar Java SDK suite</description>
 
-
-
     <distributionManagement>
         <repository>
             <id>github</id>
-            <url>https://github.com/starfederation/datastar</url>
+            <url>https://maven.pkg.github.com/rphumulock/datastar</url>
         </repository>
     </distributionManagement>
 

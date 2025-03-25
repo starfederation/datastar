@@ -127,6 +127,26 @@ func setupPageTestOnPopulate(t *testing.T, subURL string, value string) {
 	})
 }
 
+func setupPageTestOnPopulateAndClick(t *testing.T, subURL string, value string) {
+	setupPageTest(t, subURL, func(runner runnerFn) {
+		runner(subURL, func(t *testing.T, page *rod.Page) {
+			result := page.MustElement("#result")
+			before, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, before, "0")
+	
+			populatable := page.MustElement("#populatable")
+			populatable.MustInput(value)
+			clickable := page.MustElement("#clickable")
+			clickable.MustClick()
+			page.MustWaitIdle()
+			after, err := result.Text()
+			assert.NoError(t, err)
+			assert.Contains(t, after, "1")
+		})
+	})
+}
+
 func setupPageTestOnSelect(t *testing.T, subURL string) {
 	setupPageTest(t, subURL, func(runner runnerFn) {
 		runner(subURL, func(t *testing.T, page *rod.Page) {

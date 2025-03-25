@@ -39,7 +39,6 @@ $sse = new ServerSentEventGenerator();
 $sse->mergeFragments('<div></div>', [
     'selector' => '#my-div',
     'mergeMode' => FragmentMergeMode::Append,
-    'settleDuration' => 1000,
     'useViewTransition' => true,
 ]);
 

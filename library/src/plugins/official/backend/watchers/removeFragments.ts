@@ -1,9 +1,9 @@
-// Icon: material-symbols:settings-input-antenna
+// Authors: Delaney Gillilan
+// Icon: material-symbols:scan-delete-outline
 // Slug: Remove fragments from the DOM using a Server-Sent Event
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.
 
 import {
-  DefaultFragmentsSettleDurationMs,
   DefaultFragmentsUseViewTransitions,
   EventTypes,
 } from '../../../../engine/consts'
@@ -14,7 +14,7 @@ import {
   docWithViewTransitionAPI,
   supportsViewTransitions,
 } from '../../../../utils/view-transtions'
-import { SWAPPING_CLASS, datastarSSEEventWatcher } from '../shared'
+import { datastarSSEEventWatcher } from '../shared'
 
 export const RemoveFragments: WatcherPlugin = {
   type: PluginType.Watcher,
@@ -24,8 +24,6 @@ export const RemoveFragments: WatcherPlugin = {
       EventTypes.RemoveFragments,
       ({
         selector,
-        settleDuration:
-          settleDurationRaw = `${DefaultFragmentsSettleDurationMs}`,
         useViewTransition:
           useViewTransitionRaw = `${DefaultFragmentsUseViewTransitions}`,
       }) => {
@@ -33,20 +31,13 @@ export const RemoveFragments: WatcherPlugin = {
           throw initErr('NoSelectorProvided', ctx)
         }
 
-        const settleDuration = Number.parseInt(settleDurationRaw)
         const useViewTransition = isBoolString(useViewTransitionRaw)
         const removeTargets = document.querySelectorAll(selector)
 
         const applyToTargets = () => {
           for (const target of removeTargets) {
-            target.classList.add(SWAPPING_CLASS)
+            target.remove()
           }
-
-          setTimeout(() => {
-            for (const target of removeTargets) {
-              target.remove()
-            }
-          }, settleDuration)
         }
 
         if (useViewTransition && supportsViewTransitions) {

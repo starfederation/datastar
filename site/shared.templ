@@ -205,11 +205,11 @@ templ header(r *http.Request) {
 		<div class="flex justify-between w-full gap-4">
 			<div class="flex flex-wrap items-baseline gap-1">
 				<a
-					class="flex gap-1 text-2xl font-bold uppercase font-brand"
+					class="flex items-center gap-1 text-2xl font-bold uppercase font-brand"
 					href="/"
 				>
 					<span>Datastar</span>
-					<img src={ staticPath("images/datastar_icon.svg") } class="h-8"/>
+					<img src={ staticPath("images/rocket.svg") } class="h-7"/>
 				</a>
 				<div class="font-mono text-xs text-accent">v{ datastar.Version }</div>
 			</div>

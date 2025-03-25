@@ -28,7 +28,6 @@ pub enum TestEvent {
         retry_duration: Option<u64>,
         selector: Option<String>,
         merge_mode: Option<String>,
-        settle_duration: Option<u64>,
         use_view_transition: Option<bool>,
     },
     #[serde(rename_all = "camelCase")]
@@ -43,7 +42,6 @@ pub enum TestEvent {
         selector: String,
         event_id: Option<String>,
         retry_duration: Option<u64>,
-        settle_duration: Option<u64>,
         use_view_transition: Option<bool>,
     },
     #[serde(rename_all = "camelCase")]
@@ -97,7 +95,6 @@ pub fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> {
                     retry_duration,
                     selector,
                     merge_mode,
-                    settle_duration,
                     use_view_transition,
                 } => {
                     let merge_mode = merge_mode
@@ -120,7 +117,6 @@ pub fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> {
                         retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
                         selector,
                         merge_mode,
-                        settle_duration: Duration::from_millis(settle_duration.unwrap_or(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION)),
                         use_view_transition: use_view_transition.unwrap_or(consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS),
                     }.into()
                 },
@@ -139,13 +135,11 @@ pub fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> {
                     selector,
                     event_id,
                     retry_duration,
-                    settle_duration,
                     use_view_transition,
                 } => RemoveFragments {
                     selector,
                     id: event_id,
                     retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
-                    settle_duration: Duration::from_millis(settle_duration.unwrap_or(consts::DEFAULT_FRAGMENTS_SETTLE_DURATION)),
                     use_view_transition: use_view_transition.unwrap_or(consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS),
                 }.into(),
                 TestEvent::RemoveSignals {

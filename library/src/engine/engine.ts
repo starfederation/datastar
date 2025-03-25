@@ -21,9 +21,8 @@ import {
 } from './types'
 
 const signals: SignalsRoot = new SignalsRoot()
-const plugins: AttributePlugin[] = []
 const actions: ActionPlugins = {}
-const watchers: WatcherPlugin[] = []
+const plugins: AttributePlugin[] = []
 
 // Map of cleanup functions by element ID, keyed by a dataset key-value hash
 const removals = new Map<string, Map<number, OnRemovalFn>>()
@@ -48,12 +47,6 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
 
     let globalInitializer: GlobalInitializer | undefined
     switch (plugin.type) {
-      case PluginType.Watcher: {
-        const wp = plugin as WatcherPlugin
-        watchers.push(wp)
-        globalInitializer = wp.onGlobalInit
-        break
-      }
       case PluginType.Action: {
         actions[plugin.name] = plugin as ActionPlugin
         break
@@ -62,6 +55,11 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
         const ap = plugin as AttributePlugin
         plugins.push(ap)
         globalInitializer = ap.onGlobalInit
+        break
+      }
+      case PluginType.Watcher: {
+        const wp = plugin as WatcherPlugin
+        globalInitializer = wp.onGlobalInit
         break
       }
       default: {
@@ -193,7 +191,11 @@ function applyAttributePlugin(
   const rawKey = camel(camelCasedKey.slice(alias.length))
 
   // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically. The first match will be the most specific.
-  const plugin = plugins.find((p) => rawKey.startsWith(p.name))
+  const plugin = plugins.find((p) => {
+    // Ignore keys with the plugin name as a prefix (ignores `classes` but not `classBold`)
+    const regex = new RegExp(`^${p.name}([A-Z]|_|$)`)
+    return regex.test(rawKey)
+  })
 
   // Skip if no plugin is found
   if (!plugin) return
@@ -263,7 +265,7 @@ function applyAttributePlugin(
 
   // Load the plugin
   const cleanup = plugin.onLoad(ctx) ?? (() => {})
-  
+
   // Store the cleanup function
   let elTracking = removals.get(el.id)
   if (!elTracking) {
@@ -349,7 +351,7 @@ function genRX(
     userExpression = userExpression.replace(k, v)
   }
 
-  const fnContent = `return (()=> {\n${userExpression}\n})()` // Wrap in IIFE
+  const fnContent = `return (() => {\n${userExpression}\n})()` // Wrap in IIFE
   ctx.fnContent = fnContent
 
   try {

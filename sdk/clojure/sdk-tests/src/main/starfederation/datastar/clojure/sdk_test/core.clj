@@ -5,7 +5,7 @@
     [reitit.ring.middleware.parameters :as rrm-params]
     [reitit.ring.middleware.multipart :as rrm-multi-params]
     [reitit.ring :as rr]
-    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response]]
+    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response on-open]]
     [starfederation.datastar.clojure.api :as d*]))
 
 ;; -----------------------------------------------------------------------------
@@ -42,7 +42,6 @@
    "selector" d*/selector
    "mergeMode" d*/merge-mode
    "useViewTransition" d*/use-view-transition
-   "settleDuration" d*/settle-duration
 
    "onlyIfMissing" d*/only-if-missing
    "autoRemove" d*/auto-remove
@@ -122,7 +121,7 @@
 ;; -----------------------------------------------------------------------------
 (defn test-handler [req]
   (->sse-response req
-    {:on-open
+    {on-open
      (fn [sse]
        (d*/with-open-sse sse
          (send-events-back! sse req)))}))

@@ -10,7 +10,7 @@ With Datastar, you can build any UI that a full-stack framework like React, Vue.
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
     <div>
-        We're so confident that Datastar can be used as a JavaScript framework replacement that we challenge anyone to find a use-case for a web app that Datastar <em>cannot</em> realistically be used to build!
+        We're so confident that Datastar can be used as a JavaScript framework replacement that we challenge anyone to find a use-case for a web app that Datastar <em>cannot</em> be used to build!
     </div>
 </div>
 
@@ -19,7 +19,7 @@ With Datastar, you can build any UI that a full-stack framework like React, Vue.
 The quickest way to use Datastar is to include it in your HTML using a script tag hosted on a CDN.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.9/bundles/datastar.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.10/bundles/datastar.js"></script>
 ```
 
 If you prefer to host the file yourself, download your own bundle using the [bundler](/bundler), then include it from the appropriate path.
@@ -450,7 +450,7 @@ One of the benefits of using SSE is that we can send multiple events (HTML fragm
 
 ## Actions
 
-Actions in Datastar are helper functions that are available in `data-*` attributes and have the syntax `@actionName()`. We already saw the backend plugin actions above. Here are a few other common actions.
+Actions in Datastar are helper functions that are available in `data-*` attributes and have the syntax `@actionName()`. We already saw the backend plugin actions above. Here are a few other useful actions.
 
 ### `@setAll()`
 
@@ -534,24 +534,4 @@ This toggles the values of all signals containing `form.` (to either `true` or `
     </button>
 </div>
 
-## A Quick Overview
-
-Using [`data-*`](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes) attributes, you can introduce reactive state to your frontend and access it anywhere in the DOM and in your backend. You can set up events that trigger requests to backend endpoints that respond with HTML fragment and signal updates.
-
-- Bind element values to signals: `data-bind-foo`
-- Set the text content of an element to an expression.: `data-text="$foo"`
-- Create a computed signal: `data-computed-foo="$bar + 1"`
-- Show or hide an element using an expression: `data-show="$foo"`
-- Modify the classes on an element: `data-class-bold="$foo == 1"`
-- Bind an expression to an HTML attribute: `data-attr-disabled="$foo == ''"`
-- Merge signals into the signals: `data-signals-foo=""`
-- Execute an expression on an event: `data-on-click="@get(/endpoint)"`
-- Use signals to track in flight backend requests: `data-indicator-fetching`
-- Replace the URL: `data-replace-url="'/page1'"`
-- Persist all signals in local storage: `data-persist`
-- Create a reference to an element: `data-ref-alert`
-- Check for intersection with the viewport: `data-intersect="alert('visible')"`
-- Scroll programmatically: `data-scroll-into-view`
-- Interact with the [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API): `data-view-transition="slide"`
-
-View the [attribute plugins reference](/reference/attribute_plugins).
+View the [reference overview](/reference/overview).

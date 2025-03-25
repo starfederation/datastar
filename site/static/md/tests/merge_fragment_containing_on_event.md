@@ -1,6 +1,6 @@
-# Merge Fregment Containing On Event
+# Merge Fragment Containing On Event
 
-Tests that merging a fragment containing an `on` event works.
+Tests merging a fragment containing an `on` event.
 
 <div>
   <div id="content" data-signals-hidden="false" data-show="!$hidden"><button data-on-click="$hidden = true" data-show="!$hidden" class="btn">Hide</button><input data-bind-name class="input input-bordered" /><button data-on-click="@get('/tests/merge_fragment_containing_on_event/data')" class="btn">Merge</button></div>

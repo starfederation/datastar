@@ -19,8 +19,6 @@ cVersionClientByteSize                   :: Int
 cVersionClientByteSize                   = 36872
 cVersionClientByteSizeGzip               :: Int
 cVersionClientByteSizeGzip               = 13691
-cDefaultFragmentsSettleDuration          :: Int
-cDefaultFragmentsSettleDuration          = 300 -- milliseconds
 cDefaultSseRetryDuration                 :: Int
 cDefaultSseRetryDuration                 = 1000 -- milliseconds
 cExecuteScriptAttributes                 :: StringLike a => a
@@ -29,8 +27,6 @@ cSelector                                :: StringLike a => a
 cSelector                                = "selector"
 cMergeMode                               :: StringLike a => a
 cMergeMode                               = "mergeMode"
-cSettleDuration                          :: StringLike a => a
-cSettleDuration                          = "settleDuration"
 cFragments                               :: StringLike a => a
 cFragments                               = "fragments"
 cUseViewTransition                       :: StringLike a => a

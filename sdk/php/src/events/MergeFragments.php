@@ -17,7 +17,6 @@ class MergeFragments implements EventInterface
     public string $fragments;
     public string $selector = '';
     public FragmentMergeMode $mergeMode = Consts::DEFAULT_FRAGMENT_MERGE_MODE;
-    public int $settleDuration = Consts::DEFAULT_FRAGMENTS_SETTLE_DURATION;
     public bool $useViewTransition = Consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS;
 
     public function __construct(string $fragments, array $options = [])
@@ -54,10 +53,6 @@ class MergeFragments implements EventInterface
 
         if ($this->mergeMode !== Consts::DEFAULT_FRAGMENT_MERGE_MODE) {
             $dataLines[] = $this->getDataLine(Consts::MERGE_MODE_DATALINE_LITERAL, $this->mergeMode->value);
-        }
-
-        if ($this->settleDuration != Consts::DEFAULT_FRAGMENTS_SETTLE_DURATION) {
-            $dataLines[] = $this->getDataLine(Consts::SETTLE_DURATION_DATALINE_LITERAL, $this->settleDuration);
         }
 
         if ($this->useViewTransition !== Consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS) {

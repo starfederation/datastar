@@ -1,55 +1,81 @@
-(ns
-  ^{:doc "Public api for the Datastar SDK.
+(ns starfederation.datastar.clojure.api
+  "
+Public api for the Datastar SDK.
 
-    The api consists of 5 main functions that operate on SSE generators, see:
-    - [[merge-fragment!]]
-    - [[remove-fragment!]]
-    - [[merge-signals!]]
-    - [[remove-signals!]]
-    - [[execute-script!]]
+The api consists of 5 main functions that operate on SSE generators, see:
+- [[merge-fragment!]]
+- [[remove-fragment!]]
+- [[merge-signals!]]
+- [[remove-signals!]]
+- [[execute-script!]]
 
-    These function take options map whose keys are:
-    - [[id]]
-    - [[retry-duration]]
-    - [[selector]]
-    - [[merge-mode]]
-    - [[settle-duration]]
-    - [[use-view-transition]]
-    - [[only-if-missing]]
-    - [[auto-remove]]
-    - [[attributes]]
+These function take options map whose keys are:
+- [[id]]
+- [[retry-duration]]
+- [[selector]]
+- [[merge-mode]]
+- [[use-view-transition]]
+- [[only-if-missing]]
+- [[auto-remove]]
+- [[attributes]]
 
-    To help manage SSE generators's underlying connection there is:
-    - [[close-sse!]]
-    - [[with-open-sse]]
+To help manage SSE generators's underlying connection there is:
+- [[close-sse!]]
+- [[with-open-sse]]
 
-    Some common utilities for HTTP are also provided:
-    - [[sse-get]]
-    - [[sse-post]]
-    - [[sse-put]]
-    - [[sse-patch]]
-    - [[sse-delete]]
+Some common utilities for HTTP are also provided:
+- [[sse-get]]
+- [[sse-post]]
+- [[sse-put]]
+- [[sse-patch]]
+- [[sse-delete]]
 
-    Some scripts are provided:
-    - [[console-log!]]
-    - [[console-error!]]
-    - [[redirect!]]
-    "}
-  starfederation.datastar.clojure.api
+Some scripts are provided:
+- [[console-log!]]
+- [[console-error!]]
+- [[redirect!]]"
   (:require
     [starfederation.datastar.clojure.api.common :as common]
     [starfederation.datastar.clojure.api.fragments :as fragments]
     [starfederation.datastar.clojure.api.signals :as signals]
     [starfederation.datastar.clojure.api.scripts :as scripts]
     [starfederation.datastar.clojure.consts :as consts]
-    [starfederation.datastar.clojure.protocols :as p]))
-
+    [starfederation.datastar.clojure.protocols :as p]
+    [starfederation.datastar.clojure.utils :as u]))
 
 ;; -----------------------------------------------------------------------------
 ;; SSE generator management
 ;; -----------------------------------------------------------------------------
+(defmacro lock-sse!
+  "Hold onto the lock of a `sse-gen` while executing `body`. This allows for
+  preventing concurent sending of sse events. Sse generators use
+  [[java.util.concurrent.locks.ReentrantLock]] under the hood.
+
+  Ex:
+  ```clojure
+  (lock-sse! my-sse-gen
+             (merge-fragment! sse frags)
+             (merge-signals! sse signals))
+  ```
+  "
+  [sse-gen & body]
+  `(u/lock! (p/get-lock ~sse-gen) ~@body))
+
+
+(comment
+  (macroexpand-1
+    (macroexpand-1
+      '(lock-sse! my-sse-gen
+                  (merge-fragment! sse frags)
+                  (merge-signals! sse signals)))))
+
+
 (defn close-sse!
-  "Close the connection of a sse generator."
+  "Close the connection of a sse generator.
+
+  Return value:
+  - true if `sse-gen` closed
+  - false if it was already closed"
   [sse-gen]
   (p/close-sse! sse-gen))
 
@@ -127,16 +153,6 @@
   - [[mm-upsert-attributes]]
   "
   common/merge-mode)
-
-(def settle-duration
-  "[[merge-fragment!]] / [[remove-fragment!]] option, number:
-
-  Used to control the amount of time that a fragment
-  should take before removing any CSS related to settling. It is used to allow
-  for animations in the browser via the Datastar client. If provided the value must
-  be a positive integer of the number of milliseconds to allow for settling. If none
-  is provided, the default value of 300 milliseconds will be used."
-  common/settle-duration)
 
 (def use-view-transition
   "[[merge-fragment!]] / [[remove-fragment!]  option, boolean:
@@ -220,8 +236,11 @@
   - [[retry-duration]]
   - [[selector]]
   - [[merge-mode]]
-  - [[settle-duration]]
   - [[use-view-transition]]
+
+  Return value:
+  - `false` if the connection is closed
+  - `true` otherwise
   "
   ([sse-gen fragments]
    (merge-fragment! sse-gen fragments {}))
@@ -251,8 +270,11 @@
   Options keys:
   - [[id]]
   - [[retry-duration]]
-  - [[settle-duration]]
   - [[use-view-transition]]
+
+  Return value:
+  - `false` if the connection is closed
+  - `true` otherwise
   "
   ([sse-gen selector]
    (remove-fragment! sse-gen selector {}))
@@ -269,12 +291,16 @@
       the browser to update signals in the signals. The data must evaluate to a
       valid JavaScript. It will be converted to signals by the Datastar client
       side.
-  - `opts`: An options map
+   - `opts`: An options map
 
   Options keys:
   - [[id]]
   - [[retry-duration]]
   - [[only-if-missing]]
+
+  Return value:
+  - `false` if the connection is closed
+  - `true` otherwise
   "
   ([sse-gen signals-content]
    (merge-signals! sse-gen signals-content {}))
@@ -296,6 +322,10 @@
   - [[id]]
   - [[retry-duration]]
   - [[only-if-missing]]
+
+  Return value:
+  - `false` if the connection is closed
+  - `true` otherwise
   "
   ([sse-gen paths]
    (signals/remove-signals! sse-gen paths {}))
@@ -305,6 +335,11 @@
 
 (defn get-signals
   "Returns the signals json string from a ring request map.
+
+  The Datastar signals are read from:
+  - the `:query-params` key of of the ring request map for HTTP get requests
+  - the body of the request for other HTTP methods
+
   (Bring your own json parsing)"
   [ring-request]
   (signals/get-signals ring-request))
@@ -325,6 +360,10 @@
   - [[retry-duration]]
   - [[auto-remove]]
   - [[attributes]]
+
+  Return value:
+  - `false` if the connection is closed
+  - `true` otherwise
   "
   ([sse-gen script-content]
    (scripts/execute-script! sse-gen script-content {}))
@@ -395,7 +434,10 @@
 ;; Scripts common
 ;; -----------------------------------------------------------------------------
 (defn console-log!
-  "Log msg in the browser console."
+  "Log msg in the browser console.
+
+  Same behavior as [[execute-script!]].
+  "
   ([sse-gen msg]
    (console-log! sse-gen msg {}))
   ([sse-gen msg opts]
@@ -403,7 +445,10 @@
 
 
 (defn console-error!
-  "Log error msg in the browser console."
+  "Log error msg in the browser console.
+
+  Same behavior as [[execute-script!]].
+  "
   ([sse-gen msg]
    (console-error! sse-gen msg {}))
   ([sse-gen msg opts]
@@ -411,7 +456,10 @@
 
 
 (defn redirect!
-  "Redirect a page using a script."
+  "Redirect a page using a script.
+
+  Same behavior as [[execute-script!]].
+  "
   ([sse-gen url]
    (redirect! sse-gen url {}))
   ([sse-gen url opts]

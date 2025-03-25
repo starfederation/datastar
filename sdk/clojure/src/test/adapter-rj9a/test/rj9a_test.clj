@@ -86,4 +86,9 @@
 
 
 
-
+(comment
+  (require '[lazytest.repl :as ltr])
+  (ltr/run-test-var #'counters-test)
+  (ltr/run-test-var #'form-test)
+  (ltr/run-test-var #'persistent-sse-test)
+  (user/clear-terminal!))

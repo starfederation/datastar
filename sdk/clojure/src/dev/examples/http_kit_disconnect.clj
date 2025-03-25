@@ -3,21 +3,22 @@
     [examples.utils :as u]
     [reitit.ring :as rr]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response]]))
+    [starfederation.datastar.clojure.adapter.http-kit :refer [->sse-response on-open on-close]]))
 
 
 ;; This is a small experiment to determine the behaviour of
-;; ring jetty in the face of the client disconnecting
+;; Http-kit in the face of the client disconnecting
+;; Http-kit somehow detects closed connections on it's own
 
 (def !conn (atom nil))
 
 (defn long-connection [req]
   (->sse-response req
-    {:on-open
+    {on-open
      (fn [sse]
        (reset! !conn sse)
        (d*/console-log! sse "'connected'"))
-     :on-close
+     on-close
      (fn on-close [_ status-code]
        (println "-----------------")
        (println "Connection closed status: " status-code)
@@ -47,9 +48,8 @@
 (comment
   (-> !conn deref d*/close-sse!)
   (send-tiny-event!)
-  (d*/console-log! @!conn "'toto'"))
+  (d*/console-log! @!conn "'toto'")
 
-(comment
   (u/clear-terminal!)
   (u/reboot-hk-server! #'handler))
 
