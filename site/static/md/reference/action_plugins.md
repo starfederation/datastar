@@ -113,6 +113,7 @@ All of the actions above trigger `datastar-sse` events during the SSE request li
 - `finished` - Triggered when the SSE request is finished.
 - `error` - Triggered when the SSE request encounters an error.
 - `retrying` - Triggered when the SSE request is retrying.
+- `retries-failed` - Triggered when the SSE request fails after retrying.
 
 ```html
 <div data-on-datastar-sse="evt.detail.type == 'error' && console.log('SSE error encountered')"></div>

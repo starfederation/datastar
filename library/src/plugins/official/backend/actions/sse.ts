@@ -2,30 +2,18 @@
 // Slug: Use a GET request to fetch data from a server using Server-Sent Events matching the Datastar SDK interface
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.
 
-import { DATASTAR, DATASTAR_REQUEST, DefaultSseRetryDurationMs } from '../../../../engine/consts'
+import {
+  DATASTAR,
+  DATASTAR_REQUEST,
+  DefaultSseRetryDurationMs,
+} from '../../../../engine/consts'
 import { runtimeErr } from '../../../../engine/errors'
-import type { HTMLorSVGElement, RuntimeContext } from '../../../../engine/types'
+import type { RuntimeContext } from '../../../../engine/types'
 import {
   type FetchEventSourceInit,
   fetchEventSource,
 } from '../../../../vendored/fetch-event-source'
-import {
-  DATASTAR_SSE_EVENT,
-  type DatastarSSEEvent,
-  ERROR,
-  FINISHED,
-  RETRYING,
-  STARTED,
-} from '../shared'
-
-function dispatchSSE(el: HTMLorSVGElement, type: string, argsRaw: Record<string, string>) {
-  el.dispatchEvent(
-    new CustomEvent<DatastarSSEEvent>(DATASTAR_SSE_EVENT, {
-      detail: { type, argsRaw },
-      bubbles: true,
-    }),
-  )
-}
+import { dispatchSSE, ERROR, FINISHED, RETRYING, STARTED } from '../shared'
 
 const isWrongContent = (err: any) => `${err}`.includes('text/event-stream')
 
@@ -205,7 +193,7 @@ export const sse = async (
     urlInstance.search = queryParams.toString()
 
     try {
-      await fetchEventSource(urlInstance.toString(), req)
+      await fetchEventSource(el, urlInstance.toString(), req)
     } catch (error) {
       if (!isWrongContent(error)) {
         throw runtimeErr('SseFetchFailed', ctx, { method, url, error })
