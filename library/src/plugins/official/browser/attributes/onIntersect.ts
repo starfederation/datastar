@@ -8,6 +8,7 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
+import { modifyTiming } from '../../../../utils/timing'
 
 const ONCE = 'once'
 const HALF = 'half'
@@ -19,7 +20,8 @@ export const OnIntersect: AttributePlugin = {
   keyReq: Requirement.Denied,
   mods: new Set([ONCE, HALF, FULL]),
   onLoad: ({ el, rawKey, mods, genRX }) => {
-    const callback = genRX()
+    const callback = modifyTiming(genRX(), mods)
+
     const options = { threshold: 0 }
     if (mods.has(FULL)) {
       options.threshold = 1
