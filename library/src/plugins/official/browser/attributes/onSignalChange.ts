@@ -11,6 +11,7 @@ import {
   Requirement,
 } from '../../../../engine/types'
 import { modifyCasing } from '../../../../utils/text'
+import { modifyTiming } from '../../../../utils/timing'
 import { effect, type Signal } from '../../../../vendored/preact-core'
 
 export const OnSignalChange: AttributePlugin = {
@@ -18,7 +19,7 @@ export const OnSignalChange: AttributePlugin = {
   name: 'onSignalChange',
   valReq: Requirement.Must,
   onLoad: ({ key, mods, signals, genRX }) => {
-    const callback = genRX()
+    const callback = modifyTiming(genRX(), mods)
 
     if (key === '') {
       const signalFn = (event: CustomEvent<DatastarSignalEvent>) =>

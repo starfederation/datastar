@@ -527,20 +527,29 @@ Runs an expression when the element intersects with the viewport.
 
 #### Modifiers
 
-Modifiers allow you to modify the element intersection behavior.
+Modifiers allow you to modify the element intersection behavior and the timing of the event listener.
 
 - `__once` - Only triggers the event once.
 - `__half` - Triggers when half of the element is visible.
 - `__full` - Triggers when the full element is visible.
+- `__debounce` - Debounce the event listener.
+- `.500ms` - Debounce for 500 milliseconds.
+- `.1s` - Debounce for 1 second.
+- `.leading` - Debounce with leading edge.
+- `.notrail` - Debounce without trailing edge.
+- `__throttle` - Throttle the event listener.
+- `.500ms` - Throttle for 500 milliseconds.
+- `.1s` - Throttle for 1 second.
+- `.noleading` - Throttle without leading edge.
+- `.trail` - Throttle with trailing edge.
 
 ```html
-<div data-on-intersect__once="$intersected = true"></div>
+<div data-on-intersect__once__full="$fullyIntersected = true"></div>
 ```
 
 ### `data-on-interval`
 
-Runs an expression at a regular interval. The interval duration defaults to 1 second and can be modified using the
-`__duration` modifier.
+Runs an expression at a regular interval. The interval duration defaults to 1 second and can be modified using the `__duration` modifier.
 
 ```html
 <div data-on-interval="$count++"></div>
@@ -618,6 +627,25 @@ A key can be provided to only trigger the event when a specific signal changes.
 
 ```html
 <div data-on-signal-change-foo="$fooCount++"></div>
+```
+
+#### Modifiers
+
+Modifiers allow you to modify the timing of the event listener.
+
+- `__debounce` - Debounce the event listener.
+- `.500ms` - Debounce for 500 milliseconds.
+- `.1s` - Debounce for 1 second.
+- `.leading` - Debounce with leading edge.
+- `.notrail` - Debounce without trailing edge.
+- `__throttle` - Throttle the event listener.
+- `.500ms` - Throttle for 500 milliseconds.
+- `.1s` - Throttle for 1 second.
+- `.noleading` - Throttle without leading edge.
+- `.trail` - Throttle with trailing edge.
+
+```html
+<div data-on-signal-change__debounce.100ms="$count++"></div>
 ```
 
 ### `data-persist`
