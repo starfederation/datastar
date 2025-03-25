@@ -2,7 +2,7 @@
 
 Tests that the on load event is triggered with a delay.
 
-<div data-signals-result="false" data-on-load__delay.100ms="$result = true" >
+<div data-signals-result="false" data-on-load__delay.100ms="$result = true">
   Result:
   <code id="result" data-text="$result ? 1 : 0"></code>
   <hr />

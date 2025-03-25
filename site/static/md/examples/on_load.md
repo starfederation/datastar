@@ -2,10 +2,7 @@
 
 ## Demo
 
-<div
-  id="replaceMe"
-  data-on-load="@post('/examples/on_load/data')"
-  >
+<div id="replaceMe" data-on-load="@post('/examples/on_load/data')">
   No session data
 </div>
 
@@ -17,7 +14,9 @@
 </div>
 ```
 
-The `data-on-load` attribute is used to specify a fetch request that should be made when the element is loaded. The value of the attribute is a JavaScript expression that is evaluated when the element is loaded. 
+The `data-on-load` attribute is used to specify a fetch request that should be made when the element is loaded. The
+value
+of the attribute is a JavaScript expression that is evaluated when the element is loaded.
 
 The following example adds a delay of 3 seconds.
 

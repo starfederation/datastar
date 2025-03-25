@@ -18,7 +18,7 @@ The following example outputs `1` not because `$foo` is defined in the global sc
 </div>
 ```
 
-When Datastar evaluates the expression `$foo`, it first converts it to `ctx.signals.signal('foo').value`, and then evaluates that expression in a sandboxed context, in which `ctx` represents the current [expression context](/reference/expression_context). 
+When Datastar evaluates the expression `$foo`, it first converts it to `ctx.signals.signal('foo').value`, and then evaluates that expression in a sandboxed context, in which `ctx` represents the current expression context. 
 
 This means that JavaScript can be used in Datastar expressions.
 
@@ -127,4 +127,3 @@ For quick reference, here are the key aspects of Datastar expressions:
 - **Implicit Return:** The last statement is automatically returned without needing the `return` keyword.
 - **Special Variables:**
   - `evt`: The event object (available in `data-on-*` attributes).
-  - `ctx`: The [expression context](/reference/expression_context) with access to signals and utilities.

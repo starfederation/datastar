@@ -6,12 +6,17 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ## v1.0.0-beta.10
 
+### Added
+
+- Added a `retries-failed` event type that is dispatched when the SSE plugin fails after retrying ([#785](https://github.com/starfederation/datastar/issues/785)).
+
 ### Changed
 
 - Updated Idiomorph to version [0.7.3](https://github.com/bigskysoftware/idiomorph/releases/tag/v0.7.3).
+- Renamed the `data-intersects` attribute to `data-on-intersect`.
+- Renamed the `data-on-signals-change` attribute to `data-on-signal-change`.
 - Classes used in `data-class-*` attributes now default to kebab-case ([#761](https://github.com/starfederation/datastar/issues/761)).
 - Events used in `data-on-*` attributes now default to kebab-case ([#761](https://github.com/starfederation/datastar/issues/761)).
-- Keys used in `data-persist-*` attributes now default to kebab-case.
 - The `datastar-sse` event is now dispatched on the element itself ([#761](https://github.com/starfederation/datastar/issues/761)).
 - The NPM package now also exports all plugins and bundles ([#742](https://github.com/starfederation/datastar/issues/742)).
 - Data attributes with plugin names in their prefix are no longer processed ([#771](https://github.com/starfederation/datastar/issues/771)).

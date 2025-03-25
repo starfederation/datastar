@@ -2,13 +2,13 @@
 
 ## Demo
 
-<div
-    data-on-load="@get('/examples/replace_url_from_backend/updates')"
-></div>
+<div data-on-load="@get('/examples/replace_url_from_backend/updates')"></div>
 
 ## Explanation
 
-Interacting with the history API is a common task when building single page applications. The [`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE event can be used to execute JavaScript on the client. This can be used to replace the URL in the browser without reloading the page.
+Interacting with the history API is a common task when building single page applications. The
+[`datastar-execute-script`](/reference/sse_events#datastar-execute-script) SSE event can be used to execute JavaScript
+on the client. This can be used to replace the URL in the browser without reloading the page.
 
 ```html
 event: datastar-execute-script

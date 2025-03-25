@@ -1,4 +1,5 @@
-// Icon: material-symbols:network-wifi
+// Authors: Delaney Gillilan
+// Icon: material-symbols:clock-loader-60-sharp
 // Slug: Sets the indicator signal used when fetching data via SSE
 // Description: must be a valid signal name
 
@@ -11,7 +12,6 @@ import { modifyCasing, trimDollarSignPrefix } from '../../../../utils/text'
 import {
   DATASTAR_SSE_EVENT,
   type DatastarSSEEvent,
-  ERROR,
   FINISHED,
   STARTED,
 } from '../shared'

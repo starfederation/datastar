@@ -10,7 +10,7 @@ With Datastar, you can build any UI that a full-stack framework like React, Vue.
 <div class="alert alert-info">
     <iconify-icon icon="simple-icons:rocket"></iconify-icon>
     <div>
-        We're so confident that Datastar can be used as a JavaScript framework replacement that we challenge anyone to find a use-case for a web app that Datastar <em>cannot</em> realistically be used to build!
+        We're so confident that Datastar can be used as a JavaScript framework replacement that we challenge anyone to find a use-case for a web app that Datastar <em>cannot</em> be used to build!
     </div>
 </div>
 
@@ -450,7 +450,7 @@ One of the benefits of using SSE is that we can send multiple events (HTML fragm
 
 ## Actions
 
-Actions in Datastar are helper functions that are available in `data-*` attributes and have the syntax `@actionName()`. We already saw the backend plugin actions above. Here are a few other common actions.
+Actions in Datastar are helper functions that are available in `data-*` attributes and have the syntax `@actionName()`. We already saw the backend plugin actions above. Here are a few other useful actions.
 
 ### `@setAll()`
 
@@ -534,4 +534,4 @@ This toggles the values of all signals containing `form.` (to either `true` or `
     </button>
 </div>
 
-View the [full reference](/reference/overview).
+View the [reference overview](/reference/overview).

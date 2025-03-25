@@ -2,7 +2,6 @@
 
 - [Attribute Plugins](#attribute-plugins)
 - [Action Plugins](#action-plugins)
-- [Expression Context](#expression-context)
 - [Server-Sent Events](#server-sent-events)
 - [SDKs](#sdks)
 - [Security](#security)
@@ -31,23 +30,27 @@ Attribute plugins are `data-*` attributes that add reactive behavior to HTML ele
 | [`data-persist`](/reference/attribute_plugins#data-persist) | Persists signals in Local Storage or Session Storage. |
 | [`data-ref`](/reference/attribute_plugins#data-ref) | Creates a signal reference to the DOM element. |
 | [`data-replace-url`](/reference/attribute_plugins#data-replace-url) | Replaces the URL in the browser without page reload. |
-| [`data-text`](/reference/attribute_plugins#data-text) | Binds text content of an element to an expression. |
-
-### Browser Attributes
-
-| Attribute | Description |
-|-----------|-------------|
-| [`data-custom-validity`](/reference/attribute_plugins#data-custom-validity) | Adds custom validation to elements. |
-| [`data-intersects`](/reference/attribute_plugins#data-intersects) | Runs expressions when elements intersect the viewport. |
-| [`data-scroll-into-view`](/reference/attribute_plugins#data-scroll-into-view) | Scrolls elements into view with various options. |
 | [`data-show`](/reference/attribute_plugins#data-show) | Shows or hides elements based on expressions. |
-| [`data-view-transition`](/reference/attribute_plugins#data-view-transition) | Sets `view-transition-name` for View Transitions API. |
+| [`data-text`](/reference/attribute_plugins#data-text) | Binds text content of an element to an expression. |
 
 ### Backend Attributes
 
 | Attribute | Description |
 |-----------|-------------|
 | [`data-indicator`](/reference/attribute_plugins#data-indicator) | Creates signals that indicate when SSE requests are in flight. |
+
+### Browser Attributes
+
+| Attribute | Description |
+|-----------|-------------|
+| [`data-custom-validity`](/reference/attribute_plugins#data-custom-validity) | Adds custom validation to elements. |
+| [`data-on-intersect`](/reference/attribute_plugins#data-on-intersect) | Runs expressions when elements intersect the viewport. |
+| [`data-on-interval`](/reference/attribute_plugins#data-on-interval) | Runs expressions at regular intervals. |
+| [`data-on-load`](/reference/attribute_plugins#data-on-load) | Runs expressions when elements are loaded into the DOM. |
+| [`data-on-raf`](/reference/attribute_plugins#data-on-raf) | Runs expressions on `requestAnimationFrame` events. |
+| [`data-on-signal-change`](/reference/attribute_plugins#data-on-signal-change) | Runs expressions when signals change. |
+| [`data-scroll-into-view`](/reference/attribute_plugins#data-scroll-into-view) | Scrolls elements into view with various options. |
+| [`data-view-transition`](/reference/attribute_plugins#data-view-transition) | Sets `view-transition-name` for View Transitions API. |
 
 View the [attribute plugins reference](/reference/attribute_plugins)
 
@@ -73,19 +76,11 @@ Action plugins are used in Datastar expressions to perform specific actions.
 
 | Action | Description |
 |--------|-------------|
-| [`@fit()`](/reference/action_plugins#fit) | Makes a value linearly interpolate from an original range to a new one. |
 | [`@setAll()`](/reference/action_plugins#setall) | Sets all signals with a specific prefix to a provided value. |
 | [`@toggleAll()`](/reference/action_plugins#toggleall) | Toggles all signals that start with a given prefix. |
+| [`@fit()`](/reference/action_plugins#fit) | Makes a value linearly interpolate from an original range to a new one. |
 
 View the [action plugins reference](/reference/action_plugins)
-
-## Expression Context
-
-Datastar expressions have access to a context object (`ctx`) providing:
-- Current element reference (`ctx.el`)
-- Signals root object for accessing and modifying signals (`ctx.signals`)
-
-View the [expression context reference](/reference/expression_context)
 
 ## Server-Sent Events
 
@@ -105,7 +100,7 @@ View the [SSE events reference](/reference/sse_events)
 
 Officially supported SDKs for generating Datastar-specific SSE events:
 - [Clojure](/reference/sdks#clojure)
-- [.NET](/reference/sdks#net)
+- [C# (.NET)](/reference/sdks#c-net)
 - [Go](/reference/sdks#go)
 - [Haskell](/reference/sdks#haskell)
 - [Java](/reference/sdks#java)
@@ -133,6 +128,7 @@ View the [security reference](/reference/security)
 
 ## Custom Builds
 
-Datastar is built using a modular architecture that allows you to create custom builds with only the plugins you need, useful for reducing the framework's footprint.
+Datastar is built using a modular architecture that allows you to create custom builds with only the plugins you need,
+useful for reducing the framework's footprint.
 
 View the [custom builds reference](/reference/custom_builds)
