@@ -66,7 +66,7 @@ func setupReferences(ctx context.Context, router chi.Router) error {
 
 		// Redirect legacy “JavaScript APIs” page.
 		referenceRouter.Get("/javascript_api", func(w http.ResponseWriter, r *http.Request) {
-			http.Redirect(w, r, "/reference/expression_context", http.StatusMovedPermanently)
+			http.Redirect(w, r, "/reference", http.StatusMovedPermanently)
 		})
 
 		referenceRouter.Get("/{name}", func(w http.ResponseWriter, r *http.Request) {

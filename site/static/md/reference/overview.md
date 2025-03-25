@@ -2,7 +2,6 @@
 
 - [Attribute Plugins](#attribute-plugins)
 - [Action Plugins](#action-plugins)
-- [Expression Context](#expression-context)
 - [Server-Sent Events](#server-sent-events)
 - [SDKs](#sdks)
 - [Security](#security)
