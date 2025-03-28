@@ -3,7 +3,7 @@ using StarFederation.Datastar.DependencyInjection;
 // Adds Datastar as a service
 builder.Services.AddDatastar();
 
-app.MapGet("/", async (IServerSentEventService sse) =>
+app.MapGet("/", async (IDatastarServerSentEventService sse) =>
 {
     await sse.MergeFragmentsAsync(@"<div id=""question"">What do you put in a toaster?</div>");
     await sse.MergeSignalsAsync("{foo: {bar: 1}}");

@@ -51,7 +51,7 @@ In addition, we'll send a [`datastar-merge-signals`](/reference/sse_events#datas
 
 ```
 event: datastar-merge-signals
-data: signals {offset: 2)
+data: signals {offset: 2}
 ```
 
 In the case when all five list items have been shown, we'll remove the button from the DOM entirely.
