@@ -91,6 +91,7 @@ module Signals =
 
 module SignalPath =
     let value (signalPath:SignalPath) = signalPath.ToString()
+    let kebabValue signals = signals |> value |> String.toKebab
     let isValidKey (signalPathKey:string) =
         signalPathKey |> String.IsPopulated && signalPathKey.ToCharArray() |> Seq.forall (fun chr -> Char.IsLetter chr || Char.IsNumber chr || chr = '_')
     let isValid (signalPathString:string) = signalPathString.Split('.') |> Array.forall isValidKey

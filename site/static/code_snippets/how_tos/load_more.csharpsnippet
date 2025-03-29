@@ -1,0 +1,38 @@
+using System.Text.Json;
+using StarFederation.Datastar;
+using StarFederation.Datastar.DependencyInjection;
+
+public class Program
+{
+    public record OffsetSignals(int offset);
+
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddDatastar();
+        var app = builder.Build();
+
+        app.MapGet("/more", async (IDatastarServerSentEventService sse, IDatastarSignalsReaderService signalsReader) =>
+        {
+            var max = 5;
+            var limit = 1;
+            var signals = await signalsReader.ReadSignalsAsync<OffsetSignals>();
+            var offset = signals.offset;
+            if (offset < max)
+            {
+                var newOffset = offset + limit;
+                await sse.MergeFragmentsAsync($"<div>Item {newOffset}</div>", new()
+                {
+                    Selector = "#list",
+                    MergeMode = FragmentMergeMode.Append,
+                });
+                if (newOffset < max)
+                    await sse.MergeSignalsAsync(JsonSerializer.Serialize(new OffsetSignals(newOffset)));
+                else
+                    await sse.RemoveFragmentsAsync("#load-more");
+            }
+        });
+
+        app.Run();
+    }
+}
