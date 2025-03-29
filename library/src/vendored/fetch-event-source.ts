@@ -259,8 +259,8 @@ export interface FetchEventSourceInit extends RequestInit {
 }
 
 export function fetchEventSource(
-  el: HTMLorSVGElement,
   input: RequestInfo,
+  elId: string,
   {
     signal: inputSignal,
     headers: inputHeaders,
@@ -361,7 +361,7 @@ export function fetchEventSource(
             retryInterval = Math.min(retryInterval, retryMaxWaitMs)
             retries++
             if (retries > retryMaxCount) {
-              dispatchSSE(el, RETRIES_FAILED, {})
+              dispatchSSE(RETRIES_FAILED, elId, {})
 
               // we should not retry anymore:
               dispose()

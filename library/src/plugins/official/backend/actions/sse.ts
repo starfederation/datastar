@@ -43,10 +43,10 @@ export const sse = async (
   args: SSEArgs,
 ) => {
   const {
-    el: { id: elId },
     el,
     signals,
   } = ctx
+  const elId = el.id
   const {
     headers: userHeaders,
     contentType,
@@ -76,7 +76,7 @@ export const sse = async (
   const action = method.toLowerCase()
   let cleanupFn = (): void => {}
   try {
-    dispatchSSE(el, STARTED, { elId })
+    dispatchSSE(STARTED, elId, {})
     if (!url?.length) {
       throw runtimeErr('SseNoUrlProvided', ctx, { action })
     }
@@ -102,7 +102,7 @@ export const sse = async (
       onopen: async (response: Response) => {
         if (response.status >= 400) {
           const status = response.status.toString()
-          dispatchSSE(el, ERROR, { status })
+          dispatchSSE(ERROR, elId, { status })
         }
       },
       onmessage: (evt) => {
@@ -131,7 +131,7 @@ export const sse = async (
         }
 
         // if you aren't seeing your event you can debug by using this line in the console
-        dispatchSSE(el, type, argsRaw)
+        dispatchSSE(type, elId, argsRaw)
       },
       onerror: (error) => {
         if (isWrongContent(error)) {
@@ -141,7 +141,7 @@ export const sse = async (
         // do nothing and it will retry
         if (error) {
           console.error(error.message)
-          dispatchSSE(el, RETRYING, { message: error.message })
+          dispatchSSE(RETRYING, elId, { message: error.message })
         }
       },
     }
@@ -204,7 +204,7 @@ export const sse = async (
       // set the content-type to text/event-stream
     }
   } finally {
-    dispatchSSE(el, FINISHED, { elId })
+    dispatchSSE(FINISHED, elId, {})
     cleanupFn()
   }
 }

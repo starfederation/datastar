@@ -59,6 +59,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "radio_value"},
 				{ID: "ref"},
 				{ID: "remove_fragment"},
+				{ID: "remove_initiating_fragment"},
 				{ID: "select_multiple"},
 				{ID: "select_single"},
 				{ID: "sse_error_event"},
@@ -125,6 +126,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 			setupTestsMergeFragmentWhitespace(testsRouter),
 			setupTestsOnLoad(testsRouter),
 			setupTestsRemoveFragment(testsRouter),
+			setupTestsRemoveInitiatingFragment(testsRouter),
 			setupTestsSseErrorEvent(testsRouter),
 			setupTestsSseEvents(testsRouter),
 		); err != nil {
