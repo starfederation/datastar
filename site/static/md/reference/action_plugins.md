@@ -137,22 +137,38 @@ Copies the provided evaluated expression to the clipboard.
 
 ### `@setAll()`
 
-Arguments: `@setAll(pathPrefix: string, value: any)`
+Arguments: `@setAll(paths: string, value: any)`
 
-Sets all the signals that start with the prefix to the expression provided in the second argument. This is useful for setting all the values of a signal namespace at once.
+Sets the value of all matching signals to the expression provided in the second argument. The first argument can be one or more space-separated signal paths in which `*` can be used as a wildcard.
 
-```html
-<div data-on-change="@setAll('foo.', true)"></div>
+```html 
+<!-- Sets the value of `$foo` to `true` -->
+<div data-signals-foo="false">
+  <button data-on-click="@setAll('foo', $bar)"></button>
+</div>
+
+<!-- Sets the values of `$foo` and `$bar.baz` to `true` -->
+<div data-signals-foo="false" data-signals-bar.baz="false">
+  <button data-on-click="@setAll('foo bar.*', true)"></button>
+</div>
 ```
 
 ### `@toggleAll()`
 
-Arguments: `@toggleAll(pathPrefix: string)`
+Arguments: `@toggleAll(paths: string)`
 
-Toggles all the signals that start with the prefix. This is useful for toggling all the values of a signal namespace at once.
+Toggles the value of all matching signals. The first argument can be one or more space-separated signal paths or namespaced signal paths in which `*` can be used as a wildcard.
 
-```html
-<div data-on-click="@toggleAll('foo.')"></div>
+```html 
+<!-- Toggles the value of `$foo` -->
+<div data-signals-foo="false">
+  <button data-on-change="@toggleAll('foo')"></button>
+</div>
+
+<!-- Toggles the values of `$foo` and `$bar.baz` -->
+<div data-signals-foo="false" data-signals-bar.baz="false">
+  <button data-on-click="@toggleAll('foo bar.*')"></button>
+</div>
 ```
 
 ### `@fit()`

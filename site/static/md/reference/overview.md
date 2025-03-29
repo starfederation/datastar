@@ -76,9 +76,9 @@ Action plugins are used in Datastar expressions to perform specific actions.
 
 | Action | Description |
 |--------|-------------|
-| [`@setAll()`](/reference/action_plugins#setall) | Sets all signals with a specific prefix to a provided value. |
-| [`@toggleAll()`](/reference/action_plugins#toggleall) | Toggles all signals that start with a given prefix. |
-| [`@fit()`](/reference/action_plugins#fit) | Makes a value linearly interpolate from an original range to a new one. |
+| [`@setAll()`](/reference/action_plugins#setall) | Sets all signal to a provided value. |
+| [`@toggleAll()`](/reference/action_plugins#toggleall) | Toggles all signal values. |
+| [`@fit()`](/reference/action_plugins#fit) | Makes a value linearly interpolate. |
 
 View the [action plugins reference](/reference/action_plugins)
 
