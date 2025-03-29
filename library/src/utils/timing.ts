@@ -1,14 +1,12 @@
-import type { Modifiers } from '../engine/types'
+import type { EventCallbackHandler, Modifiers } from '../engine/types'
 import { tagHas, tagToMs } from './tags'
 
-export type TimerHandler = (...args: any[]) => void
-
 export function debounce(
-  callback: TimerHandler,
+  callback: EventCallbackHandler,
   wait: number,
   leading = false,
   trailing = true,
-): TimerHandler {
+): EventCallbackHandler {
   let timer = -1
 
   const resetTimer = () => timer && clearTimeout(timer)
@@ -30,11 +28,11 @@ export function debounce(
 }
 
 export function throttle(
-  callback: TimerHandler,
+  callback: EventCallbackHandler,
   wait: number,
   leading = true,
   trailing = false,
-): TimerHandler {
+): EventCallbackHandler {
   let waiting = false
 
   return (...args: any[]) => {
@@ -55,9 +53,9 @@ export function throttle(
 }
 
 export function modifyTiming(
-  callback: TimerHandler,
+  callback: EventCallbackHandler,
   mods: Modifiers,
-): TimerHandler {
+): EventCallbackHandler {
   const debounceArgs = mods.get('debounce')
   if (debounceArgs) {
     const wait = tagToMs(debounceArgs)
