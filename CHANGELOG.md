@@ -17,3 +17,6 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 ### Changed
 
 - The `datastar-sse` event is now dispatched on the `document` element, and using `data-on-datastar-sse` automatically listens for the event on the `document` ([#802](https://github.com/starfederation/datastar/issues/802)).
+- The `data-on-signals-change-*` attribute key now accepts a path in which `*` can be used as a wildcard (`data-on-signals-change-foo.*`).
+- The `@setAll` action now accepts one or more space-separated paths in which `*` can be used as a wildcard (`@setAll('foo.* bar.*', true)`).
+- The `@toggleAll` action now accepts one or more space-separated paths in which `*` can be used as a wildcard (`@toggleAll('foo.* bar.*', true)`).

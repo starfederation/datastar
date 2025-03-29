@@ -41,7 +41,7 @@ Datastar provides the following
   <div>
     The Datastar <a href="https://marketplace.visualstudio.com/items?itemName=starfederation.datastar-vscode">VSCode
       extension</a> and <a href="https://plugins.jetbrains.com/plugin/26072-datastar-support">IntelliJ plugin</a>
-    provided autocompletion for all <code>data-*</code> attributes.
+    provide autocompletion for all <code>data-*</code> attributes.
   </div>
 </div>
 
