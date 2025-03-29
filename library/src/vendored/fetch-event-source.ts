@@ -1,4 +1,3 @@
-import type { HTMLorSVGElement } from '../engine/types'
 import { RETRIES_FAILED, dispatchSSE } from '../plugins/official/backend/shared'
 
 /**

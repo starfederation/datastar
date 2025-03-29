@@ -1,9 +1,8 @@
 # SSE Events
 
-Tests that SSE events are dispatched on the element itself.
+Tests that SSE events are dispatched.
 
-<div data-signals-result="0" data-on-load="@get('/tests/sse_events/data')"
-  data-on-datastar-sse="events.innerHTML += evt.detail.type + '\n'; $result++">
+<div data-signals-result="0" data-on-datastar-sse="$result++; events.innerHTML += evt.detail.type + '\n'" data-on-load="@get('/tests/sse_events/data')">
   <pre id="events"></pre>
   <hr />
   Result:
