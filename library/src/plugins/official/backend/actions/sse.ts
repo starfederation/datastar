@@ -193,7 +193,7 @@ export const sse = async (
     urlInstance.search = queryParams.toString()
 
     try {
-      await fetchEventSource(el, urlInstance.toString(), req)
+      await fetchEventSource(urlInstance.toString(), elId, req)
     } catch (error) {
       if (!isWrongContent(error)) {
         throw runtimeErr('SseFetchFailed', ctx, { method, url, error })
