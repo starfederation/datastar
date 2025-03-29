@@ -7,7 +7,7 @@ import starfederation.datastar.enums.FragmentMergeMode;
  */
 public final class Consts {
     public static final String DATASTAR_KEY = "datastar";
-    public static final String VERSION = "1.0.0-beta.10";
+    public static final String VERSION = "1.0.0-beta.11";
 
     // The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     public static final int DEFAULT_SSE_RETRY_DURATION = 1000;

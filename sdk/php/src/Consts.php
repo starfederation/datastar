@@ -10,7 +10,7 @@ use starfederation\datastar\enums\FragmentMergeMode;
 class Consts
 {
     public const DATASTAR_KEY = 'datastar';
-    public const VERSION = '1.0.0-beta.10';
+    public const VERSION = '1.0.0-beta.11';
 
     // The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     public const DEFAULT_SSE_RETRY_DURATION = 1000;

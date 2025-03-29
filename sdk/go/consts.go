@@ -6,7 +6,7 @@ import "time"
 
 const (
     DatastarKey = "datastar"
-    Version                   = "1.0.0-beta.10"
+    Version                   = "1.0.0-beta.11"
     VersionClientByteSize     = 40231
     VersionClientByteSizeGzip = 14988
 

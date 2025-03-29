@@ -15,7 +15,7 @@ It is possible to alias `data-*` attributes to a custom alias (`data-foo-*`, for
 We maintain a `data-star-*` aliased version that can be included as follows.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.10/bundles/datastar-aliased.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar-aliased.js"></script>
 ```
 
 ### NPM
