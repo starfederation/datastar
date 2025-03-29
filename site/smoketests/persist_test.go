@@ -10,6 +10,7 @@ import (
 
 func TestExamplePersist(t *testing.T) {
 	setupPageTest(t, "examples/persist", func(runner runnerFn) {
+		t.Skip("skipping test, handled by unit tests")
 		runner("persist", func(t *testing.T, page *rod.Page) {
 			page.MustWaitIdle()
 

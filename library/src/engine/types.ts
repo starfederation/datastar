@@ -108,3 +108,5 @@ export type RuntimeExpressionFunction = (
   ctx: RuntimeContext,
   ...args: any[]
 ) => any
+
+export type EventCallbackHandler = (...args: any[]) => void

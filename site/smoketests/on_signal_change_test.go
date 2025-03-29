@@ -5,5 +5,5 @@ import (
 )
 
 func TestUnitOnSignalChange(t *testing.T) {
-	setupPageTestOnClick(t, "tests/on_signal_change")
+	setupPageTestOnLoad(t, "tests/on_signal_change")
 }

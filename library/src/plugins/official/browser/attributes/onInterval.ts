@@ -9,6 +9,7 @@ import {
   Requirement,
 } from '../../../../engine/types'
 import { tagHas, tagToMs } from '../../../../utils/tags'
+import { modifyViewTransition } from '../../../../utils/view-transtions'
 
 export const OnInterval: AttributePlugin = {
   type: PluginType.Attribute,
@@ -16,7 +17,7 @@ export const OnInterval: AttributePlugin = {
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
   onLoad: ({ mods, genRX }) => {
-    const callback = genRX()
+    const callback = modifyViewTransition(genRX(), mods)
 
     let duration = 1000
     const durationArgs = mods.get('duration')
@@ -27,7 +28,7 @@ export const OnInterval: AttributePlugin = {
         callback()
       }
     }
-    
+
     const intervalId = setInterval(callback, duration)
 
     return () => {

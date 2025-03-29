@@ -6,7 +6,7 @@ from sanic.response import html
 
 from datastar_py import ServerSentEventGenerator as SSE
 from datastar_py.consts import FragmentMergeMode
-from datastar_py.responses import make_datastar_sanic_response
+from datastar_py.sanic import datastar_respond
 
 app = Sanic("DataStarApp")
 
@@ -54,14 +54,14 @@ async def hello_world(request):
 
 @app.get("/add_signal")
 async def add_signal(request):
-    response = await make_datastar_sanic_response(request)
+    response = await datastar_respond(request)
 
     await response.send(
         SSE.merge_fragments(
             [
                 """
             <div class="time signal">
-            Current time from signal: <span data-text="currentTime.value">CURRENT_TIME</span>
+            Current time from signal: <span data-text="$currentTime">CURRENT_TIME</span>
             </div>
             """
             ],
@@ -75,7 +75,7 @@ async def add_signal(request):
 
 @app.get("/add_fragment")
 async def add_fragment(request):
-    response = await make_datastar_sanic_response(request)
+    response = await datastar_respond(request)
 
     await response.send(
         SSE.merge_fragments(
@@ -96,7 +96,7 @@ async def add_fragment(request):
 
 @app.get("/updates")
 async def updates(request):
-    response = await make_datastar_sanic_response(request)
+    response = await datastar_respond(request)
 
     while True:
         await response.send(

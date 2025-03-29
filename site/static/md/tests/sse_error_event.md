@@ -2,8 +2,8 @@
 
 Tests that an SSE error event is dispatched.
 
-<div data-signals-result="0" data-on-load="@get('/tests/sse_error_event/data')"
-  data-on-datastar-sse="events.innerHTML += evt.detail.type + '\n'; evt.detail.type == 'error' && $result++">
+<div data-signals-result="0"
+  data-on-datastar-sse="evt.detail.type == 'error' && $result++; events.innerHTML += evt.detail.type + '\n'" data-on-load="@get('/tests/sse_error_event/data')">
   <pre id="events"></pre>
   <hr />
   Result:

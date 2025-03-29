@@ -9,6 +9,7 @@ import {
   Requirement,
 } from '../../../../engine/types'
 import { tagToMs } from '../../../../utils/tags'
+import { modifyViewTransition } from '../../../../utils/view-transtions'
 
 export const OnLoad: AttributePlugin = {
   type: PluginType.Attribute,
@@ -16,7 +17,7 @@ export const OnLoad: AttributePlugin = {
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
   onLoad: ({ mods, genRX }) => {
-    const callback = genRX()
+    const callback = modifyViewTransition(genRX(), mods)
 
     let wait = 0
     const delayArgs = mods.get('delay')

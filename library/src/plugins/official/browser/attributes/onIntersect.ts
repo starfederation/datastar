@@ -8,6 +8,8 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
+import { modifyTiming } from '../../../../utils/timing'
+import { modifyViewTransition } from '../../../../utils/view-transtions'
 
 const ONCE = 'once'
 const HALF = 'half'
@@ -19,7 +21,9 @@ export const OnIntersect: AttributePlugin = {
   keyReq: Requirement.Denied,
   mods: new Set([ONCE, HALF, FULL]),
   onLoad: ({ el, rawKey, mods, genRX }) => {
-    const callback = genRX()
+    let callback = modifyTiming(genRX(), mods)
+    callback = modifyViewTransition(callback, mods)
+
     const options = { threshold: 0 }
     if (mods.has(FULL)) {
       options.threshold = 1

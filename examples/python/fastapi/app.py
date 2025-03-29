@@ -4,7 +4,7 @@ from datetime import datetime
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
-from datastar_py.responses import DatastarFastAPIResponse
+from datastar_py.fastapi import DatastarStreamingResponse
 
 app = FastAPI()
 
@@ -51,16 +51,16 @@ async def read_root():
     )
 
 
-async def time_updates(sse):
+async def time_updates():
     while True:
-        yield sse.merge_fragments(
+        yield DatastarStreamingResponse.merge_fragments(
             [f"""<span id="currentTime">{datetime.now().isoformat()}"""]
         )
         await asyncio.sleep(1)
-        yield sse.merge_signals({"currentTime": f"{datetime.now().isoformat()}"})
+        yield DatastarStreamingResponse.merge_signals({"currentTime": f"{datetime.now().isoformat()}"})
         await asyncio.sleep(1)
 
 
 @app.get("/updates")
 async def updates():
-    return DatastarFastAPIResponse(time_updates)
+    return DatastarStreamingResponse(time_updates())

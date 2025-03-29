@@ -1,0 +1,11 @@
+[project]
+name = "datastar-django-example"
+version = "1.0.0"
+description = "Datastar Example Django Project"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "daphne>=4.1.2",
+    "datastar-py>=0.4.3",
+    "django>=5.1.7",
+]

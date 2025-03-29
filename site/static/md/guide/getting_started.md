@@ -19,7 +19,7 @@ With Datastar, you can build any UI that a full-stack framework like React, Vue.
 The quickest way to use Datastar is to include it in your HTML using a script tag hosted on a CDN.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.10/bundles/datastar.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js"></script>
 ```
 
 If you prefer to host the file yourself, download your own bundle using the [bundler](/bundler), then include it from the appropriate path.
@@ -390,7 +390,7 @@ Now when the `Fetch a question` button is clicked, the server will respond with 
 
 ### `data-indicator`
 
-The [`data-indicator`](/reference/attribute_plugins#data-data-indicator) attribute sets the value of a signal to `true` while the request is in flight, otherwise `false`. We can use this signal to show a loading indicator, which may be desirable for slower responses.
+The [`data-indicator`](/reference/attribute_plugins#data-indicator) attribute sets the value of a signal to `true` while the request is in flight, otherwise `false`. We can use this signal to show a loading indicator, which may be desirable for slower responses.
 
 ```html
 <div id="question"></div>
@@ -454,19 +454,19 @@ Actions in Datastar are helper functions that are available in `data-*` attribut
 
 ### `@setAll()`
 
-The `@setAll()` action sets the values of multiple signals at once. It takes a path prefix that is used to match against signals, and a value to set them to, as arguments.
+The `@setAll()` action sets the value of all matching signals to the expression provided in the second argument. The first argument can be one or more space-separated paths in which `*` can be used as a wildcard.
 
 ```html
-<button data-on-click="@setAll('form.', true)"></button>
+<button data-on-click="@setAll('foo.*', $bar)"></button>
 ```
 
-This sets the values of all signals namespaced under the `form` signal to `true`, which could be useful for enabling input fields in a form.
+This sets the values of all signals namespaced under the `foo` signal to the value of `$bar`. This can  be useful for checking multiple checkbox fields in a form, for example:
 
 ```html
 <input type="checkbox" data-bind-checkboxes.checkbox1 /> Checkbox 1
 <input type="checkbox" data-bind-checkboxes.checkbox2 /> Checkbox 2
 <input type="checkbox" data-bind-checkboxes.checkbox3 /> Checkbox 3
-<button data-on-click="@setAll('checkboxes.', true)">Check All</button>
+<button data-on-click="@setAll('checkboxes.*', true)">Check All</button>
 ```
 
 <div class="flex flex-col items-start gap-2 p-8 alert">
@@ -488,26 +488,26 @@ This sets the values of all signals namespaced under the `form` signal to `true`
             <input type="checkbox" data-bind-checkboxes1.checkbox3 class="toggle" />
         </label>
     </div>
-    <button data-on-click="@setAll('checkboxes1.', true)" class="mt-4 btn btn-secondary">
+    <button data-on-click="@setAll('checkboxes1.*', true)" class="mt-4 btn btn-secondary">
         Check All
     </button>
 </div>
 
 ### `@toggleAll()`
 
-The `@toggleAll()` action toggles the values of multiple signals at once. It takes a path prefix that is used to match against signals, as an argument.
+The `@toggleAll()` action toggles the value of all matching signals. The first argument can be one or more space-separated paths in which `*` can be used as a wildcard.
 
 ```html
-<button data-on-click="@toggleAll('form.')"></button>
+<button data-on-click="@toggleAll('foo.*')"></button>
 ```
 
-This toggles the values of all signals containing `form.` (to either `true` or `false`), which could be useful for toggling input fields in a form.
+This toggles the values of all signals namespaced under the `foo` signal (to either `true` or `false`). This can be useful for toggling multiple checkbox fields in a form, for example:
 
 ```html
 <input type="checkbox" data-bind-checkboxes.checkbox1 /> Checkbox 1
 <input type="checkbox" data-bind-checkboxes.checkbox2 /> Checkbox 2
 <input type="checkbox" data-bind-checkboxes.checkbox3 /> Checkbox 3
-<button data-on-click="@toggleAll('checkboxes.')">Toggle All</button>
+<button data-on-click="@toggleAll('checkboxes.*')">Toggle All</button>
 ```
 
 <div class="flex flex-col items-start gap-2 p-8 alert">
@@ -529,7 +529,7 @@ This toggles the values of all signals containing `form.` (to either `true` or `
             <input type="checkbox" data-bind-checkboxes2.checkbox_3 class="toggle" />
         </label>
     </div>
-    <button data-on-click="@toggleAll('checkboxes2.')" class="mt-4 btn btn-secondary">
+    <button data-on-click="@toggleAll('checkboxes2.*')" class="mt-4 btn btn-secondary">
         Toggle All
     </button>
 </div>
