@@ -17,8 +17,7 @@ export const OnLoad: AttributePlugin = {
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
   onLoad: ({ mods, genRX }) => {
-    let callback = genRX()
-    callback = modifyViewTransition(callback, mods)
+    const callback = modifyViewTransition(genRX(), mods)
 
     let wait = 0
     const delayArgs = mods.get('delay')

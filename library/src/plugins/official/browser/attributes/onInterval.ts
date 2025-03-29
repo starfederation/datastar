@@ -17,8 +17,7 @@ export const OnInterval: AttributePlugin = {
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
   onLoad: ({ mods, genRX }) => {
-    let callback = genRX()
-    callback = modifyViewTransition(callback, mods)
+    const callback = modifyViewTransition(genRX(), mods)
 
     let duration = 1000
     const durationArgs = mods.get('duration')
