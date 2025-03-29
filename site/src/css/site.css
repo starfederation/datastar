@@ -49,3 +49,7 @@ pre code {
     border-radius: .375rem;
     background-color: hsl(204deg 100% calc(calc(50% /50) * 50)/.1);
 }
+
+.prose ol, .prose ul {
+    margin: 0 !important;
+}

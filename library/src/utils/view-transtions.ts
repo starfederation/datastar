@@ -13,5 +13,6 @@ export interface IViewTransition {
 
 export const docWithViewTransitionAPI =
   document as unknown as DocumentSupportingViewTransitionAPI
+
 export const supportsViewTransitions =
   !!docWithViewTransitionAPI.startViewTransition

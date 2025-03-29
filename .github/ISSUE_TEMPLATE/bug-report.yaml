@@ -26,6 +26,6 @@ body:
     attributes:
       label: Datastar Version
       description: Provide the Datastar version that this relates to, ideally the [latest release](https://github.com/starfederation/datastar/releases).
-      placeholder: v1.0.0-beta.9
+      placeholder: v1.0.0
     validations:
       required: true

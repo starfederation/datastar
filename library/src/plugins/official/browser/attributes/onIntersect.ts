@@ -1,34 +1,39 @@
 // Authors: Delaney Gillilan
 // Icon: mdi-light:vector-intersection
-// Slug: Run expression when element intersects with viewport
-// Description: An attribute that runs an expression when the element intersects with the viewport.
+// Slug: Executes an expression when an element intersects with the viewport
+// Description: An attribute that executes an expression when an element intersects with the viewport.
 
 import {
   type AttributePlugin,
   PluginType,
   Requirement,
 } from '../../../../engine/types'
+import { modifyTiming } from '../../../../utils/timing'
 
 const ONCE = 'once'
 const HALF = 'half'
 const FULL = 'full'
 
-// Run expression when element intersects with viewport
-export const Intersects: AttributePlugin = {
+export const OnIntersect: AttributePlugin = {
   type: PluginType.Attribute,
-  name: 'intersects',
+  name: 'onIntersect',
   keyReq: Requirement.Denied,
   mods: new Set([ONCE, HALF, FULL]),
   onLoad: ({ el, rawKey, mods, genRX }) => {
-    const options = { threshold: 0 }
-    if (mods.has(FULL)) options.threshold = 1
-    else if (mods.has(HALF)) options.threshold = 0.5
+    const callback = modifyTiming(genRX(), mods)
 
-    const rx = genRX()
+    const options = { threshold: 0 }
+    if (mods.has(FULL)) {
+      options.threshold = 1
+    } else if (mods.has(HALF)) {
+      options.threshold = 0.5
+    }
+
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
-          rx()
+          callback()
+
           if (mods.has(ONCE)) {
             observer.disconnect()
             delete el.dataset[rawKey]
@@ -36,8 +41,9 @@ export const Intersects: AttributePlugin = {
         }
       }
     }, options)
-
+    
     observer.observe(el)
+
     return () => observer.disconnect()
   },
 }

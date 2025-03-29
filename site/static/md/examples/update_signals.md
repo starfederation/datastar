@@ -2,27 +2,16 @@
 
 ## Demo
 
-<div
-     data-signals='{"existingSignals": "this already exists"}'
->
-     <button
-          class="btn btn-success"
-          data-on-click="@post('/examples/update_signals/data')"
-     >
+<div data-signals='{"existingSignals": "this already exists"}'>
+     <button class="btn btn-success" data-on-click="@post('/examples/update_signals/data')">
           Apply random signals
      </button>
-     <button
-          class="btn btn-error"
-          data-on-click="@delete('/examples/update_signals/data')"
-     >
+     <button class="btn btn-error" data-on-click="@delete('/examples/update_signals/data')">
           Remove 2 random signals
      </button>
 
-     <pre
-          class="border-2 border-accent bg-base-200 text-accent text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
-          data-text="ctx.signals.JSON()"
-          data-on-signals-change="ctx.el.textContent = ctx.signals.JSON()"
-     >
+     <pre class="border-2 border-accent bg-base-200 text-accent text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+          data-text="ctx.signals.JSON()" data-on-signal-change="ctx.el.textContent = ctx.signals.JSON()">
           Stuff in signals
      </pre>
 </div>
@@ -44,4 +33,5 @@ event: datastar-remove-signals,
 data: paths 12768 existingSignals
 ```
 
-Where the paths are `.` delimited paths.  For namespaced signals it might look like `foo.bar.baz`.  Using the Go helpers for example this looks like `datastar.RemoveSignals(sse, keysToRemove...)`
+Where the paths are `.` delimited paths. For namespaced signals it might look like `foo.bar.baz`. Using the Go helpers
+for example this looks like `datastar.RemoveSignals(sse, keysToRemove...)`

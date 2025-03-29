@@ -10,6 +10,9 @@
 
 ## Explanation
 
-You can dispatch custom events from the server to the client. This is useful for when you need to trigger a client-side action from the server. The client can listen for the event and respond accordingly. This is useful for when you need to update the UI based on server-side events.
+You can dispatch custom events from the server to the client. This is useful for when you need to trigger a client-side
+action from the server. The client can listen for the event and respond accordingly. This is useful for when you need to
+update the UI based on server-side events.
 
-***Note:*** In general you want to use signals for reactivity.  This is a stop gap to interact with legace code or libraries that don't support signals.
+***Note:*** In general you want to use signals for reactivity. This is a stop gap to interact with legace code or
+libraries that don't support signals.

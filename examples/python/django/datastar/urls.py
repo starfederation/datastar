@@ -21,6 +21,8 @@ from ds import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", views.home),
-    path("updates", views.updates),
+    path("", views.home_asgi),
+    path("updates", views.updates_asgi),
+    path("wsgi/", views.home_wsgi),
+    path("updates-wsgi/", views.updates_wsgi),
 ]

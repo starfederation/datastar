@@ -1,5 +1,7 @@
 # Datastar + dotnet
 
+[![NuGet Version](https://img.shields.io/nuget/v/Starfederation.Datastar.svg)](https://www.nuget.org/packages/Starfederation.Datastar)
+
 Real-time Hypermedia first Library and Framework for dotnet
 
 # HTML Frontend
@@ -28,14 +30,14 @@ using System.Text.Json.Serialization;
 builder.Services.AddDatastar();
 
 // displayDate - merging a fragment
-app.MapGet("/displayDate", async (IServerSentEventService sse) =>
+app.MapGet("/displayDate", async (IDatastarServerSentEventService sse) =>
 {
     string today = DateTime.Now.ToString("%y-%M-%d %h:%m:%s");
     await sse.MergeFragmentsAsync($"""<div id='target'><span id='date'><b>{today}</b><button data-on-click="@get('/removeDate')">Remove</button></span></div>""");
 });
 
 // removeDate - removing a fragment
-app.MapGet("/removeDate", async (IServerSentEventService sse) => { await sse.RemoveFragmentsAsync("#date"); });
+app.MapGet("/removeDate", async (IDatastarServerSentEventService sse) => { await sse.RemoveFragmentsAsync("#date"); });
 
 public record Signals {
     [JsonPropertyName("input")]

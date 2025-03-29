@@ -1,3 +1,4 @@
+// Authors: Delaney Gillilan
 // Icon: tabler:file-type-js
 // Slug: Execute JavaScript using a Server-Sent Event
 // Description: Remember, SSE is just a regular SSE request but with the ability to send 0-inf messages to the client.

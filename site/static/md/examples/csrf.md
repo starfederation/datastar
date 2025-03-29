@@ -2,7 +2,8 @@
 
 ## Explanation
 
-Sometimes a backend framework need to set a header.  Normally you should be using cookies to be more secure, but it depends on your backend.
+Sometimes a backend framework need to set a header. Normally you should be using cookies to be more secure, but it
+depends on your backend.
 
 ```html
 <button data-on-click="@post('/examples/csrf/data', {

@@ -2,9 +2,25 @@
 
 Datastar provides the following actions, that can be used in Datastar expressions.
 
-## Backend Plugins
+### Backend Actions
 
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/backend/actions)
+- [`@get()`](#get)
+- [`@post()`](#post)
+- [`@put()`](#put)
+- [`@patch()`](#patch)
+- [`@delete()`](#delete)
+
+### Browser Actions
+
+- [`@clipboard()`](#clipboard)
+
+### Utility Actions
+
+- [`@setAll()`](#setall)
+- [`@toggleAll()`](#toggleall)
+- [`@fit()`](#fit)
+
+## Backend Actions
 
 Allow for the integration of any backend service that supports SSE.
 
@@ -97,16 +113,15 @@ All of the actions above trigger `datastar-sse` events during the SSE request li
 - `finished` - Triggered when the SSE request is finished.
 - `error` - Triggered when the SSE request encounters an error.
 - `retrying` - Triggered when the SSE request is retrying.
+- `retries-failed` - Triggered when the SSE request fails after retrying.
 
 ```html
 <div data-on-datastar-sse="evt.detail.type == 'error' && console.log('SSE error encountered')"></div>
 ```
 
-## Browser Plugins
+## Browser Actions
 
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/browser/actions)
-
-Provides actions for performing browser operations.
+Actions for performing browser operations.
 
 ### `@clipboard()`
 
@@ -118,11 +133,7 @@ Copies the provided evaluated expression to the clipboard.
 <div data-on-click="@clipboard('Hello, world!')"></div>
 ```
 
-## Logic Plugins
-
-[Source Code](https://github.com/starfederation/datastar/blob/main/library/src/plugins/official/logic/actions)
-
-Provides actions for performing logic operations.
+## Utility Actions
 
 ### `@setAll()`
 

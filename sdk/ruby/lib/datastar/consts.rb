@@ -4,7 +4,7 @@
 module Datastar
   module Consts
     DATASTAR_KEY = 'datastar'
-    VERSION = '1.0.0-beta.9'
+    VERSION = '1.0.0-beta.10'
 
     # The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     DEFAULT_SSE_RETRY_DURATION = 1000
