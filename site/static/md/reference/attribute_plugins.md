@@ -533,15 +533,16 @@ Modifiers allow you to modify the element intersection behavior and the timing o
 - `__half` - Triggers when half of the element is visible.
 - `__full` - Triggers when the full element is visible.
 - `__debounce` - Debounce the event listener.
-- `.500ms` - Debounce for 500 milliseconds.
-- `.1s` - Debounce for 1 second.
-- `.leading` - Debounce with leading edge.
-- `.notrail` - Debounce without trailing edge.
+  - `.500ms` - Debounce for 500 milliseconds.
+  - `.1s` - Debounce for 1 second.
+  - `.leading` - Debounce with leading edge.
+  - `.notrail` - Debounce without trailing edge.
 - `__throttle` - Throttle the event listener.
-- `.500ms` - Throttle for 500 milliseconds.
-- `.1s` - Throttle for 1 second.
-- `.noleading` - Throttle without leading edge.
-- `.trail` - Throttle with trailing edge.
+  - `.500ms` - Throttle for 500 milliseconds.
+  - `.1s` - Throttle for 1 second.
+  - `.noleading` - Throttle without leading edge.
+  - `.trail` - Throttle with trailing edge.
+- `__viewtransition` - Wraps the expression in `document.startViewTransition()` when the View Transition API is available.
 
 ```html
 <div data-on-intersect__once__full="$fullyIntersected = true"></div>
@@ -560,9 +561,10 @@ Runs an expression at a regular interval. The interval duration defaults to 1 se
 Modifiers allow you to modify the interval duration.
 
 - `__duration` - Sets the interval duration.
-- `.500ms` - Interval duration of 500 milliseconds.
-- `.1s` - Interval duration of 1 second (default).
-- `.leading` - Execute the first interval immediately.
+  - `.500ms` - Interval duration of 500 milliseconds.
+  - `.1s` - Interval duration of 1 second (default).
+  - `.leading` - Execute the first interval immediately.
+- `__viewtransition` - Wraps the expression in `document.startViewTransition()` when the View Transition API is available.
 
 ```html
 <div data-on-interval__duration.500ms="$count++"></div>
@@ -581,8 +583,9 @@ Runs an expression when the element is loaded into the DOM.
 Modifiers allow you to add a delay to the event listener.
 
 - `__delay` - Delay the event listener.
-- `.500ms` - Delay for 500 milliseconds.
-- `.1s` - Delay for 1 second.
+  - `.500ms` - Delay for 500 milliseconds.
+  - `.1s` - Delay for 1 second.
+- `__viewtransition` - Wraps the expression in `document.startViewTransition()` when the View Transition API is available.
 
 ```html
 <div data-on-load__delay.500ms="$count = 1"></div>
@@ -601,15 +604,16 @@ Runs an expression on every [`requestAnimationFrame`](https://developer.mozilla.
 Modifiers allow you to modify the timing of the event listener.
 
 - `__debounce` - Debounce the event listener.
-- `.500ms` - Debounce for 500 milliseconds.
-- `.1s` - Debounce for 1 second.
-- `.leading` - Debounce with leading edge.
-- `.notrail` - Debounce without trailing edge.
+  - `.500ms` - Debounce for 500 milliseconds.
+  - `.1s` - Debounce for 1 second.
+  - `.leading` - Debounce with leading edge.
+  - `.notrail` - Debounce without trailing edge.
 - `__throttle` - Throttle the event listener.
-- `.500ms` - Throttle for 500 milliseconds.
-- `.1s` - Throttle for 1 second.
-- `.noleading` - Throttle without leading edge.
-- `.trail` - Throttle with trailing edge.
+  - `.500ms` - Throttle for 500 milliseconds.
+  - `.1s` - Throttle for 1 second.
+  - `.noleading` - Throttle without leading edge.
+  - `.trail` - Throttle with trailing edge.
+- `__viewtransition` - Wraps the expression in `document.startViewTransition()` when the View Transition API is available.
 
 ```html
 <div data-on-raf__debounce.10ms="$count++"></div>
@@ -629,20 +633,29 @@ A key can be provided to only trigger the event when a specific signal changes.
 <div data-on-signal-change-foo="$fooCount++"></div>
 ```
 
+The signal path can contain `*` as a wildcard.
+
+```html
+<div data-signals-foo.bar="1"
+     data-on-signal-change-foo.*="$fooCount++"
+></div>
+```
+
 #### Modifiers
 
 Modifiers allow you to modify the timing of the event listener.
 
 - `__debounce` - Debounce the event listener.
-- `.500ms` - Debounce for 500 milliseconds.
-- `.1s` - Debounce for 1 second.
-- `.leading` - Debounce with leading edge.
-- `.notrail` - Debounce without trailing edge.
+  - `.500ms` - Debounce for 500 milliseconds.
+  - `.1s` - Debounce for 1 second.
+  - `.leading` - Debounce with leading edge.
+  - `.notrail` - Debounce without trailing edge.
 - `__throttle` - Throttle the event listener.
-- `.500ms` - Throttle for 500 milliseconds.
-- `.1s` - Throttle for 1 second.
-- `.noleading` - Throttle without leading edge.
-- `.trail` - Throttle with trailing edge.
+  - `.500ms` - Throttle for 500 milliseconds.
+  - `.1s` - Throttle for 1 second.
+  - `.noleading` - Throttle without leading edge.
+  - `.trail` - Throttle with trailing edge.
+- `__viewtransition` - Wraps the expression in `document.startViewTransition()` when the View Transition API is available.
 
 ```html
 <div data-on-signal-change__debounce.100ms="$count++"></div>

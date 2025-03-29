@@ -10,6 +10,7 @@ import {
   PluginType,
   Requirement,
 } from '../../../../engine/types'
+import { pathMatchesPattern } from '../../../../utils/paths'
 import { modifyCasing } from '../../../../utils/text'
 import { modifyTiming } from '../../../../utils/timing'
 import { modifyViewTransition } from '../../../../utils/view-transtions'
@@ -33,10 +34,10 @@ export const OnSignalChange: AttributePlugin = {
       }
     }
 
-    const signalPath = modifyCasing(key, mods)
+    const pattern = modifyCasing(key, mods)
     const signalValues = new Map<Signal, any>()
     signals.walk((path, signal) => {
-      if (path.startsWith(signalPath)) {
+      if (pathMatchesPattern(path, pattern)) {
         signalValues.set(signal, signal.value)
       }
     })
