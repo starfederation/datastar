@@ -3,7 +3,7 @@ from datetime import datetime
 
 from quart import Quart
 
-from datastar_py.responses import make_datastar_quart_response
+from datastar_py.quart import make_datastar_response, ServerSentEventGenerator
 
 app = Quart(__name__)
 
@@ -44,16 +44,16 @@ HTML = """\
 
 @app.route("/updates")
 async def updates():
-    async def time_updates(sse):
+    async def time_updates():
         while True:
-            yield sse.merge_fragments(
+            yield ServerSentEventGenerator.merge_fragments(
                 [f"""<span id="currentTime">{datetime.now().isoformat()}"""]
             )
             await asyncio.sleep(1)
-            yield sse.merge_signals({"currentTime": f"{datetime.now().isoformat()}"})
+            yield ServerSentEventGenerator.merge_signals({"currentTime": f"{datetime.now().isoformat()}"})
             await asyncio.sleep(1)
 
-    response = await make_datastar_quart_response(time_updates)
+    response = await make_datastar_response(time_updates())
     return response
 
 

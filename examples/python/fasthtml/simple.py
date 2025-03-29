@@ -4,7 +4,8 @@ from datetime import datetime
 from pathlib import Path
 
 from fasthtml.common import *
-from datastar_py.responses import DatastarFastHTMLResponse
+
+from datastar_py.fasthtml import DatastarStreamingResponse
 
 repo_root = next(p for p in Path(__file__).parents if (p / ".git").exists())
 
@@ -42,18 +43,18 @@ async def index():
     )
 
 
-async def clock(sse):
+async def clock():
     while True:
         now = datetime.isoformat(datetime.now())
-        yield sse.merge_fragments([Span(id="currentTime")(now)])
+        yield DatastarStreamingResponse.merge_fragments([Span(id="currentTime")(now)])
         await asyncio.sleep(1)
-        yield sse.merge_signals({"currentTime": f"{now}"})
+        yield DatastarStreamingResponse.merge_signals({"currentTime": f"{now}"})
         await asyncio.sleep(1)
 
 
 @rt
 async def updates():
-    return DatastarFastHTMLResponse(clock)
+    return DatastarStreamingResponse(clock())
 
 
 serve()
