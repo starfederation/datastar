@@ -8,9 +8,9 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ### Added
 
-- Added the `__debounce`, `__throttle` and `__viewtransition` modifiers to `data-on-intersect`.
-- Added the `__debounce`, `__throttle` and `__viewtransition` modifiers to `data-on-signal-change`.
+- Added the `__debounce`, `__throttle` modifiers to `data-on-intersect`.
+- Added the `__debounce`, `__throttle` modifiers to `data-on-signal-change`.
 
 ### Changed
 
-- The `datastar-sse` event is now dispatched on the `document` element, and using `data-on-datastar-sse` automatically listens for the event on the `document`.
+- The `datastar-sse` event is now dispatched on the `document` element, and using `data-on-datastar-sse` automatically listens for the event on the `document` ([#802](https://github.com/starfederation/datastar/issues/802)).
