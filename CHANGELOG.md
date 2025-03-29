@@ -8,8 +8,11 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 ### Added
 
-- Added the `__debounce`, `__throttle` modifiers to `data-on-intersect`.
-- Added the `__debounce`, `__throttle` modifiers to `data-on-signal-change`.
+- Added the `__viewtransition` modifier to `data-on-interval`.
+- Added the `__debounce`, `__throttle` and `__viewtransition` modifiers to `data-on-intersect`.
+- Added the `__viewtransition` modifier to `data-on-load`.
+- Added the `__viewtransition` modifier to `data-on-raf`.
+- Added the `__debounce`, `__throttle` and `__viewtransition` modifiers to `data-on-signal-change`.
 
 ### Changed
 

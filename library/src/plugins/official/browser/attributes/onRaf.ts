@@ -9,6 +9,7 @@ import {
   Requirement,
 } from '../../../../engine/types'
 import { modifyTiming } from '../../../../utils/timing'
+import { modifyViewTransition } from '../../../../utils/view-transtions'
 
 export const OnRaf: AttributePlugin = {
   type: PluginType.Attribute,
@@ -16,7 +17,8 @@ export const OnRaf: AttributePlugin = {
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
   onLoad: ({ mods, genRX }) => {
-    const callback = modifyTiming(genRX(), mods)
+    let callback = modifyTiming(genRX(), mods)
+    callback = modifyViewTransition(callback, mods)
 
     let rafId: number | undefined
     const raf = () => {

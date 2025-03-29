@@ -42,11 +42,11 @@ export const On: AttributePlugin = {
     }
 
     const evtListOpts: AddEventListenerOptions = {
-      capture: true,
+      capture: false,
       passive: false,
       once: false,
     }
-    if (!mods.has('capture')) evtListOpts.capture = false
+    if (mods.has('capture')) evtListOpts.capture = true
     if (mods.has('passive')) evtListOpts.passive = true
     if (mods.has('once')) evtListOpts.once = true
 
