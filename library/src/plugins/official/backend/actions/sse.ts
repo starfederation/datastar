@@ -130,7 +130,6 @@ export const sse = async (
           argsRaw[key] = lines.join('\n')
         }
 
-        // if you aren't seeing your event you can debug by using this line in the console
         dispatchSSE(type, elId, argsRaw)
       },
       onerror: (error) => {
