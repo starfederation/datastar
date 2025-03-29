@@ -29,7 +29,7 @@ export const Indicator: AttributePlugin = {
     const watcher = ((event: CustomEvent<DatastarSSEEvent>) => {
       const {
         type,
-        argsRaw: { elId },
+        elId,
       } = event.detail
       if (elId !== el.id) return
       switch (type) {
@@ -38,15 +38,12 @@ export const Indicator: AttributePlugin = {
           break
         case FINISHED:
           signal.value = false
+          // Remove the event listener only when finished, in case the element is removed while the request is still in progress
+          document.removeEventListener(DATASTAR_SSE_EVENT, watcher)
           break
       }
     }) as EventListener
 
-    el.addEventListener(DATASTAR_SSE_EVENT, watcher)
-
-    return () => {
-      // Delay removing the event listener to the next macrotask so that the watcher can set the signal appropriately (`queueMicrotask` is insufficient, ask me how I know!)
-      setTimeout(() => el.removeEventListener(DATASTAR_SSE_EVENT, watcher))
-    }
+    document.addEventListener(DATASTAR_SSE_EVENT, watcher)
   },
 }

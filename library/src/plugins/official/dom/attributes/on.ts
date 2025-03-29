@@ -11,6 +11,7 @@ import {
 import { kebab, modifyCasing } from '../../../../utils/text'
 import { modifyTiming } from '../../../../utils/timing'
 import { supportsViewTransitions } from '../../../../utils/view-transtions'
+import { DATASTAR_SSE_EVENT } from '../../backend/shared'
 
 export const On: AttributePlugin = {
   type: PluginType.Attribute,
@@ -65,6 +66,11 @@ export const On: AttributePlugin = {
     // Default to kebab-case and allow modifying
     let eventName = kebab(key)
     eventName = modifyCasing(eventName, mods)
+
+    // Listen for Datastar SSE events on the document
+    if (eventName === DATASTAR_SSE_EVENT) {
+      target = document
+    }
 
     target.addEventListener(eventName, callback, evtListOpts)
     return () => {
