@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Jeffail/gabs/v2"
 	"github.com/delaneyj/toolbelt"
 	"github.com/go-rod/rod"
 	"github.com/starfederation/datastar/site"
@@ -163,4 +164,14 @@ func setupPageTestOnSelect(t *testing.T, subURL string) {
 			assert.Contains(t, after, "1")
 		})
 	})
+}
+
+func getLocalStoragePath(t *testing.T, page *rod.Page, path string) string {
+	fromLocalStorage := page.MustEval(`k => localStorage[k]`, "datastar")
+	marshalled := fromLocalStorage.String()
+	c, err := gabs.ParseJSON([]byte(marshalled))
+	assert.NoError(t, err)
+	actual, ok := c.Path(path).Data().(string)
+	assert.True(t, ok)
+	return actual
 }
