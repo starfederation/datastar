@@ -139,17 +139,18 @@ Copies the provided evaluated expression to the clipboard.
 
 Arguments: `@setAll(paths: string, value: any)`
 
-Sets the value of all matching signals to the expression provided in the second argument. The first argument can be one or more space-separated signal paths in which `*` can be used as a wildcard.
+Sets the value of all matching signals to the expression provided in the second argument. The first argument accepts one or more space-separated signal paths. You can use `*` to match a single segment and `**` to match multiple path segments.
 
-```html 
-<!-- Sets the value of `$foo` to `true` -->
+```html
+<!-- Sets the value of `$foo` -->
 <div data-signals-foo="false">
   <button data-on-click="@setAll('foo', $bar)"></button>
 </div>
 
-<!-- Sets the values of `$foo` and `$bar.baz` to `true` -->
-<div data-signals-foo="false" data-signals-bar.baz="false">
-  <button data-on-click="@setAll('foo bar.*', true)"></button>
+<!-- Sets the value of `$foo.bar.baz` -->
+<div data-signals-foo.bar.baz="false">
+  <button data-on-click="@setAll('foo.*.baz', true)"></button>
+  <button data-on-click="@setAll('foo.**', true)"></button>
 </div>
 ```
 
@@ -157,17 +158,18 @@ Sets the value of all matching signals to the expression provided in the second 
 
 Arguments: `@toggleAll(paths: string)`
 
-Toggles the value of all matching signals. The first argument can be one or more space-separated signal paths or namespaced signal paths in which `*` can be used as a wildcard.
+Toggles the value of all matching signals. The first argument accepts one or more space-separated signal paths. You can use `*` to match a single segment and `**` to match multiple path segments.
 
-```html 
+```html
 <!-- Toggles the value of `$foo` -->
 <div data-signals-foo="false">
   <button data-on-change="@toggleAll('foo')"></button>
 </div>
 
-<!-- Toggles the values of `$foo` and `$bar.baz` -->
-<div data-signals-foo="false" data-signals-bar.baz="false">
-  <button data-on-click="@toggleAll('foo bar.*')"></button>
+<!-- Toggles the value of `$foo.bar.baz` -->
+<div data-signals-foo.bar.baz="false">
+  <button data-on-click="@toggleAll('foo.*.baz')"></button>
+  <button data-on-click="@toggleAll('foo.**')"></button>
 </div>
 ```
 
