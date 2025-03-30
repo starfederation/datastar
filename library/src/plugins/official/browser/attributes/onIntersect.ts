@@ -11,23 +11,18 @@ import {
 import { modifyTiming } from '../../../../utils/timing'
 import { modifyViewTransition } from '../../../../utils/view-transtions'
 
-const ONCE = 'once'
-const HALF = 'half'
-const FULL = 'full'
-
 export const OnIntersect: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'onIntersect',
   keyReq: Requirement.Denied,
-  mods: new Set([ONCE, HALF, FULL]),
   onLoad: ({ el, rawKey, mods, genRX }) => {
     let callback = modifyTiming(genRX(), mods)
     callback = modifyViewTransition(callback, mods)
 
     const options = { threshold: 0 }
-    if (mods.has(FULL)) {
+    if (mods.has('full')) {
       options.threshold = 1
-    } else if (mods.has(HALF)) {
+    } else if (mods.has('half')) {
       options.threshold = 0.5
     }
 
@@ -36,7 +31,7 @@ export const OnIntersect: AttributePlugin = {
         if (entry.isIntersecting) {
           callback()
 
-          if (mods.has(ONCE)) {
+          if (mods.has('once')) {
             observer.disconnect()
             delete el.dataset[rawKey]
           }

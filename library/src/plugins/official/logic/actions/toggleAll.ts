@@ -4,14 +4,15 @@
 // Description: Toggle all signals that match one or more space-separated paths in which `*` can be used as a wildcard
 
 import { type ActionPlugin, PluginType } from '../../../../engine/types'
-import { applyToMatchingPaths } from '../../../../utils/paths'
+import { getMatchingSignalPaths } from '../../../../utils/paths'
 
 export const ToggleAll: ActionPlugin = {
   type: PluginType.Action,
   name: 'toggleAll',
   fn: ({ signals }, paths: string) => {
-    applyToMatchingPaths(signals, paths, (signal) => {
-      signal.value = !signal.value
-    })
+    const signalPaths = getMatchingSignalPaths(signals, paths)
+    for (const path of signalPaths) {
+      signals.setValue(path, !signals.value(path))
+    }
   },
 }

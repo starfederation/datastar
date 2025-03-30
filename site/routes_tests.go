@@ -57,6 +57,8 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "on_signal_change_path_once"},
 				{ID: "on_signal_change_path_wildcard"},
 				{ID: "persist_signals"},
+				{ID: "persist_signals_path"},
+				{ID: "persist_signals_path_wildcard"},
 				{ID: "plugin_name_prefix"},
 				{ID: "radio_value"},
 				{ID: "ref"},
@@ -69,6 +71,7 @@ func setupTests(ctx context.Context, router chi.Router) (err error) {
 				{ID: "set_all_paths"},
 				{ID: "sse_error_event"},
 				{ID: "sse_events"},
+				{ID: "toggle_all_path"},
 			},
 		},
 	}

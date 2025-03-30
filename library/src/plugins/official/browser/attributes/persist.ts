@@ -6,24 +6,21 @@
 import { DATASTAR } from '../../../../engine/consts'
 import {
   type AttributePlugin,
-  type NestedValues,
   PluginType,
   Requirement,
 } from '../../../../engine/types'
-import { trimDollarSignPrefix } from '../../../../utils/text'
-
-const SESSION = 'session'
+import { getMatchingSignalPaths } from '../../../../utils/paths'
 
 export const Persist: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'persist',
   keyReq: Requirement.Denied,
-  mods: new Set([SESSION]),
   onLoad: ({ effect, mods, signals, value }) => {
     const key = DATASTAR
-    const storage = mods.has(SESSION) ? sessionStorage : localStorage
-    let paths = value.split(/\s+/).filter((p) => p !== '')
-    paths = paths.map((p) => trimDollarSignPrefix(p))
+    const storage = mods.has('session') ? sessionStorage : localStorage
+    
+    // If the value is empty, persist all signals
+    const paths = value !== '' ? value : '**'
 
     const storageToSignals = () => {
       const data = storage.getItem(key) || '{}'
@@ -32,12 +29,8 @@ export const Persist: AttributePlugin = {
     }
 
     const signalsToStorage = () => {
-      let nv: NestedValues
-      if (!paths.length) {
-        nv = signals.values()
-      } else {
-        nv = signals.subset(...paths)
-      }
+      const signalPaths = getMatchingSignalPaths(signals, paths)
+      const nv = signals.subset(...signalPaths)
       storage.setItem(key, JSON.stringify(nv))
     }
 

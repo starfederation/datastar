@@ -21,12 +21,11 @@ const VSTART = 'vstart'
 const VCENTER = 'vcenter'
 const VEND = 'vend'
 const VNEAREST = 'vnearest'
-const FOCUS = 'focus'
-
 const CENTER = 'center'
 const START = 'start'
 const END = 'end'
 const NEAREST = 'nearest'
+const FOCUS = 'focus'
 
 // Scrolls the element into view
 export const ScrollIntoView: AttributePlugin = {
@@ -34,21 +33,6 @@ export const ScrollIntoView: AttributePlugin = {
   name: 'scrollIntoView',
   keyReq: Requirement.Denied,
   valReq: Requirement.Denied,
-  mods: new Set([
-    SMOOTH,
-    INSTANT,
-    AUTO,
-    HSTART,
-    HCENTER,
-    HEND,
-    HNEAREST,
-    VSTART,
-    VCENTER,
-    VEND,
-    VNEAREST,
-    FOCUS,
-  ]),
-
   onLoad: (ctx) => {
     const { el, mods, rawKey } = ctx
     if (!el.tabIndex) el.setAttribute('tabindex', '0')
@@ -77,7 +61,7 @@ export const ScrollIntoView: AttributePlugin = {
     }
 
     el.scrollIntoView(opts)
-    if (mods.has('focus')) {
+    if (mods.has(FOCUS)) {
       el.focus()
     }
 

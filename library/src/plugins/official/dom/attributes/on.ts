@@ -10,7 +10,7 @@ import {
 } from '../../../../engine/types'
 import { kebab, modifyCasing } from '../../../../utils/text'
 import { modifyTiming } from '../../../../utils/timing'
-import { supportsViewTransitions } from '../../../../utils/view-transtions'
+import { modifyViewTransition } from '../../../../utils/view-transtions'
 import { DATASTAR_SSE_EVENT } from '../../backend/shared'
 
 export const On: AttributePlugin = {
@@ -34,12 +34,7 @@ export const On: AttributePlugin = {
     }
 
     callback = modifyTiming(callback, mods)
-    
-    if (mods.has('viewtransition') && supportsViewTransitions) {
-      const cb = callback // I hate javascript
-      callback = (...args: any[]) =>
-        document.startViewTransition(() => cb(...args))
-    }
+    callback = modifyViewTransition(callback, mods)
 
     const evtListOpts: AddEventListenerOptions = {
       capture: false,
