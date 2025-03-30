@@ -74,7 +74,7 @@ The following example shows how to toggle the value of all signals starting with
 
 ```html
 <div data-signals="{menu: {isopen: {desktop: false, mobile: false}}}">
-  <button data-on-click="@toggleAll('menu.isopen.')">
+  <button data-on-click="@toggleAll('menu.isopen.*')">
     Open/close menu
   </button>
 </div>
@@ -87,7 +87,7 @@ The beauty of this is that you don't need to write a bunch of code to set up and
 Actions are helper functions that can be used in [Datastar expressions](/guide/datastar_expressions). They allow you to perform logical operations without having to write procedural JavaScript.
 
 ```html
-<button data-on-click="@setAll('foo.', $mysignal.toUpperCase())">
+<button data-on-click="@setAll('foo.*', $mysignal.toUpperCase())">
   Convert all to uppercase
 </button>
 ```
