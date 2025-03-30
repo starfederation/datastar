@@ -150,6 +150,10 @@ Sets the value of all matching signals to the expression provided in the second 
 <!-- Sets the value of `$foo.bar.baz` -->
 <div data-signals-foo.bar.baz="false">
   <button data-on-click="@setAll('foo.*.baz', true)"></button>
+</div>
+
+<!-- Sets the value of `$foo.bar.baz` -->
+<div data-signals-foo.bar.baz="false">
   <button data-on-click="@setAll('foo.**', true)"></button>
 </div>
 ```
@@ -169,6 +173,10 @@ Toggles the value of all matching signals. The first argument accepts one or mor
 <!-- Toggles the value of `$foo.bar.baz` -->
 <div data-signals-foo.bar.baz="false">
   <button data-on-click="@toggleAll('foo.*.baz')"></button>
+</div>
+
+<!-- Toggles the value of `$foo.bar.baz` -->
+<div data-signals-foo.bar.baz="false">
   <button data-on-click="@toggleAll('foo.**')"></button>
 </div>
 ```

@@ -665,7 +665,7 @@ Modifiers allow you to modify the timing of the event listener.
 
 ### `data-persist`
 
-Persists signals in Local Storage. This is useful for storing values between page loads.
+Persists signals in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage). This is useful for storing values between page loads.
 
 ```html
 <div data-persist></div>
@@ -677,11 +677,25 @@ If one or more space-separated values are provided as a string, only those signa
 <div data-persist="foo bar"></div>
 ```
 
+You can use `*` to match a single path segment and `**` to match multiple path segments.
+
+```html
+<!-- Persists `$foo.bar.baz` -->
+<div data-signals-foo.bar.baz="1"
+     data-persist="foo.*.baz"
+></div>
+
+<!-- Persists `$foo.bar.baz` -->
+<div data-signals-foo.bar.baz="1"
+     data-persist="foo.**"
+></div>
+```
+
 #### Modifiers
 
 Modifiers allow you to modify the storage target.
 
-- `__session` - Persists signals in Session Storage.
+- `__session` - Persists signals in [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage).
 
 ```html
 <div data-persist__session="foo bar"></div>
