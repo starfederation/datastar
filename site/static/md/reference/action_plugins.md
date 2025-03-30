@@ -139,7 +139,7 @@ Copies the provided evaluated expression to the clipboard.
 
 Arguments: `@setAll(paths: string, value: any)`
 
-Sets the value of all matching signals to the expression provided in the second argument. The first argument accepts one or more space-separated signal paths. You can use `*` to match a single segment and `**` to match multiple path segments.
+Sets the value of all matching signals to the expression provided in the second argument. The first argument accepts one or more space-separated signal paths. You can use `*` to match a single path segment and `**` to match multiple path segments.
 
 ```html
 <!-- Sets the value of `$foo` -->
@@ -158,7 +158,7 @@ Sets the value of all matching signals to the expression provided in the second 
 
 Arguments: `@toggleAll(paths: string)`
 
-Toggles the value of all matching signals. The first argument accepts one or more space-separated signal paths. You can use `*` to match a single segment and `**` to match multiple path segments.
+Toggles the value of all matching signals. The first argument accepts one or more space-separated signal paths. You can use `*` to match a single path segment and `**` to match multiple path segments.
 
 ```html
 <!-- Toggles the value of `$foo` -->

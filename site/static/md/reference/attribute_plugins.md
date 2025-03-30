@@ -633,7 +633,7 @@ A key can be provided to only trigger the event when a specific signal changes.
 <div data-on-signal-change-foo="$fooCount++"></div>
 ```
 
-You can use `*` to match a single segment and `**` to match multiple path segments.
+You can use `*` to match a single path segment and `**` to match multiple path segments.
 
 ```html
 <!-- Listen for changes to `$foo.bar.baz` -->
