@@ -411,12 +411,3 @@
     (throw (ex-info "Error sending SSE event." ctx e))))
 
 
-;; TODO: remove next version
-(defn get-on-open [opts]
-  (or (on-open opts) (:on-open opts)))
-
-(defn get-on-close [opts]
-  (or (on-close opts) (:on-close opts)))
-
-
-

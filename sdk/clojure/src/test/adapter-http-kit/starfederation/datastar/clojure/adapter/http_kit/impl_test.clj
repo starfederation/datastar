@@ -9,7 +9,7 @@
   (:import
     [java.io Closeable ByteArrayOutputStream OutputStreamWriter]))
 
-
+;; Mock Http-kit channel
 (defrecord Channel [^ByteArrayOutputStream baos
                     !ch-open?
                     !on-close]
@@ -64,7 +64,7 @@
     (hk-server/on-close c
       (fn [status]
         (send!)
-        (when-let [callback (:on-close opts)]
+        (when-let [callback (ac/on-close opts)]
           (callback c status))))
     (impl/->sse-gen c send!)))
 
