@@ -75,7 +75,7 @@ func setupExamplesMergeOptions(examplesRouter chi.Router) error {
 			now := time.Now().UTC().Format(time.RFC3339)
 			h := fmt.Sprint(xxh3.HashString(now))
 			frag := mergeOptionsViewUpdate(brewerColorsBG[idx], brewrColorsFG[idx], h)
-			sse.MergeFragmentTempl(frag, datastar.WithMergeMode(mergeMode))
+			sse.MergeFragmentTempl(frag, datastar.WithMergeMode(mergeMode), datastar.WithSelector("#imTheTarget"))
 		}
 	})
 
