@@ -20,7 +20,6 @@
 (def-clone gzip-buffered-writer-profile ac/gzip-buffered-writer-profile)
 
 
-;; TODO: remove deprecated get-on-open/close next release
 (defn ->sse-response
   "Make a Ring like response that will start a SSE stream.
 
@@ -30,9 +29,6 @@
   Note that the SSE connection stays opened util you close it.
 
   General options:
-  - `:on-open`: deprecated in favor of [[on-open]]
-  - `:on-close`: deprecated in favor of [[on-close]]
-
   - `:status`: status for the HTTP response, defaults to 200.
   - `:headers`: ring headers map to add to the response.
   - [[on-open]]: mandatory callback called when the generator is ready to send.
@@ -53,9 +49,9 @@
   namespace if you want to write your own profiles.
   "
   [ring-request opts]
-  {:pre [(ac/get-on-open opts)]}
-  (let [on-open-cb (ac/get-on-open opts)
-        on-close-cb (ac/get-on-close opts)
+  {:pre [(ac/on-open opts)]}
+  (let [on-open-cb (ac/on-open opts)
+        on-close-cb (ac/on-close opts)
         future-send! (promise)
         future-gen (promise)]
     (hk-server/as-channel ring-request

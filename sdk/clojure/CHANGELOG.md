@@ -1,5 +1,13 @@
 # Release notes for the Clojure SDK
 
+## 2025-03-31
+
+### Changed
+
+- Removed the use of the deprecated `:on-open` and `:on-close` keywords. The
+  `->sse-response` functions of both adapters will not use them anymore. The
+  corresponding docstrings are updated.
+
 ## 2025-03-11
 
 ### Deprecated

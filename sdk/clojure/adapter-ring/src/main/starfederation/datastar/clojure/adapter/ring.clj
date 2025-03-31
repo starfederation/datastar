@@ -41,9 +41,6 @@
   - [[write-profile]]: write profile for the connection
     defaults to [[basic-profile]]
 
-  - `:on-open`: deprecated in favor of [[on-open]]
-  - `:on-close`: deprecated in favor of [[on-close]]
-
   When it comes to write profiles, the SDK provides:
   - [[basic-profile]]
   - [[buffered-writer-profile]]
@@ -54,7 +51,7 @@
   namespace if you want to write your own profiles.
   "
   [ring-request {:keys [status] :as opts}]
-  {:pre [(ac/get-on-open opts)]}
+  {:pre [(ac/on-open opts)]}
   (let [sse-gen (impl/->sse-gen)]
     {:status (or status 200)
      :headers (ac/headers ring-request opts)
