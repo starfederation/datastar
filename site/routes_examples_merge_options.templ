@@ -31,7 +31,6 @@ templ mergeOptionsView() {
 
 templ mergeOptionsViewUpdate(bg, fg, hash string) {
 	<div
-		id="imTheTarget"
 		class="p-4 rounded"
 		{ templ.Attributes{
 			"style": fmt.Sprintf("background-color:%s;color:%s;", bg, fg),
