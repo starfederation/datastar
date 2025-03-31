@@ -176,3 +176,17 @@ class ServerSentEventGenerator:
     @classmethod
     def redirect(cls, location: str):
         return cls.execute_script(f"setTimeout(() => window.location = '{location}')")
+
+
+def _wrap_event(event):
+    if isinstance(event, _HtmlProvider) or (isinstance(event, str) and event.startswith("<")):
+        return ServerSentEventGenerator.merge_fragments(event)
+    elif isinstance(event, dict):
+        return ServerSentEventGenerator.merge_signals(event)
+    else:
+        return event
+
+
+async def _async_map(func, async_iter):
+    async for item in async_iter:
+        yield func(item)
