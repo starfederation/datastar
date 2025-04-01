@@ -74,15 +74,15 @@ To see this in action, we can use the [`data-text`](/reference/attribute_plugins
 </div>
 ```
 
-<div class="flex items-start justify-between p-8 alert">
+<div class="flex items-start justify-between p-8 alert max-md:flex-col" data-signals-input="''">
     <div class="flex flex-col gap-4">
-        <div class="flex items-center">
-            <div class="w-20">Input:</div>
-            <input data-bind-input1 class="input input-bordered" />
+        <div class="flex items-center gap-x-6 max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Input:</div>
+            <input data-bind-input1 class="input input-bordered w-full" />
         </div>
-        <div class="flex items-center">
-            <div class="w-20">Output:</div>
-            <div data-text="$input1" class="output"></div>
+        <div class="flex items-center gap-x-6 max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Output:</div>
+            <div data-text="$input1" class="output w-full"></div>
         </div>
     </div>
 </div>
@@ -100,15 +100,15 @@ The value of the `data-text` attribute is a [Datastar expression](/guide/datasta
 </div>
 ```
 
-<div class="flex items-start justify-between p-8 alert">
+<div class="flex items-start justify-between p-8 alert max-md:flex-col" data-signals-input2="''">
     <div class="flex flex-col gap-4">
-        <div class="flex items-center">
-            <div class="w-20">Input:</div>
-            <input data-bind-input2 class="input input-bordered" />
+        <div class="flex items-center gap-x-6 max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Input:</div>
+            <input data-bind-input2 class="input input-bordered w-full" />
         </div>
-        <div class="flex items-center">
-            <div class="w-20">Output:</div>
-            <div data-text="$input2.toUpperCase()" class="output"></div>
+        <div class="flex items-center gap-x-6 max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Output:</div>
+            <div data-text="$input2.toUpperCase()" class="output w-full"></div>
         </div>
     </div>
 </div>
@@ -128,15 +128,15 @@ The [`data-computed`](/reference/attribute_plugins#data-computed) attribute crea
 
 This results in the `$repeated` signal's value always being equal to the value of the `$input` signal repeated twice. Computed signals are useful for memoizing expressions containing other signals.
 
-<div class="flex items-start justify-between p-8 alert">
+<div class="flex items-start justify-between p-8 alert max-md:flex-col">
     <div class="flex flex-col gap-4">
-        <div class="flex items-center">
-            <div class="w-20">Input:</div>
-            <input data-bind-input3 class="input input-bordered" />
+        <div class="flex items-center gap-6px max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Input:</div>
+            <input data-bind-input3 class="input input-bordered w-full" />
         </div>
-        <div class="flex items-center">
-            <div class="w-20">Output:</div>
-            <div data-computed-repeated="$input3.repeat(2)" data-text="$repeated" class="output"></div>
+        <div class="flex items-center gap-6px max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Output:</div>
+            <div data-computed-repeated="$input3.repeat(2)" data-text="$repeated" class="output w-full"></div>
         </div>
     </div>
 </div>
@@ -152,15 +152,15 @@ The [`data-show`](/reference/attribute_plugins#data-show) attribute can be used 
 
 This results in the button being visible only when the input is _not_ an empty string (this could also be written as `!input`).
 
-<div class="flex items-start justify-between p-8 alert">
+<div class="flex items-start justify-between p-8 alert max-md:flex-col">
     <div class="flex flex-col gap-4">
-        <div class="flex items-center">
-            <div class="w-20">Input:</div>
-            <input data-bind-input4 class="input input-bordered" />
+        <div class="flex items-center gap-6px max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Input:</div>
+            <input data-bind-input4 class="input input-bordered w-full" />
         </div>
-        <div class="flex items-center">
-            <div class="w-20">Output:</div>
-            <div data-text="$input4" class="output"></div>
+        <div class="flex items-center gap-6px max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Output:</div>
+            <div data-text="$input4" class="output w-full"></div>
         </div>
     </div>
     <button data-show="$input4 != ''" class="btn btn-primary">
@@ -179,18 +179,18 @@ The [`data-class`](/reference/attribute_plugins#data-class) attribute allows us 
 
 If the expression evaluates to `true`, the `hidden` class is added to the element; otherwise, it is removed.
 
-<div class="flex items-start justify-between p-8 alert">
+<div class="flex items-start justify-between p-8 alert max-md:flex-col">
     <div class="flex flex-col gap-4">
-        <div class="flex items-center">
-            <div class="w-20">Input:</div>
-            <input data-bind-input5 class="input input-bordered" />
+        <div class="flex items-center gap-x-6 max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Input:</div>
+            <input data-bind-input5 class="input input-bordered w-full" />
         </div>
-        <div class="flex items-center">
-            <div class="w-20">Output:</div>
-            <div data-text="$input5" class="output"></div>
+        <div class="flex items-center gap-x-6 max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Output:</div>
+            <div data-text="$input5" class="output w-full"></div>
         </div>
     </div>
-    <button data-class-hidden="$input5 == ''" class="btn btn-primary">
+    <button data-class-hidden="$input5 == ''" class="btn btn-primary max-sm:self-end">
         Save
     </button>
 </div>
@@ -212,18 +212,18 @@ The [`data-attr`](/reference/attribute_plugins#data-attr) attribute can be used 
 
 This results in a `disabled` attribute being given the value `true` whenever the input is an empty string.
 
-<div class="flex items-start justify-between p-8 alert" data-signals-input6="''">
+<div class="flex items-start justify-between p-8 alert max-md:flex-col" data-signals-input6="''">
     <div class="flex flex-col gap-4">
-        <div class="flex items-center">
-            <div class="w-20">Input:</div>
-            <input data-bind-input6 class="input input-bordered" />
+        <div class="flex items-center gap-x-6 max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Input:</div>
+            <input data-bind-input6 class="input input-bordered w-full" />
         </div>
-        <div class="flex items-center">
-            <div class="w-20">Output:</div>
-            <div data-text="$input6" class="output"></div>
+        <div class="flex items-center gap-x-6 max-sm:flex-col gap-[8px]">
+            <div class="w-20 max-sm:self-start max-sm:w-auto">Output:</div>
+            <div data-text="$input6" class="output w-full"></div>
         </div>
     </div>
-    <button data-attr-disabled="$input6 == ''" class="btn btn-primary">
+    <button data-attr-disabled="$input6 == ''" class="btn btn-primary max-sm:self-end">
         Save
     </button>
 </div>
@@ -269,18 +269,18 @@ The [`data-on`](/reference/attribute_plugins#data-on) attribute can be used to a
 
 This results in the `$input` signal's value being set to an empty string whenever the button element is clicked. This can be used with any valid event name such as `data-on-keydown`, `data-on-mouseover`, etc.
 
-<div class="flex items-start justify-between p-8 alert" >
+<div class="flex items-start justify-between p-8 alert max-md:flex-col" >
     <div class="flex flex-col gap-4">
-        <div class="flex items-center">
-            <div class="w-20">Input:</div>
-            <input data-bind-input7 class="input input-bordered" />
+        <div class="flex items-center gap-6px max-sm:flex-col gap-[8px]">
+            <div class="max-sm:self-start max-sm:w-auto">Input:</div>
+            <input data-bind-input7 class="input input-bordered w-full" />
         </div>
-        <div class="flex items-center">
-            <div class="w-20">Output:</div>
-            <div data-text="$input7" class="output"></div>
+        <div class="flex items-center gap-6px max-sm:flex-col gap-[8px]">
+            <div class="max-sm:self-start max-sm:w-auto">Output:</div>
+            <div data-text="$input7" class="output w-full"></div>
         </div>
     </div>
-    <button data-on-click="$input7 = ''" class="btn btn-secondary">
+    <button data-on-click="$input7 = ''" class="btn btn-secondary max-md:self-end">
         Reset
     </button>
 </div>
