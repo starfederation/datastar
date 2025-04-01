@@ -279,7 +279,7 @@ templ sidebarPageContents(sidebarGroups []*SidebarGroup, current *SidebarLink, c
 		<aside class="flex-col hidden gap-4 px-4 py-8 overflow-y-auto lg:flex min-w-80 bg-base-300 lg:visible">
 			@SidebarContents(sidebarGroups, current)
 		</aside>
-		<div class="flex flex-col w-full gap-16 p-4 lg:items-center lg:p-16">
+		<div class="flex flex-col w-full gap-16 p-4 lg:items-center">
 			@SidebarPrevNextLinks(sidebarGroups, current)
 			<article
 				class="flex flex-col flex-1 p-1 prose prose-primary lg:prose-lg prose-a:link-primary max-w-none lg:max-w-prose w-full"
@@ -387,7 +387,7 @@ templ sseIndicator(signalName string) {
 templ headerDropdownMenu(title string) {
 	<div class="dropdown dropdown-hover">
 		<div tabindex="0" role="button" class="font-bold uppercase link-hover">{ title }</div>
-		<ul tabindex="0" class="dropdown-content menu bg-base-300 rounded-box z-[1] w-52 p-2 shadow">
+		<ul tabindex="0" class="dropdown-content menu bg-base-300 rounded-box z-[1] w-52 p-2 shadow right-0">
 			{ children... }
 		</ul>
 	</div>
