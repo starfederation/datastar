@@ -72,7 +72,7 @@ module ServerSentEvent =
             then $"id: {sse.Id |> ValueOption.get}"
 
             if (sse.Retry <> Consts.DefaultSseRetryDuration)
-            then $"retry: {sse.Retry.Milliseconds}"
+            then $"retry: {sse.Retry.TotalMilliseconds}"
 
             yield! sse.DataLines |> Array.map (fun dataLine -> $"data: {dataLine}")
 
