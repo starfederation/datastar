@@ -74,7 +74,7 @@ To see this in action, we can use the [`data-text`](/reference/attribute_plugins
 </div>
 ```
 
-<div class="flex items-start justify-between p-8 alert max-md:flex-col" data-signals-input="''">
+<div class="flex items-start justify-between p-8 alert max-md:flex-col">
     <div class="flex flex-col gap-4">
         <div class="flex items-center gap-x-6 max-sm:flex-col gap-[8px]">
             <div class="w-20 max-sm:self-start max-sm:w-auto">Input:</div>
@@ -100,7 +100,7 @@ The value of the `data-text` attribute is a [Datastar expression](/guide/datasta
 </div>
 ```
 
-<div class="flex items-start justify-between p-8 alert max-md:flex-col" data-signals-input2="''">
+<div class="flex items-start justify-between p-8 alert max-md:flex-col">
     <div class="flex flex-col gap-4">
         <div class="flex items-center gap-x-6 max-sm:flex-col gap-[8px]">
             <div class="w-20 max-sm:self-start max-sm:w-auto">Input:</div>
