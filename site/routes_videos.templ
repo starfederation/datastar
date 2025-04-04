@@ -19,8 +19,9 @@ templ PageVideos(r *http.Request, videos ...Video) {
 						thumbnail := "https://img.youtube.com/vi/" + video.Code + "/maxresdefault.jpg"
 						title := video.Title
 					}}
-					<div id={ id } data-on-click={ action } title={ title } class="w-full max-w-xl aspect-video cursor-pointer">
+					<div id={ id } data-on-click={ action } title={ title } class="w-full max-w-xl aspect-video cursor-pointer video-wrapper relative">
 						<img src={ thumbnail } alt={ title } class="w-full h-full"/>
+						<button class="play-button" aria-label="Play video"></button>
 					</div>
 				}
 			</div>
