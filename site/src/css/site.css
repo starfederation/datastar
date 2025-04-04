@@ -16,6 +16,10 @@ pre code {
     @apply text-base !important;
 }
 
+pre code span.cl {
+    padding-inline-end: 12px;
+}
+
 .output {
     @apply input input-bordered bg-transparent flex flex-grow items-center max-w-64 overflow-hidden;
 }
