@@ -1,0 +1,29 @@
+package site
+
+import "net/http"
+import "strconv"
+
+templ PageVideos(r *http.Request, videos ...Video) {
+	@Page("Videos", "A day without a good video is like a joke without a punchline—pointless.", "/videos") {
+		@header(r)
+		<div class="flex flex-col gap-8 p-8">
+			<div>
+				<h1 class="text-6xl font-brand font-bold text-center">Videos</h1>
+				<div class="text-center">Subscribe to our <a href="https://www.youtube.com/@data-star" target="_blank" class="text-primary">YouTube channel</a> and never miss a video update.</div>
+			</div>			
+			<div class="flex flex-wrap justify-center gap-8">
+				for key, video := range videos {
+					{{
+						id := "video-" + strconv.Itoa(key)
+						action := "@get('/videos/data/" + strconv.Itoa(key) + "')"
+						thumbnail := "https://img.youtube.com/vi/" + video.Code + "/maxresdefault.jpg"
+						title := video.Title
+					}}
+					<div id={ id } data-on-click={ action } class="w-full max-w-xl aspect-video cursor-pointer">
+						<img src={ thumbnail } alt={ title } class="w-full h-full"/>
+					</div>
+				}
+			</div>
+		</div>
+	}
+}

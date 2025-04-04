@@ -15,7 +15,7 @@ templ PageBundler(r *http.Request, manifest PluginManifest, store *BundlerStore)
 		@header(r)
 		<div data-signals={ templ.JSONString(store) } class="p-8 flex flex-col gap-8">
 			<div>
-				<div class="text-6xl font-brand font-bold text-center">Bundler</div>
+				<h1 class="text-6xl font-brand font-bold text-center">Bundler</h1>
 				<div class="text-center">While Datastar is still one of the smallest frameworks available, you can bundle only the plugins you need to reduce the size even further.</div>
 			</div>
 			<div id="results"></div>
