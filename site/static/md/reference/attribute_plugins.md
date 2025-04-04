@@ -110,24 +110,25 @@ Merges one or more signals into the existing signals. Values defined later in th
 earlier.
 
 ```html
-<div data-signals-foo="1"></div>
+<div data-signals-foo="baz"></div>
 ```
 
 Signals can be namespaced using dot-notation.
 
 ```html
-<div data-signals-foo.bar="1"></div>
+<div data-signals-foo.bar="baz"></div>
 ```
 
 Note when working with namespaced signals that only the leaf nodes are actually signals. So in the example above, only
 `bar` is a signal, meaning that while using `$foo.bar` in an expression is possible, using `$foo` (the namespace) is
 not.
 
-The `data-signals` attribute can also be used to merge multiple signals using a set of key-value pairs, where the keys
-represent signal names and the values represent expressions.
+The `data-signals` attribute can also be used with an object notation. This format can be to merge multiple signals
+using a set of key-value pairs, where the keys represent signal names and the values represent expressions. This format
+is also required to set signals to types other than a string.
 
 ```html
-<div data-signals="{foo: {bar: 1, baz: 2}}"></div>
+<div data-signals="{foo: {bar: 1, baz: false}}"></div>
 ```
 
 The value above is written in JavaScript object notation, but JSON, which is a subset and which most templating
