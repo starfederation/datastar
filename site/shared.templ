@@ -42,6 +42,10 @@ templ Page(title, description string, uri string) {
 			} else {
 				<script type="module" src={ staticPath("js/datastar.js") }></script>
 			}
+			if uri == "/videos" {
+				<link rel="preconnect" href="https://img.youtube.com">
+				<link rel="preconnect" href="https://www.youtube.com">
+			}
 			<style>
 .indicator {
 	opacity:0;
