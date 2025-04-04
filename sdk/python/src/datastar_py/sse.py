@@ -162,3 +162,17 @@ class ServerSentEventGenerator:
             event_id,
             retry_duration,
         )
+
+
+def _wrap_event(event):
+    if isinstance(event, list):
+        return ServerSentEventGenerator.merge_fragments(event)
+    elif isinstance(event, dict):
+        return ServerSentEventGenerator.merge_signals(event)
+    else:
+        return event
+
+
+async def _async_map(func, async_iter):
+    async for item in async_iter:
+        yield func(item)
