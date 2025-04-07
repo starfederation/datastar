@@ -5,7 +5,6 @@ go 1.24.2
 require (
 	github.com/CAFxX/httpcompression v0.0.9
 	github.com/Jeffail/gabs/v2 v2.7.0
-	github.com/TwiN/go-away v1.6.14
 	github.com/a-h/templ v0.3.819
 	github.com/alecthomas/chroma v0.10.0
 	github.com/benbjohnson/hashfs v0.2.2
@@ -35,7 +34,6 @@ require (
 	github.com/segmentio/encoding v0.4.1
 	github.com/stretchr/testify v1.10.0
 	github.com/valyala/bytebufferpool v1.0.0
-	github.com/valyala/quicktemplate v1.8.0
 	github.com/wcharczuk/go-chart/v2 v2.1.2
 	github.com/ysmood/gson v0.7.3
 	github.com/zeebo/xxh3 v1.0.2
