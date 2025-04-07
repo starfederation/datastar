@@ -134,15 +134,17 @@
     (-> (transient {})
         (u/merge-transient! sse/base-SSE-headers)
         (cond->
-          (sse/http1? ring-request) (assoc! "Connection"       "keep-alive",)
-          encoding                  (assoc! "Content-Encoding" encoding))
+          (sse/add-keep-alive? ring-request) (assoc! "Connection"       "keep-alive",)
+          encoding                           (assoc! "Content-Encoding" encoding))
         (u/merge-transient! (:headers opts))
         persistent!)))
 
 
 (comment
-  (headers {:protocol "HTTP/2"} {})
-  (headers {:protocol "HTTP/2"} {write-profile {content-encoding "br"}}))
+  (headers {:protocol "HTTP/1.0"} {})
+  (headers {:protocol "HTTP/1.1"} {})
+  (headers {:protocol "HTTP/2"}   {})
+  (headers {:protocol "HTTP/2"}   {write-profile {content-encoding "br"}}))
 
 ;; -----------------------------------------------------------------------------
 ;; Utilities for wrapping an OutputStream
