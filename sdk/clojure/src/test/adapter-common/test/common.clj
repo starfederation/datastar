@@ -11,9 +11,7 @@
     [starfederation.datastar.clojure.adapter.common :as ac]
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.api.sse :as sse]
-    [test.utils :as u])
-  (:import
-    java.util.concurrent.CountDownLatch))
+    [test.utils :as u]))
 
 
 (def ^:dynamic *ctx* nil)
@@ -93,7 +91,8 @@
                                (println "Killing agents")
                                (shutdown-agents)))))
 
-(install-shutdown-hooks!)
+(defonce _ (install-shutdown-hooks!))
+
 ;; -----------------------------------------------------------------------------
 ;; Generic counters tests
 ;; -----------------------------------------------------------------------------
@@ -143,13 +142,12 @@
 (defn- ->persistent-sse-handler
   "Make a ring handler that puts a sse gen into an atom for use later.
   Counts down an latch to allow the tests to continue."
-  [->sse-response !conn ^CountDownLatch latch]
+  [->sse-response !conn]
   (fn handler
     ([req]
      (->sse-response req
        {ac/on-open (fn [sse-gen]
-                     (reset! !conn sse-gen)
-                     (.countDown latch))}))
+                     (deliver !conn sse-gen))}))
     ([req respond _raise]
      (respond (handler req)))))
 
@@ -159,11 +157,9 @@
   We put together an atom to store a sse generator, a countdown latch and a
   ring handler hooked to them."
   [->sse-response]
-  (let [!conn (atom nil)
-        latch (CountDownLatch. 1)
-        handler (->persistent-sse-handler ->sse-response !conn latch)]
+  (let [!conn (promise)
+        handler (->persistent-sse-handler ->sse-response !conn)]
     {:!conn !conn
-     :latch latch
      :handler handler}))
 
 
@@ -177,8 +173,7 @@
           {:keys [!conn latch handler]} (setup-persistent-see-state ->sse-response)]
       (u/with-server server handler (dissoc server-opts :get-port)
         (binding [*ctx* {:port (get-port server)
-                         :!conn !conn
-                         :latch latch}]
+                         :!conn !conn}]
           (f))))))
 
 
@@ -188,13 +183,14 @@
 
 
 (defn run-persistent-sse-test! []
-  (let [{:keys [port latch !conn]} *ctx*
-        response (http/request {:url (u/url port "")})]
-    (.await ^CountDownLatch latch)
-    (let [sse-gen @!conn]
-      (persistent-see-send-events! sse-gen)
-      (d*/close-sse! sse-gen)
-      (deref response 10 :error))))
+  (let [{:keys [port !conn]} *ctx*
+        response (http/request {:url (u/url port "")})
+        sse-gen (deref !conn 100 nil)]
+    (when-not sse-gen
+      (throw (ex-info "The handler did not deliver the persistent sse-gen." {})))
+    (persistent-see-send-events! sse-gen)
+    (d*/close-sse! sse-gen)
+    (deref response 10 :error)))
 
 
 
@@ -202,12 +198,18 @@
   (lt/expect (= (:status response) 200)))
 
 
-(def SSE-headers-1   (update-keys (sse/headers {})  (comp keyword string/lower-case)))
-#_{:clj-kondo/ignore true}
-(def SSE-headers-2+ (update-keys (sse/headers {:protocol "2"}) (comp keyword string/lower-case)))
+(defn ->headers [req]
+  (-> req
+      sse/headers
+      (update-keys (comp keyword string/lower-case))))
+
+(def SSE-headers-1-dot-0 (->headers {}))
+(def SSE-headers-1-dot-1 (->headers {:protocol "HTTP/1.1"}))
+(def SSE-headers-2+      (->headers {:protocol "HTTP/2"}))
+
 
 (defn p-sse-http1-headers-ok? [response]
-  (lt/expect (mc/match? SSE-headers-1 (:headers response))))
+  (lt/expect (mc/match? SSE-headers-1-dot-1 (:headers response))))
 
 
 (def expected-p-sse-res-body
