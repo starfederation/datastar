@@ -1,6 +1,6 @@
 module github.com/starfederation/datastar
 
-go 1.23.3
+go 1.24.2
 
 require (
 	github.com/CAFxX/httpcompression v0.0.9
