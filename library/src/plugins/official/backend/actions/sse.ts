@@ -150,7 +150,7 @@ export const sse = async (
 
     if (contentType === 'json') {
       const json = signals.JSON(false, !includeLocal)
-      if (method === 'GET') {
+      if (method === 'GET' || method === 'DELETE') {
         queryParams.set(DATASTAR, json)
       } else {
         req.body = json
@@ -177,13 +177,13 @@ export const sse = async (
         return
       }
       const formData = new FormData(formEl)
-      if (method === 'GET') {
-        const formParams = new URLSearchParams(formData as any)
+      const formParams = new URLSearchParams(formData as any)
+      if (method === 'GET' || method === 'DELETE') {
         for (const [key, value] of formParams) {
-          queryParams.set(key, value)
+          queryParams.append(key, value)
         }
       } else {
-        req.body = formData
+        req.body = formParams
       }
     } else {
       throw runtimeErr('SseInvalidContentType', ctx, { action, contentType })
