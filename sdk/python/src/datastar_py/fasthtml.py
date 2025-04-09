@@ -2,11 +2,11 @@ from typing import override
 
 from fastcore.xml import to_xml
 
-from .sse import SSE_HEADERS, ServerSentEventGenerator
-from .starlette import DatastarStreamingResponse as _DatastarStreamingResponse
+from .sse import SSE_HEADERS, ServerSentEventGenerator as _ServerSentEventGenerator
+from .starlette import DatastarStreamingResponse
 
 
-class DatastarStreamingResponse(_DatastarStreamingResponse):
+class ServerSentEventGenerator(_ServerSentEventGenerator):
     @classmethod
     @override
     def merge_fragments(cls, fragments, *args, **kwargs):
