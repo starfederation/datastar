@@ -10,11 +10,18 @@ vars:
 
 tasks:
   tools:
-    platforms: [windows, linux, darwin/arm64, darwin/amd64, openbsd, dragonfly, freebsd, netbsd]
+    platforms:
+      [
+        windows,
+        linux,
+        darwin/arm64,
+        darwin/amd64,
+        openbsd,
+        dragonfly,
+        freebsd,
+        netbsd,
+      ]
     cmds:
-      - go install github.com/go-task/task/v3/cmd/task@latest
-      - go install github.com/a-h/templ/cmd/templ@latest
-
       - platforms: [linux/amd64]
         cmd: test -f site/tailwindcli || wget -O site/tailwindcli https://github.com/dobicinaitis/tailwind-cli-extra/releases/download/v1.7.21/tailwindcss-extra-linux-x64
 
@@ -143,7 +150,7 @@ tasks:
     sources:
       - "**/*.templ"
     cmds:
-      - templ generate .
+      - go tool templ generate .
 
   kill:
     method: none
