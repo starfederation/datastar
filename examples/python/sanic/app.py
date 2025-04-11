@@ -58,13 +58,11 @@ async def add_signal(request):
 
     await response.send(
         SSE.merge_fragments(
-            [
-                """
+            """
             <div class="time signal">
             Current time from signal: <span data-text="$currentTime">CURRENT_TIME</span>
             </div>
-            """
-            ],
+            """,
             selector="#timers",
             merge_mode=FragmentMergeMode.FragmentMergeModeAppend,
         )
@@ -79,13 +77,11 @@ async def add_fragment(request):
 
     await response.send(
         SSE.merge_fragments(
-            [
-                f"""\
+            f"""\
             <div class="time fragment">
             Current time from fragment: {datetime.now().isoformat()}
             </div>
-            """
-            ],
+            """,
             selector="#timers",
             merge_mode=FragmentMergeMode.FragmentMergeModeAppend,
         )
@@ -101,13 +97,11 @@ async def updates(request):
     while True:
         await response.send(
             SSE.merge_fragments(
-                [
-                    f"""
+                f"""
             <div class="time fragment" >
             Current time from fragment: {datetime.now().isoformat()}
             </div>
-                """
-                ],
+                """,
                 selector=".fragment",
             )
         )

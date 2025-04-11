@@ -46,7 +46,7 @@ async def index():
 async def clock():
     while True:
         now = datetime.isoformat(datetime.now())
-        yield DatastarStreamingResponse.merge_fragments([Span(id="currentTime")(now)])
+        yield DatastarStreamingResponse.merge_fragments(Span(id="currentTime")(now))
         await asyncio.sleep(1)
         yield DatastarStreamingResponse.merge_signals({"currentTime": f"{now}"})
         await asyncio.sleep(1)

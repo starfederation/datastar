@@ -38,7 +38,7 @@ class ServerSentEventGenerator:
     @classmethod
     def merge_fragments(
         cls,
-        fragments: list[str],
+        fragments: str,
         selector: Optional[str] = None,
         merge_mode: Optional[consts.FragmentMergeMode] = None,
         use_view_transition: bool = consts.DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
@@ -57,8 +57,7 @@ class ServerSentEventGenerator:
 
         data_lines.extend(
             f"data: {consts.FRAGMENTS_DATALINE_LITERAL} {x}"
-            for fragment in fragments
-            for x in fragment.splitlines()
+            for x in fragments.splitlines()
         )
 
         return ServerSentEventGenerator._send(

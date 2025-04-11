@@ -52,7 +52,7 @@ async def updates_asgi(request):
     async def time_updates():
         while True:
             yield DatastarStreamingHttpResponse.merge_fragments(
-                [f"""<span id="currentTime">{datetime.now().isoformat()}"""]
+                f"""<span id="currentTime">{datetime.now().isoformat()}"""
             )
             await asyncio.sleep(1)
             yield DatastarStreamingHttpResponse.merge_signals(
@@ -110,7 +110,7 @@ def updates_wsgi(request):
     def time_updates():
         while True:
             yield DatastarStreamingHttpResponse.merge_fragments(
-                [f"""<span id="currentTime">{datetime.now().isoformat()}"""]
+                f"""<span id="currentTime">{datetime.now().isoformat()}"""
             )
             time.sleep(0.5)
             yield DatastarStreamingHttpResponse.merge_signals(
