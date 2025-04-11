@@ -1,10 +1,10 @@
 package datastar
 
 import (
+	"context"
 	"fmt"
+	"io"
 
-	"github.com/a-h/templ"
-	"github.com/delaneyj/gostar/elements"
 	"github.com/valyala/bytebufferpool"
 )
 
@@ -80,7 +80,17 @@ func (sse *ServerSentEventGenerator) MergeFragmentf(format string, args ...any) 
 	return sse.MergeFragments(fmt.Sprintf(format, args...))
 }
 
-func (sse *ServerSentEventGenerator) MergeFragmentTempl(c templ.Component, opts ...MergeFragmentOption) error {
+// TemplComponent satisfies the component rendering interface for HTML template engine [Templ].
+// This separate type ensures compatibility with [Templ] without imposing a dependency requirement
+// on those who prefer to use a different template engine.
+//
+// [Templ]: https://templ.guide/
+type TemplComponent interface {
+	Render(ctx context.Context, w io.Writer) error
+}
+
+// MergeFragmentTempl is a convenience adaptor of [sse.MergeFragments] for [TemplComponent].
+func (sse *ServerSentEventGenerator) MergeFragmentTempl(c TemplComponent, opts ...MergeFragmentOption) error {
 	buf := bytebufferpool.Get()
 	defer bytebufferpool.Put(buf)
 	if err := c.Render(sse.Context(), buf); err != nil {
@@ -92,7 +102,17 @@ func (sse *ServerSentEventGenerator) MergeFragmentTempl(c templ.Component, opts 
 	return nil
 }
 
-func (sse *ServerSentEventGenerator) MergeFragmentGostar(child elements.ElementRenderer, opts ...MergeFragmentOption) error {
+// GoStarElementRenderer satisfies the component rendering interface for HTML template engine [GoStar].
+// This separate type ensures compatibility with [GoStar] without imposing a dependency requirement
+// on those who prefer to use a different template engine.
+//
+// [GoStar]: https://github.com/delaneyj/gostar
+type GoStarElementRenderer interface {
+	Render(w io.Writer) error
+}
+
+// MergeFragmentGostar is a convenience adaptor of [sse.MergeFragments] for [GoStarElementRenderer].
+func (sse *ServerSentEventGenerator) MergeFragmentGostar(child GoStarElementRenderer, opts ...MergeFragmentOption) error {
 	buf := bytebufferpool.Get()
 	defer bytebufferpool.Put(buf)
 	if err := child.Render(buf); err != nil {
