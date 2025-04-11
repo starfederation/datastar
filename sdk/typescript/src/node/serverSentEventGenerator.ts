@@ -1,4 +1,4 @@
-import { DatastarEventOptions, EventType, sseHeaders } from "../types.ts";
+import { DatastarEventOptions, EventType, sseHeaders, StreamOptions } from "../types.ts";
 
 import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator.ts";
 
@@ -47,11 +47,7 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
     req: IncomingMessage,
     res: ServerResponse,
     onStart: (stream: ServerSentEventGenerator) => Promise<void> | void,
-    options?: Partial<{
-      onError: (error: unknown) => Promise<void> | void;
-      onAbort: () => Promise<void> | void;
-      keepalive: boolean;
-    }>,
+    options?: StreamOptions,
   ): Promise<void> {
     const generator = new ServerSentEventGenerator(req, res);
 
