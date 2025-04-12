@@ -1,4 +1,4 @@
-ARG TAG=1.23
+ARG TAG=1.24
 
 FROM golang:$TAG
 
