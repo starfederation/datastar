@@ -37,13 +37,6 @@ RUN apt update && sudo apt upgrade \
     npm install -g npm@^10.0.0 \
     npm install -g pnpm \
     && \
-    # Install needed Go tooling \
-    go install github.com/go-task/task/v3/cmd/task@latest \
-    && \
-    go install github.com/a-h/templ/cmd/templ@latest \
-    && \
-    go install github.com/valyala/quicktemplate/qtc@latest \
-    && \
     # Install flyctl cli \
     curl -L https://fly.io/install.sh | sh \
     && \
