@@ -154,4 +154,5 @@ require (
 tool (
 	github.com/a-h/templ/cmd/templ
 	github.com/go-task/task/v3/cmd/task
+	github.com/valyala/quicktemplate/qtc
 )
