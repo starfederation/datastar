@@ -44,7 +44,6 @@ tasks:
         cmd: test -f site/tailwindcli || (echo "#!/bin/sh" > site/tailwindcli  && echo "tailwindcss $@" >> site/tailwindcli)
 
       - chmod +x site/tailwindcli
-      - go install github.com/valyala/quicktemplate/qtc@latest
 
   version:
     cmds:
@@ -56,7 +55,7 @@ tasks:
     generates:
       - "**/*.qtpl.go"
     cmds:
-      - qtc
+      - go tool qtc
 
   build:
     deps:
