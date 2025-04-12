@@ -26,10 +26,10 @@ require (
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/huantt/plaintext-extractor v1.1.0
 	github.com/joho/godotenv v1.5.1
-	github.com/klauspost/compress v1.17.11
+	github.com/klauspost/compress v1.18.0
 	github.com/lithammer/fuzzysearch v1.1.8
-	github.com/nats-io/nats-server/v2 v2.10.24
-	github.com/nats-io/nats.go v1.38.0
+	github.com/nats-io/nats-server/v2 v2.11.1
+	github.com/nats-io/nats.go v1.41.1
 	github.com/samber/lo v1.47.0
 	github.com/segmentio/encoding v0.4.1
 	github.com/stretchr/testify v1.10.0
@@ -94,6 +94,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/google/go-tpm v0.9.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
@@ -109,7 +110,7 @@ require (
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/natefinch/atomic v1.0.1 // indirect
 	github.com/nats-io/jwt/v2 v2.7.3 // indirect
-	github.com/nats-io/nkeys v0.4.9 // indirect
+	github.com/nats-io/nkeys v0.4.10 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/pjbgf/sha1cd v0.3.2 // indirect
@@ -129,16 +130,16 @@ require (
 	github.com/ysmood/got v0.40.0 // indirect
 	github.com/ysmood/leakless v0.9.0 // indirect
 	go.etcd.io/bbolt v1.3.7 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 // indirect
 	golang.org/x/image v0.23.0 // indirect
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/net v0.37.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/term v0.30.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
-	golang.org/x/time v0.9.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/term v0.31.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/time v0.11.0 // indirect
 	golang.org/x/tools v0.29.0 // indirect
 	google.golang.org/protobuf v1.36.2 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
