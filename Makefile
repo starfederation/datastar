@@ -1,4 +1,4 @@
-TAG?=1.23
+TAG?=1.24
 CONTAINER?=$(shell basename $(CURDIR))-dev
 DEV_PORT?=8080
 IMAGE_INFO=$(shell docker image inspect $(CONTAINER):$(TAG))
@@ -17,17 +17,17 @@ clean:
 	docker volume rm go-modules
 # Run the development server
 dev: --image-check
-	${DOCKER_RUN} --name ${CONTAINER}-$@ -e DEV_PORT="${DEV_PORT}" -p ${DEV_PORT}:${DEV_PORT} ${IMAGE_NAME} -c 'task -w'
+	${DOCKER_RUN} --name ${CONTAINER}-$@ -e DEV_PORT="${DEV_PORT}" -p ${DEV_PORT}:${DEV_PORT} ${IMAGE_NAME} -c 'go tool task -w'
 # Build the Docker image
 image-build:
 	docker build -f Dockerfile-dev . -t ${IMAGE_NAME} --build-arg TAG=${TAG} --no-cache
-	${DOCKER_RUN} --name ${CONTAINER}-$@ ${IMAGE_NAME} -c 'task tools'
+	${DOCKER_RUN} --name ${CONTAINER}-$@ ${IMAGE_NAME} -c 'go tool task tools'
 # Run the passed in task command
 task: --image-check
-	${DOCKER_RUN} --name ${CONTAINER}-$@ -e DEV_PORT="${DEV_PORT}" -p ${DEV_PORT}:${DEV_PORT} ${IMAGE_NAME} -c 'task $(filter-out $@,$(MAKECMDGOALS)) $(MAKEFLAGS)'
+	${DOCKER_RUN} --name ${CONTAINER}-$@ -e DEV_PORT="${DEV_PORT}" -p ${DEV_PORT}:${DEV_PORT} ${IMAGE_NAME} -c 'go tool task $(filter-out $@,$(MAKECMDGOALS)) $(MAKEFLAGS)'
 # Run the test suite
 test: --image-check
-	${DOCKER_RUN} --name ${CONTAINER}-$@ -e DEV_PORT="${DEV_PORT}" -p ${DEV_PORT}:${DEV_PORT} ${IMAGE_NAME} -c 'task test'
+	${DOCKER_RUN} --name ${CONTAINER}-$@ -e DEV_PORT="${DEV_PORT}" -p ${DEV_PORT}:${DEV_PORT} ${IMAGE_NAME} -c 'go tool task test'
 # Open a shell inside of the container
 ssh: --image-check
 	${DOCKER_RUN} --name ${CONTAINER}-$@ --entrypoint=/bin/sh ${IMAGE_NAME}
