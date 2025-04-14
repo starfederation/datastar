@@ -1,6 +1,7 @@
 package datastar
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -16,7 +17,7 @@ type executeScriptOptions struct {
 }
 
 // ExecuteScriptOption configures script execution event that will be sent to the client.
-type ExecuteScriptOption func(*executeScriptOptions)
+type ExecuteScriptOption func(*executeScriptOptions) error
 
 // WithExecuteScriptEventID configures an optional event ID for the script execution event.
 // The client message field [lastEventId] will be set to this value.
@@ -24,16 +25,18 @@ type ExecuteScriptOption func(*executeScriptOptions)
 //
 // [lastEventId]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/lastEventId
 func WithExecuteScriptEventID(id string) ExecuteScriptOption {
-	return func(o *executeScriptOptions) {
+	return func(o *executeScriptOptions) error {
 		o.EventID = id
+		return nil
 	}
 }
 
 // WithExecuteScriptRetryDuration overrides the [DefaultSseRetryDuration] for this script
 // execution only.
 func WithExecuteScriptRetryDuration(retryDuration time.Duration) ExecuteScriptOption {
-	return func(o *executeScriptOptions) {
+	return func(o *executeScriptOptions) error {
 		o.RetryDuration = retryDuration
+		return nil
 	}
 }
 
@@ -42,40 +45,46 @@ func WithExecuteScriptRetryDuration(retryDuration time.Duration) ExecuteScriptOp
 // Each attribute should include a pair of plain words representing the attribute name and value
 // without any formatting.
 func WithExecuteScriptAttributes(attributes ...string) ExecuteScriptOption {
-	return func(o *executeScriptOptions) {
+	return func(o *executeScriptOptions) error {
 		o.Attributes = attributes
+		return nil
 	}
 }
 
 // WithExecuteScriptAttributeKVs is an alternative option for [WithExecuteScriptAttributes].
 // Even parameters are keys, odd parameters are their values.
 func WithExecuteScriptAttributeKVs(kvs ...string) ExecuteScriptOption {
-	if len(kvs)%2 != 0 {
-		panic("WithExecuteScriptAttributeKVs requires an even number of arguments")
+	return func(o *executeScriptOptions) error {
+		if len(kvs)%2 != 0 {
+			return errors.New("WithExecuteScriptAttributeKVs option requires an even number of arguments")
+		}
+		attributes := make([]string, 0, len(kvs)/2)
+		for i := 0; i < len(kvs); i += 2 {
+			attribute := fmt.Sprintf("%s %s", kvs[i], kvs[i+1])
+			attributes = append(attributes, attribute)
+		}
+		return WithExecuteScriptAttributes(attributes...)(o)
 	}
-	attributes := make([]string, 0, len(kvs)/2)
-	for i := 0; i < len(kvs); i += 2 {
-		attribute := fmt.Sprintf("%s %s", kvs[i], kvs[i+1])
-		attributes = append(attributes, attribute)
-	}
-	return WithExecuteScriptAttributes(attributes...)
 }
 
 // WithExecuteScriptAutoRemove requires the client to eliminate the script element after its execution.
 func WithExecuteScriptAutoRemove(autoremove bool) ExecuteScriptOption {
-	return func(o *executeScriptOptions) {
+	return func(o *executeScriptOptions) error {
 		o.AutoRemove = &autoremove
+		return nil
 	}
 }
 
 // ExecuteScript runs a script in the client browser. Seperate commands with semicolons.
-func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts ...ExecuteScriptOption) error {
+func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts ...ExecuteScriptOption) (err error) {
 	options := &executeScriptOptions{
 		RetryDuration: DefaultSseRetryDuration,
 		Attributes:    []string{"type module"},
 	}
 	for _, opt := range opts {
-		opt(options)
+		if err = opt(options); err != nil {
+			return err
+		}
 	}
 
 	sendOpts := make([]SSEEventOption, 0, 2)
@@ -99,8 +108,7 @@ func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts .
 		}
 	}
 
-	scriptLines := strings.Split(scriptContents, NewLine)
-	for _, line := range scriptLines {
+	for line := range strings.SplitSeq(scriptContents, NewLine) {
 		dataLines = append(dataLines, ScriptDatalineLiteral+line)
 	}
 
