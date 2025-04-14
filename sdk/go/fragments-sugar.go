@@ -8,6 +8,18 @@ import (
 	"github.com/valyala/bytebufferpool"
 )
 
+// ValidFragmentMergeTypes is a list of valid fragment merge modes.
+var ValidFragmentMergeTypes = []FragmentMergeMode{
+	FragmentMergeModeMorph,
+	FragmentMergeModeInner,
+	FragmentMergeModeOuter,
+	FragmentMergeModePrepend,
+	FragmentMergeModeAppend,
+	FragmentMergeModeBefore,
+	FragmentMergeModeAfter,
+	FragmentMergeModeUpsertAttributes,
+}
+
 // FragmentMergeTypeFromString converts a string to a [FragmentMergeMode].
 func FragmentMergeTypeFromString(s string) (FragmentMergeMode, error) {
 	switch s {

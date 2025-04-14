@@ -3,19 +3,8 @@ package datastar
 import "testing"
 
 func TestAllValidFragmentMergeTypes(t *testing.T) {
-	validFragmentMergeTypes := [...]FragmentMergeMode{
-		FragmentMergeModeMorph,
-		FragmentMergeModeInner,
-		FragmentMergeModeOuter,
-		FragmentMergeModePrepend,
-		FragmentMergeModeAppend,
-		FragmentMergeModeBefore,
-		FragmentMergeModeAfter,
-		FragmentMergeModeUpsertAttributes,
-	}
-
 	var err error
-	for _, validType := range validFragmentMergeTypes {
+	for _, validType := range ValidFragmentMergeTypes {
 		if _, err = FragmentMergeTypeFromString(string(validType)); err != nil {
 			t.Errorf("Expected %v to be a valid fragment merge type, but it was rejected: %v", validType, err)
 		}
