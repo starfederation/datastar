@@ -29,7 +29,7 @@ func WithExecuteScriptEventID(id string) ExecuteScriptOption {
 	}
 }
 
-// WithExecuteScriptRetryDuration overrides the [DefaultRetryDuration] for this script
+// WithExecuteScriptRetryDuration overrides the [DefaultSseRetryDuration] for this script
 // execution only.
 func WithExecuteScriptRetryDuration(retryDuration time.Duration) ExecuteScriptOption {
 	return func(o *executeScriptOptions) {
