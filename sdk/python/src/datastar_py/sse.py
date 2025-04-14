@@ -1,6 +1,6 @@
 import json
 from itertools import chain
-from typing import Optional
+from typing import Optional, Protocol, Union, runtime_checkable
 
 import datastar_py.consts as consts
 
@@ -9,6 +9,12 @@ SSE_HEADERS = {
     "Connection": "keep-alive",
     "Content-Type": "text/event-stream",
 }
+
+
+@runtime_checkable
+class _HasHtml(Protocol):
+    def __html__(self) -> str:
+        ...
 
 
 class ServerSentEventGenerator:
@@ -38,13 +44,15 @@ class ServerSentEventGenerator:
     @classmethod
     def merge_fragments(
         cls,
-        fragments: str,
+        fragments: Union[str, _HasHtml],
         selector: Optional[str] = None,
         merge_mode: Optional[consts.FragmentMergeMode] = None,
         use_view_transition: bool = consts.DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
         event_id: Optional[int] = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
+        if isinstance(fragments, _HasHtml):
+            fragments = fragments.__html__()
         data_lines = []
         if merge_mode:
             data_lines.append(f"data: {consts.MERGE_MODE_DATALINE_LITERAL} {merge_mode}")
