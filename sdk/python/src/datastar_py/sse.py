@@ -161,3 +161,7 @@ class ServerSentEventGenerator:
             event_id,
             retry_duration,
         )
+
+    @classmethod
+    def redirect(cls, location: str):
+        return cls.execute_script(f"setTimeout(() => window.location = '{location}')")
