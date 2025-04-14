@@ -7,7 +7,9 @@ import (
 	"time"
 )
 
-type MergeFragmentOptions struct {
+// mergeFragmentOptions holds the configuration data for [MergeFragmentOption]s used
+// for initialization of [sse.MergeFragments] event.
+type mergeFragmentOptions struct {
 	EventID            string
 	RetryDuration      time.Duration
 	Selector           string
@@ -15,37 +17,50 @@ type MergeFragmentOptions struct {
 	UseViewTransitions bool
 }
 
-type MergeFragmentOption func(*MergeFragmentOptions)
+// MergeFragmentOption configures the [sse.MergeFragments] event initialization.
+type MergeFragmentOption func(*mergeFragmentOptions)
 
+// WithSelectorf is a convenience wrapper for [WithSelector] option that formats the selector string
+// using the provided format and arguments similar to [fmt.Sprintf].
 func WithSelectorf(selectorFormat string, args ...any) MergeFragmentOption {
 	selector := fmt.Sprintf(selectorFormat, args...)
 	return WithSelector(selector)
 }
 
+// WithSelector specifies the [CSS selector] for HTML elements that a fragment will be merged over or
+// merged next to, depending on the merge mode.
+//
+// [CSS selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors
 func WithSelector(selector string) MergeFragmentOption {
-	return func(o *MergeFragmentOptions) {
+	return func(o *mergeFragmentOptions) {
 		o.Selector = selector
 	}
 }
 
+// WithMergeMode overrides the [DefaultFragmentMergeMode] for the fragment.
+// Choose a valid [FragmentMergeMode].
 func WithMergeMode(merge FragmentMergeMode) MergeFragmentOption {
-	return func(o *MergeFragmentOptions) {
+	return func(o *mergeFragmentOptions) {
 		o.MergeMode = merge
 	}
 }
 
+// WithUseViewTransitions specifies whether to use [view transitions] when merging fragments.
+//
+// [view transitions]: https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API
 func WithUseViewTransitions(useViewTransition bool) MergeFragmentOption {
-	return func(o *MergeFragmentOptions) {
+	return func(o *mergeFragmentOptions) {
 		o.UseViewTransitions = useViewTransition
 	}
 }
 
+// MergeFragments sends an HTML fragment to the client to update the DOM tree with.
 func (sse *ServerSentEventGenerator) MergeFragments(fragment string, opts ...MergeFragmentOption) error {
-	options := &MergeFragmentOptions{
-		EventID:        "",
-		RetryDuration:  DefaultSseRetryDuration,
-		Selector:       "",
-		MergeMode:      FragmentMergeModeMorph,
+	options := &mergeFragmentOptions{
+		EventID:       "", // TODO: Implement EventID option? currently field does nothing.
+		RetryDuration: DefaultSseRetryDuration,
+		Selector:      "",
+		MergeMode:     FragmentMergeModeMorph,
 	}
 	for _, opt := range opts {
 		opt(options)
@@ -88,38 +103,54 @@ func (sse *ServerSentEventGenerator) MergeFragments(fragment string, opts ...Mer
 	return nil
 }
 
-type RemoveFragmentsOptions struct {
+// mergeFragmentOptions holds the configuration data for [RemoveFragmentsOption]s used
+// for initialization of [sse.RemoveFragments] event.
+type removeFragmentsOptions struct {
 	EventID            string
 	RetryDuration      time.Duration
 	UseViewTransitions *bool
 }
 
-type RemoveFragmentsOption func(*RemoveFragmentsOptions)
+// RemoveFragmentsOption configures the [sse.RemoveFragments] event.
+type RemoveFragmentsOption func(*removeFragmentsOptions)
 
+// WithRemoveEventID configures an optional event ID for the fragment removal event.
+// The client message field [lastEventId] will be set to this value.
+// If the next event does not have an event ID, the last used event ID will remain.
+//
+// [lastEventId]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/lastEventId
 func WithRemoveEventID(id string) RemoveFragmentsOption {
-	return func(o *RemoveFragmentsOptions) {
+	return func(o *removeFragmentsOptions) {
 		o.EventID = id
 	}
 }
 
+// WithExecuteScriptRetryDuration overrides the [DefaultSseRetryDuration] for this script
+// execution only.
 func WithRemoveRetryDuration(d time.Duration) RemoveFragmentsOption {
-	return func(o *RemoveFragmentsOptions) {
+	return func(o *removeFragmentsOptions) {
 		o.RetryDuration = d
 	}
 }
 
+// WithRemoveUseViewTransitions specifies whether to use [view transitions] when merging fragments.
+//
+// [view transitions]: https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API
 func WithRemoveUseViewTransitions(useViewTransition bool) RemoveFragmentsOption {
-	return func(o *RemoveFragmentsOptions) {
+	return func(o *removeFragmentsOptions) {
 		o.UseViewTransitions = &useViewTransition
 	}
 }
 
+// MergeFragments sends a [CSS selector] to the client to update the DOM tree by removing matching elements.
+//
+// [CSS selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors
 func (sse *ServerSentEventGenerator) RemoveFragments(selector string, opts ...RemoveFragmentsOption) error {
 	if selector == "" {
 		panic("missing " + SelectorDatalineLiteral)
 	}
 
-	options := &RemoveFragmentsOptions{
+	options := &removeFragmentsOptions{
 		EventID:            "",
 		RetryDuration:      DefaultSseRetryDuration,
 		UseViewTransitions: nil,
