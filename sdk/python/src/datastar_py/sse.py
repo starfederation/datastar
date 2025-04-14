@@ -12,9 +12,14 @@ SSE_HEADERS = {
 
 
 @runtime_checkable
-class _HasHtml(Protocol):
-    def __html__(self) -> str:
-        ...
+class _HtmlProvider(Protocol):
+    """A type that produces text ready to be placed in an HTML document.
+
+    This is a convention used by html producing/consuming libraries. This lets
+    e.g. fasthtml fasttags, or htpy elements, be passed straight in to
+    merge_fragments."""
+
+    def __html__(self) -> str: ...
 
 
 class ServerSentEventGenerator:
@@ -44,14 +49,14 @@ class ServerSentEventGenerator:
     @classmethod
     def merge_fragments(
         cls,
-        fragments: Union[str, _HasHtml],
+        fragments: Union[str, _HtmlProvider],
         selector: Optional[str] = None,
         merge_mode: Optional[consts.FragmentMergeMode] = None,
         use_view_transition: bool = consts.DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
         event_id: Optional[int] = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
-        if isinstance(fragments, _HasHtml):
+        if isinstance(fragments, _HtmlProvider):
             fragments = fragments.__html__()
         data_lines = []
         if merge_mode:
