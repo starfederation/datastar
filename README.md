@@ -28,7 +28,7 @@ Visit the [Datastar Website »](https://data-star.dev/)
 
 Watch the [Videos »](https://www.youtube.com/@data-star)
 
-Join the [Discord Server »](https://discord.com/channels/1296224603642925098/1296224603642925102)
+Join the [Discord Server »](https://discord.com/invite/bnRNgZjgPh)
 
 ## Getting Started
 
