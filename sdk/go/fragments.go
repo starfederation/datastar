@@ -20,6 +20,17 @@ type mergeFragmentOptions struct {
 // MergeFragmentOption configures the [sse.MergeFragments] event initialization.
 type MergeFragmentOption func(*mergeFragmentOptions)
 
+// WithMergeFragmentsEventID configures an optional event ID for the fragments merge event.
+// The client message field [lastEventId] will be set to this value.
+// If the next event does not have an event ID, the last used event ID will remain.
+//
+// [lastEventId]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/lastEventId
+func WithMergeFragmentsEventID(id string) MergeFragmentOption {
+	return func(o *mergeFragmentOptions) {
+		o.EventID = id
+	}
+}
+
 // WithSelectorf is a convenience wrapper for [WithSelector] option that formats the selector string
 // using the provided format and arguments similar to [fmt.Sprintf].
 func WithSelectorf(selectorFormat string, args ...any) MergeFragmentOption {
@@ -57,7 +68,7 @@ func WithUseViewTransitions(useViewTransition bool) MergeFragmentOption {
 // MergeFragments sends an HTML fragment to the client to update the DOM tree with.
 func (sse *ServerSentEventGenerator) MergeFragments(fragment string, opts ...MergeFragmentOption) error {
 	options := &mergeFragmentOptions{
-		EventID:       "", // TODO: Implement EventID option? currently field does nothing.
+		EventID:       "",
 		RetryDuration: DefaultSseRetryDuration,
 		Selector:      "",
 		MergeMode:     FragmentMergeModeMorph,
