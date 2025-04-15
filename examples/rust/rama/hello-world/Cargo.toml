@@ -6,8 +6,8 @@ rust-version = "1.85.0"
 
 [dependencies]
 async-stream = "0.3.6"
-axum = "0.8.1"
-datastar = { path = "../../../../sdk/rust", features = ["axum"] }
+rama = { version = "0.2.0-alpha.10", features = ["http-full"] }
+datastar = { path = "../../../../sdk/rust", features = ["rama"] }
 futures = "0.3.31"
 serde = { version = "1.0.217", features = ["derive"] }
 tokio = { version = "1.43.0", features = ["full"] }

@@ -1,8 +1,11 @@
 [package]
-authors = ["Johnathan Stevers <jmstevers@gmail.com>"]
+authors = [
+    "Johnathan Stevers <jmstevers@gmail.com>",
+    "Glen Henri J. De Cauwsemaecker <glen@plabayo.tech>",
+]
 categories = ["web-programming"]
 description = "Datastar is the Rust implementation of the [Datastar](https://data-star.dev) SDK."
-edition = "2021"
+edition = "2024"
 homepage = "https://data-star.dev"
 keywords = ["datastar", "web", "backend"]
 license = "MIT OR Apache-2.0"
@@ -10,34 +13,39 @@ name = "datastar"
 readme = "README.md"
 repository = "https://github.com/starfederation/datastar-rs"
 version = "0.1.0"
+rust-version = "1.85.0"
 
 [dev-dependencies]
 async-stream = { version = "0.3.6", default-features = false }
-serde = { version = "1.0.217", default-features = false, features = ["derive"] }
-serde_json = { version = "1.0.138", default-features = false, features = [
-    "std",
-] }
+serde = { version = "1", default-features = false, features = ["derive"] }
+serde_json = { version = "1", default-features = false, features = ["std"] }
 tokio = { version = "1.43.0", features = ["full"] }
 axum = { version = "0.8.1" }
 rocket = { version = "0.5.1", features = ["json"] }
+rama = { version = "0.2.0-alpha.10", features = ["http-full"] }
 
 
 [dependencies]
+matchit = "0.8.4"
 axum = { version = "0.8.1", default-features = false, optional = true, features = [
     "query",
     "tokio",
 ] }
-futures-util = { version = "0.3.31", default-features = false }
-http-body = { version = "1.0.1", default-features = false, optional = true }
-pin-project-lite = { version = "0.2.16", default-features = false, optional = true }
+futures-util = { version = "0.3", default-features = false }
+http-body = { version = "1.0", default-features = false, optional = true }
+pin-project-lite = { version = "0.2", default-features = false, optional = true }
 rocket = { version = "0.5.1", default-features = false, optional = true }
-serde = { version = "1.0.217", default-features = false, optional = true, features = [
+rama = { version = "0.2.0-alpha.10", default-features = false, optional = true, features = [
+    "http",
+] }
+serde = { version = "1", default-features = false, optional = true, features = [
     "derive",
 ] }
-serde_json = { version = "1.0.138", default-features = false, optional = true, features = [
+serde_json = { version = "1", default-features = false, optional = true, features = [
     "std",
 ] }
-sync_wrapper = { version = "1.0.2", default-features = false, optional = true }
+sync_wrapper = { version = "1", default-features = false, optional = true }
+bytes = { version = "1", default-features = false, optional = true }
 
 
 [features]
@@ -51,6 +59,14 @@ axum = [
 ]
 http2 = []
 rocket = ["dep:rocket"]
+rama = [
+    "dep:rama",
+    "dep:serde",
+    "dep:serde_json",
+    "dep:pin-project-lite",
+    "dep:bytes",
+    "dep:sync_wrapper",
+]
 
 [profile.dev]
 opt-level = 1
