@@ -35,7 +35,7 @@ futures-util = { version = "0.3", default-features = false }
 http-body = { version = "1.0", default-features = false, optional = true }
 pin-project-lite = { version = "0.2", default-features = false, optional = true }
 rocket = { version = "0.5.1", default-features = false, optional = true }
-rama = { version = "0.2.0-alpha.10", default-features = false, optional = true, features = [
+rama = { version = "0.2.0-alpha.11", default-features = false, optional = true, features = [
     "http",
 ] }
 serde = { version = "1", default-features = false, optional = true, features = [
