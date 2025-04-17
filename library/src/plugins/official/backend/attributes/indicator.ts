@@ -16,6 +16,8 @@ import {
   STARTED,
 } from '../shared'
 
+const orphanedWatchers = new WeakSet<Function>();
+
 export const Indicator: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'indicator',
@@ -26,24 +28,33 @@ export const Indicator: AttributePlugin = {
       ? modifyCasing(key, mods)
       : trimDollarSignPrefix(value)
     const { signal } = signals.upsertIfMissing(signalName, false)
+
     const watcher = ((event: CustomEvent<DatastarSSEEvent>) => {
       const {
         type,
         elId,
       } = event.detail
+
       if (elId !== el.id) return
+
       switch (type) {
         case STARTED:
           signal.value = true
           break
         case FINISHED:
           signal.value = false
-          // Remove the event listener only when finished, in case the element is removed while the request is still in progress
-          document.removeEventListener(DATASTAR_SSE_EVENT, watcher)
           break
+      }
+
+      if (orphanedWatchers.has(watcher)) {
+        document.removeEventListener(DATASTAR_SSE_EVENT, watcher)
       }
     }) as EventListener
 
     document.addEventListener(DATASTAR_SSE_EVENT, watcher)
+
+    return () => {
+      orphanedWatchers.add(watcher);
+    }
   },
 }
