@@ -60,13 +60,19 @@ class ServerSentEventGenerator:
             fragments = fragments.__html__()
         data_lines = []
         if merge_mode:
-            data_lines.append(f"data: {consts.MERGE_MODE_DATALINE_LITERAL} {merge_mode}")
+            data_lines.append(
+                f"data: {consts.MERGE_MODE_DATALINE_LITERAL} {merge_mode}"
+            )
         if selector:
             data_lines.append(f"data: {consts.SELECTOR_DATALINE_LITERAL} {selector}")
         if use_view_transition:
-            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} true")
+            data_lines.append(
+                f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} true"
+            )
         else:
-            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} false")
+            data_lines.append(
+                f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} false"
+            )
 
         data_lines.extend(
             f"data: {consts.FRAGMENTS_DATALINE_LITERAL} {x}"
@@ -92,9 +98,13 @@ class ServerSentEventGenerator:
         if selector:
             data_lines.append(f"data: {consts.SELECTOR_DATALINE_LITERAL} {selector}")
         if use_view_transition:
-            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} true")
+            data_lines.append(
+                f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} true"
+            )
         else:
-            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} false")
+            data_lines.append(
+                f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} false"
+            )
 
         return ServerSentEventGenerator._send(
             consts.EventType.REMOVE_FRAGMENTS,
