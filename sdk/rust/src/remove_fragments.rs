@@ -1,7 +1,7 @@
 //! [`RemoveFragments`] sends a selector to the browser to remove HTML fragments from the DOM.
 
 use {
-    crate::{consts, DatastarEvent},
+    crate::{DatastarEvent, consts},
     core::time::Duration,
 };
 
@@ -26,10 +26,10 @@ use {
 pub struct RemoveFragments {
     /// `id` can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id>
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry>
     pub retry: Duration,
     /// `selector` is a CSS selector that represents the fragments to be removed from the DOM.
     /// The selector must be a valid CSS selector.

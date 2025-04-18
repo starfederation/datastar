@@ -12,7 +12,7 @@ use {
 
 #[derive(Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
-pub enum TestEvent {
+pub(crate) enum TestEvent {
     #[serde(rename_all = "camelCase")]
     ExecuteScript {
         script: String,
@@ -53,11 +53,11 @@ pub enum TestEvent {
 }
 
 #[derive(Deserialize)]
-pub struct Signals {
+pub(crate) struct Signals {
     pub events: Vec<TestEvent>,
 }
 
-pub fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> {
+pub(crate) fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> + Send + 'static {
     stream! {
         for event in events {
             yield match event {

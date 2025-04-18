@@ -4,40 +4,66 @@ authors = [
     "Glen Henri J. De Cauwsemaecker <glen@plabayo.tech>",
 ]
 categories = ["web-programming"]
-description = "Datastar is the Rust implementation of the [Datastar](https://data-star.dev) SDK."
+description = "Datastar SDK for Rust"
+documentation = "https://docs.rs/datastar"
 edition = "2024"
 homepage = "https://data-star.dev"
-keywords = ["datastar", "web", "backend"]
+keywords = ["datastar", "web", "backend", "axum", "rama", "rocket"]
 license = "MIT OR Apache-2.0"
 name = "datastar"
 readme = "README.md"
 repository = "https://github.com/starfederation/datastar-rs"
-version = "0.1.1"
+version = "0.1.2"
 rust-version = "1.85.0"
 
-[dev-dependencies]
-async-stream = { version = "0.3.6", default-features = false }
-serde = { version = "1", default-features = false, features = ["derive"] }
-serde_json = { version = "1", default-features = false, features = ["std"] }
-tokio = { version = "1.43.0", features = ["full"] }
-axum = { version = "0.8.1" }
-rocket = { version = "0.5.1", features = ["json"] }
-rama = { version = "0.2.0-alpha.10", features = ["http-full"] }
+[lints.rust]
+unreachable_pub = "deny"
+elided_lifetimes_in_paths = "allow"
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
 
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+todo = "warn"
+empty_enum = "warn"
+enum_glob_use = "warn"
+mem_forget = "warn"
+unused_self = "warn"
+filter_map_next = "warn"
+needless_continue = "warn"
+needless_borrow = "warn"
+match_wildcard_for_single_variants = "warn"
+if_let_mutex = "warn"
+await_holding_lock = "warn"
+match_on_vec_items = "warn"
+imprecise_flops = "warn"
+suboptimal_flops = "warn"
+lossy_float_literal = "warn"
+rest_pat_in_fully_bound_structs = "warn"
+fn_params_excessive_bools = "warn"
+exit = "warn"
+inefficient_to_string = "warn"
+linkedlist = "warn"
+macro_use_imports = "warn"
+option_option = "warn"
+verbose_file_reads = "warn"
+unnested_or_patterns = "warn"
+str_to_string = "warn"
+type_complexity = "allow"
 
 [dependencies]
-matchit = "0.8.4"
 axum = { version = "0.8.1", default-features = false, optional = true, features = [
     "query",
     "tokio",
 ] }
+bytes = { version = "1", default-features = false, optional = true }
 futures-util = { version = "0.3", default-features = false }
 http-body = { version = "1.0", default-features = false, optional = true }
+matchit = "0.8.4"
 pin-project-lite = { version = "0.2", default-features = false, optional = true }
-rocket = { version = "0.5.1", default-features = false, optional = true }
 rama = { version = "0.2.0-alpha.11", default-features = false, optional = true, features = [
     "http",
 ] }
+rocket = { version = "0.5.1", default-features = false, optional = true }
 serde = { version = "1", default-features = false, optional = true, features = [
     "derive",
 ] }
@@ -45,8 +71,15 @@ serde_json = { version = "1", default-features = false, optional = true, feature
     "std",
 ] }
 sync_wrapper = { version = "1", default-features = false, optional = true }
-bytes = { version = "1", default-features = false, optional = true }
 
+[dev-dependencies]
+async-stream = { version = "0.3.6", default-features = false }
+axum = { version = "0.8.1" }
+rama = { version = "0.2.0-alpha.11", features = ["http-full"] }
+rocket = { version = "0.5.1", features = ["json"] }
+serde = { version = "1", default-features = false, features = ["derive"] }
+serde_json = { version = "1", default-features = false, features = ["std"] }
+tokio = { version = "1.43.0", features = ["full"] }
 
 [features]
 axum = [
@@ -77,3 +110,7 @@ opt-level = 3
 [profile.release]
 codegen-units = 1
 lto = "thin"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
