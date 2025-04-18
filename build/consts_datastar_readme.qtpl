@@ -63,4 +63,6 @@ You can manually add your own plugins to the core:
 </script>
 ```
 
+[![Star History Chart](https://api.star-history.com/svg?repos=starfederation/datastar&type=Date)](https://www.star-history.com/#starfederation/datastar&Date)
+
 {%- endfunc -%}

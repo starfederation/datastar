@@ -22,8 +22,8 @@ jobs:
       - name: Deploy to fly.io
         uses: superfly/flyctl-actions/setup-flyctl@master
       - run: |
-          docker container run --rm -t -v "${{ github.workspace }}":/app -v go-modules:/go/pkg/mod ghcr.io/starfederation/datastar-dev -c 'task tools'
-          docker container run --rm -t -v "${{ github.workspace }}":/app -v go-modules:/go/pkg/mod ghcr.io/starfederation/datastar-dev -c 'task support'
+          docker container run --rm -t -v "${{ github.workspace }}":/app -v go-modules:/go/pkg/mod ghcr.io/starfederation/datastar-dev -c 'go tool task tools'
+          docker container run --rm -t -v "${{ github.workspace }}":/app -v go-modules:/go/pkg/mod ghcr.io/starfederation/datastar-dev -c 'go tool task support'
           flyctl deploy --local-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

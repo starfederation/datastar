@@ -1,11 +1,11 @@
-# Datastar-py
+# datastar-py
 
-The `datastar_py` package provides backend helpers for the [Datastar](https://data-star.dev) JS library.
+The `datastar-py` package provides backend helpers for the [Datastar](https://data-star.dev) JS library.
 
 Datastar requires all backend responses to use SSE. This allows the backend to
 send any number of responses, from zero to inifinity.
 
-`Datastar-py` helps with the formatting of these responses, while also
+`datastar-py` helps with the formatting of these responses, while also
 providing helper functions for the different supported responses.
 
 To use `datastar-py`, import the SSE generator in your app and then use
@@ -32,7 +32,7 @@ async def updates():
     return response
 ```
 
-There are also a number of custom responses/helpers for various frameworks. Current ly the following frameworks are supported:
+There are also a number of custom responses/helpers for various frameworks. Currently the following frameworks are supported:
 
 * [Sanic](https://sanic.dev/en/)
 * [Django](https://www.djangoproject.com/)

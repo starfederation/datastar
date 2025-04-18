@@ -5,6 +5,8 @@
 
 #[cfg(feature = "axum")]
 pub mod axum;
+#[cfg(feature = "rama")]
+pub mod rama;
 #[cfg(feature = "rocket")]
 pub mod rocket;
 
@@ -23,6 +25,8 @@ mod consts;
 pub mod prelude {
     #[cfg(feature = "axum")]
     pub use crate::axum::ReadSignals;
+    #[cfg(all(feature = "rama", not(feature = "axum")))]
+    pub use crate::rama::ReadSignals;
     pub use crate::{
         consts::FragmentMergeMode, execute_script::ExecuteScript, merge_fragments::MergeFragments,
         merge_signals::MergeSignals, remove_fragments::RemoveFragments,

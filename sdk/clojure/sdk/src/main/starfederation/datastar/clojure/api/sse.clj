@@ -15,11 +15,16 @@
    "Content-Type"  "text/event-stream"})
 
 
-(defn http1? [ring-request]
+(defn add-keep-alive? [ring-request]
   (let [protocol (:protocol ring-request)]
-    (or
-      (nil? protocol)
-      (= "HTTP/1.1" protocol))))
+    (or (nil? protocol)
+        (neg? (compare protocol "HTTP/1.1")))))
+
+(comment
+  (add-keep-alive? {:protocol "HTTP/0.9"})
+  (add-keep-alive? {:protocol "HTTP/1.0"})
+  (add-keep-alive? {:protocol "HTTP/1.1"})
+  (add-keep-alive? {:protocol "HTTP/2"}))
 
 
 (defn headers
@@ -41,7 +46,7 @@
   (-> (transient {})
       (u/merge-transient! base-SSE-headers)
       (cond->
-        (http1? ring-request) (assoc! "Connection" "keep-alive",))
+        (add-keep-alive? ring-request) (assoc! "Connection" "keep-alive",))
       (u/merge-transient! (:headers opts))
       persistent!))
 

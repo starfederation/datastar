@@ -1,6 +1,6 @@
 import json
 from itertools import chain
-from typing import Optional
+from typing import Optional, Protocol, Union, runtime_checkable
 
 import datastar_py.consts as consts
 
@@ -9,6 +9,17 @@ SSE_HEADERS = {
     "Connection": "keep-alive",
     "Content-Type": "text/event-stream",
 }
+
+
+@runtime_checkable
+class _HtmlProvider(Protocol):
+    """A type that produces text ready to be placed in an HTML document.
+
+    This is a convention used by html producing/consuming libraries. This lets
+    e.g. fasthtml fasttags, or htpy elements, be passed straight in to
+    merge_fragments."""
+
+    def __html__(self) -> str: ...
 
 
 class ServerSentEventGenerator:
@@ -38,13 +49,15 @@ class ServerSentEventGenerator:
     @classmethod
     def merge_fragments(
         cls,
-        fragments: list[str],
+        fragments: Union[str, _HtmlProvider],
         selector: Optional[str] = None,
         merge_mode: Optional[consts.FragmentMergeMode] = None,
         use_view_transition: bool = consts.DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
         event_id: Optional[int] = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
+        if isinstance(fragments, _HtmlProvider):
+            fragments = fragments.__html__()
         data_lines = []
         if merge_mode:
             data_lines.append(f"data: {consts.MERGE_MODE_DATALINE_LITERAL} {merge_mode}")
@@ -57,8 +70,7 @@ class ServerSentEventGenerator:
 
         data_lines.extend(
             f"data: {consts.FRAGMENTS_DATALINE_LITERAL} {x}"
-            for fragment in fragments
-            for x in fragment.splitlines()
+            for x in fragments.splitlines()
         )
 
         return ServerSentEventGenerator._send(
@@ -162,3 +174,7 @@ class ServerSentEventGenerator:
             event_id,
             retry_duration,
         )
+
+    @classmethod
+    def redirect(cls, location: str):
+        return cls.execute_script(f"setTimeout(() => window.location = '{location}')")

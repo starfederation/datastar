@@ -1,2 +1,2 @@
-{:paths ["src/main"]}
+{:paths ["src/main" "resources"]}
 

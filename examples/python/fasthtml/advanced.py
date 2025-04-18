@@ -93,7 +93,7 @@ def GreatTable(pattern=default_pattern):
 @app.post
 async def table(filter: str):
     async def _():
-        yield DatastarStreamingResponse.merge_fragments([GreatTable(filter)])
+        yield DatastarStreamingResponse.merge_fragments(GreatTable(filter))
 
     return DatastarStreamingResponse(_())
 
@@ -151,7 +151,7 @@ def index():
 async def clock():
     while True:
         now = datetime.isoformat(datetime.now())
-        yield DatastarStreamingResponse.merge_fragments([Span(id="currentTime")(now)])
+        yield DatastarStreamingResponse.merge_fragments(Span(id="currentTime")(now))
         await asyncio.sleep(1)
 
 
@@ -165,7 +165,7 @@ async def hello():
     async def _():
         # Simulate load time
         await asyncio.sleep(1)
-        yield DatastarStreamingResponse.merge_fragments([HELLO_BUTTON])
+        yield DatastarStreamingResponse.merge_fragments(HELLO_BUTTON)
 
     return DatastarStreamingResponse(_())
 
@@ -185,7 +185,7 @@ async def reset():
 
     async def _(sse):
         await asyncio.sleep(1)
-        yield sse.merge_fragments([reset_and_hello])
+        yield sse.merge_fragments(reset_and_hello)
 
     return DatastarFastHTMLResponse(_)
 

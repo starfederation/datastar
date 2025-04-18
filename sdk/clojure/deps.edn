@@ -1,6 +1,7 @@
-{:paths ["sdk/src/main"]
+{:paths []
  
- :deps {io.github.paintparty/fireworks      {:mvn/version "0.10.4"}
+ :deps {sdk/sdk                             {:local/root "./sdk"}
+        io.github.paintparty/fireworks      {:mvn/version "0.10.4"}
         com.taoensso/telemere               {:mvn/version "1.0.0-RC3"}
         com.aayushatharva.brotli4j/brotli4j {:mvn/version "1.18.0"}}
 
@@ -42,7 +43,7 @@
   :http-kit      {:extra-deps {sdk/adapter-http-kit       {:local/root "./adapter-http-kit"}}}
 
   :ring-jetty    {:extra-deps {sdk/adapter-ring           {:local/root "./adapter-ring"}
-                               ring/ring-jetty-adapter    {:mvn/version "1.13.0"}}}
+                               ring/ring-jetty-adapter    {:mvn/version "1.14.1"}}}
   
   :ring-rj9a {:extra-deps {sdk/adapter-ring               {:local/root "./adapter-ring"}
                            info.sunng/ring-jetty9-adapter {:mvn/version "0.36.1"}}}

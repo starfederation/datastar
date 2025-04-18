@@ -1,0 +1,3 @@
+{:lint-as
+ {starfederation.datastar.clojure.utils/def-clone clojure.core/def}}
+ 

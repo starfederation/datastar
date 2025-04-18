@@ -23,7 +23,6 @@
       (write! writer event-type data-lines event-opts)
       (ac/flush writer)))))
 
-;; TODO: Remove the get-on-open/close next release
 
 ;; Note that the send! field has 2 usages:
 ;; - it stores the sending function
@@ -49,7 +48,7 @@
           (set! send! (->send output-stream opts))
           (set! on-exception (or (ac/on-exception opts)
                                  ac/default-on-exception))
-          (when-let [cb (ac/get-on-close opts)]
+          (when-let [cb (ac/on-close opts)]
             (set! on-close cb)))
 
         ;; flush the HTTP headers
@@ -68,7 +67,7 @@
           (if-let [e @!error]
             (throw e) ;; if error throw, the lock is already released
             ;; if all is ok call on-open, it can safely throw...
-            (when-let [on-open (-> response ::opts (ac/get-on-open))]
+            (when-let [on-open (-> response ::opts ac/on-open)]
               (on-open this)))))))
  
   p/SSEGenerator

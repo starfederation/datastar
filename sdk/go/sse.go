@@ -13,6 +13,8 @@ import (
 	"github.com/valyala/bytebufferpool"
 )
 
+// ServerSentEventGenerator streams events into
+// an [http.ResponseWriter]. Each event is flushed immediately.
 type ServerSentEventGenerator struct {
 	ctx             context.Context
 	mu              *sync.Mutex
@@ -23,8 +25,13 @@ type ServerSentEventGenerator struct {
 	acceptEncoding  string
 }
 
+// SSEOption configures the initialization of an
+// HTTP Server-Sent Event stream.
 type SSEOption func(*ServerSentEventGenerator)
 
+// NewSSE upgrades an [http.ResponseWriter] to an HTTP Server-Sent Event stream.
+// The connection is kept alive until the context is canceled or the response is closed by returning from the handler.
+// Run an event loop for persistent streaming.
 func NewSSE(w http.ResponseWriter, r *http.Request, opts ...SSEOption) *ServerSentEventGenerator {
 	rc := http.NewResponseController(w)
 
@@ -43,7 +50,7 @@ func NewSSE(w http.ResponseWriter, r *http.Request, opts ...SSEOption) *ServerSe
 		acceptEncoding:  r.Header.Get("Accept-Encoding"),
 	}
 
-	// Apply options
+	// apply options
 	for _, opt := range opts {
 		opt(sseHandler)
 	}
@@ -65,27 +72,39 @@ func NewSSE(w http.ResponseWriter, r *http.Request, opts ...SSEOption) *ServerSe
 	return sseHandler
 }
 
+// Context returns the context associated with the upgraded connection.
+// It is equivalent to calling [request.Context].
 func (sse *ServerSentEventGenerator) Context() context.Context {
 	return sse.ctx
 }
 
-type ServerSentEventData struct {
+// serverSentEventData holds event configuration data for
+// [SSEEventOption]s.
+type serverSentEventData struct {
 	Type          EventType
 	EventID       string
 	Data          []string
 	RetryDuration time.Duration
 }
 
-type SSEEventOption func(*ServerSentEventData)
+// SSEEventOption modifies one server-sent event.
+type SSEEventOption func(*serverSentEventData)
 
+// WithSSEEventId configures an optional event ID for one server-sent event.
+// The client message field [lastEventId] will be set to this value.
+// If the next event does not have an event ID, the last used event ID will remain.
+//
+// [lastEventId]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/lastEventId
 func WithSSEEventId(id string) SSEEventOption {
-	return func(e *ServerSentEventData) {
+	return func(e *serverSentEventData) {
 		e.EventID = id
 	}
 }
 
+// WithSSERetryDuration overrides the [DefaultSseRetryDuration] for
+// one server-sent event.
 func WithSSERetryDuration(retryDuration time.Duration) SSEEventOption {
-	return func(e *ServerSentEventData) {
+	return func(e *serverSentEventData) {
 		e.RetryDuration = retryDuration
 	}
 }
@@ -102,12 +121,14 @@ func writeJustError(w io.Writer, b []byte) (err error) {
 	return err
 }
 
+// Send emits a server-sent event to the client. Method is safe for
+// concurrent use.
 func (sse *ServerSentEventGenerator) Send(eventType EventType, dataLines []string, opts ...SSEEventOption) error {
 	sse.mu.Lock()
 	defer sse.mu.Unlock()
 
 	// create the event
-	evt := ServerSentEventData{
+	evt := serverSentEventData{
 		Type:          eventType,
 		Data:          dataLines,
 		RetryDuration: DefaultSseRetryDuration,
@@ -187,6 +208,5 @@ func (sse *ServerSentEventGenerator) Send(eventType EventType, dataLines []strin
 	}
 
 	// log.Print(NewLine + buf.String())
-
 	return nil
 }
