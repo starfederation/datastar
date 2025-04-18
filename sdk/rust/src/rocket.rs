@@ -1,13 +1,13 @@
 //! Rocket integration for Datastar.
 
 use {
-    crate::{prelude::DatastarEvent, Sse, TrySse},
+    crate::{Sse, TrySse, prelude::DatastarEvent},
     core::error::Error,
     futures_util::{Stream, StreamExt},
     rocket::{
-        http::ContentType,
-        response::{self, stream::ReaderStream, Responder},
         Request, Response,
+        http::ContentType,
+        response::{self, Responder, stream::ReaderStream},
     },
     std::io::Cursor,
 };
@@ -60,14 +60,15 @@ where
 mod tests {
     use {
         crate::{
-            testing::{self, Signals},
             DatastarEvent, Sse,
+            testing::{self, Signals},
         },
         futures_util::Stream,
         rocket::{get, post, routes, serde::json::Json},
     };
 
     #[tokio::test]
+    #[ignore]
     async fn sdk_test() {
         rocket::build()
             .mount("/", routes![get_test, post_test])

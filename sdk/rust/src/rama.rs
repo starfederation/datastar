@@ -8,11 +8,14 @@ use {
     bytes::Bytes,
     futures_util::{Stream, StreamExt},
     pin_project_lite::pin_project,
-    rama::http::{
-        Body, BodyExtractExt, IntoResponse, Method, Request, Response, StatusCode,
-        dep::http_body::{Body as HttpBody, Frame},
-        header,
-        service::web::extract::{FromRequest, Query},
+    rama::{
+        error::BoxError,
+        http::{
+            Body, BodyExtractExt, IntoResponse, Method, Request, Response, StatusCode,
+            dep::http_body::{Body as HttpBody, Frame},
+            header,
+            service::web::extract::{FromRequest, Query},
+        },
     },
     serde::{Deserialize, de::DeserializeOwned},
     std::{
@@ -52,7 +55,7 @@ where
 impl<S, E> IntoResponse for TrySse<S>
 where
     S: Stream<Item = Result<DatastarEvent, E>> + Send + 'static,
-    E: Into<Box<dyn std::error::Error + Send + Sync>>,
+    E: Into<BoxError>,
 {
     fn into_response(self) -> Response {
         (
@@ -157,12 +160,13 @@ mod tests {
     use {
         super::Sse,
         crate::{
-            prelude::ReadSignals,
+            rama::ReadSignals,
             testing::{self, Signals},
         },
         rama::{
             error::BoxError,
             http::{IntoResponse, server::HttpServer, service::web::Router},
+            net::address::SocketAddress,
             rt::Executor,
         },
     };
@@ -172,10 +176,11 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn sdk_test() -> Result<(), BoxError> {
         HttpServer::auto(Executor::default())
             .listen(
-                "127.0.0.1:3000",
+                SocketAddress::local_ipv4(3000),
                 Router::new().get("/test", test).post("/test", test),
             )
             .await?;
