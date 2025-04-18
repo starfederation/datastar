@@ -19,7 +19,7 @@ pub mod remove_signals;
 #[cfg(test)]
 mod testing;
 
-mod consts;
+pub mod consts;
 
 /// The prelude for the `datastar` crate
 pub mod prelude {
@@ -28,9 +28,9 @@ pub mod prelude {
     #[cfg(all(feature = "rama", not(feature = "axum")))]
     pub use crate::rama::ReadSignals;
     pub use crate::{
-        consts::FragmentMergeMode, execute_script::ExecuteScript, merge_fragments::MergeFragments,
-        merge_signals::MergeSignals, remove_fragments::RemoveFragments,
-        remove_signals::RemoveSignals, DatastarEvent, Sse, TrySse,
+        DatastarEvent, Sse, TrySse, consts::FragmentMergeMode, execute_script::ExecuteScript,
+        merge_fragments::MergeFragments, merge_signals::MergeSignals,
+        remove_fragments::RemoveFragments, remove_signals::RemoveSignals,
     };
 }
 
@@ -47,10 +47,10 @@ pub struct DatastarEvent {
     pub event: consts::EventType,
     /// `id` is can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id>
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry>
     pub retry: Duration,
     /// `data` is the data that is sent with the event.
     pub data: Vec<String>,

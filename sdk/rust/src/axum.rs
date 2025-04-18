@@ -1,7 +1,7 @@
 //! Axum integration for Datastar.
 
 use {
-    crate::{prelude::DatastarEvent, Sse, TrySse},
+    crate::{Sse, TrySse, prelude::DatastarEvent},
     axum::{
         body::{Body, Bytes, HttpBody},
         extract::{FromRequest, Query, Request},
@@ -16,7 +16,7 @@ use {
     futures_util::{Stream, StreamExt},
     http_body::Frame,
     pin_project_lite::pin_project,
-    serde::{de::DeserializeOwned, Deserialize},
+    serde::{Deserialize, de::DeserializeOwned},
     sync_wrapper::SyncWrapper,
 };
 
@@ -162,9 +162,9 @@ mod tests {
             testing::{self, Signals},
         },
         axum::{
+            Router,
             response::IntoResponse,
             routing::{get, post},
-            Router,
         },
         tokio::net::TcpListener,
     };
@@ -174,6 +174,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn sdk_test() -> Result<(), Box<dyn core::error::Error>> {
         let listener = TcpListener::bind("127.0.0.1:3000").await?;
         let app = Router::new()

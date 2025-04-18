@@ -3,8 +3,8 @@
 
 use {
     crate::{
-        consts::{self, FragmentMergeMode},
         DatastarEvent,
+        consts::{self, FragmentMergeMode},
     },
     core::time::Duration,
 };
@@ -33,10 +33,10 @@ use {
 pub struct MergeFragments {
     /// `id` is can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id>
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry>
     pub retry: Duration,
     /// The HTML fragments to merge into the DOM.
     pub fragments: String,

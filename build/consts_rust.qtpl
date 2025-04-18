@@ -1,8 +1,13 @@
 {%- func rustConsts(data *ConstTemplateData) -%}
+//! Datastar constants
+#![allow(rustdoc::invalid_html_tags)]
+
 // {%s data.DoNotEdit %}
 
-pub const _DATASTAR_KEY: &str = "{%s data.DatastarKey %}";
-pub const _VERSION: &str = "{%s data.Version %}";
+#[expect(unused)]
+pub(crate) const DATASTAR_KEY: &str = "{%s data.DatastarKey %}";
+#[expect(unused)]
+pub(crate) const VERSION: &str = "{%s data.Version %}";
 
 // #region Defaults
 
@@ -19,7 +24,7 @@ pub const DEFAULT_{%s d.Name.ScreamingSnake %}: u64 = {%d durationToMs(d.Duratio
 
 {%- for _, s := range data.DefaultStrings -%}
 /// {%s= s.Description %}
-pub const DEFAULT_{%s s.Name.ScreamingSnake %}: &str = "{%s s.Value %}";
+pub(crate) const DEFAULT_{%s s.Name.ScreamingSnake %}: &str = "{%s s.Value %}";
 {%- endfor -%}
 
 // #endregion
@@ -27,7 +32,7 @@ pub const DEFAULT_{%s s.Name.ScreamingSnake %}: &str = "{%s s.Value %}";
 // #region Datalines
 
 {%- for _, literal := range data.DatalineLiterals -%}
-pub const {%s literal.ScreamingSnake %}_DATALINE_LITERAL: &str = "{%s literal.Camel %}";
+pub(crate) const {%s literal.ScreamingSnake %}_DATALINE_LITERAL: &str = "{%s literal.Camel %}";
 {%- endfor -%}
 
 // #endregion
@@ -36,7 +41,7 @@ pub const {%s literal.ScreamingSnake %}_DATALINE_LITERAL: &str = "{%s literal.Ca
 
 {%- for _, b := range data.DefaultBools -%}
 /// {%s= b.Description %}
-pub const DEFAULT_{%s b.Name.ScreamingSnake %}: bool = {%v b.Value %};
+pub(crate) const DEFAULT_{%s b.Name.ScreamingSnake %}: bool = {%v b.Value %};
 {%- endfor -%}
 
 // #endregion
@@ -58,7 +63,7 @@ pub enum {%s enum.Name.Pascal %} {
 
 impl {%s enum.Name.Pascal %} {
     /// Returns the [`{%s enum.Name.Pascal %}`] as a string.
-    pub const fn as_str(&self) -> &str {
+    pub(crate) const fn as_str(&self) -> &str {
         match self {
 {%- for _, entry := range enum.Values -%}
             Self::{%s entry.Name.Pascal %} => "{%s entry.Value %}",
