@@ -1,5 +1,11 @@
 {
+  "name": "@gavriguy/datastar-sdk",
+  "exports": "./src/index.ts",
+  "version": "0.0.3",
+  "license": "MIT",
   "imports": {
-    "@deno/dnt": "jsr:@deno/dnt@^0.41.3"
+    "@deno/dnt": "jsr:@deno/dnt@^0.41.3",
+    "npm:deepmerge-ts": "npm:deepmerge-ts@^7.1.4",
+    "npm:type-fest": "npm:type-fest@^4.32.0"
   }
 }
