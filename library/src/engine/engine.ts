@@ -291,6 +291,11 @@ function genRX(
   // double quotes      "(\\"|[^\"])*"
   // single quotes      '(\\'|[^'])*'
   // ticks              `(\\`|[^`])*`
+  // iife               \(\s*((function)\s*\(\s*\)|(\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;)\{]*)\s*\)\s*\(\s*\)
+  //
+  // The iife support is (intentionally) limited. It only supports
+  // function and arrow syntax with no arguments, and does not support nested
+  // IIFEs.
   //
   // We also want to match the non delimiter part of statements
   // note we only support ; statement delimiters:
@@ -298,7 +303,7 @@ function genRX(
   // [^;]
   //
   const statementRe =
-    /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|[^;])+/gm
+    /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|\(\s*((function)\s*\(\s*\)|(\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;)\{]*)\s*\)\s*\(\s*\)|[^;])+/gm
   const statements = ctx.value.trim().match(statementRe)
   if (statements) {
     const lastIdx = statements.length - 1
