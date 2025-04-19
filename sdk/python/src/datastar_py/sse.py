@@ -8,6 +8,7 @@ SSE_HEADERS = {
     "Cache-Control": "no-cache",
     "Connection": "keep-alive",
     "Content-Type": "text/event-stream",
+    "X-Accel-Buffering": "no",
 }
 
 
