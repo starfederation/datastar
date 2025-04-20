@@ -27,29 +27,21 @@ pin_project! {
     }
 }
 
-impl<S> IntoResponse for Sse<S>
+impl<S, I> IntoResponse for Sse<S>
 where
-    S: Stream<Item = DatastarEvent> + Send + 'static,
+    S: Stream<Item = I> + Send + 'static,
+    I: Into<DatastarEvent> + Send + 'static,
 {
+    #[inline]
     fn into_response(self) -> Response {
-        (
-            [
-                (http::header::CONTENT_TYPE, "text/event-stream"),
-                (http::header::CACHE_CONTROL, "no-cache"),
-                #[cfg(not(feature = "http2"))]
-                (http::header::CONNECTION, "keep-alive"),
-            ],
-            Body::new(SseBody {
-                stream: SyncWrapper::new(self.0.map(Ok::<_, Infallible>)),
-            }),
-        )
-            .into_response()
+        TrySse(self.0.map(Ok::<_, Infallible>)).into_response()
     }
 }
 
-impl<S, E> IntoResponse for TrySse<S>
+impl<S, I, E> IntoResponse for TrySse<S>
 where
-    S: Stream<Item = Result<DatastarEvent, E>> + Send + 'static,
+    S: Stream<Item = Result<I, E>> + Send + 'static,
+    I: Into<DatastarEvent> + Send + 'static,
     E: Into<Box<dyn std::error::Error + Send + Sync>>,
 {
     fn into_response(self) -> Response {
@@ -61,7 +53,7 @@ where
                 (http::header::CONNECTION, "keep-alive"),
             ],
             Body::new(SseBody {
-                stream: SyncWrapper::new(self.0),
+                stream: SyncWrapper::new(self.0.map(|r| r.map(Into::into))),
             }),
         )
             .into_response()

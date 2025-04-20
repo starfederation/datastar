@@ -34,10 +34,7 @@ pub mod prelude {
     };
 }
 
-use {
-    core::{error::Error, fmt::Display, time::Duration},
-    futures_util::{Stream, TryStream},
-};
+use core::{fmt::Display, time::Duration};
 
 /// [`DatastarEvent`] is a struct that represents a generic Datastar event.
 /// All Datastar events implement `Into<DatastarEvent>`.
@@ -81,13 +78,8 @@ impl Display for DatastarEvent {
 
 /// [`Sse`] is a wrapper around a stream of [`DatastarEvent`]s.
 #[derive(Debug)]
-pub struct Sse<S>(pub S)
-where
-    S: Stream<Item = DatastarEvent> + Send + 'static;
+pub struct Sse<S>(pub S);
 
 /// [`TrySse`] is a wrapper around a stream of [`DatastarEvent`]s that can fail.
 #[derive(Debug)]
-pub struct TrySse<S>(pub S)
-where
-    S: TryStream<Ok = DatastarEvent> + Send + 'static,
-    S::Error: Into<Box<dyn Error + Send + Sync>>;
+pub struct TrySse<S>(pub S);
