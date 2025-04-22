@@ -11,6 +11,7 @@ const App = struct {
 };
 
 pub fn main() !void {
+    std.debug.print("Running on port 8080\n", .{});
     try tk.app.run(App);
 }
 
