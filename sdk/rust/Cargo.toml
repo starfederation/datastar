@@ -58,7 +58,6 @@ axum = { version = "0.8.1", default-features = false, optional = true, features 
 bytes = { version = "1", default-features = false, optional = true }
 futures-util = { version = "0.3", default-features = false }
 http-body = { version = "1.0", default-features = false, optional = true }
-matchit = "0.8.4"
 pin-project-lite = { version = "0.2", default-features = false, optional = true }
 rama = { version = "0.2.0-alpha.12", default-features = false, optional = true, features = [
     "http",
