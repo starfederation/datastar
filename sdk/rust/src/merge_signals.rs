@@ -17,8 +17,7 @@ use {
 ///
 /// Sse(stream! {
 ///     yield MergeSignals::new("{foo: 1234}")
-///         .only_if_missing(true)
-///         .into();
+///         .only_if_missing(true);
 /// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -65,6 +64,12 @@ impl MergeSignals {
     pub fn only_if_missing(mut self, only_if_missing: bool) -> Self {
         self.only_if_missing = only_if_missing;
         self
+    }
+
+    /// Converts this [`MergeSignals`] into a [`DatastarEvent`].
+    #[inline]
+    pub fn into_event(self) -> DatastarEvent {
+        self.into()
     }
 }
 

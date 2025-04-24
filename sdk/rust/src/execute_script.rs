@@ -18,8 +18,7 @@ use {
 /// Sse(stream! {
 ///     yield ExecuteScript::new("console.log('Hello, world!')")
 ///         .auto_remove(false)
-///         .attributes(["type text/javascript"])
-///         .into();
+///         .attributes(["type text/javascript"]);
 /// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -75,6 +74,12 @@ impl ExecuteScript {
     pub fn attributes(mut self, attributes: impl IntoIterator<Item = impl Into<String>>) -> Self {
         self.attributes = attributes.into_iter().map(Into::into).collect();
         self
+    }
+
+    /// Converts this [`ExecuteScript`] into a [`DatastarEvent`].
+    #[inline]
+    pub fn into_event(self) -> DatastarEvent {
+        self.into()
     }
 }
 

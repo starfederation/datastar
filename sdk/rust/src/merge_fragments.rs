@@ -25,8 +25,7 @@ use {
 ///     yield MergeFragments::new("<h1>Hello, world!</h1>")
 ///         .selector("body")
 ///         .merge_mode(FragmentMergeMode::Append)
-///         .use_view_transition(true)
-///         .into();
+///         .use_view_transition(true);
 /// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -91,6 +90,12 @@ impl MergeFragments {
     pub fn use_view_transition(mut self, use_view_transition: bool) -> Self {
         self.use_view_transition = use_view_transition;
         self
+    }
+
+    /// Converts this [`MergeFragments`] into a [`DatastarEvent`].
+    #[inline]
+    pub fn into_event(self) -> DatastarEvent {
+        self.into()
     }
 }
 

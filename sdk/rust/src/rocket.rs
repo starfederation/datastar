@@ -12,9 +12,13 @@ use {
     std::io::Cursor,
 };
 
-impl<'r, S: Stream<Item = DatastarEvent> + Send + 'static> Responder<'r, 'r> for Sse<S> {
+impl<'r, S, I> Responder<'r, 'r> for Sse<S>
+where
+    S: Stream<Item = I> + Send + 'static,
+    I: Into<DatastarEvent> + Send + 'static,
+{
     fn respond_to(self, _: &'r Request<'_>) -> response::Result<'r> {
-        let stream = self.0.map(|event| Cursor::new(event.to_string()));
+        let stream = self.0.map(|event| Cursor::new(event.into().to_string()));
 
         let mut response = Response::build();
 
@@ -29,16 +33,17 @@ impl<'r, S: Stream<Item = DatastarEvent> + Send + 'static> Responder<'r, 'r> for
     }
 }
 
-impl<'r, S, E> Responder<'r, 'r> for TrySse<S>
+impl<'r, S, I, E> Responder<'r, 'r> for TrySse<S>
 where
     E: Into<Box<dyn Error + Send + Sync>> + Send + 'r,
-    S: Stream<Item = Result<DatastarEvent, E>> + Send + 'static,
+    S: Stream<Item = Result<I, E>> + Send + 'static,
+    I: Into<DatastarEvent> + Send + 'static,
 {
     fn respond_to(self, _: &'r Request<'_>) -> response::Result<'r> {
         // we just ignore errors because rocket doesn't support them in streams!
         let stream = self.0.filter_map(|event| async {
             match event {
-                Ok(event) => Some(Cursor::new(event.to_string())),
+                Ok(event) => Some(Cursor::new(event.into().to_string())),
                 _ => None,
             }
         });

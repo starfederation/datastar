@@ -16,7 +16,7 @@ use {
 /// use async_stream::stream;
 ///
 /// Sse(stream! {
-///     yield RemoveSignals::new(["foo.bar", "1234", "abc"]).into();
+///     yield RemoveSignals::new(["foo.bar", "1234", "abc"]);
 /// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -54,6 +54,12 @@ impl RemoveSignals {
     pub fn retry(mut self, retry: Duration) -> Self {
         self.retry = retry;
         self
+    }
+
+    /// Converts this [`RemoveSignals`] into a [`DatastarEvent`].
+    #[inline]
+    pub fn into_event(self) -> DatastarEvent {
+        self.into()
     }
 }
 
