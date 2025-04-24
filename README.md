@@ -53,10 +53,19 @@ You can manually add your own plugins to the core:
 <script type="module">
     import { load } from 'datastar'
 
-    load(
-        // Look ma’, I made a plugin!
-    )
+    const LogAction = {
+        type: 3,
+        name: 'log',
+        fn: (_ctx, method, ...args) => console.log(`[log] ${method}`, ...args),
+    };
+
+    // Look ma’, I made a plugin!
+    load(LogAction);
 </script>
+
+...
+
+<button data-on-click="@log('foo', 4, 'extra')">Log Plugin</button>
 ```
 
 [![Star History Chart](https://api.star-history.com/svg?repos=starfederation/datastar&type=Date)](https://www.star-history.com/#starfederation/datastar&Date)
