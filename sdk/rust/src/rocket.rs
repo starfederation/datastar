@@ -66,29 +66,112 @@ mod tests {
     use {
         crate::{
             DatastarEvent, Sse,
-            testing::{self, Signals},
+            testing::{self, Signals, base_test_server},
         },
         futures_util::Stream,
-        rocket::{get, post, routes, serde::json::Json},
+        rocket::{
+            Config, Responder, get, post, response::content::RawHtml, routes, serde::json::Json,
+        },
+        std::time::Duration,
+        tracing_test::traced_test,
     };
 
     #[tokio::test]
-    #[ignore]
-    async fn sdk_test() {
-        rocket::build()
-            .mount("/", routes![get_test, post_test])
-            .launch()
+    #[traced_test]
+    async fn sdk_base_test() -> Result<(), Box<dyn core::error::Error>> {
+        fn get_available_port() -> Option<u16> {
+            fn port_is_available(port: u16) -> bool {
+                std::net::TcpListener::bind(("127.0.0.1", port)).is_ok()
+            }
+            (8000..9000).find(|port| port_is_available(*port))
+        }
+
+        let available_port = get_available_port().expect("find available tcp port");
+        let base_url = format!("http://127.0.0.1:{available_port}");
+
+        println!("base url: {base_url}");
+
+        tokio::time::sleep(Duration::from_secs(1)).await;
+
+        let server = rocket::build()
+            .mount(
+                "/base",
+                routes![
+                    base_test_endpoint_required_get,
+                    base_test_endpoint_required_post,
+                    base_test_endpoint_optional_get,
+                    base_test_endpoint_optional_post,
+                ],
+            )
+            .configure(Config {
+                port: available_port,
+                address: std::net::Ipv4Addr::new(127, 0, 0, 1).into(),
+                ..Config::debug_default()
+            })
+            .ignite()
             .await
-            .unwrap();
+            .expect("ignite the rocket server");
+
+        let rocket_shutdown = server.shutdown();
+
+        let (server_result_tx, server_result_rx) = tokio::sync::oneshot::channel();
+        tokio::spawn(async move {
+            server_result_tx
+                .send(server.launch().await)
+                .expect("send rocket serve result upstream over oneshot ch");
+        });
+
+        tokio::time::sleep(Duration::from_secs(1)).await;
+
+        base_test_server(&base_url).await;
+
+        rocket_shutdown.notify();
+        server_result_rx.await??;
+
+        Ok(())
     }
 
     #[get("/test?<datastar>")]
-    fn get_test(datastar: Json<Signals>) -> Sse<impl Stream<Item = DatastarEvent>> {
+    fn base_test_endpoint_required_get(
+        datastar: Json<Signals>,
+    ) -> Sse<impl Stream<Item = DatastarEvent>> {
         Sse(testing::test(datastar.into_inner().events))
     }
 
     #[post("/test", data = "<datastar>")]
-    fn post_test(datastar: Json<Signals>) -> Sse<impl Stream<Item = DatastarEvent>> {
+    fn base_test_endpoint_required_post(
+        datastar: Json<Signals>,
+    ) -> Sse<impl Stream<Item = DatastarEvent>> {
         Sse(testing::test(datastar.into_inner().events))
+    }
+
+    #[derive(Responder)]
+    enum PageOrEvents<S: Stream<Item = DatastarEvent>> {
+        Html(RawHtml<&'static str>),
+        Events(Sse<S>),
+    }
+
+    #[get("/test-opt?<datastar>")]
+    fn base_test_endpoint_optional_get(
+        datastar: Option<Json<Signals>>,
+    ) -> PageOrEvents<impl Stream<Item = DatastarEvent>> {
+        match datastar {
+            Some(datastar) => {
+                PageOrEvents::Events(Sse(testing::test(datastar.into_inner().events)))
+            }
+            None => PageOrEvents::Html(RawHtml("<p>Hello</p>")),
+        }
+    }
+
+    #[post("/test-opt", data = "<datastar>")]
+    fn base_test_endpoint_optional_post(
+        datastar: Option<Json<Signals>>,
+    ) -> PageOrEvents<impl Stream<Item = DatastarEvent>> {
+        match datastar {
+            Some(datastar) => {
+                PageOrEvents::Events(Sse(testing::test(datastar.into_inner().events)))
+            }
+            None => PageOrEvents::Html(RawHtml("<p>Hello</p>")),
+        }
     }
 }

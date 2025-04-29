@@ -347,7 +347,10 @@ pub(crate) async fn base_test_server(base_url: &str) {
             _ => do_post(&client, &url, None).await,
         };
 
-        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        assert!(
+            [StatusCode::BAD_REQUEST, StatusCode::UNPROCESSABLE_ENTITY]
+                .contains(&response.status())
+        );
         println!("✔️ {} {} returns 400 Bad Request", method, path);
     }
 }

@@ -211,7 +211,7 @@ mod tests {
     ) -> impl IntoResponse {
         match signals {
             Some(ReadSignals(signals)) => Sse(testing::test(signals.events)).into_response(),
-            None => Html("Hello").into_response(),
+            None => Html("<p>Hello</p>").into_response(),
         }
     }
 

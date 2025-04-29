@@ -131,17 +131,20 @@ where
                         .map_err(IntoResponse::into_response)?;
 
                 let signals = query.0.datastar.as_str().ok_or_else(|| {
+                    tracing::debug!("failed to get datastar query value from GET request");
                     (StatusCode::BAD_REQUEST, "Failed to parse JSON").into_response()
                 })?;
 
                 serde_json::from_str(signals)
-                    .map_err(|err| (StatusCode::BAD_REQUEST, err.to_string()).into_response())?
+                    .map_err(|err| {
+                        tracing::debug!(%err, "failed to parse datastar query json value from GET request");
+                        (StatusCode::BAD_REQUEST, err.to_string()).into_response()}
+                    )?
             }
-            _ => req
-                .into_body()
-                .try_into_json()
-                .await
-                .map_err(|err| (StatusCode::BAD_REQUEST, err.to_string()).into_response())?,
+            _ => req.into_body().try_into_json().await.map_err(|err| {
+                tracing::debug!(%err, "failed to parse datastar json payload from POST request");
+                (StatusCode::BAD_REQUEST, err.to_string()).into_response()
+            })?,
         };
 
         Ok(Self(json))
@@ -156,6 +159,9 @@ where
 
     async fn from_request(req: Request) -> Result<Option<Self>, Self::Rejection> {
         if req.headers().get(DATASTAR_REQ_HEADER_STR).is_none() {
+            tracing::trace!(
+                "no datastar request header present: returning no read signals as such"
+            );
             return Ok(None);
         }
         Ok(Some(<Self as FromRequest>::from_request(req).await?))
@@ -178,6 +184,7 @@ mod tests {
             rt::Executor,
             tcp::server::TcpListener,
         },
+        tracing_test::traced_test,
     };
 
     async fn base_test_endpoint_required(
@@ -191,11 +198,12 @@ mod tests {
     ) -> impl IntoResponse {
         match signals {
             Some(ReadSignals(signals)) => Sse(testing::test(signals.events)).into_response(),
-            None => Html("Hello").into_response(),
+            None => Html("<p>Hello</p>").into_response(),
         }
     }
 
     #[tokio::test]
+    #[traced_test]
     async fn sdk_base_test() -> Result<(), BoxError> {
         let listener = TcpListener::bind(SocketAddress::local_ipv4(0)).await?;
         let local_addr = listener.local_addr()?;
