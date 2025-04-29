@@ -1,10 +1,10 @@
 //! Axum integration for Datastar.
 
 use {
-    crate::{Sse, TrySse, prelude::DatastarEvent},
+    crate::{consts::DATASTAR_REQ_HEADER, prelude::DatastarEvent, Sse, TrySse},
     axum::{
         body::{Body, Bytes, HttpBody},
-        extract::{FromRequest, Query, Request},
+        extract::{FromRequest, OptionalFromRequest, Query, Request},
         http::{self},
         response::{IntoResponse, Response},
     },
@@ -16,7 +16,7 @@ use {
     futures_util::{Stream, StreamExt},
     http_body::Frame,
     pin_project_lite::pin_project,
-    serde::{Deserialize, de::DeserializeOwned},
+    serde::{de::DeserializeOwned, Deserialize},
     sync_wrapper::SyncWrapper,
 };
 
@@ -112,6 +112,27 @@ struct DatastarParam {
 #[derive(Debug)]
 pub struct ReadSignals<T: DeserializeOwned>(pub T);
 
+impl<T: DeserializeOwned, S: Send + Sync> OptionalFromRequest<S> for ReadSignals<T>
+where
+    Bytes: FromRequest<S>,
+{
+    type Rejection = Response;
+
+    async fn from_request(
+        req: Request,
+        state: &S,
+    ) -> Result<Option<Self>, Self::Rejection> {
+        if let None = req.headers().get(DATASTAR_REQ_HEADER) {
+            return Ok(None) 
+        }
+        let result = <Self as FromRequest<S>>::from_request(req, state).await;
+        match result {
+            Ok(v) => Ok(Some(v)),
+            Err(e) => Err(e) 
+        }
+    }
+}
+
 impl<T: DeserializeOwned, S: Send + Sync> FromRequest<S> for ReadSignals<T>
 where
     Bytes: FromRequest<S>,
@@ -164,6 +185,13 @@ mod tests {
     async fn test(ReadSignals(signals): ReadSignals<Signals>) -> impl IntoResponse {
         Sse(testing::test(signals.events))
     }
+    
+    async fn test2(signals: Option<ReadSignals<Signals>>) -> impl IntoResponse {
+        match signals {
+            Some(ReadSignals(signals)) => Sse(testing::test(signals.events)),
+            None => Sse(testing::test(Vec::new())) 
+        }
+    }
 
     #[tokio::test]
     #[ignore]
@@ -171,7 +199,9 @@ mod tests {
         let listener = TcpListener::bind("127.0.0.1:3000").await?;
         let app = Router::new()
             .route("/test", get(test))
-            .route("/test", post(test));
+            .route("/test", post(test))
+            .route("/opt_test", get(test2))
+            .route("/opt_test", post(test2));
 
         axum::serve(listener, app).await?;
 
