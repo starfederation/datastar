@@ -8,7 +8,7 @@ ServerSentEventGenerator struct that can be used to implement runtime specific c
 ## Installation
 
 ```sh
-go get -u github.com/starfederation/datastar/sdk/go
+go get -u github.com/starfederation/datastar/sdk/go@v1.0.0-beta.11
 ```
 
 ## Examples
