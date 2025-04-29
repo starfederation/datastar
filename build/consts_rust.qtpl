@@ -6,6 +6,8 @@
 
 #[expect(unused)]
 pub(crate) const DATASTAR_KEY: &str = "{%s data.DatastarKey %}";
+#[allow(unused)]
+pub(crate) const DATASTAR_REQ_HEADER_STR: &str = "{%s data.DatastarKey.Lower %}-request";
 #[expect(unused)]
 pub(crate) const VERSION: &str = "{%s data.Version %}";
 
