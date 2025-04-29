@@ -53,7 +53,7 @@ Below are details and options available in each of the provided `make` commands:
 
 You can pass in optional CLI arguments to override the default settings Datastar dev uses:
 
-* `TAG=` (default: `1.23.1-alpine`) - allows you to specify the official [golang Docker image](https://hub.docker.com/_/golang) tag that should be used. Using this, you can change the version of Go the container runs, e.g.: `make image-build TAG="1.23-alpine"` will use the latest version of Go 1.23 for Alpine Linux.
+* `TAG=` (default is defined in `Dockerfile-dev`) - allows you to specify the official [golang Docker image](https://hub.docker.com/_/golang) tag that should be used. Using this, you can change the version of Go the container runs, e.g.: `make image-build TAG="1.24"` will use the latest patch version of Go 1.24 official Docker image.
 
 ### Terminating
 

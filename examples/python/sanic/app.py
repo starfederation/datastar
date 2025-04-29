@@ -57,13 +57,11 @@ async def add_signal(request):
 
     await response.send(
         ServerSentEventGenerator.merge_fragments(
-            [
-                """
+            """
             <div class="time signal">
             Current time from signal: <span data-text="$currentTime">CURRENT_TIME</span>
             </div>
-            """
-            ],
+            """,
             selector="#timers",
             merge_mode=FragmentMergeMode.APPEND,
         )
@@ -78,13 +76,11 @@ async def add_fragment(request):
 
     await response.send(
         ServerSentEventGenerator.merge_fragments(
-            [
-                f"""\
+            f"""\
             <div class="time fragment">
             Current time from fragment: {datetime.now().isoformat()}
             </div>
-            """
-            ],
+            """,
             selector="#timers",
             merge_mode=FragmentMergeMode.APPEND,
         )
@@ -100,13 +96,11 @@ async def updates(request):
     while True:
         await response.send(
             ServerSentEventGenerator.merge_fragments(
-                [
-                    f"""
-            <div class="time fragment" >
-            Current time from fragment: {datetime.now().isoformat()}
-            </div>
-                """
-                ],
+                f"""
+                <div class="time fragment" >
+                Current time from fragment: {datetime.now().isoformat()}
+                </div>
+                """,
                 selector=".fragment",
             )
         )

@@ -133,6 +133,7 @@ func setupRoutes(ctx context.Context, router chi.Router) (err error) {
 		setupHowTos(ctx, router),
 		setupExamples(ctx, router, sessionSignals),
 		setupTests(ctx, router),
+		setupVideos(router),
 		setupEssays(ctx, router),
 		setupErrors(router),
 		setupMemes(router),

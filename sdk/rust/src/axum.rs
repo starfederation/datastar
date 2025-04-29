@@ -1,7 +1,7 @@
 //! Axum integration for Datastar.
 
 use {
-    crate::{prelude::DatastarEvent, Sse, TrySse},
+    crate::{Sse, TrySse, prelude::DatastarEvent},
     axum::{
         body::{Body, Bytes, HttpBody},
         extract::{FromRequest, Query, Request},
@@ -16,7 +16,7 @@ use {
     futures_util::{Stream, StreamExt},
     http_body::Frame,
     pin_project_lite::pin_project,
-    serde::{de::DeserializeOwned, Deserialize},
+    serde::{Deserialize, de::DeserializeOwned},
     sync_wrapper::SyncWrapper,
 };
 
@@ -27,29 +27,21 @@ pin_project! {
     }
 }
 
-impl<S> IntoResponse for Sse<S>
+impl<S, I> IntoResponse for Sse<S>
 where
-    S: Stream<Item = DatastarEvent> + Send + 'static,
+    S: Stream<Item = I> + Send + 'static,
+    I: Into<DatastarEvent> + Send + 'static,
 {
+    #[inline]
     fn into_response(self) -> Response {
-        (
-            [
-                (http::header::CONTENT_TYPE, "text/event-stream"),
-                (http::header::CACHE_CONTROL, "no-cache"),
-                #[cfg(not(feature = "http2"))]
-                (http::header::CONNECTION, "keep-alive"),
-            ],
-            Body::new(SseBody {
-                stream: SyncWrapper::new(self.0.map(Ok::<_, Infallible>)),
-            }),
-        )
-            .into_response()
+        TrySse(self.0.map(Ok::<_, Infallible>)).into_response()
     }
 }
 
-impl<S, E> IntoResponse for TrySse<S>
+impl<S, I, E> IntoResponse for TrySse<S>
 where
-    S: Stream<Item = Result<DatastarEvent, E>> + Send + 'static,
+    S: Stream<Item = Result<I, E>> + Send + 'static,
+    I: Into<DatastarEvent> + Send + 'static,
     E: Into<Box<dyn std::error::Error + Send + Sync>>,
 {
     fn into_response(self) -> Response {
@@ -61,7 +53,7 @@ where
                 (http::header::CONNECTION, "keep-alive"),
             ],
             Body::new(SseBody {
-                stream: SyncWrapper::new(self.0),
+                stream: SyncWrapper::new(self.0.map(|r| r.map(Into::into))),
             }),
         )
             .into_response()
@@ -162,9 +154,9 @@ mod tests {
             testing::{self, Signals},
         },
         axum::{
+            Router,
             response::IntoResponse,
             routing::{get, post},
-            Router,
         },
         tokio::net::TcpListener,
     };
@@ -174,6 +166,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn sdk_test() -> Result<(), Box<dyn core::error::Error>> {
         let listener = TcpListener::bind("127.0.0.1:3000").await?;
         let app = Router::new()

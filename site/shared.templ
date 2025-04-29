@@ -42,6 +42,10 @@ templ Page(title, description string, uri string) {
 			} else {
 				<script type="module" src={ staticPath("js/datastar.js") }></script>
 			}
+			if uri == "/videos" {
+				<link rel="preconnect" href="https://img.youtube.com">
+				<link rel="preconnect" href="https://www.youtube.com">
+			}
 			<style>
 .indicator {
 	opacity:0;
@@ -103,6 +107,9 @@ templ headerTopLevelLinks(r *http.Request) {
 	@headerTopLevelLink(r, "How Tos")
 	@headerTopLevelLink(r, "Examples")
 	@headerDropdownMenu("More") {
+		<li>
+			@headerTopLevelLink(r, "Videos")
+		</li>
 		<li>
 			@headerTopLevelLink(r, "Essays")
 		</li>

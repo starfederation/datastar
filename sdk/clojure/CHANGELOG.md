@@ -1,5 +1,24 @@
 # Release notes for the Clojure SDK
 
+## 2025-04-07
+
+### Added
+
+- The vars holding keywords (like `on-open`) in the adapter namespaces were not
+  properly recognized by Clj-kondo. This generated `unresolved var` warnings. A
+  specific Clj-kondo config has been added to fix these warnings.
+
+### Fixed
+
+- The HTTP version detection that determines whether to add the
+  `Connection keep-alive` HTTP header has been changed. The header is now
+  properly added for versions older than `HTTP/1.1`.
+
+### Changed
+
+- Bumped the ring version from `1.13.0` to `1.14.1`. This encourages users
+  to use Jetty 12 when using ring jetty adapter.
+
 ## 2025-03-31
 
 ### Changed

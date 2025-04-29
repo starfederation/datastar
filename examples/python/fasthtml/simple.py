@@ -1,6 +1,7 @@
 import asyncio
 import json
 from datetime import datetime
+from pathlib import Path
 
 from fasthtml.common import *
 
@@ -45,7 +46,7 @@ async def index():
 async def clock():
     while True:
         now = datetime.isoformat(datetime.now())
-        yield ServerSentEventGenerator.merge_fragments([Span(id="currentTime")(now)])
+        yield ServerSentEventGenerator.merge_fragments(Span(id="currentTime")(now))
         await asyncio.sleep(1)
         yield ServerSentEventGenerator.merge_signals({"currentTime": f"{now}"})
         await asyncio.sleep(1)

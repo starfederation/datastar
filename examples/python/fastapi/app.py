@@ -54,7 +54,7 @@ async def read_root():
 async def time_updates():
     while True:
         yield ServerSentEventGenerator.merge_fragments(
-            [f"""<span id="currentTime">{datetime.now().isoformat()}"""]
+            f"""<span id="currentTime">{datetime.now().isoformat()}"""
         )
         await asyncio.sleep(1)
         yield ServerSentEventGenerator.merge_signals({"currentTime": f"{datetime.now().isoformat()}"})

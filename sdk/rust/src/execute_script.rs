@@ -1,7 +1,7 @@
 //! [`ExecuteScript`] executes JavaScript in the browser.
 
 use {
-    crate::{consts, DatastarEvent},
+    crate::{DatastarEvent, consts},
     core::time::Duration,
 };
 
@@ -18,8 +18,7 @@ use {
 /// Sse(stream! {
 ///     yield ExecuteScript::new("console.log('Hello, world!')")
 ///         .auto_remove(false)
-///         .attributes(["type text/javascript"])
-///         .into();
+///         .attributes(["type text/javascript"]);
 /// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -27,10 +26,10 @@ use {
 pub struct ExecuteScript {
     /// `id` can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id>
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry>
     pub retry: Duration,
     /// `script` is a string that represents the JavaScript to be executed by the browser.
     pub script: String,
@@ -49,7 +48,7 @@ impl ExecuteScript {
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             script: script.into(),
             auto_remove: consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE,
-            attributes: vec![consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES.to_string()],
+            attributes: vec![consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES.to_owned()],
         }
     }
 
@@ -75,6 +74,12 @@ impl ExecuteScript {
     pub fn attributes(mut self, attributes: impl IntoIterator<Item = impl Into<String>>) -> Self {
         self.attributes = attributes.into_iter().map(Into::into).collect();
         self
+    }
+
+    /// Converts this [`ExecuteScript`] into a [`DatastarEvent`].
+    #[inline]
+    pub fn into_event(self) -> DatastarEvent {
+        self.into()
     }
 }
 

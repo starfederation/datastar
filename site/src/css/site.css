@@ -53,3 +53,36 @@ pre code {
 .prose ol, .prose ul {
     margin: 0 !important;
 }
+
+.video-wrapper .play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s, box-shadow 0.3s;
+    pointer-events: none; /* For poster-based videos, we rely on the poster click */
+}
+.video-wrapper .play-button::before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    margin-left: 2px; /* Nudge right for visual centering */
+    border-left: 18px solid #000;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+}
+.video-wrapper:hover .play-button {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}

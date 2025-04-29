@@ -5,6 +5,8 @@
 
 #[cfg(feature = "axum")]
 pub mod axum;
+#[cfg(feature = "rama")]
+pub mod rama;
 #[cfg(feature = "rocket")]
 pub mod rocket;
 
@@ -17,23 +19,22 @@ pub mod remove_signals;
 #[cfg(test)]
 mod testing;
 
-mod consts;
+pub mod consts;
 
 /// The prelude for the `datastar` crate
 pub mod prelude {
     #[cfg(feature = "axum")]
     pub use crate::axum::ReadSignals;
+    #[cfg(all(feature = "rama", not(feature = "axum")))]
+    pub use crate::rama::ReadSignals;
     pub use crate::{
-        consts::FragmentMergeMode, execute_script::ExecuteScript, merge_fragments::MergeFragments,
-        merge_signals::MergeSignals, remove_fragments::RemoveFragments,
-        remove_signals::RemoveSignals, DatastarEvent, Sse, TrySse,
+        DatastarEvent, Sse, TrySse, consts::FragmentMergeMode, execute_script::ExecuteScript,
+        merge_fragments::MergeFragments, merge_signals::MergeSignals,
+        remove_fragments::RemoveFragments, remove_signals::RemoveSignals,
     };
 }
 
-use {
-    core::{error::Error, fmt::Display, time::Duration},
-    futures_util::{Stream, TryStream},
-};
+use core::{fmt::Display, time::Duration};
 
 /// [`DatastarEvent`] is a struct that represents a generic Datastar event.
 /// All Datastar events implement `Into<DatastarEvent>`.
@@ -43,10 +44,10 @@ pub struct DatastarEvent {
     pub event: consts::EventType,
     /// `id` is can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id>
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry>
     pub retry: Duration,
     /// `data` is the data that is sent with the event.
     pub data: Vec<String>,
@@ -77,13 +78,8 @@ impl Display for DatastarEvent {
 
 /// [`Sse`] is a wrapper around a stream of [`DatastarEvent`]s.
 #[derive(Debug)]
-pub struct Sse<S>(pub S)
-where
-    S: Stream<Item = DatastarEvent> + Send + 'static;
+pub struct Sse<S>(pub S);
 
 /// [`TrySse`] is a wrapper around a stream of [`DatastarEvent`]s that can fail.
 #[derive(Debug)]
-pub struct TrySse<S>(pub S)
-where
-    S: TryStream<Ok = DatastarEvent> + Send + 'static,
-    S::Error: Into<Box<dyn Error + Send + Sync>>;
+pub struct TrySse<S>(pub S);

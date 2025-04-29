@@ -13,37 +13,49 @@ import (
 )
 
 var (
+	// ErrNoPathsProvided is returned when no paths were provided for // for [sse.RemoveSignals] call.
 	ErrNoPathsProvided = errors.New("no paths provided")
 )
 
-type MergeSignalsOptions struct {
+// mergeSignalsOptions holds configuration options for merging signals.
+type mergeSignalsOptions struct {
 	EventID       string
 	RetryDuration time.Duration
 	OnlyIfMissing bool
 }
 
-type MergeSignalsOption func(*MergeSignalsOptions)
+// MergeSignalsOption configures one [EventTypeMergeSignals] event.
+type MergeSignalsOption func(*mergeSignalsOptions)
 
+// WithMergeSignalsEventID configures an optional event ID for the signals merge event.
+// The client message field [lastEventId] will be set to this value.
+// If the next event does not have an event ID, the last used event ID will remain.
+//
+// [lastEventId]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/lastEventId
 func WithMergeSignalsEventID(id string) MergeSignalsOption {
-	return func(o *MergeSignalsOptions) {
+	return func(o *mergeSignalsOptions) {
 		o.EventID = id
 	}
 }
 
+// WithMergeSignalsRetryDuration overrides the [DefaultSseRetryDuration] for signal merging.
 func WithMergeSignalsRetryDuration(retryDuration time.Duration) MergeSignalsOption {
-	return func(o *MergeSignalsOptions) {
+	return func(o *mergeSignalsOptions) {
 		o.RetryDuration = retryDuration
 	}
 }
 
+// WithOnlyIfMissing instructs the client to only merge signals if they are missing.
 func WithOnlyIfMissing(onlyIfMissing bool) MergeSignalsOption {
-	return func(o *MergeSignalsOptions) {
+	return func(o *mergeSignalsOptions) {
 		o.OnlyIfMissing = onlyIfMissing
 	}
 }
 
+// MergeSignals sends a [EventTypeMergeSignals] to the client.
+// Requires a JSON-encoded payload.
 func (sse *ServerSentEventGenerator) MergeSignals(signalsContents []byte, opts ...MergeSignalsOption) error {
-	options := &MergeSignalsOptions{
+	options := &mergeSignalsOptions{
 		EventID:       "",
 		RetryDuration: DefaultSseRetryDuration,
 		OnlyIfMissing: false,
@@ -79,6 +91,8 @@ func (sse *ServerSentEventGenerator) MergeSignals(signalsContents []byte, opts .
 	return nil
 }
 
+// RemoveSignals sends a [EventTypeRemoveSignals] event to the client.
+// Requires a non-empty list of paths.
 func (sse *ServerSentEventGenerator) RemoveSignals(paths ...string) error {
 	if len(paths) == 0 {
 		return ErrNoPathsProvided
@@ -98,6 +112,12 @@ func (sse *ServerSentEventGenerator) RemoveSignals(paths ...string) error {
 	return nil
 }
 
+// ReadSignals extracts Datastar signals from
+// an HTTP request and unmarshals them into the signals target,
+// which should be a pointer to a struct.
+//
+// Expects signals in [URL.Query] for [http.MethodGet] requests.
+// Expects JSON-encoded signals in [Request.Body] for other request methods.
 func ReadSignals(r *http.Request, signals any) error {
 	var dsInput []byte
 

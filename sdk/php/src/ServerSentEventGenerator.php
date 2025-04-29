@@ -55,10 +55,10 @@ class ServerSentEventGenerator
         // Abort the process if the client closes the connection.
         ignore_user_abort(false);
 
-        // Sends the response headers only if not already sent.
+        // Sets the response headers only if not already sent and not yet set.
         if (!headers_sent()) {
             foreach (static::headers() as $name => $value) {
-                header("$name: $value");
+                header("$name: $value", false);
             }
         }
     }

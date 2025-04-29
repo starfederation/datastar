@@ -12,7 +12,7 @@ use {
 
 #[derive(Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
-pub enum TestEvent {
+pub(crate) enum TestEvent {
     #[serde(rename_all = "camelCase")]
     ExecuteScript {
         script: String,
@@ -53,11 +53,11 @@ pub enum TestEvent {
 }
 
 #[derive(Deserialize)]
-pub struct Signals {
+pub(crate) struct Signals {
     pub events: Vec<TestEvent>,
 }
 
-pub fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> {
+pub(crate) fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> + Send + 'static {
     stream! {
         for event in events {
             yield match event {
@@ -87,7 +87,7 @@ pub fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> {
                         retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
                         attributes,
                         auto_remove: auto_remove.unwrap_or(consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE),
-                    }.into()
+                    }.into_event()
                 },
                 TestEvent::MergeFragments {
                     fragments,
@@ -118,7 +118,7 @@ pub fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> {
                         selector,
                         merge_mode,
                         use_view_transition: use_view_transition.unwrap_or(consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS),
-                    }.into()
+                    }.into_event()
                 },
                 TestEvent::MergeSignals {
                     signals,
@@ -130,7 +130,7 @@ pub fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> {
                     id: event_id,
                     retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
                     only_if_missing: only_if_missing.unwrap_or(consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING),
-                }.into(),
+                }.into_event(),
                 TestEvent::RemoveFragments {
                     selector,
                     event_id,
@@ -141,7 +141,7 @@ pub fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> {
                     id: event_id,
                     retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
                     use_view_transition: use_view_transition.unwrap_or(consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS),
-                }.into(),
+                }.into_event(),
                 TestEvent::RemoveSignals {
                     paths,
                     event_id,
@@ -150,7 +150,7 @@ pub fn test(events: Vec<TestEvent>) -> impl Stream<Item = DatastarEvent> {
                     paths,
                     id: event_id,
                     retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
-                }.into(),
+                }.into_event(),
             }
         }
     }

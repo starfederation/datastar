@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>StarFederation.Datastar</AssemblyName>
-        <Version>1.0.0-beta.4</Version>
+        <Version>1.0.0-beta.5</Version>
         <RootNamespace>StarFederation.Datastar</RootNamespace>
         <Nullable>disabled</Nullable>
 
