@@ -4,7 +4,7 @@
 //! <https://github.com/plabayo/rama>.
 
 use {
-    crate::{Sse, TrySse, prelude::DatastarEvent},
+    crate::{Sse, TrySse, consts::DATASTAR_REQ_HEADER_STR, prelude::DatastarEvent},
     bytes::Bytes,
     futures_util::{Stream, StreamExt},
     pin_project_lite::pin_project,
@@ -14,7 +14,7 @@ use {
             Body, BodyExtractExt, IntoResponse, Method, Request, Response, StatusCode,
             dep::http_body::{Body as HttpBody, Frame},
             header,
-            service::web::extract::{FromRequest, Query},
+            service::web::extract::{FromRequest, OptionalFromRequest, Query},
         },
     },
     serde::{Deserialize, de::DeserializeOwned},
@@ -148,35 +148,84 @@ where
     }
 }
 
+impl<T> OptionalFromRequest for ReadSignals<T>
+where
+    T: DeserializeOwned + Send + Sync + 'static,
+{
+    type Rejection = Response;
+
+    async fn from_request(req: Request) -> Result<Option<Self>, Self::Rejection> {
+        if req.headers().get(DATASTAR_REQ_HEADER_STR).is_none() {
+            return Ok(None);
+        }
+        Ok(Some(<Self as FromRequest>::from_request(req).await?))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use {
         super::Sse,
         crate::{
             rama::ReadSignals,
-            testing::{self, Signals},
+            testing::{self, Signals, base_test_server},
         },
         rama::{
             error::BoxError,
-            http::{IntoResponse, server::HttpServer, service::web::Router},
+            graceful::Shutdown,
+            http::{IntoResponse, response::Html, server::HttpServer, service::web::Router},
             net::address::SocketAddress,
             rt::Executor,
+            tcp::server::TcpListener,
         },
     };
 
-    async fn test(ReadSignals(signals): ReadSignals<Signals>) -> impl IntoResponse {
+    async fn base_test_endpoint_required(
+        ReadSignals(signals): ReadSignals<Signals>,
+    ) -> impl IntoResponse {
         Sse(testing::test(signals.events))
     }
 
+    async fn base_test_endpoint_optional(
+        signals: Option<ReadSignals<Signals>>,
+    ) -> impl IntoResponse {
+        match signals {
+            Some(ReadSignals(signals)) => Sse(testing::test(signals.events)).into_response(),
+            None => Html("Hello").into_response(),
+        }
+    }
+
     #[tokio::test]
-    #[ignore]
-    async fn sdk_test() -> Result<(), BoxError> {
-        HttpServer::auto(Executor::default())
-            .listen(
-                SocketAddress::local_ipv4(3000),
-                Router::new().get("/test", test).post("/test", test),
-            )
-            .await?;
+    async fn sdk_base_test() -> Result<(), BoxError> {
+        let listener = TcpListener::bind(SocketAddress::local_ipv4(0)).await?;
+        let local_addr = listener.local_addr()?;
+
+        let base_url = format!("http://{local_addr}");
+
+        let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
+        let shutdown = Shutdown::new(shutdown_rx);
+
+        let listener_guard = shutdown.guard();
+
+        let server_task = tokio::spawn(async move {
+            listener
+                .serve_graceful(
+                    listener_guard,
+                    HttpServer::auto(Executor::default()).service(
+                        Router::new()
+                            .get("/base/test", base_test_endpoint_required)
+                            .post("/base/test", base_test_endpoint_required)
+                            .get("/base/test-opt", base_test_endpoint_optional)
+                            .post("/base/test-opt", base_test_endpoint_optional),
+                    ),
+                )
+                .await;
+        });
+
+        base_test_server(&base_url).await;
+
+        shutdown_tx.send(()).expect("trigger shutdown signal");
+        server_task.await.expect("server task to finish gracefully");
 
         Ok(())
     }

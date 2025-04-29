@@ -251,6 +251,7 @@ mod tests {
 
         shutdown_tx.send(()).expect("trigger shutdown signal");
         server_result_rx.await??;
+
         Ok(())
     }
 }
