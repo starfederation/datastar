@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	datastar "github.com/starfederation/datastar/sdk/go"
+	"github.com/starfederation/datastar/sdk/go/datastar"
 )
 
 type OnLoadSignals struct {
@@ -13,7 +13,7 @@ type OnLoadSignals struct {
 }
 
 func setupTestsOnLoad(testsRouter chi.Router) error {
-	
+
 	testsRouter.Get("/on_load/data", func(w http.ResponseWriter, r *http.Request) {
 		signals := &OnLoadSignals{}
 		if err := datastar.ReadSignals(r, signals); err != nil {

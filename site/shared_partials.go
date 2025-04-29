@@ -22,7 +22,7 @@ import (
 	mdhtml "github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
 	build "github.com/starfederation/datastar/build"
-	datastar "github.com/starfederation/datastar/sdk/go"
+	"github.com/starfederation/datastar/sdk/go/datastar"
 	"github.com/valyala/bytebufferpool"
 )
 

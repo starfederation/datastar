@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	datastar "github.com/starfederation/datastar/sdk/go"
+	"github.com/starfederation/datastar/sdk/go/datastar"
 )
 
 const (
