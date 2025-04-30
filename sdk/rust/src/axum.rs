@@ -1,8 +1,9 @@
 //! Axum integration for Datastar.
 
 use {
-    crate::{consts::DATASTAR_REQ_HEADER, prelude::DatastarEvent, Sse, TrySse},
+    crate::{Sse, TrySse, consts::DATASTAR_REQ_HEADER_STR, prelude::DatastarEvent},
     axum::{
+        Json,
         body::{Body, Bytes, HttpBody},
         extract::{FromRequest, OptionalFromRequest, Query, Request},
         http::{self},
@@ -16,7 +17,7 @@ use {
     futures_util::{Stream, StreamExt},
     http_body::Frame,
     pin_project_lite::pin_project,
-    serde::{de::DeserializeOwned, Deserialize},
+    serde::{Deserialize, de::DeserializeOwned},
     sync_wrapper::SyncWrapper,
 };
 
@@ -118,18 +119,13 @@ where
 {
     type Rejection = Response;
 
-    async fn from_request(
-        req: Request,
-        state: &S,
-    ) -> Result<Option<Self>, Self::Rejection> {
-        if let None = req.headers().get(DATASTAR_REQ_HEADER) {
-            return Ok(None) 
+    async fn from_request(req: Request, state: &S) -> Result<Option<Self>, Self::Rejection> {
+        if req.headers().get(DATASTAR_REQ_HEADER_STR).is_none() {
+            return Ok(None);
         }
-        let result = <Self as FromRequest<S>>::from_request(req, state).await;
-        match result {
-            Ok(v) => Ok(Some(v)),
-            Err(e) => Err(e) 
-        }
+        Ok(Some(
+            <Self as FromRequest<S>>::from_request(req, state).await?,
+        ))
     }
 }
 
@@ -147,21 +143,42 @@ where
                     .map_err(IntoResponse::into_response)?;
 
                 let signals = query.0.datastar.as_str().ok_or(
-                    (http::StatusCode::BAD_REQUEST, "Failed to parse JSON").into_response(),
+                    (http::StatusCode::BAD_REQUEST, "Failed to parse JSON str").into_response(),
                 )?;
 
-                serde_json::from_str(signals)
+                serde_json::from_str(signals).map_err(
+                    #[cfg_attr(not(feature = "tracing"), expect(unused_variables))]
+                    |err| {
+                        #[cfg(feature = "tracing")]
+                        tracing::debug!(%err, "failed to parse JSON value");
+
+                        (
+                            http::StatusCode::BAD_REQUEST,
+                            "Failed to parse JSON value from query",
+                        )
+                            .into_response()
+                    },
+                )
             }
             _ => {
-                let body = Bytes::from_request(req, state)
+                let Json(json) = <Json<T> as FromRequest<S>>::from_request(req, state)
                     .await
-                    .map_err(IntoResponse::into_response)?;
+                    .map_err(
+                        #[cfg_attr(not(feature = "tracing"), expect(unused_variables))]
+                        |err| {
+                            #[cfg(feature = "tracing")]
+                            tracing::debug!(%err, "failed to parse JSON value from payload");
 
-                serde_json::from_slice(&body)
+                            (
+                                http::StatusCode::BAD_REQUEST,
+                                "Failed to parse JSON value from payload",
+                            )
+                                .into_response()
+                        },
+                    )?;
+                Ok(json)
             }
-        }
-        .map_err(|_| (http::StatusCode::BAD_REQUEST, "Failed to parse JSON").into_response())?;
-
+        }?;
         Ok(Self(json))
     }
 }
@@ -172,38 +189,68 @@ mod tests {
         super::Sse,
         crate::{
             prelude::ReadSignals,
-            testing::{self, Signals},
+            testing::{self, Signals, base_test_server},
         },
         axum::{
             Router,
-            response::IntoResponse,
+            response::{Html, IntoResponse},
             routing::{get, post},
         },
         tokio::net::TcpListener,
+        tracing_test::traced_test,
     };
 
-    async fn test(ReadSignals(signals): ReadSignals<Signals>) -> impl IntoResponse {
+    async fn base_test_endpoint_required(
+        ReadSignals(signals): ReadSignals<Signals>,
+    ) -> impl IntoResponse {
         Sse(testing::test(signals.events))
     }
-    
-    async fn test2(signals: Option<ReadSignals<Signals>>) -> impl IntoResponse {
+
+    async fn base_test_endpoint_optional(
+        signals: Option<ReadSignals<Signals>>,
+    ) -> impl IntoResponse {
         match signals {
-            Some(ReadSignals(signals)) => Sse(testing::test(signals.events)),
-            None => Sse(testing::test(Vec::new())) 
+            Some(ReadSignals(signals)) => Sse(testing::test(signals.events)).into_response(),
+            None => Html("<p>Hello</p>").into_response(),
         }
     }
 
     #[tokio::test]
-    #[ignore]
-    async fn sdk_test() -> Result<(), Box<dyn core::error::Error>> {
-        let listener = TcpListener::bind("127.0.0.1:3000").await?;
-        let app = Router::new()
-            .route("/test", get(test))
-            .route("/test", post(test))
-            .route("/opt_test", get(test2))
-            .route("/opt_test", post(test2));
+    #[traced_test]
+    async fn sdk_base_test() -> Result<(), Box<dyn core::error::Error>> {
+        let listener = TcpListener::bind("127.0.0.1:0").await?;
+        let local_addr = listener.local_addr()?;
 
-        axum::serve(listener, app).await?;
+        let base_url = format!("http://{local_addr}");
+
+        let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
+        let shutdown_signal = async move {
+            shutdown_rx
+                .await
+                .expect("to have no shutdown signal error on receival");
+        };
+
+        let app = Router::new()
+            .route("/base/test", get(base_test_endpoint_required))
+            .route("/base/test", post(base_test_endpoint_required))
+            .route("/base/test-opt", get(base_test_endpoint_optional))
+            .route("/base/test-opt", post(base_test_endpoint_optional));
+
+        let (server_result_tx, server_result_rx) = tokio::sync::oneshot::channel();
+        tokio::spawn(async move {
+            server_result_tx
+                .send(
+                    axum::serve(listener, app)
+                        .with_graceful_shutdown(shutdown_signal)
+                        .await,
+                )
+                .expect("send axum serve result upstream over oneshot ch");
+        });
+
+        base_test_server(&base_url).await;
+
+        shutdown_tx.send(()).expect("trigger shutdown signal");
+        server_result_rx.await??;
 
         Ok(())
     }
