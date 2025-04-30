@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	datastar "github.com/starfederation/datastar/sdk/go"
+	"github.com/starfederation/datastar/sdk/go/datastar"
 )
 
 func setupHowTosPolling(howTosRouter chi.Router) error {
@@ -15,12 +15,12 @@ func setupHowTosPolling(howTosRouter chi.Router) error {
 
 		dataRouter.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			sse := datastar.NewSSE(w, r)
-            currentTime := time.Now().Format("2006-01-02 15:04:05")
+			currentTime := time.Now().Format("2006-01-02 15:04:05")
 			currentSeconds := time.Now().Format("05")
 			duration := 1
-            if currentSeconds < "50" {
-                duration = 5
-            }
+			if currentSeconds < "50" {
+				duration = 5
+			}
 			sse.MergeFragments(fmt.Sprintf(`
 				<div id="time" data-on-interval__duration.%ds="@get('/how_tos/polling/data')" class="text-primary font-bold">
 					%s

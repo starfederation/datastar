@@ -130,7 +130,7 @@ func writeOutConsts(version string) error {
 		"library/src/engine/consts.ts": datastarClientConsts,
 		"library/package.json":         datastarClientPackageJSON,
 		"sdk/clojure/sdk/src/main/starfederation/datastar/clojure/consts.clj": clojureConsts,
-		"sdk/go/consts.go":                                                                 goConsts,
+		"sdk/go/datastar/consts.go":                                                        goConsts,
 		"sdk/dotnet/src/Consts.fs":                                                         dotnetConsts,
 		"sdk/php/src/Consts.php":                                                           phpConsts,
 		"sdk/php/src/enums/EventType.php":                                                  phpEventType,

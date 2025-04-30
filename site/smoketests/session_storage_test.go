@@ -5,7 +5,7 @@ import (
 
 	"github.com/Jeffail/gabs/v2"
 	"github.com/go-rod/rod"
-	datastar "github.com/starfederation/datastar/sdk/go"
+	"github.com/starfederation/datastar/sdk/go/datastar"
 	"github.com/stretchr/testify/assert"
 )
 

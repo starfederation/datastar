@@ -6,22 +6,22 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	datastar "github.com/starfederation/datastar/sdk/go"
+	"github.com/starfederation/datastar/sdk/go/datastar"
 )
 
 func setupExamplesQuizSlow(examplesRouter chi.Router) error {
 
 	examplesRouter.Get("/quiz_slow/data", func(w http.ResponseWriter, r *http.Request) {
-        type Signals struct {
-            LastQuestionId int `json:"lastQuestionId1"`
-        }
-        signals := &Signals{
+		type Signals struct {
+			LastQuestionId int `json:"lastQuestionId1"`
+		}
+		signals := &Signals{
 			LastQuestionId: 0,
 		}
-        if err := datastar.ReadSignals(r, signals); err != nil {
-            http.Error(w, err.Error(), http.StatusBadRequest)
-            return
-        }
+		if err := datastar.ReadSignals(r, signals); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
 		sse := datastar.NewSSE(w, r)
 		questionID := randomQuestionId(signals.LastQuestionId)

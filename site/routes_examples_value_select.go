@@ -6,7 +6,7 @@ import (
 	"github.com/delaneyj/toolbelt"
 	"github.com/go-chi/chi/v5"
 	"github.com/samber/lo"
-	datastar "github.com/starfederation/datastar/sdk/go"
+	"github.com/starfederation/datastar/sdk/go/datastar"
 )
 
 func setupExamplesValueSelect(examplesRouter chi.Router) error {

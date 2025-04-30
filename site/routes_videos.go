@@ -5,12 +5,12 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	datastar "github.com/starfederation/datastar/sdk/go"
+	"github.com/starfederation/datastar/sdk/go/datastar"
 )
 
 type Video struct {
-    Code  string
-    Title string
+	Code  string
+	Title string
 }
 
 func setupVideos(router chi.Router) error {
@@ -36,7 +36,7 @@ func setupVideos(router chi.Router) error {
 		{Code: "aVjU1st-52g", Title: "Intro to Datastar (and Craft CMS)"},
 		{Code: "FMKdE4QFyNk", Title: "Puffy does Realtime Hypermedia - Patrick Marchand - EuroBSDCon 2024"},
 	}
-	
+
 	router.Route("/videos", func(videosRouter chi.Router) {
 		videosRouter.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			PageVideos(r, videos...).Render(r.Context(), w)
@@ -44,7 +44,7 @@ func setupVideos(router chi.Router) error {
 
 		videosRouter.Get("/data/{index}", func(w http.ResponseWriter, r *http.Request) {
 			sse := datastar.NewSSE(w, r)
-			
+
 			indexStr := chi.URLParam(r, "index")
 			if indexStr == "" {
 				http.Error(w, "Missing index", http.StatusBadRequest)
