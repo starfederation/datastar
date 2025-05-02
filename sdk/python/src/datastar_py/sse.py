@@ -114,9 +114,8 @@ class ServerSentEventGenerator:
         if only_if_missing:
             data_lines.append(f"data: {consts.ONLY_IF_MISSING_DATALINE_LITERAL} true")
 
-        data_lines.extend(
-            f"data: {consts.SIGNALS_DATALINE_LITERAL} {signalLine}"
-            for signalLine in json.dumps(signals, indent=2).splitlines()
+        data_lines.append(
+            f"data: {consts.SIGNALS_DATALINE_LITERAL} {json.dumps(signals)}"
         )
 
         return ServerSentEventGenerator._send(
