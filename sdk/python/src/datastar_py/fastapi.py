@@ -8,10 +8,10 @@ from .starlette import DatastarStreamingResponse, read_signals
 __all__ = [
     "SSE_HEADERS",
     "ServerSentEventGenerator",
-    "SignalsDep",
+    "ReadSignals",
     "read_signals",
     "DatastarStreamingResponse",
 ]
 
 
-SignalsDep = Annotated[dict[str, Any], Depends(read_signals)]
+ReadSignals = Annotated[dict[str, Any], Depends(read_signals)]
