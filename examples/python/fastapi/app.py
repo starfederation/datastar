@@ -84,11 +84,14 @@ async def updates2():
 # This is also identical, but yielding a string of fragments automatically calls merge_fragments
 # and dicts automatically calls merge_signals
 @app.get("/updates3")
+# Wraps the resulting async generator in a DatastarStreamingResponse
 @sse_generator
 async def updates3():
     while True:
+        # Implicit merge_fragments
         yield f"""<span id="currentTime">{datetime.now().isoformat()}"""
         await asyncio.sleep(1)
+        # Implicit merge_signals
         yield {"currentTime": f"{datetime.now().isoformat()}"}
         await asyncio.sleep(1)
 

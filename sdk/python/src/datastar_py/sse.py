@@ -1,6 +1,17 @@
+from __future__ import annotations
+
 import json
 from itertools import chain
-from typing import Optional, Protocol, Union, runtime_checkable
+from typing import (
+    Optional,
+    Protocol,
+    Union,
+    runtime_checkable,
+    Callable,
+    AsyncIterable,
+    TypeVar,
+    Iterable,
+)
 
 import datastar_py.consts as consts
 
@@ -178,8 +189,10 @@ class ServerSentEventGenerator:
         return cls.execute_script(f"setTimeout(() => window.location = '{location}')")
 
 
-def _wrap_event(event):
-    if isinstance(event, _HtmlProvider) or (isinstance(event, str) and event.startswith("<")):
+def _wrap_event(event: str | _HtmlProvider | dict) -> str:
+    if isinstance(event, _HtmlProvider) or (
+        isinstance(event, str) and event.startswith("<")
+    ):
         return ServerSentEventGenerator.merge_fragments(event)
     elif isinstance(event, dict):
         return ServerSentEventGenerator.merge_signals(event)
@@ -187,6 +200,18 @@ def _wrap_event(event):
         return event
 
 
-async def _async_map(func, async_iter):
+async def _async_map(func: Callable, async_iter: AsyncIterable) -> AsyncIterable:
     async for item in async_iter:
         yield func(item)
+
+
+SyncOrAsyncIterable = TypeVar("SyncOrAsyncIterable", AsyncIterable, Iterable)
+
+
+def _sse_iterable_wrapper(iterable: SyncOrAsyncIterable) -> SyncOrAsyncIterable:
+    """Wraps an iterable to allow implicitly turning fragments and dictionaries
+    into merge-fragments and merge-signals events."""
+    if isinstance(iterable, AsyncIterable):
+        return _async_map(_wrap_event, iterable)
+    else:
+        return map(_wrap_event, iterable)
