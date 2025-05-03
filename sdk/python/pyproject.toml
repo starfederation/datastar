@@ -43,6 +43,7 @@ dev = [
     "sanic>=24.6.0",
     "starlette>=0.46.1",
     "uvicorn>=0.32.1",
+    "litestar>=2.15.2",
 ]
 
 [tool.hatch.version]
