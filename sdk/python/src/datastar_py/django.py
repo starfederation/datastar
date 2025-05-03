@@ -3,7 +3,7 @@ from functools import wraps
 
 from django.http import StreamingHttpResponse as _StreamingHttpResponse
 
-from .sse import SSE_HEADERS, ServerSentEventGenerator, _async_map, _wrap_event
+from .sse import SSE_HEADERS, ServerSentEventGenerator, _sse_iterable_wrapper
 
 
 class DatastarStreamingHttpResponse(_StreamingHttpResponse):
@@ -17,10 +17,5 @@ def sse_generator(generator_func):
     @wraps(generator_func)
     def _wrapper(*args, **kwargs):
         content = generator_func(*args, **kwargs)
-        if isinstance(content, typing.AsyncIterable):
-            content = _async_map(_wrap_event, content)
-        else:
-            content = map(_wrap_event, content)
-
-        return DatastarStreamingHttpResponse(content)
+        return DatastarStreamingHttpResponse(_sse_iterable_wrapper(content))
     return _wrapper
