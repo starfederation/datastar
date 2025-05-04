@@ -19,6 +19,11 @@ pub mod remove_signals;
 #[cfg(test)]
 mod testing;
 
+#[doc = include_str!("../README.md")]
+#[cfg(doctest)]
+#[expect(unused)]
+struct ReadmeDoctests;
+
 pub mod consts;
 
 /// The prelude for the `datastar` crate
