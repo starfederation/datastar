@@ -1,6 +1,6 @@
 import (
 	"time"
-    datastar "github.com/starfederation/datastar/sdk/go"
+    "github.com/starfederation/datastar/sdk/go/datastar"
 )
 
 sse := datastar.NewSSE(w, r)

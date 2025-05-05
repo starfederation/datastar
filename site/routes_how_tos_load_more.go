@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	datastar "github.com/starfederation/datastar/sdk/go"
+	"github.com/starfederation/datastar/sdk/go/datastar"
 )
 
 type OffsetSignals struct {
@@ -35,7 +35,7 @@ func setupHowTosLoadMore(howTosRedirect chi.Router) error {
 				} else {
 					sse.RemoveFragments(`#load-more`)
 				}
-			
+
 				sse.MergeFragments(fmt.Sprintf(`<div class="text-primary font-bold">Item %d</div>`, newOffset),
 					datastar.WithSelectorID("list"),
 					datastar.WithMergeMode(datastar.FragmentMergeModeAppend),

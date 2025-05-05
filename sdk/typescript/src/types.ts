@@ -22,6 +22,13 @@ import type { Jsonifiable } from "npm:type-fest";
 export type FragmentMergeMode = typeof FragmentMergeModes[number];
 export type EventType = typeof EventTypes[number];
 
+export type StreamOptions = Partial<{
+  onError: (error: unknown) => Promise<void> | void;
+  onAbort: (reason?: string) => Promise<void> | void;
+  responseInit: ResponseInit;
+  keepalive: boolean;
+}>
+
 export interface DatastarEventOptions {
   eventId?: string;
   retryDuration?: number;

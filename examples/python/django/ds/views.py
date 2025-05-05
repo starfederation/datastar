@@ -4,7 +4,7 @@ from datetime import datetime
 
 from django.http import HttpResponse
 
-from datastar_py.django import DatastarStreamingHttpResponse
+from datastar_py.django import DatastarStreamingHttpResponse, ServerSentEventGenerator
 
 
 # ASGI Example
@@ -51,11 +51,11 @@ async def home_asgi(request):
 async def updates_asgi(request):
     async def time_updates():
         while True:
-            yield DatastarStreamingHttpResponse.merge_fragments(
+            yield ServerSentEventGenerator.merge_fragments(
                 f"""<span id="currentTime">{datetime.now().isoformat()}"""
             )
             await asyncio.sleep(1)
-            yield DatastarStreamingHttpResponse.merge_signals(
+            yield ServerSentEventGenerator.merge_signals(
                 {"currentTime": f"{datetime.now().isoformat()}"}
             )
             await asyncio.sleep(1)
@@ -109,11 +109,11 @@ def home_wsgi(request):
 def updates_wsgi(request):
     def time_updates():
         while True:
-            yield DatastarStreamingHttpResponse.merge_fragments(
+            yield ServerSentEventGenerator.merge_fragments(
                 f"""<span id="currentTime">{datetime.now().isoformat()}"""
             )
             time.sleep(0.5)
-            yield DatastarStreamingHttpResponse.merge_signals(
+            yield ServerSentEventGenerator.merge_signals(
                 {"currentTime": f"{datetime.now().isoformat()}"}
             )
             time.sleep(0.5)

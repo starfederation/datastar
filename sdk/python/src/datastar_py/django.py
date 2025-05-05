@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-class DatastarStreamingHttpResponse(_StreamingHttpResponse, ServerSentEventGenerator):
+class DatastarStreamingHttpResponse(_StreamingHttpResponse):
     @wraps(_StreamingHttpResponse.__init__)
     def __init__(self, *args, **kwargs):
         kwargs["headers"] = {**SSE_HEADERS, **kwargs.get("headers", {})}

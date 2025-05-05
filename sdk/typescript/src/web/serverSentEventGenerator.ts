@@ -1,4 +1,4 @@
-import { DatastarEventOptions, EventType, sseHeaders } from "../types.ts";
+import { DatastarEventOptions, EventType, sseHeaders, StreamOptions } from "../types.ts";
 import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator.ts";
 
 import type { Jsonifiable } from "npm:type-fest";
@@ -41,12 +41,7 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
    */
   static stream(
     onStart: (stream: ServerSentEventGenerator) => Promise<void> | void,
-    options?: Partial<{
-      onError: (error: unknown) => Promise<void> | void;
-      onAbort: (reason: string) => Promise<void> | void;
-      responseInit: ResponseInit;
-      keepalive: boolean;
-    }>,
+    options?: StreamOptions,
   ): Response {
     const readableStream = new ReadableStream({
       async start(controller) {

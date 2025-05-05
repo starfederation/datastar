@@ -3,8 +3,8 @@
 
 use {
     crate::{
-        consts::{self, FragmentMergeMode},
         DatastarEvent,
+        consts::{self, FragmentMergeMode},
     },
     core::time::Duration,
 };
@@ -25,18 +25,17 @@ use {
 ///     yield MergeFragments::new("<h1>Hello, world!</h1>")
 ///         .selector("body")
 ///         .merge_mode(FragmentMergeMode::Append)
-///         .use_view_transition(true)
-///         .into();
+///         .use_view_transition(true);
 /// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MergeFragments {
     /// `id` is can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id>
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry>
     pub retry: Duration,
     /// The HTML fragments to merge into the DOM.
     pub fragments: String,
@@ -91,6 +90,12 @@ impl MergeFragments {
     pub fn use_view_transition(mut self, use_view_transition: bool) -> Self {
         self.use_view_transition = use_view_transition;
         self
+    }
+
+    /// Converts this [`MergeFragments`] into a [`DatastarEvent`].
+    #[inline]
+    pub fn into_event(self) -> DatastarEvent {
+        self.into()
     }
 }
 

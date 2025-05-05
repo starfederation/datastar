@@ -10,7 +10,7 @@ requires-python = ">=3.9"
 dependencies = []
 dynamic=["version"]
 license = {text = "MIT"}
-keywords = ["datastar", "django", "fastapi", "fasthtml", "flask", "quart", "sanic", "html"]
+keywords = ["datastar", "django", "fastapi", "fasthtml", "flask", "litestar", "quart", "sanic", "starlette", "html"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
@@ -37,12 +37,13 @@ build-backend = "hatchling.build"
 dev = [
     "django>=4.2.17",
     "fastapi[standard]>=0.115.4",
-    #    "fasthtml>=0.12.0",
+    "python-fasthtml>=0.12.0; python_version > '3.10'",
     "flask[async]>=3.0.3",
     "quart>=0.19.9",
     "sanic>=24.6.0",
     "starlette>=0.46.1",
     "uvicorn>=0.32.1",
+    "litestar>=2.15.2",
 ]
 
 [tool.hatch.version]

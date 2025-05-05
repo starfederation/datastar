@@ -10,7 +10,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/go-chi/chi/v5"
 	"github.com/goccy/go-json"
-	datastar "github.com/starfederation/datastar/sdk/go"
+	"github.com/starfederation/datastar/sdk/go/datastar"
 	"github.com/zeebo/xxh3"
 )
 

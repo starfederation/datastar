@@ -1,7 +1,7 @@
 //! [`MergeSignals`] sends one or more signals to the browser to be merged into the signals.
 
 use {
-    crate::{consts, DatastarEvent},
+    crate::{DatastarEvent, consts},
     core::time::Duration,
 };
 
@@ -17,18 +17,17 @@ use {
 ///
 /// Sse(stream! {
 ///     yield MergeSignals::new("{foo: 1234}")
-///         .only_if_missing(true)
-///         .into();
+///         .only_if_missing(true);
 /// });
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MergeSignals {
     /// `id` can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id>
     pub id: Option<String>,
     /// `retry` is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost.
-    /// For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
+    /// For more details see <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry>
     pub retry: Duration,
     /// `signals` is a JavaScript object or JSON string that will be sent to the browser to update signals in the signals.
     /// The data ***must*** evaluate to a valid JavaScript. It will be converted to signals by the Datastar client side.
@@ -65,6 +64,12 @@ impl MergeSignals {
     pub fn only_if_missing(mut self, only_if_missing: bool) -> Self {
         self.only_if_missing = only_if_missing;
         self
+    }
+
+    /// Converts this [`MergeSignals`] into a [`DatastarEvent`].
+    #[inline]
+    pub fn into_event(self) -> DatastarEvent {
+        self.into()
     }
 }
 

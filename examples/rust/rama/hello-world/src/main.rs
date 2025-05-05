@@ -50,7 +50,7 @@ pub struct Signals {
 async fn hello_world(ReadSignals(signals): ReadSignals<Signals>) -> impl IntoResponse {
     Sse(stream! {
         for i in 0..MESSAGE.len() {
-            yield MergeFragments::new(format!("<div id='message'>{}</div>", &MESSAGE[0..i + 1])).into();
+            yield MergeFragments::new(format!("<div id='message'>{}</div>", &MESSAGE[0..i + 1]));
             tokio::time::sleep(Duration::from_millis(signals.delay)).await;
         }
     })

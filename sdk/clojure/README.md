@@ -43,7 +43,7 @@ To your `deps.edn` file you can add the following coordinates:
                 :git/sha "LATEST_SHA"
                 :deps/root "sdk/clojure/adapter-ring"}
 
- ring-compliant/adapter "Coordinate for the ring compliant adater you want to use."}
+ ring-compliant/adapter "Coordinate for the ring compliant adapter you want to use."}
 ```
 
 By ring compliant adapter we mean adapters that are implementing the
