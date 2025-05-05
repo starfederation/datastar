@@ -86,6 +86,7 @@ pre_commit_hooks = []
 post_commit_hooks = []
 
 [tool.ruff]
+line-length = 99
 exclude = [
   "src/datastar_py/consts.py",
 ]
