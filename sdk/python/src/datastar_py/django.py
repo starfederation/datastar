@@ -7,7 +7,7 @@ from typing import Any
 from django.http import HttpRequest
 from django.http import StreamingHttpResponse as _StreamingHttpResponse
 
-from .sse import SSE_HEADERS, ServerSentEventGenerator
+from .sse import SSE_HEADERS, ServerSentEventGenerator, _read_signals
 
 __all__ = [
     "SSE_HEADERS",
@@ -25,12 +25,4 @@ class DatastarStreamingHttpResponse(_StreamingHttpResponse):
 
 
 def read_signals(request: HttpRequest) -> dict[str, Any] | None:
-    if not request.headers.get("Datastar-Request"):
-        return None
-    if request.method == "GET":
-        if "datastar" not in request.GET:
-            return None
-        return json.loads(request.GET["datastar"])
-    elif request.headers.get("Content-Type") == "application/json":
-        return json.loads(request.body)
-    return None
+    return _read_signals(request.method, request.headers, request.GET, request.body)

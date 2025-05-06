@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import json
+from collections.abc import Mapping
 from itertools import chain
-from typing import Optional, Protocol, Union, runtime_checkable
+from typing import Any, Optional, Protocol, Union, runtime_checkable
 
 import datastar_py.consts as consts
 
@@ -59,23 +62,16 @@ class ServerSentEventGenerator:
             fragments = fragments.__html__()
         data_lines = []
         if merge_mode:
-            data_lines.append(
-                f"data: {consts.MERGE_MODE_DATALINE_LITERAL} {merge_mode}"
-            )
+            data_lines.append(f"data: {consts.MERGE_MODE_DATALINE_LITERAL} {merge_mode}")
         if selector:
             data_lines.append(f"data: {consts.SELECTOR_DATALINE_LITERAL} {selector}")
         if use_view_transition:
-            data_lines.append(
-                f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} true"
-            )
+            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} true")
         else:
-            data_lines.append(
-                f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} false"
-            )
+            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} false")
 
         data_lines.extend(
-            f"data: {consts.FRAGMENTS_DATALINE_LITERAL} {x}"
-            for x in fragments.splitlines()
+            f"data: {consts.FRAGMENTS_DATALINE_LITERAL} {x}" for x in fragments.splitlines()
         )
 
         return ServerSentEventGenerator._send(
@@ -97,13 +93,9 @@ class ServerSentEventGenerator:
         if selector:
             data_lines.append(f"data: {consts.SELECTOR_DATALINE_LITERAL} {selector}")
         if use_view_transition:
-            data_lines.append(
-                f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} true"
-            )
+            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} true")
         else:
-            data_lines.append(
-                f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} false"
-            )
+            data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} false")
 
         return ServerSentEventGenerator._send(
             consts.EventType.REMOVE_FRAGMENTS,
@@ -124,9 +116,7 @@ class ServerSentEventGenerator:
         if only_if_missing:
             data_lines.append(f"data: {consts.ONLY_IF_MISSING_DATALINE_LITERAL} true")
 
-        data_lines.append(
-            f"data: {consts.SIGNALS_DATALINE_LITERAL} {json.dumps(signals)}"
-        )
+        data_lines.append(f"data: {consts.SIGNALS_DATALINE_LITERAL} {json.dumps(signals)}")
 
         return ServerSentEventGenerator._send(
             consts.EventType.MERGE_SIGNALS, data_lines, event_id, retry_duration
@@ -141,9 +131,7 @@ class ServerSentEventGenerator:
     ):
         data_lines = []
 
-        data_lines.extend(
-            f"data: {consts.PATHS_DATALINE_LITERAL} {path}" for path in paths
-        )
+        data_lines.extend(f"data: {consts.PATHS_DATALINE_LITERAL} {path}" for path in paths)
 
         return ServerSentEventGenerator._send(
             consts.EventType.REMOVE_SIGNALS,
@@ -186,3 +174,17 @@ class ServerSentEventGenerator:
     @classmethod
     def redirect(cls, location: str):
         return cls.execute_script(f"setTimeout(() => window.location = '{location}')")
+
+
+def _read_signals(
+    method: str, headers: Mapping, params: Mapping, body: str | bytes
+) -> dict[str, Any] | None:
+    if "Datastar-Request" not in headers:
+        return None
+    if method == "GET":
+        data = params.get("datastar")
+    elif headers.get("Content-Type") == "application/json":
+        data = body
+    else:
+        return None
+    return json.loads(data) if data else None

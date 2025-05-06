@@ -6,7 +6,7 @@ from typing import Any
 from quart import make_response as _make_response
 from quart import request
 
-from .sse import SSE_HEADERS, ServerSentEventGenerator
+from .sse import SSE_HEADERS, ServerSentEventGenerator, _read_signals
 
 __all__ = [
     "SSE_HEADERS",
@@ -23,12 +23,4 @@ async def make_datastar_response(async_generator):
 
 
 async def read_signals() -> dict[str, Any] | None:
-    if not request.headers.get("Datastar-Request"):
-        return None
-    if request.method == "GET":
-        if "datastar" not in request.args:
-            return None
-        return json.loads(request.args["datastar"])
-    elif request.headers.get("Content-Type") == "application/json":
-        return await request.get_json()
-    return None
+    return _read_signals(request.method, request.headers, request.args, await request.get_data())
