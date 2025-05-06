@@ -59,4 +59,5 @@ async def updates(request):
     return DatastarStreamingResponse(clock())
 
 
-serve()
+if __name__ == '__main__':
+    serve()

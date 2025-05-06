@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 
+import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
@@ -19,7 +20,7 @@ HTML = """\
 		<head>
 			<title>DATASTAR on FastAPI</title>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script>
+            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.11/bundles/datastar.js"></script>
 			<style>
             html, body { height: 100%; width: 100%; }
             body { background-image: linear-gradient(to right bottom, oklch(0.424958 0.052808 253.972015), oklch(0.189627 0.038744 264.832977)); }
@@ -70,3 +71,7 @@ async def updates(signals: ReadSignals):
     # ReadSignals is a dependency that automatically loads the signals from the request
     print(signals)
     return DatastarStreamingResponse(time_updates())
+
+
+if __name__ == '__main__':
+    uvicorn.run(app)

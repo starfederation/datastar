@@ -17,7 +17,7 @@ HTML = """\
 		<head>
 			<title>DATASTAR on Quart</title>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script>
+            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.11/bundles/datastar.js"></script>
 			<style>
             html, body { height: 100%; width: 100%; }
             body { background-image: linear-gradient(to right bottom, oklch(0.424958 0.052808 253.972015), oklch(0.189627 0.038744 264.832977)); }
@@ -69,4 +69,5 @@ async def hello():
     return HTML.replace("CURRENT_TIME", f"{datetime.isoformat(datetime.now())}")
 
 
-# app.run()
+if __name__ == '__main__':
+    app.run()
