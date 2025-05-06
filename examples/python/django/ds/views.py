@@ -4,8 +4,7 @@ from datetime import datetime
 
 from django.http import HttpResponse
 
-from datastar_py.django import DatastarStreamingHttpResponse, ServerSentEventGenerator
-
+from datastar_py.django import DatastarStreamingHttpResponse, ServerSentEventGenerator, read_signals
 
 # ASGI Example
 
@@ -49,6 +48,9 @@ async def home_asgi(request):
 
 
 async def updates_asgi(request):
+    # You can read the signals from the request using the `read_signals` helper
+    signals = read_signals(request)
+    print(signals)
     async def time_updates():
         while True:
             yield ServerSentEventGenerator.merge_fragments(

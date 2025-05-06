@@ -2,8 +2,9 @@ import asyncio
 from datetime import datetime
 from typing import AsyncGenerator
 
-from datastar_py.litestar import  ServerSentEventGenerator, DatastarSSE
-from litestar import Litestar, get, MediaType
+from datastar_py.litestar import ServerSentEventGenerator, DatastarSSE, read_signals
+from litestar import Litestar, get, MediaType, post
+from litestar.di import Provide
 import uvicorn
 
 
@@ -57,8 +58,11 @@ async def time_updates() -> AsyncGenerator[str, None]:
         await asyncio.sleep(1)
 
 
-@get("/updates")
-async def updates() -> DatastarSSE:
+# We aren't using the signals for anything meaningful here, but `read_signals` can be
+# used as a dependency to automatically parse the signals from the request.
+@get("/updates", dependencies={"signals": Provide(read_signals)})
+async def updates(signals: dict | None) -> DatastarSSE:
+    print(signals)
     return DatastarSSE(time_updates())
 
 
