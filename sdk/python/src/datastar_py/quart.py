@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from typing import Any
 
@@ -20,8 +22,13 @@ async def make_datastar_response(async_generator):
     return response
 
 
-async def read_signals() -> dict[str, Any]:
+async def read_signals() -> dict[str, Any] | None:
+    if not request.headers.get("Datastar-Request"):
+        return None
     if request.method == "GET":
+        if "datastar" not in request.args:
+            return None
         return json.loads(request.args["datastar"])
-    else:
+    elif request.headers.get("Content-Type") == "application/json":
         return await request.get_json()
+    return None

@@ -1,4 +1,4 @@
-from typing import Annotated, Any
+from typing import Annotated, Any, Union
 
 from fastapi import Depends
 
@@ -14,4 +14,4 @@ __all__ = [
 ]
 
 
-ReadSignals = Annotated[dict[str, Any], Depends(read_signals)]
+ReadSignals = Annotated[Union[dict[str, Any], None], Depends(read_signals)]

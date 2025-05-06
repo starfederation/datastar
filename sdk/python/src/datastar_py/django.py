@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from functools import wraps
 from typing import Any
@@ -22,8 +24,13 @@ class DatastarStreamingHttpResponse(_StreamingHttpResponse):
         super().__init__(*args, **kwargs)
 
 
-def read_signals(request: HttpRequest) -> dict[str, Any]:
+def read_signals(request: HttpRequest) -> dict[str, Any] | None:
+    if not request.headers.get("Datastar-Request"):
+        return None
     if request.method == "GET":
+        if "datastar" not in request.GET:
+            return None
         return json.loads(request.GET["datastar"])
-    else:
+    elif request.headers.get("Content-Type") == "application/json":
         return json.loads(request.body)
+    return None

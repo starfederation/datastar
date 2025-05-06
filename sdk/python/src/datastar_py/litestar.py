@@ -4,6 +4,7 @@ import json
 from functools import wraps
 from typing import TYPE_CHECKING, Any, Callable
 
+from litestar.di import Provide
 from litestar.response import Stream
 
 from .sse import SSE_HEADERS, ServerSentEventGenerator
@@ -33,8 +34,13 @@ class DatastarSSE(Stream):
         super().__init__(content, **kwargs)
 
 
-async def read_signals(request: Request) -> dict[str, Any]:
+async def read_signals(request: Request) -> dict[str, Any] | None:
+    if not request.headers.get("Datastar-Request"):
+        return None
     if request.method == "GET":
+        if "datastar" not in request.query_params:
+            return None
         return json.loads(request.query_params["datastar"])
-    else:
+    elif request.headers.get("Content-Type") == "application/json":
         return await request.json()
+    return None
