@@ -5,7 +5,7 @@ from sanic import Sanic
 from sanic.response import html
 
 from datastar_py.consts import FragmentMergeMode
-from datastar_py.sanic import datastar_respond, ServerSentEventGenerator
+from datastar_py.sanic import datastar_respond, ServerSentEventGenerator, read_signals
 
 app = Sanic("DataStarApp")
 
@@ -15,7 +15,7 @@ HTML = """\
 		<head>
 			<title>DATASTAR on Sanic</title>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"></script>
+            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.11/bundles/datastar.js"></script>
 			<style>
             html, body { height: 100%; width: 100%; }
             body { background-image: linear-gradient(to right bottom, oklch(0.424958 0.052808 253.972015), oklch(0.189627 0.038744 264.832977)); }
@@ -91,6 +91,10 @@ async def add_fragment(request):
 
 @app.get("/updates")
 async def updates(request):
+    # Signals can be parsed from the request using the `read_signals` helper
+    signals = await read_signals(request)
+    print(signals)
+
     response = await datastar_respond(request)
 
     while True:
@@ -109,3 +113,7 @@ async def updates(request):
             ServerSentEventGenerator.merge_signals({"currentTime": f"{datetime.now().isoformat()}"})
         )
         await asyncio.sleep(1)
+
+
+if __name__ == '__main__':
+    app.run()
