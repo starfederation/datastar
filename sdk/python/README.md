@@ -34,8 +34,9 @@ async def updates():
 
 There are also a number of custom responses/helpers for various frameworks. Currently the following frameworks are supported:
 
-* [Sanic](https://sanic.dev/en/)
 * [Django](https://www.djangoproject.com/)
-* [Quart](https://quart.palletsprojects.com/en/stable/)
 * [FastAPI](https://fastapi.tiangolo.com/)
 * [FastHTML](https://fastht.ml/)
+* [Litestar](https://litestar.dev/)
+* [Quart](https://quart.palletsprojects.com/en/stable/)
+* [Sanic](https://sanic.dev/en/)
