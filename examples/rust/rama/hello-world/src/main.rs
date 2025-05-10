@@ -7,7 +7,13 @@ use {
     },
     rama::{
         error::BoxError,
-        http::{IntoResponse, response::Html, server::HttpServer, service::web::Router},
+        http::{
+            server::HttpServer,
+            service::web::{
+                Router,
+                response::{Html, IntoResponse},
+            },
+        },
         rt::Executor,
     },
     serde::Deserialize,

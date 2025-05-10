@@ -11,10 +11,11 @@ use {
     rama::{
         error::BoxError,
         http::{
-            Body, BodyExtractExt, IntoResponse, Method, Request, Response, StatusCode,
+            Body, BodyExtractExt, Method, Request, Response, StatusCode,
             dep::http_body::{Body as HttpBody, Frame},
             header,
             service::web::extract::{FromRequest, OptionalFromRequest, Query},
+            service::web::response::IntoResponse,
         },
     },
     serde::{Deserialize, de::DeserializeOwned},
@@ -179,7 +180,11 @@ mod tests {
         rama::{
             error::BoxError,
             graceful::Shutdown,
-            http::{IntoResponse, response::Html, server::HttpServer, service::web::Router},
+            http::{
+                server::HttpServer,
+                service::web::Router,
+                service::web::response::{Html, IntoResponse},
+            },
             net::address::SocketAddress,
             rt::Executor,
             tcp::server::TcpListener,
