@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import json
 from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable
+from typing import Any, Callable, TYPE_CHECKING
 
-from litestar.di import Provide
 from litestar.response import Stream
 
 from .sse import SSE_HEADERS, ServerSentEventGenerator, _read_signals
@@ -24,14 +22,17 @@ class DatastarSSE(Stream):
         **kwargs: Any,
     ) -> None:
         """
-        Similar to litestar's ServerSentEvent, but since our event generator just returns text we
-        don't need anything fancy.
+        Similar to litestar's ServerSentEvent, but since our event generator just returns text we don't need
+        anything fancy.
         """
         kwargs["headers"] = {**SSE_HEADERS, **kwargs.get("headers", {})}
         kwargs["media_type"] = "text/event-stream"
         # Removing this argument allows the class to be used as a 'response_class' on a route
         kwargs.pop("type_encoders", None)
-        super().__init__(content, **kwargs)
+        super().__init__(
+            content,
+            **kwargs,
+        )
 
 
 async def read_signals(request: Request) -> dict[str, Any] | None:

@@ -116,7 +116,9 @@ class ServerSentEventGenerator:
         if only_if_missing:
             data_lines.append(f"data: {consts.ONLY_IF_MISSING_DATALINE_LITERAL} true")
 
-        data_lines.append(f"data: {consts.SIGNALS_DATALINE_LITERAL} {json.dumps(signals)}")
+        data_lines.append(
+            f"data: {consts.SIGNALS_DATALINE_LITERAL} {json.dumps(signals)}"
+        )
 
         return ServerSentEventGenerator._send(
             consts.EventType.MERGE_SIGNALS, data_lines, event_id, retry_duration
@@ -131,7 +133,9 @@ class ServerSentEventGenerator:
     ):
         data_lines = []
 
-        data_lines.extend(f"data: {consts.PATHS_DATALINE_LITERAL} {path}" for path in paths)
+        data_lines.extend(
+            f"data: {consts.PATHS_DATALINE_LITERAL} {path}" for path in paths
+        )
 
         return ServerSentEventGenerator._send(
             consts.EventType.REMOVE_SIGNALS,

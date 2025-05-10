@@ -200,5 +200,4 @@ HELLO_BUTTON = Div(id="myElement")(
     )("Say hello"),
 )
 
-if __name__ == '__main__':
-    serve()
+serve()

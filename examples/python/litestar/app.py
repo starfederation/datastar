@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import AsyncGenerator
 
 from datastar_py.litestar import ServerSentEventGenerator, DatastarSSE, read_signals
-from litestar import Litestar, get, MediaType, post
+from litestar import Litestar, get, MediaType
 from litestar.di import Provide
 import uvicorn
 

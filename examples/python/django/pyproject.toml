@@ -9,6 +9,3 @@ dependencies = [
     "datastar-py>=0.4.3",
     "django>=5.1.7",
 ]
-
-[tool.uv.sources]
-datastar-py = { path = "../../../sdk/python" }
