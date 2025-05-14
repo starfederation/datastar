@@ -7,5 +7,5 @@ docker build -t starfederation-datastar-razorpages:latest -f Dockerfile ./../
 
 ## Deploy
 ```shell
-fly deploy ../../ --dockerfile ./Web/TerraScale.Web/Dockerfile --config ./Web/TerraScale.Web/fly.toml
+fly deploy ../ --dockerfile ./Examples/Starfederation.Datastar.RazorPages/Dockerfile --config ./Examples/Starfederation.Datastar.RazorPages/fly.toml
 ```
