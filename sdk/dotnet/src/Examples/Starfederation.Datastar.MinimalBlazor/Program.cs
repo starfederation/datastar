@@ -16,4 +16,7 @@ app.MapOpenApi();
 app.Run();
 
 //TODO remove this program reference for unit testing as it will not be needed in .net 10
-public partial class Program;
+namespace Starfederation.Datastar.MinimalBlazor
+{
+    public partial class Program;
+}

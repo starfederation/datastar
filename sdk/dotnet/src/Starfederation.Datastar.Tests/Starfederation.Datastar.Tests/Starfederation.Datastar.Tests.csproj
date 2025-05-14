@@ -10,7 +10,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Starfederation.Datastar.MinimalBlazor\Starfederation.Datastar.MinimalBlazor.csproj" />
+      <ProjectReference Include="..\..\Examples\Starfederation.Datastar.MinimalBlazor\Starfederation.Datastar.MinimalBlazor.csproj" />
     </ItemGroup>
+
+
 
 </Project>

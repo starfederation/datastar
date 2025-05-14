@@ -3,9 +3,11 @@
     <ItemGroup>
         <SupportedPlatform Include="browser"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Components" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
+    
+
 
 </Project>
