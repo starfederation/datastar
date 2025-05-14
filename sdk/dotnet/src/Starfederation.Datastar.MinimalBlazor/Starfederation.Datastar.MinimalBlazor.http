@@ -1,0 +1,6 @@
+@Starfederation.Datastar.MinimalBlazor_HostAddress = http://localhost:5079
+
+GET {{Starfederation.Datastar.MinimalBlazor_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

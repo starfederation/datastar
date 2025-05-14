@@ -1,26 +1,14 @@
 <Project>
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>preview</LangVersion>
-
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <AnalysisLevel>latest-Recommended</AnalysisLevel>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
 
-        <Authors>TerraScale</Authors>
+        <Authors>Starfederation</Authors>
     </PropertyGroup>
-
-    <PropertyGroup>
-        <SolutionDirectory>$(MSBuildThisFileDirectory.TrimEnd('\\'))</SolutionDirectory>
-    </PropertyGroup>
-
-    <!-- Add TerraScale.Common to all projects but itself \Libraries\TerraScale.Common\TerraScale.Common.csproj -->
-    <ItemGroup>
-        <ProjectReference 
-            Include="$(SolutionDirectory)\Libraries\TerraScale.Common\TerraScale.Common.csproj" Condition="'$(MSBuildProjectName)' != 'TerraScale.Common'"/>
-    </ItemGroup>
 </Project>
