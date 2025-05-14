@@ -19,7 +19,7 @@
     <ItemGroup>
         <PackageReference Include="NetEscapades.EnumGenerators" PrivateAssets="all" ExcludeAssets="runtime"/>
         <PackageReference Include="NetEscapades.EnumGenerators.Interceptors" PrivateAssets="all" ExcludeAssets="runtime"/>
-        <PackageReference Include="ZString" />
+        <PackageReference Include="ZString"/>
     </ItemGroup>
 
 </Project>

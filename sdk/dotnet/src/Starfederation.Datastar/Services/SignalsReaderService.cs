@@ -11,7 +11,7 @@ public class SignalsReaderService : IDatastarSignalsReaderService
     ///     Initializes a new instance of the SignalsReaderService class.
     /// </summary>
     /// <param name="handler">The underlying signals reader handler.</param>
-    public SignalsReaderService(IReadSignals handler)
+    public SignalsReaderService(ISignalsReader handler)
     {
         Handler = handler;
     }
@@ -19,7 +19,7 @@ public class SignalsReaderService : IDatastarSignalsReaderService
     /// <summary>
     ///     Gets the underlying signals reader handler.
     /// </summary>
-    public IReadSignals Handler { get; }
+    public ISignalsReader Handler { get; }
 
     /// <inheritdoc />
     public async Task<DatastarSignals?> ReadSignalsAsync()

@@ -6,12 +6,12 @@ namespace Starfederation.Datastar.Services;
 /// <summary>
 ///     Interface for Datastar server-sent event service.
 /// </summary>
-public interface IDatastarServerSentEventService
+public interface IDatastarServerSentEventService : IDatastarSignalsReaderService
 {
     /// <summary>
     ///     Gets the underlying server-sent event handler.
     /// </summary>
-    ISendServerEvent Handler { get; }
+    IServerEventSender ServerEventSenderSender { get; }
 
     /// <summary>
     ///     Merges fragments into the DOM.

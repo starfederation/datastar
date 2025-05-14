@@ -1,3 +1,5 @@
+using Starfederation.Datastar.Extensions;
+
 namespace Starfederation.Datastar.Types;
 
 /// <summary>
@@ -24,7 +26,7 @@ public class SignalPath
     ///     Gets the kebab case value of the signal path.
     /// </summary>
     /// <returns>The kebab case value of the signal path.</returns>
-    public string KebabValue => Utils.Strings.ToKebabCase(Value);
+    public string KebabValue => Value.ToKebabCase();
 
     /// <summary>
     ///     Returns the string representation of the signal path.

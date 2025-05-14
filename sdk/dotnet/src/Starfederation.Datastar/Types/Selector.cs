@@ -43,6 +43,9 @@ public partial class Selector
         return new Selector(selector);
     }
 
-    [GeneratedRegex("""[#.][-_]?[_a-zA-Z]+(?:\w|\\.)*|(?<=\s+|^)(?:\w+|\*)|\[[^\s"'=<>`]+?(?<![~|^$*])([~|^$*]?=(?:['"].*['"]|[^\s"'=<>`]+))?\]|:[\w-]+(?:\(.*\))?""", RegexOptions.Compiled)]
+    [GeneratedRegex("""[#.][-_]?[_a-zA-Z]+(?:\w|\\.)*|(?<=\s+|^)(?:\w+|\*)|\[[^\s"'=<>`]+?(?<![~|^$*])([~|^$*]?=(?:['"].*['"]|[^\s"'=<>`]+))?\]|:[\w-]+(?:\(.*\))?""",
+                    RegexOptions.Compiled)]
     private static partial Regex GeneratedSelectorRegex();
+
+    //TODO add implicit conversion to string and string to Selector
 }

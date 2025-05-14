@@ -6,26 +6,26 @@ namespace Starfederation.Datastar.Services;
 /// <summary>
 ///     Implementation of IDatastarServerSentEventService.
 /// </summary>
-public class ServerSentEventService : IDatastarServerSentEventService
+public class ServerSentEventService : SignalsReaderService, IDatastarServerSentEventService
 {
     /// <summary>
     ///     Initializes a new instance of the ServerSentEventService class.
     /// </summary>
     /// <param name="handler">The underlying server-sent event handler.</param>
-    public ServerSentEventService(ISendServerEvent handler)
+    public ServerSentEventService(IServerEventSender handler, ISignalsReader signalsReaderReader) : base(signalsReaderReader)
     {
-        Handler = handler;
+        ServerEventSenderSender = handler;
     }
 
     /// <summary>
     ///     Gets the underlying server-sent event handler.
     /// </summary>
-    public ISendServerEvent Handler { get; }
+    public IServerEventSender ServerEventSenderSender { get; }
 
     /// <inheritdoc />
     public Task MergeFragmentsAsync(string fragment)
     {
-        return ServerSentEventGenerator.MergeFragments(Handler, fragment);
+        return ServerSentEventGenerator.MergeFragments(ServerEventSenderSender, fragment);
     }
 
     /// <inheritdoc />
@@ -40,13 +40,13 @@ public class ServerSentEventService : IDatastarServerSentEventService
             Retry = options.Retry
         };
 
-        return ServerSentEventGenerator.MergeFragments(Handler, fragment, mergeOptions);
+        return ServerSentEventGenerator.MergeFragments(ServerEventSenderSender, fragment, mergeOptions);
     }
 
     /// <inheritdoc />
     public Task RemoveFragmentsAsync(Selector selector)
     {
-        return ServerSentEventGenerator.RemoveFragments(Handler, selector);
+        return ServerSentEventGenerator.RemoveFragments(ServerEventSenderSender, selector);
     }
 
     /// <inheritdoc />
@@ -61,13 +61,13 @@ public class ServerSentEventService : IDatastarServerSentEventService
             Retry = options.Retry
         };
 
-        return ServerSentEventGenerator.RemoveFragments(Handler, selector, removeOptions);
+        return ServerSentEventGenerator.RemoveFragments(ServerEventSenderSender, selector, removeOptions);
     }
 
     /// <inheritdoc />
     public Task MergeSignalsAsync(DatastarSignals dataDatastarSignals)
     {
-        return ServerSentEventGenerator.MergeSignals(Handler, dataDatastarSignals);
+        return ServerSentEventGenerator.MergeSignals(ServerEventSenderSender, dataDatastarSignals);
     }
 
     /// <inheritdoc />
@@ -82,13 +82,13 @@ public class ServerSentEventService : IDatastarServerSentEventService
             Retry = options.Retry
         };
 
-        return ServerSentEventGenerator.MergeSignals(Handler, dataDatastarSignals, mergeOptions);
+        return ServerSentEventGenerator.MergeSignals(ServerEventSenderSender, dataDatastarSignals, mergeOptions);
     }
 
     /// <inheritdoc />
     public Task RemoveSignalsAsync(IEnumerable<SignalPath> paths)
     {
-        return ServerSentEventGenerator.RemoveSignals(Handler, paths);
+        return ServerSentEventGenerator.RemoveSignals(ServerEventSenderSender, paths);
     }
 
     /// <inheritdoc />
@@ -102,13 +102,13 @@ public class ServerSentEventService : IDatastarServerSentEventService
             Retry = options.Retry
         };
 
-        return ServerSentEventGenerator.RemoveSignals(Handler, paths, eventOptions);
+        return ServerSentEventGenerator.RemoveSignals(ServerEventSenderSender, paths, eventOptions);
     }
 
     /// <inheritdoc />
     public Task ExecuteScriptAsync(string script)
     {
-        return ServerSentEventGenerator.ExecuteScript(Handler, script);
+        return ServerSentEventGenerator.ExecuteScript(ServerEventSenderSender, script);
     }
 
     /// <inheritdoc />
@@ -121,6 +121,6 @@ public class ServerSentEventService : IDatastarServerSentEventService
             Retry = options.Retry
         };
 
-        return ServerSentEventGenerator.ExecuteScript(Handler, script, scriptOptions);
+        return ServerSentEventGenerator.ExecuteScript(ServerEventSenderSender, script, scriptOptions);
     }
 }

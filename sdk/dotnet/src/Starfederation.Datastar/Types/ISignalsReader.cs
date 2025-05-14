@@ -5,7 +5,7 @@ namespace Starfederation.Datastar.Types;
 /// <summary>
 ///     Interface for reading signals from a request.
 /// </summary>
-public interface IReadSignals
+public interface ISignalsReader
 {
     /// <summary>
     ///     Reads the signals from the request.

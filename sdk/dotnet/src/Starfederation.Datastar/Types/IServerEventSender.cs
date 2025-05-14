@@ -3,7 +3,7 @@ namespace Starfederation.Datastar.Types;
 /// <summary>
 ///     Interface for sending server-sent events.
 /// </summary>
-public interface ISendServerEvent
+public interface IServerEventSender
 {
     /// <summary>
     ///     Sends a server-sent event.

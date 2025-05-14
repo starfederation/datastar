@@ -18,7 +18,7 @@ public static class BrowserConsoleUtility
     /// <param name="message">The message for Log and Error actions.</param>
     /// <param name="options">The event options.</param>
     /// <returns>A task that represents the asynchronous execution operation.</returns>
-    public static Task BrowserConsoleActionAsync(ISendServerEvent handler, BrowserConsoleAction action, string? message = null, EventOptions? options = null)
+    public static Task BrowserConsoleActionAsync(IServerEventSender handler, BrowserConsoleAction action, string? message = null, EventOptions? options = null)
     {
         options ??= EventOptions.Defaults;
 

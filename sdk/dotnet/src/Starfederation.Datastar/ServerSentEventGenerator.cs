@@ -15,7 +15,7 @@ public static class ServerSentEventGenerator
     /// <param name="sseHandler">The handler to send the event to.</param>
     /// <param name="sse">The server-sent event to send.</param>
     /// <returns>A task that represents the asynchronous send operation.</returns>
-    public static Task Send(ISendServerEvent sseHandler, ServerSentEvent sse)
+    public static Task Send(IServerEventSender sseHandler, ServerSentEvent sse)
     {
         return sseHandler.SendServerEventAsync(sse);
     }
@@ -27,7 +27,7 @@ public static class ServerSentEventGenerator
     /// <param name="fragments">The fragments to merge.</param>
     /// <param name="options">The options for the merge fragments event.</param>
     /// <returns>A task that represents the asynchronous send operation.</returns>
-    public static Task MergeFragments(ISendServerEvent sseHandler, string fragments, MergeFragmentsOptions? options = null)
+    public static Task MergeFragments(IServerEventSender sseHandler, string fragments, MergeFragmentsOptions? options = null)
     {
         options ??= MergeFragmentsOptions.Defaults;
 
@@ -64,7 +64,7 @@ public static class ServerSentEventGenerator
     /// <param name="selector">The selector for the fragments to remove.</param>
     /// <param name="options">The options for the remove fragments event.</param>
     /// <returns>A task that represents the asynchronous send operation.</returns>
-    public static Task RemoveFragments(ISendServerEvent sseHandler, Selector selector, RemoveFragmentsOptions? options = null)
+    public static Task RemoveFragments(IServerEventSender sseHandler, Selector selector, RemoveFragmentsOptions? options = null)
     {
         options ??= RemoveFragmentsOptions.Defaults;
 
@@ -96,7 +96,7 @@ public static class ServerSentEventGenerator
     /// <param name="mergeDatastarSignals">The signals to merge.</param>
     /// <param name="options">The options for the merge signals event.</param>
     /// <returns>A task that represents the asynchronous send operation.</returns>
-    public static Task MergeSignals(ISendServerEvent sseHandler, DatastarSignals mergeDatastarSignals, MergeSignalsOptions? options = null)
+    public static Task MergeSignals(IServerEventSender sseHandler, DatastarSignals mergeDatastarSignals, MergeSignalsOptions? options = null)
     {
         options ??= MergeSignalsOptions.Defaults;
 
@@ -128,7 +128,7 @@ public static class ServerSentEventGenerator
     /// <param name="paths">The signal paths to remove.</param>
     /// <param name="options">The options for the remove signals event.</param>
     /// <returns>A task that represents the asynchronous send operation.</returns>
-    public static Task RemoveSignals(ISendServerEvent sseHandler, IEnumerable<SignalPath> paths, EventOptions? options = null)
+    public static Task RemoveSignals(IServerEventSender sseHandler, IEnumerable<SignalPath> paths, EventOptions? options = null)
     {
         options ??= EventOptions.Defaults;
 
@@ -152,7 +152,7 @@ public static class ServerSentEventGenerator
     /// <param name="script">The script to execute.</param>
     /// <param name="options">The options for the execute script event.</param>
     /// <returns>A task that represents the asynchronous send operation.</returns>
-    public static Task ExecuteScript(ISendServerEvent sseHandler, string script, ExecuteScriptOptions? options = null)
+    public static Task ExecuteScript(IServerEventSender sseHandler, string script, ExecuteScriptOptions? options = null)
     {
         options ??= ExecuteScriptOptions.Defaults;
 

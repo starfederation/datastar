@@ -15,7 +15,7 @@ public static class RedirectUtility
     /// <param name="url">The URL to redirect to.</param>
     /// <param name="options">The event options.</param>
     /// <returns>A task that represents the asynchronous redirect operation.</returns>
-    public static Task RedirectAsync(ISendServerEvent handler, string url, EventOptions? options = null)
+    public static Task RedirectAsync(IServerEventSender handler, string url, EventOptions? options = null)
     {
         options ??= EventOptions.Defaults;
 

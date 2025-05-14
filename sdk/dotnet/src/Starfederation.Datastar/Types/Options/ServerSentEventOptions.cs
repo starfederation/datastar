@@ -1,4 +1,4 @@
-namespace Starfederation.Datastar.Services;
+namespace Starfederation.Datastar.Types.Options;
 
 /// <summary>
 ///     Common options for server-sent events.

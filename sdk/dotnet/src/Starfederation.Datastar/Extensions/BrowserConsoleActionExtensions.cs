@@ -20,7 +20,7 @@ public static class BrowserConsoleActionExtensions
         var script = action.ToJavaScript(message);
         return service.ExecuteScriptAsync(script);
     }
-    
+
     private static string EscapeMessage(string str)
     {
         return str.Replace("'", @"\'");

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Starfederation.Datastar.Handlers;
 using Starfederation.Datastar.ModelBinding;
 using Starfederation.Datastar.Services;
 
@@ -22,14 +23,14 @@ public static class ServiceCollectionExtensions
               .AddScoped<IDatastarSignalsReaderService>(serviceProvider =>
                {
                    var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
-                   var signalsHttpHandler = new SignalsHttpHandlers(httpContextAccessor.HttpContext!.Request);
+                   var signalsHttpHandler = new SignalsReaderHttpHandlers(httpContextAccessor.HttpContext!.Request);
                    return new SignalsReaderService(signalsHttpHandler);
                })
               .AddScoped<IDatastarServerSentEventService>(serviceProvider =>
                {
                    var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
 
-                   var sseHttpHandler = new ServerSentEventHttpHandlers(httpContextAccessor.HttpContext!.Response);
+                   var sseHttpHandler = new ServerSentEventSenderHttpHandlers(httpContextAccessor.HttpContext!.Response);
 
                    // Start the response
                    sseHttpHandler.StartResponse();
@@ -37,10 +38,12 @@ public static class ServiceCollectionExtensions
                    // You can add headers here if needed
                    // sseHttpHandler.AddHeader("X-Accel-Buffering", "no");
 
-                   return new ServerSentEventService(sseHttpHandler);
+                   var signalsReader = new SignalsReaderHttpHandlers(httpContextAccessor.HttpContext.Request);
+
+                   return new ServerSentEventService(sseHttpHandler, signalsReader);
                });
     }
-    
+
     /// <summary>
     ///     Adds Datastar MVC services to the service collection.
     /// </summary>

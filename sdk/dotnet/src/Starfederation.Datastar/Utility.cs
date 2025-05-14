@@ -1,4 +1,3 @@
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -37,90 +36,23 @@ internal static class Utils
         {
             var parts = path.Split('.', 2);
 
-            if (parts.Length == 1)
+            switch (parts.Length)
             {
-                return jObject[parts[0]]?.Deserialize(valueType);
-            }
-
-            if (parts.Length == 2)
-            {
-                var node = jObject[parts[0]];
-                if (node != null)
+                case 1:
+                    return jObject[parts[0]]?.Deserialize(valueType);
+                case 2:
                 {
-                    return GetValue(valueType, node.AsObject(), parts[1]);
+                    var node = jObject[parts[0]];
+                    if (node != null)
+                    {
+                        return GetValue(valueType, node.AsObject(), parts[1]);
+                    }
+
+                    return null;
                 }
-
-                return null;
+                default:
+                    return jObject.Deserialize(valueType);
             }
-
-            return jObject.Deserialize(valueType);
-        }
-    }
-
-    /// <summary>
-    ///     String utility methods.
-    /// </summary>
-    public static class Strings
-    {
-        /// <summary>
-        ///     The standard newline characters.
-        /// </summary>
-        public static readonly string[] NewLines = ["\r\n", "\n", "\r"];
-
-        /// <summary>
-        ///     Splits a string by multiple delimiters.
-        /// </summary>
-        /// <param name="line">The string to split.</param>
-        /// <param name="delimiters">The delimiters to split on.</param>
-        /// <returns>The split string.</returns>
-        public static string[] Split(string line, IEnumerable<string> delimiters)
-        {
-            return line.Split(delimiters as string[] ?? new List<string>(delimiters).ToArray(), StringSplitOptions.None);
-        }
-
-        /// <summary>
-        ///     Checks if a string is populated (not null, empty, or whitespace).
-        /// </summary>
-        /// <param name="value">The string to check.</param>
-        /// <returns>True if the string is populated, false otherwise.</returns>
-        public static bool IsPopulated(string value)
-        {
-            return !string.IsNullOrWhiteSpace(value);
-        }
-
-        /// <summary>
-        ///     Converts a PascalCase string to kebab-case.
-        /// </summary>
-        /// <param name="pascalString">The PascalCase string.</param>
-        /// <returns>The kebab-case string.</returns>
-        public static string ToKebabCase(string pascalString)
-        {
-            if (string.IsNullOrEmpty(pascalString))
-            {
-                return string.Empty;
-            }
-
-            var stringBuilder = new StringBuilder();
-
-            foreach (var c in pascalString)
-            {
-                if (char.IsUpper(c))
-                {
-                    stringBuilder.Append('-').Append(char.ToLower(c));
-                }
-                else
-                {
-                    stringBuilder.Append(c);
-                }
-            }
-
-            // Remove leading hyphen if it exists
-            if (stringBuilder.Length > 0 && stringBuilder[0] == '-')
-            {
-                stringBuilder.Remove(0, 1);
-            }
-
-            return stringBuilder.ToString();
         }
     }
 }

@@ -10,7 +10,7 @@ public interface IDatastarSignalsReaderService
     /// <summary>
     ///     Gets the underlying signals reader handler.
     /// </summary>
-    IReadSignals Handler { get; }
+    ISignalsReader Handler { get; }
 
     /// <summary>
     ///     Reads the signals and returns as a serialized string.
