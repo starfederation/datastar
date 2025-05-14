@@ -1,0 +1,142 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Utilities -->
+    <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.14.0" />
+    <PackageVersion Include="CommandLineParser" Version="2.9.1" />
+    <PackageVersion Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
+    <PackageVersion Include="ConsoleAppFramework" Version="5.3.4" />
+    <PackageVersion Include="Ardalis.SmartEnum" Version="8.2.0" />
+    <PackageVersion Include="Ardalis.SmartEnum.SystemTextJson" Version="8.1.0" />
+    <PackageVersion Include="CliWrap" Version="3.8.0" />
+    <PackageVersion Include="FastGenericNew.SourceGenerator" Version="3.3.1" />
+    <PackageVersion Include="Fluid.Core" Version="2.19.0" />
+    <PackageVersion Include="Injectio" Version="4.1.0" />
+    <PackageVersion Include="Marten" Version="7.40.1" />
+    <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.13.9" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.4" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="MongoDB.Driver" Version="3.3.0" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageVersion Include="protobuf-net.BuildTools" Version="3.2.52" />
+    <PackageVersion Include="protobuf-net.Grpc" Version="1.2.2" />
+    <PackageVersion Include="protobuf-net.Grpc.AspNetCore" Version="1.2.2" />
+    <PackageVersion Include="StarFederation.Datastar" Version="1.0.0-beta.5" />
+    <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
+    <PackageVersion Include="Scrutor" Version="6.0.1" />
+    <!-- Payments -->
+    <PackageVersion Include="Adyen" Version="29.0.0" />
+    <PackageVersion Include="Stripe.net" Version="47.3.0" />
+    <!-- CLI -->
+    <PackageVersion Include="Spectre.Console" Version="0.49.1" />
+    <PackageVersion Include="Spectre.Console.Analyzer" Version="1.0.0" />
+    <PackageVersion Include="Spectre.Console.Cli" Version="0.49.1" />
+    <PackageVersion Include="Spectre.Console.Json" Version="0.49.1" />
+    <!--API-->
+    <PackageVersion Include="FluentValidation" Version="12.0.0-preview1" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0-preview1" />
+    <PackageVersion Include="Riok.Mapperly" Version="4.2.0" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.1.18" />
+    <PackageVersion Include="System.Net.Http" Version="4.3.4" />
+    <PackageVersion Include="System.Text.Json" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-preview.3.25172.1" />
+    <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <!--Magic Onion-->
+    <PackageVersion Include="MagicOnion.Abstractions" Version="7.0.3" />
+    <PackageVersion Include="MagicOnion.Client" Version="7.0.3" />
+    <PackageVersion Include="MagicOnion.Server" Version="7.0.3" />
+    <PackageVersion Include="MagicOnion.Hosting" Version="7.0.3" />
+    <PackageVersion Include="MagicOnion.MessagePack" Version="7.0.3" />
+    <PackageVersion Include="MagicOnion.MessagePackAnalyzer" Version="7.0.3" />
+    <!--Microsoft Extensions-->
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.0-preview.3.25171.5" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0-preview.3.25172.1" />
+    <PackageVersion Include="Microsoft.NET.StringTools" Version="17.13.9" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.12.0" />
+    <!-- Telemetry -->
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.11.2" />
+    <PackageVersion Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.11.2-beta.1" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.11.2" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.11.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.11.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.11.1" />
+    <!-- Database -->
+    <PackageVersion Include="Dapper" Version="2.1.66" />
+    <PackageVersion Include="Dapper.SqlBuilder" Version="2.1.66" />
+    <PackageVersion Include="Dapper.Rainbow" Version="2.1.66" />
+    <PackageVersion Include="LiteDB" Version="5.0.21" />
+    <PackageVersion Include="Jint" Version="4.2.0" />
+    <PackageVersion Include="Superpower" Version="3.0.0" />
+    <PackageVersion Include="SystemTextJsonPatch" Version="4.2.0" />
+    <PackageVersion Include="Testcontainers" Version="4.2.0" />
+    <PackageVersion Include="Testcontainers.Azurite" Version="4.3.0" />
+    <PackageVersion Include="Testcontainers.MongoDb" Version="4.4.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.4.0" />
+    <PackageVersion Include="Ulid" Version="1.3.4" />
+    <PackageVersion Include="Ulid.MessagePack" Version="1.3.4" />
+    <PackageVersion Include="Ulid.SystemTextJson" Version="1.3.4" />
+    <PackageVersion Include="MasterMemory" Version="3.0.3" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.4" />
+    <PackageVersion Include="MasterMemory.Annotations" Version="3.0.3" />
+    <PackageVersion Include="ZoneTree" Version="1.8.5" />
+    <PackageVersion Include="ZoneTree.FullTextSearch" Version="1.0.8" />
+    <!-- Helpers -->
+    <PackageVersion Include="ZString" Version="2.6.0" />
+    <PackageVersion Include="R3" Version="1.3.0" />
+    <PackageVersion Include="FastExpressionCompiler" Version="5.1.1" />
+    <PackageVersion Include="NetEscapades.EnumGenerators" Version="1.0.0-beta12" />
+    <PackageVersion Include="Polly" Version="8.5.2" />
+    <PackageVersion Include="SharpZipLib" Version="1.4.2" />
+    <!-- Logging -->
+    <PackageVersion Include="ZLogger" Version="2.5.10" />
+    <PackageVersion Include="ZLogger.MessagePack" Version="2.5.10" />
+    <PackageVersion Include="Discord.Net.Webhook" Version="3.17.2" />
+    <!-- RPC -->
+    <PackageVersion Include="Google.Protobuf" Version="3.18.0" />
+    <PackageVersion Include="Grpc.Core.Api" Version="2.70.0" />
+    <PackageVersion Include="Grpc.Net.Client" Version="2.70.0" />
+    <PackageVersion Include="Grpc.AspNetCore.Server" Version="2.70.0" />
+    <PackageVersion Include="Grpc.Tools" Version="2.70.0" />
+    <PackageVersion Include="MessagePack" Version="3.1.3" />
+    <PackageVersion Include="MessagePack.Annotations" Version="3.1.3" />
+    <PackageVersion Include="MessagePackAnalyzer" Version="3.1.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageVersion>
+    <PackageVersion Include="NATS.Net" Version="2.6.0-preview.4" />
+    <PackageVersion Include="NATS.Extensions.Microsoft.DependencyInjection" Version="2.6.0-preview.4" />
+    <PackageVersion Include="NATS.Client.KeyValueStore" Version="2.6.0-preview.4" />
+    <!-- ThirdParty -->
+    <PackageVersion Include="AWSSDK.S3" Version="4.0.0-preview.13" />
+    <PackageVersion Include="Azure.Data.Tables" Version="12.10.0" />
+    <!-- Tests -->
+    <PackageVersion Include="TUnit" Version="0.19.74" />
+    <PackageVersion Include="TUnit.Engine" Version="0.19.52" />
+    <PackageVersion Include="TUnit.Assertions" Version="0.19.52" />
+    <PackageVersion Include="TUnit.Assertions.Analyzers" Version="0.19.52" />
+    <PackageVersion Include="NBomber" Version="5.8.2" />
+    <PackageVersion Include="NBomber.Http" Version="5.2.1" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.dotTrace" Version="0.14.0" />
+  </ItemGroup>
+</Project>

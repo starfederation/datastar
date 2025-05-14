@@ -1,0 +1,30 @@
+# Top level entry required to mark this as a global AnalyzerConfig file
+is_global = true
+
+dotnet_diagnostic.IDE0005.severity = error        # IDE0005: Remove unnecessary using directives
+dotnet_diagnostic.IDE0044.severity = error        # IDE0044: Add readonly modifier
+
+dotnet_diagnostic.CA1031.severity = none        # CA1031: Do not catch general exception types
+dotnet_diagnostic.CA1305.severity = none        # CA1305: Specify IFormatProvider
+dotnet_diagnostic.CA1711.severity = none        # CA1711: Identifiers should not have incorrect suffix
+dotnet_diagnostic.CA1716.severity = none        # CA1716: Identifiers should not match keywords
+dotnet_diagnostic.CA1805.severity = none        # CA1805: Do not initialize unnecessarily
+dotnet_diagnostic.CA1822.severity = none        # CA1822: Mark members as static
+dotnet_diagnostic.CA1848.severity = none        # CA1848: Use the LoggerMessage delegates
+dotnet_diagnostic.CS0067.severity = none        # CS0067: The event is never used
+dotnet_diagnostic.CA2201.severity = none        # CA2201: Exception is not sufficiently specific
+dotnet_diagnostic.CA2254.severity = none
+dotnet_diagnostic.CA1304.severity = none
+dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1310.severity = none        # CA1310: Specify StringComparison for correctness
+dotnet_diagnostic.CA1311.severity = none
+dotnet_diagnostic.CA2208.severity = none        # CA2208: Instantiate argument exceptions correctly
+dotnet_diagnostic.CA1707.severity = none        # CA1707: Remove the underscores from member names
+
+dotnet_diagnostic.NU1507.severity = none        # NU1507: Package does not support any target frameworks
+dotnet_diagnostic.NU1603.severity = none
+dotnet_diagnostic.NU1604.severity = none
+dotnet_diagnostic.NU1605.severity = none
+dotnet_diagnostic.NU1510.severity = none
+
+dotnet_diagnostic.xUnit1013.severity = none        # xUnit1013: Public method should be marked as test
