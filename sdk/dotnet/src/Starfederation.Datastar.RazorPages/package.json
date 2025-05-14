@@ -1,0 +1,21 @@
+{
+    "name": "starfederation.datastar.razorpages",
+    "module": "index.ts",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "dev": "bunx @tailwindcss/cli -i ./Tailwind.css -o ./wwwroot/css/tailwind.css --watch",
+        "css:build": "bunx @tailwindcss/cli -i ./Tailwind.css -o ./wwwroot/css/tailwind.css --minify"
+    },
+    "devDependencies": {
+        "@iconify/json": "^2.2.337",
+        "@iconify/tailwind4": "^1.0.6",
+        "@tailwindcss/language-server": "^0.14.16",
+        "@types/bun": "latest",
+        "daisyui": "^5.0.35",
+        "tailwindcss": "^4.1.5"
+    },
+    "peerDependencies": {
+        "typescript": "^5"
+    }
+}
