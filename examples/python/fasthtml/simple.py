@@ -1,11 +1,21 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "datastar-py",
+#     "python-fasthtml",
+# ]
+# [tool.uv.sources]
+# datastar-py = { path = "../../../sdk/python" }
+# ///
 import asyncio
 import json
 from datetime import datetime
 from pathlib import Path
 
-from fasthtml.common import *
-
 from datastar_py.fasthtml import DatastarStreamingResponse, ServerSentEventGenerator, read_signals
+
+# ruff: noqa: F403, F405
+from fasthtml.common import *
 
 repo_root = next(p for p in Path(__file__).parents if (p / ".git").exists())
 
@@ -59,4 +69,5 @@ async def updates(request):
     return DatastarStreamingResponse(clock())
 
 
-serve()
+if __name__ == "__main__":
+    serve()

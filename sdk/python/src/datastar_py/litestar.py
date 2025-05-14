@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import wraps
-from typing import Any, Callable, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable
 
 from litestar.response import Stream
 
@@ -22,8 +22,8 @@ class DatastarSSE(Stream):
         **kwargs: Any,
     ) -> None:
         """
-        Similar to litestar's ServerSentEvent, but since our event generator just returns text we don't need
-        anything fancy.
+        Similar to litestar's ServerSentEvent, but since our event generator just returns text we
+        don't need anything fancy.
         """
         kwargs["headers"] = {**SSE_HEADERS, **kwargs.get("headers", {})}
         kwargs["media_type"] = "text/event-stream"
