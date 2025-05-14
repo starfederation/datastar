@@ -1,13 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
-    
+
+    <PropertyGroup>
+        <EnableEnumGeneratorInterceptor>true</EnableEnumGeneratorInterceptor>
+    </PropertyGroup>
+
     <ItemGroup>
         <SupportedPlatform Include="browser"/>
     </ItemGroup>
 
     <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
     </ItemGroup>
-    
 
+    <ItemGroup>
+        <Folder Include="Interfaces\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NetEscapades.EnumGenerators" PrivateAssets="all" ExcludeAssets="runtime"/>
+        <PackageReference Include="NetEscapades.EnumGenerators.Interceptors" PrivateAssets="all" ExcludeAssets="runtime"/>
+        <PackageReference Include="ZString" />
+    </ItemGroup>
 
 </Project>

@@ -2,84 +2,57 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using Starfederation.Datastar.DependencyInjection;
+using Starfederation.Datastar.Services;
 
-namespace Starfederation.Datastar.ModelBinding
+namespace Starfederation.Datastar.ModelBinding;
+
+/// <summary>
+///     Model binder for Datastar signals.
+/// </summary>
+public class SignalsModelBinder : IModelBinder
 {
-    /// <summary>
-    /// Model binder for Datastar signals.
-    /// </summary>
-    public class SignalsModelBinder : IModelBinder
-    {
-        private readonly IDatastarSignalsReaderService _signalsReader;
+    private readonly IDatastarSignalsReaderService _signalsReader;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SignalsModelBinder"/> class.
-        /// </summary>
-        /// <param name="signalsReader">The signals reader service.</param>
-        public SignalsModelBinder(IDatastarSignalsReaderService signalsReader)
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="SignalsModelBinder" /> class.
+    /// </summary>
+    /// <param name="signalsReader">The signals reader service.</param>
+    public SignalsModelBinder(IDatastarSignalsReaderService signalsReader)
+    {
+        _signalsReader = signalsReader;
+    }
+
+    /// <inheritdoc />
+    public async Task BindModelAsync(ModelBindingContext? bindingContext)
+    {
+        if (bindingContext == null)
         {
-            _signalsReader = signalsReader;
+            return;
         }
 
-        /// <inheritdoc/>
-        public async Task BindModelAsync(ModelBindingContext bindingContext)
-        {
-            if (bindingContext == null)
-            {
-                return;
-            }
-            
-            var signalBindingContext = bindingContext.BindingSource as DatastarSignalsBindingSource;
-            var path = signalBindingContext?.Path;
+        var signalBindingContext = bindingContext.BindingSource as DatastarSignalsBindingSource;
+        var path = signalBindingContext?.Path;
 
-            if (string.IsNullOrEmpty(path))
+        if (string.IsNullOrEmpty(path))
+        {
+            if (bindingContext.ModelType.IsValueType || bindingContext.ModelType == typeof(string))
             {
-                if (bindingContext.ModelType.IsValueType || bindingContext.ModelType == typeof(string))
+                var signals = await _signalsReader.ReadSignalsAsync();
+                try
                 {
-                    var signals = await _signalsReader.ReadSignalsAsync();
-                    try
-                    {
-                        if (signals == null)
-                        {
-                            bindingContext.Result = ModelBindingResult.Failed();
-                            return;
-                        }
-                        var signalsJsonObject = JsonObject.Parse(signals.Value)!.AsObject();
-                        var value = Utils.JsonPath.GetValue(bindingContext.ModelType, signalsJsonObject, bindingContext.FieldName);
-                        bindingContext.Result = ModelBindingResult.Success(value);
-                    }
-                    catch
+                    if (signals == null)
                     {
                         bindingContext.Result = ModelBindingResult.Failed();
+                        return;
                     }
+
+                    var signalsJsonObject = JsonObject.Parse(signals.Value)!.AsObject();
+                    var value = Utils.JsonPath.GetValue(bindingContext.ModelType, signalsJsonObject, bindingContext.FieldName);
+                    bindingContext.Result = ModelBindingResult.Success(value);
                 }
-                else
+                catch
                 {
-                    var signals = await _signalsReader.ReadSignalsAsync();
-                    try
-                    {
-                        if (signals == null)
-                        {
-                            bindingContext.Result = ModelBindingResult.Failed();
-                            return;
-                        }
-                        var signalsJsonObject = JsonObject.Parse(signals.Value)!.AsObject();
-                        object? value;
-                        if (signalsJsonObject.ContainsKey(bindingContext.FieldName))
-                        {
-                            value = Utils.JsonPath.GetValue(bindingContext.ModelType, signalsJsonObject, bindingContext.FieldName);
-                        }
-                        else
-                        {
-                            value = JsonSerializer.Deserialize(signalsJsonObject, bindingContext.ModelType);
-                        }
-                        bindingContext.Result = ModelBindingResult.Success(value);
-                    }
-                    catch
-                    {
-                        bindingContext.Result = ModelBindingResult.Failed();
-                    }
+                    bindingContext.Result = ModelBindingResult.Failed();
                 }
             }
             else
@@ -92,8 +65,18 @@ namespace Starfederation.Datastar.ModelBinding
                         bindingContext.Result = ModelBindingResult.Failed();
                         return;
                     }
+
                     var signalsJsonObject = JsonObject.Parse(signals.Value)!.AsObject();
-                    var value = Utils.JsonPath.GetValue(bindingContext.ModelType, signalsJsonObject, path);
+                    object? value;
+                    if (signalsJsonObject.ContainsKey(bindingContext.FieldName))
+                    {
+                        value = Utils.JsonPath.GetValue(bindingContext.ModelType, signalsJsonObject, bindingContext.FieldName);
+                    }
+                    else
+                    {
+                        value = signalsJsonObject.Deserialize(bindingContext.ModelType);
+                    }
+
                     bindingContext.Result = ModelBindingResult.Success(value);
                 }
                 catch
@@ -102,29 +85,48 @@ namespace Starfederation.Datastar.ModelBinding
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// Model binder provider for Datastar signals.
-    /// </summary>
-    public class SignalsModelBinderProvider : IModelBinderProvider
-    {
-        /// <inheritdoc/>
-        public IModelBinder? GetBinder(ModelBinderProviderContext? context)
+        else
         {
-            if (context == null || 
-                context.BindingInfo == null || 
-                context.BindingInfo.BindingSource == null)
+            var signals = await _signalsReader.ReadSignalsAsync();
+            try
             {
-                return null;
+                if (signals == null)
+                {
+                    bindingContext.Result = ModelBindingResult.Failed();
+                    return;
+                }
+
+                var signalsJsonObject = JsonObject.Parse(signals.Value)!.AsObject();
+                var value = Utils.JsonPath.GetValue(bindingContext.ModelType, signalsJsonObject, path);
+                bindingContext.Result = ModelBindingResult.Success(value);
             }
-            
-            var isSignalsBindingSource = 
-                context.BindingInfo.BindingSource.DisplayName == DatastarSignalsBindingSourceConst.BindingSourceName;
-                
-            return isSignalsBindingSource
-                ? new BinderTypeModelBinder(typeof(SignalsModelBinder))
-                : null;
+            catch
+            {
+                bindingContext.Result = ModelBindingResult.Failed();
+            }
         }
+    }
+}
+
+/// <summary>
+///     Model binder provider for Datastar signals.
+/// </summary>
+public class SignalsModelBinderProvider : IModelBinderProvider
+{
+    /// <inheritdoc />
+    public IModelBinder? GetBinder(ModelBinderProviderContext? context)
+    {
+        if (context                           == null ||
+            context.BindingInfo.BindingSource == null)
+        {
+            return null;
+        }
+
+        var isSignalsBindingSource =
+            context.BindingInfo.BindingSource.DisplayName == Consts.BindingSourceName;
+
+        return isSignalsBindingSource
+            ? new BinderTypeModelBinder(typeof(SignalsModelBinder))
+            : null;
     }
 }
