@@ -1,14 +1,19 @@
 namespace Starfederation.Datastar.Types.Options;
 
 /// <summary>
-///     Common options for events.
+///     Options for removing fragments.
 /// </summary>
-public class EventOptions
+public class RemoveFragmentsOptions
 {
+    /// <summary>
+    ///     Gets or sets whether to use view transition.
+    /// </summary>
+    public bool UseViewTransition { get; set; } = Consts.DefaultFragmentsUseViewTransitions;
+
     /// <summary>
     ///     Gets or sets the event ID.
     /// </summary>
-    public Optional<string> EventId { get; set; } = Optional<string>.None;
+    public string? EventId { get; set; }
 
     /// <summary>
     ///     Gets or sets the retry duration.
@@ -18,5 +23,5 @@ public class EventOptions
     /// <summary>
     ///     Gets the default options.
     /// </summary>
-    public static EventOptions Defaults => new();
+    public static RemoveFragmentsOptions Defaults => new();
 }

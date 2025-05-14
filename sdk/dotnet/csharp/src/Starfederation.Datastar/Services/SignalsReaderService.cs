@@ -3,27 +3,41 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Starfederation.Datastar.Types;
 
-namespace Starfederation.Datastar.Handlers;
+namespace Starfederation.Datastar.Services;
 
 /// <summary>
-///     Implementation of IReadSignals, for reading the Signals from the HttpRequest
+///     Implementation of IDatastarSignalsReaderService.
 /// </summary>
-public class SignalsReaderHttpHandlers : ISignalsReader
+public class SignalsReaderService : IDatastarSignalsReaderService
 {
+    private HttpRequest HttpRequest { get; }
+    
     /// <summary>
     ///     Initializes a new instance of the SignalsHttpHandlers class.
     /// </summary>
     /// <param name="httpRequest">The HTTP request.</param>
-    public SignalsReaderHttpHandlers(HttpRequest httpRequest)
+    public SignalsReaderService(HttpRequest httpRequest)
     {
         HttpRequest = httpRequest;
         HttpRequest.EnableBuffering();
     }
+    
 
-    /// <summary>
-    ///     Gets the HTTP request.
-    /// </summary>
-    public HttpRequest HttpRequest { get; }
+    /// <inheritdoc />
+    public async Task<DatastarSignals?> ReadSignalsAsync()
+    {
+        var signals = await Handler.ReadSignalsAsync();
+        return signals;
+    }
+
+    /// <inheritdoc />
+    public async Task<T?> ReadSignalsAsync<T>() where T : class
+    {
+        var signals = await Handler.ReadSignalsAsync<T>();
+        return signals;
+    }
+    
+    
 
     /// <summary>
     ///     Reads the signals from the request.

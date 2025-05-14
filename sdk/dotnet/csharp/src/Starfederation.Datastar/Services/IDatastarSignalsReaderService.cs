@@ -8,11 +8,6 @@ namespace Starfederation.Datastar.Services;
 public interface IDatastarSignalsReaderService
 {
     /// <summary>
-    ///     Gets the underlying signals reader handler.
-    /// </summary>
-    ISignalsReader Handler { get; }
-
-    /// <summary>
     ///     Reads the signals and returns as a serialized string.
     /// </summary>
     /// <returns>A task that represents the asynchronous read operation. The result contains the serialized signals.</returns>

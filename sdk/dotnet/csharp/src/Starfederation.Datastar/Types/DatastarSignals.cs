@@ -50,19 +50,23 @@ public class DatastarSignals
     ///     Attempts to create a new signals instance.
     /// </summary>
     /// <param name="signalsString">The signals string.</param>
+    /// <param name="signals"></param>
     /// <returns>An Optional containing the Signals if valid, None otherwise.</returns>
-    public static Optional<DatastarSignals> TryCreate(string signalsString)
+    public static bool TryCreate(string signalsString, out DatastarSignals signals)
+
     {
         try
         {
             //TODO there is a better way to validate the json
             // Validate JSON
             _ = JsonNode.Parse(signalsString);
-            return Optional<DatastarSignals>.Some(new DatastarSignals(signalsString));
+            signals =  new DatastarSignals(signalsString);
+            return true;
         }
         catch
         {
-            return Optional<DatastarSignals>.None;
+            signals = null!;
+            return false;
         }
     }
 }

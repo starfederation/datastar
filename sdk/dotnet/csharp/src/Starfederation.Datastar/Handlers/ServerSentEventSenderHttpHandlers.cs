@@ -72,7 +72,6 @@ public class ServerSentEventSenderHttpHandlers : IServerEventSender
                 //TODO test if this is needed
                 SetHeader(HttpResponse, (HeaderNames.CacheControl, "no-cache"));
                 SetHeader(HttpResponse, (HeaderNames.Connection, "keep-alive"));
-                //SetHeader(_httpResponse, (HeaderNames.KeepAlive, "timeout=60"));
             }
 
             foreach (var header in _additionalHeaders)

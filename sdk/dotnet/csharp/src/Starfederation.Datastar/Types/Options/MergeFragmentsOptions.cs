@@ -1,19 +1,21 @@
+using Starfederation.Datastar.Enumerations;
+
 namespace Starfederation.Datastar.Types.Options;
 
 /// <summary>
-///     Options for merging signals.
+///     Options for merging fragments.
 /// </summary>
-public class MergeSignalsOptions
+public class MergeFragmentsOptions
 {
     /// <summary>
-    ///     Gets or sets whether to only merge if missing.
+    ///     Gets or sets the selector.
     /// </summary>
-    public bool OnlyIfMissing { get; set; } = Consts.DefaultMergeSignalsOnlyIfMissing;
+    public Selector? Selector { get; set; }
 
     /// <summary>
-    ///     Gets or sets the event ID.
+    ///     Gets or sets the merge mode.
     /// </summary>
-    public Optional<string> EventId { get; set; } = Optional<string>.None;
+    public FragmentMergeMode MergeMode { get; set; } = Consts.DefaultFragmentMergeMode;
 
     /// <summary>
     ///     Gets or sets the retry duration.
@@ -23,5 +25,5 @@ public class MergeSignalsOptions
     /// <summary>
     ///     Gets the default options.
     /// </summary>
-    public static MergeSignalsOptions Defaults => new();
+    public static MergeFragmentsOptions Defaults => new();
 }

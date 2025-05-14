@@ -17,7 +17,7 @@ public class DatastarHeadOutlet : IComponent
         {
             if (UseEmbeddedDatastar)
             {
-                builder.AddMarkupContent(0, """<script defer src="_content/Starfederation.Datastar/datastar.js"></script>""");
+                builder.AddMarkupContent(0, """<script type="module" src="_content/Starfederation.Datastar/datastar.js"></script>""");
             }
         });
     }

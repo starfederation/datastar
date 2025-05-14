@@ -29,11 +29,11 @@ public class ServerSentEventService : SignalsReaderService, IDatastarServerSentE
     }
 
     /// <inheritdoc />
-    public Task MergeFragmentsAsync(string fragment, ServerSentEventMergeFragmentsOptions options)
+    public Task MergeFragmentsAsync(string fragment, ServerSentEventMergeFragmentsOptions? options)
     {
         var mergeOptions = new MergeFragmentsOptions
         {
-            Selector = string.IsNullOrEmpty(options.Selector)
+            Selector = string.IsNullOrEmpty(options?.Selector)
                 ? Optional<Selector>.None
                 : Optional<Selector>.Some(new Selector(options.Selector)),
             MergeMode = options.MergeMode,

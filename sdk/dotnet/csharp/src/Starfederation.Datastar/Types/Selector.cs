@@ -13,7 +13,7 @@ public partial class Selector
     ///     Initializes a new instance of the Selector class.
     /// </summary>
     /// <param name="selector">The selector string.</param>
-    public Selector(string selector)
+    public Selector(string? selector)
     {
         Value = selector ?? string.Empty;
     }
@@ -22,7 +22,15 @@ public partial class Selector
     ///     Gets the string value of the selector.
     /// </summary>
     /// <returns>The string value of the selector.</returns>
-    public string Value { get; }
+    public string Value
+    {
+        get => field; 
+        init
+        {
+            field = value;
+            ValidateSelector();
+        }
+    }
 
     /// <summary>
     ///     Returns the string representation of the selector.
@@ -32,15 +40,18 @@ public partial class Selector
     {
         return Value;
     }
-
-    /// <summary>
-    ///     Creates a new selector instance.
-    /// </summary>
-    /// <param name="selector">The selector string.</param>
-    /// <returns>A new Selector instance.</returns>
-    public static Selector Create(string selector)
+    
+    private void ValidateSelector()
     {
-        return new Selector(selector);
+        if (string.IsNullOrEmpty(Value))
+        {
+            throw new ArgumentException("Selector cannot be null or empty.", nameof(Value));
+        }
+
+        if (!SelectorRegex.IsMatch(Value))
+        {
+            throw new ArgumentException($"Invalid selector: {Value}", nameof(Value));
+        }
     }
 
     [GeneratedRegex("""[#.][-_]?[_a-zA-Z]+(?:\w|\\.)*|(?<=\s+|^)(?:\w+|\*)|\[[^\s"'=<>`]+?(?<![~|^$*])([~|^$*]?=(?:['"].*['"]|[^\s"'=<>`]+))?\]|:[\w-]+(?:\(.*\))?""",
@@ -48,4 +59,13 @@ public partial class Selector
     private static partial Regex GeneratedSelectorRegex();
 
     //TODO add implicit conversion to string and string to Selector
+    public static implicit operator string?(Selector? selector)
+    {
+        return selector?.Value;
+    }
+    
+    public static implicit operator Selector(string? selector)
+    {
+        return new Selector(selector);
+    }
 }

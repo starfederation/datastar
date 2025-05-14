@@ -1,19 +1,19 @@
 namespace Starfederation.Datastar.Types.Options;
 
 /// <summary>
-///     Options for removing fragments.
+///     Options for merging signals.
 /// </summary>
-public class RemoveFragmentsOptions
+public class MergeSignalsOptions
 {
     /// <summary>
-    ///     Gets or sets whether to use view transition.
+    ///     Gets or sets whether to only merge if missing.
     /// </summary>
-    public bool UseViewTransition { get; set; } = Consts.DefaultFragmentsUseViewTransitions;
+    public bool OnlyIfMissing { get; set; } = Consts.DefaultMergeSignalsOnlyIfMissing;
 
     /// <summary>
     ///     Gets or sets the event ID.
     /// </summary>
-    public Optional<string> EventId { get; set; } = Optional<string>.None;
+    public string? EventId { get; set; }
 
     /// <summary>
     ///     Gets or sets the retry duration.
@@ -23,5 +23,5 @@ public class RemoveFragmentsOptions
     /// <summary>
     ///     Gets the default options.
     /// </summary>
-    public static RemoveFragmentsOptions Defaults => new();
+    public static MergeSignalsOptions Defaults => new();
 }

@@ -33,9 +33,9 @@ public static class ServerSentEventGenerator
 
         var dataLines = new List<string>();
 
-        if (options.Selector.HasValue)
+        if (options.Selector != null)
         {
-            dataLines.Add($"{Consts.DatastarDatalineSelector} {options.Selector.Value.Value}");
+            dataLines.Add($"{Consts.DatastarDatalineSelector} {options.Selector.Value}");
         }
 
         var mergeMode = Consts.FragmentMergeModeHelper.ToString(options.MergeMode);
@@ -49,7 +49,7 @@ public static class ServerSentEventGenerator
         var sse = new ServerSentEvent
         {
             EventType = EventType.MergeFragments,
-            Id = options.Selector.HasValue ? Utils.FromEmptyString(options.Selector.Value.Value) : Optional<string>.None,
+            Id = options.Selector,
             Retry = options.Retry,
             DataLines = dataLines.ToArray()
         };
@@ -175,7 +175,7 @@ public static class ServerSentEventGenerator
         var sse = new ServerSentEvent
         {
             EventType = EventType.ExecuteScript,
-            Id = Utils.FromEmptyString(script),
+            Id = script,
             Retry = options.Retry,
             DataLines = dataLines.ToArray()
         };

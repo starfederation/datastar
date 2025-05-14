@@ -1,3 +1,4 @@
+using Cysharp.Text;
 using Starfederation.Datastar.Enumerations;
 
 namespace Starfederation.Datastar.Types;
@@ -15,7 +16,7 @@ public class ServerSentEvent
     /// <summary>
     ///     Gets the ID of the event.
     /// </summary>
-    public Optional<string> Id { get; init; }
+    public string? Id { get; init; }
 
     /// <summary>
     ///     Gets the retry duration for the event.
@@ -33,28 +34,28 @@ public class ServerSentEvent
     /// <returns>The serialized ServerSentEvent.</returns>
     public string Serialize()
     {
-        var lines = new List<string>();
+        var sb = ZString.CreateStringBuilder();
 
-        lines.Add($"event: {Consts.EventType.ToString(EventType)}");
+        sb.AppendLine($"event: {Consts.EventType.ToString(EventType)}");
 
-        if (Id.HasValue)
+        if (Id != null)
         {
-            lines.Add($"id: {Id.Value}");
+            sb.AppendLine($"id: {Id}");
         }
 
         if (Retry != TimeSpan.Zero)
         {
-            lines.Add($"retry: {(int)Retry.TotalMilliseconds}");
+            sb.AppendLine($"retry: {(int)Retry.TotalMilliseconds}");
         }
 
         foreach (var dataLine in DataLines)
         {
-            lines.Add($"data: {dataLine}");
+            sb.AppendLine($"data: {dataLine}");
         }
 
         // Add an extra newline at the end to complete the event
-        lines.Add("");
+        sb.AppendLine("");
 
-        return string.Join("\n", lines);
+        return sb.ToString();
     }
 }
