@@ -17,4 +17,17 @@
       <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Starfederation.Datastar\Starfederation.Datastar.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+    <Target Name="BuildTailwindCss" BeforeTargets="Compile">
+        <Exec Command="bun install" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="'$(Configuration)'=='Release'" />
+        <Exec Command="bun run css:build" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    </Target>
+
 </Project>

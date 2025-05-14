@@ -1,8 +1,12 @@
+using Microsoft.AspNetCore.Mvc;
+using Starfederation.Datastar.MinimalBlazor.Extensions;
+using Index = Starfederation.Datastar.MinimalBlazor.Components.Index;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddBlazorRenderer();
 
 var app = builder.Build();
 
@@ -12,6 +16,18 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapOpenApi();
+app.MapStaticAssets();
+
+app.MapGet("/", async ([FromServices] BlazorRenderer blazorRenderer) =>
+{
+    var result = await blazorRenderer.RenderComponent<Index>(new Dictionary<string, object?>
+    {
+        { "Title", "Datastar Minimal Blazor example" },
+        { "Description", "Hello there, this is the minimal api + blazor demo;" }
+    });
+
+    return result;
+});
 
 app.Run();
 

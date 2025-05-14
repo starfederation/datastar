@@ -13,9 +13,9 @@
       </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="wwwroot\js\site.js" />
-      <_ContentIncludedByDefault Remove="wwwroot\css\site.css" />
-    </ItemGroup>
+    <Target Name="BuildTailwindCss" BeforeTargets="Compile">
+        <Exec Command="bun install" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="'$(Configuration)'=='Release'" />
+        <Exec Command="bun run css:build" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    </Target>
 
 </Project>
