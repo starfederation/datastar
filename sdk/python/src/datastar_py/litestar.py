@@ -5,12 +5,13 @@ from typing import Any, Callable, TYPE_CHECKING
 
 from litestar.response import Stream
 
-from .sse import SSE_HEADERS, ServerSentEventGenerator
+from .sse import SSE_HEADERS, ServerSentEventGenerator, _read_signals
 
 if TYPE_CHECKING:
+    from litestar import Request
     from litestar.types.helper_types import StreamType
 
-__all__ = ["SSE_HEADERS", "DatastarSSE", "ServerSentEventGenerator"]
+__all__ = ["SSE_HEADERS", "DatastarSSE", "ServerSentEventGenerator", "read_signals"]
 
 
 class DatastarSSE(Stream):
@@ -32,3 +33,9 @@ class DatastarSSE(Stream):
             content,
             **kwargs,
         )
+
+
+async def read_signals(request: Request) -> dict[str, Any] | None:
+    return _read_signals(
+        request.method, request.headers, request.query_params, await request.body()
+    )

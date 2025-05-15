@@ -3,7 +3,11 @@ from datetime import datetime
 
 from quart import Quart
 
-from datastar_py.quart import make_datastar_response, ServerSentEventGenerator
+from datastar_py.quart import (
+    make_datastar_response,
+    ServerSentEventGenerator,
+    read_signals,
+)
 
 app = Quart(__name__)
 
@@ -44,6 +48,9 @@ HTML = """\
 
 @app.route("/updates")
 async def updates():
+    # If you need to load the signals, the `read_signals helper` is available
+    signals = await read_signals()
+    print(signals)
     async def time_updates():
         while True:
             yield ServerSentEventGenerator.merge_fragments(

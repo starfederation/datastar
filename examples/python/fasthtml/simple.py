@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fasthtml.common import *
 
-from datastar_py.fasthtml import DatastarStreamingResponse, ServerSentEventGenerator
+from datastar_py.fasthtml import DatastarStreamingResponse, ServerSentEventGenerator, read_signals
 
 repo_root = next(p for p in Path(__file__).parents if (p / ".git").exists())
 
@@ -53,7 +53,9 @@ async def clock():
 
 
 @rt
-async def updates():
+async def updates(request):
+    signals = await read_signals(request)
+    print(signals)
     return DatastarStreamingResponse(clock())
 
 
