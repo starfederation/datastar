@@ -165,7 +165,7 @@ end
 Register server-side code to run when the connection is closed by the client
 
 ```ruby
-datastar.on_client_connect do
+datastar.on_client_disconnect do
   puts 'A user has disconnected connected'
 end
 ```
@@ -178,7 +178,7 @@ Register server-side code to run when the connection is closed by the server.
 Ie when the served is done streaming without errors.
 
 ```ruby
-datastar.on_server_connect do
+datastar.on_server_disconnect do
   puts 'Server is done streaming'
 end
 ```
