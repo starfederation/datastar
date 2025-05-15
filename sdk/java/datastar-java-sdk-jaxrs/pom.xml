@@ -6,7 +6,7 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
     <parent>
-        <groupId>com.starfederation</groupId>
+        <groupId>dev.data-star</groupId>
         <artifactId>datastar-java-sdk-suite</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -42,7 +42,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.starfederation</groupId>
+            <groupId>dev.data-star</groupId>
             <artifactId>datastar-java-sdk-core</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
