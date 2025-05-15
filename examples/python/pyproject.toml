@@ -1,0 +1,24 @@
+[tool.ruff]
+line-length = 99
+exclude = [
+  "src/datastar_py/consts.py",
+]
+[tool.ruff.lint]
+select = [
+  # pycodestyle
+  "E",
+  # Pyflakes
+  "F",
+  # pyupgrade
+  "UP",
+  # flake8-bugbear
+  "B",
+  # flake8-simplify
+  "SIM",
+  # isort
+  "I",
+]
+extend-ignore = [
+  "E501", # line too long
+]
+fixable = ["ALL"]
