@@ -43,12 +43,12 @@ public class SignalsReaderService : IDatastarSignalsReaderService
     ///     Reads the signals from the request.
     /// </summary>
     /// <returns>A task that represents the asynchronous read operation. The result contains the signals if present.</returns>
-    public async Task<Optional<DatastarSignals>> ReadSignalsAsync()
+    public async Task<DatastarSignals?> ReadSignalsAsync()
     {
         var rawSignals = await ReadRawSignalsAsync();
-        return rawSignals.HasValue
-            ? Optional<DatastarSignals>.Some(new DatastarSignals(rawSignals.Value))
-            : Optional<DatastarSignals>.None;
+        return rawSignals != null
+            ? new DatastarSignals(rawSignals)
+            : null;
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public class SignalsReaderService : IDatastarSignalsReaderService
     /// </summary>
     /// <typeparam name="T">The type to deserialize to.</typeparam>
     /// <returns>A task that represents the asynchronous read operation. The result contains the deserialized data if present.</returns>
-    public Task<Optional<T>> ReadSignalsAsync<T>()
+    public Task<T?> ReadSignalsAsync<T>() where T : class
     {
         return ReadSignalsAsync<T>(JsonSerializerOptions.Default);
     }
@@ -67,34 +67,32 @@ public class SignalsReaderService : IDatastarSignalsReaderService
     /// <typeparam name="T">The type to deserialize to.</typeparam>
     /// <param name="jsonSerializerOptions">The JSON serializer options to use.</param>
     /// <returns>A task that represents the asynchronous read operation. The result contains the deserialized data if present.</returns>
-    public async Task<Optional<T>> ReadSignalsAsync<T>(JsonSerializerOptions jsonSerializerOptions)
+    public async Task<T?> ReadSignalsAsync<T>(JsonSerializerOptions jsonSerializerOptions) where T : class
     {
         var signals = await ReadRawSignalsAsync();
 
-        if (!signals.HasValue)
+        if (signals == null)
         {
-            return Optional<T>.None;
+            return null;
         }
 
         try
         {
-            var deserialized = JsonSerializer.Deserialize<T>(signals.Value, jsonSerializerOptions);
-            return deserialized == null
-                ? Optional<T>.None
-                : Optional<T>.Some(deserialized);
+            var deserialized = JsonSerializer.Deserialize<T>(signals, jsonSerializerOptions);
+            return deserialized;
         }
         catch
         {
-            return Optional<T>.None;
+            return null;
         }
     }
 
-    private async Task<Optional<string>> ReadRawSignalsAsync()
+    private async Task<string?> ReadRawSignalsAsync()
     {
         if (HttpRequest.Method == "GET")
         {
             // Handle GET request (if implemented)
-            return Optional<string>.None;
+            return null;
         }
 
         // Read the request body
@@ -105,9 +103,9 @@ public class SignalsReaderService : IDatastarSignalsReaderService
 
         if (string.IsNullOrWhiteSpace(body))
         {
-            return Optional<string>.None;
+            return null;
         }
 
-        return Optional<string>.Some(body);
+        return body;
     }
 }
