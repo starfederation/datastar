@@ -1,0 +1,14 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>preview</LangVersion>
+
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <AnalysisLevel>latest-Recommended</AnalysisLevel>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+
+        <Authors>Starfederation</Authors>
+    </PropertyGroup>
+</Project>
