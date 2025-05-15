@@ -9,6 +9,6 @@
         <AnalysisLevel>latest-Recommended</AnalysisLevel>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
 
-        <Authors>Starfederation</Authors>
+        <Authors>StarFederation</Authors>
     </PropertyGroup>
 </Project>

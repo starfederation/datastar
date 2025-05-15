@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\StarFederation.Datastar\StarFederation.Datastar.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+    <Target Name="BuildTailwindCss" BeforeTargets="Compile">
+        <Exec Command="bun install" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="'$(Configuration)'=='Release'" />
+        <Exec Command="bun run css:build" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    </Target>
+
+</Project>
