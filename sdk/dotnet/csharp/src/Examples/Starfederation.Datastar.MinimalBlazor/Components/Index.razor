@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="css/tailwind.css">
+    <DatastarHeadOutlet UseEmbeddedDatastar="true"/>
+    <title>@Title</title>
+</head>
+<body>
+<header>
+    @Description
+</header>
+<main>
+
+</main>
+</body>
+</html>
+
+@code
+{
+    [Parameter] 
+    [EditorRequired]
+    public required string Title { get; set; }
+    [Parameter] 
+    [EditorRequired]
+    public required string Description { get; set; }
+}
