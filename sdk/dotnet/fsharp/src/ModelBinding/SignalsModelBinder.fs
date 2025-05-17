@@ -1,11 +1,11 @@
-namespace StarFederation.Datastar.ModelBinding
+namespace StarFederation.Datastar.FSharp.ModelBinding
 
 open System.Text.Json.Nodes
 open Microsoft.AspNetCore.Mvc.ModelBinding
 open Microsoft.AspNetCore.Mvc.ModelBinding.Binders
-open StarFederation.Datastar.DependencyInjection
+open StarFederation.Datastar.FSharp.DependencyInjection
 open System.Text.Json
-open StarFederation.Datastar.Utility
+open StarFederation.Datastar.FSharp.Utility
 
 type SignalsModelBinder(signalsReader:IDatastarSignalsReaderService) =
     interface IModelBinder with

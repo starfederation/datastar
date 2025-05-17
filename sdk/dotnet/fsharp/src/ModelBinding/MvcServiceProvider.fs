@@ -1,7 +1,7 @@
-namespace StarFederation.Datastar.ModelBinding
+namespace StarFederation.Datastar.FSharp.ModelBinding
 
 open Microsoft.Extensions.DependencyInjection
-open StarFederation.Datastar.DependencyInjection
+open StarFederation.Datastar.FSharp.DependencyInjection
 open System.Linq
 open System.Runtime.CompilerServices
 

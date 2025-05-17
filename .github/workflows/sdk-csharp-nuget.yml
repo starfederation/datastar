@@ -21,7 +21,7 @@ jobs:
         dotnet-version: 9.0.x
 
     - name: Build and Pack NuGet package with versioning
-      run: dotnet pack sdk/dotnet/src/Starfederation.Datastar/Starfederation.Datastar.csproj --configuration Release --output ${{ env.NuGetDirectory }}
+      run: dotnet pack sdk/dotnet/csharp/src/StarFederation.Datastar/StarFederation.Datastar.csproj --configuration Release --output ${{ env.NuGetDirectory }}
 
     - name: Publish to NuGet.org
       run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
