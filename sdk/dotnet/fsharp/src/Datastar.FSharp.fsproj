@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <AssemblyName>StarFederation.Datastar</AssemblyName>
+        <AssemblyName>StarFederation.Datastar.FSharp</AssemblyName>
         <Version>1.0.0-beta.5</Version>
-        <RootNamespace>StarFederation.Datastar</RootNamespace>
+        <RootNamespace>StarFederation.Datastar.FSharp</RootNamespace>
         <Nullable>disabled</Nullable>
 
         <!-- General info -->
@@ -18,7 +18,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <!-- NuGet config -->
-        <PackageId>StarFederation.Datastar</PackageId>
+        <PackageId>StarFederation.Datastar.FSharp</PackageId>
         <PackageTags>datastar;datastar-sharp;fsharp;functional;asp.net core;asp.net;.net core;routing;web;csharp</PackageTags>
         <PackageProjectUrl>https://github.com/starfederation/datastar</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -32,8 +32,9 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
-        <Title>StarFederation.Datastar</Title>
+        <Title>StarFederation.Datastar.FSharp</Title>
         <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <Product>StarFederation.Datastar.FSharp</Product>
     </PropertyGroup>
 
     <ItemGroup>
@@ -41,11 +42,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="..\assets\datastar_icon.png">
-          <Pack>true</Pack>
+        <Content Include="..\..\assets\datastar_icon.png">
           <Link>datastar_icon.png</Link>
-          <PackagePath>$(PackageIconUrl)</PackagePath>
-        </None>
+        </Content>
         <None Include="..\README.md">
           <Pack>true</Pack>
           <PackagePath>/</PackagePath>

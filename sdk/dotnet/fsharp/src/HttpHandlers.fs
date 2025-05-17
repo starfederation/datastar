@@ -1,4 +1,4 @@
-namespace StarFederation.Datastar
+namespace StarFederation.Datastar.FSharp
 
 open System.IO
 open System.Text

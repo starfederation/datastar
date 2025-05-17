@@ -1,6 +1,6 @@
-namespace StarFederation.Datastar.Scripts
+namespace StarFederation.Datastar.FSharp.Scripts
 
-open StarFederation.Datastar
+open StarFederation.Datastar.FSharp
 
 [<AbstractClass; Sealed>]
 type Redirect =

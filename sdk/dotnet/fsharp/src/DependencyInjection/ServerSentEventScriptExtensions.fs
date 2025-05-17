@@ -1,7 +1,7 @@
-namespace StarFederation.Datastar.Scripts
+namespace StarFederation.Datastar.FSharp.Scripts
 
 open System.Runtime.CompilerServices
-open StarFederation.Datastar.DependencyInjection
+open StarFederation.Datastar.FSharp.DependencyInjection
 
 [<AbstractClass; Sealed; Extension>]
 type ServerSentEventScriptExtensions() =

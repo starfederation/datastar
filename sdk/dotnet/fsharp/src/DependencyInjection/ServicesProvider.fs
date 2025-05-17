@@ -1,10 +1,10 @@
-namespace StarFederation.Datastar.DependencyInjection
+namespace StarFederation.Datastar.FSharp.DependencyInjection
 
 open System
 open System.Runtime.CompilerServices
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
-open StarFederation.Datastar
+open StarFederation.Datastar.FSharp
 
 [<AbstractClass; Sealed; Extension>]
 type ServiceCollectionExtensionMethods() =

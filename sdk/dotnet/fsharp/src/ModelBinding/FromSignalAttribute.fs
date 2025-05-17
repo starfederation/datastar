@@ -1,4 +1,4 @@
-namespace StarFederation.Datastar.ModelBinding
+namespace StarFederation.Datastar.FSharp.ModelBinding
 
 open System
 open Microsoft.AspNetCore.Mvc.ModelBinding
