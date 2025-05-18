@@ -5,13 +5,13 @@ namespace StarFederation.Datastar.Types;
 /// <summary>
 ///     Represents a dotted path into Signals to access a key/value pair.
 /// </summary>
-public class SignalPath
+public readonly struct DatastarSignalPath
 {
     /// <summary>
     ///     Initializes a new instance of the SignalPath class.
     /// </summary>
     /// <param name="path">The signal path.</param>
-    public SignalPath(string path)
+    public DatastarSignalPath(string path)
     {
         Value = path ?? string.Empty;
     }

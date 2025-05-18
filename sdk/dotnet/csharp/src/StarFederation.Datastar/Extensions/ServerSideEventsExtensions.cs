@@ -150,7 +150,7 @@ public static class ServerSideEventsExtensions
         return httpResponse.SendEvent(serverSideEvent);
     }
     
-    public static Task RemoveSignals(this HttpResponse httpResponse, IEnumerable<SignalPath> paths, EventOptions? options = null)
+    public static Task RemoveSignals(this HttpResponse httpResponse, IEnumerable<DatastarSignalPath> paths, EventOptions? options = null)
     {
         options ??= EventOptions.Defaults;
 

@@ -47,7 +47,7 @@ public interface IDatastarServerSentEventService : IDatastarSignalsReaderService
     /// <param name="paths">The paths for the signals to remove.</param>
     /// <param name="options">The remove options.</param>
     /// <returns>A task that represents the asynchronous remove operation.</returns>
-    Task RemoveSignalsAsync(IEnumerable<SignalPath> paths, ServerSentEventOptions? options= null);
+    Task RemoveSignalsAsync(IEnumerable<DatastarSignalPath> paths, ServerSentEventOptions? options= null);
 
     /// <summary>
     ///     Executes a script in the browser with the specified options.

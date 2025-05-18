@@ -48,7 +48,7 @@ public class ServerSentEventService : SignalsReaderService, IDatastarServerSentE
         throw new NotImplementedException();
     }
 
-    public Task RemoveSignalsAsync(IEnumerable<SignalPath> paths, ServerSentEventOptions? options = null)
+    public Task RemoveSignalsAsync(IEnumerable<DatastarSignalPath> paths, ServerSentEventOptions? options = null)
     {
         throw new NotImplementedException();
     }
