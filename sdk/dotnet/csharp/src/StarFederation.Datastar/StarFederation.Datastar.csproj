@@ -13,10 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Interfaces\"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="NetEscapades.EnumGenerators" PrivateAssets="all" ExcludeAssets="runtime"/>
         <PackageReference Include="NetEscapades.EnumGenerators.Interceptors" PrivateAssets="all" ExcludeAssets="runtime"/>
         <PackageReference Include="ZString"/>

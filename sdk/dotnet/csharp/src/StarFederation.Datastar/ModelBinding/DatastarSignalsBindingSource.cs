@@ -12,7 +12,7 @@ public class DatastarSignalsBindingSource : BindingSource
     /// </summary>
     /// <param name="path">The path to the signals value.</param>
     public DatastarSignalsBindingSource(string path)
-        : base(Consts.BindingSourceName, Consts.BindingSourceName, true, true)
+        : base(DatastarConstants.BindingSourceName, DatastarConstants.BindingSourceName, true, true)
     {
         Path = path;
     }

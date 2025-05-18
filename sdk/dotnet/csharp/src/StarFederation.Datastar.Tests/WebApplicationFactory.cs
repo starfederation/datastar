@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
-using StarFederation.Datastar.MinimalBlazor;
+using StarFederation.Datastar.Example;
 using TUnit.Core.Interfaces;
 
 namespace StarFederation.Datastar.Tests;

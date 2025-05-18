@@ -1,8 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using StarFederation.Datastar.Services;
+using StarFederation.Datastar.Interfaces;
 
 namespace StarFederation.Datastar.ModelBinding;
 
@@ -37,7 +36,7 @@ public class SignalsModelBinder : IModelBinder
         {
             if (bindingContext.ModelType.IsValueType || bindingContext.ModelType == typeof(string))
             {
-                var signals = await _signalsReader.ReadSignalsAsync();
+                var signals = await _signalsReader.ReadSignalsAsStringAsync();
                 try
                 {
                     if (signals == null)
@@ -46,7 +45,7 @@ public class SignalsModelBinder : IModelBinder
                         return;
                     }
 
-                    var signalsJsonObject = JsonObject.Parse(signals.Value)!.AsObject();
+                    var signalsJsonObject = JsonNode.Parse(signals)!.AsObject();
                     var value = Utils.JsonPath.GetValue(bindingContext.ModelType, signalsJsonObject, bindingContext.FieldName);
                     bindingContext.Result = ModelBindingResult.Success(value);
                 }
@@ -57,7 +56,7 @@ public class SignalsModelBinder : IModelBinder
             }
             else
             {
-                var signals = await _signalsReader.ReadSignalsAsync();
+                var signals = await _signalsReader.ReadSignalsAsStringAsync();
                 try
                 {
                     if (signals == null)
@@ -66,7 +65,7 @@ public class SignalsModelBinder : IModelBinder
                         return;
                     }
 
-                    var signalsJsonObject = JsonObject.Parse(signals.Value)!.AsObject();
+                    var signalsJsonObject = JsonNode.Parse(signals)!.AsObject();
                     object? value;
                     if (signalsJsonObject.ContainsKey(bindingContext.FieldName))
                     {
@@ -87,7 +86,7 @@ public class SignalsModelBinder : IModelBinder
         }
         else
         {
-            var signals = await _signalsReader.ReadSignalsAsync();
+            var signals = await _signalsReader.ReadSignalsAsStringAsync();
             try
             {
                 if (signals == null)
@@ -96,7 +95,7 @@ public class SignalsModelBinder : IModelBinder
                     return;
                 }
 
-                var signalsJsonObject = JsonObject.Parse(signals.Value)!.AsObject();
+                var signalsJsonObject = JsonNode.Parse(signals)!.AsObject();
                 var value = Utils.JsonPath.GetValue(bindingContext.ModelType, signalsJsonObject, path);
                 bindingContext.Result = ModelBindingResult.Success(value);
             }
@@ -105,28 +104,5 @@ public class SignalsModelBinder : IModelBinder
                 bindingContext.Result = ModelBindingResult.Failed();
             }
         }
-    }
-}
-
-/// <summary>
-///     Model binder provider for Datastar signals.
-/// </summary>
-public class SignalsModelBinderProvider : IModelBinderProvider
-{
-    /// <inheritdoc />
-    public IModelBinder? GetBinder(ModelBinderProviderContext? context)
-    {
-        if (context                           == null ||
-            context.BindingInfo.BindingSource == null)
-        {
-            return null;
-        }
-
-        var isSignalsBindingSource =
-            context.BindingInfo.BindingSource.DisplayName == Consts.BindingSourceName;
-
-        return isSignalsBindingSource
-            ? new BinderTypeModelBinder(typeof(SignalsModelBinder))
-            : null;
     }
 }

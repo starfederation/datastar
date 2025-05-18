@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using StarFederation.Datastar.Handlers;
+using StarFederation.Datastar.Interfaces;
 using StarFederation.Datastar.ModelBinding;
 using StarFederation.Datastar.Services;
 
@@ -18,30 +18,15 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddDatastar(this IServiceCollection services)
     {
+        //Check if HttpContextAccessor is already registered, if not, register it
+        if (services.All(svc => svc.ServiceType != typeof(IHttpContextAccessor)))
+        {
+            services.AddHttpContextAccessor();
+        }
+        
         return services
-              .AddHttpContextAccessor()
-              .AddScoped<IDatastarSignalsReaderService>(serviceProvider =>
-               {
-                   var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
-                   var signalsHttpHandler = new SignalsReaderHttpHandlers(httpContextAccessor.HttpContext!.Request);
-                   return new SignalsReaderService(signalsHttpHandler);
-               })
-              .AddScoped<IDatastarServerSentEventService>(serviceProvider =>
-               {
-                   var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
-
-                   var sseHttpHandler = new ServerSentEventSenderHttpHandlers(httpContextAccessor.HttpContext!.Response);
-
-                   // Start the response
-                   sseHttpHandler.StartResponse();
-
-                   // You can add headers here if needed
-                   // sseHttpHandler.AddHeader("X-Accel-Buffering", "no");
-
-                   var signalsReader = new SignalsReaderHttpHandlers(httpContextAccessor.HttpContext.Request);
-
-                   return new ServerSentEventService(sseHttpHandler, signalsReader);
-               });
+              .AddScoped<IDatastarSignalsReaderService>()
+              .AddScoped<IDatastarServerSentEventService>();
     }
 
     /// <summary>

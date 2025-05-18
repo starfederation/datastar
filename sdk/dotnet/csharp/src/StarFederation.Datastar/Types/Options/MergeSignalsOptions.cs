@@ -8,7 +8,7 @@ public class MergeSignalsOptions
     /// <summary>
     ///     Gets or sets whether to only merge if missing.
     /// </summary>
-    public bool OnlyIfMissing { get; set; } = Consts.DefaultMergeSignalsOnlyIfMissing;
+    public bool OnlyIfMissing { get; set; } = DatastarConstants.DefaultMergeSignalsOnlyIfMissing;
 
     /// <summary>
     ///     Gets or sets the event ID.
@@ -18,7 +18,7 @@ public class MergeSignalsOptions
     /// <summary>
     ///     Gets or sets the retry duration.
     /// </summary>
-    public TimeSpan Retry { get; set; } = Consts.DefaultSseRetryDuration;
+    public TimeSpan Retry { get; set; } = DatastarConstants.DefaultSseRetryDuration;
 
     /// <summary>
     ///     Gets the default options.

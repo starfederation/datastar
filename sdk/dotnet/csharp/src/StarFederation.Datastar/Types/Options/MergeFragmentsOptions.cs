@@ -10,17 +10,17 @@ public class MergeFragmentsOptions
     /// <summary>
     ///     Gets or sets the selector.
     /// </summary>
-    public Selector? Selector { get; set; }
+    public DatastarSelector? Selector { get; set; }
 
     /// <summary>
     ///     Gets or sets the merge mode.
     /// </summary>
-    public FragmentMergeMode MergeMode { get; set; } = Consts.DefaultFragmentMergeMode;
+    public FragmentMergeMode MergeMode { get; set; } = DatastarConstants.DefaultFragmentMergeMode;
 
     /// <summary>
     ///     Gets or sets the retry duration.
     /// </summary>
-    public TimeSpan Retry { get; set; } = Consts.DefaultSseRetryDuration;
+    public TimeSpan Retry { get; set; } = DatastarConstants.DefaultSseRetryDuration;
 
     /// <summary>
     ///     Gets the default options.

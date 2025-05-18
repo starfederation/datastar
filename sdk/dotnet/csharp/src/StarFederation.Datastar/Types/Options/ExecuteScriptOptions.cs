@@ -8,17 +8,17 @@ public class ExecuteScriptOptions
     /// <summary>
     ///     Gets or sets whether to auto remove the script.
     /// </summary>
-    public bool AutoRemove { get; set; } = Consts.DefaultExecuteScriptAutoRemove;
+    public bool AutoRemove { get; set; } = DatastarConstants.DefaultExecuteScriptAutoRemove;
 
     /// <summary>
     ///     Gets or sets the script attributes.
     /// </summary>
-    public string[] Attributes { get; set; } = Consts.DefaultExecuteScriptAttributes.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    public string[] Attributes { get; set; } = DatastarConstants.DefaultExecuteScriptAttributes.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
     /// <summary>
     ///     Gets or sets the retry duration.
     /// </summary>
-    public TimeSpan Retry { get; set; } = Consts.DefaultSseRetryDuration;
+    public TimeSpan Retry { get; set; } = DatastarConstants.DefaultSseRetryDuration;
 
     /// <summary>
     ///     Gets the default options.

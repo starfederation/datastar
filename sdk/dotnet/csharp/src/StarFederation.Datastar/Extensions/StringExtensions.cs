@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Cysharp.Text;
 
 namespace StarFederation.Datastar.Extensions;

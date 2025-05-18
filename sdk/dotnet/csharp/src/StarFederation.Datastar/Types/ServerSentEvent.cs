@@ -21,22 +21,29 @@ public class ServerSentEvent
     /// <summary>
     ///     Gets the retry duration for the event.
     /// </summary>
-    public TimeSpan Retry { get; init; } = Consts.DefaultSseRetryDuration;
+    public TimeSpan Retry { get; init; } = DatastarConstants.DefaultSseRetryDuration;
 
-    /// <summary>
+    /*/// <summary>
     ///     Gets the data lines for the event.
     /// </summary>
-    public string[] DataLines { get; init; } = [];
+    public IEnumerable<string> DataLines { get; init; } = [];*/
+    
+    internal Utf8ValueStringBuilder DataLineBuilder { get; } = ZString.CreateUtf8StringBuilder();
+    
+    public void AddDataLine(string dataLine)
+    {
+        DataLineBuilder.AppendLine($"data: {dataLine}");
+    }
 
     /// <summary>
     ///     Serializes the ServerSentEvent to a string.
     /// </summary>
     /// <returns>The serialized ServerSentEvent.</returns>
-    public string Serialize()
+    public ReadOnlyMemory<byte> Serialize()
     {
-        var sb = ZString.CreateStringBuilder();
-
-        sb.AppendLine($"event: {Consts.EventType.ToString(EventType)}");
+        var sb = ZString.CreateUtf8StringBuilder();
+        
+        sb.AppendLine($"event: {EventType.ToStringFast(true)}");
 
         if (Id != null)
         {
@@ -48,14 +55,12 @@ public class ServerSentEvent
             sb.AppendLine($"retry: {(int)Retry.TotalMilliseconds}");
         }
 
-        foreach (var dataLine in DataLines)
-        {
-            sb.AppendLine($"data: {dataLine}");
-        }
+        var dataLines = DataLineBuilder.ToString();
+        sb.Append(dataLines);
 
         // Add an extra newline at the end to complete the event
-        sb.AppendLine("");
+        sb.AppendLine(string.Empty);
 
-        return sb.ToString();
+        return sb.AsMemory();
     }
 }

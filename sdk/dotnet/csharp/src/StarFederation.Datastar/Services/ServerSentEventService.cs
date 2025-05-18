@@ -1,3 +1,8 @@
+using System.Text;
+using Microsoft.AspNetCore.Http;
+using StarFederation.Datastar.Enumerations;
+using StarFederation.Datastar.Extensions;
+using StarFederation.Datastar.Interfaces;
 using StarFederation.Datastar.Types;
 using StarFederation.Datastar.Types.Options;
 
@@ -6,121 +11,55 @@ namespace StarFederation.Datastar.Services;
 /// <summary>
 ///     Implementation of IDatastarServerSentEventService.
 /// </summary>
-public class ServerSentEventService : SignalsReaderService, IDatastarServerSentEventService
+public class ServerSentEventService : SignalsReaderService, IDatastarServerSentEventService, IDatastarSignalsReaderService
 {
+    private HttpResponse HttpResponse { get; }
+    
     /// <summary>
     ///     Initializes a new instance of the ServerSentEventService class.
     /// </summary>
-    /// <param name="handler">The underlying server-sent event handler.</param>
-    public ServerSentEventService(IServerEventSender handler, ISignalsReader signalsReaderReader) : base(signalsReaderReader)
+    /// <param name="httpContextAccessor"></param>
+    public ServerSentEventService(HttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
     {
-        ServerEventSenderSender = handler;
+        ArgumentNullException.ThrowIfNull(httpContextAccessor);
+        ArgumentNullException.ThrowIfNull(httpContextAccessor.HttpContext);
+        ArgumentNullException.ThrowIfNull(httpContextAccessor.HttpContext.Response);
+        
+        HttpResponse = httpContextAccessor.HttpContext.Response;
     }
 
-    /// <summary>
-    ///     Gets the underlying server-sent event handler.
-    /// </summary>
-    public IServerEventSender ServerEventSenderSender { get; }
-
-    /// <inheritdoc />
-    public Task MergeFragmentsAsync(string fragment)
+    public Task MergeFragmentsAsync(string fragment, ServerSentEventMergeFragmentsOptions? options = null)
     {
-        return ServerSentEventGenerator.MergeFragments(ServerEventSenderSender, fragment);
+        throw new NotImplementedException();
     }
 
-    /// <inheritdoc />
-    public Task MergeFragmentsAsync(string fragment, ServerSentEventMergeFragmentsOptions? options)
+    public Task MergeFragmentsAsync(Span<char> fragment, ServerSentEventMergeFragmentsOptions? options = null)
     {
-        var mergeOptions = new MergeFragmentsOptions
-        {
-            Selector = string.IsNullOrEmpty(options?.Selector)
-                ? Optional<Selector>.None
-                : Optional<Selector>.Some(new Selector(options.Selector)),
-            MergeMode = options.MergeMode,
-            Retry = options.Retry
-        };
-
-        return ServerSentEventGenerator.MergeFragments(ServerEventSenderSender, fragment, mergeOptions);
+        throw new NotImplementedException();
     }
 
-    /// <inheritdoc />
-    public Task RemoveFragmentsAsync(Selector selector)
+    public Task RemoveFragmentsAsync(DatastarSelector datastarSelector, ServerSentEventRemoveFragmentsOptions? options = null)
     {
-        return ServerSentEventGenerator.RemoveFragments(ServerEventSenderSender, selector);
+        throw new NotImplementedException();
     }
 
-    /// <inheritdoc />
-    public Task RemoveFragmentsAsync(Selector selector, ServerSentEventRemoveFragmentsOptions options)
+    public Task MergeSignalsAsync<T>(T? dataDatastarSignals, ServerSentEventMergeSignalsOptions? options = null) where T : class
     {
-        var removeOptions = new RemoveFragmentsOptions
-        {
-            UseViewTransition = options.UseViewTransition,
-            EventId = string.IsNullOrEmpty(options.EventId)
-                ? Optional<string>.None
-                : Optional<string>.Some(options.EventId),
-            Retry = options.Retry
-        };
-
-        return ServerSentEventGenerator.RemoveFragments(ServerEventSenderSender, selector, removeOptions);
+        throw new NotImplementedException();
     }
 
-    /// <inheritdoc />
-    public Task MergeSignalsAsync(DatastarSignals dataDatastarSignals)
+    public Task RemoveSignalsAsync(IEnumerable<SignalPath> paths, ServerSentEventOptions? options = null)
     {
-        return ServerSentEventGenerator.MergeSignals(ServerEventSenderSender, dataDatastarSignals);
+        throw new NotImplementedException();
     }
 
-    /// <inheritdoc />
-    public Task MergeSignalsAsync(DatastarSignals dataDatastarSignals, ServerSentEventMergeSignalsOptions options)
+    public Task ExecuteScriptAsync(string script, ServerSentEventExecuteScriptOptions? options = null)
     {
-        var mergeOptions = new MergeSignalsOptions
-        {
-            OnlyIfMissing = options.OnlyIfMissing,
-            EventId = string.IsNullOrEmpty(options.EventId)
-                ? Optional<string>.None
-                : Optional<string>.Some(options.EventId),
-            Retry = options.Retry
-        };
-
-        return ServerSentEventGenerator.MergeSignals(ServerEventSenderSender, dataDatastarSignals, mergeOptions);
+        throw new NotImplementedException();
     }
 
-    /// <inheritdoc />
-    public Task RemoveSignalsAsync(IEnumerable<SignalPath> paths)
+    public Task BrowserConsoleActionAsync(BrowserConsoleAction action, string? message = null, EventOptions? options = null)
     {
-        return ServerSentEventGenerator.RemoveSignals(ServerEventSenderSender, paths);
-    }
-
-    /// <inheritdoc />
-    public Task RemoveSignalsAsync(IEnumerable<SignalPath> paths, ServerSentEventOptions options)
-    {
-        var eventOptions = new EventOptions
-        {
-            EventId = string.IsNullOrEmpty(options.EventId)
-                ? Optional<string>.None
-                : Optional<string>.Some(options.EventId),
-            Retry = options.Retry
-        };
-
-        return ServerSentEventGenerator.RemoveSignals(ServerEventSenderSender, paths, eventOptions);
-    }
-
-    /// <inheritdoc />
-    public Task ExecuteScriptAsync(string script)
-    {
-        return ServerSentEventGenerator.ExecuteScript(ServerEventSenderSender, script);
-    }
-
-    /// <inheritdoc />
-    public Task ExecuteScriptAsync(string script, ServerSentEventExecuteScriptOptions options)
-    {
-        var scriptOptions = new ExecuteScriptOptions
-        {
-            AutoRemove = options.AutoRemove,
-            Attributes = options.Attributes?.Split(' ') ?? ["type", "module"],
-            Retry = options.Retry
-        };
-
-        return ServerSentEventGenerator.ExecuteScript(ServerEventSenderSender, script, scriptOptions);
+        throw new NotImplementedException();
     }
 }

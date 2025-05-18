@@ -13,7 +13,7 @@ public class EventOptions
     /// <summary>
     ///     Gets or sets the retry duration.
     /// </summary>
-    public TimeSpan Retry { get; set; } = Consts.DefaultSseRetryDuration;
+    public TimeSpan Retry { get; set; } = DatastarConstants.DefaultSseRetryDuration;
 
     /// <summary>
     ///     Gets the default options.

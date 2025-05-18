@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarFederation.Datastar", "StarFederation.Datastar\StarFederation.Datastar.csproj", "{DEED24D2-9A70-4815-B899-8E5A6A8EDF1D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_SolutionItems", "_SolutionItems", "{D239B5AA-B253-4FB7-9DD4-1412ACC11105}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Packages.props = Directory.Packages.props
+		Directory.Build.props = Directory.Build.props
+		.editorconfig = .editorconfig
+		.globalconfig = .globalconfig
+		..\..\..\..\.github\workflows\sdk-dotnet-nuget.yml = ..\..\..\..\.github\workflows\sdk-dotnet-nuget.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{3ABA911C-9A49-46DC-8E37-419E2CE6F44A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E8176B92-7066-487F-BCC1-FDAD6796CC1C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarFederation.Datastar.Tests", "StarFederation.Datastar.Tests\StarFederation.Datastar.Tests.csproj", "{0FE29EB0-DA1F-459E-AA1B-09AB3C27B0AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarFederation.Datastar.Example", "StarFederation.Datastar.Example\StarFederation.Datastar.Example.csproj", "{9ABCC213-85C3-4053-A75A-DC236CCB6547}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DEED24D2-9A70-4815-B899-8E5A6A8EDF1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEED24D2-9A70-4815-B899-8E5A6A8EDF1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEED24D2-9A70-4815-B899-8E5A6A8EDF1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEED24D2-9A70-4815-B899-8E5A6A8EDF1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FE29EB0-DA1F-459E-AA1B-09AB3C27B0AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FE29EB0-DA1F-459E-AA1B-09AB3C27B0AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FE29EB0-DA1F-459E-AA1B-09AB3C27B0AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FE29EB0-DA1F-459E-AA1B-09AB3C27B0AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9ABCC213-85C3-4053-A75A-DC236CCB6547}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9ABCC213-85C3-4053-A75A-DC236CCB6547}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9ABCC213-85C3-4053-A75A-DC236CCB6547}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9ABCC213-85C3-4053-A75A-DC236CCB6547}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0FE29EB0-DA1F-459E-AA1B-09AB3C27B0AB} = {E8176B92-7066-487F-BCC1-FDAD6796CC1C}
+		{9ABCC213-85C3-4053-A75A-DC236CCB6547} = {3ABA911C-9A49-46DC-8E37-419E2CE6F44A}
+	EndGlobalSection
+EndGlobal
