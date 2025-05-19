@@ -1,9 +1,11 @@
+using StarFederation.Datastar.Interfaces;
+
 namespace StarFederation.Datastar.Types.Options;
 
 /// <summary>
 ///     Options for merging signals.
 /// </summary>
-public class MergeSignalsOptions
+public class MergeSignalsOptions : IDatastarOptions
 {
     /// <summary>
     ///     Gets or sets whether to only merge if missing.
@@ -19,9 +21,4 @@ public class MergeSignalsOptions
     ///     Gets or sets the retry duration.
     /// </summary>
     public TimeSpan Retry { get; set; } = DatastarConstants.DefaultSseRetryDuration;
-
-    /// <summary>
-    ///     Gets the default options.
-    /// </summary>
-    public static MergeSignalsOptions Defaults => new();
 }

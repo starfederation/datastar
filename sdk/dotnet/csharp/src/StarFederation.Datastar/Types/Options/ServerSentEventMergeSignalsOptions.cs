@@ -1,11 +1,12 @@
 using System.Text.Json;
+using StarFederation.Datastar.Interfaces;
 
 namespace StarFederation.Datastar.Types.Options;
 
 /// <summary>
 ///     Options for merging signals in server-sent events.
 /// </summary>
-public sealed class ServerSentEventMergeSignalsOptions
+public sealed class ServerSentEventMergeSignalsOptions : IDatastarServerSentEventOptions
 {
     /// <summary>
     ///     Gets or sets whether to only merge if missing.

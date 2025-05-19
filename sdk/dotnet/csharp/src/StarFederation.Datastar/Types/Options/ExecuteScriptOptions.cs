@@ -1,9 +1,11 @@
+using StarFederation.Datastar.Interfaces;
+
 namespace StarFederation.Datastar.Types.Options;
 
 /// <summary>
 ///     Options for executing scripts.
 /// </summary>
-public class ExecuteScriptOptions
+public class ExecuteScriptOptions : IDatastarOptions
 {
     /// <summary>
     ///     Gets or sets whether to auto remove the script.
@@ -19,9 +21,4 @@ public class ExecuteScriptOptions
     ///     Gets or sets the retry duration.
     /// </summary>
     public TimeSpan Retry { get; set; } = DatastarConstants.DefaultSseRetryDuration;
-
-    /// <summary>
-    ///     Gets the default options.
-    /// </summary>
-    public static ExecuteScriptOptions Defaults => new();
 }

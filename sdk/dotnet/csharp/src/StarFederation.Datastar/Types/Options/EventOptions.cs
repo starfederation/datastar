@@ -1,9 +1,11 @@
+using StarFederation.Datastar.Interfaces;
+
 namespace StarFederation.Datastar.Types.Options;
 
 /// <summary>
 ///     Common options for events.
 /// </summary>
-public class EventOptions
+public class EventOptions : IDatastarOptions
 {
     /// <summary>
     ///     Gets or sets the event ID.
@@ -14,9 +16,4 @@ public class EventOptions
     ///     Gets or sets the retry duration.
     /// </summary>
     public TimeSpan Retry { get; set; } = DatastarConstants.DefaultSseRetryDuration;
-
-    /// <summary>
-    ///     Gets the default options.
-    /// </summary>
-    public static EventOptions Defaults => new();
 }

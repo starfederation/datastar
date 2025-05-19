@@ -1,11 +1,12 @@
 using StarFederation.Datastar.Enumerations;
+using StarFederation.Datastar.Interfaces;
 
 namespace StarFederation.Datastar.Types.Options;
 
 /// <summary>
 ///     Options for merging fragments.
 /// </summary>
-public class MergeFragmentsOptions
+public class MergeFragmentsOptions : IDatastarOptions
 {
     /// <summary>
     ///     Gets or sets the selector.
@@ -21,9 +22,4 @@ public class MergeFragmentsOptions
     ///     Gets or sets the retry duration.
     /// </summary>
     public TimeSpan Retry { get; set; } = DatastarConstants.DefaultSseRetryDuration;
-
-    /// <summary>
-    ///     Gets the default options.
-    /// </summary>
-    public static MergeFragmentsOptions Defaults => new();
 }

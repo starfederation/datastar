@@ -1,9 +1,11 @@
+using StarFederation.Datastar.Interfaces;
+
 namespace StarFederation.Datastar.Types.Options;
 
 /// <summary>
 ///     Common options for server-sent events.
 /// </summary>
-public class ServerSentEventOptions
+public class ServerSentEventOptions : IDatastarServerSentEventOptions
 {
     /// <summary>
     ///     Gets or sets the event ID.

@@ -30,36 +30,42 @@ public class ServerSentEventService : SignalsReaderService, IDatastarServerSentE
 
     public Task MergeFragmentsAsync(string fragment, ServerSentEventMergeFragmentsOptions? options = null)
     {
-        throw new NotImplementedException();
+        options ??= new ServerSentEventMergeFragmentsOptions();
+        return HttpResponse.MergeFragments(fragment, options);
     }
 
     public Task MergeFragmentsAsync(Span<char> fragment, ServerSentEventMergeFragmentsOptions? options = null)
     {
-        throw new NotImplementedException();
+        return MergeFragmentsAsync(fragment.ToString(), options);
     }
 
     public Task RemoveFragmentsAsync(DatastarSelector datastarSelector, ServerSentEventRemoveFragmentsOptions? options = null)
     {
-        throw new NotImplementedException();
+        options ??= new ServerSentEventRemoveFragmentsOptions();
+        return HttpResponse.RemoveFragments(datastarSelector, options);
     }
 
     public Task MergeSignalsAsync<T>(T? dataDatastarSignals, ServerSentEventMergeSignalsOptions? options = null) where T : class
     {
-        throw new NotImplementedException();
+        options ??= new ServerSentEventMergeSignalsOptions();
+        return HttpResponse.MergeSignals(dataDatastarSignals, options);
     }
 
     public Task RemoveSignalsAsync(IEnumerable<DatastarSignalPath> paths, ServerSentEventOptions? options = null)
     {
-        throw new NotImplementedException();
+        options ??= new ServerSentEventOptions();
+        return HttpResponse.RemoveSignals(paths, options);
     }
 
     public Task ExecuteScriptAsync(string script, ServerSentEventExecuteScriptOptions? options = null)
     {
-        throw new NotImplementedException();
+        options ??= new ServerSentEventExecuteScriptOptions();
+        return HttpResponse.ExecuteJavascriptAsync(script, options);
     }
 
     public Task BrowserConsoleActionAsync(BrowserConsoleAction action, string? message = null, EventOptions? options = null)
     {
-        throw new NotImplementedException();
+        return HttpResponse.ExecuteConsoleActionAsync(action, message);
     }
 }
+

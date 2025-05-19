@@ -1,27 +1,27 @@
-using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using StarFederation.Datastar.Enumerations;
-using StarFederation.Datastar.Interfaces;
 using StarFederation.Datastar.Types;
 using StarFederation.Datastar.Types.Options;
 
-namespace StarFederation.Datastar.Extensions;
+namespace StarFederation.Datastar;
 
-/// <summary>
-///     Extension methods for IDatastarServerSentEventService.
-/// </summary>
-public static class ServerSideEventsExtensions
+public static class ServerSentEventGenerator
 {
     #region Basic SSE
 
+    /// <summary>
+    /// Starts a server-sent event (SSE) response.
+    /// </summary>
+    /// <param name="httpResponse"></param>
+    /// <returns></returns>
     public static Task StartSseResponse(this HttpResponse httpResponse)
     {
         httpResponse.Headers.ContentType = DatastarConstants.DatastarSseContentType;
-
+        httpResponse.Headers.CacheControl = "no-cache";
+        
         if (httpResponse.HttpContext.Request.Protocol == "HTTP/1.1")
         {
-            httpResponse.Headers.CacheControl = "no-cache";
             httpResponse.Headers.Connection = "keep-alive";
         }
 
@@ -29,20 +29,30 @@ public static class ServerSideEventsExtensions
         return httpResponse.Body.FlushAsync();
     }
 
-    public static async Task SendEvent(this HttpResponse httpResponse, ServerSentEvent serverSentEvent)
+    /// <summary>
+    /// Sends a server-sent event to the client.
+    /// </summary>
+    /// <param name="httpResponse"></param>
+    /// <param name="serverSentEvent"></param>
+    internal static async Task SendEvent(this HttpResponse httpResponse, ServerSentEvent serverSentEvent)
     {
         // Ensure the response is started
         if (!httpResponse.HasStarted)
         {
             await httpResponse.StartSseResponse();
         }
-        
+
         var serializedEvent = serverSentEvent.Serialize();
-        
+
         await httpResponse.Body.WriteAsync(serializedEvent);
         await httpResponse.Body.FlushAsync();
     }
-    
+
+    /// <summary>
+    /// Ends the server-sent event (SSE) response.
+    /// </summary>
+    /// <param name="httpResponse"></param>
+    /// <returns></returns>
     public static Task EndSseResponse(this HttpResponse httpResponse)
     {
         // Ensure the response is started
@@ -62,9 +72,9 @@ public static class ServerSideEventsExtensions
 
     #region Datastar Fragments
 
-    public static Task MergeFragments(this HttpResponse httpResponse, string fragments, MergeFragmentsOptions? options = null)
+    public static Task MergeFragments(this HttpResponse httpResponse, string fragments, ServerSentEventMergeFragmentsOptions? options = null)
     {
-        options ??= MergeFragmentsOptions.Defaults;
+        options ??= new ServerSentEventMergeFragmentsOptions();
 
         var serverSideEvent = new ServerSentEvent
         {
@@ -89,10 +99,10 @@ public static class ServerSideEventsExtensions
 
         return httpResponse.SendEvent(serverSideEvent);
     }
-    
-    public static Task RemoveFragments(this HttpResponse httpResponse, DatastarSelector datastarSelector, RemoveFragmentsOptions? options = null)
+
+    public static Task RemoveFragments(this HttpResponse httpResponse, DatastarSelector datastarSelector, ServerSentEventRemoveFragmentsOptions? options = null)
     {
-        options ??= RemoveFragmentsOptions.Defaults;
+        options ??= new ServerSentEventRemoveFragmentsOptions();
 
         var serverSideEvent = new ServerSentEvent
         {
@@ -102,7 +112,7 @@ public static class ServerSideEventsExtensions
         };
 
         serverSideEvent.AddDataLine($"{DatastarConstants.DatastarDatalineSelector} {datastarSelector.Value}");
-        
+
         if (options.UseViewTransition != DatastarConstants.DefaultFragmentsUseViewTransitions)
         {
             serverSideEvent.AddDataLine($"{DatastarConstants.DatastarDatalineUseViewTransition} {options.UseViewTransition.ToString().ToLower()}");
@@ -113,17 +123,16 @@ public static class ServerSideEventsExtensions
 
     #endregion
 
-
     #region Datastar Signals
 
-    public static Task MergeSignals<T>(this HttpResponse httpResponse, T? dataDatastarSignals, MergeSignalsOptions? options = null)
+    public static Task MergeSignals<T>(this HttpResponse httpResponse, T? dataDatastarSignals, ServerSentEventMergeSignalsOptions? options = null)
     {
         if (dataDatastarSignals == null)
         {
             return Task.CompletedTask;
         }
-        
-        options ??= MergeSignalsOptions.Defaults;
+
+        options ??= new ServerSentEventMergeSignalsOptions();
 
         var serverSideEvent = new ServerSentEvent
         {
@@ -132,7 +141,7 @@ public static class ServerSideEventsExtensions
             Retry = options.Retry
         };
 
-        if(dataDatastarSignals is string stringSignals)
+        if (dataDatastarSignals is string stringSignals)
         {
             serverSideEvent.AddDataLine($"{DatastarConstants.DatastarDatalineSignals} {stringSignals}");
         }
@@ -149,10 +158,10 @@ public static class ServerSideEventsExtensions
 
         return httpResponse.SendEvent(serverSideEvent);
     }
-    
-    public static Task RemoveSignals(this HttpResponse httpResponse, IEnumerable<DatastarSignalPath> paths, EventOptions? options = null)
+
+    public static Task RemoveSignals(this HttpResponse httpResponse, IEnumerable<DatastarSignalPath> paths, ServerSentEventOptions? options = null)
     {
-        options ??= EventOptions.Defaults;
+        options ??= new ServerSentEventOptions();
 
         var pathsString = string.Join(" ", paths.Select(p => p.Value));
 
@@ -169,12 +178,12 @@ public static class ServerSideEventsExtensions
     }
 
     #endregion
-    
+
     #region Datastar Script
-    
-    public static async Task<string?> ExecuteJavascriptAsync(this HttpResponse httpResponse, string script, ExecuteScriptOptions? options = null)
+
+    public static async Task<string?> ExecuteJavascriptAsync(this HttpResponse httpResponse, string script, ServerSentEventExecuteScriptOptions? options = null)
     {
-        options ??= ExecuteScriptOptions.Defaults;
+        options ??= new ServerSentEventExecuteScriptOptions();
 
         var serverSideEvent = new ServerSentEvent
         {
@@ -182,20 +191,20 @@ public static class ServerSideEventsExtensions
             Id = script,
             Retry = options.Retry,
         };
-        
+
         var attributes = string.Join(" ", options.Attributes);
         if (attributes != DatastarConstants.DefaultExecuteScriptAttributes)
         {
             serverSideEvent.AddDataLine($"{DatastarConstants.DatastarDatalineAttributes} {attributes}");
         }
-        
+
         if (options.AutoRemove != DatastarConstants.DefaultExecuteScriptAutoRemove)
         {
             serverSideEvent.AddDataLine($"{DatastarConstants.DatastarDatalineAutoRemove} {options.AutoRemove.ToString().ToLower()}");
         }
 
         await httpResponse.SendEvent(serverSideEvent);
-        
+
         //TODO: Handle the result of the script execution
         return "//TODO return the result of the script execution";
     }
@@ -211,7 +220,7 @@ public static class ServerSideEventsExtensions
         var script = $"window.location.href = '{url}';";
         return httpResponse.ExecuteJavascriptAsync(script);
     }
-    
+
     /// <summary>
     ///     Executes a browser console action.
     /// </summary>
@@ -246,7 +255,6 @@ public static class ServerSideEventsExtensions
             _                          => string.Empty
         };
     }
-    
+
     #endregion
-    
 }

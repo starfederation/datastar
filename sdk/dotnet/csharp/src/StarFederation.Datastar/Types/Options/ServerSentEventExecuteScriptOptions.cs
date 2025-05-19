@@ -1,9 +1,11 @@
+using StarFederation.Datastar.Interfaces;
+
 namespace StarFederation.Datastar.Types.Options;
 
 /// <summary>
 ///     Options for executing scripts in server-sent events.
 /// </summary>
-public class ServerSentEventExecuteScriptOptions
+public class ServerSentEventExecuteScriptOptions : IDatastarServerSentEventOptions
 {
     /// <summary>
     ///     Gets or sets whether to auto remove the script.

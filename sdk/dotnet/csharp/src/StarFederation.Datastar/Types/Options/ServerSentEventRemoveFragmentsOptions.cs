@@ -1,9 +1,11 @@
+using StarFederation.Datastar.Interfaces;
+
 namespace StarFederation.Datastar.Types.Options;
 
 /// <summary>
 ///     Options for removing fragments in server-sent events.
 /// </summary>
-public class ServerSentEventRemoveFragmentsOptions
+public class ServerSentEventRemoveFragmentsOptions : IDatastarServerSentEventOptions
 {
     /// <summary>
     ///     Gets or sets the event ID.
