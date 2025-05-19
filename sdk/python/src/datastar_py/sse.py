@@ -29,7 +29,7 @@ class ServerSentEventGenerator:
         cls,
         event_type: consts.EventType,
         data_lines: list[str],
-        event_id: Optional[int] = None,
+        event_id: Optional[str] = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ) -> str:
         prefix = []
@@ -52,7 +52,7 @@ class ServerSentEventGenerator:
         selector: Optional[str] = None,
         merge_mode: Optional[consts.FragmentMergeMode] = None,
         use_view_transition: bool = consts.DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
-        event_id: Optional[int] = None,
+        event_id: Optional[str] = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         if isinstance(fragments, _HtmlProvider):
@@ -84,7 +84,7 @@ class ServerSentEventGenerator:
         cls,
         selector: Optional[str] = None,
         use_view_transition: bool = True,
-        event_id: Optional[int] = None,
+        event_id: Optional[str] = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         data_lines = []
@@ -106,7 +106,7 @@ class ServerSentEventGenerator:
     def merge_signals(
         cls,
         signals: dict,
-        event_id: Optional[int] = None,
+        event_id: Optional[str] = None,
         only_if_missing: bool = False,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
@@ -126,7 +126,7 @@ class ServerSentEventGenerator:
     def remove_signals(
         cls,
         paths: list[str],
-        event_id: Optional[int] = None,
+        event_id: Optional[str] = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         data_lines = []
@@ -148,7 +148,7 @@ class ServerSentEventGenerator:
         script: str,
         auto_remove: bool = True,
         attributes: Optional[list[str]] = None,
-        event_id: Optional[int] = None,
+        event_id: Optional[str] = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         data_lines = []
