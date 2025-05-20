@@ -208,7 +208,7 @@ class BaseAttr(Mapping):
         return 1
 
     def __iter__(self) -> Iterable[str]:
-        return [self._key()]
+        return iter([self._key()])
 
     def __str__(self):
         r = self._key()
