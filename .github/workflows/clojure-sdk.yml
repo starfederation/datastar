@@ -5,14 +5,21 @@ on:
   push:
     branches: develop
     paths:
+      - sdk/clojure/**
       - .github/workflows/clojure-sdk.yml
   pull_request:
     paths:
       - sdk/clojure/**
       - .github/workflows/clojure-sdk.yml
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish artifacts to Clojars"
+        required: true
+        type: boolean
+        default: false
 jobs:
-  test-clojure:
+  build-clojure:
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -44,5 +51,33 @@ jobs:
           key: cljdeps-${{ hashFiles('**/deps.edn') }}
           restore-keys: cljdeps-
 
-      - name: Build and run tests
+      - name: Run test suite
         run: bb test:all
+
+      - name: Build jar artifacts
+        run: bb jar:all
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # tag: v4.6.2
+        with:
+          name: sdk.jar
+          path: sdk/clojure/sdk/target/*.jar
+          if-no-files-found: error
+          compression-level: 0
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # tag: v4.6.2
+        with:
+          name: adapter-http-kit.jar
+          path: sdk/clojure/adapter-http-kit/target/*.jar
+          if-no-files-found: error
+          compression-level: 0
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # tag: v4.6.2
+        with:
+          name: adapter-ring.jar
+          path: sdk/clojure/adapter-ring/target/*.jar
+          if-no-files-found: error
+          compression-level: 0
+
+      - name: Publish artifacts to clojars
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true'
+        run: bb publish:all

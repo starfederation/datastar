@@ -1,2 +1,7 @@
-{:paths ["src/main" "resources"]}
-
+{:paths   ["src/main" "resources"]
+ :aliases {:build {:deps       {io.github.clojure/tools.build {:git/tag "v0.10.9"
+                                                               :git/sha "e405aac"}
+                                slipset/deps-deploy           {:mvn/version "0.2.2"}}
+                   :ns-default build}
+           :neil  {:project {:name    dev.data-star/sdk
+                             :version "1.0.0-beta.11"}}}}

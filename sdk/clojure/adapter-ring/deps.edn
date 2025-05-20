@@ -1,2 +1,8 @@
-{:paths ["src/main"]
- :deps {org.ring-clojure/ring-core-protocols {:mvn/version "1.14.1"}}}
+{:paths   ["src/main"]
+ :deps    {org.ring-clojure/ring-core-protocols {:mvn/version "1.14.1"}}
+ :aliases {:build {:deps       {io.github.clojure/tools.build {:git/tag "v0.10.9"
+                                                               :git/sha "e405aac"}
+                                slipset/deps-deploy           {:mvn/version "0.2.2"}}
+                   :ns-default build}
+           :neil  {:project {:name    dev.data-star/ring
+                             :version "1.0.0-beta.11"}}}}
