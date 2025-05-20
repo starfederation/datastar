@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Mapping
-from typing import Any, Literal, Iterable, TYPE_CHECKING, overload, TypeVar
+from typing import Literal, Iterable, TYPE_CHECKING, overload, TypeVar
 
 if TYPE_CHECKING:
     from typing import Self
@@ -227,6 +228,21 @@ class CaseMod:
         self._mods["case"] = [case]
         return self
 
+    def _to_kebab_suffix(self: TAttr, signal_name: str):
+        if "-" in signal_name:
+             kebab_name, from_case = signal_name.lower(), "kebab"
+        elif "_" in signal_name:
+            kebab_name, from_case = signal_name.lower().replace("_", "-"), "snake"
+        elif signal_name[0].isupper():
+            kebab_name, from_case = re.sub(r"([A-Z])", r"-\1", signal_name).lstrip("-").lower(), "pascal"
+        elif signal_name.lower() != signal_name:
+            kebab_name, from_case = re.sub(r"([A-Z])", r"-\1", signal_name).lower(), "camel"
+        else:
+            kebab_name, from_case = signal_name, None
+        self._suffix = kebab_name
+        if from_case:
+            self._mods["case"] = [from_case]
+
 
 class TimingMod:
     def debounce(
@@ -280,7 +296,7 @@ class SignalsAttr(BaseAttr):
 class ComputedAttr(BaseAttr, CaseMod):
     def __init__(self, signal_name: str, expression: str):
         super().__init__("computed")
-        self._suffix = signal_name
+        self._to_kebab_suffix(signal_name)
         self._value = expression
 
 
@@ -331,7 +347,7 @@ class ClassAttr(BaseAttr):
 class OnAttr(BaseAttr, TimingMod, ViewtransitionMod, CaseMod):
     def __init__(self, event: str, expression: str):
         super().__init__("on")
-        self._suffix = event
+        self._to_kebab_suffix(event)
         self._value = expression
 
     @property
