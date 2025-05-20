@@ -28,11 +28,12 @@ public class ServerSentEvent
     /// </summary>
     public IEnumerable<string> DataLines { get; init; } = [];*/
     
-    internal Utf8ValueStringBuilder DataLineBuilder { get; } = ZString.CreateUtf8StringBuilder();
+    internal List<string> DataLines { get; } = [];
     
     public void AddDataLine(string dataLine)
     {
-        DataLineBuilder.AppendLine($"data: {dataLine}");
+        DataLines.Add(dataLine);
+        //DataLineBuilder.AppendLine($"data: {dataLine}");
     }
 
     /// <summary>
@@ -55,12 +56,41 @@ public class ServerSentEvent
             sb.AppendLine($"retry: {(int)Retry.TotalMilliseconds}");
         }
 
-        var dataLines = DataLineBuilder.ToString();
-        sb.Append(dataLines);
+        foreach (var line in DataLines)
+        {
+            sb.AppendLine($"data: {line}");
+        }
 
         // Add an extra newline at the end to complete the event
         sb.AppendLine(string.Empty);
 
         return sb.AsMemory();
+    }
+
+    public override string ToString()
+    {
+        var sb = ZString.CreateUtf8StringBuilder();
+        
+        sb.AppendLine($"event: {EventType.ToStringFast(true)}");
+
+        if (Id != null)
+        {
+            sb.AppendLine($"id: {Id}");
+        }
+
+        if (Retry != TimeSpan.Zero)
+        {
+            sb.AppendLine($"retry: {(int)Retry.TotalMilliseconds}");
+        }
+
+        foreach (var line in DataLines)
+        {
+            sb.AppendLine($"data: {line}");
+        }
+
+        // Add an extra newline at the end to complete the event
+        sb.AppendLine(string.Empty);
+
+        return sb.ToString();
     }
 }

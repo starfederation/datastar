@@ -43,9 +43,10 @@ public static class ServerSentEventGenerator
         }
 
         var serializedEvent = serverSentEvent.Serialize();
+        var eventString = serverSentEvent.ToString();
 
         await httpResponse.Body.WriteAsync(serializedEvent);
-        await httpResponse.Body.FlushAsync();
+        //await httpResponse.Body.FlushAsync();
     }
 
     /// <summary>

@@ -1,7 +1,32 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Datastar Example - Counter</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Counter</h1>
 
-Welcome to your new app.
+<div>
+    <h1>Signals:</h1>
+    <pre 
+    id="sigs" 
+    data-on-signal-change="document.getElementById('sigs').textContent = ctx.signals.JSON()"></pre>
+</div>
+
+<div data-signals="{_clientCounter: 0 }">
+    <div>
+        <h1>Client</h1>
+        <h2 data-text="$_clientCounter"></h2>
+    </div>
+
+    <button data-on-click="$_clientCounter = $_clientCounter-1">Decrease</button>
+    <button data-on-click="$_clientCounter = $_clientCounter+1">Increase</button>
+</div>
+
+<div data-signals="{serverCounter: 0}">
+    <div>
+        <h1>Server</h1>
+        <h2 data-text="$serverCounter"></h2>
+    </div>
+    
+    <button data-on-click="@@post('/decrease')">Decrease</button>
+    <button data-on-click="@@post('/increase')">Increase</button>
+</div>
