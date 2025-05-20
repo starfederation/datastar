@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+---
+name: Clojure SDK
+on:
+  push:
+    branches: develop
+    paths:
+      - .github/workflows/clojure-sdk.yml
+  pull_request:
+    paths:
+      - sdk/clojure/**
+      - .github/workflows/clojure-sdk.yml
+  workflow_dispatch:
+jobs:
+  test-clojure:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ./sdk/clojure
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # tag: v4.22
+
+      - name: Setup java 21 as default java
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME_21_X64" >> $GITHUB_ENV
+          echo "$JAVA_HOME_21_X64/bin" >> $GITHUB_PATH
+        shell: bash
+
+      - name: Install clojure + tools
+        uses: DeLaGuardo/setup-clojure@ada62bb3282a01a296659d48378b812b8e097360 # tag 13.2
+        with:
+          cli: latest
+          bb: latest
+
+      - name: Cache clojure dependencies
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # tag: v4.2.3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.deps.clj
+          key: cljdeps-${{ hashFiles('**/deps.edn') }}
+          restore-keys: cljdeps-
+
+      - name: Build and run tests
+        run: bb test:all
