@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 	"sync"
 	"testing"
 	"time"
@@ -17,8 +18,8 @@ import (
 )
 
 var (
-	baseURL string
-	browser *rod.Browser
+	baseURL     string
+	browserPool rod.Pool[rod.Browser]
 )
 
 func TestMain(m *testing.M) {
@@ -39,17 +40,25 @@ func TestMain(m *testing.M) {
 	go site.RunBlocking(port, readyCh)(ctx)
 	<-readyCh
 
-	browser = rod.New().MustConnect()
+	browserPool = rod.NewBrowserPool(runtime.NumCPU())
 
 	m.Run()
 
 	ctx.Done()
 }
 
+func create() *rod.Browser {
+	browser := rod.New().MustConnect()
+	return browser
+}
+
 type runnerFn func(name string, fn func(t *testing.T, page *rod.Page))
 
 func setupPageTest(t *testing.T, subURL string, gen func(runner runnerFn)) {
 	t.Parallel()
+	browser := browserPool.MustGet(create)
+	defer browserPool.Put(browser)
+
 	page := browser.MustIncognito().MustPage(fmt.Sprintf("%s/%s", baseURL, subURL))
 	require.NotNil(t, page)
 	t.Cleanup(page.MustClose)
@@ -99,7 +108,7 @@ func setupPageTestOnClick(t *testing.T, subURL string) {
 			before, err := result.Text()
 			assert.NoError(t, err)
 			assert.Contains(t, before, "0")
-	
+
 			clickable := page.MustElement("#clickable")
 			clickable.MustClick()
 			page.MustWaitIdle()
@@ -117,7 +126,7 @@ func setupPageTestOnPopulate(t *testing.T, subURL string, value string) {
 			before, err := result.Text()
 			assert.NoError(t, err)
 			assert.Contains(t, before, "0")
-	
+
 			populatable := page.MustElement("#populatable")
 			populatable.MustInput(value)
 			page.MustWaitIdle()
@@ -135,7 +144,7 @@ func setupPageTestOnPopulateAndClick(t *testing.T, subURL string, value string) 
 			before, err := result.Text()
 			assert.NoError(t, err)
 			assert.Contains(t, before, "0")
-	
+
 			populatable := page.MustElement("#populatable")
 			populatable.MustInput(value)
 			clickable := page.MustElement("#clickable")
@@ -155,7 +164,7 @@ func setupPageTestOnSelect(t *testing.T, subURL string) {
 			before, err := result.Text()
 			assert.NoError(t, err)
 			assert.Contains(t, before, "0")
-	
+
 			selectable := page.MustElement("#selectable")
 			selectable.MustSelect("bar")
 			page.MustWaitIdle()
