@@ -8,7 +8,7 @@ from typing import Literal, Iterable, TYPE_CHECKING, overload, TypeVar
 if TYPE_CHECKING:
     from typing import Self
 
-__all__ = ["data"]
+__all__ = ["attribute_generator"]
 
 JSEvent = Literal[
     "abort",
@@ -230,13 +230,19 @@ class CaseMod:
 
     def _to_kebab_suffix(self: TAttr, signal_name: str):
         if "-" in signal_name:
-             kebab_name, from_case = signal_name.lower(), "kebab"
+            kebab_name, from_case = signal_name.lower(), "kebab"
         elif "_" in signal_name:
             kebab_name, from_case = signal_name.lower().replace("_", "-"), "snake"
         elif signal_name[0].isupper():
-            kebab_name, from_case = re.sub(r"([A-Z])", r"-\1", signal_name).lstrip("-").lower(), "pascal"
+            kebab_name, from_case = (
+                re.sub(r"([A-Z])", r"-\1", signal_name).lstrip("-").lower(),
+                "pascal",
+            )
         elif signal_name.lower() != signal_name:
-            kebab_name, from_case = re.sub(r"([A-Z])", r"-\1", signal_name).lower(), "camel"
+            kebab_name, from_case = (
+                re.sub(r"([A-Z])", r"-\1", signal_name).lower(),
+                "camel",
+            )
         else:
             kebab_name, from_case = signal_name, None
         self._suffix = kebab_name
@@ -502,4 +508,4 @@ class OnSignalChangeAttr(BaseAttr, TimingMod, ViewtransitionMod):
         self._value = expression
 
 
-data = Attributes()
+attribute_generator = Attributes()
