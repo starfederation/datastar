@@ -5,7 +5,7 @@ from sanic import Sanic
 from sanic.response import html
 
 from datastar_py.consts import FragmentMergeMode
-from datastar_py.sanic import datastar_respond, ServerSentEventGenerator
+from datastar_py.sanic import datastar_respond, ServerSentEventGenerator, read_signals
 
 app = Sanic("DataStarApp")
 
@@ -91,6 +91,10 @@ async def add_fragment(request):
 
 @app.get("/updates")
 async def updates(request):
+    # Signals can be parsed from the request using the `read_signals` helper
+    signals = await read_signals(request)
+    print(signals)
+
     response = await datastar_respond(request)
 
     while True:
