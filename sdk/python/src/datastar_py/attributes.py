@@ -97,27 +97,20 @@ JSEvent = Literal[
 
 
 class Attributes:
-    @overload
     def signals(
-        self, signals_dict: Mapping | None = None, /, **signals: str
-    ) -> SignalsAttr: ...
-    @overload
-    def signals(self, signals_object: str, /) -> SignalsAttr: ...
-    def signals(
-        self, signals_object: Mapping | str | None = None, /, **signals: str
+        self, signals_dict: Mapping | None = None, /, expressions_: bool = False, **signals: str
     ) -> SignalsAttr:
-        """Merge one or more signals into the existing signals."""
-        if signals and signals_object and not isinstance(signals_object, Mapping):
-            raise TypeError(
-                "Cannot provide both a string object and keyword arguments."
-            )
-        if isinstance(signals_object, str):
-            return SignalsAttr(signals_object)
-        signals = {**(signals_object if signals_object else {}), **signals}
-        return SignalsAttr(signals)
+        """Merge one or more signals into the existing signals.
+
+        :param signals_dict: A dictionary of signals to merge.
+        :param expressions_: If True, the values of the signals will be evaluated as expressions
+            rather than literals.
+        """
+        signals = {**(signals_dict if signals_dict else {}), **signals}
+        return SignalsAttr(signals, expressions=expressions_)
 
     def computed(self, computed_dict: Mapping | None = None, /, **computed: str) -> AttrGroup:
-        """Create a signal that is computed based on an expression."""
+        """Create signals that are computed based on an expression."""
         computed = {**(computed_dict if computed_dict else {}), **computed}
         return AttrGroup(BaseAttr("computed", expr, sig) for sig, expr in computed.items())
 
@@ -127,7 +120,7 @@ class Attributes:
         return StarIgnoreAttr()
 
     def attr(self, attr_dict: Mapping | None = None, /, **attrs: str) -> BaseAttr:
-        """Set the value of any HTML attribute to an expression, and keeps it in sync."""
+        """Set the value of any HTML attributes to expressions, and keep them in sync."""
         attrs = {**(attr_dict if attr_dict else {}), **attrs}
         return BaseAttr("attr", _js_object(attrs))
 
@@ -353,12 +346,9 @@ class ViewtransitionMod:
 
 
 class SignalsAttr(BaseAttr):
-    def __init__(self, signals_object: dict | str):
-        super().__init__("signals")
-        if isinstance(signals_object, dict):
-            self._value = json.dumps(signals_object)
-        else:
-            self._value = signals_object
+    def __init__(self, signals_object: dict, expressions: bool = False):
+        val = _js_object(signals_object) if expressions else json.dumps(signals_object)
+        super().__init__("signals", val)
 
     @property
     def ifmissing(self) -> Self:
