@@ -299,13 +299,12 @@ class BaseAttr(Mapping):
         return iter([self._key()])
 
     def __str__(self):
-        r = self._key()
-        if self._value is not True:
-            r += f"={self._value!r}"
+        r = _escape(self._key())
+        if isinstance(self._value, str):
+            r += f'="{_escape(self._value)}"'
         return r
 
-    def __html__(self):
-        return str(self)
+    __html__ = __str__
 
 
 class AttrGroup(Mapping):
@@ -328,8 +327,7 @@ class AttrGroup(Mapping):
     def __str__(self):
         return self._attr_string
 
-    def __html__(self):
-        return self._attr_string
+    __html__ = __str__
 
 
 TAttr = TypeVar("TAttr", bound=BaseAttr)
@@ -622,6 +620,16 @@ class OnRafAttr(BaseAttr, TimingMod, ViewtransitionMod):
 class OnSignalChangeAttr(BaseAttr, TimingMod, ViewtransitionMod):
     def __init__(self, expression: str):
         super().__init__("on-signal-change", expression)
+
+
+def _escape(s: str) -> str:
+    return (
+        s.replace("&", "&amp;")
+        .replace("'", "&#39;")
+        .replace('"', "&#34;")
+        .replace(">", "&gt;")
+        .replace("<", "&lt;")
+    )
 
 
 attribute_generator = Attributes()
