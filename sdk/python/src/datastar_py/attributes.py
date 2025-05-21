@@ -2,11 +2,8 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Mapping
-from typing import Literal, Iterable, TYPE_CHECKING, overload, TypeVar, Iterator
-
-if TYPE_CHECKING:
-    from typing import Self
+from collections.abc import Iterable, Iterator, Mapping
+from typing import Literal, Self, TypeVar, overload
 
 __all__ = ["attribute_generator"]
 
@@ -109,7 +106,7 @@ class Attributes:
     def signals(
         self, signals_object: Mapping | str | None = None, /, **signals: str
     ) -> SignalsAttr:
-        """Merges one or more signals into the existing signals."""
+        """Merge one or more signals into the existing signals."""
         if signals and signals_object and not isinstance(signals_object, Mapping):
             raise TypeError(
                 "Cannot provide both a string object and keyword arguments."
@@ -129,14 +126,14 @@ class Attributes:
         expression: str | None = None,
         **computed: str,
     ) -> AttrGroup:
-        """Creates a signal that is computed based on an expression."""
+        """Create a signal that is computed based on an expression."""
         if signal_name and expression:
             computed[signal_name] = expression
         return AttrGroup(ComputedAttr(sig, expr) for sig, expr in computed.items())
 
     @property
     def star_ignore(self) -> StarIgnoreAttr:
-        """Tells Datastar to ignore data-* attributes on the element."""
+        """Tell Datastar to ignore data-* attributes on the element."""
         return StarIgnoreAttr()
 
     @overload
@@ -144,7 +141,7 @@ class Attributes:
     @overload
     def attr(self, attr_object: str, /) -> AttrAttr: ...
     def attr(self, attr_object: dict | str | None = None, /, **attrs: str) -> AttrAttr:
-        """Sets the value of any HTML attribute to an expression, and keeps it in sync."""
+        """Set the value of any HTML attribute to an expression, and keeps it in sync."""
         if attrs and attr_object and not isinstance(attr_object, Mapping):
             raise TypeError(
                 "Cannot provide both a string object and keyword arguments."
@@ -155,7 +152,7 @@ class Attributes:
         return AttrAttr(attrs)
 
     def bind(self, signal_name: str) -> BaseAttr:
-        """Sets up two-way data binding between a signal and an element’s value."""
+        """Set up two-way data binding between a signal and an element’s value."""
         return BaseAttr("bind", signal_name)
 
     @overload
@@ -167,7 +164,7 @@ class Attributes:
     def class_(
         self, class_object: dict | str | None = None, **classes: str
     ) -> ClassAttr:
-        """Adds or removes classes to or from an element based on expressions."""
+        """Add or removes classes to or from an element based on expressions."""
         if classes and class_object and not isinstance(class_object, Mapping):
             raise TypeError(
                 "Cannot provide both a string object and keyword arguments."
@@ -192,7 +189,7 @@ class Attributes:
     def on(
         self, event: str, expression: str
     ) -> OnAttr | OnIntervalAttr | OnLoadAttr | OnRafAttr | OnSignalChangeAttr:
-        """Attaches an event listener to an element, executing an expression whenever the event is triggered."""
+        """Execute an expression when an event occurs."""
         if event == "interval":
             return OnIntervalAttr(expression)
         elif event == "load":
@@ -205,11 +202,11 @@ class Attributes:
 
     @property
     def persist(self) -> PersistAttr:
-        """Persists signals in local storage. This is useful for storing values between page loads."""
+        """Persist signals in local storage."""
         return PersistAttr()
 
     def ref(self, signal_name: str) -> BaseAttr:
-        """Creates a new signal that is a reference to the element on which the data attribute is placed."""
+        """Create a signal which references the element on which the attribute is placed."""
         return BaseAttr("ref", signal_name)
 
     def replace_url(self, url_expression: str) -> BaseAttr:
@@ -220,15 +217,15 @@ class Attributes:
         return BaseAttr("show", expression)
 
     def text(self, expression: str) -> BaseAttr:
-        """Binds the text content of an element to an expression."""
+        """Bind the text content of an element to an expression."""
         return BaseAttr("text", expression)
 
     def indicator(self, signal_name: str) -> BaseAttr:
-        """Creates a signal and sets its value to true while an SSE request request is in flight, otherwise false."""
+        """Create a signal whose value is true while an SSE request is in flight."""
         return BaseAttr("indicator", signal_name)
 
     def custom_validity(self, expression: str) -> BaseAttr:
-        """Sets the validity message for an element based on an expression."""
+        """Set the validity message for an element based on an expression."""
         return BaseAttr("custom-validity", expression)
 
     @property
@@ -237,7 +234,7 @@ class Attributes:
         return ScrollIntoViewAttr()
 
     def view_transition(self, expression: str) -> BaseAttr:
-        """Sets the view-transition-name style attribute explicitly."""
+        """Set the view-transition-name style attribute explicitly."""
         return BaseAttr("view-transition", expression)
 
 
@@ -343,8 +340,10 @@ class TimingMod:
         """Debounce the event listener.
 
         :param wait: The minimum interval between events.
-        :param leading: If true, the event listener will be called on the leading edge of the wait time.
-        :param notrail: If true, the event listener will not be called on the trailing edge of the wait time.
+        :param leading: If True, the event listener will be called on the leading edge of the
+            wait time.
+        :param notrail: If True, the event listener will not be called on the trailing edge of the
+            wait time.
         """
         self._mods["debounce"] = [str(wait)]
         if leading:
@@ -362,8 +361,10 @@ class TimingMod:
         """Throttle the event listener.
 
         :param wait: The minimum interval between events.
-        :param noleading: If true, the event listener will not be called on the leading edge of the wait time.
-        :param trail: If true, the event listener will be called on the trailing edge of the wait time.
+        :param noleading: If true, the event listener will not be called on the leading edge of the
+            wait time.
+        :param trail: If true, the event listener will be called on the trailing edge of the
+            wait time.
         """
         self._mods["throttle"] = [str(wait)]
         if noleading:
@@ -376,7 +377,7 @@ class TimingMod:
 class ViewtransitionMod:
     @property
     def viewtransition(self: TAttr) -> TAttr:
-        """Wraps the expression in document.startViewTransition() when the View Transition API is available."""
+        """Wrap the expression in document.startViewTransition()."""
         self._mods["view-transition"] = []
         return self
 
@@ -391,7 +392,7 @@ class SignalsAttr(BaseAttr):
 
     @property
     def ifmissing(self) -> Self:
-        """Only merges signals if their keys do not already exist."""
+        """Only merge signals if their keys do not already exist."""
         self._mods["ifmissing"] = []
         return self
 
@@ -456,25 +457,25 @@ class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
 
     @property
     def window(self) -> Self:
-        """Attaches the event listener to the window element."""
+        """Attach the event listener to the window element."""
         self._mods["window"] = []
         return self
 
     @property
     def outside(self) -> Self:
-        """Triggers when the event is outside the element."""
+        """Trigger when the event is outside the element."""
         self._mods["outside"] = []
         return self
 
     @property
     def prevent(self) -> Self:
-        """Calls preventDefault on the event listener."""
+        """Call preventDefault on the event listener."""
         self._mods["prevent"] = []
         return self
 
     @property
     def stop(self) -> Self:
-        """Calls stopPropagation on the event listener."""
+        """Call stopPropagation on the event listener."""
         self._mods["stop"] = []
         return self
 
@@ -492,7 +493,7 @@ class PersistAttr(BaseAttr):
 
     @property
     def session(self) -> Self:
-        """Persists signals in session storage."""
+        """Persist signals in session storage."""
         self._mods["session"] = []
         return self
 
@@ -503,73 +504,73 @@ class ScrollIntoViewAttr(BaseAttr):
 
     @property
     def smooth(self) -> Self:
-        """Scrolling is animated smoothly."""
+        """Animate scrolling smoothly."""
         self._mods["smooth"] = []
         return self
 
     @property
     def instant(self) -> Self:
-        """Scrolling is instant."""
+        """Scroll instantly."""
         self._mods["instant"] = []
         return self
 
     @property
     def auto(self) -> Self:
-        """Scrolling is determined by the computed scroll-behavior CSS property."""
+        """Let scrolling be determined by the computed scroll-behavior CSS property."""
         self._mods["auto"] = []
         return self
 
     @property
     def hstart(self) -> Self:
-        """Scrolls to the left of the element."""
+        """Scroll to the left of the element."""
         self._mods["hstart"] = []
         return self
 
     @property
     def hcenter(self) -> Self:
-        """Scrolls to the horizontal center of the element."""
+        """Scroll to the horizontal center of the element."""
         self._mods["hcenter"] = []
         return self
 
     @property
     def hend(self) -> Self:
-        """Scrolls to the right of the element."""
+        """Scroll to the right of the element."""
         self._mods["hend"] = []
         return self
 
     @property
     def hnearest(self) -> Self:
-        """Scrolls to the nearest horizontal edge of the element."""
+        """Scroll to the nearest horizontal edge of the element."""
         self._mods["hnearest"] = []
         return self
 
     @property
     def vstart(self) -> Self:
-        """Scrolls to the top of the element."""
+        """Scroll to the top of the element."""
         self._mods["vstart"] = []
         return self
 
     @property
     def vcenter(self) -> Self:
-        """Scrolls to the vertical center of the element."""
+        """Scroll to the vertical center of the element."""
         self._mods["vcenter"] = []
         return self
 
     @property
     def vend(self) -> Self:
-        """Scrolls to the bottom of the element."""
+        """Scroll to the bottom of the element."""
         self._mods["vend"] = []
         return self
 
     @property
     def vnearest(self) -> Self:
-        """Scrolls to the nearest vertical edge of the element."""
+        """Scroll to the nearest vertical edge of the element."""
         self._mods["vnearest"] = []
         return self
 
     @property
     def focus(self) -> Self:
-        """Focuses the element after scrolling."""
+        """Focus the element after scrolling."""
         self._mods["focus"] = []
         return self
 
@@ -579,7 +580,7 @@ class OnIntervalAttr(BaseAttr, ViewtransitionMod):
         super().__init__("on-interval", expression)
 
     def duration(self, duration: int | float | str, leading: bool = False) -> Self:
-        """Sets the interval duration."""
+        """Set the interval duration."""
         self._mods["duration"] = [str(duration)]
         if leading:
             self._mods["duration"].append("leading")
@@ -617,7 +618,7 @@ def _escape(s: str) -> str:
 
 
 def _js_object(obj: dict) -> str:
-    """We sometimes need a js object where the values are not quoted, so that they become expressions."""
+    """Create a JS object where the values are expressions rather than strings."""
     return "{" + ", ".join(f"{json.dumps(k)}: {v}" for k, v in obj.items()) + "}"
 
 
