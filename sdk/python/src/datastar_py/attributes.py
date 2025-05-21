@@ -400,9 +400,8 @@ class SignalsAttr(BaseAttr):
 
 class ComputedAttr(BaseAttr):
     def __init__(self, signal_name: str, expression: str):
-        super().__init__("computed")
+        super().__init__("computed", expression)
         self._to_kebab_suffix(signal_name)
-        self._value = expression
 
 
 class StarIgnoreAttr(BaseAttr):
@@ -452,9 +451,8 @@ class ClassAttr(BaseAttr):
 
 class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
     def __init__(self, event: str, expression: str):
-        super().__init__("on")
+        super().__init__("on", expression)
         self._to_kebab_suffix(event)
-        self._value = expression
 
     @property
     def once(self) -> Self:
@@ -596,11 +594,10 @@ class ScrollIntoViewAttr(BaseAttr):
 
 class OnIntervalAttr(BaseAttr, ViewtransitionMod):
     def __init__(self, expression: str):
-        super().__init__("on-interval")
-        self._value = expression
+        super().__init__("on-interval", expression)
 
     def duration(self, duration: int | float | str, leading: bool = False) -> Self:
-        """Sets the interval duration. """
+        """Sets the interval duration."""
         self._mods["duration"] = [str(duration)]
         if leading:
             self._mods["duration"].append("leading")
@@ -609,8 +606,7 @@ class OnIntervalAttr(BaseAttr, ViewtransitionMod):
 
 class OnLoadAttr(BaseAttr, ViewtransitionMod):
     def __init__(self, expression: str):
-        super().__init__("on-load")
-        self._value = expression
+        super().__init__("on-load", expression)
 
     def delay(self, delay: int | float | str) -> Self:
         """Delay the event listener."""
@@ -620,14 +616,12 @@ class OnLoadAttr(BaseAttr, ViewtransitionMod):
 
 class OnRafAttr(BaseAttr, TimingMod, ViewtransitionMod):
     def __init__(self, expression: str):
-        super().__init__("on-raf")
-        self._value = expression
+        super().__init__("on-raf", expression)
 
 
 class OnSignalChangeAttr(BaseAttr, TimingMod, ViewtransitionMod):
     def __init__(self, expression: str):
-        super().__init__("on-signal-change")
-        self._value = expression
+        super().__init__("on-signal-change", expression)
 
 
 attribute_generator = Attributes()
