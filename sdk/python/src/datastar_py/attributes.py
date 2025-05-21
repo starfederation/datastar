@@ -342,6 +342,12 @@ class TimingMod:
         leading: bool = False,
         notrail: bool = False,
     ) -> TAttr:
+        """Debounce the event listener.
+
+        :param wait: The minimum interval between events.
+        :param leading: If true, the event listener will be called on the leading edge of the wait time.
+        :param notrail: If true, the event listener will not be called on the trailing edge of the wait time.
+        """
         self._mods["debounce"] = [str(wait)]
         if leading:
             self._mods["debounce"].append("leading")
@@ -355,6 +361,12 @@ class TimingMod:
         noleading: bool = False,
         trail: bool = False,
     ) -> TAttr:
+        """Throttle the event listener.
+
+        :param wait: The minimum interval between events.
+        :param noleading: If true, the event listener will not be called on the leading edge of the wait time.
+        :param trail: If true, the event listener will be called on the trailing edge of the wait time.
+        """
         self._mods["throttle"] = [str(wait)]
         if noleading:
             self._mods["throttle"].append("noleading")
@@ -366,6 +378,7 @@ class TimingMod:
 class ViewtransitionMod:
     @property
     def viewtransition(self: TAttr) -> TAttr:
+        """Wraps the expression in document.startViewTransition() when the View Transition API is available."""
         self._mods["view-transition"] = []
         return self
 
@@ -380,6 +393,7 @@ class SignalsAttr(BaseAttr):
 
     @property
     def ifmissing(self) -> Self:
+        """Only merges signals if their keys do not already exist."""
         self._mods["ifmissing"] = []
         return self
 
@@ -397,6 +411,7 @@ class StarIgnoreAttr(BaseAttr):
 
     @property
     def self(self) -> Self:
+        """Only ignore the element itself, not its descendants."""
         self._mods["self"] = []
         return self
 
@@ -443,36 +458,43 @@ class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
 
     @property
     def once(self) -> Self:
+        """Only trigger the event listener once."""
         self._mods["once"] = []
         return self
 
     @property
     def passive(self) -> Self:
+        """Do not call preventDefault on the event listener."""
         self._mods["passive"] = []
         return self
 
     @property
     def capture(self) -> Self:
+        """Use a capture event listener."""
         self._mods["capture"] = []
         return self
 
     @property
     def window(self) -> Self:
+        """Attaches the event listener to the window element."""
         self._mods["window"] = []
         return self
 
     @property
     def outside(self) -> Self:
+        """Triggers when the event is outside the element."""
         self._mods["outside"] = []
         return self
 
     @property
     def prevent(self) -> Self:
+        """Calls preventDefault on the event listener."""
         self._mods["prevent"] = []
         return self
 
     @property
     def stop(self) -> Self:
+        """Calls stopPropagation on the event listener."""
         self._mods["stop"] = []
         return self
 
@@ -490,6 +512,7 @@ class PersistAttr(BaseAttr):
 
     @property
     def session(self) -> Self:
+        """Persists signals in session storage."""
         self._mods["session"] = []
         return self
 
@@ -500,61 +523,73 @@ class ScrollIntoViewAttr(BaseAttr):
 
     @property
     def smooth(self) -> Self:
+        """Scrolling is animated smoothly."""
         self._mods["smooth"] = []
         return self
 
     @property
     def instant(self) -> Self:
+        """Scrolling is instant."""
         self._mods["instant"] = []
         return self
 
     @property
     def auto(self) -> Self:
+        """Scrolling is determined by the computed scroll-behavior CSS property."""
         self._mods["auto"] = []
         return self
 
     @property
     def hstart(self) -> Self:
+        """Scrolls to the left of the element."""
         self._mods["hstart"] = []
         return self
 
     @property
     def hcenter(self) -> Self:
+        """Scrolls to the horizontal center of the element."""
         self._mods["hcenter"] = []
         return self
 
     @property
     def hend(self) -> Self:
+        """Scrolls to the right of the element."""
         self._mods["hend"] = []
         return self
 
     @property
     def hnearest(self) -> Self:
+        """Scrolls to the nearest horizontal edge of the element."""
         self._mods["hnearest"] = []
         return self
 
     @property
     def vstart(self) -> Self:
+        """Scrolls to the top of the element."""
         self._mods["vstart"] = []
         return self
 
     @property
     def vcenter(self) -> Self:
+        """Scrolls to the vertical center of the element."""
         self._mods["vcenter"] = []
         return self
 
     @property
     def vend(self) -> Self:
+        """Scrolls to the bottom of the element."""
         self._mods["vend"] = []
         return self
 
     @property
     def vnearest(self) -> Self:
+        """Scrolls to the nearest vertical edge of the element."""
         self._mods["vnearest"] = []
         return self
 
     @property
     def focus(self) -> Self:
+        """Focuses the element after scrolling."""
         self._mods["focus"] = []
         return self
 
@@ -565,6 +600,7 @@ class OnIntervalAttr(BaseAttr, ViewtransitionMod):
         self._value = expression
 
     def duration(self, duration: int | float | str, leading: bool = False) -> Self:
+        """Sets the interval duration. """
         self._mods["duration"] = [str(duration)]
         if leading:
             self._mods["duration"].append("leading")
@@ -577,6 +613,7 @@ class OnLoadAttr(BaseAttr, ViewtransitionMod):
         self._value = expression
 
     def delay(self, delay: int | float | str) -> Self:
+        """Delay the event listener."""
         self._mods["delay"] = [str(delay)]
         return self
 
