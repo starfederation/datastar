@@ -417,15 +417,7 @@ class AttrAttr(BaseAttr):
     def __init__(self, attr_object: dict | str):
         super().__init__("attr")
         if isinstance(attr_object, dict):
-            # Serialize to a Javascript object without the values quoted
-            # We want the values to be d* expressions, not strings
-            r = "{"
-            for k, v in attr_object.items():
-                r += json.dumps(str(k))
-                r += f": {v},"
-            r = r.rstrip(",")
-            r += "}"
-            self._value = r
+            self._value = _js_object(attr_object)
         else:
             self._value = attr_object
 
@@ -434,15 +426,7 @@ class ClassAttr(BaseAttr):
     def __init__(self, class_object: dict | str):
         super().__init__("class")
         if isinstance(class_object, dict):
-            # Serialize to a Javascript object without the values quoted
-            # We want the values to be d* expressions, not strings
-            r = "{"
-            for k, v in class_object.items():
-                r += json.dumps(str(k))
-                r += f": {v},"
-            r = r.rstrip(",")
-            r += "}"
-            self._value = r
+            self._value = _js_object(class_object)
         else:
             self._value = class_object
 
@@ -630,6 +614,11 @@ def _escape(s: str) -> str:
         .replace(">", "&gt;")
         .replace("<", "&lt;")
     )
+
+
+def _js_object(obj: dict) -> str:
+    """We sometimes need a js object where the values are not quoted, so that they become expressions."""
+    return "{" + ", ".join(f"{json.dumps(k)}: {v}" for k, v in obj.items()) + "}"
 
 
 attribute_generator = Attributes()
