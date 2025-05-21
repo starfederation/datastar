@@ -116,63 +116,31 @@ class Attributes:
         signals = {**(signals_object if signals_object else {}), **signals}
         return SignalsAttr(signals)
 
-    @overload
-    def computed(self, **computed: str) -> AttrGroup: ...
-    @overload
-    def computed(self, signal_name: str, expression: str) -> AttrGroup: ...
-    def computed(
-        self,
-        signal_name: str | None = None,
-        expression: str | None = None,
-        **computed: str,
-    ) -> AttrGroup:
+    def computed(self, computed_dict: Mapping | None = None, /, **computed: str) -> AttrGroup:
         """Create a signal that is computed based on an expression."""
-        if signal_name and expression:
-            computed[signal_name] = expression
-        return AttrGroup(ComputedAttr(sig, expr) for sig, expr in computed.items())
+        computed = {**(computed_dict if computed_dict else {}), **computed}
+        return AttrGroup(BaseAttr("computed", expr, sig) for sig, expr in computed.items())
 
     @property
     def star_ignore(self) -> StarIgnoreAttr:
         """Tell Datastar to ignore data-* attributes on the element."""
         return StarIgnoreAttr()
 
-    @overload
-    def attr(self, attr_dict: dict | None = None, /, **attrs: str) -> AttrAttr: ...
-    @overload
-    def attr(self, attr_object: str, /) -> AttrAttr: ...
-    def attr(self, attr_object: dict | str | None = None, /, **attrs: str) -> AttrAttr:
+    def attr(self, attr_dict: Mapping | None = None, /, **attrs: str) -> BaseAttr:
         """Set the value of any HTML attribute to an expression, and keeps it in sync."""
-        if attrs and attr_object and not isinstance(attr_object, Mapping):
-            raise TypeError(
-                "Cannot provide both a string object and keyword arguments."
-            )
-        if isinstance(attr_object, str):
-            return AttrAttr(attr_object)
-        attrs = {**(attr_object if attr_object else {}), **attrs}
-        return AttrAttr(attrs)
+        attrs = {**(attr_dict if attr_dict else {}), **attrs}
+        return BaseAttr("attr", _js_object(attrs))
 
     def bind(self, signal_name: str) -> BaseAttr:
         """Set up two-way data binding between a signal and an element’s value."""
         return BaseAttr("bind", signal_name)
 
-    @overload
     def class_(
-        self, class_dict: dict | None = None, /, **classes: str
-    ) -> ClassAttr: ...
-    @overload
-    def class_(self, class_object: str, /) -> ClassAttr: ...
-    def class_(
-        self, class_object: dict | str | None = None, **classes: str
-    ) -> ClassAttr:
+        self, class_dict: Mapping | None = None, /, **classes: str
+    ) -> BaseAttr:
         """Add or removes classes to or from an element based on expressions."""
-        if classes and class_object and not isinstance(class_object, Mapping):
-            raise TypeError(
-                "Cannot provide both a string object and keyword arguments."
-            )
-        if isinstance(class_object, str):
-            return ClassAttr(class_object)
-        classes = {**(class_object if class_object else {}), **classes}
-        return ClassAttr(classes)
+        classes = {**(class_dict if class_dict else {}), **classes}
+        return BaseAttr("class", _js_object(classes))
 
     @overload
     def on(self, event: Literal["interval"], expression: str) -> OnIntervalAttr: ...
@@ -249,6 +217,8 @@ class BaseAttr(Mapping):
         self._suffix: str | None = suffix
         self._mods: dict[str, list[str]] = {}
         self._value: str | Literal[True] = value
+        if suffix:
+            self._to_kebab_suffix(suffix)
 
     def __call__(self) -> Self:
         # Because some attributes and modifiers do not need to be called
@@ -397,12 +367,6 @@ class SignalsAttr(BaseAttr):
         return self
 
 
-class ComputedAttr(BaseAttr):
-    def __init__(self, signal_name: str, expression: str):
-        super().__init__("computed", expression)
-        self._to_kebab_suffix(signal_name)
-
-
 class StarIgnoreAttr(BaseAttr):
     def __init__(self):
         super().__init__("star-ignore", True)
@@ -412,24 +376,6 @@ class StarIgnoreAttr(BaseAttr):
         """Only ignore the element itself, not its descendants."""
         self._mods["self"] = []
         return self
-
-
-class AttrAttr(BaseAttr):
-    def __init__(self, attr_object: dict | str):
-        super().__init__("attr")
-        if isinstance(attr_object, dict):
-            self._value = _js_object(attr_object)
-        else:
-            self._value = attr_object
-
-
-class ClassAttr(BaseAttr):
-    def __init__(self, class_object: dict | str):
-        super().__init__("class")
-        if isinstance(class_object, dict):
-            self._value = _js_object(class_object)
-        else:
-            self._value = class_object
 
 
 class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
