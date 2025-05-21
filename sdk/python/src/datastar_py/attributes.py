@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Mapping
-from typing import Literal, Iterable, TYPE_CHECKING, overload, TypeVar
+from typing import Literal, Iterable, TYPE_CHECKING, overload, TypeVar, Iterator
 
 if TYPE_CHECKING:
     from typing import Self
@@ -100,24 +100,82 @@ JSEvent = Literal[
 
 
 class Attributes:
-    def signals(self, signals_object: dict | str) -> SignalsAttr:
-        return SignalsAttr(signals_object)
+    @overload
+    def signals(
+        self, signals_dict: Mapping | None = None, /, **signals: str
+    ) -> SignalsAttr: ...
+    @overload
+    def signals(self, signals_object: str, /) -> SignalsAttr: ...
+    def signals(
+        self, signals_object: Mapping | str | None = None, /, **signals: str
+    ) -> SignalsAttr:
+        """Merges one or more signals into the existing signals."""
+        if signals and signals_object and not isinstance(signals_object, Mapping):
+            raise TypeError(
+                "Cannot provide both a string object and keyword arguments."
+            )
+        if isinstance(signals_object, str):
+            return SignalsAttr(signals_object)
+        signals = {**(signals_object if signals_object else {}), **signals}
+        return SignalsAttr(signals)
 
-    def computed(self, signal_name: str, expression: str) -> ComputedAttr:
-        return ComputedAttr(signal_name, expression)
+    @overload
+    def computed(self, **computed: str) -> AttrGroup: ...
+    @overload
+    def computed(self, signal_name: str, expression: str) -> AttrGroup: ...
+    def computed(
+        self,
+        signal_name: str | None = None,
+        expression: str | None = None,
+        **computed: str,
+    ) -> AttrGroup:
+        """Creates a signal that is computed based on an expression."""
+        if signal_name and expression:
+            computed[signal_name] = expression
+        return AttrGroup(ComputedAttr(sig, expr) for sig, expr in computed.items())
 
     @property
     def star_ignore(self) -> StarIgnoreAttr:
+        """Tells Datastar to ignore data-* attributes on the element."""
         return StarIgnoreAttr()
 
-    def attr(self, attr_object: dict | str) -> AttrAttr:
-        return AttrAttr(attr_object)
+    @overload
+    def attr(self, attr_dict: dict | None = None, /, **attrs: str) -> AttrAttr: ...
+    @overload
+    def attr(self, attr_object: str, /) -> AttrAttr: ...
+    def attr(self, attr_object: dict | str | None = None, /, **attrs: str) -> AttrAttr:
+        """Sets the value of any HTML attribute to an expression, and keeps it in sync."""
+        if attrs and attr_object and not isinstance(attr_object, Mapping):
+            raise TypeError(
+                "Cannot provide both a string object and keyword arguments."
+            )
+        if isinstance(attr_object, str):
+            return AttrAttr(attr_object)
+        attrs = {**(attr_object if attr_object else {}), **attrs}
+        return AttrAttr(attrs)
 
     def bind(self, signal_name: str) -> BaseAttr:
+        """Sets up two-way data binding between a signal and an element’s value."""
         return BaseAttr("bind", signal_name)
 
-    def class_(self, class_object: dict | str) -> ClassAttr:
-        return ClassAttr(class_object)
+    @overload
+    def class_(
+        self, class_dict: dict | None = None, /, **classes: str
+    ) -> ClassAttr: ...
+    @overload
+    def class_(self, class_object: str, /) -> ClassAttr: ...
+    def class_(
+        self, class_object: dict | str | None = None, **classes: str
+    ) -> ClassAttr:
+        """Adds or removes classes to or from an element based on expressions."""
+        if classes and class_object and not isinstance(class_object, Mapping):
+            raise TypeError(
+                "Cannot provide both a string object and keyword arguments."
+            )
+        if isinstance(class_object, str):
+            return ClassAttr(class_object)
+        classes = {**(class_object if class_object else {}), **classes}
+        return ClassAttr(classes)
 
     @overload
     def on(self, event: Literal["interval"], expression: str) -> OnIntervalAttr: ...
@@ -134,6 +192,7 @@ class Attributes:
     def on(
         self, event: str, expression: str
     ) -> OnAttr | OnIntervalAttr | OnLoadAttr | OnRafAttr | OnSignalChangeAttr:
+        """Attaches an event listener to an element, executing an expression whenever the event is triggered."""
         if event == "interval":
             return OnIntervalAttr(expression)
         elif event == "load":
@@ -146,31 +205,39 @@ class Attributes:
 
     @property
     def persist(self) -> PersistAttr:
+        """Persists signals in local storage. This is useful for storing values between page loads."""
         return PersistAttr()
 
     def ref(self, signal_name: str) -> BaseAttr:
+        """Creates a new signal that is a reference to the element on which the data attribute is placed."""
         return BaseAttr("ref", signal_name)
 
     def replace_url(self, url_expression: str) -> BaseAttr:
         return BaseAttr("replace-url", url_expression)
 
     def show(self, expression: str) -> BaseAttr:
+        """Show or hides an element based on whether an expression evaluates to true or false."""
         return BaseAttr("show", expression)
 
     def text(self, expression: str) -> BaseAttr:
+        """Binds the text content of an element to an expression."""
         return BaseAttr("text", expression)
 
     def indicator(self, signal_name: str) -> BaseAttr:
+        """Creates a signal and sets its value to true while an SSE request request is in flight, otherwise false."""
         return BaseAttr("indicator", signal_name)
 
     def custom_validity(self, expression: str) -> BaseAttr:
+        """Sets the validity message for an element based on an expression."""
         return BaseAttr("custom-validity", expression)
 
     @property
     def scroll_into_view(self) -> ScrollIntoViewAttr:
+        """Scrolls the element into view."""
         return ScrollIntoViewAttr()
 
     def view_transition(self, expression: str) -> BaseAttr:
+        """Sets the view-transition-name style attribute explicitly."""
         return BaseAttr("view-transition", expression)
 
 
@@ -201,34 +268,7 @@ class BaseAttr(Mapping):
                 key += f".{'.'.join(values)}"
         return key
 
-    def __getitem__(self, key, /) -> str | Literal[True]:
-        return self._value
-
-    def __len__(self) -> Literal[1]:
-        return 1
-
-    def __iter__(self) -> Iterable[str]:
-        return iter([self._key()])
-
-    def __str__(self):
-        r = self._key()
-        if self._value is not True:
-            r += f"={self._value!r}"
-        return r
-
-    def __html__(self):
-        return str(self)
-
-
-TAttr = TypeVar("TAttr", bound=BaseAttr)
-
-
-class CaseMod:
-    def case(self: TAttr, case: Literal["camel", "kebab", "snake", "pascal"]) -> TAttr:
-        self._mods["case"] = [case]
-        return self
-
-    def _to_kebab_suffix(self: TAttr, signal_name: str):
+    def _to_kebab_suffix(self, signal_name: str):
         if "-" in signal_name:
             kebab_name, from_case = signal_name.lower(), "kebab"
         elif "_" in signal_name:
@@ -248,6 +288,51 @@ class CaseMod:
         self._suffix = kebab_name
         if from_case:
             self._mods["case"] = [from_case]
+
+    def __getitem__(self, key, /) -> str | Literal[True]:
+        return self._value
+
+    def __len__(self) -> Literal[1]:
+        return 1
+
+    def __iter__(self) -> Iterator[str]:
+        return iter([self._key()])
+
+    def __str__(self):
+        r = self._key()
+        if self._value is not True:
+            r += f"={self._value!r}"
+        return r
+
+    def __html__(self):
+        return str(self)
+
+
+class AttrGroup(Mapping):
+    def __init__(self, attrs: Iterable[BaseAttr]):
+        self._attrs: list[BaseAttr] = list(attrs)
+        self._attr_dict: dict[str, str] = {}
+        for attr in self._attrs:
+            self._attr_dict.update(attr)
+        self._attr_string: str = " ".join(str(attr) for attr in self._attrs)
+
+    def __iter__(self):
+        return iter(self._attr_dict)
+
+    def __len__(self):
+        return len(self._attr_dict)
+
+    def __getitem__(self, key, /):
+        return self._attr_dict[key]
+
+    def __str__(self):
+        return self._attr_string
+
+    def __html__(self):
+        return self._attr_string
+
+
+TAttr = TypeVar("TAttr", bound=BaseAttr)
 
 
 class TimingMod:
@@ -299,7 +384,7 @@ class SignalsAttr(BaseAttr):
         return self
 
 
-class ComputedAttr(BaseAttr, CaseMod):
+class ComputedAttr(BaseAttr):
     def __init__(self, signal_name: str, expression: str):
         super().__init__("computed")
         self._to_kebab_suffix(signal_name)
@@ -350,7 +435,7 @@ class ClassAttr(BaseAttr):
             self._value = class_object
 
 
-class OnAttr(BaseAttr, TimingMod, ViewtransitionMod, CaseMod):
+class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
     def __init__(self, event: str, expression: str):
         super().__init__("on")
         self._to_kebab_suffix(event)
@@ -480,7 +565,7 @@ class OnIntervalAttr(BaseAttr, ViewtransitionMod):
         self._value = expression
 
     def duration(self, duration: int | float | str, leading: bool = False) -> Self:
-        self._mods["duration"] = [duration]
+        self._mods["duration"] = [str(duration)]
         if leading:
             self._mods["duration"].append("leading")
         return self
