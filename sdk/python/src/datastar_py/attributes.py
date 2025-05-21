@@ -128,9 +128,7 @@ class Attributes:
         """Set up two-way data binding between a signal and an element’s value."""
         return BaseAttr("bind", signal_name)
 
-    def class_(
-        self, class_dict: Mapping | None = None, /, **classes: str
-    ) -> BaseAttr:
+    def class_(self, class_dict: Mapping | None = None, /, **classes: str) -> BaseAttr:
         """Add or removes classes to or from an element based on expressions."""
         classes = {**(class_dict if class_dict else {}), **classes}
         return BaseAttr("class", _js_object(classes))
@@ -142,9 +140,7 @@ class Attributes:
     @overload
     def on(self, event: Literal["raf"], expression: str) -> OnRafAttr: ...
     @overload
-    def on(
-        self, event: Literal["signal-change"], expression: str
-    ) -> OnSignalChangeAttr: ...
+    def on(self, event: Literal["signal-change"], expression: str) -> OnSignalChangeAttr: ...
     @overload
     def on(self, event: JSEvent | str, expression: str) -> OnAttr: ...
     def on(
