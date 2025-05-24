@@ -17,21 +17,6 @@ export const ViewTransition: AttributePlugin = {
   name: 'viewTransition',
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
-  onGlobalInit() {
-    let hasViewTransitionMeta = false
-    for (const node of document.head.childNodes) {
-      if (node instanceof HTMLMetaElement && node.name === VIEW_TRANSITION) {
-        hasViewTransitionMeta = true
-      }
-    }
-
-    if (!hasViewTransitionMeta) {
-      const meta = document.createElement('meta')
-      meta.name = VIEW_TRANSITION
-      meta.content = 'same-origin'
-      document.head.appendChild(meta)
-    }
-  },
   onLoad: ({ effect, el, genRX }) => {
     if (!supportsViewTransitions) {
       console.error('Browser does not support view transitions')
