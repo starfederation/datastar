@@ -10,8 +10,6 @@ import {
 } from '../../../../engine/types'
 import { supportsViewTransitions } from '../../../../utils/view-transtions'
 
-const VIEW_TRANSITION = 'view-transition'
-
 export const ViewTransition: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'viewTransition',
