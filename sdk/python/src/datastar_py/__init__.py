@@ -1,3 +1,4 @@
 from .sse import SSE_HEADERS, ServerSentEventGenerator
+from .attributes import attribute_generator
 
-__all__ = ["ServerSentEventGenerator", "SSE_HEADERS"]
+__all__ = ["attribute_generator", "ServerSentEventGenerator", "SSE_HEADERS"]
