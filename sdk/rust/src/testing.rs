@@ -394,12 +394,10 @@ pub(crate) async fn test_server_merge_signal_complete(base_url: &str) {
                     read_header = true;
                     buffer.clear();
                 }
+            } else if line != "event: datastar-merge-signals" {
+                buffer += line;
             } else {
-                if line != "event: datastar-merge-signals" {
-                    buffer += line;
-                } else {
-                    read_header = true;
-                }
+                read_header = true;
             }
         }
     }
