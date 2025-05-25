@@ -188,14 +188,16 @@ mod tests {
     use {
         super::Sse,
         crate::{
-            prelude::ReadSignals,
-            testing::{self, Signals, base_test_server},
+            prelude::{MergeSignals, ReadSignals},
+            testing::{self, Signals, base_test_server, test_server_merge_signal_complete},
         },
+        async_stream::stream,
         axum::{
             Router,
             response::{Html, IntoResponse},
             routing::{get, post},
         },
+        std::time::Duration,
         tokio::net::TcpListener,
         tracing_test::traced_test,
     };
@@ -248,6 +250,52 @@ mod tests {
         });
 
         base_test_server(&base_url).await;
+
+        shutdown_tx.send(()).expect("trigger shutdown signal");
+        server_result_rx.await??;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn sdk_merge_complete_test() -> Result<(), Box<dyn core::error::Error>> {
+        let listener = TcpListener::bind("127.0.0.1:0").await?;
+        let local_addr = listener.local_addr()?;
+
+        let base_url = format!("http://{local_addr}");
+
+        let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
+        let shutdown_signal = async move {
+            shutdown_rx
+                .await
+                .expect("to have no shutdown signal error on receival");
+        };
+
+        let app = Router::new().route(
+            "/rounds",
+            get(async || {
+                Sse(stream! {
+                    for i in 0..100 {
+                        tokio::time::sleep(Duration::from_millis((i % 7) * 5)).await;
+                        yield MergeSignals::new(format!("{{current_round: {}}}", i*13));
+                    }
+                })
+            }),
+        );
+
+        let (server_result_tx, server_result_rx) = tokio::sync::oneshot::channel();
+        tokio::spawn(async move {
+            server_result_tx
+                .send(
+                    axum::serve(listener, app)
+                        .with_graceful_shutdown(shutdown_signal)
+                        .await,
+                )
+                .expect("send axum serve result upstream over oneshot ch");
+        });
+
+        test_server_merge_signal_complete(&base_url).await;
 
         shutdown_tx.send(()).expect("trigger shutdown signal");
         server_result_rx.await??;

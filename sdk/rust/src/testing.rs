@@ -354,3 +354,56 @@ pub(crate) async fn base_test_server(base_url: &str) {
         println!("✔️ {} {} returns 400 Bad Request", method, path);
     }
 }
+
+#[allow(unused)]
+// In function of <https://github.com/starfederation/datastar/issues/905>
+pub(crate) async fn test_server_merge_signal_complete(base_url: &str) {
+    let client = reqwest::Client::new();
+    let events = TestEvent::test_events();
+
+    let response = client
+        .get(format!("{base_url}/rounds"))
+        .send()
+        .await
+        .expect("GET request failed");
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let mut stream = response.bytes_stream();
+    let mut event_count = 0;
+
+    let mut read_header = false;
+    let mut last_round = 0;
+    let mut buffer = String::new();
+    while let Some(Ok(chunk)) = stream.next().await {
+        let s = str::from_utf8(&chunk).expect("get utf-8 encoded data");
+        for line in s.lines().filter_map(|s| {
+            let s = s.trim();
+            (!s.is_empty()).then_some(s)
+        }) {
+            if read_header {
+                last_round = event_count * 13;
+                assert_eq!(
+                    line,
+                    format!("data: signals {{current_round: {}}}", last_round)
+                );
+                read_header = false;
+                event_count += 1;
+            } else if !buffer.is_empty() {
+                buffer += line;
+                if buffer == "event: datastar-merge-signals" {
+                    read_header = true;
+                    buffer.clear();
+                }
+            } else {
+                if line != "event: datastar-merge-signals" {
+                    buffer += line;
+                } else {
+                    read_header = true;
+                }
+            }
+        }
+    }
+
+    assert_eq!(100, event_count);
+    assert_eq!(1300 - 13, last_round);
+}

@@ -66,8 +66,10 @@ mod tests {
     use {
         crate::{
             DatastarEvent, Sse,
-            testing::{self, Signals, base_test_server},
+            prelude::MergeSignals,
+            testing::{self, Signals, base_test_server, test_server_merge_signal_complete},
         },
+        async_stream::stream,
         futures_util::Stream,
         rocket::{
             Config, Responder, get, post, response::content::RawHtml, routes, serde::json::Json,
@@ -76,16 +78,17 @@ mod tests {
         tracing_test::traced_test,
     };
 
+    // rocket doesn't handle multiple servers well
+
     #[tokio::test]
     #[traced_test]
-    async fn sdk_base_test() -> Result<(), Box<dyn core::error::Error>> {
-        fn get_available_port() -> Option<u16> {
-            fn port_is_available(port: u16) -> bool {
-                std::net::TcpListener::bind(("127.0.0.1", port)).is_ok()
-            }
-            (8000..9000).find(|port| port_is_available(*port))
-        }
+    async fn rocket_sdk_test_sequential() -> Result<(), Box<dyn core::error::Error>> {
+        sdk_base_test().await?;
+        sdk_merge_complete_test().await?;
+        Ok(())
+    }
 
+    async fn sdk_base_test() -> Result<(), Box<dyn core::error::Error>> {
         let available_port = get_available_port().expect("find available tcp port");
         let base_url = format!("http://127.0.0.1:{available_port}");
 
@@ -124,6 +127,44 @@ mod tests {
         tokio::time::sleep(Duration::from_secs(1)).await;
 
         base_test_server(&base_url).await;
+
+        rocket_shutdown.notify();
+        server_result_rx.await??;
+
+        Ok(())
+    }
+
+    async fn sdk_merge_complete_test() -> Result<(), Box<dyn core::error::Error>> {
+        let available_port = get_available_port().expect("find available tcp port");
+        let base_url = format!("http://127.0.0.1:{available_port}");
+
+        println!("base url: {base_url}");
+
+        tokio::time::sleep(Duration::from_secs(1)).await;
+
+        let server = rocket::build()
+            .mount("/", routes![test_merge_complete_rounds,])
+            .configure(Config {
+                port: available_port,
+                address: std::net::Ipv4Addr::new(127, 0, 0, 1).into(),
+                ..Config::debug_default()
+            })
+            .ignite()
+            .await
+            .expect("ignite the rocket server");
+
+        let rocket_shutdown = server.shutdown();
+
+        let (server_result_tx, server_result_rx) = tokio::sync::oneshot::channel();
+        tokio::spawn(async move {
+            server_result_tx
+                .send(server.launch().await)
+                .expect("send rocket serve result upstream over oneshot ch");
+        });
+
+        tokio::time::sleep(Duration::from_secs(1)).await;
+
+        test_server_merge_signal_complete(&base_url).await;
 
         rocket_shutdown.notify();
         server_result_rx.await??;
@@ -173,5 +214,22 @@ mod tests {
             }
             None => PageOrEvents::Html(RawHtml("<p>Hello</p>")),
         }
+    }
+
+    #[get("/rounds")]
+    fn test_merge_complete_rounds() -> Sse<impl Stream<Item = impl Into<DatastarEvent>>> {
+        Sse(stream! {
+            for i in 0..100 {
+                tokio::time::sleep(Duration::from_millis((i % 7) * 5)).await;
+                yield MergeSignals::new(format!("{{current_round: {}}}", i*13));
+            }
+        })
+    }
+
+    fn get_available_port() -> Option<u16> {
+        fn port_is_available(port: u16) -> bool {
+            std::net::TcpListener::bind(("127.0.0.1", port)).is_ok()
+        }
+        (8000..9000).find(|port| port_is_available(*port))
     }
 }

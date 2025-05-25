@@ -174,21 +174,26 @@ mod tests {
     use {
         super::Sse,
         crate::{
+            prelude::MergeSignals,
             rama::ReadSignals,
-            testing::{self, Signals, base_test_server},
+            testing::{self, Signals, base_test_server, test_server_merge_signal_complete},
         },
+        async_stream::stream,
         rama::{
             error::BoxError,
             graceful::Shutdown,
             http::{
                 server::HttpServer,
-                service::web::Router,
-                service::web::response::{Html, IntoResponse},
+                service::web::{
+                    Router,
+                    response::{Html, IntoResponse},
+                },
             },
             net::address::SocketAddress,
             rt::Executor,
             tcp::server::TcpListener,
         },
+        std::time::Duration,
         tracing_test::traced_test,
     };
 
@@ -236,6 +241,45 @@ mod tests {
         });
 
         base_test_server(&base_url).await;
+
+        shutdown_tx.send(()).expect("trigger shutdown signal");
+        server_task.await.expect("server task to finish gracefully");
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn sdk_merge_complete_test() -> Result<(), BoxError> {
+        let listener = TcpListener::bind(SocketAddress::local_ipv4(0)).await?;
+        let local_addr = listener.local_addr()?;
+
+        let base_url = format!("http://{local_addr}");
+
+        let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
+        let shutdown = Shutdown::new(shutdown_rx);
+
+        let listener_guard = shutdown.guard();
+
+        let server_task =
+            tokio::spawn(async move {
+                listener
+                    .serve_graceful(
+                        listener_guard,
+                        HttpServer::auto(Executor::default())
+                            .service(Router::new().get("/rounds", async || {
+                            Sse(stream! {
+                                for i in 0..100 {
+                                    tokio::time::sleep(Duration::from_millis((i % 7) * 5)).await;
+                                    yield MergeSignals::new(format!("{{current_round: {}}}", i*13));
+                                }
+                            })
+                        })),
+                    )
+                    .await;
+            });
+
+        test_server_merge_signal_complete(&base_url).await;
 
         shutdown_tx.send(()).expect("trigger shutdown signal");
         server_task.await.expect("server task to finish gracefully");
