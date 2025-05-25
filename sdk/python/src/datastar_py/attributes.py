@@ -45,7 +45,7 @@ JSEvent = Literal[
     "keydown",
     "keypress",
     "keyup",
-    "load",  #
+    "load",
     "loadeddata",
     "loadedmetadata",
     "loadstart",
@@ -97,12 +97,20 @@ JSEvent = Literal[
 
 
 class AttributeGenerator:
-    def __init__(self, alias: str = "data-"):
-        """:param alias: The prefix for all attributes. Defaults to `data-`."""
+    def __init__(self, *, alias: str = "data-"):
+        """A helper which can generate all the Datastar attributes.
+
+        :param alias: The prefix for all attributes. Defaults to `data-`.
+        """
         self._alias: str = alias
 
     def signals(
-        self, signals_dict: Mapping | None = None, /, expressions_: bool = False, **signals: str
+        self,
+        signals_dict: Mapping | None = None,
+        /,
+        *,
+        expressions_: bool = False,
+        **signals: str,
     ) -> SignalsAttr:
         """Merge one or more signals into the existing signals.
 
@@ -113,10 +121,15 @@ class AttributeGenerator:
         signals = {**(signals_dict if signals_dict else {}), **signals}
         return SignalsAttr(signals, expressions=expressions_, alias=self._alias)
 
-    def computed(self, computed_dict: Mapping | None = None, /, **computed: str) -> AttrGroup:
+    def computed(
+        self, computed_dict: Mapping | None = None, /, **computed: str
+    ) -> AttrGroup:
         """Create signals that are computed based on an expression."""
         computed = {**(computed_dict if computed_dict else {}), **computed}
-        return AttrGroup(BaseAttr("computed", expr, sig, alias=self._alias) for sig, expr in computed.items())
+        return AttrGroup(
+            BaseAttr("computed", expr, sig, alias=self._alias)
+            for sig, expr in computed.items()
+        )
 
     @property
     def star_ignore(self) -> StarIgnoreAttr:
@@ -144,7 +157,9 @@ class AttributeGenerator:
     @overload
     def on(self, event: Literal["raf"], expression: str) -> OnRafAttr: ...
     @overload
-    def on(self, event: Literal["signal-change"], expression: str) -> OnSignalChangeAttr: ...
+    def on(
+        self, event: Literal["signal-change"], expression: str
+    ) -> OnSignalChangeAttr: ...
     @overload
     def on(self, event: JSEvent | str, expression: str) -> OnAttr: ...
     def on(
@@ -205,6 +220,7 @@ class BaseAttr(Mapping):
         attr: str,
         value: str | Literal[True] = True,
         suffix: str | None = None,
+        *,
         alias: str = "data-",
     ):
         self._attr: str = attr
@@ -299,6 +315,7 @@ class TimingMod:
     def debounce(
         self: TAttr,
         wait: int | float | str,
+        *,
         leading: bool = False,
         notrail: bool = False,
     ) -> TAttr:
@@ -320,6 +337,7 @@ class TimingMod:
     def throttle(
         self: TAttr,
         wait: int | float | str,
+        *,
         noleading: bool = False,
         trail: bool = False,
     ) -> TAttr:
@@ -348,7 +366,9 @@ class ViewtransitionMod:
 
 
 class SignalsAttr(BaseAttr):
-    def __init__(self, signals_object: dict, expressions: bool = False, alias: str = "data-"):
+    def __init__(
+        self, signals_object: dict, *, expressions: bool = False, alias: str = "data-"
+    ):
         val = _js_object(signals_object) if expressions else json.dumps(signals_object)
         super().__init__("signals", val, alias=alias)
 
@@ -360,7 +380,7 @@ class SignalsAttr(BaseAttr):
 
 
 class StarIgnoreAttr(BaseAttr):
-    def __init__(self, alias: str = "data-"):
+    def __init__(self, *, alias: str = "data-"):
         super().__init__("star-ignore", True, alias=alias)
 
     @property
@@ -371,7 +391,7 @@ class StarIgnoreAttr(BaseAttr):
 
 
 class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, event: str, expression: str, alias: str = "data-"):
+    def __init__(self, event: str, expression: str, *, alias: str = "data-"):
         super().__init__("on", expression, alias=alias)
         self._to_kebab_suffix(event)
 
@@ -419,7 +439,7 @@ class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
 
 
 class PersistAttr(BaseAttr):
-    def __init__(self, alias: str = "data-"):
+    def __init__(self, *, alias: str = "data-"):
         super().__init__("persist", True, alias=alias)
 
     def __call__(self, signal_names: str | list[str] | None = None) -> Self:
@@ -437,7 +457,7 @@ class PersistAttr(BaseAttr):
 
 
 class ScrollIntoViewAttr(BaseAttr):
-    def __init__(self, alias: str = "data-"):
+    def __init__(self, *, alias: str = "data-"):
         super().__init__("scroll-into-view", True, alias=alias)
 
     @property
@@ -514,10 +534,10 @@ class ScrollIntoViewAttr(BaseAttr):
 
 
 class OnIntervalAttr(BaseAttr, ViewtransitionMod):
-    def __init__(self, expression: str, alias: str = "data-"):
+    def __init__(self, expression: str, *, alias: str = "data-"):
         super().__init__("on-interval", expression, alias=alias)
 
-    def duration(self, duration: int | float | str, leading: bool = False) -> Self:
+    def duration(self, duration: int | float | str, *, leading: bool = False) -> Self:
         """Set the interval duration."""
         self._mods["duration"] = [str(duration)]
         if leading:
@@ -526,7 +546,7 @@ class OnIntervalAttr(BaseAttr, ViewtransitionMod):
 
 
 class OnLoadAttr(BaseAttr, ViewtransitionMod):
-    def __init__(self, expression: str, alias: str = "data-"):
+    def __init__(self, expression: str, *, alias: str = "data-"):
         super().__init__("on-load", expression, alias=alias)
 
     def delay(self, delay: int | float | str) -> Self:
@@ -536,12 +556,12 @@ class OnLoadAttr(BaseAttr, ViewtransitionMod):
 
 
 class OnRafAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, expression: str, alias: str = "data-"):
+    def __init__(self, expression: str, *, alias: str = "data-"):
         super().__init__("on-raf", expression, alias=alias)
 
 
 class OnSignalChangeAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, expression: str, alias: str = "data-"):
+    def __init__(self, expression: str, *, alias: str = "data-"):
         super().__init__("on-signal-change", expression, alias=alias)
 
 
