@@ -96,7 +96,11 @@ JSEvent = Literal[
 ]
 
 
-class Attributes:
+class AttributeGenerator:
+    def __init__(self, alias: str = "data-"):
+        """:param alias: The prefix for all attributes. Defaults to `data-`."""
+        self._alias: str = alias
+
     def signals(
         self, signals_dict: Mapping | None = None, /, expressions_: bool = False, **signals: str
     ) -> SignalsAttr:
@@ -107,31 +111,31 @@ class Attributes:
             rather than literals.
         """
         signals = {**(signals_dict if signals_dict else {}), **signals}
-        return SignalsAttr(signals, expressions=expressions_)
+        return SignalsAttr(signals, expressions=expressions_, alias=self._alias)
 
     def computed(self, computed_dict: Mapping | None = None, /, **computed: str) -> AttrGroup:
         """Create signals that are computed based on an expression."""
         computed = {**(computed_dict if computed_dict else {}), **computed}
-        return AttrGroup(BaseAttr("computed", expr, sig) for sig, expr in computed.items())
+        return AttrGroup(BaseAttr("computed", expr, sig, alias=self._alias) for sig, expr in computed.items())
 
     @property
     def star_ignore(self) -> StarIgnoreAttr:
         """Tell Datastar to ignore data-* attributes on the element."""
-        return StarIgnoreAttr()
+        return StarIgnoreAttr(alias=self._alias)
 
     def attr(self, attr_dict: Mapping | None = None, /, **attrs: str) -> BaseAttr:
         """Set the value of any HTML attributes to expressions, and keep them in sync."""
         attrs = {**(attr_dict if attr_dict else {}), **attrs}
-        return BaseAttr("attr", _js_object(attrs))
+        return BaseAttr("attr", _js_object(attrs), alias=self._alias)
 
     def bind(self, signal_name: str) -> BaseAttr:
         """Set up two-way data binding between a signal and an element’s value."""
-        return BaseAttr("bind", signal_name)
+        return BaseAttr("bind", signal_name, alias=self._alias)
 
     def class_(self, class_dict: Mapping | None = None, /, **classes: str) -> BaseAttr:
         """Add or removes classes to or from an element based on expressions."""
         classes = {**(class_dict if class_dict else {}), **classes}
-        return BaseAttr("class", _js_object(classes))
+        return BaseAttr("class", _js_object(classes), alias=self._alias)
 
     @overload
     def on(self, event: Literal["interval"], expression: str) -> OnIntervalAttr: ...
@@ -148,51 +152,51 @@ class Attributes:
     ) -> OnAttr | OnIntervalAttr | OnLoadAttr | OnRafAttr | OnSignalChangeAttr:
         """Execute an expression when an event occurs."""
         if event == "interval":
-            return OnIntervalAttr(expression)
+            return OnIntervalAttr(expression, alias=self._alias)
         elif event == "load":
-            return OnLoadAttr(expression)
+            return OnLoadAttr(expression, alias=self._alias)
         elif event == "raf":
-            return OnRafAttr(expression)
+            return OnRafAttr(expression, alias=self._alias)
         elif event == "signal-change":
-            return OnSignalChangeAttr(expression)
-        return OnAttr(event, expression)
+            return OnSignalChangeAttr(expression, alias=self._alias)
+        return OnAttr(event, expression, alias=self._alias)
 
     @property
     def persist(self) -> PersistAttr:
         """Persist signals in local storage."""
-        return PersistAttr()
+        return PersistAttr(alias=self._alias)
 
     def ref(self, signal_name: str) -> BaseAttr:
         """Create a signal which references the element on which the attribute is placed."""
-        return BaseAttr("ref", signal_name)
+        return BaseAttr("ref", signal_name, alias=self._alias)
 
     def replace_url(self, url_expression: str) -> BaseAttr:
-        return BaseAttr("replace-url", url_expression)
+        return BaseAttr("replace-url", url_expression, alias=self._alias)
 
     def show(self, expression: str) -> BaseAttr:
         """Show or hides an element based on whether an expression evaluates to true or false."""
-        return BaseAttr("show", expression)
+        return BaseAttr("show", expression, alias=self._alias)
 
     def text(self, expression: str) -> BaseAttr:
         """Bind the text content of an element to an expression."""
-        return BaseAttr("text", expression)
+        return BaseAttr("text", expression, alias=self._alias)
 
     def indicator(self, signal_name: str) -> BaseAttr:
         """Create a signal whose value is true while an SSE request is in flight."""
-        return BaseAttr("indicator", signal_name)
+        return BaseAttr("indicator", signal_name, alias=self._alias)
 
     def custom_validity(self, expression: str) -> BaseAttr:
         """Set the validity message for an element based on an expression."""
-        return BaseAttr("custom-validity", expression)
+        return BaseAttr("custom-validity", expression, alias=self._alias)
 
     @property
     def scroll_into_view(self) -> ScrollIntoViewAttr:
         """Scrolls the element into view."""
-        return ScrollIntoViewAttr()
+        return ScrollIntoViewAttr(alias=self._alias)
 
     def view_transition(self, expression: str) -> BaseAttr:
         """Set the view-transition-name style attribute explicitly."""
-        return BaseAttr("view-transition", expression)
+        return BaseAttr("view-transition", expression, alias=self._alias)
 
 
 class BaseAttr(Mapping):
@@ -201,11 +205,13 @@ class BaseAttr(Mapping):
         attr: str,
         value: str | Literal[True] = True,
         suffix: str | None = None,
+        alias: str = "data-",
     ):
         self._attr: str = attr
         self._suffix: str | None = suffix
         self._mods: dict[str, list[str]] = {}
         self._value: str | Literal[True] = value
+        self._alias: str = alias
         if suffix:
             self._to_kebab_suffix(suffix)
 
@@ -215,7 +221,7 @@ class BaseAttr(Mapping):
         return self
 
     def _key(self) -> str:
-        key = f"data-{self._attr}"
+        key = f"{self._alias}{self._attr}"
         if self._suffix:
             key += f"-{self._suffix}"
         for mod, values in self._mods.items():
@@ -342,9 +348,9 @@ class ViewtransitionMod:
 
 
 class SignalsAttr(BaseAttr):
-    def __init__(self, signals_object: dict, expressions: bool = False):
+    def __init__(self, signals_object: dict, expressions: bool = False, alias: str = "data-"):
         val = _js_object(signals_object) if expressions else json.dumps(signals_object)
-        super().__init__("signals", val)
+        super().__init__("signals", val, alias=alias)
 
     @property
     def ifmissing(self) -> Self:
@@ -354,8 +360,8 @@ class SignalsAttr(BaseAttr):
 
 
 class StarIgnoreAttr(BaseAttr):
-    def __init__(self):
-        super().__init__("star-ignore", True)
+    def __init__(self, alias: str = "data-"):
+        super().__init__("star-ignore", True, alias=alias)
 
     @property
     def self(self) -> Self:
@@ -365,8 +371,8 @@ class StarIgnoreAttr(BaseAttr):
 
 
 class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, event: str, expression: str):
-        super().__init__("on", expression)
+    def __init__(self, event: str, expression: str, alias: str = "data-"):
+        super().__init__("on", expression, alias=alias)
         self._to_kebab_suffix(event)
 
     @property
@@ -413,8 +419,8 @@ class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
 
 
 class PersistAttr(BaseAttr):
-    def __init__(self):
-        super().__init__("persist", True)
+    def __init__(self, alias: str = "data-"):
+        super().__init__("persist", True, alias=alias)
 
     def __call__(self, signal_names: str | list[str] | None = None) -> Self:
         if isinstance(signal_names, str):
@@ -431,8 +437,8 @@ class PersistAttr(BaseAttr):
 
 
 class ScrollIntoViewAttr(BaseAttr):
-    def __init__(self):
-        super().__init__("scroll-into-view", True)
+    def __init__(self, alias: str = "data-"):
+        super().__init__("scroll-into-view", True, alias=alias)
 
     @property
     def smooth(self) -> Self:
@@ -508,8 +514,8 @@ class ScrollIntoViewAttr(BaseAttr):
 
 
 class OnIntervalAttr(BaseAttr, ViewtransitionMod):
-    def __init__(self, expression: str):
-        super().__init__("on-interval", expression)
+    def __init__(self, expression: str, alias: str = "data-"):
+        super().__init__("on-interval", expression, alias=alias)
 
     def duration(self, duration: int | float | str, leading: bool = False) -> Self:
         """Set the interval duration."""
@@ -520,8 +526,8 @@ class OnIntervalAttr(BaseAttr, ViewtransitionMod):
 
 
 class OnLoadAttr(BaseAttr, ViewtransitionMod):
-    def __init__(self, expression: str):
-        super().__init__("on-load", expression)
+    def __init__(self, expression: str, alias: str = "data-"):
+        super().__init__("on-load", expression, alias=alias)
 
     def delay(self, delay: int | float | str) -> Self:
         """Delay the event listener."""
@@ -530,13 +536,13 @@ class OnLoadAttr(BaseAttr, ViewtransitionMod):
 
 
 class OnRafAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, expression: str):
-        super().__init__("on-raf", expression)
+    def __init__(self, expression: str, alias: str = "data-"):
+        super().__init__("on-raf", expression, alias=alias)
 
 
 class OnSignalChangeAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, expression: str):
-        super().__init__("on-signal-change", expression)
+    def __init__(self, expression: str, alias: str = "data-"):
+        super().__init__("on-signal-change", expression, alias=alias)
 
 
 def _escape(s: str) -> str:
@@ -554,4 +560,4 @@ def _js_object(obj: dict) -> str:
     return "{" + ", ".join(f"{json.dumps(k)}: {v}" for k, v in obj.items()) + "}"
 
 
-attribute_generator = Attributes()
+attribute_generator = AttributeGenerator()
