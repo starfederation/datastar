@@ -5,7 +5,7 @@ open Microsoft.AspNetCore.Mvc.ModelBinding
 open Microsoft.AspNetCore.Mvc.ModelBinding.Binders
 open StarFederation.Datastar.DependencyInjection
 open System.Text.Json
-open StarFederation.Datastar.Utility
+open StarFederation.Datastar.FSharp.Utility
 
 type SignalsModelBinder(signalsReader:IDatastarSignalsReaderService) =
     interface IModelBinder with

@@ -2,7 +2,8 @@ namespace StarFederation.Datastar.DependencyInjection
 
 open System.Threading.Tasks
 open StarFederation.Datastar
-open StarFederation.Datastar.Utility
+open StarFederation.Datastar.FSharp
+open StarFederation.Datastar.FSharp.Utility
 
 type IDatastarServerSentEventService =
     abstract Handler : ISendServerEvent
