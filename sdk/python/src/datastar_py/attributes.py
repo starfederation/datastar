@@ -97,7 +97,7 @@ JSEvent = Literal[
 
 
 class AttributeGenerator:
-    def __init__(self, *, alias: str = "data-"):
+    def __init__(self, alias: str = "data-"):
         """A helper which can generate all the Datastar attributes.
 
         :param alias: The prefix for all attributes. Defaults to `data-`.
