@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from itertools import chain
 from typing import Optional, Protocol, Union, runtime_checkable
@@ -68,8 +70,7 @@ class ServerSentEventGenerator:
             data_lines.append(f"data: {consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} false")
 
         data_lines.extend(
-            f"data: {consts.FRAGMENTS_DATALINE_LITERAL} {x}"
-            for x in fragments.splitlines()
+            f"data: {consts.FRAGMENTS_DATALINE_LITERAL} {x}" for x in fragments.splitlines()
         )
 
         return ServerSentEventGenerator._send(
