@@ -1,4 +1,4 @@
-{%- func dotnetConsts(data *ConstTemplateData) -%}
+{%- func fsharpConsts(data *ConstTemplateData) -%}
 // {%s data.DoNotEdit %}
 
 namespace StarFederation.Datastar
