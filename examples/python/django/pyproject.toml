@@ -5,7 +5,7 @@ description = "Datastar Example Django Project"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "daphne>=4.1.2",
-    "datastar-py>=0.4.3",
-    "django>=5.1.7",
+    "daphne>=4.2.0",
+    "datastar-py>=0.4.4",
+    "django>=5.2.1",
 ]
