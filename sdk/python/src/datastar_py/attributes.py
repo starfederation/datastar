@@ -253,7 +253,7 @@ class BaseAttr(Mapping):
             kebab_name, from_case = signal_name.lower().replace("_", "-"), "snake"
         elif signal_name[0].isupper():
             kebab_name, from_case = (
-                re.sub(r"([A-Z])", r"-\1", signal_name).lstrip("-").lower(),
+                re.sub(r"((?<!\.)[A-Z])", r"-\1", signal_name).lstrip("-").lower(),
                 "pascal",
             )
         elif signal_name.lower() != signal_name:
