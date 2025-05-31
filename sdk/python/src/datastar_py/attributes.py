@@ -213,6 +213,24 @@ class AttributeGenerator:
         """Set the view-transition-name style attribute explicitly."""
         return BaseAttr("view-transition", expression, alias=self._alias)
 
+    @property
+    def json_signals(self) -> BaseAttr:
+        """Create a signal that contains the JSON representation of the signals."""
+        return BaseAttr("json-signals", True, alias=self._alias)
+
+    @property
+    def ignore_morph(self) -> BaseAttr:
+        """Do not overwrite this element or its children when morphing."""
+        return BaseAttr("ignore-morph", True, alias=self._alias)
+
+    def preserve_attr(self, attrs: str | Iterable[str]) -> BaseAttr:
+        """Preserve the client side state for specified attribute(s) when morphing."""
+        if isinstance(attrs, str):
+            value = attrs
+        else:
+            value = " ".join(attrs)
+        return BaseAttr("preserve-attrs", value, alias=self._alias)
+
 
 class BaseAttr(Mapping):
     def __init__(
@@ -437,15 +455,21 @@ class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
         self._mods["stop"] = []
         return self
 
+    @property
+    def trust(self) -> Self:
+        """Run even when isTrusted property on the event is false."""
+        self._mods["trust"] = []
+        return self
+
 
 class PersistAttr(BaseAttr):
     def __init__(self, *, alias: str = "data-"):
         super().__init__("persist", True, alias=alias)
 
-    def __call__(self, signal_names: str | list[str] | None = None) -> Self:
+    def __call__(self, signal_names: str | Iterable[str] | None = None) -> Self:
         if isinstance(signal_names, str):
             self._value = signal_names
-        elif isinstance(signal_names, list):
+        else:
             self._value = " ".join(signal_names)
         return self
 
@@ -552,6 +576,12 @@ class OnLoadAttr(BaseAttr, ViewtransitionMod):
     def delay(self, delay: int | float | str) -> Self:
         """Delay the event listener."""
         self._mods["delay"] = [str(delay)]
+        return self
+
+    @property
+    def once(self) -> Self:
+        """Only trigger the event listener once."""
+        self._mods["once"] = []
         return self
 
 
