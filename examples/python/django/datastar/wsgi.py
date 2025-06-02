@@ -7,7 +7,6 @@ For more information on this file, see
 https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 """
 
-
 import os
 import wsgiref.handlers
 
@@ -20,7 +19,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "datastar.settings")
 if settings.DEBUG:
     original_is_hop_by_hop = wsgiref.handlers.is_hop_by_hop
 
-
     def custom_is_hop_by_hop(header_name):
         """Permit the "connection" header over WSGI
 
@@ -31,11 +29,10 @@ if settings.DEBUG:
 
         https://peps.python.org/pep-0333/#other-http-features
         """
-        if header_name.casefold() == "connection":            
+        if header_name.casefold() == "connection":
             return False
 
         return original_is_hop_by_hop(header_name)
-
 
     wsgiref.handlers.is_hop_by_hop = custom_is_hop_by_hop
 

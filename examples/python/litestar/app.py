@@ -1,12 +1,21 @@
+# /// script
+# dependencies = [
+#   "datastar-py",
+#   "litestar",
+# ]
+# [tool.uv.sources]
+# datastar-py = { path = "../../../sdk/python" }
+# ///
+
 import asyncio
+from collections.abc import AsyncGenerator
 from datetime import datetime
-from typing import AsyncGenerator
 
-from datastar_py.litestar import ServerSentEventGenerator, DatastarSSE, read_signals
-from litestar import Litestar, get, MediaType
-from litestar.di import Provide
 import uvicorn
+from datastar_py.litestar import DatastarSSE, ServerSentEventGenerator, read_signals
 
+from litestar import Litestar, MediaType, get
+from litestar.di import Provide
 
 HTML = """\
 	<!DOCTYPE html>
@@ -54,7 +63,9 @@ async def time_updates() -> AsyncGenerator[str, None]:
             f"""<span id="currentTime">{datetime.now().isoformat()}"""
         )
         await asyncio.sleep(1)
-        yield ServerSentEventGenerator.merge_signals({"currentTime": f"{datetime.now().isoformat()}"})
+        yield ServerSentEventGenerator.merge_signals(
+            {"currentTime": f"{datetime.now().isoformat()}"}
+        )
         await asyncio.sleep(1)
 
 

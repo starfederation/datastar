@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from itertools import chain
-from typing import Optional, Protocol, Union, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 import datastar_py.consts as consts
 
@@ -32,7 +33,7 @@ class ServerSentEventGenerator:
         cls,
         event_type: consts.EventType,
         data_lines: list[str],
-        event_id: Optional[str] = None,
+        event_id: str | None = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ) -> str:
         prefix = []
@@ -51,11 +52,11 @@ class ServerSentEventGenerator:
     @classmethod
     def merge_fragments(
         cls,
-        fragments: Union[str, _HtmlProvider],
-        selector: Optional[str] = None,
-        merge_mode: Optional[consts.FragmentMergeMode] = None,
+        fragments: str | _HtmlProvider,
+        selector: str | None = None,
+        merge_mode: consts.FragmentMergeMode | None = None,
         use_view_transition: bool = consts.DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
-        event_id: Optional[str] = None,
+        event_id: str | None = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         if isinstance(fragments, _HtmlProvider):
@@ -84,9 +85,9 @@ class ServerSentEventGenerator:
     @classmethod
     def remove_fragments(
         cls,
-        selector: Optional[str] = None,
+        selector: str | None = None,
         use_view_transition: bool = True,
-        event_id: Optional[str] = None,
+        event_id: str | None = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         data_lines = []
@@ -108,7 +109,7 @@ class ServerSentEventGenerator:
     def merge_signals(
         cls,
         signals: dict,
-        event_id: Optional[str] = None,
+        event_id: str | None = None,
         only_if_missing: bool = False,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
@@ -116,9 +117,7 @@ class ServerSentEventGenerator:
         if only_if_missing:
             data_lines.append(f"data: {consts.ONLY_IF_MISSING_DATALINE_LITERAL} true")
 
-        data_lines.append(
-            f"data: {consts.SIGNALS_DATALINE_LITERAL} {json.dumps(signals)}"
-        )
+        data_lines.append(f"data: {consts.SIGNALS_DATALINE_LITERAL} {json.dumps(signals)}")
 
         return ServerSentEventGenerator._send(
             consts.EventType.MERGE_SIGNALS, data_lines, event_id, retry_duration
@@ -128,14 +127,12 @@ class ServerSentEventGenerator:
     def remove_signals(
         cls,
         paths: list[str],
-        event_id: Optional[str] = None,
+        event_id: str | None = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         data_lines = []
 
-        data_lines.extend(
-            f"data: {consts.PATHS_DATALINE_LITERAL} {path}" for path in paths
-        )
+        data_lines.extend(f"data: {consts.PATHS_DATALINE_LITERAL} {path}" for path in paths)
 
         return ServerSentEventGenerator._send(
             consts.EventType.REMOVE_SIGNALS,
@@ -149,8 +146,8 @@ class ServerSentEventGenerator:
         cls,
         script: str,
         auto_remove: bool = True,
-        attributes: Optional[list[str]] = None,
-        event_id: Optional[str] = None,
+        attributes: list[str] | None = None,
+        event_id: str | None = None,
         retry_duration: int = consts.DEFAULT_SSE_RETRY_DURATION,
     ):
         data_lines = []
@@ -178,3 +175,17 @@ class ServerSentEventGenerator:
     @classmethod
     def redirect(cls, location: str):
         return cls.execute_script(f"setTimeout(() => window.location = '{location}')")
+
+
+def _read_signals(
+    method: str, headers: Mapping, params: Mapping, body: str | bytes
+) -> dict[str, Any] | None:
+    if "Datastar-Request" not in headers:
+        return None
+    if method == "GET":
+        data = params.get("datastar")
+    elif headers.get("Content-Type") == "application/json":
+        data = body
+    else:
+        return None
+    return json.loads(data) if data else None
