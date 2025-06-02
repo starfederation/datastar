@@ -1,10 +1,15 @@
 import asyncio
 from datetime import datetime
 
+import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
-from datastar_py.fastapi import DatastarStreamingResponse, ServerSentEventGenerator
+from datastar_py.fastapi import (
+    DatastarStreamingResponse,
+    ServerSentEventGenerator,
+    ReadSignals,
+)
 
 app = FastAPI()
 
@@ -62,5 +67,7 @@ async def time_updates():
 
 
 @app.get("/updates")
-async def updates():
+async def updates(signals: ReadSignals):
+    # ReadSignals is a dependency that automatically loads the signals from the request
+    print(signals)
     return DatastarStreamingResponse(time_updates())
