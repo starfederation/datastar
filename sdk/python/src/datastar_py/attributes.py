@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Iterable, Iterator, Mapping
-from typing import Literal, Self, TypeVar, overload
+from typing import Literal, Self, TypeAlias, TypeVar, Union, overload
 
 __all__ = ["attribute_generator"]
 
@@ -96,6 +96,11 @@ JSEvent = Literal[
 ]
 
 
+SignalValue: TypeAlias = Union[
+    str, int, float, bool, dict[str, "SignalValue"], list["SignalValue"], None,
+]
+
+
 class AttributeGenerator:
     def __init__(self, alias: str = "data-"):
         """A helper which can generate all the Datastar attributes.
@@ -106,11 +111,11 @@ class AttributeGenerator:
 
     def signals(
         self,
-        signals_dict: Mapping | None = None,
+        signals_dict: Mapping[str, SignalValue] | None = None,
         /,
         *,
         expressions_: bool = False,
-        **signals: str,
+        **signals: SignalValue,
     ) -> SignalsAttr:
         """Merge one or more signals into the existing signals.
 
@@ -168,11 +173,11 @@ class AttributeGenerator:
         """Execute an expression when an event occurs."""
         if event == "interval":
             return OnIntervalAttr(expression, alias=self._alias)
-        elif event == "load":
+        if event == "load":
             return OnLoadAttr(expression, alias=self._alias)
-        elif event == "raf":
+        if event == "raf":
             return OnRafAttr(expression, alias=self._alias)
-        elif event == "signal-change":
+        if event == "signal-change":
             return OnSignalChangeAttr(expression, alias=self._alias)
         return OnAttr(event, expression, alias=self._alias)
 
@@ -467,6 +472,8 @@ class PersistAttr(BaseAttr):
         super().__init__("persist", True, alias=alias)
 
     def __call__(self, signal_names: str | Iterable[str] | None = None) -> Self:
+        if not signal_names:
+            return self
         if isinstance(signal_names, str):
             self._value = signal_names
         else:
@@ -607,7 +614,14 @@ def _escape(s: str) -> str:
 
 def _js_object(obj: dict) -> str:
     """Create a JS object where the values are expressions rather than strings."""
-    return "{" + ", ".join(f"{json.dumps(k)}: {v}" for k, v in obj.items()) + "}"
+    return (
+        "{"
+        + ", ".join(
+            f"{json.dumps(k)}: {_js_object(v) if isinstance(v, dict) else v}"
+            for k, v in obj.items()
+        )
+        + "}"
+    )
 
 
 attribute_generator = AttributeGenerator()
