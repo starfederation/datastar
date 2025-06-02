@@ -9,6 +9,7 @@ import datastar_py.consts as consts
 SSE_HEADERS = {
     "Cache-Control": "no-cache",
     "Content-Type": "text/event-stream",
+    "X-Accel-Buffering": "no",
 }
 
 
