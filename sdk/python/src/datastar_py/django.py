@@ -6,7 +6,8 @@ from typing import Any
 from django.http import HttpRequest
 from django.http import StreamingHttpResponse as _StreamingHttpResponse
 
-from .sse import SSE_HEADERS, ServerSentEventGenerator, _read_signals
+from .sse import SSE_HEADERS, ServerSentEventGenerator
+from . import _read_signals
 
 __all__ = [
     "SSE_HEADERS",
