@@ -486,6 +486,7 @@ RSpec.describe Datastar::Dispatcher do
     end
 
     specify '#on_error' do
+      allow(Datastar.config.logger).to receive(:error)
       errors = []
       dispatcher.on_error { |ex| errors << ex }
 
@@ -497,6 +498,7 @@ RSpec.describe Datastar::Dispatcher do
       
       dispatcher.response.body.call(socket)
       expect(errors.first).to be_a(ArgumentError)
+      expect(Datastar.config.logger).to have_received(:error).with(/ArgumentError \(Invalid argument\):/)
     end
 
     specify 'with global on_error' do
