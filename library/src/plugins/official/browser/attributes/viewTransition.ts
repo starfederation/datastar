@@ -10,28 +10,11 @@ import {
 } from '../../../../engine/types'
 import { supportsViewTransitions } from '../../../../utils/view-transtions'
 
-const VIEW_TRANSITION = 'view-transition'
-
 export const ViewTransition: AttributePlugin = {
   type: PluginType.Attribute,
   name: 'viewTransition',
   keyReq: Requirement.Denied,
   valReq: Requirement.Must,
-  onGlobalInit() {
-    let hasViewTransitionMeta = false
-    for (const node of document.head.childNodes) {
-      if (node instanceof HTMLMetaElement && node.name === VIEW_TRANSITION) {
-        hasViewTransitionMeta = true
-      }
-    }
-
-    if (!hasViewTransitionMeta) {
-      const meta = document.createElement('meta')
-      meta.name = VIEW_TRANSITION
-      meta.content = 'same-origin'
-      document.head.appendChild(meta)
-    }
-  },
   onLoad: ({ effect, el, genRX }) => {
     if (!supportsViewTransitions) {
       console.error('Browser does not support view transitions')

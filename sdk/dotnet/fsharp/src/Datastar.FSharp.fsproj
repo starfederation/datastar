@@ -41,16 +41,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="..\assets\datastar_icon.png">
+        <None Include="..\..\assets\datastar_icon.png">
           <Pack>true</Pack>
           <Link>datastar_icon.png</Link>
           <PackagePath>$(PackageIconUrl)</PackagePath>
         </None>
-        <None Include="..\README.md">
-          <Pack>true</Pack>
-          <PackagePath>/</PackagePath>
+        <Content Include="..\..\README.md">
           <Link>README.md</Link>
-        </None>
+        </Content>
         <Compile Include="Utility.fs" />
         <Compile Include="Consts.fs" />
         <Compile Include="Types.fs" />

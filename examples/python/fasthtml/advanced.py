@@ -8,19 +8,21 @@
 #     "polars",
 #     "python-fasthtml",
 # ]
+# [tool.uv.sources]
+# datastar-py = { path = "../../../sdk/python" }
 # ///
 import asyncio
 import json
 from datetime import datetime
 from pathlib import Path
 
-
 import polars as pl
-from fasthtml.common import *
-from great_tables import GT, html
+from datastar_py.fasthtml import DatastarStreamingResponse, ServerSentEventGenerator
+from great_tables import GT
 from great_tables.data import reactions
 
-from datastar_py.fasthtml import DatastarStreamingResponse, ServerSentEventGenerator
+# ruff: noqa: F403, F405
+from fasthtml.common import *
 
 ######################################################################################################
 # This demo shows how FastHTML can be integrated with Datastar for server-driven interaction with a  #
@@ -68,7 +70,7 @@ def GreatTable(pattern=default_pattern):
                         "OH_k298",
                     ]
                 )
-                .filter((pl.col("cmpd_name").str.contains(pattern)))
+                .filter(pl.col("cmpd_name").str.contains(pattern))
                 .drop_nulls()
             )
             .cols_label(
@@ -200,4 +202,6 @@ HELLO_BUTTON = Div(id="myElement")(
     )("Say hello"),
 )
 
-serve()
+
+if __name__ == "__main__":
+    serve()

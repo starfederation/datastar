@@ -2,10 +2,13 @@ import asyncio
 import time
 from datetime import datetime
 
+from datastar_py.django import (
+    DatastarStreamingHttpResponse,
+    ServerSentEventGenerator,
+    read_signals,
+)
+
 from django.http import HttpResponse
-
-from datastar_py.django import DatastarStreamingHttpResponse, ServerSentEventGenerator
-
 
 # ASGI Example
 
@@ -15,7 +18,7 @@ HTML_ASGI = """\
         <head>
             <title>DATASTAR on Django (ASGI)</title>
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.9/bundles/datastar.js"></script>
+            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.11/bundles/datastar.js"></script>
             <style>
             html, body { height: 100%; width: 100%; }
             body { background-image: linear-gradient(to right bottom, oklch(0.424958 0.052808 253.972015), oklch(0.189627 0.038744 264.832977)); }
@@ -43,12 +46,14 @@ HTML_ASGI = """\
 
 
 async def home_asgi(request):
-    return HttpResponse(
-        HTML_ASGI.replace("CURRENT_TIME", f"{datetime.isoformat(datetime.now())}")
-    )
+    return HttpResponse(HTML_ASGI.replace("CURRENT_TIME", f"{datetime.isoformat(datetime.now())}"))
 
 
 async def updates_asgi(request):
+    # You can read the signals from the request using the `read_signals` helper
+    signals = read_signals(request)
+    print(signals)
+
     async def time_updates():
         while True:
             yield ServerSentEventGenerator.merge_fragments(
@@ -71,7 +76,7 @@ HTML_WSGI = """\
         <head>
             <title>DATASTAR on Django (WSGI)</title>
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.9/bundles/datastar.js"></script>
+            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.11/bundles/datastar.js"></script>
             <style>
             html, body { height: 100%; width: 100%; }
             body { background-image: linear-gradient(to right bottom, oklch(0.424958 0.052808 253.972015), oklch(0.189627 0.038744 264.832977)); }
@@ -101,9 +106,7 @@ HTML_WSGI = """\
 
 
 def home_wsgi(request):
-    return HttpResponse(
-        HTML_WSGI.replace("CURRENT_TIME", f"{datetime.isoformat(datetime.now())}")
-    )
+    return HttpResponse(HTML_WSGI.replace("CURRENT_TIME", f"{datetime.isoformat(datetime.now())}"))
 
 
 def updates_wsgi(request):

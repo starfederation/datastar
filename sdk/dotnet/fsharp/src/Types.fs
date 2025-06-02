@@ -1,4 +1,4 @@
-namespace StarFederation.Datastar
+namespace StarFederation.Datastar.FSharp
 
 open System
 open System.Collections.Generic
@@ -6,7 +6,8 @@ open System.Text.Json
 open System.Text.Json.Nodes
 open System.Text.RegularExpressions
 open System.Threading.Tasks
-open StarFederation.Datastar.Utility
+open StarFederation.Datastar
+open StarFederation.Datastar.FSharp.Utility
 
 type ServerSentEvent =
     { EventType: EventType

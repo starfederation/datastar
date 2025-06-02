@@ -21,7 +21,7 @@ jobs:
         dotnet-version: 9.0.x
 
     - name: Build and Pack NuGet package with versioning
-      run: dotnet pack sdk/dotnet/src/Datastar.fsproj --configuration Release --output ${{ env.NuGetDirectory }}
+      run: dotnet pack sdk/dotnet/fsharp/src/Datastar.FSharp.fsproj --configuration Release --output ${{ env.NuGetDirectory }}
 
     - name: Upload NuGet package to GitHub
       uses: actions/upload-artifact@v4

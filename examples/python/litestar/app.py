@@ -1,11 +1,21 @@
+# /// script
+# dependencies = [
+#   "datastar-py",
+#   "litestar",
+# ]
+# [tool.uv.sources]
+# datastar-py = { path = "../../../sdk/python" }
+# ///
+
 import asyncio
+from collections.abc import AsyncGenerator
 from datetime import datetime
-from typing import AsyncGenerator
 
-from datastar_py.litestar import  ServerSentEventGenerator, DatastarSSE
-from litestar import Litestar, get, MediaType
 import uvicorn
+from datastar_py.litestar import DatastarSSE, ServerSentEventGenerator, read_signals
 
+from litestar import Litestar, MediaType, get
+from litestar.di import Provide
 
 HTML = """\
 	<!DOCTYPE html>
@@ -53,12 +63,17 @@ async def time_updates() -> AsyncGenerator[str, None]:
             f"""<span id="currentTime">{datetime.now().isoformat()}"""
         )
         await asyncio.sleep(1)
-        yield ServerSentEventGenerator.merge_signals({"currentTime": f"{datetime.now().isoformat()}"})
+        yield ServerSentEventGenerator.merge_signals(
+            {"currentTime": f"{datetime.now().isoformat()}"}
+        )
         await asyncio.sleep(1)
 
 
-@get("/updates")
-async def updates() -> DatastarSSE:
+# We aren't using the signals for anything meaningful here, but `read_signals` can be
+# used as a dependency to automatically parse the signals from the request.
+@get("/updates", dependencies={"signals": Provide(read_signals)})
+async def updates(signals: dict | None) -> DatastarSSE:
+    print(signals)
     return DatastarSSE(time_updates())
 
 

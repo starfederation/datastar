@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 from functools import wraps
-from typing import Any, Callable, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable
 
 from litestar.response import Stream
 
+from . import _read_signals
 from .sse import SSE_HEADERS, ServerSentEventGenerator
 
 if TYPE_CHECKING:
+    from litestar import Request
     from litestar.types.helper_types import StreamType
 
-__all__ = ["SSE_HEADERS", "DatastarSSE", "ServerSentEventGenerator"]
+__all__ = ["SSE_HEADERS", "DatastarSSE", "ServerSentEventGenerator", "read_signals"]
 
 
 class DatastarSSE(Stream):
@@ -21,8 +23,8 @@ class DatastarSSE(Stream):
         **kwargs: Any,
     ) -> None:
         """
-        Similar to litestar's ServerSentEvent, but since our event generator just returns text we don't need
-        anything fancy.
+        Similar to litestar's ServerSentEvent, but since our event generator just returns text we
+        don't need anything fancy.
         """
         kwargs["headers"] = {**SSE_HEADERS, **kwargs.get("headers", {})}
         kwargs["media_type"] = "text/event-stream"
@@ -32,3 +34,9 @@ class DatastarSSE(Stream):
             content,
             **kwargs,
         )
+
+
+async def read_signals(request: Request) -> dict[str, Any] | None:
+    return _read_signals(
+        request.method, request.headers, request.query_params, await request.body()
+    )

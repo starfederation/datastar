@@ -1,2 +1,0 @@
-{:drivers [:firefox :chrome]
- :webdriver-opts {:chrome {:path-driver "/snap/bin/chromium.chromedriver"}}}
