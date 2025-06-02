@@ -5,8 +5,8 @@ from typing import Any
 from quart import make_response as _make_response
 from quart import request
 
-from .sse import SSE_HEADERS, ServerSentEventGenerator
 from . import _read_signals
+from .sse import SSE_HEADERS, ServerSentEventGenerator
 
 __all__ = [
     "SSE_HEADERS",

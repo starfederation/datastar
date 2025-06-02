@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Any, Callable
 
 from litestar.response import Stream
 
-from .sse import SSE_HEADERS, ServerSentEventGenerator
 from . import _read_signals
+from .sse import SSE_HEADERS, ServerSentEventGenerator
 
 if TYPE_CHECKING:
     from litestar import Request
