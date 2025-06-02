@@ -6,7 +6,7 @@ awk '
   function flush_data(data) {
     if (data) {
       print data | "sort"
-      close("sort", "to")
+      close("sort")
     }
     return ""
   }

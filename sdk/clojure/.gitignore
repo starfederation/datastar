@@ -4,7 +4,7 @@
 .clj-kondo/**
 !.clj-kondo/config.edn
 !.clj-kondo/hooks**
-
+**/target
 test-resources/test.config.edn
 /.lsp-root
 /.nfnl.fnl

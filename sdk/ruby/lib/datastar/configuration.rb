@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'thread'
+require 'logger'
 
 module Datastar
   # The default executor based on Ruby threads
@@ -30,17 +31,19 @@ module Datastar
   # You'd normally do this on app initialization 
   # For example in a Rails initializer
   class Configuration
-    NOOP_CALLBACK = ->(_error) {}
     RACK_FINALIZE = ->(_view_context, response) { response.finish }
     DEFAULT_HEARTBEAT = 3
 
-    attr_accessor :executor, :error_callback, :finalize, :heartbeat
+    attr_accessor :executor, :error_callback, :finalize, :heartbeat, :logger
 
     def initialize
       @executor = ThreadExecutor.new
-      @error_callback = NOOP_CALLBACK
       @finalize = RACK_FINALIZE
       @heartbeat = DEFAULT_HEARTBEAT
+      @logger = Logger.new(STDOUT)
+      @error_callback = proc do |e|
+        @logger.error("#{e.class} (#{e.message}):\n#{e.backtrace.join("\n")}")
+      end
     end
 
     def on_error(callable = nil, &block)

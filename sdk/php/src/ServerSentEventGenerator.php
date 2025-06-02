@@ -71,7 +71,7 @@ class ServerSentEventGenerator
     }
 
     /**
-     * Merges HTML fragments into the DOM.
+     * Merges HTML fragments into the DOM and returns the resulting output.
      *
      * @param array{
      *     selector?: string|null,
@@ -81,67 +81,71 @@ class ServerSentEventGenerator
      *     retryDuration?: int|null,
      * } $options
      */
-    public function mergeFragments(string $fragments, array $options = []): void
+    public function mergeFragments(string $fragments, array $options = []): string
     {
-        $this->sendEvent(new MergeFragments($fragments, $options));
+        return $this->sendEvent(new MergeFragments($fragments, $options));
     }
 
     /**
-     * Removes HTML fragments from the DOM.
+     * Removes HTML fragments from the DOM and returns the resulting output.
      *
      * @param array{
      *      eventId?: string|null,
      *      retryDuration?: int|null,
      *  } $options
      */
-    public function removeFragments(string $selector, array $options = []): void
+    public function removeFragments(string $selector, array $options = []): string
     {
-        $this->sendEvent(new RemoveFragments($selector, $options));
+        return $this->sendEvent(new RemoveFragments($selector, $options));
     }
 
     /**
-     * Merges signals into the signals.
+     * Merges signals and returns the resulting output.
      */
-    public function mergeSignals(array|string $signals, array $options = []): void
+    public function mergeSignals(array|string $signals, array $options = []): string
     {
-        $this->sendEvent(new MergeSignals($signals, $options));
+        return $this->sendEvent(new MergeSignals($signals, $options));
     }
 
     /**
-     * Removes signal paths from the signals.
+     * Removes signal paths and returns the resulting output.
      */
-    public function removeSignals(array $paths, array $options = []): void
+    public function removeSignals(array $paths, array $options = []): string
     {
-        $this->sendEvent(new RemoveSignals($paths, $options));
+        return $this->sendEvent(new RemoveSignals($paths, $options));
     }
 
     /**
-     * Executes JavaScript in the browser.
+     * Executes JavaScript in the browser and returns the resulting output.
      */
-    public function executeScript(string $script, array $options = []): void
+    public function executeScript(string $script, array $options = []): string
     {
-        $this->sendEvent(new ExecuteScript($script, $options));
+        return $this->sendEvent(new ExecuteScript($script, $options));
     }
 
     /**
-     * Redirects the browser by setting the location to the provided URI.
+     * Redirects the browser by setting the location to the provided URI and returns the resulting output.
      */
-    public function location(string $uri, array $options = []): void
+    public function location(string $uri, array $options = []): string
     {
-        $script = 'setTimeout(() => window.location = "' . $uri . '")';
-        $this->executeScript($script, $options);
+        $script = "setTimeout(() => window.location = '$uri')";
+        
+        return $this->executeScript($script, $options);
     }
 
     /**
-     * Sends an event and flushes the output buffer.
+     * Sends an event, flushes the output buffer and returns the resulting output.
      */
-    protected function sendEvent(EventInterface $event): void
+    protected function sendEvent(EventInterface $event): string
     {
-        echo $event->getOutput();
+        $output = $event->getOutput();
+        echo $output;
 
         if (ob_get_contents()) {
             ob_end_flush();
         }
         flush();
+
+        return $output;
     }
 }

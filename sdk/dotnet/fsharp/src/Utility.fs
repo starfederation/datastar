@@ -1,4 +1,4 @@
-module internal StarFederation.Datastar.Utility
+module internal StarFederation.Datastar.FSharp.Utility
 
 open System
 open System.Collections.Generic

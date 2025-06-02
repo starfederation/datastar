@@ -1,6 +1,7 @@
 namespace StarFederation.Datastar.Scripts
 
 open System.Runtime.CompilerServices
+open StarFederation.Datastar.FSharp.Scripts
 open StarFederation.Datastar.DependencyInjection
 
 [<AbstractClass; Sealed; Extension>]

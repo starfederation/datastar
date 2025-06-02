@@ -1,15 +1,16 @@
 {:paths ["src/main" "src/bb"]
  :tasks
  {:requires ([tasks :as t])
+  :init     (do
+              (def sdk-lib-dirs ["sdk" "adapter-ring" "adapter-http-kit"]))
 
   -prep (t/prep-libs)
 
   dev {:task (t/dev :http-kit :ring-jetty :malli-schemas)}
 
   dev:rj9a {:task (t/dev :http-kit :ring-rj9a :malli-schemas)}
-  
+
   dev:empty (t/dev :malli-schemas)
-  
 
   test:all (t/lazytest [:http-kit
                         :ring-jetty
@@ -19,7 +20,6 @@
                         :test.paths/adapter-ring
                         :test.paths/adapter-http-kit
                         :test.paths/adapter-ring-jetty])
-  
 
   test:all-w (t/lazytest [:http-kit
                           :ring-jetty
@@ -31,10 +31,42 @@
                           :test.paths/adapter-http-kit]
                          "--watch"
                          "--delay 1000")
-  
+
   test:rj9a (t/lazytest [:http-kit
                          :ring-rj9a]
                         [:test.paths/core-sdk
                          :test.paths/adapter-ring
-                         :test.paths/adapter-rj9a])}}
-  
+                         :test.paths/adapter-rj9a])
+
+  jar:sdk {:doc  "Build jar for the common sdk"
+           :task (clojure {:dir "sdk"} "-T:build jar")}
+
+  jar:adapter-ring {:doc  "Build jar for the adapter-ring"
+                    :task (clojure {:dir "adapter-ring"} "-T:build jar")}
+
+  jar:adapter-http-kit {:doc  "Build jar for the adapter-http-kit"
+                        :task (clojure {:dir "adapter-http-kit"} "-T:build jar")}
+
+  jar:all {:doc     "Build the jar for all the libs"
+           :depends [clean jar:sdk jar:adapter-ring jar:adapter-http-kit]}
+
+  clean {:doc  "Clean build artifacts"
+         :task (doseq [dir sdk-lib-dirs]
+                 (clojure {:dir dir} "-T:build clean"))}
+
+  set-version {:doc  "Set the version in all libs"
+               :task (doseq [dir sdk-lib-dirs]
+                       (shell {:dir dir} (str "neil version set "  (first *command-line-args*) " --no-tag")))}
+
+  bump-version {:doc  "Bump the version component in all libs. First argument must be one of: major, minor, patch"
+                :task (doseq [dir sdk-lib-dirs]
+                        (let [component (first *command-line-args*)]
+                          (when-not (contains? #{"major" "minor" "patch"} component)
+                            (println (str "ERROR: First argument must be one of: major, minor, patch. Got: " (or (first *command-line-args*) "nil")))
+                            (System/exit 1))
+                          (shell {:dir dir} (str "neil version " component " --no-tag"))))}
+
+  publish:all {:doc     "Publish the clojure sdk libs to clojars"
+               :depends [jar:all]
+               :task    (doseq [dir sdk-lib-dirs]
+                          (clojure {:dir dir} "-T:build deploy"))}}}

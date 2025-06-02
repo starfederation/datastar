@@ -13,7 +13,7 @@ license = "MIT OR Apache-2.0"
 name = "datastar"
 readme = "README.md"
 repository = "https://github.com/starfederation/datastar"
-version = "0.2.0"
+version = "0.2.1"
 rust-version = "1.85.0"
 
 [lints.rust]
@@ -60,7 +60,7 @@ bytes = { version = "1", default-features = false, optional = true }
 futures-util = { version = "0.3", default-features = false }
 http-body = { version = "1.0", default-features = false, optional = true }
 pin-project-lite = { version = "0.2", default-features = false, optional = true }
-rama = { version = "0.2.0-alpha.13", default-features = false, optional = true, features = [
+rama = { version = "0.2", default-features = false, optional = true, features = [
     "http",
 ] }
 rocket = { version = "0.5.1", default-features = false, optional = true }
@@ -76,7 +76,7 @@ tracing = { version = "0.1.41", optional = true }
 [dev-dependencies]
 async-stream = { version = "0.3.6", default-features = false }
 axum = { version = "0.8.3" }
-rama = { version = "0.2.0-alpha.13", features = ["http-full"] }
+rama = { version = "0.2", features = ["http-full"] }
 reqwest = { version = "0.12.15", features = ["json", "stream"] }
 rocket = { version = "0.5.1", features = ["json"] }
 serde = { version = "1", default-features = false, features = ["derive"] }

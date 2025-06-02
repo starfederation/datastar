@@ -1,4 +1,4 @@
-namespace StarFederation.Datastar
+namespace StarFederation.Datastar.FSharp
 
 open System.IO
 open System.Text
@@ -7,6 +7,7 @@ open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Primitives
 open Microsoft.Net.Http.Headers
+open StarFederation.Datastar
 
 /// <summary>
 /// Implementation of ISendServerEvent, for sending SSEs to the HttpResponse

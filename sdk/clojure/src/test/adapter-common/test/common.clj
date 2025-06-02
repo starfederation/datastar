@@ -42,6 +42,10 @@
              :args ["-private"]}})
 
 
+(def default-drivers
+  [:firefox :chrome])
+
+
 (def custom-config
   "Config from \"test-resources/test.config.edn\".
 
@@ -50,10 +54,10 @@
   - `:webdriver-opts`: map of drivers types to drivers opts
     (options passed to etaoin driver starting opts)
   "
-  (-> "test.config.edn"
-      io/resource
-      slurp
-      edn/read-string))
+  (some-> "test.config.edn"
+          io/resource
+          slurp
+          edn/read-string))
 
 
 (def drivers-configs
@@ -72,7 +76,7 @@
     (fn [acc driver]
       (assoc acc driver (delay (ea/boot-driver driver (get drivers-configs driver)))))
     {}
-    (:drivers custom-config)))
+    (:drivers custom-config default-drivers)))
 
 
 (defn install-shutdown-hooks! []

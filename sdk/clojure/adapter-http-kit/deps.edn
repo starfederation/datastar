@@ -1,4 +1,9 @@
 ;; NOTE: Track the next release of http-kit to switch to maven dep
-{:paths ["src/main"]
- :deps {http-kit/http-kit {:mvn/version "2.9.0-alpha4"}}}
-
+{:paths   ["src/main"]
+ :deps    {http-kit/http-kit {:mvn/version "2.9.0-alpha4"}}
+ :aliases {:build {:deps       {io.github.clojure/tools.build {:git/tag "v0.10.9"
+                                                               :git/sha "e405aac"}
+                                slipset/deps-deploy           {:mvn/version "0.2.2"}}
+                   :ns-default build}
+           :neil  {:project {:name    dev.data-star/http-kit
+                             :version "1.0.0-beta.11"}}}}
