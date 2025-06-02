@@ -14,6 +14,8 @@ module Datastar
     initializer 'datastar' do |_app|
       Datastar.config.finalize = FINALIZE
 
+      Datastar.config.logger = Rails.logger
+
       Datastar.config.executor = if config.active_support.isolation_level == :fiber
                                    require 'datastar/rails_async_executor'
                                    RailsAsyncExecutor.new
