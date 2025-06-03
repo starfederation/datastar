@@ -7,7 +7,7 @@ To take full advantage of Datastar, we recommend (but do not require) that you u
 
 ## ASGI (default)
 
-Install the dependencies, start runserver as usual, and go to http://127.0.0.1/ to see the demo.
+Install the dependencies, start runserver as usual, and go to http://127.0.0.1:8000/ to see the demo.
 
 💡️ Note: Because Django's `runserver` is WSGI only, we use [Daphne's](https://github.com/django/daphne) built-in ASGI `runserver`.
 
@@ -21,6 +21,8 @@ To use WSGI make sure runserver is stopped and make the following changes to the
 
 2. In `INSTALLED_APPS` comment out `"daphne"`,
 
-3. Start runserver and go to http://127.0.0.1/wsgi/ and watch the demo.
+3. Start runserver and go to http://127.0.0.1:8000/wsgi/ and watch the demo.
 
-
+   ```
+   uv run manage.py runserver
+   ```
