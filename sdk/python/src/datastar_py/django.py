@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
-from warnings import deprecated
 
 from django.http import HttpRequest
 from django.http import StreamingHttpResponse as _StreamingHttpResponse
@@ -16,7 +15,6 @@ if TYPE_CHECKING:
 __all__ = [
     "SSE_HEADERS",
     "DatastarResponse",
-    "DatastarStreamingHttpResponse",
     "ServerSentEventGenerator",
     "read_signals",
 ]
@@ -39,11 +37,6 @@ class DatastarResponse(_StreamingHttpResponse):
         if isinstance(content, DatastarEvent):
             content = (content,)
         super().__init__(content, status=status, headers=headers)
-
-
-@deprecated("Use DatastarResponse instead")
-class DatastarStreamingHttpResponse(DatastarResponse):
-    pass
 
 
 def read_signals(request: HttpRequest) -> dict[str, Any] | None:

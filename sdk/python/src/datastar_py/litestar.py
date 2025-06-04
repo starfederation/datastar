@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Mapping
-from warnings import deprecated
 
 from litestar.response import Stream
 
@@ -16,7 +15,6 @@ if TYPE_CHECKING:
 __all__ = [
     "SSE_HEADERS",
     "DatastarResponse",
-    "DatastarSSE",
     "ServerSentEventGenerator",
     "read_signals",
 ]
@@ -49,11 +47,6 @@ class DatastarResponse(Stream):
             headers=headers,
             status_code=status_code,
         )
-
-
-@deprecated("Use DatastarResponse instead")
-class DatastarSSE(DatastarResponse):
-    pass
 
 
 async def read_signals(request: Request) -> dict[str, Any] | None:
