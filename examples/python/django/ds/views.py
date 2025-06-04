@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 from datastar_py.django import (
-    DatastarStreamingHttpResponse,
+    DatastarResponse,
     ServerSentEventGenerator,
     read_signals,
 )
@@ -65,7 +65,7 @@ async def updates_asgi(request):
             )
             await asyncio.sleep(1)
 
-    return DatastarStreamingHttpResponse(time_updates())
+    return DatastarResponse(time_updates())
 
 
 # WSGI Example
@@ -121,4 +121,4 @@ def updates_wsgi(request):
             )
             time.sleep(0.5)
 
-    return DatastarStreamingHttpResponse(time_updates())
+    return DatastarResponse(time_updates())

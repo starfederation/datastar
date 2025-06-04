@@ -6,11 +6,11 @@ from typing import Any
 
 from .sse import SSE_HEADERS, ServerSentEventGenerator
 
-__all__ = ["ServerSentEventGenerator", "SSE_HEADERS"]
+__all__ = ["SSE_HEADERS", "ServerSentEventGenerator"]
 
 
 def _read_signals(
-    method: str, headers: Mapping, params: Mapping, body: str | bytes
+    method: str, headers: Mapping[str, str], params: Mapping, body: str | bytes
 ) -> dict[str, Any] | None:
     if "Datastar-Request" not in headers:
         return None

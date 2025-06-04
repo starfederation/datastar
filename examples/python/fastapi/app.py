@@ -13,7 +13,7 @@ from datetime import datetime
 
 import uvicorn
 from datastar_py.fastapi import (
-    DatastarStreamingResponse,
+    DatastarResponse,
     ReadSignals,
     ServerSentEventGenerator,
 )
@@ -80,7 +80,7 @@ async def time_updates():
 async def updates(signals: ReadSignals):
     # ReadSignals is a dependency that automatically loads the signals from the request
     print(signals)
-    return DatastarStreamingResponse(time_updates())
+    return DatastarResponse(time_updates())
 
 
 if __name__ == "__main__":

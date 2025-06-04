@@ -12,7 +12,11 @@ from collections.abc import AsyncGenerator
 from datetime import datetime
 
 import uvicorn
-from datastar_py.litestar import DatastarSSE, ServerSentEventGenerator, read_signals
+from datastar_py.litestar import (
+    ServerSentEventGenerator,
+    read_signals,
+    DatastarResponse,
+)
 
 from litestar import Litestar, MediaType, get
 from litestar.di import Provide
@@ -72,9 +76,9 @@ async def time_updates() -> AsyncGenerator[str, None]:
 # We aren't using the signals for anything meaningful here, but `read_signals` can be
 # used as a dependency to automatically parse the signals from the request.
 @get("/updates", dependencies={"signals": Provide(read_signals)})
-async def updates(signals: dict | None) -> DatastarSSE:
+async def updates(signals: dict | None) -> DatastarResponse:
     print(signals)
-    return DatastarSSE(time_updates())
+    return DatastarResponse(time_updates())
 
 
 app = Litestar(route_handlers=[read_root, updates])

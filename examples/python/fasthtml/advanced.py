@@ -17,7 +17,7 @@ from datetime import datetime
 from pathlib import Path
 
 import polars as pl
-from datastar_py.fasthtml import DatastarStreamingResponse, ServerSentEventGenerator
+from datastar_py.fasthtml import DatastarResponse, ServerSentEventGenerator
 from great_tables import GT
 from great_tables.data import reactions
 
@@ -94,10 +94,7 @@ def GreatTable(pattern=default_pattern):
 # rendered table into the DOM with the request's 'filter' value
 @app.post
 async def table(filter: str):
-    async def _():
-        yield ServerSentEventGenerator.merge_fragments(GreatTable(filter))
-
-    return DatastarStreamingResponse(_())
+    return DatastarResponse(ServerSentEventGenerator.merge_fragments(GreatTable(filter)))
 
 
 # Define default route which returns a FastTag from a GET request.
@@ -159,7 +156,7 @@ async def clock():
 
 @rt
 async def time():
-    return DatastarStreamingResponse(clock())
+    return DatastarResponse(clock())
 
 
 @rt
@@ -169,7 +166,7 @@ async def hello():
         await asyncio.sleep(1)
         yield ServerSentEventGenerator.merge_fragments(HELLO_BUTTON)
 
-    return DatastarStreamingResponse(_())
+    return DatastarResponse(_())
 
 
 @rt
@@ -189,7 +186,7 @@ async def reset():
         await asyncio.sleep(1)
         yield ServerSentEventGenerator.merge_fragments(reset_and_hello)
 
-    return DatastarStreamingResponse(_())
+    return DatastarResponse(_())
 
 
 # Define the button once so that it can be used in the index response

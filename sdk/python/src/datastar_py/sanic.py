@@ -7,6 +7,7 @@ from .sse import SSE_HEADERS, ServerSentEventGenerator
 
 if TYPE_CHECKING:
     from sanic import HTTPResponse, Request
+    from sanic.compat import Header
 
 __all__ = [
     "SSE_HEADERS",
@@ -16,8 +17,10 @@ __all__ = [
 ]
 
 
-async def datastar_respond(request: Request) -> HTTPResponse:
-    response = await request.respond(headers=SSE_HEADERS)
+async def datastar_respond(
+    request: Request, *, status: int = 200, headers: Header | dict[str, str] | None = None
+) -> HTTPResponse:
+    response = await request.respond(status=status, headers={**SSE_HEADERS, **(headers or {})})
     return response
 
 

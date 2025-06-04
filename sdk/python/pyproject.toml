@@ -104,5 +104,9 @@ select = [
     "SIM",
     # isort
     "I",
+    # Annotations
+    "ANN",
+    # Ruff specific
+    "RUF",
 ]
 fixable = ["ALL"]
