@@ -31,9 +31,10 @@ class DatastarResponse(_StreamingHttpResponse):
         headers: Mapping[str, str] | None = None,
     ) -> None:
         if not content:
-            super().__init__(tuple(), status=status or 204, headers=headers)
-            return
-        headers = {**SSE_HEADERS, **(headers or {})}
+            status = status or 204
+            content = tuple()
+        else:
+            headers = {**SSE_HEADERS, **(headers or {})}
         if isinstance(content, DatastarEvent):
             content = (content,)
         super().__init__(content, status=status, headers=headers)

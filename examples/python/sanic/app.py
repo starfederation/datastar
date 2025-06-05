@@ -12,10 +12,10 @@ from datetime import datetime
 
 from datastar_py.consts import FragmentMergeMode
 from datastar_py.sanic import (
+    DatastarResponse,
     ServerSentEventGenerator,
     datastar_respond,
     read_signals,
-    DatastarResponse,
 )
 
 from sanic import Sanic

@@ -17,6 +17,7 @@ from datastar_py.litestar import (
     ServerSentEventGenerator,
     read_signals,
 )
+from datastar_py.sse import DatastarEvent
 
 from litestar import Litestar, MediaType, get
 from litestar.di import Provide
@@ -61,7 +62,7 @@ async def read_root() -> str:
     return HTML.replace("CURRENT_TIME", f"{datetime.isoformat(datetime.now())}")
 
 
-async def time_updates() -> AsyncGenerator[str, None]:
+async def time_updates() -> AsyncGenerator[DatastarEvent, None]:
     while True:
         yield ServerSentEventGenerator.merge_fragments(
             f"""<span id="currentTime">{datetime.now().isoformat()}"""

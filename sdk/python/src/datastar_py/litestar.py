@@ -33,15 +33,16 @@ class DatastarResponse(Stream):
         cookies: ResponseCookies | None = None,
         headers: Mapping[str, str] | None = None,
         status_code: int | None = None,
+        # Enables this to be used as a response_class
+        **_,  # noqa: ANN003
     ) -> None:
         if not content:
-            super().__init__(tuple(), status_code=status_code or 204, headers=headers)
-            return
+            status_code = status_code or 204
+            content = tuple()
+        else:
+            headers = {**SSE_HEADERS, **(headers or {})}
         if isinstance(content, DatastarEvent):
             content = (content,)
-        headers = {**SSE_HEADERS, **(headers or {})}
-        # Removing this argument allows the class to be used as a 'response_class' on a route
-        # kwargs.pop("type_encoders", None)
         super().__init__(
             content,
             background=background,

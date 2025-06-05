@@ -8,7 +8,7 @@ from . import _read_signals
 from .sse import SSE_HEADERS, DatastarEvent, ServerSentEventGenerator
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Collection, Mapping
 
 __all__ = [
     "SSE_HEADERS",
@@ -22,7 +22,7 @@ __all__ = [
 class DatastarResponse(HTTPResponse):
     def __init__(
         self,
-        content: DatastarEvent | Sequence[DatastarEvent] | None = None,
+        content: DatastarEvent | Collection[DatastarEvent] | None = None,
         status: int | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> None:

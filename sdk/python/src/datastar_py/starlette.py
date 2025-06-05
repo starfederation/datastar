@@ -31,10 +31,11 @@ class DatastarResponse(_StreamingResponse):
         background: BackgroundTask | None = None,
     ) -> None:
         if not content:
-            super().__init__(tuple(), status_code=status_code or 204, headers=headers)
-            return
-        status_code = status_code or 200
-        headers = {**SSE_HEADERS, **(headers or {})}
+            status_code = status_code or 204
+            content = tuple()
+        else:
+            status_code = status_code or 200
+            headers = {**SSE_HEADERS, **(headers or {})}
         if isinstance(content, DatastarEvent):
             content = (content,)
         super().__init__(content, status_code=status_code, headers=headers, background=background)
