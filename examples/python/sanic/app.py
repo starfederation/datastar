@@ -11,7 +11,12 @@ import asyncio
 from datetime import datetime
 
 from datastar_py.consts import FragmentMergeMode
-from datastar_py.sanic import ServerSentEventGenerator, datastar_respond, read_signals
+from datastar_py.sanic import (
+    ServerSentEventGenerator,
+    datastar_respond,
+    read_signals,
+    DatastarResponse,
+)
 
 from sanic import Sanic
 from sanic.response import html
@@ -62,9 +67,7 @@ async def hello_world(request):
 
 @app.get("/add_signal")
 async def add_signal(request):
-    response = await datastar_respond(request)
-
-    await response.send(
+    return DatastarResponse(
         ServerSentEventGenerator.merge_fragments(
             """
             <div class="time signal">
@@ -76,14 +79,10 @@ async def add_signal(request):
         )
     )
 
-    await response.eof()
-
 
 @app.get("/add_fragment")
 async def add_fragment(request):
-    response = await datastar_respond(request)
-
-    await response.send(
+    return DatastarResponse(
         ServerSentEventGenerator.merge_fragments(
             f"""\
             <div class="time fragment">
@@ -94,8 +93,6 @@ async def add_fragment(request):
             merge_mode=FragmentMergeMode.APPEND,
         )
     )
-
-    await response.eof()
 
 
 @app.get("/updates")
