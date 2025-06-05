@@ -8,6 +8,17 @@ send any number of events, from zero to infinity in response to a single request
 `datastar-py` has helpers for creating those responses, formatting the events,
 reading signals from the frontend, and generating the data-* HTML attributes.
 
+The event generator can be used with any framework. There are also custom
+helpers included for the following frameworks:
+
+* [Django](https://www.djangoproject.com/)
+* [FastAPI](https://fastapi.tiangolo.com/)
+* [FastHTML](https://fastht.ml/)
+* [Litestar](https://litestar.dev/)
+* [Quart](https://quart.palletsprojects.com/en/stable/)
+* [Sanic](https://sanic.dev/en/)
+* [Starlette](https://www.starlette.io/)
+
 ## Event Generation Helpers
 
 To use `datastar-py`, import the SSE generator in your app and then use
@@ -36,17 +47,6 @@ async def updates():
 ```
 
 ## Response Helpers
-
-There are also a number of custom responses/helpers for various frameworks.
-Currently, the following frameworks are supported:
-
-* [Django](https://www.djangoproject.com/)
-* [FastAPI](https://fastapi.tiangolo.com/)
-* [FastHTML](https://fastht.ml/)
-* [Litestar](https://litestar.dev/)
-* [Quart](https://quart.palletsprojects.com/en/stable/)
-* [Sanic](https://sanic.dev/en/)
-* [Starlette](https://www.starlette.io/)
 
 The response for the quart example above could be rewritten using the helpers:
 ```python
