@@ -11,8 +11,8 @@ import asyncio
 from datetime import datetime
 
 from datastar_py.quart import (
+    DatastarResponse,
     ServerSentEventGenerator,
-    make_datastar_response,
     read_signals,
 )
 
@@ -72,8 +72,7 @@ async def updates():
             )
             await asyncio.sleep(1)
 
-    response = await make_datastar_response(time_updates())
-    return response
+    return DatastarResponse(time_updates())
 
 
 @app.route("/")
