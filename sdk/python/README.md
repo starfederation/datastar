@@ -2,11 +2,13 @@
 
 The `datastar-py` package provides backend helpers for the [Datastar](https://data-star.dev) JS library.
 
-Datastar requires all backend responses to use SSE. This allows the backend to
-send any number of responses, from zero to inifinity.
+Datastar sends responses back to the browser using SSE. This allows the backend to
+send any number of events, from zero to infinity in response to a single request.
 
-`datastar-py` helps with the formatting of these responses, while also
-providing helper functions for the different supported responses.
+`datastar-py` has helpers for creating those responses, formatting the events,
+reading signals from the frontend, and generating the data-* HTML attributes.
+
+## Event Generation Helpers
 
 To use `datastar-py`, import the SSE generator in your app and then use
 it in your route handler:
@@ -14,7 +16,8 @@ it in your route handler:
 ```python
 from datastar_py import ServerSentEventGenerator as SSE
 
-# ... various app setup. The example below is for the Quart framework
+# ... various app setup.
+# The example below is for the Quart framework, and is only using the event generation helpers.
 
 @app.route("/updates")
 async def updates():
@@ -32,7 +35,10 @@ async def updates():
     return response
 ```
 
-There are also a number of custom responses/helpers for various frameworks. Currently the following frameworks are supported:
+## Response Helpers
+
+There are also a number of custom responses/helpers for various frameworks.
+Currently, the following frameworks are supported:
 
 * [Django](https://www.djangoproject.com/)
 * [FastAPI](https://fastapi.tiangolo.com/)
@@ -41,3 +47,41 @@ There are also a number of custom responses/helpers for various frameworks. Curr
 * [Quart](https://quart.palletsprojects.com/en/stable/)
 * [Sanic](https://sanic.dev/en/)
 * [Starlette](https://www.starlette.io/)
+
+The response for the quart example above could be rewritten using the helpers:
+```python
+    return await make_datastar_response(time_updates())
+```
+
+## Signal Helpers
+The current state of the datastar signals is included by default in every 
+datastar request. A helper is included to load those signals for each
+framework. `read_signals`
+
+```python
+from datastar_py.quart import read_signals
+
+@app.route("/updates")
+async def updates():
+    signals = await read_signals()
+```
+
+## Attribute Generation Helper
+Datastar allows HTML generation to be done on the backend. datastar-py includes
+a helper to generate data-* attributes in your HTML with IDE completion and
+type checking. It can be used with many different HTML generation libraries.
+
+```python
+from datastar_py import attribute_generator as data
+
+# htpy
+button(data.on("click", "console.log('clicked')").debounce(1000).stop)["My Button"]
+# FastHTML
+Button("My Button", **data.on("click", "console.log('clicked')").debounce(1000).stop)
+# After next release of FastHTML you don't have to unpack the datastar helpers e.g.
+Button("My Button", data.on("click", "console.log('clicked')").debounce(1000).stop)
+# f-strings
+f"<button {data.on("click", "console.log('clicked')").debounce(1000).stop}>My Button</button>"
+# Jinja, but no editor completion :(
+<button {{data.on("click", "console.log('clicked')").debounce(1000).stop}}>My Button</button>
+```
