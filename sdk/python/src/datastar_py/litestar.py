@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Mapping
+from typing import TYPE_CHECKING, Any
 
 from litestar.response import Stream
 
@@ -8,6 +8,8 @@ from . import _read_signals
 from .sse import SSE_HEADERS, DatastarEvent, DatastarEvents, ServerSentEventGenerator
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from litestar import Request
     from litestar.background_tasks import BackgroundTask, BackgroundTasks
     from litestar.types import ResponseCookies

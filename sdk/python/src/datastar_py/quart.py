@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from inspect import isasyncgen, isgenerator
-from typing import TYPE_CHECKING, Any, Mapping
+from typing import TYPE_CHECKING, Any
 
 from quart import Response, request
 
 from . import _read_signals
 from .sse import SSE_HEADERS, DatastarEvents, ServerSentEventGenerator
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 __all__ = [
     "SSE_HEADERS",

@@ -13,9 +13,9 @@ from datetime import datetime
 
 import uvicorn
 from datastar_py.litestar import (
+    DatastarResponse,
     ServerSentEventGenerator,
     read_signals,
-    DatastarResponse,
 )
 
 from litestar import Litestar, MediaType, get
