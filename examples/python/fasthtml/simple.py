@@ -12,7 +12,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from datastar_py.fasthtml import DatastarStreamingResponse, ServerSentEventGenerator, read_signals
+from datastar_py.fasthtml import DatastarResponse, ServerSentEventGenerator, read_signals
 
 # ruff: noqa: F403, F405
 from fasthtml.common import *
@@ -66,7 +66,7 @@ async def clock():
 async def updates(request):
     signals = await read_signals(request)
     print(signals)
-    return DatastarStreamingResponse(clock())
+    return DatastarResponse(clock())
 
 
 if __name__ == "__main__":

@@ -1,38 +1,54 @@
 from __future__ import annotations
 
-from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from litestar.response import Stream
 
 from . import _read_signals
-from .sse import SSE_HEADERS, ServerSentEventGenerator
+from .sse import SSE_HEADERS, DatastarEvent, DatastarEvents, ServerSentEventGenerator
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from litestar import Request
-    from litestar.types.helper_types import StreamType
+    from litestar.background_tasks import BackgroundTask, BackgroundTasks
+    from litestar.types import ResponseCookies
 
-__all__ = ["SSE_HEADERS", "DatastarSSE", "ServerSentEventGenerator", "read_signals"]
+__all__ = [
+    "SSE_HEADERS",
+    "DatastarResponse",
+    "ServerSentEventGenerator",
+    "read_signals",
+]
 
 
-class DatastarSSE(Stream):
-    @wraps(Stream.__init__)
+class DatastarResponse(Stream):
+    """Respond with 0..N `DatastarEvent`s"""
+
     def __init__(
         self,
-        content: StreamType[str | bytes] | Callable[[], StreamType[str | bytes]],
-        **kwargs: Any,
+        content: DatastarEvents = None,
+        *,
+        background: BackgroundTask | BackgroundTasks | None = None,
+        cookies: ResponseCookies | None = None,
+        headers: Mapping[str, str] | None = None,
+        status_code: int | None = None,
+        # Enables this to be used as a response_class
+        **_,  # noqa: ANN003
     ) -> None:
-        """
-        Similar to litestar's ServerSentEvent, but since our event generator just returns text we
-        don't need anything fancy.
-        """
-        kwargs["headers"] = {**SSE_HEADERS, **kwargs.get("headers", {})}
-        kwargs["media_type"] = "text/event-stream"
-        # Removing this argument allows the class to be used as a 'response_class' on a route
-        kwargs.pop("type_encoders", None)
+        if not content:
+            status_code = status_code or 204
+            content = tuple()
+        else:
+            headers = {**SSE_HEADERS, **(headers or {})}
+        if isinstance(content, DatastarEvent):
+            content = (content,)
         super().__init__(
             content,
-            **kwargs,
+            background=background,
+            cookies=cookies,
+            headers=headers,
+            status_code=status_code,
         )
 
 

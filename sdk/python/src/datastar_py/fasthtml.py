@@ -1,9 +1,9 @@
 from .sse import SSE_HEADERS, ServerSentEventGenerator
-from .starlette import DatastarStreamingResponse, read_signals
+from .starlette import DatastarResponse, read_signals
 
 __all__ = [
     "SSE_HEADERS",
-    "DatastarStreamingResponse",
+    "DatastarResponse",
     "ServerSentEventGenerator",
     "read_signals",
 ]
