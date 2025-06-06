@@ -97,12 +97,18 @@ JSEvent = Literal[
 
 
 SignalValue: TypeAlias = Union[
-    str, int, float, bool, dict[str, "SignalValue"], list["SignalValue"], None,
+    str,
+    int,
+    float,
+    bool,
+    dict[str, "SignalValue"],
+    list["SignalValue"],
+    None,
 ]
 
 
 class AttributeGenerator:
-    def __init__(self, alias: str = "data-"):
+    def __init__(self, alias: str = "data-") -> None:
         """A helper which can generate all the Datastar attributes.
 
         :param alias: The prefix for all attributes. Defaults to `data-`.
@@ -126,14 +132,11 @@ class AttributeGenerator:
         signals = {**(signals_dict if signals_dict else {}), **signals}
         return SignalsAttr(signals, expressions=expressions_, alias=self._alias)
 
-    def computed(
-        self, computed_dict: Mapping | None = None, /, **computed: str
-    ) -> AttrGroup:
+    def computed(self, computed_dict: Mapping | None = None, /, **computed: str) -> AttrGroup:
         """Create signals that are computed based on an expression."""
         computed = {**(computed_dict if computed_dict else {}), **computed}
         return AttrGroup(
-            BaseAttr("computed", expr, sig, alias=self._alias)
-            for sig, expr in computed.items()
+            BaseAttr("computed", expr, sig, alias=self._alias) for sig, expr in computed.items()
         )
 
     @property
@@ -147,7 +150,7 @@ class AttributeGenerator:
         return BaseAttr("attr", _js_object(attrs), alias=self._alias)
 
     def bind(self, signal_name: str) -> BaseAttr:
-        """Set up two-way data binding between a signal and an element’s value."""
+        """Set up two-way data binding between a signal and an element's value."""
         return BaseAttr("bind", signal_name, alias=self._alias)
 
     def class_(self, class_dict: Mapping | None = None, /, **classes: str) -> BaseAttr:
@@ -162,9 +165,7 @@ class AttributeGenerator:
     @overload
     def on(self, event: Literal["raf"], expression: str) -> OnRafAttr: ...
     @overload
-    def on(
-        self, event: Literal["signal-change"], expression: str
-    ) -> OnSignalChangeAttr: ...
+    def on(self, event: Literal["signal-change"], expression: str) -> OnSignalChangeAttr: ...
     @overload
     def on(self, event: JSEvent | str, expression: str) -> OnAttr: ...
     def on(
@@ -230,10 +231,7 @@ class AttributeGenerator:
 
     def preserve_attr(self, attrs: str | Iterable[str]) -> BaseAttr:
         """Preserve the client side state for specified attribute(s) when morphing."""
-        if isinstance(attrs, str):
-            value = attrs
-        else:
-            value = " ".join(attrs)
+        value = attrs if isinstance(attrs, str) else " ".join(attrs)
         return BaseAttr("preserve-attrs", value, alias=self._alias)
 
 
@@ -245,7 +243,7 @@ class BaseAttr(Mapping):
         suffix: str | None = None,
         *,
         alias: str = "data-",
-    ):
+    ) -> None:
         self._attr: str = attr
         self._suffix: str | None = suffix
         self._mods: dict[str, list[str]] = {}
@@ -269,7 +267,7 @@ class BaseAttr(Mapping):
                 key += f".{'.'.join(values)}"
         return key
 
-    def _to_kebab_suffix(self, signal_name: str):
+    def _to_kebab_suffix(self, signal_name: str) -> None:
         if "-" in signal_name:
             kebab_name, from_case = signal_name.lower(), "kebab"
         elif "_" in signal_name:
@@ -290,7 +288,7 @@ class BaseAttr(Mapping):
         if from_case:
             self._mods["case"] = [from_case]
 
-    def __getitem__(self, key, /) -> str | Literal[True]:
+    def __getitem__(self, key: str, /) -> str | Literal[True]:
         return self._value
 
     def __len__(self) -> Literal[1]:
@@ -299,7 +297,7 @@ class BaseAttr(Mapping):
     def __iter__(self) -> Iterator[str]:
         return iter([self._key()])
 
-    def __str__(self):
+    def __str__(self) -> str:
         r = _escape(self._key())
         if isinstance(self._value, str):
             r += f'="{_escape(self._value)}"'
@@ -309,23 +307,23 @@ class BaseAttr(Mapping):
 
 
 class AttrGroup(Mapping):
-    def __init__(self, attrs: Iterable[BaseAttr]):
+    def __init__(self, attrs: Iterable[BaseAttr]) -> None:
         self._attrs: list[BaseAttr] = list(attrs)
         self._attr_dict: dict[str, str] = {}
         for attr in self._attrs:
             self._attr_dict.update(attr)
         self._attr_string: str = " ".join(str(attr) for attr in self._attrs)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         return iter(self._attr_dict)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._attr_dict)
 
-    def __getitem__(self, key, /):
+    def __getitem__(self, key: str, /) -> str:
         return self._attr_dict[key]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self._attr_string
 
     __html__ = __str__
@@ -391,7 +389,7 @@ class ViewtransitionMod:
 class SignalsAttr(BaseAttr):
     def __init__(
         self, signals_object: dict, *, expressions: bool = False, alias: str = "data-"
-    ):
+    ) -> None:
         val = _js_object(signals_object) if expressions else json.dumps(signals_object)
         super().__init__("signals", val, alias=alias)
 
@@ -403,7 +401,7 @@ class SignalsAttr(BaseAttr):
 
 
 class StarIgnoreAttr(BaseAttr):
-    def __init__(self, *, alias: str = "data-"):
+    def __init__(self, *, alias: str = "data-") -> None:
         super().__init__("star-ignore", True, alias=alias)
 
     @property
@@ -414,7 +412,7 @@ class StarIgnoreAttr(BaseAttr):
 
 
 class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, event: str, expression: str, *, alias: str = "data-"):
+    def __init__(self, event: str, expression: str, *, alias: str = "data-") -> None:
         super().__init__("on", expression, alias=alias)
         self._to_kebab_suffix(event)
 
@@ -468,7 +466,7 @@ class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
 
 
 class PersistAttr(BaseAttr):
-    def __init__(self, *, alias: str = "data-"):
+    def __init__(self, *, alias: str = "data-") -> None:
         super().__init__("persist", True, alias=alias)
 
     def __call__(self, signal_names: str | Iterable[str] | None = None) -> Self:
@@ -488,7 +486,7 @@ class PersistAttr(BaseAttr):
 
 
 class ScrollIntoViewAttr(BaseAttr):
-    def __init__(self, *, alias: str = "data-"):
+    def __init__(self, *, alias: str = "data-") -> None:
         super().__init__("scroll-into-view", True, alias=alias)
 
     @property
@@ -565,7 +563,7 @@ class ScrollIntoViewAttr(BaseAttr):
 
 
 class OnIntervalAttr(BaseAttr, ViewtransitionMod):
-    def __init__(self, expression: str, *, alias: str = "data-"):
+    def __init__(self, expression: str, *, alias: str = "data-") -> None:
         super().__init__("on-interval", expression, alias=alias)
 
     def duration(self, duration: int | float | str, *, leading: bool = False) -> Self:
@@ -577,7 +575,7 @@ class OnIntervalAttr(BaseAttr, ViewtransitionMod):
 
 
 class OnLoadAttr(BaseAttr, ViewtransitionMod):
-    def __init__(self, expression: str, *, alias: str = "data-"):
+    def __init__(self, expression: str, *, alias: str = "data-") -> None:
         super().__init__("on-load", expression, alias=alias)
 
     def delay(self, delay: int | float | str) -> Self:
@@ -593,12 +591,12 @@ class OnLoadAttr(BaseAttr, ViewtransitionMod):
 
 
 class OnRafAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, expression: str, *, alias: str = "data-"):
+    def __init__(self, expression: str, *, alias: str = "data-") -> None:
         super().__init__("on-raf", expression, alias=alias)
 
 
 class OnSignalChangeAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, expression: str, *, alias: str = "data-"):
+    def __init__(self, expression: str, *, alias: str = "data-") -> None:
         super().__init__("on-signal-change", expression, alias=alias)
 
 

@@ -4,8 +4,8 @@ import json
 from collections.abc import Mapping
 from typing import Any
 
-from .sse import SSE_HEADERS, ServerSentEventGenerator
 from .attributes import attribute_generator
+from .sse import SSE_HEADERS, ServerSentEventGenerator
 
 __all__ = ["SSE_HEADERS", "ServerSentEventGenerator", "attribute_generator"]
 
