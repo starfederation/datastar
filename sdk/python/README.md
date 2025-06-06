@@ -48,9 +48,38 @@ async def updates():
 
 ## Response Helpers
 
-The response for the quart example above could be rewritten using the helpers:
+A datastar response consists of 0..N datastar events. There are response
+classes included to make this easy in all of the supported frameworks.
+
+The following examples will work across all supported frameworks when the
+response class is imported from the appropriate framework package.
+e.g. `from datastar_py.quart import DatastarResponse` The containing functions
+are not shown here, as they will differ per framework.
+
+
 ```python
-    return await make_datastar_response(time_updates())
+# 0 events, a 204
+return DatastarResponse()
+# 1 event
+return DatastarResponse(ServerSentEventGenerator.merge_fragments("<div id='mydiv'></div>"))
+# 2 events
+return DatastarResponse([
+    ServerSentEventGenerator.merge_fragments("<div id='mydiv'></div>"),
+    ServerSentEventGenerator.merge_signals({"mysignal": "myval"}),
+])
+# N events, a long lived stream (for all frameworks but sanic)
+async def updates():
+    while True:
+        yield ServerSentEventGenerator.merge_fragments("<div id='mydiv'></div>")
+        await asyncio.sleep(1)
+return DatastarResponse(updates())
+# A long lived stream for sanic
+response = await datastar_respond(request)
+# which is just a helper for the following
+# response = await request.respond(DatastarResponse())
+while True:
+    await response.send(ServerSentEventGenerator.merge_fragments("<div id='mydiv'></div>"))
+    await asyncio.sleep(1)
 ```
 
 ## Signal Helpers
