@@ -1,14 +1,15 @@
 [project]
 name = "datastar-py"
 description = "Helper functions and classes for the Datastar library (https://data-star.dev/)"
+version = "0.5.0"
 readme = "README.md"
 authors = [
     { name = "Felix Ingram", email = "f.ingram@gmail.com" },
-    { name = "Lucian Knock", email = "git@lucianknock.com" }
+    { name = "Lucian Knock", email = "git@lucianknock.com" },
+    { name = "Chase Sterling", email = "chase.sterling@gmail.com" }
 ]
 requires-python = ">=3.9"
 dependencies = []
-dynamic=["version"]
 license = {text = "MIT"}
 keywords = ["datastar", "django", "fastapi", "fasthtml", "flask", "litestar", "quart", "sanic", "starlette", "html"]
 classifiers = [
@@ -45,45 +46,6 @@ dev = [
     "uvicorn>=0.32.1",
     "litestar>=2.15.2",
 ]
-
-[tool.hatch.version]
-path = "src/datastar_py/__about__.py"
-
-[[tool.bumpversion.files]]
-filename = "src/datastar_py/__about__.py"
-
-[tool.bumpversion]
-current_version = "0.4.2"
-parse = """(?x)
-    (?P<major>\\d+)\\.
-    (?P<minor>\\d+)\\.
-    (?P<patch>\\d+)
-    (?:
-        \\.post
-        (?P<postn>0|[1-9]\\d*)        # post-release versions
-    )?
-"""
-serialize = [
-    "{major}.{minor}.{patch}.post{postn}",
-    "{major}.{minor}.{patch}",
-
-]
-search = "{current_version}"
-replace = "{new_version}"
-regex = false
-ignore_missing_version = false
-ignore_missing_files = false
-tag = false
-sign_tags = false
-tag_name = "v{new_version}"
-tag_message = "Bump version: {current_version} → {new_version}"
-allow_dirty = true
-commit = false
-message = "Bump version: {current_version} → {new_version}"
-commit_args = ""
-setup_hooks = []
-pre_commit_hooks = []
-post_commit_hooks = []
 
 [tool.ruff]
 line-length = 99
