@@ -6,7 +6,12 @@ from django.http import HttpRequest
 from django.http import StreamingHttpResponse as _StreamingHttpResponse
 
 from . import _read_signals
-from .sse import SSE_HEADERS, DatastarEvent, DatastarEvents, ServerSentEventGenerator
+from .sse import (
+    SSE_HEADERS,
+    DatastarEvents,
+    ServerSentEventGenerator,
+    _to_events_iterable,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -32,12 +37,9 @@ class DatastarResponse(_StreamingHttpResponse):
     ) -> None:
         if not content:
             status = status or 204
-            content = tuple()
         else:
             headers = {**SSE_HEADERS, **(headers or {})}
-        if isinstance(content, DatastarEvent):
-            content = (content,)
-        super().__init__(content, status=status, headers=headers)
+        super().__init__(_to_events_iterable(content), status=status, headers=headers)
 
 
 def read_signals(request: HttpRequest) -> dict[str, Any] | None:
