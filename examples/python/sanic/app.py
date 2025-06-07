@@ -115,11 +115,8 @@ async def updates(request):
             )
         )
         await asyncio.sleep(1)
-        await response.send(
-            ServerSentEventGenerator.merge_signals(
-                {"currentTime": f"{datetime.now().isoformat()}"}
-            )
-        )
+        # a dict response becomes a merge-signals event implicitly
+        await response.send({"currentTime": f"{datetime.now().isoformat()}"})
         await asyncio.sleep(1)
 
 

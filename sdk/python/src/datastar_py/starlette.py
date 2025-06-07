@@ -7,7 +7,12 @@ from starlette.requests import Request
 from starlette.responses import StreamingResponse as _StreamingResponse
 
 from . import _read_signals
-from .sse import SSE_HEADERS, DatastarEvent, DatastarEvents, ServerSentEventGenerator
+from .sse import (
+    SSE_HEADERS,
+    DatastarEvents,
+    ServerSentEventGenerator,
+    _to_events_iterable,
+)
 
 if TYPE_CHECKING:
     from starlette.background import BackgroundTask
@@ -32,13 +37,15 @@ class DatastarResponse(_StreamingResponse):
     ) -> None:
         if not content:
             status_code = status_code or 204
-            content = tuple()
         else:
             status_code = status_code or 200
             headers = {**SSE_HEADERS, **(headers or {})}
-        if isinstance(content, DatastarEvent):
-            content = (content,)
-        super().__init__(content, status_code=status_code, headers=headers, background=background)
+        super().__init__(
+            _to_events_iterable(content),
+            status_code=status_code,
+            headers=headers,
+            background=background,
+        )
 
 
 async def read_signals(request: Request) -> dict[str, Any] | None:

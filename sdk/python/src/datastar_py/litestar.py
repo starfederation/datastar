@@ -5,7 +5,12 @@ from typing import TYPE_CHECKING, Any
 from litestar.response import Stream
 
 from . import _read_signals
-from .sse import SSE_HEADERS, DatastarEvent, DatastarEvents, ServerSentEventGenerator
+from .sse import (
+    SSE_HEADERS,
+    DatastarEvents,
+    ServerSentEventGenerator,
+    _to_events_iterable,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -38,13 +43,10 @@ class DatastarResponse(Stream):
     ) -> None:
         if not content:
             status_code = status_code or 204
-            content = tuple()
         else:
             headers = {**SSE_HEADERS, **(headers or {})}
-        if isinstance(content, DatastarEvent):
-            content = (content,)
         super().__init__(
-            content,
+            _to_events_iterable(content),
             background=background,
             cookies=cookies,
             headers=headers,

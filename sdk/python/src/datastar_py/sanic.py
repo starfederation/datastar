@@ -5,7 +5,13 @@ from typing import TYPE_CHECKING, Any
 from sanic import HTTPResponse, Request
 
 from . import _read_signals
-from .sse import SSE_HEADERS, DatastarEvent, ServerSentEventGenerator
+from .sse import (
+    SSE_HEADERS,
+    DatastarEvent,
+    ServerSentEventGenerator,
+    _to_concrete_event,
+    _to_events_iterable,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
@@ -28,7 +34,11 @@ class DatastarResponse(HTTPResponse):
     ) -> None:
         if not content:
             status = status or 204
-        super().__init__(content, status=status or 200, headers={**SSE_HEADERS, **(headers or {})})
+        super().__init__(
+            _to_events_iterable(content),
+            status=status or 200,
+            headers={**SSE_HEADERS, **(headers or {})},
+        )
 
     async def send(
         self,
@@ -39,7 +49,7 @@ class DatastarResponse(HTTPResponse):
             # When the response is created with no content, it's set to a 204 by default
             # if we end up streaming to it, change the status code to 200 before sending.
             self.status = 200
-        await super().send(event, end_stream=end_stream)
+        await super().send(_to_concrete_event(event), end_stream=end_stream)
 
 
 async def datastar_respond(

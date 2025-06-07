@@ -12,7 +12,6 @@ from datetime import datetime
 
 from datastar_py.quart import (
     DatastarResponse,
-    ServerSentEventGenerator,
     read_signals,
 )
 
@@ -63,13 +62,17 @@ async def updates():
 
     async def time_updates():
         while True:
-            yield ServerSentEventGenerator.merge_fragments(
-                f"""<span id="currentTime">{datetime.now().isoformat()}"""
-            )
+            # DatastarResponse automatically turns strings into a merge_fragments event
+            yield f"""<span id="currentTime">{datetime.now().isoformat()}</span>"""
+            # yield ServerSentEventGenerator.merge_fragments(
+            #     f"""<span id="currentTime">{datetime.now().isoformat()}"""
+            # )
             await asyncio.sleep(1)
-            yield ServerSentEventGenerator.merge_signals(
-                {"currentTime": f"{datetime.now().isoformat()}"}
-            )
+            # dicts are automatically turned into a merge_signals event
+            yield {"currentTime": f"{datetime.now().isoformat()}"}
+            # yield ServerSentEventGenerator.merge_signals(
+            #     {"currentTime": f"{datetime.now().isoformat()}"}
+            # )
             await asyncio.sleep(1)
 
     return DatastarResponse(time_updates())
