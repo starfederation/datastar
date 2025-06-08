@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from inspect import isasyncgen, isgenerator
-from typing import TYPE_CHECKING, Any
+from collections.abc import Awaitable, Mapping
+from functools import wraps
+from inspect import isasyncgen, isasyncgenfunction, isgenerator
+from typing import Any, Callable, ParamSpec
 
-from quart import Response, request
+from quart import Response, copy_current_request_context, request, stream_with_context
 
 from . import _read_signals
 from .sse import SSE_HEADERS, DatastarEvents, ServerSentEventGenerator
-
-if TYPE_CHECKING:
-    from collections.abc import Mapping
 
 __all__ = [
     "SSE_HEADERS",
@@ -35,6 +34,27 @@ class DatastarResponse(Response):
         super().__init__(content, status=status, headers=headers)
         if isgenerator(content) or isasyncgen(content):
             self.timeout = None
+
+
+P = ParamSpec("P")
+
+
+def datastar_response(
+    func: Callable[P, Awaitable[DatastarEvents] | DatastarEvents],
+) -> Callable[P, Awaitable[DatastarResponse]]:
+    """A decorator which wraps a function result in DatastarResponse.
+
+    Can be used on a sync or async function or generator function.
+    """
+
+    @wraps(func)
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> DatastarResponse:
+        if isasyncgenfunction(func):
+            return DatastarResponse(stream_with_context(func)(*args, **kwargs))
+        return DatastarResponse(await copy_current_request_context(func)(*args, **kwargs))
+
+    wrapper.__annotations__["return"] = "DatastarResponse"
+    return wrapper
 
 
 async def read_signals() -> dict[str, Any] | None:

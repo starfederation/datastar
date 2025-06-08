@@ -1,7 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
+from collections.abc import Awaitable, Mapping
+from functools import wraps
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    ParamSpec,
+)
 
 from starlette.requests import Request
 from starlette.responses import StreamingResponse as _StreamingResponse
@@ -39,6 +45,28 @@ class DatastarResponse(_StreamingResponse):
         if isinstance(content, DatastarEvent):
             content = (content,)
         super().__init__(content, status_code=status_code, headers=headers, background=background)
+
+
+P = ParamSpec("P")
+
+
+def datastar_response(
+    func: Callable[P, Awaitable[DatastarEvents] | DatastarEvents],
+) -> Callable[P, Awaitable[DatastarResponse]]:
+    """A decorator which wraps a function result in DatastarResponse.
+
+    Can be used on a sync or async function or generator function.
+    """
+
+    @wraps(func)
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> DatastarResponse:
+        r = func(*args, **kwargs)
+        if isinstance(r, Awaitable):
+            return DatastarResponse(await r)
+        return DatastarResponse(r)
+
+    wrapper.__annotations__["return"] = "DatastarResponse"
+    return wrapper
 
 
 async def read_signals(request: Request) -> dict[str, Any] | None:
