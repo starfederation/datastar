@@ -25,6 +25,8 @@ __all__ = [
 class DatastarResponse(Stream):
     """Respond with 0..N `DatastarEvent`s"""
 
+    default_headers: dict[str, str] = SSE_HEADERS.copy()
+
     def __init__(
         self,
         content: DatastarEvents = None,
@@ -40,7 +42,7 @@ class DatastarResponse(Stream):
             status_code = status_code or 204
             content = tuple()
         else:
-            headers = {**SSE_HEADERS, **(headers or {})}
+            headers = {**self.default_headers, **(headers or {})}
         if isinstance(content, DatastarEvent):
             content = (content,)
         super().__init__(

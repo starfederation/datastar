@@ -20,6 +20,8 @@ __all__ = [
 
 
 class DatastarResponse(HTTPResponse):
+    default_headers: dict[str, str] = SSE_HEADERS.copy()
+
     def __init__(
         self,
         content: DatastarEvent | Collection[DatastarEvent] | None = None,
@@ -28,7 +30,9 @@ class DatastarResponse(HTTPResponse):
     ) -> None:
         if not content:
             status = status or 204
-        super().__init__(content, status=status or 200, headers={**SSE_HEADERS, **(headers or {})})
+        super().__init__(
+            content, status=status or 200, headers={**self.default_headers, **(headers or {})}
+        )
 
     async def send(
         self,
