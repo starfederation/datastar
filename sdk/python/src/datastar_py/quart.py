@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 from quart import Response, request
 
 from . import _read_signals
-from .sse import SSE_HEADERS, DatastarEvents, ServerSentEventGenerator
+from .sse import SSE_HEADERS, DatastarEvents, ServerSentEventGenerator, _to_events_iterable
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -32,7 +32,7 @@ class DatastarResponse(Response):
             status = status or 204
         else:
             headers = {**SSE_HEADERS, **(headers or {})}
-        super().__init__(content, status=status, headers=headers)
+        super().__init__(_to_events_iterable(content), status=status, headers=headers)
         if isgenerator(content) or isasyncgen(content):
             self.timeout = None
 

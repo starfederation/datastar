@@ -1,3 +1,5 @@
+from datastar_py import ServerSentEventGeneratorfrom datastar_py import ServerSentEventGenerator
+
 # datastar-py
 
 The `datastar-py` package provides backend helpers for the [Datastar](https://data-star.dev) JS library.
@@ -80,6 +82,25 @@ response = await datastar_respond(request)
 while True:
     await response.send(ServerSentEventGenerator.merge_fragments("<div id='mydiv'></div>"))
     await asyncio.sleep(1)
+```
+
+### Implicit merge-fragments/signals events
+
+When using the response classes a bare string returned will be automatically
+wrapped in a `merge_fragments` call, and a bare dict will be automatically
+wrapped in a `merge_signals` call. FastHTML fasttags and htpy elements also
+can be returned and are interpreted as a `merge_fragments` event (or any class
+with an `__html__` attribute.)
+
+```python
+return "<div id='myid'></div>"
+# is equivalent to
+return ServerSentEventGenerator.merge_fragments("<div id='myid'></div>")
+
+# This works if you are returning generator as well
+yield {"my": "signal"}
+# is equivalent to
+yield ServerSentEventGenerator.merge_signals({"my": "signal"})
 ```
 
 ## Signal Helpers

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from collections.abc import AsyncIterable, Iterable
 from itertools import chain
-from typing import Protocol, TypeAlias, Union, runtime_checkable
+from typing import Callable, Protocol, TypeAlias, TypeVar, Union, overload, runtime_checkable
 
 import datastar_py.consts as consts
 
@@ -25,9 +25,12 @@ class _HtmlProvider(Protocol):
     def __html__(self) -> str: ...
 
 
-class DatastarEvent(str):
+class ConcreteDatastarEvent(str):
     pass
 
+
+# HTML/dicts are implicit merge-fragments/signals events
+DatastarEvent: TypeAlias = Union[ConcreteDatastarEvent, str, _HtmlProvider, dict]
 
 # 0..N datastar events
 DatastarEvents: TypeAlias = Union[
@@ -45,7 +48,7 @@ class ServerSentEventGenerator:
         data_lines: list[str],
         event_id: str | None = None,
         retry_duration: int | None = None,
-    ) -> DatastarEvent:
+    ) -> ConcreteDatastarEvent:
         prefix = []
         if event_id:
             prefix.append(f"id: {event_id}")
@@ -57,7 +60,7 @@ class ServerSentEventGenerator:
 
         data_lines = [f"data: {line}" for line in data_lines]
 
-        return DatastarEvent("\n".join(chain(prefix, data_lines)) + "\n\n")
+        return ConcreteDatastarEvent("\n".join(chain(prefix, data_lines)) + "\n\n")
 
     @classmethod
     def merge_fragments(
@@ -68,7 +71,7 @@ class ServerSentEventGenerator:
         use_view_transition: bool | None = None,
         event_id: str | None = None,
         retry_duration: int | None = None,
-    ) -> DatastarEvent:
+    ) -> ConcreteDatastarEvent:
         if isinstance(fragments, _HtmlProvider):
             fragments = fragments.__html__()
         data_lines = []
@@ -99,7 +102,7 @@ class ServerSentEventGenerator:
         use_view_transition: bool | None = None,
         event_id: str | None = None,
         retry_duration: int | None = None,
-    ) -> DatastarEvent:
+    ) -> ConcreteDatastarEvent:
         data_lines = []
         if selector:
             data_lines.append(f"{consts.SELECTOR_DATALINE_LITERAL} {selector}")
@@ -122,7 +125,7 @@ class ServerSentEventGenerator:
         event_id: str | None = None,
         only_if_missing: bool | None = None,
         retry_duration: int | None = None,
-    ) -> DatastarEvent:
+    ) -> ConcreteDatastarEvent:
         data_lines = []
         if only_if_missing is not None:
             data_lines.append(
@@ -141,7 +144,7 @@ class ServerSentEventGenerator:
         paths: list[str],
         event_id: str | None = None,
         retry_duration: int | None = None,
-    ) -> DatastarEvent:
+    ) -> ConcreteDatastarEvent:
         data_lines = [f"{consts.PATHS_DATALINE_LITERAL} {path}" for path in paths]
 
         return ServerSentEventGenerator._send(
@@ -159,7 +162,7 @@ class ServerSentEventGenerator:
         attributes: list[str] | None = None,
         event_id: str | None = None,
         retry_duration: int | None = None,
-    ) -> DatastarEvent:
+    ) -> ConcreteDatastarEvent:
         data_lines = []
 
         if auto_remove is not None:
@@ -185,9 +188,54 @@ class ServerSentEventGenerator:
         )
 
     @classmethod
-    def redirect(cls, location: str) -> DatastarEvent:
+    def redirect(cls, location: str) -> ConcreteDatastarEvent:
         return cls.execute_script(f"setTimeout(() => window.location = '{location}')")
 
 
 def _js_bool(b: bool) -> str:
     return "true" if b else "false"
+
+
+def _to_concrete_event(event: str | _HtmlProvider | dict) -> ConcreteDatastarEvent:
+    if isinstance(event, ConcreteDatastarEvent):
+        return event
+    if isinstance(event, (_HtmlProvider, str)):
+        return ServerSentEventGenerator.merge_fragments(event)
+    if isinstance(event, dict):
+        return ServerSentEventGenerator.merge_signals(event)
+    raise TypeError(f"{type(event)} is not a valid type for a datastar event.")
+
+
+T = TypeVar("T")
+R = TypeVar("R")
+SyncOrAsyncIterable = TypeVar("SyncOrAsyncIterable", bound=Union[AsyncIterable, Iterable])
+
+
+async def _async_map(func: Callable[[T], R], async_iter: AsyncIterable[T]) -> AsyncIterable[R]:
+    async for item in async_iter:
+        yield func(item)
+
+
+@overload
+def _to_events_iterable(iterable: None) -> Iterable[ConcreteDatastarEvent]: ...
+@overload
+def _to_events_iterable(iterable: DatastarEvent) -> Iterable[ConcreteDatastarEvent]: ...
+@overload
+def _to_events_iterable(
+    iterable: AsyncIterable[DatastarEvent],
+) -> AsyncIterable[ConcreteDatastarEvent]: ...
+@overload
+def _to_events_iterable(
+    iterable: Iterable[DatastarEvent],
+) -> Iterable[ConcreteDatastarEvent]: ...
+def _to_events_iterable(iterable: SyncOrAsyncIterable) -> SyncOrAsyncIterable:
+    """Wraps an iterable to allow implicitly turning fragments and dictionaries
+    into merge-fragments and merge-signals events."""
+    if not iterable:
+        return tuple()
+    if isinstance(iterable, (str, dict)):
+        iterable = (iterable,)
+    if isinstance(iterable, AsyncIterable):
+        return _async_map(_to_concrete_event, iterable)
+    else:
+        return map(_to_concrete_event, iterable)
