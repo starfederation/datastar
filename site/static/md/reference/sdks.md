@@ -81,6 +81,6 @@ Community SDKs are contributed and maintained independently. If you'd like to co
 
 ### Rama (Rust)
 
-[Rama module for Datastar](https://ramaproxy.org/docs/rama/http/sse/datastar/index.html)
+[Datastar module in Rama](https://ramaproxy.org/docs/rama/http/sse/datastar/index.html)
 and [example](https://github.com/plabayo/rama/blob/main/examples/http_sse_datastar_hello.rs).
 _Author: [Plabayo BV](https://github.com/plabayo)_
