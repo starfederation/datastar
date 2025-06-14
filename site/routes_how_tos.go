@@ -26,6 +26,7 @@ func setupHowTos(ctx context.Context, router chi.Router) error {
 				{ID: "how_to_load_more_list_items"},
 				{ID: "how_to_poll_the_backend_at_regular_intervals"},
 				{ID: "how_to_redirect_the_page_from_the_backend"},
+				{ID: "how_to_send_toast_notifications_from_the_backend"},
 			},
 		},
 	}
