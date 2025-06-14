@@ -13,6 +13,7 @@ Send a toast notification from the backend and have it appear on the page.
 ## Demo
 
 <button data-on-click="@post('/how_tos/toast/data')" class="btn btn-primary font-bold">Cook!</button>
+<ul id="toaster"></ul>
 
 ## Steps
 
