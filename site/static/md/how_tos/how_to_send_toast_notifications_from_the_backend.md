@@ -17,4 +17,13 @@ Send a toast notification from the backend and have it appear on the page.
 
 ## Steps
 
+To display our toasts, we will need a toaster somewhere on the page. In the demo, the toaster is a simple `ul` with `id="toaster"`. We will then
+append `li` on click, coming from the backend.
+
+```html
+<button data-on-click="@post('/create_user')">
+    Create
+</button>
+```
+
 ## Conclusion
