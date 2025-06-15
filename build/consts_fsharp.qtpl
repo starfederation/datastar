@@ -1,7 +1,7 @@
 {%- func fsharpConsts(data *ConstTemplateData) -%}
 // {%s data.DoNotEdit %}
 
-namespace StarFederation.Datastar
+namespace StarFederation.Datastar.FSharp
 
 open System
 
