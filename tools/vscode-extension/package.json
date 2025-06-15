@@ -15,10 +15,139 @@
   "engines": {
     "vscode": "^1.63.0"
   },
+  "categories": [
+    "Snippets",
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./src/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Datastar",
+      "properties": {
+        "datastar.enabledLanguages": {
+          "type": "array",
+          "default": [
+            "html",
+            "php",
+            "twig",
+            "edge",
+            "nunjucks",
+            "templ",
+            "astro",
+            "vue",
+            "svelte",
+            "handlebars",
+            "mustache",
+            "liquid",
+            "erb",
+            "ejs",
+            "pug",
+            "razor",
+            "blade",
+            "django-html",
+            "jinja",
+            "gohtml",
+            "jsp",
+            "aspnetcorerazor"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "Languages and file extensions where Datastar snippets should be available. Supports both VS Code language IDs (e.g., 'html', 'php') and file extensions (e.g., '.twig', '.templ', '.custom').",
+          "markdownDescription": "Languages and file extensions where Datastar snippets should be available. Supports both VS Code language IDs and file extensions.\n\n**Default supported languages/extensions:**\n- `html` - HTML files\n- `php` - PHP files\n- `twig` - Twig templates (Craft CMS, Symfony)\n- `blade` - Laravel Blade templates\n- `vue` - Vue single file components\n- `svelte` - Svelte files\n- `astro` - Astro files\n- `templ` - Go Templ files\n- `erb` - Ruby ERB templates\n- `ejs` - EJS templates\n- `handlebars` - Handlebars templates\n- `jinja` - Jinja templates (Python/Django)\n- `gohtml` - Go HTML templates\n\n**Add custom file extensions:**\n- `.edge` - Edge templates\n- `.njk` - Nunjucks templates\n- `.liquid` - Liquid templates\n- `.pug` - Pug templates\n- `.hbs` - Handlebars files\n- `.mustache` - Mustache templates\n- `.custom` - Any custom extension\n\n**Example:**\n```json\n[\n  \"html\",\n  \"php\",\n  \"twig\",\n  \".edge\",\n  \".njk\",\n  \".custom\"\n]\n```"
+        }
+      }
+    },
     "snippets": [
       {
         "language": "html",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "php",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "twig",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "edge",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "nunjucks",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "templ",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "astro",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "vue",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "svelte",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "handlebars",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "mustache",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "liquid",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "erb",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "ejs",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "pug",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "razor",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "blade",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "django-html",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "jinja",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "gohtml",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "jsp",
+        "path": "./src/data-attributes.json"
+      },
+      {
+        "language": "aspnetcorerazor",
         "path": "./src/data-attributes.json"
       }
     ]
