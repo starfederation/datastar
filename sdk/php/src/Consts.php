@@ -28,7 +28,7 @@ class Consts
     public const DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = 'type module';
 
     // The mode in which a fragment is merged into the DOM.
-    public const DEFAULT_FRAGMENT_MERGE_MODE = FragmentMergeMode::Morph;
+    public const DEFAULT_FRAGMENT_MERGE_MODE = FragmentMergeMode::Outer;
 
     // Dataline literals.
     public const SELECTOR_DATALINE_LITERAL = 'selector ';

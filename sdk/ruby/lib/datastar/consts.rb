@@ -23,19 +23,19 @@ module Datastar
 
     module FragmentMergeMode
 
-      # Morphs the fragment into the existing element using idiomorph.
-      MORPH = 'morph'
-
-      # Replaces the inner HTML of the existing element.
-      INNER = 'inner'
-
-      # Replaces the outer HTML of the existing element.
+      # Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
       OUTER = 'outer'
 
-      # Prepends the fragment to the existing element.
+      # Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
+      INNER = 'inner'
+
+      # Replaces the outer HTML of the existing element (no morphing).
+      REPLACE = 'replace'
+
+      # Prepends the fragment inside the existing element.
       PREPEND = 'prepend'
 
-      # Appends the fragment to the existing element.
+      # Appends the fragment inside the existing element.
       APPEND = 'append'
 
       # Inserts the fragment before the existing element.
@@ -44,15 +44,12 @@ module Datastar
       # Inserts the fragment after the existing element.
       AFTER = 'after'
 
-      # Upserts the attributes of the existing element.
-      UPSERT_ATTRIBUTES = 'upsertAttributes'
-
       # Removes the existing element from the DOM.
       REMOVE = 'remove'
     end
 
     # The mode in which a fragment is merged into the DOM.
-    DEFAULT_FRAGMENT_MERGE_MODE = FragmentMergeMode::MORPH
+    DEFAULT_FRAGMENT_MERGE_MODE = FragmentMergeMode::OUTER
 
     # Dataline literals.
     SELECTOR_DATALINE_LITERAL = 'selector'

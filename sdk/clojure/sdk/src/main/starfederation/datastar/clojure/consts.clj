@@ -63,24 +63,24 @@
 ;; -----------------------------------------------------------------------------
 ;; FragmentMergeMode
 
-(def fragment-merge-mode-morph
-  "Morphs the fragment into the existing element using idiomorph."
-  "morph")
-
-(def fragment-merge-mode-inner
-  "Replaces the inner HTML of the existing element."
-  "inner")
-
 (def fragment-merge-mode-outer
-  "Replaces the outer HTML of the existing element."
+  "Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes."
   "outer")
 
+(def fragment-merge-mode-inner
+  "Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes."
+  "inner")
+
+(def fragment-merge-mode-replace
+  "Replaces the outer HTML of the existing element (no morphing)."
+  "replace")
+
 (def fragment-merge-mode-prepend
-  "Prepends the fragment to the existing element."
+  "Prepends the fragment inside the existing element."
   "prepend")
 
 (def fragment-merge-mode-append
-  "Appends the fragment to the existing element."
+  "Appends the fragment inside the existing element."
   "append")
 
 (def fragment-merge-mode-before
@@ -91,10 +91,6 @@
   "Inserts the fragment after the existing element."
   "after")
 
-(def fragment-merge-mode-upsert-attributes
-  "Upserts the attributes of the existing element."
-  "upsertAttributes")
-
 (def fragment-merge-mode-remove
   "Removes the existing element from the DOM."
   "remove")
@@ -102,8 +98,8 @@
 
 (def default-fragment-merge-mode
   "Default value for FragmentMergeMode.
-  Morphs the fragment into the existing element using idiomorph."
-  fragment-merge-mode-morph)
+  Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes."
+  fragment-merge-mode-outer)
 
 
 ;; EventType

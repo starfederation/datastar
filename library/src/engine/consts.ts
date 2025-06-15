@@ -42,28 +42,26 @@ export const DefaultExecuteScriptAutoRemove = true;
 
 // The mode in which a fragment is merged into the DOM.
 export const FragmentMergeModes = {
-    // Morphs the fragment into the existing element using idiomorph.
-    Morph: "morph",
-    // Replaces the inner HTML of the existing element.
-    Inner: "inner",
-    // Replaces the outer HTML of the existing element.
+    // Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
     Outer: "outer",
-    // Prepends the fragment to the existing element.
+    // Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
+    Inner: "inner",
+    // Replaces the outer HTML of the existing element (no morphing).
+    Replace: "replace",
+    // Prepends the fragment inside the existing element.
     Prepend: "prepend",
-    // Appends the fragment to the existing element.
+    // Appends the fragment inside the existing element.
     Append: "append",
     // Inserts the fragment before the existing element.
     Before: "before",
     // Inserts the fragment after the existing element.
     After: "after",
-    // Upserts the attributes of the existing element.
-    UpsertAttributes: "upsertAttributes",
     // Removes the existing element from the DOM.
     Remove: "remove",
 } as const;
 
 // Default value for FragmentMergeMode
-export const DefaultFragmentMergeMode = FragmentMergeModes.Morph;
+export const DefaultFragmentMergeMode = FragmentMergeModes.Outer;
 
 // The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 export const EventTypes = {

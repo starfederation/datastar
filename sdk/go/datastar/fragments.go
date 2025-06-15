@@ -70,7 +70,7 @@ func (sse *ServerSentEventGenerator) MergeFragments(fragment string, opts ...Mer
 		EventID:       "",
 		RetryDuration: DefaultSseRetryDuration,
 		Selector:      "",
-		MergeMode:     FragmentMergeModeMorph,
+		MergeMode:     FragmentMergeModeOuter,
 	}
 	for _, opt := range opts {
 		opt(options)
@@ -88,7 +88,7 @@ func (sse *ServerSentEventGenerator) MergeFragments(fragment string, opts ...Mer
 	if options.Selector != "" {
 		dataRows = append(dataRows, SelectorDatalineLiteral+options.Selector)
 	}
-	if options.MergeMode != FragmentMergeModeMorph {
+	if options.MergeMode != FragmentMergeModeOuter {
 		dataRows = append(dataRows, MergeModeDatalineLiteral+string(options.MergeMode))
 	}
 	if options.UseViewTransitions {

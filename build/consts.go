@@ -186,24 +186,24 @@ var Consts = &ConstTemplateData{
 			DefaultIndex: 0,
 			Values: []*EnumValueDefinition{
 				{
-					Value:       "morph",
-					Description: "Morphs the fragment into the existing element using idiomorph.",
+					Value:       "outer",
+					Description: "Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.",
 				},
 				{
 					Value:       "inner",
-					Description: "Replaces the inner HTML of the existing element.",
+					Description: "Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.",
 				},
 				{
-					Value:       "outer",
-					Description: "Replaces the outer HTML of the existing element.",
+					Value:       "replace",
+					Description: "Replaces the outer HTML of the existing element (no morphing).",
 				},
 				{
 					Value:       "prepend",
-					Description: "Prepends the fragment to the existing element.",
+					Description: "Prepends the fragment inside the existing element.",
 				},
 				{
 					Value:       "append",
-					Description: "Appends the fragment to the existing element.",
+					Description: "Appends the fragment inside the existing element.",
 				},
 				{
 					Value:       "before",
@@ -212,10 +212,6 @@ var Consts = &ConstTemplateData{
 				{
 					Value:       "after",
 					Description: "Inserts the fragment after the existing element.",
-				},
-				{
-					Value:       "upsertAttributes",
-					Description: "Upserts the attributes of the existing element.",
 				},
 				{
 					Value:       "remove",

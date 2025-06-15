@@ -50,22 +50,20 @@ pub const default_execute_script_auto_remove = true;
 
 /// The mode in which a fragment is merged into the DOM.
 pub const FragmentMergeMode = enum {
-    /// Morphs the fragment into the existing element using idiomorph.
-    morph,
-    /// Replaces the inner HTML of the existing element.
-    inner,
-    /// Replaces the outer HTML of the existing element.
+    /// Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
     outer,
-    /// Prepends the fragment to the existing element.
+    /// Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
+    inner,
+    /// Replaces the outer HTML of the existing element (no morphing).
+    replace,
+    /// Prepends the fragment inside the existing element.
     prepend,
-    /// Appends the fragment to the existing element.
+    /// Appends the fragment inside the existing element.
     append,
     /// Inserts the fragment before the existing element.
     before,
     /// Inserts the fragment after the existing element.
     after,
-    /// Upserts the attributes of the existing element.
-    upsert_attributes,
     /// Removes the existing element from the DOM.
     remove,
 
@@ -80,21 +78,20 @@ pub const FragmentMergeMode = enum {
 
         try writer.writeAll(
             switch (self) {
-                .morph => "morph",
-                .inner => "inner",
                 .outer => "outer",
+                .inner => "inner",
+                .replace => "replace",
                 .prepend => "prepend",
                 .append => "append",
                 .before => "before",
                 .after => "after",
-                .upsert_attributes => "upsertAttributes",
                 .remove => "remove",
             },
         );
     }
 };
 
-pub const default_fragment_merge_mode = FragmentMergeMode.morph;
+pub const default_fragment_merge_mode = FragmentMergeMode.outer;
 
 /// The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 pub const EventType = enum {

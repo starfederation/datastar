@@ -10,25 +10,25 @@ import (
 
 // ValidFragmentMergeTypes is a list of valid fragment merge modes.
 var ValidFragmentMergeTypes = []FragmentMergeMode{
-	FragmentMergeModeMorph,
-	FragmentMergeModeInner,
 	FragmentMergeModeOuter,
+	FragmentMergeModeInner,
+	FragmentMergeModeReplace,
 	FragmentMergeModePrepend,
 	FragmentMergeModeAppend,
 	FragmentMergeModeBefore,
 	FragmentMergeModeAfter,
-	FragmentMergeModeUpsertAttributes,
+	FragmentMergeModeRemove,
 }
 
 // FragmentMergeTypeFromString converts a string to a [FragmentMergeMode].
 func FragmentMergeTypeFromString(s string) (FragmentMergeMode, error) {
 	switch s {
-	case "morph":
-		return FragmentMergeModeMorph, nil
-	case "inner":
-		return FragmentMergeModeInner, nil
 	case "outer":
 		return FragmentMergeModeOuter, nil
+	case "inner":
+		return FragmentMergeModeInner, nil
+	case "replace":
+		return FragmentMergeModeReplace, nil
 	case "prepend":
 		return FragmentMergeModePrepend, nil
 	case "append":
@@ -37,16 +37,16 @@ func FragmentMergeTypeFromString(s string) (FragmentMergeMode, error) {
 		return FragmentMergeModeBefore, nil
 	case "after":
 		return FragmentMergeModeAfter, nil
-	case "upsertAttributes":
-		return FragmentMergeModeUpsertAttributes, nil
+	case "remove":
+		return FragmentMergeModeRemove, nil
 	default:
 		return "", fmt.Errorf("invalid fragment merge type: %s", s)
 	}
 }
 
-// WithMergeMorph creates a MergeFragmentOption that merges fragments using the morph mode.
-func WithMergeMorph() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModeMorph)
+// WithMergeOuter creates a MergeFragmentOption that merges fragments using the outer mode (idiomorph).
+func WithMergeOuter() MergeFragmentOption {
+	return WithMergeMode(FragmentMergeModeOuter)
 }
 
 // WithMergeInner creates a MergeFragmentOption that merges fragments using the inner mode.
@@ -54,9 +54,9 @@ func WithMergeInner() MergeFragmentOption {
 	return WithMergeMode(FragmentMergeModeInner)
 }
 
-// WithMergeOuter creates a MergeFragmentOption that merges fragments using the outer mode.
-func WithMergeOuter() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModeOuter)
+// WithMergeReplace creates a MergeFragmentOption that merges fragments using the replace mode.
+func WithMergeReplace() MergeFragmentOption {
+	return WithMergeMode(FragmentMergeModeReplace)
 }
 
 // WithMergePrepend creates a MergeFragmentOption that merges fragments using the prepend mode.
@@ -77,11 +77,6 @@ func WithMergeBefore() MergeFragmentOption {
 // WithMergeAfter creates a MergeFragmentOption that merges fragments using the after mode.
 func WithMergeAfter() MergeFragmentOption {
 	return WithMergeMode(FragmentMergeModeAfter)
-}
-
-// WithMergeUpsertAttributes creates a MergeFragmentOption that merges fragments using the upsert attributes mode.
-func WithMergeUpsertAttributes() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModeUpsertAttributes)
 }
 
 // WithSelectorID is a convenience wrapper for [WithSelector] option

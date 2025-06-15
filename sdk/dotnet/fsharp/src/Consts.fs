@@ -5,22 +5,20 @@ namespace StarFederation.Datastar
 open System
 
 type FragmentMergeMode =
-/// Morphs the fragment into the existing element using idiomorph.
-| Morph
-/// Replaces the inner HTML of the existing element.
-| Inner
-/// Replaces the outer HTML of the existing element.
+/// Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
 | Outer
-/// Prepends the fragment to the existing element.
+/// Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
+| Inner
+/// Replaces the outer HTML of the existing element (no morphing).
+| Replace
+/// Prepends the fragment inside the existing element.
 | Prepend
-/// Appends the fragment to the existing element.
+/// Appends the fragment inside the existing element.
 | Append
 /// Inserts the fragment before the existing element.
 | Before
 /// Inserts the fragment after the existing element.
 | After
-/// Upserts the attributes of the existing element.
-| UpsertAttributes
 /// Removes the existing element from the DOM.
 | Remove
 
@@ -41,8 +39,8 @@ module Consts =
     let DefaultSseRetryDuration = TimeSpan.FromMilliseconds 1000
 
 
-    /// Default: morph - Morphs the fragment into the existing element using idiomorph.
-    let DefaultFragmentMergeMode = Morph
+    /// Default: outer - Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
+    let DefaultFragmentMergeMode = Outer
 
     let [<Literal>] DefaultFragmentsUseViewTransitions = false
     let [<Literal>] DefaultMergeSignalsOnlyIfMissing = false
@@ -63,14 +61,13 @@ module Consts =
     module FragmentMergeMode =
         let toString this =
             match this with
-                | FragmentMergeMode.Morph -> "morph"
-                | FragmentMergeMode.Inner -> "inner"
                 | FragmentMergeMode.Outer -> "outer"
+                | FragmentMergeMode.Inner -> "inner"
+                | FragmentMergeMode.Replace -> "replace"
                 | FragmentMergeMode.Prepend -> "prepend"
                 | FragmentMergeMode.Append -> "append"
                 | FragmentMergeMode.Before -> "before"
                 | FragmentMergeMode.After -> "after"
-                | FragmentMergeMode.UpsertAttributes -> "upsertAttributes"
                 | FragmentMergeMode.Remove -> "remove"
 
     module EventType =

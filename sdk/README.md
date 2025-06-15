@@ -125,27 +125,39 @@ data: fragments </div>
 An enum of Datastar supported fragment merge modes.  Will be a string over the wire
 Valid values should match the [FragmentMergeMode](#FragmentMergeMode) and currently include
 
+#### Morphing vs Non-Morphing Modes
+
+**Morphing modes** (`outer` and `inner`) use [Idiomorph](https://github.com/bigskysoftware/idiomorph) to intelligently merge fragments:
+- **Preserves focus** on form elements and interactive components
+- **Minimizes DOM changes** by only updating what has actually changed
+- **Maintains scroll position** and other element state
+- **Provides smooth transitions** between content updates
+
+**Non-morphing modes** (`replace`, `prepend`, `append`, `before`, `after`) perform direct DOM manipulation:
+- **Faster execution** for simple content replacement
+- **Complete replacement** of target elements
+- **No state preservation** - focus and scroll position may be lost
+
 | Mode             | Description                                             |
 |------------------|---------------------------------------------------------|
-| morph            | Use Idiomorph to merge the fragment into the DOM        |
-| inner            | Replace the innerHTML of the selector with the fragment |
-| outer            | Replace the outerHTML of the selector with the fragment |
+| outer            | Use Idiomorph to merge the fragment into the DOM, preserving focus and minimizing element changes |
+| inner            | Use Idiomorph to merge the fragment into the innerHTML, preserving focus and minimizing element changes |
+| replace          | Replace the outerHTML of the selector with the fragment (no morphing) |
 | prepend          | Prepend the fragment to the selector                    |
 | append           | Append the fragment to the selector                     |
 | before           | Insert the fragment before the selector                 |
 | after            | Insert the fragment after the selector                  |
-| upsertAttributes | Update the attributes of the selector with the fragment |
 | remove           | Remove the existing element from the DOM                |
 
 ##### Options
 * `selector` (string) The CSS selector to use to insert the fragments.  If not provided or empty, Datastar **will** default to using the `id` attribute of the fragment.
-* `mergeMode` (FragmentMergeMode) The mode to use when merging the fragment into the DOM.  If not provided the Datastar client side ***will*** default to `morph`.
+* `mergeMode` (FragmentMergeMode) The mode to use when merging the fragment into the DOM.  If not provided the Datastar client side ***will*** default to `outer`.
 * `useViewTransition` Whether to use view transitions, if not provided the Datastar client side ***will*** default to `false`.
 
 #### Logic
 When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-merge-fragments` event type.
 1. If `selector` is provided, the function ***must*** include the selector in the event data in the format `selector SELECTOR\n`, ***unless*** the selector is empty.
-2. If `mergeMode` is provided, the function ***must*** include the merge mode in the event data in the format `merge MERGE_MODE\n`, ***unless*** the value is the default of `morph`.
+2. If `mergeMode` is provided, the function ***must*** include the merge mode in the event data in the format `merge MERGE_MODE\n`, ***unless*** the value is the default of `outer`.
 3. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
 4. The function ***must*** include the fragments in the event data, with each line prefixed with `fragments `. This ***should*** be output after all other event data.
 

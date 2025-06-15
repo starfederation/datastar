@@ -25,7 +25,7 @@ public final class Consts {
     public static final String DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = "type module";
 
     // The mode in which a fragment is merged into the DOM.
-    public static final FragmentMergeMode DEFAULT_FRAGMENT_MERGE_MODE = FragmentMergeMode.Morph;
+    public static final FragmentMergeMode DEFAULT_FRAGMENT_MERGE_MODE = FragmentMergeMode.Outer;
 
     // Dataline literals.
     public static final String SELECTOR_DATALINE_LITERAL = "selector ";

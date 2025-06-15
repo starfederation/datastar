@@ -7,8 +7,8 @@ import "time"
 const (
     DatastarKey = "datastar"
     Version                   = "1.0.0-beta.11"
-    VersionClientByteSize     = 39846
-    VersionClientByteSizeGzip = 14861
+    VersionClientByteSize     = 39770
+    VersionClientByteSizeGzip = 14847
 
     //region Default durations
 
@@ -59,22 +59,22 @@ type FragmentMergeMode string
 
 const (
     // Default value for FragmentMergeMode
-    // Morphs the fragment into the existing element using idiomorph.
-    DefaultFragmentMergeMode = FragmentMergeModeMorph
+    // Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
+    DefaultFragmentMergeMode = FragmentMergeModeOuter
 
-    // Morphs the fragment into the existing element using idiomorph.
-    FragmentMergeModeMorph FragmentMergeMode = "morph"
-
-    // Replaces the inner HTML of the existing element.
-    FragmentMergeModeInner FragmentMergeMode = "inner"
-
-    // Replaces the outer HTML of the existing element.
+    // Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
     FragmentMergeModeOuter FragmentMergeMode = "outer"
 
-    // Prepends the fragment to the existing element.
+    // Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
+    FragmentMergeModeInner FragmentMergeMode = "inner"
+
+    // Replaces the outer HTML of the existing element (no morphing).
+    FragmentMergeModeReplace FragmentMergeMode = "replace"
+
+    // Prepends the fragment inside the existing element.
     FragmentMergeModePrepend FragmentMergeMode = "prepend"
 
-    // Appends the fragment to the existing element.
+    // Appends the fragment inside the existing element.
     FragmentMergeModeAppend FragmentMergeMode = "append"
 
     // Inserts the fragment before the existing element.
@@ -82,9 +82,6 @@ const (
 
     // Inserts the fragment after the existing element.
     FragmentMergeModeAfter FragmentMergeMode = "after"
-
-    // Upserts the attributes of the existing element.
-    FragmentMergeModeUpsertAttributes FragmentMergeMode = "upsertAttributes"
 
     // Removes the existing element from the DOM.
     FragmentMergeModeRemove FragmentMergeMode = "remove"

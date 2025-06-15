@@ -56,23 +56,21 @@ pub(crate) const DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE: bool = true;
 /// The mode in which a fragment is merged into the DOM.
 #[derive(Default,Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FragmentMergeMode {
-    /// Morphs the fragment into the existing element using idiomorph.
+    /// Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
     #[default]
-    Morph,
-    /// Replaces the inner HTML of the existing element.
-    Inner,
-    /// Replaces the outer HTML of the existing element.
     Outer,
-    /// Prepends the fragment to the existing element.
+    /// Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
+    Inner,
+    /// Replaces the outer HTML of the existing element (no morphing).
+    Replace,
+    /// Prepends the fragment inside the existing element.
     Prepend,
-    /// Appends the fragment to the existing element.
+    /// Appends the fragment inside the existing element.
     Append,
     /// Inserts the fragment before the existing element.
     Before,
     /// Inserts the fragment after the existing element.
     After,
-    /// Upserts the attributes of the existing element.
-    UpsertAttributes,
     /// Removes the existing element from the DOM.
     Remove,
 }
@@ -81,14 +79,13 @@ impl FragmentMergeMode {
     /// Returns the [`FragmentMergeMode`] as a string.
     pub(crate) const fn as_str(&self) -> &str {
         match self {
-            Self::Morph => "morph",
-            Self::Inner => "inner",
             Self::Outer => "outer",
+            Self::Inner => "inner",
+            Self::Replace => "replace",
             Self::Prepend => "prepend",
             Self::Append => "append",
             Self::Before => "before",
             Self::After => "after",
-            Self::UpsertAttributes => "upsertAttributes",
             Self::Remove => "remove",
         }
     }
