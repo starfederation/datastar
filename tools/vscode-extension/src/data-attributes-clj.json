@@ -1,0 +1,332 @@
+{
+  "data-attr": {
+    "prefix": ":data-attr",
+    "body": ":data-attr \"{${1:attributeName}: ${2:expression}}\"",
+    "description": "Sets one or more attribute values using a set of key-value pairs that map to the attribute name and expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-attributes"
+      }
+    ]
+  },
+  "data-attr-*": {
+    "prefix": ":data-attr-*",
+    "body": ":data-attr-${1:name} \"${2:expression}\"",
+    "description": "Sets an element’s attribute value based on an expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-attributes"
+      }
+    ]
+  },
+  "data-bind": {
+    "prefix": ":data-bind",
+    "body": ":data-bind \"${1:signalName}\"",
+    "description": "Creates a new signal and enables two-way binding between it and the element.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-bind"
+      }
+    ]
+  },
+  "data-bind-*": {
+    "prefix": ":data-bind-*",
+    "body": ":data-bind-${1:name}",
+    "description": "Creates a new signal and enables two-way binding between it and the element.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-bind"
+      }
+    ]
+  },
+  "data-class": {
+    "prefix": "data-class",
+    "body": ":data-class \"{${1:className}: ${2:expression}}\"",
+    "description": "Adds or removes one or more classes from an element using a set of key-value pairs that map to the class name and expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-class"
+      }
+    ]
+  },
+  "data-class-*": {
+    "prefix": "data-class-*",
+    "body": ":data-class-${1:name} \"${2:expression}\"",
+    "description": "Adds or removes a class from an element based on an expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-class"
+      }
+    ]
+  },
+  "data-computed": {
+    "prefix": "data-computed-*",
+    "body": ":data-computed-${1:name} \"${2:expression}\"",
+    "description": "Creates a signal that is computed based on an expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-computed"
+      }
+    ]
+  },
+  "data-custom-validity": {
+    "prefix": "data-custom-validity",
+    "body": ":data-custom-validity \"${1:expression}\"",
+    "description": "Adds custom validity to an element using an expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-custom-validity"
+      }
+    ]
+  },
+  "data-indicator": {
+    "prefix": "data-indicator",
+    "body": ":data-indicator \"${1:signalName}\"",
+    "description": "Creates a signal to track in-flight backend requests.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-indicator"
+      }
+    ]
+  },
+  "data-indicator-*": {
+    "prefix": "data-indicator-*",
+    "body": ":data-indicator-${1:name}",
+    "description": "Creates a signal to track in-flight backend requests.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-indicator"
+      }
+    ]
+  },
+  "data-on": {
+    "prefix": "data-on-*",
+    "body": ":data-on-${1:name} \"${2:expression}\"",
+    "description": "Runs an expression whenever an event is triggered on an element.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
+      }
+    ]
+  },
+  "data-on-click": {
+    "prefix": "data-on-click",
+    "body": ":data-on-click \"${1:expression}\"",
+    "description": "Runs an expression whenever the element is clicked.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
+      }
+    ]
+  },
+  "data-on-keydown": {
+    "prefix": "data-on-keydown",
+    "body": ":data-on-keydown \"${1:expression}\"",
+    "description": "Runs an expression whenever a key is pressed.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
+      }
+    ]
+  },
+  "data-on-intersect": {
+    "prefix": "data-on-intersect",
+    "body": ":data-on-intersect \"${1:expression}\"",
+    "description": "Runs an expression on intersection with the viewport.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-intersect"
+      }
+    ]
+  },
+  "data-on-interval": {
+    "prefix": "data-on-interval",
+    "body": ":data-on-interval \"${1:expression}\"",
+    "description": "Runs an expression at a regular interval.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-interval"
+      }
+    ]
+  },
+  "data-on-load": {
+    "prefix": "data-on-load",
+    "body": ":data-on-load \"${1:expression}\"",
+    "description": "Runs an expression whenever the element is initialised.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-load"
+      }
+    ]
+  },
+  "data-on-raf": {
+    "prefix": "data-on-raf",
+    "body": ":data-on-raf \"${1:expression}\"",
+    "description": "Runs an expression on every `requestAnimationFrame` event.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-raf"
+      }
+    ]
+  },
+  "data-on-signal-change": {
+    "prefix": "data-on-signal-change",
+    "body": ":data-on-signal-change \"${1:expression}\"",
+    "description": "Runs an expression whenever a signal changes.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-signal-change"
+      }
+    ]
+  },
+  "data-on-signal-change-*": {
+    "prefix": "data-on-signal-change-*",
+    "body": ":data-on-signal-change-${1:name} \"${2:expression}\"",
+    "description": "Runs an expression whenever a specific signal changes.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-on-signal-change"
+      }
+    ]
+  },
+  "data-persist": {
+    "prefix": "data-persist",
+    "body": ":data-persist \"\"",
+    "description": "Persists signals in local storage.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-persist"
+      }
+    ]
+  },
+  "data-ref": {
+    "prefix": "data-ref",
+    "body": ":data-ref \"${1:signalName}\"",
+    "description": "Creates a signal whose value references an element.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-ref"
+      }
+    ]
+  },
+  "data-ref-*": {
+    "prefix": "data-ref-*",
+    "body": ":data-ref-${1:name}",
+    "description": "Creates a signal whose value references an element.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-ref"
+      }
+    ]
+  },
+  "data-replace-url": {
+    "prefix": "data-replace-url",
+    "body": ":data-replace-url \"${1:expression}\"",
+    "description": "Replaces the URL in the browser with an evaluated expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-replace-url"
+      }
+    ]
+  },
+  "data-scroll-into-view": {
+    "prefix": "data-scroll-into-view",
+    "body": ":data-scroll-into-view",
+    "description": "Scrolls the element into view.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-scroll-into-view"
+      }
+    ]
+  },
+  "data-show": {
+    "prefix": "data-show",
+    "body": ":data-show \"${1:expression}\"",
+    "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-show"
+      }
+    ]
+  },
+  "data-signals": {
+    "prefix": "data-signals",
+    "body": ":data-signals \"{${1:signalName}: ${2:expression}}\"",
+    "description": "Merges one or more signals into the existing signals using a set of key-value pairs that map to the signal name and expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-signals"
+      }
+    ]
+  },
+  "data-signals-*": {
+    "prefix": "data-signals-*",
+    "body": ":data-signals-${1:name} \"${2:expression}\"",
+    "description": "Merges a signal into the existing signals.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-signals"
+      }
+    ]
+  },
+  "data-star-ignore": {
+    "prefix": "data-star-ignore",
+    "body": ":data-star-ignore",
+    "description": "Ignores an element’s attributes when Datastar applies plugins.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-data-star-ignore"
+      }
+    ]
+  },
+  "data-text": {
+    "prefix": "data-text",
+    "body": ":data-text \"${1:expression}\"",
+    "description": "Sets the text content of an element to the evaluated expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-text"
+      }
+    ]
+  },
+  "data-view-transition": {
+    "prefix": "data-view-transition",
+    "body": ":data-view-transition \"${1:expression}\"",
+    "description": "Sets the value of `view-transition-name` for use with the View Transition API.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attribute_plugins#data-view-transition"
+      }
+    ]
+  }
+}
