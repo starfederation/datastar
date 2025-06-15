@@ -144,7 +144,7 @@ Valid values should match the [ElementMergeMode](#ElementMergeMode) and currentl
 
 #### Morphing vs Non-Morphing Modes
 
-**Morphing modes** (`outer` and `inner`) use [Idiomorph](https://github.com/bigskysoftware/idiomorph) to intelligently merge elements:
+**Morphing modes** (`outer` and `inner`) use Datastar's custom morphing algorithm to intelligently merge elements:
 - **Preserves focus** on form elements and interactive components
 - **Minimizes DOM changes** by only updating what has actually changed
 - **Maintains scroll position** and other element state
@@ -157,8 +157,8 @@ Valid values should match the [ElementMergeMode](#ElementMergeMode) and currentl
 
 | Mode             | Description                                             |
 |------------------|---------------------------------------------------------|
-| outer            | Use Idiomorph to merge the element into the DOM, preserving focus and minimizing element changes |
-| inner            | Use Idiomorph to merge the element into the innerHTML, preserving focus and minimizing element changes |
+| outer            | Use Datastar's morphing to merge the element into the DOM, preserving focus and minimizing element changes |
+| inner            | Use Datastar's morphing to merge the element into the innerHTML, preserving focus and minimizing element changes |
 | prepend          | Prepend the element to the selector                     |
 | append           | Append the element to the selector                      |
 | before           | Insert the element before the selector                  |
