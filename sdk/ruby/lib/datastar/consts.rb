@@ -46,6 +46,9 @@ module Datastar
 
       # Upserts the attributes of the existing element.
       UPSERT_ATTRIBUTES = 'upsertAttributes'
+
+      # Removes the existing element from the DOM.
+      REMOVE = 'remove'
     end
 
     # The mode in which a fragment is merged into the DOM.
@@ -58,7 +61,6 @@ module Datastar
     USE_VIEW_TRANSITION_DATALINE_LITERAL = 'useViewTransition'
     SIGNALS_DATALINE_LITERAL = 'signals'
     ONLY_IF_MISSING_DATALINE_LITERAL = 'onlyIfMissing'
-    PATHS_DATALINE_LITERAL = 'paths'
     SCRIPT_DATALINE_LITERAL = 'script'
     ATTRIBUTES_DATALINE_LITERAL = 'attributes'
     AUTO_REMOVE_DATALINE_LITERAL = 'autoRemove'

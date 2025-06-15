@@ -36,7 +36,6 @@
 (def use-view-transition-dataline-literal "useViewTransition ")
 (def signals-dataline-literal "signals ")
 (def only-if-missing-dataline-literal "onlyIfMissing ")
-(def paths-dataline-literal "paths ")
 (def script-dataline-literal "script ")
 (def attributes-dataline-literal "attributes ")
 (def auto-remove-dataline-literal "autoRemove ")
@@ -96,6 +95,10 @@
   "Upserts the attributes of the existing element."
   "upsertAttributes")
 
+(def fragment-merge-mode-remove
+  "Removes the existing element from the DOM."
+  "remove")
+
 
 (def default-fragment-merge-mode
   "Default value for FragmentMergeMode.
@@ -116,10 +119,6 @@
 (def event-type-remove-fragments
   "An event for removing HTML fragments from the DOM."
   "datastar-remove-fragments")
-
-(def event-type-remove-signals
-  "An event for removing signals."
-  "datastar-remove-signals")
 
 (def event-type-execute-script
   "An event for executing <script/> elements in the browser."

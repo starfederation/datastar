@@ -34,7 +34,6 @@ pub(crate) const FRAGMENTS_DATALINE_LITERAL: &str = "fragments";
 pub(crate) const USE_VIEW_TRANSITION_DATALINE_LITERAL: &str = "useViewTransition";
 pub(crate) const SIGNALS_DATALINE_LITERAL: &str = "signals";
 pub(crate) const ONLY_IF_MISSING_DATALINE_LITERAL: &str = "onlyIfMissing";
-pub(crate) const PATHS_DATALINE_LITERAL: &str = "paths";
 pub(crate) const SCRIPT_DATALINE_LITERAL: &str = "script";
 pub(crate) const ATTRIBUTES_DATALINE_LITERAL: &str = "attributes";
 pub(crate) const AUTO_REMOVE_DATALINE_LITERAL: &str = "autoRemove";
@@ -55,7 +54,7 @@ pub(crate) const DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE: bool = true;
 // #region Enums
 
 /// The mode in which a fragment is merged into the DOM.
-#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Default,Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FragmentMergeMode {
     /// Morphs the fragment into the existing element using idiomorph.
     #[default]
@@ -74,6 +73,8 @@ pub enum FragmentMergeMode {
     After,
     /// Upserts the attributes of the existing element.
     UpsertAttributes,
+    /// Removes the existing element from the DOM.
+    Remove,
 }
 
 impl FragmentMergeMode {
@@ -88,6 +89,7 @@ impl FragmentMergeMode {
             Self::Before => "before",
             Self::After => "after",
             Self::UpsertAttributes => "upsertAttributes",
+            Self::Remove => "remove",
         }
     }
 }
@@ -100,8 +102,6 @@ pub enum EventType {
     MergeSignals,
     /// An event for removing HTML fragments from the DOM.
     RemoveFragments,
-    /// An event for removing signals.
-    RemoveSignals,
     /// An event for executing <script/> elements in the browser.
     ExecuteScript,
 }
@@ -113,7 +113,6 @@ impl EventType {
             Self::MergeFragments => "datastar-merge-fragments",
             Self::MergeSignals => "datastar-merge-signals",
             Self::RemoveFragments => "datastar-remove-fragments",
-            Self::RemoveSignals => "datastar-remove-signals",
             Self::ExecuteScript => "datastar-execute-script",
         }
     }

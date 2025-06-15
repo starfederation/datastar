@@ -17,9 +17,6 @@ enum EventType: string
     // An event for removing HTML fragments from the DOM.
     case RemoveFragments = 'datastar-remove-fragments';
 
-    // An event for removing signals.
-    case RemoveSignals = 'datastar-remove-signals';
-
     // An event for executing &lt;script/&gt; elements in the browser.
     case ExecuteScript = 'datastar-execute-script';
 }

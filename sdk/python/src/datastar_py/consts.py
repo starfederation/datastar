@@ -37,6 +37,9 @@ class FragmentMergeMode(StrEnum):
     # Upserts the attributes of the existing element.
     UPSERT_ATTRIBUTES = "upsertAttributes"
 
+    # Removes the existing element from the DOM.
+    REMOVE = "remove"
+
 
 # endregion FragmentMergeMode
 
@@ -51,9 +54,6 @@ class EventType(StrEnum):
 
     # An event for removing HTML fragments from the DOM.
     REMOVE_FRAGMENTS = "datastar-remove-fragments"
-
-    # An event for removing signals.
-    REMOVE_SIGNALS = "datastar-remove-signals"
 
     # An event for executing <script/> elements in the browser.
     EXECUTE_SCRIPT = "datastar-execute-script"
@@ -88,7 +88,6 @@ FRAGMENTS_DATALINE_LITERAL = "fragments"
 USE_VIEW_TRANSITION_DATALINE_LITERAL = "useViewTransition"
 SIGNALS_DATALINE_LITERAL = "signals"
 ONLY_IF_MISSING_DATALINE_LITERAL = "onlyIfMissing"
-PATHS_DATALINE_LITERAL = "paths"
 SCRIPT_DATALINE_LITERAL = "script"
 ATTRIBUTES_DATALINE_LITERAL = "attributes"
 AUTO_REMOVE_DATALINE_LITERAL = "autoRemove"

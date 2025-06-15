@@ -31,4 +31,7 @@ enum FragmentMergeMode: string
 
     // Upserts the attributes of the existing element.
     case UpsertAttributes = 'upsertAttributes';
+
+    // Removes the existing element from the DOM.
+    case Remove = 'remove';
 }

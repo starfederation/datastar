@@ -43,7 +43,6 @@ export const DatastarDatalineFragments = "fragments"
 export const DatastarDatalineUseViewTransition = "useViewTransition"
 export const DatastarDatalineSignals = "signals"
 export const DatastarDatalineOnlyIfMissing = "onlyIfMissing"
-export const DatastarDatalinePaths = "paths"
 export const DatastarDatalineScript = "script"
 export const DatastarDatalineAttributes = "attributes"
 export const DatastarDatalineAutoRemove = "autoRemove"
@@ -70,6 +69,8 @@ export const FragmentMergeModes = [
     "after",
 // Upserts the attributes of the existing element.
     "upsertAttributes",
+// Removes the existing element from the DOM.
+    "remove",
 ] as const;
 
 // Default value for FragmentMergeMode
@@ -83,8 +84,6 @@ export const EventTypes = [
     "datastar-merge-signals",
 // An event for removing HTML fragments from the DOM.
     "datastar-remove-fragments",
-// An event for removing signals.
-    "datastar-remove-signals",
 // An event for executing <script/> elements in the browser.
     "datastar-execute-script",
 ] as const;

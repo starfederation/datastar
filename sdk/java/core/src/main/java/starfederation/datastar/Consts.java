@@ -34,7 +34,6 @@ public final class Consts {
     public static final String USE_VIEW_TRANSITION_DATALINE_LITERAL = "useViewTransition ";
     public static final String SIGNALS_DATALINE_LITERAL = "signals ";
     public static final String ONLY_IF_MISSING_DATALINE_LITERAL = "onlyIfMissing ";
-    public static final String PATHS_DATALINE_LITERAL = "paths ";
     public static final String SCRIPT_DATALINE_LITERAL = "script ";
     public static final String ATTRIBUTES_DATALINE_LITERAL = "attributes ";
     public static final String AUTO_REMOVE_DATALINE_LITERAL = "autoRemove ";

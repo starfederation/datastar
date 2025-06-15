@@ -29,7 +29,6 @@ pub const fragments_dataline_literal = "fragments";
 pub const use_view_transition_dataline_literal = "useViewTransition";
 pub const signals_dataline_literal = "signals";
 pub const only_if_missing_dataline_literal = "onlyIfMissing";
-pub const paths_dataline_literal = "paths";
 pub const script_dataline_literal = "script";
 pub const attributes_dataline_literal = "attributes";
 pub const auto_remove_dataline_literal = "autoRemove";
@@ -67,6 +66,8 @@ pub const FragmentMergeMode = enum {
     after,
     /// Upserts the attributes of the existing element.
     upsert_attributes,
+    /// Removes the existing element from the DOM.
+    remove,
 
     pub fn format(
         self: @This(),
@@ -87,6 +88,7 @@ pub const FragmentMergeMode = enum {
                 .before => "before",
                 .after => "after",
                 .upsert_attributes => "upsertAttributes",
+                .remove => "remove",
             },
         );
     }
@@ -102,8 +104,6 @@ pub const EventType = enum {
     merge_signals,
     /// An event for removing HTML fragments from the DOM.
     remove_fragments,
-    /// An event for removing signals.
-    remove_signals,
     /// An event for executing <script/> elements in the browser.
     execute_script,
 
@@ -121,7 +121,6 @@ pub const EventType = enum {
                 .merge_fragments => "datastar-merge-fragments",
                 .merge_signals => "datastar-merge-signals",
                 .remove_fragments => "datastar-remove-fragments",
-                .remove_signals => "datastar-remove-signals",
                 .execute_script => "datastar-execute-script",
             },
         );

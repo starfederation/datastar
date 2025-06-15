@@ -58,6 +58,8 @@ export const FragmentMergeModes = {
     After: "after",
     // Upserts the attributes of the existing element.
     UpsertAttributes: "upsertAttributes",
+    // Removes the existing element from the DOM.
+    Remove: "remove",
 } as const;
 
 // Default value for FragmentMergeMode
@@ -71,8 +73,6 @@ export const EventTypes = {
     MergeSignals: "datastar-merge-signals",
     // An event for removing HTML fragments from the DOM.
     RemoveFragments: "datastar-remove-fragments",
-    // An event for removing signals.
-    RemoveSignals: "datastar-remove-signals",
     // An event for executing <script/> elements in the browser.
     ExecuteScript: "datastar-execute-script",
 } as const;

@@ -7,8 +7,8 @@ import "time"
 const (
     DatastarKey = "datastar"
     Version                   = "1.0.0-beta.11"
-    VersionClientByteSize     = 40026
-    VersionClientByteSizeGzip = 14900
+    VersionClientByteSize     = 39886
+    VersionClientByteSizeGzip = 14868
 
     //region Default durations
 
@@ -31,7 +31,6 @@ const (
     UseViewTransitionDatalineLiteral = "useViewTransition "
     SignalsDatalineLiteral = "signals "
     OnlyIfMissingDatalineLiteral = "onlyIfMissing "
-    PathsDatalineLiteral = "paths "
     ScriptDatalineLiteral = "script "
     AttributesDatalineLiteral = "attributes "
     AutoRemoveDatalineLiteral = "autoRemove "
@@ -87,6 +86,9 @@ const (
     // Upserts the attributes of the existing element.
     FragmentMergeModeUpsertAttributes FragmentMergeMode = "upsertAttributes"
 
+    // Removes the existing element from the DOM.
+    FragmentMergeModeRemove FragmentMergeMode = "remove"
+
 )
 //endregion FragmentMergeMode
 
@@ -102,9 +104,6 @@ const (
 
     // An event for removing HTML fragments from the DOM.
     EventTypeRemoveFragments EventType = "datastar-remove-fragments"
-
-    // An event for removing signals.
-    EventTypeRemoveSignals EventType = "datastar-remove-signals"
 
     // An event for executing <script/> elements in the browser.
     EventTypeExecuteScript EventType = "datastar-execute-script"

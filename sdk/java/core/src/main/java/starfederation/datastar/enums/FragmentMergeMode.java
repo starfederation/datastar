@@ -27,7 +27,10 @@ public enum FragmentMergeMode {
     After("after"),
 
     // Upserts the attributes of the existing element.
-    UpsertAttributes("upsertAttributes");
+    UpsertAttributes("upsertAttributes"),
+
+    // Removes the existing element from the DOM.
+    Remove("remove");
 
     private final String value;
 

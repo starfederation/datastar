@@ -21,6 +21,8 @@ type FragmentMergeMode =
 | After
 /// Upserts the attributes of the existing element.
 | UpsertAttributes
+/// Removes the existing element from the DOM.
+| Remove
 
 type EventType =
 /// An event for merging HTML fragments into the DOM.
@@ -29,8 +31,6 @@ type EventType =
 | MergeSignals
 /// An event for removing HTML fragments from the DOM.
 | RemoveFragments
-/// An event for removing signals.
-| RemoveSignals
 /// An event for executing &lt;script/&gt; elements in the browser.
 | ExecuteScript
 
@@ -58,7 +58,6 @@ module Consts =
     let [<Literal>] DatastarDatalineUseViewTransition = "useViewTransition"
     let [<Literal>] DatastarDatalineSignals = "signals"
     let [<Literal>] DatastarDatalineOnlyIfMissing = "onlyIfMissing"
-    let [<Literal>] DatastarDatalinePaths = "paths"
     let [<Literal>] DatastarDatalineScript = "script"
     let [<Literal>] DatastarDatalineAttributes = "attributes"
     let [<Literal>] DatastarDatalineAutoRemove = "autoRemove"
@@ -74,6 +73,7 @@ module Consts =
                 | FragmentMergeMode.Before -> "before"
                 | FragmentMergeMode.After -> "after"
                 | FragmentMergeMode.UpsertAttributes -> "upsertAttributes"
+                | FragmentMergeMode.Remove -> "remove"
 
     module EventType =
         let toString this =
@@ -81,5 +81,4 @@ module Consts =
                 | EventType.MergeFragments -> "datastar-merge-fragments"
                 | EventType.MergeSignals -> "datastar-merge-signals"
                 | EventType.RemoveFragments -> "datastar-remove-fragments"
-                | EventType.RemoveSignals -> "datastar-remove-signals"
                 | EventType.ExecuteScript -> "datastar-execute-script"

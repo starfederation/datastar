@@ -63,7 +63,6 @@ Currently valid values are
 | datastar-merge-fragments  | Merges HTML fragments into the DOM  |
 | datastar-merge-signals    | Merges signals into the signals       |
 | datastar-remove-fragments | Removes HTML fragments from the DOM |
-| datastar-remove-signals   | Removes signals from the signals      |
 | datastar-execute-script   | Executes JavaScript in the browser  |
 
 ##### Options
@@ -137,6 +136,7 @@ Valid values should match the [FragmentMergeMode](#FragmentMergeMode) and curren
 | before           | Insert the fragment before the selector                 |
 | after            | Insert the fragment after the selector                  |
 | upsertAttributes | Update the attributes of the selector with the fragment |
+| remove           | Remove the existing element from the DOM                |
 
 ##### Options
 * `selector` (string) The CSS selector to use to insert the fragments.  If not provided or empty, Datastar **will** default to using the `id` attribute of the fragment.
@@ -230,11 +230,53 @@ data: onlyIfMissing true
 data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 ```
 
-`MergeSignals` is a helper function to send one or more signals to the browser to be merged into the signals.
+`MergeSignals` is a helper function to send one or more signals to the browser to be merged into the signals. This function implements [RFC 7386 JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386) semantics.
 
 #### Args
 
 Data is a JavaScript object or JSON string that will be sent to the browser to update signals in the signals.  The data ***must*** evaluate to a valid JavaScript.  It will be converted to signals by the Datastar client side.
+
+#### RFC 7386 JSON Merge Patch Behavior
+
+MergeSignals follows RFC 7386 JSON Merge Patch specification:
+
+* **Adding/Updating**: Properties in the patch object will be added to or update existing signals
+* **Removing**: Properties set to `null` in the patch object will **remove** the corresponding signal from the signals
+* **Nested Objects**: The merge operation works recursively on nested objects
+
+#### Examples
+
+**Adding a signal:**
+```json
+{"newSignal": "value"}
+```
+
+**Updating an existing signal:**
+```json
+{"existingSignal": "newValue"}
+```
+
+**Removing a signal using null:**
+```json
+{"signalToRemove": null}
+```
+
+**Complex merge with nested objects:**
+```json
+{
+  "user": {
+    "name": "John",
+    "email": null,
+    "preferences": {
+      "theme": "dark"
+    }
+  }
+}
+```
+This would:
+- Set `user.name` to "John"
+- Remove `user.email` (due to null value)
+- Set `user.preferences.theme` to "dark"
 
 ##### Options
 
@@ -246,48 +288,7 @@ When called the function ***must*** call `ServerSentEventGenerator.send` with th
 1. If `onlyIfMissing` is provided, the function ***must*** include it in the event data in the format `onlyIfMissing ONLY_IF_MISSING\n`, ***unless*** the value is the default of `false`.  `ONLY_IF_MISSING` should be `true` or `false` (string), depending on the value of the `onlyIfMissing` option.
 2. The function ***must*** include the signals in the event data, with each line prefixed with `signals `.  This ***should*** be output after all other event data.
 
-### `ServerSentEventGenerator.RemoveSignals`
 
-```html
-ServerSentEventGenerator.RemoveSignals(
-    paths: string[],
-    options?: {
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-    }
-)
-```
-
-#### Example Output
-
-Minimal:
-
-```
-event: datastar-remove-signals
-data: paths user.name
-data: paths user.email
-```
-
-Maximal:
-
-```
-event: datastar-remove-signals
-id: 123
-retry: 2000
-data: paths user.name
-data: paths user.email
-```
-
-`RemoveSignals` is a helper function to send signals to the browser to be removed from the signals.
-
-#### Args
-
-`paths` is a list of strings that represent the signal paths to be removed from the signals.  The paths ***must*** be valid `.` delimited paths to signals within the signals.  The Datastar client side will use these paths to remove the data from the signals.
-
-#### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-remove-signals` event type.
-
-1. The function ***must*** include the paths in the event data, with each line prefixed with `paths `.  Space-separated paths such as `paths foo.bar baz.qux.hello world` ***should*** be allowed.
 
 ### `ServerSentEventGenerator.ExecuteScript`
 
