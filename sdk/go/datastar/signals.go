@@ -3,18 +3,12 @@ package datastar
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/valyala/bytebufferpool"
-)
-
-var (
-	// ErrNoPathsProvided is returned when no paths were provided for // for [sse.RemoveSignals] call.
-	ErrNoPathsProvided = errors.New("no paths provided")
 )
 
 // mergeSignalsOptions holds configuration options for merging signals.
@@ -87,27 +81,6 @@ func (sse *ServerSentEventGenerator) MergeSignals(signalsContents []byte, opts .
 		sendOptions...,
 	); err != nil {
 		return fmt.Errorf("failed to send merge signals: %w", err)
-	}
-	return nil
-}
-
-// RemoveSignals sends a [EventTypeRemoveSignals] event to the client.
-// Requires a non-empty list of paths.
-func (sse *ServerSentEventGenerator) RemoveSignals(paths ...string) error {
-	if len(paths) == 0 {
-		return ErrNoPathsProvided
-	}
-
-	dataRows := make([]string, 0, len(paths))
-	for _, path := range paths {
-		dataRows = append(dataRows, PathsDatalineLiteral+path)
-	}
-
-	if err := sse.Send(
-		EventTypeRemoveSignals,
-		dataRows,
-	); err != nil {
-		return fmt.Errorf("failed to send remove signals: %w", err)
 	}
 	return nil
 }

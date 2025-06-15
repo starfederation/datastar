@@ -10,7 +10,7 @@ templ mergeOptionsView() {
 	<div id="contents" class="flex flex-col gap-8">
 		<div id="imTheTarget">Target DIV</div>
 		<div class="flex gap-2 flex-wrap justify-center">
-			for _, mergeMode := range datastar.ValidFragmentMergeTypes {
+			for _, mergeMode := range datastar.ValidElementMergeTypes {
 				<button
 					id={ string(mergeMode) }
 					class="btn btn-accent"

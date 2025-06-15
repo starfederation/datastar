@@ -8,17 +8,11 @@ namespace starfederation\datastar\enums;
 enum EventType: string
 {
 
-    // An event for merging HTML fragments into the DOM.
-    case MergeFragments = 'datastar-merge-fragments';
+    // An event for merging HTML elements into the DOM.
+    case MergeElements = 'datastar-merge-elements';
 
     // An event for merging signals.
     case MergeSignals = 'datastar-merge-signals';
-
-    // An event for removing HTML fragments from the DOM.
-    case RemoveFragments = 'datastar-remove-fragments';
-
-    // An event for removing signals.
-    case RemoveSignals = 'datastar-remove-signals';
 
     // An event for executing &lt;script/&gt; elements in the browser.
     case ExecuteScript = 'datastar-execute-script';

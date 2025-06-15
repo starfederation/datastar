@@ -24,8 +24,8 @@ export const DefaultExecuteScriptAttributes = "type module";
 
 // #region Default booleans
 
-// Should fragments be merged using the ViewTransition API?
-export const DefaultFragmentsUseViewTransitions = false;
+// Should elements be merged using the ViewTransition API?
+export const DefaultElementsUseViewTransitions = false;
 
 // Should a given set of signals merge if they are missing?
 export const DefaultMergeSignalsOnlyIfMissing = false;
@@ -39,11 +39,10 @@ export const DefaultExecuteScriptAutoRemove = true;
 
 export const DatastarDatalineSelector = "selector"
 export const DatastarDatalineMergeMode = "mergeMode"
-export const DatastarDatalineFragments = "fragments"
+export const DatastarDatalineElements = "elements"
 export const DatastarDatalineUseViewTransition = "useViewTransition"
 export const DatastarDatalineSignals = "signals"
 export const DatastarDatalineOnlyIfMissing = "onlyIfMissing"
-export const DatastarDatalinePaths = "paths"
 export const DatastarDatalineScript = "script"
 export const DatastarDatalineAttributes = "attributes"
 export const DatastarDatalineAutoRemove = "autoRemove"
@@ -52,39 +51,33 @@ export const DatastarDatalineAutoRemove = "autoRemove"
 
 // #region Enums
 
-// The mode in which a fragment is merged into the DOM.
-export const FragmentMergeModes = [
-// Morphs the fragment into the existing element using idiomorph.
-    "morph",
-// Replaces the inner HTML of the existing element.
-    "inner",
-// Replaces the outer HTML of the existing element.
+// The mode in which an element is merged into the DOM.
+export const ElementMergeModes = [
+// Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
     "outer",
-// Prepends the fragment to the existing element.
+// Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    "inner",
+// Removes the existing element from the DOM.
+    "remove",
+// Prepends the element inside the existing element.
     "prepend",
-// Appends the fragment to the existing element.
+// Appends the element inside the existing element.
     "append",
-// Inserts the fragment before the existing element.
+// Inserts the element before the existing element.
     "before",
-// Inserts the fragment after the existing element.
+// Inserts the element after the existing element.
     "after",
-// Upserts the attributes of the existing element.
-    "upsertAttributes",
 ] as const;
 
-// Default value for FragmentMergeMode
-export const DefaultFragmentMergeMode = "morph";
+// Default value for ElementMergeMode
+export const DefaultElementMergeMode = "outer";
 
 // The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 export const EventTypes = [
-// An event for merging HTML fragments into the DOM.
-    "datastar-merge-fragments",
+// An event for merging HTML elements into the DOM.
+    "datastar-merge-elements",
 // An event for merging signals.
     "datastar-merge-signals",
-// An event for removing HTML fragments from the DOM.
-    "datastar-remove-fragments",
-// An event for removing signals.
-    "datastar-remove-signals",
 // An event for executing <script/> elements in the browser.
     "datastar-execute-script",
 ] as const;

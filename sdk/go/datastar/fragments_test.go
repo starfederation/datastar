@@ -2,19 +2,19 @@ package datastar
 
 import "testing"
 
-func TestAllValidFragmentMergeTypes(t *testing.T) {
+func TestAllValidElementMergeTypes(t *testing.T) {
 	var err error
-	for _, validType := range ValidFragmentMergeTypes {
-		if _, err = FragmentMergeTypeFromString(string(validType)); err != nil {
-			t.Errorf("Expected %v to be a valid fragment merge type, but it was rejected: %v", validType, err)
+	for _, validType := range ValidElementMergeTypes {
+		if _, err = ElementMergeTypeFromString(string(validType)); err != nil {
+			t.Errorf("Expected %v to be a valid element merge type, but it was rejected: %v", validType, err)
 		}
 	}
 
-	if _, err = FragmentMergeTypeFromString(""); err == nil {
-		t.Errorf("Expected an empty string to be an invalid fragment merge type, but it was accepted")
+	if _, err = ElementMergeTypeFromString(""); err == nil {
+		t.Errorf("Expected an empty string to be an invalid element merge type, but it was accepted")
 	}
 
-	if _, err = FragmentMergeTypeFromString("fakeType"); err == nil {
-		t.Errorf("Expected a fake type to be an invalid fragment merge type, but it was accepted")
+	if _, err = ElementMergeTypeFromString("fakeType"); err == nil {
+		t.Errorf("Expected a fake type to be an invalid element merge type, but it was accepted")
 	}
 }

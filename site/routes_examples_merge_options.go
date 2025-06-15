@@ -60,22 +60,22 @@ func setupExamplesMergeOptions(examplesRouter chi.Router) error {
 			sse.RemoveFragments("#target")
 			return
 		default:
-			mergeMode, err := datastar.FragmentMergeTypeFromString(mergeModeRaw)
+			mergeMode, err := datastar.ElementMergeTypeFromString(mergeModeRaw)
 			if err != nil {
 				sse.ConsoleError(err)
 				return
 			}
 
-			if !lo.Contains(datastar.ValidFragmentMergeTypes, mergeMode) {
+			if !lo.Contains(datastar.ValidElementMergeTypes, mergeMode) {
 				http.Error(w, "invalid merge mode", http.StatusBadRequest)
 				return
 			}
 
-			idx := lo.IndexOf(datastar.ValidFragmentMergeTypes, mergeMode)
+			idx := lo.IndexOf(datastar.ValidElementMergeTypes, mergeMode)
 			now := time.Now().UTC().Format(time.RFC3339)
 			h := fmt.Sprint(xxh3.HashString(now))
 			frag := mergeOptionsViewUpdate(brewerColorsBG[idx], brewrColorsFG[idx], h)
-			sse.MergeFragmentTempl(frag, datastar.WithMergeMode(mergeMode), datastar.WithSelector("#imTheTarget"))
+			sse.MergeElementTempl(frag, datastar.WithMergeMode(mergeMode), datastar.WithSelector("#imTheTarget"))
 		}
 	})
 

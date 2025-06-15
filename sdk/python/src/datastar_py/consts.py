@@ -11,49 +11,40 @@ class StrEnum(str, Enum):
 # region Enums
 
 
-# region The mode in which a fragment is merged into the DOM.
-class FragmentMergeMode(StrEnum):
-    # Morphs the fragment into the existing element using idiomorph.
-    MORPH = "morph"
-
-    # Replaces the inner HTML of the existing element.
-    INNER = "inner"
-
-    # Replaces the outer HTML of the existing element.
+# region The mode in which an element is merged into the DOM.
+class ElementMergeMode(StrEnum):
+    # Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
     OUTER = "outer"
 
-    # Prepends the fragment to the existing element.
+    # Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    INNER = "inner"
+
+    # Removes the existing element from the DOM.
+    REMOVE = "remove"
+
+    # Prepends the element inside the existing element.
     PREPEND = "prepend"
 
-    # Appends the fragment to the existing element.
+    # Appends the element inside the existing element.
     APPEND = "append"
 
-    # Inserts the fragment before the existing element.
+    # Inserts the element before the existing element.
     BEFORE = "before"
 
-    # Inserts the fragment after the existing element.
+    # Inserts the element after the existing element.
     AFTER = "after"
 
-    # Upserts the attributes of the existing element.
-    UPSERT_ATTRIBUTES = "upsertAttributes"
 
-
-# endregion FragmentMergeMode
+# endregion ElementMergeMode
 
 
 # region The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 class EventType(StrEnum):
-    # An event for merging HTML fragments into the DOM.
-    MERGE_FRAGMENTS = "datastar-merge-fragments"
+    # An event for merging HTML elements into the DOM.
+    MERGE_ELEMENTS = "datastar-merge-elements"
 
     # An event for merging signals.
     MERGE_SIGNALS = "datastar-merge-signals"
-
-    # An event for removing HTML fragments from the DOM.
-    REMOVE_FRAGMENTS = "datastar-remove-fragments"
-
-    # An event for removing signals.
-    REMOVE_SIGNALS = "datastar-remove-signals"
 
     # An event for executing <script/> elements in the browser.
     EXECUTE_SCRIPT = "datastar-execute-script"
@@ -84,11 +75,10 @@ DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = "type module"
 # region Dataline literals
 SELECTOR_DATALINE_LITERAL = "selector"
 MERGE_MODE_DATALINE_LITERAL = "mergeMode"
-FRAGMENTS_DATALINE_LITERAL = "fragments"
+ELEMENTS_DATALINE_LITERAL = "elements"
 USE_VIEW_TRANSITION_DATALINE_LITERAL = "useViewTransition"
 SIGNALS_DATALINE_LITERAL = "signals"
 ONLY_IF_MISSING_DATALINE_LITERAL = "onlyIfMissing"
-PATHS_DATALINE_LITERAL = "paths"
 SCRIPT_DATALINE_LITERAL = "script"
 ATTRIBUTES_DATALINE_LITERAL = "attributes"
 AUTO_REMOVE_DATALINE_LITERAL = "autoRemove"
@@ -96,8 +86,8 @@ AUTO_REMOVE_DATALINE_LITERAL = "autoRemove"
 
 # region Default booleans
 
-# Should fragments be merged using the ViewTransition API?
-DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS = False
+# Should elements be merged using the ViewTransition API?
+DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS = False
 
 # Should a given set of signals merge if they are missing?
 DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING = False

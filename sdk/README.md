@@ -60,10 +60,8 @@ Currently valid values are
 
 | Event                     | Description                         |
 |---------------------------|-------------------------------------|
-| datastar-merge-fragments  | Merges HTML fragments into the DOM  |
+| datastar-merge-elements   | Merges HTML elements into the DOM   |
 | datastar-merge-signals    | Merges signals into the signals       |
-| datastar-remove-fragments | Removes HTML fragments from the DOM |
-| datastar-remove-signals   | Removes signals from the signals      |
 | datastar-execute-script   | Executes JavaScript in the browser  |
 
 ##### Options
@@ -79,14 +77,14 @@ When called the function ***must*** write to the response buffer the following i
 5. ***Must*** write a `\n\n` to complete the event per the SSE spec.
 6. Afterward the writer ***should*** immediately flush.  This can be confounded by other middlewares such as compression layers.
 
-### `ServerSentEventGenerator.MergeFragments`
+### `ServerSentEventGenerator.MergeElements`
 
 ```
-ServerSentEventGenerator.MergeFragments(
-    fragments: string,
+ServerSentEventGenerator.MergeElements(
+    elements: string,
     options?: {
         selector?: string,
-        mergeMode?: FragmentMergeMode,
+        mergeMode?: ElementMergeMode,
         useViewTransition?: boolean,
         eventId?: string,
         retryDuration?: durationInMilliseconds
@@ -99,103 +97,85 @@ ServerSentEventGenerator.MergeFragments(
 Minimal:
 
 ```
-event: datastar-merge-fragments
-data: fragments <div id="feed">
-data: fragments     <span>1</span>
-data: fragments </div>
+event: datastar-merge-elements
+data: elements <div id="feed">
+data: elements     <span>1</span>
+data: elements </div>
 ```
 
 Maximal:
 
 ```
-event: datastar-merge-fragments
+event: datastar-merge-elements
 id: 123
 retry: 2000
 data: selector #feed
 data: useViewTransition true
-data: fragments <div id="feed">
-data: fragments     <span>1</span>
-data: fragments </div>
+data: elements <div id="feed">
+data: elements     <span>1</span>
+data: elements </div>
 ```
 
-`MergeFragments` is a helper function to send HTML fragments to the browser to be merged into the DOM.
+`MergeElements` is a helper function to send HTML elements to the browser to be merged into the DOM. To remove elements, use the `remove` merge mode.
+
+#### Elements vs Fragments: Datastar vs HTMX
+
+**Important:** Datastar works with complete HTML **elements**, not HTML fragments like HTMX.
+
+**Datastar approach (elements):**
+- Sends complete, well-formed HTML elements: `<div id="content">Hello</div>`
+- Elements must be valid, standalone HTML with proper opening/closing tags
+- Browser can parse and work with elements using standard DOM APIs
+- Matches browser semantic understanding of HTML structure
+
+**HTMX approach (fragments):**
+- Can send partial HTML fragments: `Hello <strong>World</strong>`
+- Fragments may not be complete elements (missing tags, partial content)
+- Requires special handling to insert into DOM
+
+This element-based approach ensures better compatibility with browser standards, easier debugging, and more predictable behavior when working with the DOM.
 
 #### Args
 
-##### FragmentMergeMode
+##### ElementMergeMode
 
-An enum of Datastar supported fragment merge modes.  Will be a string over the wire
-Valid values should match the [FragmentMergeMode](#FragmentMergeMode) and currently include
+An enum of Datastar supported element merge modes.  Will be a string over the wire
+Valid values should match the [ElementMergeMode](#ElementMergeMode) and currently include
+
+#### Morphing vs Non-Morphing Modes
+
+**Morphing modes** (`outer` and `inner`) use Datastar's custom morphing algorithm to intelligently merge elements:
+- **Preserves focus** on form elements and interactive components
+- **Minimizes DOM changes** by only updating what has actually changed
+- **Maintains scroll position** and other element state
+- **Provides smooth transitions** between content updates
+
+**Non-morphing modes** (`replace`, `prepend`, `append`, `before`, `after`) perform direct DOM manipulation:
+- **Faster execution** for simple content replacement
+- **Complete replacement** of target elements
+- **No state preservation** - focus and scroll position may be lost
 
 | Mode             | Description                                             |
 |------------------|---------------------------------------------------------|
-| morph            | Use Idiomorph to merge the fragment into the DOM        |
-| inner            | Replace the innerHTML of the selector with the fragment |
-| outer            | Replace the outerHTML of the selector with the fragment |
-| prepend          | Prepend the fragment to the selector                    |
-| append           | Append the fragment to the selector                     |
-| before           | Insert the fragment before the selector                 |
-| after            | Insert the fragment after the selector                  |
-| upsertAttributes | Update the attributes of the selector with the fragment |
+| outer            | Use Datastar's morphing to merge the element into the DOM, preserving focus and minimizing element changes |
+| inner            | Use Datastar's morphing to merge the element into the innerHTML, preserving focus and minimizing element changes |
+| prepend          | Prepend the element to the selector                     |
+| append           | Append the element to the selector                      |
+| before           | Insert the element before the selector                  |
+| after            | Insert the element after the selector                   |
+| remove           | Remove the existing element from the DOM                |
 
 ##### Options
-* `selector` (string) The CSS selector to use to insert the fragments.  If not provided or empty, Datastar **will** default to using the `id` attribute of the fragment.
-* `mergeMode` (FragmentMergeMode) The mode to use when merging the fragment into the DOM.  If not provided the Datastar client side ***will*** default to `morph`.
+* `selector` (string) The CSS selector to use to insert the elements.  If not provided or empty, Datastar **will** default to using the `id` attribute of the element.
+* `mergeMode` (ElementMergeMode) The mode to use when merging the element into the DOM.  If not provided the Datastar client side ***will*** default to `outer`.
 * `useViewTransition` Whether to use view transitions, if not provided the Datastar client side ***will*** default to `false`.
 
 #### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-merge-fragments` event type.
+When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-merge-elements` event type.
 1. If `selector` is provided, the function ***must*** include the selector in the event data in the format `selector SELECTOR\n`, ***unless*** the selector is empty.
-2. If `mergeMode` is provided, the function ***must*** include the merge mode in the event data in the format `merge MERGE_MODE\n`, ***unless*** the value is the default of `morph`.
+2. If `mergeMode` is provided, the function ***must*** include the merge mode in the event data in the format `merge MERGE_MODE\n`, ***unless*** the value is the default of `outer`.
 3. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
-4. The function ***must*** include the fragments in the event data, with each line prefixed with `fragments `. This ***should*** be output after all other event data.
-
-### `ServerSentEventGenerator.RemoveFragments`
-
-```
-ServerSentEventGenerator.RemoveFragments(
-    selector: string,
-    options?: {
-        useViewTransition?: boolean,
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-    }
-)
-```
-
-#### Example Output
-
-Minimal:
-
-```
-event: datastar-remove-fragments
-data: selector #target
-```
-
-Maximal:
-
-```
-event: datastar-remove-fragments
-id: 123
-retry: 2000
-data: selector #target
-data: useViewTransition true
-```
-
-`RemoveFragments` is a helper function to send a selector to the browser to remove HTML fragments from the DOM.
-
-#### Args
-
-`selector` is a CSS selector that represents the fragments to be removed from the DOM.  The selector ***must*** be a valid CSS selector.  The Datastar client side will use this selector to remove the fragment from the DOM.
-
-##### Options
-
-* `useViewTransition` Whether to use view transitions, if not provided the Datastar client side ***will*** default to `false`.
-
-#### Logic
-1. When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-remove-fragments` event type.
-2. The function ***must*** include the selector in the event data in the format `selector SELECTOR\n`.
-3. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
+4. The function ***must*** include the elements in the event data, with each line prefixed with `elements `. This ***should*** be output after all other event data.
 
 
 ### `ServerSentEventGenerator.MergeSignals`
@@ -230,11 +210,53 @@ data: onlyIfMissing true
 data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 ```
 
-`MergeSignals` is a helper function to send one or more signals to the browser to be merged into the signals.
+`MergeSignals` is a helper function to send one or more signals to the browser to be merged into the signals. This function implements [RFC 7386 JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386) semantics.
 
 #### Args
 
 Data is a JavaScript object or JSON string that will be sent to the browser to update signals in the signals.  The data ***must*** evaluate to a valid JavaScript.  It will be converted to signals by the Datastar client side.
+
+#### RFC 7386 JSON Merge Patch Behavior
+
+MergeSignals follows RFC 7386 JSON Merge Patch specification:
+
+* **Adding/Updating**: Properties in the patch object will be added to or update existing signals
+* **Removing**: Properties set to `null` in the patch object will **remove** the corresponding signal from the signals
+* **Nested Objects**: The merge operation works recursively on nested objects
+
+#### Examples
+
+**Adding a signal:**
+```json
+{"newSignal": "value"}
+```
+
+**Updating an existing signal:**
+```json
+{"existingSignal": "newValue"}
+```
+
+**Removing a signal using null:**
+```json
+{"signalToRemove": null}
+```
+
+**Complex merge with nested objects:**
+```json
+{
+  "user": {
+    "name": "John",
+    "email": null,
+    "preferences": {
+      "theme": "dark"
+    }
+  }
+}
+```
+This would:
+- Set `user.name` to "John"
+- Remove `user.email` (due to null value)
+- Set `user.preferences.theme` to "dark"
 
 ##### Options
 
@@ -246,48 +268,7 @@ When called the function ***must*** call `ServerSentEventGenerator.send` with th
 1. If `onlyIfMissing` is provided, the function ***must*** include it in the event data in the format `onlyIfMissing ONLY_IF_MISSING\n`, ***unless*** the value is the default of `false`.  `ONLY_IF_MISSING` should be `true` or `false` (string), depending on the value of the `onlyIfMissing` option.
 2. The function ***must*** include the signals in the event data, with each line prefixed with `signals `.  This ***should*** be output after all other event data.
 
-### `ServerSentEventGenerator.RemoveSignals`
 
-```html
-ServerSentEventGenerator.RemoveSignals(
-    paths: string[],
-    options?: {
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-    }
-)
-```
-
-#### Example Output
-
-Minimal:
-
-```
-event: datastar-remove-signals
-data: paths user.name
-data: paths user.email
-```
-
-Maximal:
-
-```
-event: datastar-remove-signals
-id: 123
-retry: 2000
-data: paths user.name
-data: paths user.email
-```
-
-`RemoveSignals` is a helper function to send signals to the browser to be removed from the signals.
-
-#### Args
-
-`paths` is a list of strings that represent the signal paths to be removed from the signals.  The paths ***must*** be valid `.` delimited paths to signals within the signals.  The Datastar client side will use these paths to remove the data from the signals.
-
-#### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-remove-signals` event type.
-
-1. The function ***must*** include the paths in the event data, with each line prefixed with `paths `.  Space-separated paths such as `paths foo.bar baz.qux.hello world` ***should*** be allowed.
 
 ### `ServerSentEventGenerator.ExecuteScript`
 
