@@ -52,9 +52,6 @@ class EventType(StrEnum):
     # An event for merging signals.
     MERGE_SIGNALS = "datastar-merge-signals"
 
-    # An event for removing HTML fragments from the DOM.
-    REMOVE_FRAGMENTS = "datastar-remove-fragments"
-
     # An event for executing <script/> elements in the browser.
     EXECUTE_SCRIPT = "datastar-execute-script"
 

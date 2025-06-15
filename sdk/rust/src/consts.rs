@@ -100,8 +100,6 @@ pub enum EventType {
     MergeFragments,
     /// An event for merging signals.
     MergeSignals,
-    /// An event for removing HTML fragments from the DOM.
-    RemoveFragments,
     /// An event for executing <script/> elements in the browser.
     ExecuteScript,
 }
@@ -112,7 +110,6 @@ impl EventType {
         match self {
             Self::MergeFragments => "datastar-merge-fragments",
             Self::MergeSignals => "datastar-merge-signals",
-            Self::RemoveFragments => "datastar-remove-fragments",
             Self::ExecuteScript => "datastar-execute-script",
         }
     }

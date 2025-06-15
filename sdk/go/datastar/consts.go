@@ -7,8 +7,8 @@ import "time"
 const (
     DatastarKey = "datastar"
     Version                   = "1.0.0-beta.11"
-    VersionClientByteSize     = 39886
-    VersionClientByteSizeGzip = 14868
+    VersionClientByteSize     = 39846
+    VersionClientByteSizeGzip = 14861
 
     //region Default durations
 
@@ -101,9 +101,6 @@ const (
 
     // An event for merging signals.
     EventTypeMergeSignals EventType = "datastar-merge-signals"
-
-    // An event for removing HTML fragments from the DOM.
-    EventTypeRemoveFragments EventType = "datastar-remove-fragments"
 
     // An event for executing <script/> elements in the browser.
     EventTypeExecuteScript EventType = "datastar-execute-script"

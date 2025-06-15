@@ -240,11 +240,6 @@ var Consts = &ConstTemplateData{
 					Value:       "datastar-merge-signals",
 				},
 				{
-					Name:        toolbelt.ToCasedString("RemoveFragments"),
-					Description: "An event for removing HTML fragments from the DOM.",
-					Value:       "datastar-remove-fragments",
-				},
-				{
 					Name:        toolbelt.ToCasedString("ExecuteScript"),
 					Description: "An event for executing <script/> elements in the browser.",
 					Value:       "datastar-execute-script",

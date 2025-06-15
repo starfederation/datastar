@@ -71,8 +71,6 @@ export const EventTypes = {
     MergeFragments: "datastar-merge-fragments",
     // An event for merging signals.
     MergeSignals: "datastar-merge-signals",
-    // An event for removing HTML fragments from the DOM.
-    RemoveFragments: "datastar-remove-fragments",
     // An event for executing <script/> elements in the browser.
     ExecuteScript: "datastar-execute-script",
 } as const;

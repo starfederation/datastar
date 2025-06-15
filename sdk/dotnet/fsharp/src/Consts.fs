@@ -29,8 +29,6 @@ type EventType =
 | MergeFragments
 /// An event for merging signals.
 | MergeSignals
-/// An event for removing HTML fragments from the DOM.
-| RemoveFragments
 /// An event for executing &lt;script/&gt; elements in the browser.
 | ExecuteScript
 
@@ -80,5 +78,4 @@ module Consts =
             match this with
                 | EventType.MergeFragments -> "datastar-merge-fragments"
                 | EventType.MergeSignals -> "datastar-merge-signals"
-                | EventType.RemoveFragments -> "datastar-remove-fragments"
                 | EventType.ExecuteScript -> "datastar-execute-script"

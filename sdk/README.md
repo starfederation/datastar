@@ -62,7 +62,6 @@ Currently valid values are
 |---------------------------|-------------------------------------|
 | datastar-merge-fragments  | Merges HTML fragments into the DOM  |
 | datastar-merge-signals    | Merges signals into the signals       |
-| datastar-remove-fragments | Removes HTML fragments from the DOM |
 | datastar-execute-script   | Executes JavaScript in the browser  |
 
 ##### Options
@@ -117,7 +116,7 @@ data: fragments     <span>1</span>
 data: fragments </div>
 ```
 
-`MergeFragments` is a helper function to send HTML fragments to the browser to be merged into the DOM.
+`MergeFragments` is a helper function to send HTML fragments to the browser to be merged into the DOM. To remove fragments, use the `remove` merge mode.
 
 #### Args
 
@@ -149,53 +148,6 @@ When called the function ***must*** call `ServerSentEventGenerator.send` with th
 2. If `mergeMode` is provided, the function ***must*** include the merge mode in the event data in the format `merge MERGE_MODE\n`, ***unless*** the value is the default of `morph`.
 3. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
 4. The function ***must*** include the fragments in the event data, with each line prefixed with `fragments `. This ***should*** be output after all other event data.
-
-### `ServerSentEventGenerator.RemoveFragments`
-
-```
-ServerSentEventGenerator.RemoveFragments(
-    selector: string,
-    options?: {
-        useViewTransition?: boolean,
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-    }
-)
-```
-
-#### Example Output
-
-Minimal:
-
-```
-event: datastar-remove-fragments
-data: selector #target
-```
-
-Maximal:
-
-```
-event: datastar-remove-fragments
-id: 123
-retry: 2000
-data: selector #target
-data: useViewTransition true
-```
-
-`RemoveFragments` is a helper function to send a selector to the browser to remove HTML fragments from the DOM.
-
-#### Args
-
-`selector` is a CSS selector that represents the fragments to be removed from the DOM.  The selector ***must*** be a valid CSS selector.  The Datastar client side will use this selector to remove the fragment from the DOM.
-
-##### Options
-
-* `useViewTransition` Whether to use view transitions, if not provided the Datastar client side ***will*** default to `false`.
-
-#### Logic
-1. When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-remove-fragments` event type.
-2. The function ***must*** include the selector in the event data in the format `selector SELECTOR\n`.
-3. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
 
 
 ### `ServerSentEventGenerator.MergeSignals`

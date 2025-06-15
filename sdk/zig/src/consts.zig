@@ -102,8 +102,6 @@ pub const EventType = enum {
     merge_fragments,
     /// An event for merging signals.
     merge_signals,
-    /// An event for removing HTML fragments from the DOM.
-    remove_fragments,
     /// An event for executing <script/> elements in the browser.
     execute_script,
 
@@ -120,7 +118,6 @@ pub const EventType = enum {
             switch (self) {
                 .merge_fragments => "datastar-merge-fragments",
                 .merge_signals => "datastar-merge-signals",
-                .remove_fragments => "datastar-remove-fragments",
                 .execute_script => "datastar-execute-script",
             },
         );

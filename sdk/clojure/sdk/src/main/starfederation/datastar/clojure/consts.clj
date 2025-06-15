@@ -116,10 +116,6 @@
   "An event for merging signals."
   "datastar-merge-signals")
 
-(def event-type-remove-fragments
-  "An event for removing HTML fragments from the DOM."
-  "datastar-remove-fragments")
-
 (def event-type-execute-script
   "An event for executing <script/> elements in the browser."
   "datastar-execute-script")
