@@ -39,15 +39,15 @@ Normal JavaScript operators are also available in Datastar expressions. This inc
 For example, the following would only trigger a post action if the signal is logically true.
 
 ```html
-<button data-on-click="$landingGearRetracted && @post('/launch')"></div
+<button data-on-click="$landingGearRetracted && @post('/launch')"></button>
 
-<button data-on-click="$landingGearState == 'retracted' && @post('/launch')"></div
+<button data-on-click="$landingGearState == 'retracted' && @post('/launch')"></button>
 ```
 
 The ternary operator is useful to choose among two options:
 
 ```html
-<div data-attr-class="$theme == 'dark' ? 'bg-black text-white' : 'bg-white text-black'"
+<div data-attr-class="$theme == 'dark' ? 'bg-black text-white' : 'bg-white text-black'"></div>
 ```
 
 ## Namespaced Signals
