@@ -8,98 +8,98 @@ import (
 	"github.com/valyala/bytebufferpool"
 )
 
-// ValidFragmentMergeTypes is a list of valid fragment merge modes.
-var ValidFragmentMergeTypes = []FragmentMergeMode{
-	FragmentMergeModeOuter,
-	FragmentMergeModeInner,
-	FragmentMergeModeRemove,
-	FragmentMergeModePrepend,
-	FragmentMergeModeAppend,
-	FragmentMergeModeBefore,
-	FragmentMergeModeAfter,
+// ValidElementMergeTypes is a list of valid element merge modes.
+var ValidElementMergeTypes = []ElementMergeMode{
+	ElementMergeModeOuter,
+	ElementMergeModeInner,
+	ElementMergeModeRemove,
+	ElementMergeModePrepend,
+	ElementMergeModeAppend,
+	ElementMergeModeBefore,
+	ElementMergeModeAfter,
 }
 
-// FragmentMergeTypeFromString converts a string to a [FragmentMergeMode].
-func FragmentMergeTypeFromString(s string) (FragmentMergeMode, error) {
+// ElementMergeTypeFromString converts a string to a [ElementMergeMode].
+func ElementMergeTypeFromString(s string) (ElementMergeMode, error) {
 	switch s {
 	case "outer":
-		return FragmentMergeModeOuter, nil
+		return ElementMergeModeOuter, nil
 	case "inner":
-		return FragmentMergeModeInner, nil
+		return ElementMergeModeInner, nil
 	case "remove":
-		return FragmentMergeModeRemove, nil
+		return ElementMergeModeRemove, nil
 	case "prepend":
-		return FragmentMergeModePrepend, nil
+		return ElementMergeModePrepend, nil
 	case "append":
-		return FragmentMergeModeAppend, nil
+		return ElementMergeModeAppend, nil
 	case "before":
-		return FragmentMergeModeBefore, nil
+		return ElementMergeModeBefore, nil
 	case "after":
-		return FragmentMergeModeAfter, nil
+		return ElementMergeModeAfter, nil
 	default:
-		return "", fmt.Errorf("invalid fragment merge type: %s", s)
+		return "", fmt.Errorf("invalid element merge type: %s", s)
 	}
 }
 
-// WithMergeOuter creates a MergeFragmentOption that merges fragments using the outer mode (idiomorph).
-func WithMergeOuter() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModeOuter)
+// WithMergeOuter creates a MergeElementOption that merges elements using the outer mode.
+func WithMergeOuter() MergeElementOption {
+	return WithMergeMode(ElementMergeModeOuter)
 }
 
-// WithMergeInner creates a MergeFragmentOption that merges fragments using the inner mode.
-func WithMergeInner() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModeInner)
+// WithMergeInner creates a MergeElementOption that merges elements using the inner mode.
+func WithMergeInner() MergeElementOption {
+	return WithMergeMode(ElementMergeModeInner)
 }
 
-// WithMergeRemove creates a MergeFragmentOption that removes elements from the DOM.
-func WithMergeRemove() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModeRemove)
+// WithMergeRemove creates a MergeElementOption that removes elements from the DOM.
+func WithMergeRemove() MergeElementOption {
+	return WithMergeMode(ElementMergeModeRemove)
 }
 
-// WithMergePrepend creates a MergeFragmentOption that merges fragments using the prepend mode.
-func WithMergePrepend() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModePrepend)
+// WithMergePrepend creates a MergeElementOption that merges elements using the prepend mode.
+func WithMergePrepend() MergeElementOption {
+	return WithMergeMode(ElementMergeModePrepend)
 }
 
-// WithMergeAppend creates a MergeFragmentOption that merges fragments using the append mode.
-func WithMergeAppend() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModeAppend)
+// WithMergeAppend creates a MergeElementOption that merges elements using the append mode.
+func WithMergeAppend() MergeElementOption {
+	return WithMergeMode(ElementMergeModeAppend)
 }
 
-// WithMergeBefore creates a MergeFragmentOption that merges fragments using the before mode.
-func WithMergeBefore() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModeBefore)
+// WithMergeBefore creates a MergeElementOption that merges elements using the before mode.
+func WithMergeBefore() MergeElementOption {
+	return WithMergeMode(ElementMergeModeBefore)
 }
 
-// WithMergeAfter creates a MergeFragmentOption that merges fragments using the after mode.
-func WithMergeAfter() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModeAfter)
+// WithMergeAfter creates a MergeElementOption that merges elements using the after mode.
+func WithMergeAfter() MergeElementOption {
+	return WithMergeMode(ElementMergeModeAfter)
 }
 
 // WithSelectorID is a convenience wrapper for [WithSelector] option
 // equivalent to calling `WithSelector("#"+id)`.
-func WithSelectorID(id string) MergeFragmentOption {
+func WithSelectorID(id string) MergeElementOption {
 	return WithSelector("#" + id)
 }
 
-// WithViewTransitions enables the use of view transitions when merging fragments.
-func WithViewTransitions() MergeFragmentOption {
-	return func(o *mergeFragmentOptions) {
+// WithViewTransitions enables the use of view transitions when merging elements.
+func WithViewTransitions() MergeElementOption {
+	return func(o *mergeElementOptions) {
 		o.UseViewTransitions = true
 	}
 }
 
-// WithoutViewTransitions disables the use of view transitions when merging fragments.
-func WithoutViewTransitions() MergeFragmentOption {
-	return func(o *mergeFragmentOptions) {
+// WithoutViewTransitions disables the use of view transitions when merging elements.
+func WithoutViewTransitions() MergeElementOption {
+	return func(o *mergeElementOptions) {
 		o.UseViewTransitions = false
 	}
 }
 
-// MergeFragmentf is a convenience wrapper for [MergeFragments] option
-// equivalent to calling `MergeFragments(fmt.Sprintf(format, args...))`.
-func (sse *ServerSentEventGenerator) MergeFragmentf(format string, args ...any) error {
-	return sse.MergeFragments(fmt.Sprintf(format, args...))
+// MergeElementf is a convenience wrapper for [MergeElements] option
+// equivalent to calling `MergeElements(fmt.Sprintf(format, args...))`.
+func (sse *ServerSentEventGenerator) MergeElementf(format string, args ...any) error {
+	return sse.MergeElements(fmt.Sprintf(format, args...))
 }
 
 // TemplComponent satisfies the component rendering interface for HTML template engine [Templ].
@@ -111,15 +111,15 @@ type TemplComponent interface {
 	Render(ctx context.Context, w io.Writer) error
 }
 
-// MergeFragmentTempl is a convenience adaptor of [sse.MergeFragments] for [TemplComponent].
-func (sse *ServerSentEventGenerator) MergeFragmentTempl(c TemplComponent, opts ...MergeFragmentOption) error {
+// MergeElementTempl is a convenience adaptor of [sse.MergeElements] for [TemplComponent].
+func (sse *ServerSentEventGenerator) MergeElementTempl(c TemplComponent, opts ...MergeElementOption) error {
 	buf := bytebufferpool.Get()
 	defer bytebufferpool.Put(buf)
 	if err := c.Render(sse.Context(), buf); err != nil {
-		return fmt.Errorf("failed to merge fragment: %w", err)
+		return fmt.Errorf("failed to merge element: %w", err)
 	}
-	if err := sse.MergeFragments(buf.String(), opts...); err != nil {
-		return fmt.Errorf("failed to merge fragment: %w", err)
+	if err := sse.MergeElements(buf.String(), opts...); err != nil {
+		return fmt.Errorf("failed to merge element: %w", err)
 	}
 	return nil
 }
@@ -133,15 +133,15 @@ type GoStarElementRenderer interface {
 	Render(w io.Writer) error
 }
 
-// MergeFragmentGostar is a convenience adaptor of [sse.MergeFragments] for [GoStarElementRenderer].
-func (sse *ServerSentEventGenerator) MergeFragmentGostar(child GoStarElementRenderer, opts ...MergeFragmentOption) error {
+// MergeElementGostar is a convenience adaptor of [sse.MergeElements] for [GoStarElementRenderer].
+func (sse *ServerSentEventGenerator) MergeElementGostar(child GoStarElementRenderer, opts ...MergeElementOption) error {
 	buf := bytebufferpool.Get()
 	defer bytebufferpool.Put(buf)
 	if err := child.Render(buf); err != nil {
 		return fmt.Errorf("failed to render: %w", err)
 	}
-	if err := sse.MergeFragments(buf.String(), opts...); err != nil {
-		return fmt.Errorf("failed to merge fragment: %w", err)
+	if err := sse.MergeElements(buf.String(), opts...); err != nil {
+		return fmt.Errorf("failed to merge element: %w", err)
 	}
 	return nil
 }

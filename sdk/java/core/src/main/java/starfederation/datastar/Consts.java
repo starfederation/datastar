@@ -12,8 +12,8 @@ public final class Consts {
     // The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     public static final int DEFAULT_SSE_RETRY_DURATION = 1000;
 
-    // Should fragments be merged using the ViewTransition API?
-    public static final boolean DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS = false;
+    // Should elements be merged using the ViewTransition API?
+    public static final boolean DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS = false;
 
     // Should a given set of signals merge if they are missing?
     public static final boolean DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING = false;
@@ -24,13 +24,13 @@ public final class Consts {
     // The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
     public static final String DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = "type module";
 
-    // The mode in which a fragment is merged into the DOM.
-    public static final FragmentMergeMode DEFAULT_FRAGMENT_MERGE_MODE = FragmentMergeMode.Outer;
+    // The mode in which an element is merged into the DOM.
+    public static final FragmentMergeMode DEFAULT_ELEMENT_MERGE_MODE = FragmentMergeMode.Outer;
 
     // Dataline literals.
     public static final String SELECTOR_DATALINE_LITERAL = "selector ";
     public static final String MERGE_MODE_DATALINE_LITERAL = "mergeMode ";
-    public static final String FRAGMENTS_DATALINE_LITERAL = "fragments ";
+    public static final String ELEMENTS_DATALINE_LITERAL = "elements ";
     public static final String USE_VIEW_TRANSITION_DATALINE_LITERAL = "useViewTransition ";
     public static final String SIGNALS_DATALINE_LITERAL = "signals ";
     public static final String ONLY_IF_MISSING_DATALINE_LITERAL = "onlyIfMissing ";

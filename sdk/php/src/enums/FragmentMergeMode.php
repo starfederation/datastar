@@ -7,25 +7,4 @@ namespace starfederation\datastar\enums;
  */
 enum FragmentMergeMode: string
 {
-
-    // Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
-    case Outer = 'outer';
-
-    // Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
-    case Inner = 'inner';
-
-    // Removes the existing element from the DOM.
-    case Remove = 'remove';
-
-    // Prepends the fragment inside the existing element.
-    case Prepend = 'prepend';
-
-    // Appends the fragment inside the existing element.
-    case Append = 'append';
-
-    // Inserts the fragment before the existing element.
-    case Before = 'before';
-
-    // Inserts the fragment after the existing element.
-    case After = 'after';
 }

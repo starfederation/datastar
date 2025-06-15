@@ -6,71 +6,71 @@ import (
 	"time"
 )
 
-// mergeFragmentOptions holds the configuration data for [MergeFragmentOption]s used
-// for initialization of [sse.MergeFragments] event.
-type mergeFragmentOptions struct {
+// mergeElementOptions holds the configuration data for [MergeElementOption]s used
+// for initialization of [sse.MergeElements] event.
+type mergeElementOptions struct {
 	EventID            string
 	RetryDuration      time.Duration
 	Selector           string
-	MergeMode          FragmentMergeMode
+	MergeMode          ElementMergeMode
 	UseViewTransitions bool
 }
 
-// MergeFragmentOption configures the [sse.MergeFragments] event initialization.
-type MergeFragmentOption func(*mergeFragmentOptions)
+// MergeElementOption configures the [sse.MergeElements] event initialization.
+type MergeElementOption func(*mergeElementOptions)
 
-// WithMergeFragmentsEventID configures an optional event ID for the fragments merge event.
+// WithMergeElementsEventID configures an optional event ID for the elements merge event.
 // The client message field [lastEventId] will be set to this value.
 // If the next event does not have an event ID, the last used event ID will remain.
 //
 // [lastEventId]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/lastEventId
-func WithMergeFragmentsEventID(id string) MergeFragmentOption {
-	return func(o *mergeFragmentOptions) {
+func WithMergeElementsEventID(id string) MergeElementOption {
+	return func(o *mergeElementOptions) {
 		o.EventID = id
 	}
 }
 
 // WithSelectorf is a convenience wrapper for [WithSelector] option that formats the selector string
 // using the provided format and arguments similar to [fmt.Sprintf].
-func WithSelectorf(selectorFormat string, args ...any) MergeFragmentOption {
+func WithSelectorf(selectorFormat string, args ...any) MergeElementOption {
 	selector := fmt.Sprintf(selectorFormat, args...)
 	return WithSelector(selector)
 }
 
-// WithSelector specifies the [CSS selector] for HTML elements that a fragment will be merged over or
+// WithSelector specifies the [CSS selector] for HTML elements that an element will be merged over or
 // merged next to, depending on the merge mode.
 //
 // [CSS selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors
-func WithSelector(selector string) MergeFragmentOption {
-	return func(o *mergeFragmentOptions) {
+func WithSelector(selector string) MergeElementOption {
+	return func(o *mergeElementOptions) {
 		o.Selector = selector
 	}
 }
 
-// WithMergeMode overrides the [DefaultFragmentMergeMode] for the fragment.
-// Choose a valid [FragmentMergeMode].
-func WithMergeMode(merge FragmentMergeMode) MergeFragmentOption {
-	return func(o *mergeFragmentOptions) {
+// WithMergeMode overrides the [DefaultElementMergeMode] for the element.
+// Choose a valid [ElementMergeMode].
+func WithMergeMode(merge ElementMergeMode) MergeElementOption {
+	return func(o *mergeElementOptions) {
 		o.MergeMode = merge
 	}
 }
 
-// WithUseViewTransitions specifies whether to use [view transitions] when merging fragments.
+// WithUseViewTransitions specifies whether to use [view transitions] when merging elements.
 //
 // [view transitions]: https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API
-func WithUseViewTransitions(useViewTransition bool) MergeFragmentOption {
-	return func(o *mergeFragmentOptions) {
+func WithUseViewTransitions(useViewTransition bool) MergeElementOption {
+	return func(o *mergeElementOptions) {
 		o.UseViewTransitions = useViewTransition
 	}
 }
 
-// MergeFragments sends an HTML fragment to the client to update the DOM tree with.
-func (sse *ServerSentEventGenerator) MergeFragments(fragment string, opts ...MergeFragmentOption) error {
-	options := &mergeFragmentOptions{
+// MergeElements sends HTML elements to the client to update the DOM tree with.
+func (sse *ServerSentEventGenerator) MergeElements(elements string, opts ...MergeElementOption) error {
+	options := &mergeElementOptions{
 		EventID:       "",
 		RetryDuration: DefaultSseRetryDuration,
 		Selector:      "",
-		MergeMode:     FragmentMergeModeOuter,
+		MergeMode:     ElementMergeModeOuter,
 	}
 	for _, opt := range opts {
 		opt(options)
@@ -88,26 +88,26 @@ func (sse *ServerSentEventGenerator) MergeFragments(fragment string, opts ...Mer
 	if options.Selector != "" {
 		dataRows = append(dataRows, SelectorDatalineLiteral+options.Selector)
 	}
-	if options.MergeMode != FragmentMergeModeOuter {
+	if options.MergeMode != ElementMergeModeOuter {
 		dataRows = append(dataRows, MergeModeDatalineLiteral+string(options.MergeMode))
 	}
 	if options.UseViewTransitions {
 		dataRows = append(dataRows, UseViewTransitionDatalineLiteral+"true")
 	}
 
-	if fragment != "" {
-		parts := strings.Split(fragment, "\n")
+	if elements != "" {
+		parts := strings.Split(elements, "\n")
 		for _, part := range parts {
-			dataRows = append(dataRows, FragmentsDatalineLiteral+part)
+			dataRows = append(dataRows, ElementsDatalineLiteral+part)
 		}
 	}
 
 	if err := sse.Send(
-		EventTypeMergeFragments,
+		EventTypeMergeElements,
 		dataRows,
 		sendOptions...,
 	); err != nil {
-		return fmt.Errorf("failed to send fragment: %w", err)
+		return fmt.Errorf("failed to send elements: %w", err)
 	}
 
 	return nil

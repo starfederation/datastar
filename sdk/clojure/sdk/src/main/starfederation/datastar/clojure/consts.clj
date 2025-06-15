@@ -32,7 +32,7 @@
 ;; -----------------------------------------------------------------------------
 (def selector-dataline-literal "selector ")
 (def merge-mode-dataline-literal "mergeMode ")
-(def fragments-dataline-literal "fragments ")
+(def elements-dataline-literal "elements ")
 (def use-view-transition-dataline-literal "useViewTransition ")
 (def signals-dataline-literal "signals ")
 (def only-if-missing-dataline-literal "onlyIfMissing ")
@@ -44,8 +44,8 @@
 ;; -----------------------------------------------------------------------------
 ;; Default booleans
 ;; -----------------------------------------------------------------------------
-(def default-fragments-use-view-transitions
-  "Should fragments be merged using the ViewTransition API?"
+(def default-elements-use-view-transitions
+  "Should elements be merged using the ViewTransition API?"
   false)
 
 (def default-merge-signals-only-if-missing
@@ -61,48 +61,48 @@
 ;; -----------------------------------------------------------------------------
 ;; Enums
 ;; -----------------------------------------------------------------------------
-;; FragmentMergeMode
+;; ElementMergeMode
 
-(def fragment-merge-mode-outer
-  "Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes."
+(def element-merge-mode-outer
+  "Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes."
   "outer")
 
-(def fragment-merge-mode-inner
-  "Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes."
+(def element-merge-mode-inner
+  "Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes."
   "inner")
 
-(def fragment-merge-mode-remove
+(def element-merge-mode-remove
   "Removes the existing element from the DOM."
   "remove")
 
-(def fragment-merge-mode-prepend
-  "Prepends the fragment inside the existing element."
+(def element-merge-mode-prepend
+  "Prepends the element inside the existing element."
   "prepend")
 
-(def fragment-merge-mode-append
-  "Appends the fragment inside the existing element."
+(def element-merge-mode-append
+  "Appends the element inside the existing element."
   "append")
 
-(def fragment-merge-mode-before
-  "Inserts the fragment before the existing element."
+(def element-merge-mode-before
+  "Inserts the element before the existing element."
   "before")
 
-(def fragment-merge-mode-after
-  "Inserts the fragment after the existing element."
+(def element-merge-mode-after
+  "Inserts the element after the existing element."
   "after")
 
 
-(def default-fragment-merge-mode
-  "Default value for FragmentMergeMode.
-  Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes."
-  fragment-merge-mode-outer)
+(def default-element-merge-mode
+  "Default value for ElementMergeMode.
+  Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes."
+  element-merge-mode-outer)
 
 
 ;; EventType
 
-(def event-type-merge-fragments
-  "An event for merging HTML fragments into the DOM."
-  "datastar-merge-fragments")
+(def event-type-merge-elements
+  "An event for merging HTML elements into the DOM."
+  "datastar-merge-elements")
 
 (def event-type-merge-signals
   "An event for merging signals."

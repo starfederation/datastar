@@ -25,7 +25,7 @@ pub const default_execute_script_attributes = "type module";
 
 pub const selector_dataline_literal = "selector";
 pub const merge_mode_dataline_literal = "mergeMode";
-pub const fragments_dataline_literal = "fragments";
+pub const elements_dataline_literal = "elements";
 pub const use_view_transition_dataline_literal = "useViewTransition";
 pub const signals_dataline_literal = "signals";
 pub const only_if_missing_dataline_literal = "onlyIfMissing";
@@ -37,8 +37,8 @@ pub const auto_remove_dataline_literal = "autoRemove";
 
 // #region Default booleans
 
-/// Should fragments be merged using the ViewTransition API?
-pub const default_fragments_use_view_transitions = false;
+/// Should elements be merged using the ViewTransition API?
+pub const default_elements_use_view_transitions = false;
 /// Should a given set of signals merge if they are missing?
 pub const default_merge_signals_only_if_missing = false;
 /// Should script element remove itself after execution?
@@ -48,21 +48,21 @@ pub const default_execute_script_auto_remove = true;
 
 // #region Enums
 
-/// The mode in which a fragment is merged into the DOM.
-pub const FragmentMergeMode = enum {
-    /// Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
+/// The mode in which an element is merged into the DOM.
+pub const ElementMergeMode = enum {
+    /// Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
     outer,
-    /// Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
+    /// Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
     inner,
     /// Removes the existing element from the DOM.
     remove,
-    /// Prepends the fragment inside the existing element.
+    /// Prepends the element inside the existing element.
     prepend,
-    /// Appends the fragment inside the existing element.
+    /// Appends the element inside the existing element.
     append,
-    /// Inserts the fragment before the existing element.
+    /// Inserts the element before the existing element.
     before,
-    /// Inserts the fragment after the existing element.
+    /// Inserts the element after the existing element.
     after,
 
     pub fn format(
@@ -88,12 +88,12 @@ pub const FragmentMergeMode = enum {
     }
 };
 
-pub const default_fragment_merge_mode = FragmentMergeMode.outer;
+pub const default_element_merge_mode = ElementMergeMode.outer;
 
 /// The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 pub const EventType = enum {
-    /// An event for merging HTML fragments into the DOM.
-    merge_fragments,
+    /// An event for merging HTML elements into the DOM.
+    merge_elements,
     /// An event for merging signals.
     merge_signals,
     /// An event for executing <script/> elements in the browser.
@@ -110,7 +110,7 @@ pub const EventType = enum {
 
         try writer.writeAll(
             switch (self) {
-                .merge_fragments => "datastar-merge-fragments",
+                .merge_elements => "datastar-merge-elements",
                 .merge_signals => "datastar-merge-signals",
                 .execute_script => "datastar-execute-script",
             },

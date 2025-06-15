@@ -7,8 +7,8 @@ import "time"
 const (
     DatastarKey = "datastar"
     Version                   = "1.0.0-beta.11"
-    VersionClientByteSize     = 39754
-    VersionClientByteSizeGzip = 14842
+    VersionClientByteSize     = 39752
+    VersionClientByteSizeGzip = 14841
 
     //region Default durations
 
@@ -27,7 +27,7 @@ const (
     //region Dataline literals
     SelectorDatalineLiteral = "selector "
     MergeModeDatalineLiteral = "mergeMode "
-    FragmentsDatalineLiteral = "fragments "
+    ElementsDatalineLiteral = "elements "
     UseViewTransitionDatalineLiteral = "useViewTransition "
     SignalsDatalineLiteral = "signals "
     OnlyIfMissingDatalineLiteral = "onlyIfMissing "
@@ -40,8 +40,8 @@ const (
 var (
     //region Default booleans
 
-    // Should fragments be merged using the ViewTransition API?
-    DefaultFragmentsUseViewTransitions = false
+    // Should elements be merged using the ViewTransition API?
+    DefaultElementsUseViewTransitions = false
 
     // Should a given set of signals merge if they are missing?
     DefaultMergeSignalsOnlyIfMissing = false
@@ -54,44 +54,44 @@ var (
 
 //region Enums
 
-//region The mode in which a fragment is merged into the DOM.
-type FragmentMergeMode string
+//region The mode in which an element is merged into the DOM.
+type ElementMergeMode string
 
 const (
-    // Default value for FragmentMergeMode
-    // Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
-    DefaultFragmentMergeMode = FragmentMergeModeOuter
+    // Default value for ElementMergeMode
+    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    DefaultElementMergeMode = ElementMergeModeOuter
 
-    // Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
-    FragmentMergeModeOuter FragmentMergeMode = "outer"
+    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    ElementMergeModeOuter ElementMergeMode = "outer"
 
-    // Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
-    FragmentMergeModeInner FragmentMergeMode = "inner"
+    // Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    ElementMergeModeInner ElementMergeMode = "inner"
 
     // Removes the existing element from the DOM.
-    FragmentMergeModeRemove FragmentMergeMode = "remove"
+    ElementMergeModeRemove ElementMergeMode = "remove"
 
-    // Prepends the fragment inside the existing element.
-    FragmentMergeModePrepend FragmentMergeMode = "prepend"
+    // Prepends the element inside the existing element.
+    ElementMergeModePrepend ElementMergeMode = "prepend"
 
-    // Appends the fragment inside the existing element.
-    FragmentMergeModeAppend FragmentMergeMode = "append"
+    // Appends the element inside the existing element.
+    ElementMergeModeAppend ElementMergeMode = "append"
 
-    // Inserts the fragment before the existing element.
-    FragmentMergeModeBefore FragmentMergeMode = "before"
+    // Inserts the element before the existing element.
+    ElementMergeModeBefore ElementMergeMode = "before"
 
-    // Inserts the fragment after the existing element.
-    FragmentMergeModeAfter FragmentMergeMode = "after"
+    // Inserts the element after the existing element.
+    ElementMergeModeAfter ElementMergeMode = "after"
 
 )
-//endregion FragmentMergeMode
+//endregion ElementMergeMode
 
 //region The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 type EventType string
 
 const (
-    // An event for merging HTML fragments into the DOM.
-    EventTypeMergeFragments EventType = "datastar-merge-fragments"
+    // An event for merging HTML elements into the DOM.
+    EventTypeMergeElements EventType = "datastar-merge-elements"
 
     // An event for merging signals.
     EventTypeMergeSignals EventType = "datastar-merge-signals"

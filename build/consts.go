@@ -132,8 +132,8 @@ var Consts = &ConstTemplateData{
 	DatastarKey: "datastar",
 	DefaultBools: []*DefaultBool{
 		{
-			Name:        toolbelt.ToCasedString("fragmentsUseViewTransitions"),
-			Description: "Should fragments be merged using the ViewTransition API?",
+			Name:        toolbelt.ToCasedString("elementsUseViewTransitions"),
+			Description: "Should elements be merged using the ViewTransition API?",
 			Value:       false,
 		},
 		{
@@ -165,9 +165,9 @@ var Consts = &ConstTemplateData{
 		// Shared
 		toolbelt.ToCasedString("selector"),
 
-		// MergeFragments
+		// MergeElements
 		toolbelt.ToCasedString("mergeMode"),
-		toolbelt.ToCasedString("fragments"),
+		toolbelt.ToCasedString("elements"),
 		toolbelt.ToCasedString("useViewTransition"),
 
 		// MergeSignals
@@ -181,17 +181,17 @@ var Consts = &ConstTemplateData{
 	},
 	Enums: []*EnumDefinition{
 		{
-			Name:         toolbelt.ToCasedString("FragmentMergeMode"),
-			Description:  "The mode in which a fragment is merged into the DOM.",
+			Name:         toolbelt.ToCasedString("ElementMergeMode"),
+			Description:  "The mode in which an element is merged into the DOM.",
 			DefaultIndex: 0,
 			Values: []*EnumValueDefinition{
 				{
 					Value:       "outer",
-					Description: "Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.",
+					Description: "Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.",
 				},
 				{
 					Value:       "inner",
-					Description: "Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.",
+					Description: "Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.",
 				},
 				{
 					Value:       "remove",
@@ -199,19 +199,19 @@ var Consts = &ConstTemplateData{
 				},
 				{
 					Value:       "prepend",
-					Description: "Prepends the fragment inside the existing element.",
+					Description: "Prepends the element inside the existing element.",
 				},
 				{
 					Value:       "append",
-					Description: "Appends the fragment inside the existing element.",
+					Description: "Appends the element inside the existing element.",
 				},
 				{
 					Value:       "before",
-					Description: "Inserts the fragment before the existing element.",
+					Description: "Inserts the element before the existing element.",
 				},
 				{
 					Value:       "after",
-					Description: "Inserts the fragment after the existing element.",
+					Description: "Inserts the element after the existing element.",
 				},
 			},
 		},
@@ -222,9 +222,9 @@ var Consts = &ConstTemplateData{
 			DefaultIndex: -1,
 			Values: []*EnumValueDefinition{
 				{
-					Name:        toolbelt.ToCasedString("MergeFragments"),
-					Description: "An event for merging HTML fragments into the DOM.",
-					Value:       "datastar-merge-fragments",
+					Name:        toolbelt.ToCasedString("MergeElements"),
+					Description: "An event for merging HTML elements into the DOM.",
+					Value:       "datastar-merge-elements",
 				},
 				{
 					Name:        toolbelt.ToCasedString("MergeSignals"),

@@ -9,8 +9,8 @@ module Datastar
     # The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     DEFAULT_SSE_RETRY_DURATION = 1000
 
-    # Should fragments be merged using the ViewTransition API?
-    DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS = false
+    # Should elements be merged using the ViewTransition API?
+    DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS = false
 
     # Should a given set of signals merge if they are missing?
     DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING = false
@@ -21,37 +21,14 @@ module Datastar
     # The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.}
     DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = 'type module'
 
-    module FragmentMergeMode
 
-      # Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
-      OUTER = 'outer'
-
-      # Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
-      INNER = 'inner'
-
-      # Removes the existing element from the DOM.
-      REMOVE = 'remove'
-
-      # Prepends the fragment inside the existing element.
-      PREPEND = 'prepend'
-
-      # Appends the fragment inside the existing element.
-      APPEND = 'append'
-
-      # Inserts the fragment before the existing element.
-      BEFORE = 'before'
-
-      # Inserts the fragment after the existing element.
-      AFTER = 'after'
-    end
-
-    # The mode in which a fragment is merged into the DOM.
-    DEFAULT_FRAGMENT_MERGE_MODE = FragmentMergeMode::OUTER
+    # The mode in which an element is merged into the DOM.
+    DEFAULT_ELEMENT_MERGE_MODE = ElementMergeMode::OUTER
 
     # Dataline literals.
     SELECTOR_DATALINE_LITERAL = 'selector'
     MERGE_MODE_DATALINE_LITERAL = 'mergeMode'
-    FRAGMENTS_DATALINE_LITERAL = 'fragments'
+    ELEMENTS_DATALINE_LITERAL = 'elements'
     USE_VIEW_TRANSITION_DATALINE_LITERAL = 'useViewTransition'
     SIGNALS_DATALINE_LITERAL = 'signals'
     ONLY_IF_MISSING_DATALINE_LITERAL = 'onlyIfMissing'

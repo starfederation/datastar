@@ -4,25 +4,25 @@ namespace StarFederation.Datastar
 
 open System
 
-type FragmentMergeMode =
-/// Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
+type ElementMergeMode =
+/// Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
 | Outer
-/// Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
+/// Morphs the element into the innerHTML using Datastar&#39;s morphing, preserving focus and minimizing element changes.
 | Inner
 /// Removes the existing element from the DOM.
 | Remove
-/// Prepends the fragment inside the existing element.
+/// Prepends the element inside the existing element.
 | Prepend
-/// Appends the fragment inside the existing element.
+/// Appends the element inside the existing element.
 | Append
-/// Inserts the fragment before the existing element.
+/// Inserts the element before the existing element.
 | Before
-/// Inserts the fragment after the existing element.
+/// Inserts the element after the existing element.
 | After
 
 type EventType =
-/// An event for merging HTML fragments into the DOM.
-| MergeFragments
+/// An event for merging HTML elements into the DOM.
+| MergeElements
 /// An event for merging signals.
 | MergeSignals
 /// An event for executing &lt;script/&gt; elements in the browser.
@@ -37,10 +37,10 @@ module Consts =
     let DefaultSseRetryDuration = TimeSpan.FromMilliseconds 1000
 
 
-    /// Default: outer - Morphs the fragment into the existing element using idiomorph, preserving focus and minimizing element changes.
-    let DefaultFragmentMergeMode = Outer
+    /// Default: outer - Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+    let DefaultElementMergeMode = Outer
 
-    let [<Literal>] DefaultFragmentsUseViewTransitions = false
+    let [<Literal>] DefaultElementsUseViewTransitions = false
     let [<Literal>] DefaultMergeSignalsOnlyIfMissing = false
     let [<Literal>] DefaultExecuteScriptAutoRemove = true
 
@@ -48,7 +48,7 @@ module Consts =
 
     let [<Literal>] DatastarDatalineSelector = "selector"
     let [<Literal>] DatastarDatalineMergeMode = "mergeMode"
-    let [<Literal>] DatastarDatalineFragments = "fragments"
+    let [<Literal>] DatastarDatalineElements = "elements"
     let [<Literal>] DatastarDatalineUseViewTransition = "useViewTransition"
     let [<Literal>] DatastarDatalineSignals = "signals"
     let [<Literal>] DatastarDatalineOnlyIfMissing = "onlyIfMissing"
@@ -56,20 +56,20 @@ module Consts =
     let [<Literal>] DatastarDatalineAttributes = "attributes"
     let [<Literal>] DatastarDatalineAutoRemove = "autoRemove"
 
-    module FragmentMergeMode =
+    module ElementMergeMode =
         let toString this =
             match this with
-                | FragmentMergeMode.Outer -> "outer"
-                | FragmentMergeMode.Inner -> "inner"
-                | FragmentMergeMode.Remove -> "remove"
-                | FragmentMergeMode.Prepend -> "prepend"
-                | FragmentMergeMode.Append -> "append"
-                | FragmentMergeMode.Before -> "before"
-                | FragmentMergeMode.After -> "after"
+                | ElementMergeMode.Outer -> "outer"
+                | ElementMergeMode.Inner -> "inner"
+                | ElementMergeMode.Remove -> "remove"
+                | ElementMergeMode.Prepend -> "prepend"
+                | ElementMergeMode.Append -> "append"
+                | ElementMergeMode.Before -> "before"
+                | ElementMergeMode.After -> "after"
 
     module EventType =
         let toString this =
             match this with
-                | EventType.MergeFragments -> "datastar-merge-fragments"
+                | EventType.MergeElements -> "datastar-merge-elements"
                 | EventType.MergeSignals -> "datastar-merge-signals"
                 | EventType.ExecuteScript -> "datastar-execute-script"
