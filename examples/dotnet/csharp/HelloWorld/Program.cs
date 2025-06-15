@@ -1,6 +1,4 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using StarFederation.Datastar;
 using StarFederation.Datastar.DependencyInjection;
 
 namespace HelloWorld;
@@ -14,7 +12,7 @@ public class Program
         public float? Delay { get; set; } = null;
     }
 
-    public const string Message = "Hello, World!";
+    public const string Message = "Hello, world!";
 
     public static void Main(string[] args)
     {

@@ -1,19 +1,10 @@
 namespace StarFederation.Datastar.FSharp
 
-open StarFederation.Datastar
 open StarFederation.Datastar.FSharp.Utility
 
-/// <summary>
-/// Converts requests into SSEs, serializes, and sends to sseHandler handlers
-/// </summary>
 [<AbstractClass; Sealed>]
 type ServerSentEventGenerator =
-    static member inline private send (seeHandler: ISendServerEvent) sse = seeHandler.SendServerEvent sse
-
-    static member Send (sse, sseHandler:ISendServerEvent) = ServerSentEventGenerator.send sseHandler sse
-
-    static member MergeFragments (sseHandler, fragments, ?options:MergeFragmentsOptions) =
-        let options = defaultArg options MergeFragmentsOptions.defaults
+    static member MergeFragments(fragments, options:MergeFragmentsOptions) =
         { EventType = MergeFragments
           Id = options.EventId
           Retry = options.Retry
@@ -23,10 +14,9 @@ type ServerSentEventGenerator =
             if (options.UseViewTransition <> Consts.DefaultFragmentsUseViewTransitions) then $"{Consts.DatastarDatalineUseViewTransition} %A{options.UseViewTransition}"
             yield! (fragments |> String.split String.newLines |> Seq.map (fun fragmentLine -> $"{Consts.DatastarDatalineFragments} %s{fragmentLine}"))
             |] }
-        |> ServerSentEventGenerator.send sseHandler
+    static member MergeFragments fragments = ServerSentEventGenerator.MergeFragments (fragments, MergeFragmentsOptions.defaults)
 
-    static member RemoveFragments (sseHandler, selector, ?options:RemoveFragmentsOptions) =
-        let options = defaultArg options RemoveFragmentsOptions.defaults
+    static member RemoveFragments(selector, options:RemoveFragmentsOptions) =
         { EventType = RemoveFragments
           Id = options.EventId
           Retry = options.Retry
@@ -34,30 +24,27 @@ type ServerSentEventGenerator =
             $"{Consts.DatastarDatalineSelector} {selector |> Selector.value}"
             if (options.UseViewTransition <> Consts.DefaultFragmentsUseViewTransitions) then $"{Consts.DatastarDatalineUseViewTransition} %A{options.UseViewTransition}"
             |] }
-        |> ServerSentEventGenerator.send sseHandler
+    static member RemoveFragments selector = ServerSentEventGenerator.RemoveFragments(selector, RemoveFragmentsOptions.defaults)
 
-    static member MergeSignals (sseHandler, mergeSignals, ?options:MergeSignalsOptions) =
-        let options = defaultArg options MergeSignalsOptions.defaults
+    static member MergeSignals(signals, options:MergeSignalsOptions) =
         { EventType = MergeSignals
           Id = options.EventId
           Retry = options.Retry
           DataLines = [|
             if (options.OnlyIfMissing <> Consts.DefaultMergeSignalsOnlyIfMissing) then $"{Consts.DatastarDatalineOnlyIfMissing} %A{options.OnlyIfMissing}"
-            yield! mergeSignals |> Signals.value |> String.split String.newLines |> Seq.map (fun dataLine -> $"{Consts.DatastarDatalineSignals} %s{dataLine}")
+            yield! signals |> Signals.value |> String.split String.newLines |> Seq.map (fun dataLine -> $"{Consts.DatastarDatalineSignals} %s{dataLine}")
             |] }
-       |> ServerSentEventGenerator.send sseHandler
+    static member MergeSignals signals = ServerSentEventGenerator.MergeSignals(signals, MergeSignalsOptions.defaults)
 
-    static member RemoveSignals (sseHandler, paths, ?options:EventOptions) =
-        let options = defaultArg options EventOptions.defaults
-        let paths' = paths |> Seq.map SignalPath.value |> String.concat " "
+    static member RemoveSignals(signalPaths, options:EventOptions) =
+        let paths' = signalPaths |> Seq.map SignalPath.value |> String.concat " "
         { EventType = RemoveSignals
           Id = options.EventId
           Retry = options.Retry
           DataLines = [| $"{Consts.DatastarDatalinePaths} {paths'}" |] }
-        |> ServerSentEventGenerator.send sseHandler
+    static member RemoveSignals signalPaths = ServerSentEventGenerator.RemoveSignals(signalPaths, EventOptions.defaults)
 
-    static member ExecuteScript (sseHandler, script, ?options:ExecuteScriptOptions) =
-        let options = defaultArg options ExecuteScriptOptions.defaults
+    static member ExecuteScript(script, options:ExecuteScriptOptions) =
         { EventType = ExecuteScript
           Id = options.EventId
           Retry = options.Retry
@@ -67,4 +54,4 @@ type ServerSentEventGenerator =
                 yield! options.Attributes |> Seq.map (fun attr -> $"{Consts.DefaultExecuteScriptAttributes} {attr}")
             yield! script |> String.split String.newLines |> Seq.map (fun scriptLine -> $"{Consts.DatastarDatalineScript} %s{scriptLine}")
             |] }
-        |> ServerSentEventGenerator.send sseHandler
+    static member ExecuteScript script = ServerSentEventGenerator.ExecuteScript(script, ExecuteScriptOptions.defaults)
