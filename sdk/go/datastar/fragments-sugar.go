@@ -104,6 +104,12 @@ func WithoutViewTransitions() MergeFragmentOption {
 	}
 }
 
+// WithMergeRemove sets the merge mode to remove, which removes the existing element from the DOM.
+// This is a convenience function equivalent to WithMergeMode(FragmentMergeModeRemove).
+func WithMergeRemove() MergeFragmentOption {
+	return WithMergeMode(FragmentMergeModeRemove)
+}
+
 // MergeFragmentf is a convenience wrapper for [MergeFragments] option
 // equivalent to calling `MergeFragments(fmt.Sprintf(format, args...))`.
 func (sse *ServerSentEventGenerator) MergeFragmentf(format string, args ...any) error {
