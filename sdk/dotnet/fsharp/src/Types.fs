@@ -2,11 +2,12 @@ namespace StarFederation.Datastar.FSharp
 
 open System
 open System.Collections.Generic
+open System.IO
 open System.Text.Json
 open System.Text.Json.Nodes
 open System.Text.RegularExpressions
+open System.Threading
 open System.Threading.Tasks
-open StarFederation.Datastar
 open StarFederation.Datastar.FSharp.Utility
 
 type ServerSentEvent =
@@ -55,14 +56,24 @@ type EventOptions = { EventId: string voption; Retry: TimeSpan }
 /// Read the signals from the request
 /// </summary>
 type IReadSignals =
-    abstract ReadSignals: unit -> Task<Signals voption>
-    abstract ReadSignals<'T>: unit -> Task<'T voption>
-    abstract ReadSignals<'T>: JsonSerializerOptions -> Task<'T voption>
+    abstract GetSignalsStream : unit -> Stream
+    //
+    abstract ReadSignalsAsync : unit -> Task<Signals>
+    abstract ReadSignalsAsync : CancellationToken -> Task<Signals>
+    abstract ReadSignalsAsync<'T> : unit -> Task<'T voption>
+    abstract ReadSignalsAsync<'T> : JsonSerializerOptions -> Task<'T voption>
+    abstract ReadSignalsAsync<'T> : JsonSerializerOptions * CancellationToken -> Task<'T voption>
 
 /// <summary>
 /// Can send SSEs to the client
 /// </summary>
-type ISendServerEvent = abstract SendServerEvent: ServerSentEvent -> Task
+type ISendServerEvent =
+    abstract StartServerEventStream : unit -> Task
+    abstract StartServerEventStream : additionalHeaders:(string * string)[] -> Task
+    abstract StartServerEventStream : additionalHeaders:(string * string)[] * CancellationToken -> Task
+    //
+    abstract SendServerEvent : ServerSentEvent -> Task
+    abstract SendServerEvent : ServerSentEvent * CancellationToken -> Task
 
 module ServerSentEvent =
     let serialize sse =
@@ -94,7 +105,7 @@ module SignalPath =
     let value (signalPath:SignalPath) = signalPath.ToString()
     let kebabValue signals = signals |> value |> String.toKebab
     let isValidKey (signalPathKey:string) =
-        signalPathKey |> String.IsPopulated && signalPathKey.ToCharArray() |> Seq.forall (fun chr -> Char.IsLetter chr || Char.IsNumber chr || chr = '_')
+        signalPathKey |> String.isPopulated && signalPathKey.ToCharArray() |> Seq.forall (fun chr -> Char.IsLetter chr || Char.IsNumber chr || chr = '_')
     let isValid (signalPathString:string) = signalPathString.Split('.') |> Array.forall isValidKey
     let tryCreate (signalPathString:string) =
         if isValid signalPathString
@@ -113,7 +124,6 @@ module SignalPath =
         |> Seq.fold (fun json key ->
             JsonObject([ KeyValuePair<string, JsonNode> (key, json) ]) :> JsonNode
             ) (JsonValue.Create(signalValue) :> JsonNode)
-
 
 module Selector =
     let regex = Regex(@"[#.][-_]?[_a-zA-Z]+(?:\w|\\.)*|(?<=\s+|^)(?:\w+|\*)|\[[^\s""'=<>`]+?(?<![~|^$*])([~|^$*]?=(?:['""].*['""]|[^\s""'=<>`]+))?\]|:[\w-]+(?:\(.*\))?", RegexOptions.Compiled)
