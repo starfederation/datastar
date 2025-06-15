@@ -57,8 +57,8 @@ export const FragmentMergeModes = [
     "outer",
 // Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
     "inner",
-// Replaces the outer HTML of the existing element (no morphing).
-    "replace",
+// Removes the existing element from the DOM.
+    "remove",
 // Prepends the fragment inside the existing element.
     "prepend",
 // Appends the fragment inside the existing element.
@@ -67,8 +67,6 @@ export const FragmentMergeModes = [
     "before",
 // Inserts the fragment after the existing element.
     "after",
-// Removes the existing element from the DOM.
-    "remove",
 ] as const;
 
 // Default value for FragmentMergeMode

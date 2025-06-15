@@ -194,8 +194,8 @@ var Consts = &ConstTemplateData{
 					Description: "Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.",
 				},
 				{
-					Value:       "replace",
-					Description: "Replaces the outer HTML of the existing element (no morphing).",
+					Value:       "remove",
+					Description: "Removes the existing element from the DOM.",
 				},
 				{
 					Value:       "prepend",
@@ -212,10 +212,6 @@ var Consts = &ConstTemplateData{
 				{
 					Value:       "after",
 					Description: "Inserts the fragment after the existing element.",
-				},
-				{
-					Value:       "remove",
-					Description: "Removes the existing element from the DOM.",
 				},
 			},
 		},

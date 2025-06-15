@@ -7,8 +7,8 @@ import "time"
 const (
     DatastarKey = "datastar"
     Version                   = "1.0.0-beta.11"
-    VersionClientByteSize     = 39770
-    VersionClientByteSizeGzip = 14847
+    VersionClientByteSize     = 39754
+    VersionClientByteSizeGzip = 14842
 
     //region Default durations
 
@@ -68,8 +68,8 @@ const (
     // Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
     FragmentMergeModeInner FragmentMergeMode = "inner"
 
-    // Replaces the outer HTML of the existing element (no morphing).
-    FragmentMergeModeReplace FragmentMergeMode = "replace"
+    // Removes the existing element from the DOM.
+    FragmentMergeModeRemove FragmentMergeMode = "remove"
 
     // Prepends the fragment inside the existing element.
     FragmentMergeModePrepend FragmentMergeMode = "prepend"
@@ -82,9 +82,6 @@ const (
 
     // Inserts the fragment after the existing element.
     FragmentMergeModeAfter FragmentMergeMode = "after"
-
-    // Removes the existing element from the DOM.
-    FragmentMergeModeRemove FragmentMergeMode = "remove"
 
 )
 //endregion FragmentMergeMode

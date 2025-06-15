@@ -14,8 +14,8 @@ enum FragmentMergeMode: string
     // Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
     case Inner = 'inner';
 
-    // Replaces the outer HTML of the existing element (no morphing).
-    case Replace = 'replace';
+    // Removes the existing element from the DOM.
+    case Remove = 'remove';
 
     // Prepends the fragment inside the existing element.
     case Prepend = 'prepend';
@@ -28,7 +28,4 @@ enum FragmentMergeMode: string
 
     // Inserts the fragment after the existing element.
     case After = 'after';
-
-    // Removes the existing element from the DOM.
-    case Remove = 'remove';
 }

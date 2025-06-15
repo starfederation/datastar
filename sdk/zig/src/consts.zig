@@ -54,8 +54,8 @@ pub const FragmentMergeMode = enum {
     outer,
     /// Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
     inner,
-    /// Replaces the outer HTML of the existing element (no morphing).
-    replace,
+    /// Removes the existing element from the DOM.
+    remove,
     /// Prepends the fragment inside the existing element.
     prepend,
     /// Appends the fragment inside the existing element.
@@ -64,8 +64,6 @@ pub const FragmentMergeMode = enum {
     before,
     /// Inserts the fragment after the existing element.
     after,
-    /// Removes the existing element from the DOM.
-    remove,
 
     pub fn format(
         self: @This(),
@@ -80,12 +78,11 @@ pub const FragmentMergeMode = enum {
             switch (self) {
                 .outer => "outer",
                 .inner => "inner",
-                .replace => "replace",
+                .remove => "remove",
                 .prepend => "prepend",
                 .append => "append",
                 .before => "before",
                 .after => "after",
-                .remove => "remove",
             },
         );
     }

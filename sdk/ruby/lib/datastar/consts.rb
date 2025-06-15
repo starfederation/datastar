@@ -29,8 +29,8 @@ module Datastar
       # Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
       INNER = 'inner'
 
-      # Replaces the outer HTML of the existing element (no morphing).
-      REPLACE = 'replace'
+      # Removes the existing element from the DOM.
+      REMOVE = 'remove'
 
       # Prepends the fragment inside the existing element.
       PREPEND = 'prepend'
@@ -43,9 +43,6 @@ module Datastar
 
       # Inserts the fragment after the existing element.
       AFTER = 'after'
-
-      # Removes the existing element from the DOM.
-      REMOVE = 'remove'
     end
 
     # The mode in which a fragment is merged into the DOM.

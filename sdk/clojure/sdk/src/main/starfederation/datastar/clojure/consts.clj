@@ -71,9 +71,9 @@
   "Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes."
   "inner")
 
-(def fragment-merge-mode-replace
-  "Replaces the outer HTML of the existing element (no morphing)."
-  "replace")
+(def fragment-merge-mode-remove
+  "Removes the existing element from the DOM."
+  "remove")
 
 (def fragment-merge-mode-prepend
   "Prepends the fragment inside the existing element."
@@ -90,10 +90,6 @@
 (def fragment-merge-mode-after
   "Inserts the fragment after the existing element."
   "after")
-
-(def fragment-merge-mode-remove
-  "Removes the existing element from the DOM."
-  "remove")
 
 
 (def default-fragment-merge-mode

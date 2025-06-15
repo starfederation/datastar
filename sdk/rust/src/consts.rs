@@ -61,8 +61,8 @@ pub enum FragmentMergeMode {
     Outer,
     /// Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
     Inner,
-    /// Replaces the outer HTML of the existing element (no morphing).
-    Replace,
+    /// Removes the existing element from the DOM.
+    Remove,
     /// Prepends the fragment inside the existing element.
     Prepend,
     /// Appends the fragment inside the existing element.
@@ -71,8 +71,6 @@ pub enum FragmentMergeMode {
     Before,
     /// Inserts the fragment after the existing element.
     After,
-    /// Removes the existing element from the DOM.
-    Remove,
 }
 
 impl FragmentMergeMode {
@@ -81,12 +79,11 @@ impl FragmentMergeMode {
         match self {
             Self::Outer => "outer",
             Self::Inner => "inner",
-            Self::Replace => "replace",
+            Self::Remove => "remove",
             Self::Prepend => "prepend",
             Self::Append => "append",
             Self::Before => "before",
             Self::After => "after",
-            Self::Remove => "remove",
         }
     }
 }

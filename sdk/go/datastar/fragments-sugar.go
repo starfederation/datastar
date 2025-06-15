@@ -12,12 +12,11 @@ import (
 var ValidFragmentMergeTypes = []FragmentMergeMode{
 	FragmentMergeModeOuter,
 	FragmentMergeModeInner,
-	FragmentMergeModeReplace,
+	FragmentMergeModeRemove,
 	FragmentMergeModePrepend,
 	FragmentMergeModeAppend,
 	FragmentMergeModeBefore,
 	FragmentMergeModeAfter,
-	FragmentMergeModeRemove,
 }
 
 // FragmentMergeTypeFromString converts a string to a [FragmentMergeMode].
@@ -27,8 +26,8 @@ func FragmentMergeTypeFromString(s string) (FragmentMergeMode, error) {
 		return FragmentMergeModeOuter, nil
 	case "inner":
 		return FragmentMergeModeInner, nil
-	case "replace":
-		return FragmentMergeModeReplace, nil
+	case "remove":
+		return FragmentMergeModeRemove, nil
 	case "prepend":
 		return FragmentMergeModePrepend, nil
 	case "append":
@@ -37,8 +36,6 @@ func FragmentMergeTypeFromString(s string) (FragmentMergeMode, error) {
 		return FragmentMergeModeBefore, nil
 	case "after":
 		return FragmentMergeModeAfter, nil
-	case "remove":
-		return FragmentMergeModeRemove, nil
 	default:
 		return "", fmt.Errorf("invalid fragment merge type: %s", s)
 	}
@@ -54,9 +51,9 @@ func WithMergeInner() MergeFragmentOption {
 	return WithMergeMode(FragmentMergeModeInner)
 }
 
-// WithMergeReplace creates a MergeFragmentOption that merges fragments using the replace mode.
-func WithMergeReplace() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModeReplace)
+// WithMergeRemove creates a MergeFragmentOption that removes elements from the DOM.
+func WithMergeRemove() MergeFragmentOption {
+	return WithMergeMode(FragmentMergeModeRemove)
 }
 
 // WithMergePrepend creates a MergeFragmentOption that merges fragments using the prepend mode.
@@ -97,12 +94,6 @@ func WithoutViewTransitions() MergeFragmentOption {
 	return func(o *mergeFragmentOptions) {
 		o.UseViewTransitions = false
 	}
-}
-
-// WithMergeRemove sets the merge mode to remove, which removes the existing element from the DOM.
-// This is a convenience function equivalent to WithMergeMode(FragmentMergeModeRemove).
-func WithMergeRemove() MergeFragmentOption {
-	return WithMergeMode(FragmentMergeModeRemove)
 }
 
 // MergeFragmentf is a convenience wrapper for [MergeFragments] option

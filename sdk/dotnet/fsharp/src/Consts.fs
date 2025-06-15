@@ -9,8 +9,8 @@ type FragmentMergeMode =
 | Outer
 /// Morphs the fragment into the innerHTML using idiomorph, preserving focus and minimizing element changes.
 | Inner
-/// Replaces the outer HTML of the existing element (no morphing).
-| Replace
+/// Removes the existing element from the DOM.
+| Remove
 /// Prepends the fragment inside the existing element.
 | Prepend
 /// Appends the fragment inside the existing element.
@@ -19,8 +19,6 @@ type FragmentMergeMode =
 | Before
 /// Inserts the fragment after the existing element.
 | After
-/// Removes the existing element from the DOM.
-| Remove
 
 type EventType =
 /// An event for merging HTML fragments into the DOM.
@@ -63,12 +61,11 @@ module Consts =
             match this with
                 | FragmentMergeMode.Outer -> "outer"
                 | FragmentMergeMode.Inner -> "inner"
-                | FragmentMergeMode.Replace -> "replace"
+                | FragmentMergeMode.Remove -> "remove"
                 | FragmentMergeMode.Prepend -> "prepend"
                 | FragmentMergeMode.Append -> "append"
                 | FragmentMergeMode.Before -> "before"
                 | FragmentMergeMode.After -> "after"
-                | FragmentMergeMode.Remove -> "remove"
 
     module EventType =
         let toString this =
