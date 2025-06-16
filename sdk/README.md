@@ -11,6 +11,14 @@ Provide an SDK in a language agnostic way, to that end
 1. Keep SDK as minimal as possible
 2. Allow per language/framework extended features to live in an SDK ***sugar*** version
 
+#### Naming Rationale
+
+**Why "Patch" instead of "Merge":**
+The prefix "Patch" was chosen to better reflect the non-idempotent nature of these operations. Unlike PUT requests that replace entire resources, PATCH requests apply partial modifications. This aligns with our SDK's behavior where operations modify specific parts of the DOM or signal state rather than replacing them entirely.
+
+**Why "Elements" instead of "Fragments":**
+We use "Elements" because it accurately describes what the SDK handles - complete HTML elements, not arbitrary DOM nodes like text nodes or document fragments. This naming matches the actual intent and constraints of the system, making the API clearer and more predictable for developers.
+
 ## Details
 
 ### Assumptions
@@ -60,8 +68,8 @@ Currently valid values are
 
 | Event                     | Description                         |
 |---------------------------|-------------------------------------|
-| datastar-merge-elements   | Merges HTML elements into the DOM   |
-| datastar-merge-signals    | Merges signals into the signals       |
+| datastar-patch-elements   | Patches HTML elements into the DOM   |
+| datastar-patch-signals    | Patches signals into the signals       |
 
 ##### Options
 * `eventId` (string) Each event ***may*** include an `eventId`.  This can be used by the backend to replay events.  This is part of the SSE spec and is used to tell the browser how to handle the event.  For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
@@ -76,10 +84,10 @@ When called the function ***must*** write to the response buffer the following i
 5. ***Must*** write a `\n\n` to complete the event per the SSE spec.
 6. Afterward the writer ***should*** immediately flush.  This can be confounded by other middlewares such as compression layers.
 
-### `ServerSentEventGenerator.MergeElements`
+### `ServerSentEventGenerator.PatchElements`
 
 ```
-ServerSentEventGenerator.MergeElements(
+ServerSentEventGenerator.PatchElements(
     elements: string,
     options?: {
         selector?: string,
@@ -115,9 +123,9 @@ data: elements     <span>1</span>
 data: elements </div>
 ```
 
-`MergeElements` is a helper function to send HTML elements to the browser to be merged into the DOM. To remove elements, use the `remove` merge mode.
+`PatchElements` is a helper function to send HTML elements to the browser to be merged into the DOM. To remove elements, use the `remove` merge mode.
 
-**Note:** To execute JavaScript, send a `<script>` element using MergeElements. The browser will automatically execute the script when it's added to the DOM.
+**Note:** To execute JavaScript, send a `<script>` element using PatchElements. The browser will automatically execute the script when it's added to the DOM.
 
 #### Elements vs Fragments: Datastar vs HTMX
 
@@ -173,17 +181,17 @@ Valid values should match the [ElementMergeMode](#ElementMergeMode) and currentl
 * `useViewTransition` Whether to use view transitions, if not provided the Datastar client side ***will*** default to `false`.
 
 #### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-merge-elements` event type.
+When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-patch-elements` event type.
 1. If `selector` is provided, the function ***must*** include the selector in the event data in the format `selector SELECTOR\n`, ***unless*** the selector is empty.
 2. If `mergeMode` is provided, the function ***must*** include the merge mode in the event data in the format `merge MERGE_MODE\n`, ***unless*** the value is the default of `outer`.
 3. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
 4. The function ***must*** include the elements in the event data, with each line prefixed with `elements `. This ***should*** be output after all other event data.
 
 
-### `ServerSentEventGenerator.MergeSignals`
+### `ServerSentEventGenerator.PatchSignals`
 
 ```
-ServerSentEventGenerator.MergeSignals(
+ServerSentEventGenerator.PatchSignals(
     signals: string,
     options ?: {
         onlyIfMissing?: boolean,
@@ -212,7 +220,7 @@ data: onlyIfMissing true
 data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 ```
 
-`MergeSignals` is a helper function to send one or more signals to the browser to be merged into the signals. This function implements [RFC 7386 JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386) semantics.
+`PatchSignals` is a helper function to send one or more signals to the browser to be merged into the signals. This function implements [RFC 7386 JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386) semantics.
 
 #### Args
 
@@ -220,7 +228,7 @@ Data is a JavaScript object or JSON string that will be sent to the browser to u
 
 #### RFC 7386 JSON Merge Patch Behavior
 
-MergeSignals follows RFC 7386 JSON Merge Patch specification:
+PatchSignals follows RFC 7386 JSON Merge Patch specification:
 
 * **Adding/Updating**: Properties in the patch object will be added to or update existing signals
 * **Removing**: Properties set to `null` in the patch object will **remove** the corresponding signal from the signals
@@ -265,7 +273,7 @@ This would:
 * `onlyIfMissing` (boolean) Whether to merge the signal only if it does not already exist.  If not provided, the Datastar client side ***will*** default to `false`, which will cause the data to be merged into the signals.
 
 #### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-merge-signals` event type.
+When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-patch-signals` event type.
 
 1. If `onlyIfMissing` is provided, the function ***must*** include it in the event data in the format `onlyIfMissing ONLY_IF_MISSING\n`, ***unless*** the value is the default of `false`.  `ONLY_IF_MISSING` should be `true` or `false` (string), depending on the value of the `onlyIfMissing` option.
 2. The function ***must*** include the signals in the event data, with each line prefixed with `signals `.  This ***should*** be output after all other event data.

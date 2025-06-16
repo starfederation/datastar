@@ -11,45 +11,45 @@ import (
 	"github.com/valyala/bytebufferpool"
 )
 
-// mergeSignalsOptions holds configuration options for merging signals.
-type mergeSignalsOptions struct {
+// patchSignalsOptions holds configuration options for patching signals.
+type patchSignalsOptions struct {
 	EventID       string
 	RetryDuration time.Duration
 	OnlyIfMissing bool
 }
 
-// MergeSignalsOption configures one [EventTypeMergeSignals] event.
-type MergeSignalsOption func(*mergeSignalsOptions)
+// PatchSignalsOption configures one [EventTypePatchSignals] event.
+type PatchSignalsOption func(*patchSignalsOptions)
 
-// WithMergeSignalsEventID configures an optional event ID for the signals merge event.
+// WithPatchSignalsEventID configures an optional event ID for the signals patch event.
 // The client message field [lastEventId] will be set to this value.
 // If the next event does not have an event ID, the last used event ID will remain.
 //
 // [lastEventId]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/lastEventId
-func WithMergeSignalsEventID(id string) MergeSignalsOption {
-	return func(o *mergeSignalsOptions) {
+func WithPatchSignalsEventID(id string) PatchSignalsOption {
+	return func(o *patchSignalsOptions) {
 		o.EventID = id
 	}
 }
 
-// WithMergeSignalsRetryDuration overrides the [DefaultSseRetryDuration] for signal merging.
-func WithMergeSignalsRetryDuration(retryDuration time.Duration) MergeSignalsOption {
-	return func(o *mergeSignalsOptions) {
+// WithPatchSignalsRetryDuration overrides the [DefaultSseRetryDuration] for signal patching.
+func WithPatchSignalsRetryDuration(retryDuration time.Duration) PatchSignalsOption {
+	return func(o *patchSignalsOptions) {
 		o.RetryDuration = retryDuration
 	}
 }
 
-// WithOnlyIfMissing instructs the client to only merge signals if they are missing.
-func WithOnlyIfMissing(onlyIfMissing bool) MergeSignalsOption {
-	return func(o *mergeSignalsOptions) {
+// WithOnlyIfMissing instructs the client to only patch signals if they are missing.
+func WithOnlyIfMissing(onlyIfMissing bool) PatchSignalsOption {
+	return func(o *patchSignalsOptions) {
 		o.OnlyIfMissing = onlyIfMissing
 	}
 }
 
-// MergeSignals sends a [EventTypeMergeSignals] to the client.
+// PatchSignals sends a [EventTypePatchSignals] to the client.
 // Requires a JSON-encoded payload.
-func (sse *ServerSentEventGenerator) MergeSignals(signalsContents []byte, opts ...MergeSignalsOption) error {
-	options := &mergeSignalsOptions{
+func (sse *ServerSentEventGenerator) PatchSignals(signalsContents []byte, opts ...PatchSignalsOption) error {
+	options := &patchSignalsOptions{
 		EventID:       "",
 		RetryDuration: DefaultSseRetryDuration,
 		OnlyIfMissing: false,
@@ -76,11 +76,11 @@ func (sse *ServerSentEventGenerator) MergeSignals(signalsContents []byte, opts .
 	}
 
 	if err := sse.Send(
-		EventTypeMergeSignals,
+		EventTypePatchSignals,
 		dataRows,
 		sendOptions...,
 	); err != nil {
-		return fmt.Errorf("failed to send merge signals: %w", err)
+		return fmt.Errorf("failed to send patch signals: %w", err)
 	}
 	return nil
 }

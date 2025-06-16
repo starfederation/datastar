@@ -210,14 +210,14 @@ var Consts = &ConstTemplateData{
 			DefaultIndex: -1,
 			Values: []*EnumValueDefinition{
 				{
-					Name:        toolbelt.ToCasedString("MergeElements"),
-					Description: "An event for merging HTML elements into the DOM.",
-					Value:       "datastar-merge-elements",
+					Name:        toolbelt.ToCasedString("PatchElements"),
+					Description: "An event for patching HTML elements into the DOM.",
+					Value:       "datastar-patch-elements",
 				},
 				{
-					Name:        toolbelt.ToCasedString("MergeSignals"),
-					Description: "An event for merging signals.",
-					Value:       "datastar-merge-signals",
+					Name:        toolbelt.ToCasedString("PatchSignals"),
+					Description: "An event for patching signals.",
+					Value:       "datastar-patch-signals",
 				},
 			},
 		},

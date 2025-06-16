@@ -93,14 +93,11 @@ const (
 type EventType string
 
 const (
-    // An event for merging HTML elements into the DOM.
-    EventTypeMergeElements EventType = "datastar-merge-elements"
+    // An event for patching HTML elements into the DOM.
+    EventTypePatchElements EventType = "datastar-patch-elements"
 
-    // An event for merging signals.
-    EventTypeMergeSignals EventType = "datastar-merge-signals"
-
-    // An event for executing <script/> elements in the browser.
-    EventTypeExecuteScript EventType = "datastar-execute-script"
+    // An event for patching signals.
+    EventTypePatchSignals EventType = "datastar-patch-signals"
 
 )
 //endregion EventType

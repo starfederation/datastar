@@ -68,8 +68,8 @@ func WithExecuteScriptAttributeKVs(kvs ...string) ExecuteScriptOption {
 	return WithExecuteScriptAttributes(attributes...)
 }
 
-// ExecuteScript runs a script in the client browser by using MergeElements to send a <script> element.
-// This is a sugar helper that maintains backward compatibility while using the standard MergeElements approach.
+// ExecuteScript runs a script in the client browser by using PatchElements to send a <script> element.
+// This is a sugar helper that maintains backward compatibility while using the standard PatchElements approach.
 func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts ...ExecuteScriptOption) error {
 	options := &executeScriptOptions{
 		RetryDuration: DefaultSseRetryDuration,
@@ -97,19 +97,19 @@ func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts .
 	sb.WriteString(scriptContents)
 	sb.WriteString("</script>")
 
-	// Use MergeElements to send the script
-	mergeOpts := []MergeElementOption{
+	// Use PatchElements to send the script
+	patchOpts := []PatchElementOption{
 		WithSelector("body"),
 		WithMergeAppend(),
 	}
 	if options.EventID != "" {
-		mergeOpts = append(mergeOpts, WithMergeElementsEventID(options.EventID))
+		patchOpts = append(patchOpts, WithPatchElementsEventID(options.EventID))
 	}
 	if options.RetryDuration > 0 {
-		mergeOpts = append(mergeOpts, WithRetryDuration(options.RetryDuration))
+		patchOpts = append(patchOpts, WithRetryDuration(options.RetryDuration))
 	}
 
-	return sse.MergeElements(sb.String(), mergeOpts...)
+	return sse.PatchElements(sb.String(), patchOpts...)
 }
 
 // ConsoleLog is a convenience method for [see.ExecuteScript].

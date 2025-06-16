@@ -44,71 +44,71 @@ func ElementMergeTypeFromString(s string) (ElementMergeMode, error) {
 	}
 }
 
-// WithMergeOuter creates a MergeElementOption that merges elements using the outer mode.
-func WithMergeOuter() MergeElementOption {
+// WithMergeOuter creates a PatchElementOption that merges elements using the outer mode.
+func WithMergeOuter() PatchElementOption {
 	return WithMergeMode(ElementMergeModeOuter)
 }
 
-// WithMergeInner creates a MergeElementOption that merges elements using the inner mode.
-func WithMergeInner() MergeElementOption {
+// WithMergeInner creates a PatchElementOption that merges elements using the inner mode.
+func WithMergeInner() PatchElementOption {
 	return WithMergeMode(ElementMergeModeInner)
 }
 
-// WithMergeRemove creates a MergeElementOption that removes elements from the DOM.
-func WithMergeRemove() MergeElementOption {
+// WithMergeRemove creates a PatchElementOption that removes elements from the DOM.
+func WithMergeRemove() PatchElementOption {
 	return WithMergeMode(ElementMergeModeRemove)
 }
 
-// WithMergePrepend creates a MergeElementOption that merges elements using the prepend mode.
-func WithMergePrepend() MergeElementOption {
+// WithMergePrepend creates a PatchElementOption that merges elements using the prepend mode.
+func WithMergePrepend() PatchElementOption {
 	return WithMergeMode(ElementMergeModePrepend)
 }
 
-// WithMergeAppend creates a MergeElementOption that merges elements using the append mode.
-func WithMergeAppend() MergeElementOption {
+// WithMergeAppend creates a PatchElementOption that merges elements using the append mode.
+func WithMergeAppend() PatchElementOption {
 	return WithMergeMode(ElementMergeModeAppend)
 }
 
-// WithMergeBefore creates a MergeElementOption that merges elements using the before mode.
-func WithMergeBefore() MergeElementOption {
+// WithMergeBefore creates a PatchElementOption that merges elements using the before mode.
+func WithMergeBefore() PatchElementOption {
 	return WithMergeMode(ElementMergeModeBefore)
 }
 
-// WithMergeAfter creates a MergeElementOption that merges elements using the after mode.
-func WithMergeAfter() MergeElementOption {
+// WithMergeAfter creates a PatchElementOption that merges elements using the after mode.
+func WithMergeAfter() PatchElementOption {
 	return WithMergeMode(ElementMergeModeAfter)
 }
 
-// WithMergeReplace creates a MergeElementOption that replaces elements without morphing.
+// WithMergeReplace creates a PatchElementOption that replaces elements without morphing.
 // This mode does not use morphing and will completely replace the element, resetting any related state.
-func WithMergeReplace() MergeElementOption {
+func WithMergeReplace() PatchElementOption {
 	return WithMergeMode(ElementMergeModeReplace)
 }
 
 // WithSelectorID is a convenience wrapper for [WithSelector] option
 // equivalent to calling `WithSelector("#"+id)`.
-func WithSelectorID(id string) MergeElementOption {
+func WithSelectorID(id string) PatchElementOption {
 	return WithSelector("#" + id)
 }
 
 // WithViewTransitions enables the use of view transitions when merging elements.
-func WithViewTransitions() MergeElementOption {
-	return func(o *mergeElementOptions) {
+func WithViewTransitions() PatchElementOption {
+	return func(o *patchElementOptions) {
 		o.UseViewTransitions = true
 	}
 }
 
 // WithoutViewTransitions disables the use of view transitions when merging elements.
-func WithoutViewTransitions() MergeElementOption {
-	return func(o *mergeElementOptions) {
+func WithoutViewTransitions() PatchElementOption {
+	return func(o *patchElementOptions) {
 		o.UseViewTransitions = false
 	}
 }
 
-// MergeElementf is a convenience wrapper for [MergeElements] option
-// equivalent to calling `MergeElements(fmt.Sprintf(format, args...))`.
-func (sse *ServerSentEventGenerator) MergeElementf(format string, args ...any) error {
-	return sse.MergeElements(fmt.Sprintf(format, args...))
+// PatchElementf is a convenience wrapper for [PatchElements] option
+// equivalent to calling `PatchElements(fmt.Sprintf(format, args...))`.
+func (sse *ServerSentEventGenerator) PatchElementf(format string, args ...any) error {
+	return sse.PatchElements(fmt.Sprintf(format, args...))
 }
 
 // TemplComponent satisfies the component rendering interface for HTML template engine [Templ].
@@ -120,15 +120,15 @@ type TemplComponent interface {
 	Render(ctx context.Context, w io.Writer) error
 }
 
-// MergeElementTempl is a convenience adaptor of [sse.MergeElements] for [TemplComponent].
-func (sse *ServerSentEventGenerator) MergeElementTempl(c TemplComponent, opts ...MergeElementOption) error {
+// PatchElementTempl is a convenience adaptor of [sse.PatchElements] for [TemplComponent].
+func (sse *ServerSentEventGenerator) PatchElementTempl(c TemplComponent, opts ...PatchElementOption) error {
 	buf := bytebufferpool.Get()
 	defer bytebufferpool.Put(buf)
 	if err := c.Render(sse.Context(), buf); err != nil {
 		return fmt.Errorf("failed to merge element: %w", err)
 	}
-	if err := sse.MergeElements(buf.String(), opts...); err != nil {
-		return fmt.Errorf("failed to merge element: %w", err)
+	if err := sse.PatchElements(buf.String(), opts...); err != nil {
+		return fmt.Errorf("failed to patch element: %w", err)
 	}
 	return nil
 }
@@ -142,15 +142,15 @@ type GoStarElementRenderer interface {
 	Render(w io.Writer) error
 }
 
-// MergeElementGostar is a convenience adaptor of [sse.MergeElements] for [GoStarElementRenderer].
-func (sse *ServerSentEventGenerator) MergeElementGostar(child GoStarElementRenderer, opts ...MergeElementOption) error {
+// PatchElementGostar is a convenience adaptor of [sse.PatchElements] for [GoStarElementRenderer].
+func (sse *ServerSentEventGenerator) PatchElementGostar(child GoStarElementRenderer, opts ...PatchElementOption) error {
 	buf := bytebufferpool.Get()
 	defer bytebufferpool.Put(buf)
 	if err := child.Render(buf); err != nil {
 		return fmt.Errorf("failed to render: %w", err)
 	}
-	if err := sse.MergeElements(buf.String(), opts...); err != nil {
-		return fmt.Errorf("failed to merge element: %w", err)
+	if err := sse.PatchElements(buf.String(), opts...); err != nil {
+		return fmt.Errorf("failed to patch element: %w", err)
 	}
 	return nil
 }
@@ -191,11 +191,11 @@ func DeleteSSE(urlFormat string, args ...any) string {
 }
 
 // RemoveElement is a convenience method for removing elements from the DOM.
-// It uses MergeElements with the remove merge mode and the specified selector.
-func (sse *ServerSentEventGenerator) RemoveElement(selector string, opts ...MergeElementOption) error {
+// It uses PatchElements with the remove merge mode and the specified selector.
+func (sse *ServerSentEventGenerator) RemoveElement(selector string, opts ...PatchElementOption) error {
 	// Prepend the remove mode option
-	allOpts := append([]MergeElementOption{WithMergeRemove(), WithSelector(selector)}, opts...)
-	return sse.MergeElements("", allOpts...)
+	allOpts := append([]PatchElementOption{WithMergeRemove(), WithSelector(selector)}, opts...)
+	return sse.PatchElements("", allOpts...)
 }
 
 // RemoveElementf is a convenience wrapper for RemoveElement that formats the selector string
