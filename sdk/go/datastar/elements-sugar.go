@@ -17,6 +17,7 @@ var ValidElementMergeTypes = []ElementMergeMode{
 	ElementMergeModeAppend,
 	ElementMergeModeBefore,
 	ElementMergeModeAfter,
+	ElementMergeModeReplace,
 }
 
 // ElementMergeTypeFromString converts a string to a [ElementMergeMode].
@@ -36,6 +37,8 @@ func ElementMergeTypeFromString(s string) (ElementMergeMode, error) {
 		return ElementMergeModeBefore, nil
 	case "after":
 		return ElementMergeModeAfter, nil
+	case "replace":
+		return ElementMergeModeReplace, nil
 	default:
 		return "", fmt.Errorf("invalid element merge type: %s", s)
 	}
@@ -74,6 +77,12 @@ func WithMergeBefore() MergeElementOption {
 // WithMergeAfter creates a MergeElementOption that merges elements using the after mode.
 func WithMergeAfter() MergeElementOption {
 	return WithMergeMode(ElementMergeModeAfter)
+}
+
+// WithMergeReplace creates a MergeElementOption that replaces elements without morphing.
+// This mode does not use morphing and will completely replace the element, resetting any related state.
+func WithMergeReplace() MergeElementOption {
+	return WithMergeMode(ElementMergeModeReplace)
 }
 
 // WithSelectorID is a convenience wrapper for [WithSelector] option

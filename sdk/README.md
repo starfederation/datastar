@@ -165,6 +165,7 @@ Valid values should match the [ElementMergeMode](#ElementMergeMode) and currentl
 | before           | Insert the element before the selector                  |
 | after            | Insert the element after the selector                   |
 | remove           | Remove the existing element from the DOM                |
+| replace | Do not morph, simply replace the whole element and reset any related state |
 
 ##### Options
 * `selector` (string) The CSS selector to use to insert the elements.  If not provided or empty, Datastar **will** default to using the `id` attribute of the element.

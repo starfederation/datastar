@@ -197,6 +197,10 @@ var Consts = &ConstTemplateData{
 					Value:       "after",
 					Description: "Inserts the element after the existing element.",
 				},
+				{
+					Value:       "replace",
+					Description: "Do not morph, simply replace the whole element and reset any related state.",
+				},
 			},
 		},
 

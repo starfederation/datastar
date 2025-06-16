@@ -83,6 +83,9 @@ const (
     // Inserts the element after the existing element.
     ElementMergeModeAfter ElementMergeMode = "after"
 
+    // Do not morph, simply replace the whole element and reset any related state.
+    ElementMergeModeReplace ElementMergeMode = "replace"
+
 )
 //endregion ElementMergeMode
 
