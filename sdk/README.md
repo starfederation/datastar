@@ -122,9 +122,8 @@ ServerSentEventGenerator.PatchElements(
 
 ```http
 event: datastar-patch-elements
-data: elements <div id="feed">
-data: elements     <span>1</span>
-data: elements </div>
+data: elements <div id="feed"><span>1</span></div>
+
 ```
 </details>
 
@@ -141,6 +140,7 @@ data: useViewTransition true
 data: elements <div id="feed">
 data: elements     <span>1</span>
 data: elements </div>
+
 ```
 </details>
 
@@ -221,6 +221,7 @@ ServerSentEventGenerator.PatchSignals(
 ```http
 event: datastar-patch-signals
 data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
+
 ```
 </details>
 
@@ -231,9 +232,9 @@ data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":
 event: datastar-patch-signals
 id: 123
 retry: 2000
-data: mode inner
 data: onlyIfMissing true
 data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
+
 ```
 </details>
 
