@@ -180,3 +180,24 @@ func PatchSSE(urlFormat string, args ...any) string {
 func DeleteSSE(urlFormat string, args ...any) string {
 	return fmt.Sprintf(`@delete('%s')`, fmt.Sprintf(urlFormat, args...))
 }
+
+// RemoveElement is a convenience method for removing elements from the DOM.
+// It uses MergeElements with the remove merge mode and the specified selector.
+func (sse *ServerSentEventGenerator) RemoveElement(selector string, opts ...MergeElementOption) error {
+	// Prepend the remove mode option
+	allOpts := append([]MergeElementOption{WithMergeRemove(), WithSelector(selector)}, opts...)
+	return sse.MergeElements("", allOpts...)
+}
+
+// RemoveElementf is a convenience wrapper for RemoveElement that formats the selector string
+// using the provided format and arguments similar to fmt.Sprintf.
+func (sse *ServerSentEventGenerator) RemoveElementf(selectorFormat string, args ...any) error {
+	selector := fmt.Sprintf(selectorFormat, args...)
+	return sse.RemoveElement(selector)
+}
+
+// RemoveElementByID is a convenience wrapper for RemoveElement that removes an element by its ID.
+// Equivalent to calling RemoveElement("#"+id).
+func (sse *ServerSentEventGenerator) RemoveElementByID(id string) error {
+	return sse.RemoveElement("#" + id)
+}
