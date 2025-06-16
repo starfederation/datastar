@@ -9,36 +9,36 @@ import (
 )
 
 // ValidElementMergeTypes is a list of valid element merge modes.
-var ValidElementMergeTypes = []ElementMergeMode{
-	ElementMergeModeOuter,
-	ElementMergeModeInner,
-	ElementMergeModeRemove,
-	ElementMergeModePrepend,
-	ElementMergeModeAppend,
-	ElementMergeModeBefore,
-	ElementMergeModeAfter,
-	ElementMergeModeReplace,
+var ValidElementMergeTypes = []ElementPatchMode{
+	ElementPatchModeOuter,
+	ElementPatchModeInner,
+	ElementPatchModeRemove,
+	ElementPatchModePrepend,
+	ElementPatchModeAppend,
+	ElementPatchModeBefore,
+	ElementPatchModeAfter,
+	ElementPatchModeReplace,
 }
 
-// ElementMergeTypeFromString converts a string to a [ElementMergeMode].
-func ElementMergeTypeFromString(s string) (ElementMergeMode, error) {
+// ElementMergeTypeFromString converts a string to a [ElementPatchMode].
+func ElementMergeTypeFromString(s string) (ElementPatchMode, error) {
 	switch s {
 	case "outer":
-		return ElementMergeModeOuter, nil
+		return ElementPatchModeOuter, nil
 	case "inner":
-		return ElementMergeModeInner, nil
+		return ElementPatchModeInner, nil
 	case "remove":
-		return ElementMergeModeRemove, nil
+		return ElementPatchModeRemove, nil
 	case "prepend":
-		return ElementMergeModePrepend, nil
+		return ElementPatchModePrepend, nil
 	case "append":
-		return ElementMergeModeAppend, nil
+		return ElementPatchModeAppend, nil
 	case "before":
-		return ElementMergeModeBefore, nil
+		return ElementPatchModeBefore, nil
 	case "after":
-		return ElementMergeModeAfter, nil
+		return ElementPatchModeAfter, nil
 	case "replace":
-		return ElementMergeModeReplace, nil
+		return ElementPatchModeReplace, nil
 	default:
 		return "", fmt.Errorf("invalid element merge type: %s", s)
 	}
@@ -46,43 +46,43 @@ func ElementMergeTypeFromString(s string) (ElementMergeMode, error) {
 
 // WithMergeOuter creates a PatchElementOption that merges elements using the outer mode.
 func WithMergeOuter() PatchElementOption {
-	return WithMergeMode(ElementMergeModeOuter)
+	return WithMergeMode(ElementPatchModeOuter)
 }
 
 // WithMergeInner creates a PatchElementOption that merges elements using the inner mode.
 func WithMergeInner() PatchElementOption {
-	return WithMergeMode(ElementMergeModeInner)
+	return WithMergeMode(ElementPatchModeInner)
 }
 
 // WithMergeRemove creates a PatchElementOption that removes elements from the DOM.
 func WithMergeRemove() PatchElementOption {
-	return WithMergeMode(ElementMergeModeRemove)
+	return WithMergeMode(ElementPatchModeRemove)
 }
 
 // WithMergePrepend creates a PatchElementOption that merges elements using the prepend mode.
 func WithMergePrepend() PatchElementOption {
-	return WithMergeMode(ElementMergeModePrepend)
+	return WithMergeMode(ElementPatchModePrepend)
 }
 
 // WithMergeAppend creates a PatchElementOption that merges elements using the append mode.
 func WithMergeAppend() PatchElementOption {
-	return WithMergeMode(ElementMergeModeAppend)
+	return WithMergeMode(ElementPatchModeAppend)
 }
 
 // WithMergeBefore creates a PatchElementOption that merges elements using the before mode.
 func WithMergeBefore() PatchElementOption {
-	return WithMergeMode(ElementMergeModeBefore)
+	return WithMergeMode(ElementPatchModeBefore)
 }
 
 // WithMergeAfter creates a PatchElementOption that merges elements using the after mode.
 func WithMergeAfter() PatchElementOption {
-	return WithMergeMode(ElementMergeModeAfter)
+	return WithMergeMode(ElementPatchModeAfter)
 }
 
 // WithMergeReplace creates a PatchElementOption that replaces elements without morphing.
 // This mode does not use morphing and will completely replace the element, resetting any related state.
 func WithMergeReplace() PatchElementOption {
-	return WithMergeMode(ElementMergeModeReplace)
+	return WithMergeMode(ElementPatchModeReplace)
 }
 
 // WithSelectorID is a convenience wrapper for [WithSelector] option

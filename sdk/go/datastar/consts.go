@@ -26,7 +26,7 @@ const (
 
     //region Dataline literals
     SelectorDatalineLiteral = "selector "
-    MergeModeDatalineLiteral = "mergeMode "
+    ModeDatalineLiteral = "mode "
     ElementsDatalineLiteral = "elements "
     UseViewTransitionDatalineLiteral = "useViewTransition "
     SignalsDatalineLiteral = "signals "
@@ -54,40 +54,40 @@ var (
 
 //region Enums
 
-//region The mode in which an element is merged into the DOM.
-type ElementMergeMode string
+//region The mode in which an element is patched into the DOM.
+type ElementPatchMode string
 
 const (
-    // Default value for ElementMergeMode
+    // Default value for ElementPatchMode
     // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
-    DefaultElementMergeMode = ElementMergeModeOuter
+    DefaultElementPatchMode = ElementPatchModeOuter
 
     // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
-    ElementMergeModeOuter ElementMergeMode = "outer"
+    ElementPatchModeOuter ElementPatchMode = "outer"
 
     // Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
-    ElementMergeModeInner ElementMergeMode = "inner"
+    ElementPatchModeInner ElementPatchMode = "inner"
 
     // Removes the existing element from the DOM.
-    ElementMergeModeRemove ElementMergeMode = "remove"
+    ElementPatchModeRemove ElementPatchMode = "remove"
 
     // Prepends the element inside the existing element.
-    ElementMergeModePrepend ElementMergeMode = "prepend"
+    ElementPatchModePrepend ElementPatchMode = "prepend"
 
     // Appends the element inside the existing element.
-    ElementMergeModeAppend ElementMergeMode = "append"
+    ElementPatchModeAppend ElementPatchMode = "append"
 
     // Inserts the element before the existing element.
-    ElementMergeModeBefore ElementMergeMode = "before"
+    ElementPatchModeBefore ElementPatchMode = "before"
 
     // Inserts the element after the existing element.
-    ElementMergeModeAfter ElementMergeMode = "after"
+    ElementPatchModeAfter ElementPatchMode = "after"
 
     // Do not morph, simply replace the whole element and reset any related state.
-    ElementMergeModeReplace ElementMergeMode = "replace"
+    ElementPatchModeReplace ElementPatchMode = "replace"
 
 )
-//endregion ElementMergeMode
+//endregion ElementPatchMode
 
 //region The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 type EventType string

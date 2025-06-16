@@ -154,19 +154,19 @@ var Consts = &ConstTemplateData{
 		// Shared
 		toolbelt.ToCasedString("selector"),
 
-		// MergeElements
-		toolbelt.ToCasedString("mergeMode"),
+		// PatchElements
+		toolbelt.ToCasedString("mode"),
 		toolbelt.ToCasedString("elements"),
 		toolbelt.ToCasedString("useViewTransition"),
 
-		// MergeSignals
+		// PatchSignals
 		toolbelt.ToCasedString("signals"),
 		toolbelt.ToCasedString("onlyIfMissing"),
 	},
 	Enums: []*EnumDefinition{
 		{
-			Name:         toolbelt.ToCasedString("ElementMergeMode"),
-			Description:  "The mode in which an element is merged into the DOM.",
+			Name:         toolbelt.ToCasedString("ElementPatchMode"),
+			Description:  "The mode in which an element is patched into the DOM.",
 			DefaultIndex: 0,
 			Values: []*EnumValueDefinition{
 				{

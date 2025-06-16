@@ -12,7 +12,7 @@ type patchElementOptions struct {
 	EventID            string
 	RetryDuration      time.Duration
 	Selector           string
-	MergeMode          ElementMergeMode
+	MergeMode          ElementPatchMode
 	UseViewTransitions bool
 }
 
@@ -47,9 +47,9 @@ func WithSelector(selector string) PatchElementOption {
 	}
 }
 
-// WithMergeMode overrides the [DefaultElementMergeMode] for the element.
-// Choose a valid [ElementMergeMode].
-func WithMergeMode(merge ElementMergeMode) PatchElementOption {
+// WithMergeMode overrides the [DefaultElementPatchMode] for the element.
+// Choose a valid [ElementPatchMode].
+func WithMergeMode(merge ElementPatchMode) PatchElementOption {
 	return func(o *patchElementOptions) {
 		o.MergeMode = merge
 	}
@@ -77,7 +77,7 @@ func (sse *ServerSentEventGenerator) PatchElements(elements string, opts ...Patc
 		EventID:       "",
 		RetryDuration: DefaultSseRetryDuration,
 		Selector:      "",
-		MergeMode:     ElementMergeModeOuter,
+		MergeMode:     ElementPatchModeOuter,
 	}
 	for _, opt := range opts {
 		opt(options)
@@ -95,8 +95,8 @@ func (sse *ServerSentEventGenerator) PatchElements(elements string, opts ...Patc
 	if options.Selector != "" {
 		dataRows = append(dataRows, SelectorDatalineLiteral+options.Selector)
 	}
-	if options.MergeMode != ElementMergeModeOuter {
-		dataRows = append(dataRows, MergeModeDatalineLiteral+string(options.MergeMode))
+	if options.MergeMode != ElementPatchModeOuter {
+		dataRows = append(dataRows, ModeDatalineLiteral+string(options.MergeMode))
 	}
 	if options.UseViewTransitions {
 		dataRows = append(dataRows, UseViewTransitionDatalineLiteral+"true")

@@ -93,7 +93,7 @@ String enum of supported events:
 2. `id: EVENT_ID\n` (if eventId provided)
 3. `retry: RETRY_DURATION\n` (***unless*** default 1000ms)
 4. `data: DATA\n` (for each dataLine)
-5. `\n\n` (end of event)
+5. `\n` (end of event)
 6. ***Should*** flush immediately (note: compression middleware may interfere)
 
 **Error Handling**: ***Must*** return/throw errors per language conventions.
@@ -107,7 +107,7 @@ ServerSentEventGenerator.PatchElements(
     elements: string,
     options?: {
         selector?: string,
-        mergeMode?: ElementMergeMode,
+        mode?: ElementPatchMode,
         useViewTransition?: boolean,
         eventId?: string,
         retryDuration?: durationInMilliseconds
@@ -161,36 +161,29 @@ data: elements </div>
 
 ### Parameters
 
-#### ElementMergeMode
+#### ElementPatchMode
 
-String enum defining how elements are merged into the DOM.
-
-##### Morphing vs Non-Morphing Modes
-
-| Mode Type | Modes | Characteristics |
-|-----------|-------|-----------------|
-| **Morphing** | `outer`, `inner` | • Preserves focus & scroll position<br>• Minimal DOM changes<br>• Smooth transitions<br>• Maintains element state |
-| **Non-morphing** | `replace`, `prepend`, `append`, `before`, `after` | • Direct DOM manipulation<br>• Faster execution<br>• No state preservation<br>• Complete element replacement |
+String enum defining how elements are patched into the DOM.
 
 ##### Available Modes
 
-| Mode | Type | Description |
+| Mode |Is Morphed? | Description |
 |------|------|-------------|
-| `outer` | Morphing | Morph entire element, preserving state |
-| `inner` | Morphing | Morph inner HTML only, preserving state |
-| `prepend` | Non-morphing | Insert at beginning inside target |
-| `append` | Non-morphing | Insert at end inside target |
-| `before` | Non-morphing | Insert before target element |
-| `after` | Non-morphing | Insert after target element |
-| `remove` | Non-morphing | Remove target element from DOM |
-| `replace` | Non-morphing | Replace entire element, reset state |
+| `outer` | ✔️ | Morph entire element, preserving state |
+| `inner` | ✔️ | Morph inner HTML only, preserving state |
+| `replace` | 🚫 | Replace entire element, reset state |
+| `prepend` | 🚫 | Insert at beginning inside target |
+| `append` | 🚫 | Insert at end inside target |
+| `before` | 🚫 | Insert before target element |
+| `after` | 🚫 | Insert after target element |
+| `remove` | 🚫 | Remove target element from DOM |
 
 #### Options
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `selector` | string | Element's `id` | CSS selector for target element |
-| `mergeMode` | ElementMergeMode | `outer` | How to merge the element |
+| `mode` | ElementPatchMode | `outer` | How to patch the element |
 | `useViewTransition` | boolean | `false` | Enable view transitions API |
 
 ### Implementation
@@ -199,7 +192,7 @@ String enum defining how elements are merged into the DOM.
 
 **Data format** (only include non-defaults):
 - `selector SELECTOR\n` (if provided)
-- `mergeMode MERGE_MODE\n` (if not `outer`)
+- `mode PATCH_MODE\n` (if not `outer`)
 - `useViewTransition true\n` (if `true`)
 - `elements HTML_LINE\n` (for each line of HTML)
 
@@ -237,6 +230,7 @@ data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":
 event: datastar-patch-signals
 id: 123
 retry: 2000
+data: mode inner
 data: onlyIfMissing true
 data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 ```
