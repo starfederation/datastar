@@ -135,6 +135,7 @@ data: elements </div>
 event: datastar-patch-elements
 id: 123
 retry: 2000
+data: mode inner
 data: selector #feed
 data: useViewTransition true
 data: elements <div id="feed">
