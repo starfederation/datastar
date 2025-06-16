@@ -31,6 +31,14 @@ func WithExecuteScriptEventID(id string) ExecuteScriptOption {
 	}
 }
 
+// WithExecuteScriptRetryDuration overrides the [DefaultSseRetryDuration] for this script
+// execution only.
+func WithExecuteScriptRetryDuration(retryDuration time.Duration) ExecuteScriptOption {
+	return func(o *executeScriptOptions) {
+		o.RetryDuration = retryDuration
+	}
+}
+
 // WithExecuteScriptAutoRemove requires the client to eliminate the script element after its execution.
 func WithExecuteScriptAutoRemove(autoremove bool) ExecuteScriptOption {
 	return func(o *executeScriptOptions) {
@@ -38,8 +46,8 @@ func WithExecuteScriptAutoRemove(autoremove bool) ExecuteScriptOption {
 	}
 }
 
-// WithExecuteScriptAttributes overrides the default script attribute
-// value `type="module"`, which renders as `<script type="module">` in client's browser.
+// WithExecuteScriptAttributes sets the script element attributes.
+// Each attribute should be a complete key="value" pair (e.g., `type="module"`).
 func WithExecuteScriptAttributes(attributes ...string) ExecuteScriptOption {
 	return func(o *executeScriptOptions) {
 		o.Attributes = attributes
@@ -65,6 +73,7 @@ func WithExecuteScriptAttributeKVs(kvs ...string) ExecuteScriptOption {
 func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts ...ExecuteScriptOption) error {
 	options := &executeScriptOptions{
 		RetryDuration: DefaultSseRetryDuration,
+		Attributes:    []string{},
 	}
 	for _, opt := range opts {
 		opt(options)
@@ -72,16 +81,16 @@ func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts .
 
 	// Build the script element
 	sb := strings.Builder{}
-	sb.WriteString("<script ")
+	sb.WriteString("<script")
 
 	for _, attribute := range options.Attributes {
-		sb.WriteString(attribute)
 		sb.WriteString(" ")
+		sb.WriteString(attribute)
 	}
 
 	// Add data-datastar-autoremove attribute if needed
 	if options.AutoRemove == nil || *options.AutoRemove {
-		sb.WriteString(`data-on-load="el.remove()"`)
+		sb.WriteString(` data-on-load="el.remove()"`)
 	}
 
 	sb.WriteString(">")
@@ -91,7 +100,7 @@ func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts .
 	// Use MergeElements to send the script
 	mergeOpts := make([]MergeElementOption, 0, 2)
 	if options.EventID != "" {
-		mergeOpts = append(mergeOpts)
+		mergeOpts = append(mergeOpts, WithMergeElementsEventID(options.EventID))
 	}
 
 	return sse.MergeElements(sb.String(), mergeOpts...)
@@ -317,6 +326,6 @@ func (sse *ServerSentEventGenerator) Prefetch(urls ...string) error {
 	return sse.ExecuteScript(
 		script,
 		WithExecuteScriptAutoRemove(false),
-		WithExecuteScriptAttributes("type speculationrules"),
+		WithExecuteScriptAttributes(`type="speculationrules"`),
 	)
 }
