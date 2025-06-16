@@ -2,16 +2,16 @@
 
 ## Summary
 
-Datastar has had a few helper tools in the past for different languages.  The SDK effort is to unify around the tooling needed for Hypermedia On Whatever your Like (HOWL) based UIs.  Although Datastar the library can use any plugins, the default bundle includes robust Server Sent Event (SSE) base approach.  Most current languages and backend don't have great tooling around the style of delivering content to the frontend.
+Datastar SDK provides unified tooling for building Hypermedia On Whatever you Like (HOWL) based UIs across multiple languages. While Datastar supports various plugins, the default bundle focuses on a robust Server-Sent Event (SSE) approach, addressing the lack of good SSE tooling in most languages and backends.
 
-### Decision
+## Decision
 
-Provide an SDK in a language agnostic way, to that end
+Provide a language-agnostic SDK with these principles:
 
-1. Keep SDK as minimal as possible
-2. Allow per language/framework extended features to live in an SDK ***sugar*** version
+1. **Minimal Core**: Keep the SDK as minimal as possible
+2. **Sugar Extensions**: Allow per-language/framework extended features in SDK "sugar" versions
 
-#### Naming Rationale
+### Naming Rationale
 
 **Why "Patch" instead of "Merge":**
 The prefix "Patch" was chosen to better reflect the non-idempotent nature of these operations. Unlike PUT requests that replace entire resources, PATCH requests apply partial modifications. This aligns with our SDK's behavior where operations modify specific parts of the DOM or signal state rather than replacing them entirely.
@@ -21,33 +21,40 @@ We use "Elements" because it accurately describes what the SDK handles - complet
 
 ## Details
 
-### Assumptions
+### Core Mechanics
 
 The core mechanics of Datastar’s SSE support is
 
-1. Data gets sent to browser as SSE events.
-2. Data comes in via JSON from browser under a `datastar` namespace.
+1. **Server → Browser**: Data is sent as SSE events
+2. **Browser → Server**: Data arrives as JSON under the `datastar` namespace
 
-# Library
+# SDK Specification
 
-> [!WARNING] All naming conventions are shown using `Go` as the standard. Things may vary per language norms but please keep as close as possible.
+> [!WARNING] 
+> All naming conventions use Go as the reference implementation. Adapt to language-specific conventions while maintaining consistency.
 
 ## ServerSentEventGenerator
 
-***There must*** be a `ServerSentEventGenerator` namespace.  In Go this is implemented as a struct, but could be a class or even namespace in languages such as C.
+**Required**: A `ServerSentEventGenerator` namespace/class/struct (implementation varies by language).
+
+---
 
 ### Construction / Initialization
-   1. ***There must*** be a way to create a new instance of this object based on the incoming `HTTP` Request and Response objects.
-   2. The `ServerSentEventGenerator` ***must*** use a response controller that has the following response headers set by default
-      1. `Cache-Control = nocache`
-      2. `Content-Type = text/event-stream`
-      3. `Connection = keep-alive` ***only*** if a HTTP/1.1 connection is used (see [spec](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Connection))
-   3. Then the created response ***should*** `flush` immediately to avoid timeouts while 0-♾️ events are created
-   4. Multiple calls using `ServerSentEventGenerator` should be single threaded to guarantee order.  The Go implementation uses a mutex to facilitate this behavior but might not be needed in a some environments
+
+**Requirements:**
+
+| Requirement | Description |
+|-------------|-------------|
+| **Constructor** | ***Must*** accept HTTP Request and Response objects |
+| **Response Headers** | ***Must*** set:<br>• `Cache-Control: no-cache`<br>• `Content-Type: text/event-stream`<br>• `Connection: keep-alive` (HTTP/1.1 only - [see spec](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Connection)) |
+| **Immediate Flush** | ***Should*** flush response immediately to prevent timeouts |
+| **Thread Safety** | ***Should*** ensure ordered delivery (e.g., mutex in Go) |
+
+---
 
 ### `ServerSentEventGenerator.send`
 
-```
+```typescript
 ServerSentEventGenerator.send(
     eventType: EventType,
     dataLines: string[],
@@ -58,35 +65,44 @@ ServerSentEventGenerator.send(
 )
 ```
 
-All top level `ServerSentEventGenerator` ***should*** use a unified sending function.  This method ***should be private/protected***
+A unified sending function ***should*** be used internally (private/protected).
 
-####  Args
+#### Parameters
 
 ##### EventType
-An enum of Datastar supported events.  Will be a string over the wire.
-Currently valid values are
 
-| Event                     | Description                         |
-|---------------------------|-------------------------------------|
-| datastar-patch-elements   | Patches HTML elements into the DOM   |
-| datastar-patch-signals    | Patches signals into the signals       |
+String enum of supported events:
+
+| Event | Description |
+|-------|-------------|
+| `datastar-patch-elements` | Patches HTML elements into the DOM |
+| `datastar-patch-signals` | Patches signals into the signal store |
 
 ##### Options
-* `eventId` (string) Each event ***may*** include an `eventId`.  This can be used by the backend to replay events.  This is part of the SSE spec and is used to tell the browser how to handle the event.  For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
-* `retryDuration` (duration) Each event ***may*** include a `retryDuration` value.  If one is not provided the SDK ***must*** default to `1000` milliseconds.  This is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost. For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
 
-#### Logic
-When called the function ***must*** write to the response buffer the following in specified order.  If any part of this process fails you ***must*** return/throw an error depending on language norms.
-1. ***Must*** write `event: EVENT_TYPE\n` where `EVENT_TYPE` is [EventType](#EventType).
-2. If a user defined event ID is provided, the function ***must*** write `id: EVENT_ID\n` where `EVENT_ID` is the event ID.
-3. ***Must*** write `retry: RETRY_DURATION\n` where `RETRY_DURATION` is the provided retry duration, ***unless*** the value is the default of `1000` milliseconds.
-4. For each string in the provided `dataLines`, you ***must*** write `data: DATA\n` where `DATA` is the provided string.
-5. ***Must*** write a `\n\n` to complete the event per the SSE spec.
-6. Afterward the writer ***should*** immediately flush.  This can be confounded by other middlewares such as compression layers.
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `eventId` | string | - | Unique event identifier for replay functionality ([SSE spec](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id)) |
+| `retryDuration` | ms | `1000` | Reconnection delay after connection loss ([SSE spec](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry)) |
+
+#### Implementation Requirements
+
+***Must*** write to response buffer in this exact order:
+
+1. `event: EVENT_TYPE\n`
+2. `id: EVENT_ID\n` (if eventId provided)
+3. `retry: RETRY_DURATION\n` (***unless*** default 1000ms)
+4. `data: DATA\n` (for each dataLine)
+5. `\n\n` (end of event)
+6. ***Should*** flush immediately (note: compression middleware may interfere)
+
+**Error Handling**: ***Must*** return/throw errors per language conventions.
+
+---
 
 ### `ServerSentEventGenerator.PatchElements`
 
-```
+```typescript
 ServerSentEventGenerator.PatchElements(
     elements: string,
     options?: {
@@ -101,19 +117,22 @@ ServerSentEventGenerator.PatchElements(
 
 #### Example Output
 
-Minimal:
+<details>
+<summary>Minimal Example</summary>
 
-```
-event: datastar-merge-elements
+```http
+event: datastar-patch-elements
 data: elements <div id="feed">
 data: elements     <span>1</span>
 data: elements </div>
 ```
+</details>
 
-Maximal:
+<details>
+<summary>Full Example (all options)</summary>
 
-```
-event: datastar-merge-elements
+```http
+event: datastar-patch-elements
 id: 123
 retry: 2000
 data: selector #feed
@@ -122,75 +141,74 @@ data: elements <div id="feed">
 data: elements     <span>1</span>
 data: elements </div>
 ```
+</details>
 
-`PatchElements` is a helper function to send HTML elements to the browser to be merged into the DOM. To remove elements, use the `remove` merge mode.
+`PatchElements` sends HTML elements to the browser for DOM manipulation.
 
-**Note:** To execute JavaScript, send a `<script>` element using PatchElements. The browser will automatically execute the script when it's added to the DOM.
+> [!TIP]
+> - To remove elements, use the `remove` merge mode
+> - To execute JavaScript, send a `<script>` element - it will auto-execute when added to the DOM
 
-#### Elements vs Fragments: Datastar vs HTMX
+### Elements vs Fragments: Key Distinction
 
-**Important:** Datastar works with complete HTML **elements**, not HTML fragments like HTMX.
+> [!IMPORTANT]
+> Datastar requires **complete HTML elements**, not fragments.
 
-**Datastar approach (elements):**
-- Sends complete, well-formed HTML elements: `<div id="content">Hello</div>`
-- Elements must be valid, standalone HTML with proper opening/closing tags
-- Browser can parse and work with elements using standard DOM APIs
-- Matches browser semantic understanding of HTML structure
+| Approach | Example | Characteristics |
+|----------|---------|-----------------|
+| **Datastar (Elements)** | `<div id="content">Hello</div>` | • Complete, well-formed HTML<br>• Valid opening/closing tags<br>• Standard DOM API compatible<br>• Predictable browser behavior |
+| **HTMX (Fragments)** | `Hello <strong>World</strong>` | • Partial HTML allowed<br>• May lack proper structure<br>• Requires special handling<br>• More flexible but less predictable |
 
-**HTMX approach (fragments):**
-- Can send partial HTML fragments: `Hello <strong>World</strong>`
-- Fragments may not be complete elements (missing tags, partial content)
-- Requires special handling to insert into DOM
+### Parameters
 
-This element-based approach ensures better compatibility with browser standards, easier debugging, and more predictable behavior when working with the DOM.
+#### ElementMergeMode
 
-#### Args
+String enum defining how elements are merged into the DOM.
 
-##### ElementMergeMode
+##### Morphing vs Non-Morphing Modes
 
-An enum of Datastar supported element merge modes.  Will be a string over the wire
-Valid values should match the [ElementMergeMode](#ElementMergeMode) and currently include
+| Mode Type | Modes | Characteristics |
+|-----------|-------|-----------------|
+| **Morphing** | `outer`, `inner` | • Preserves focus & scroll position<br>• Minimal DOM changes<br>• Smooth transitions<br>• Maintains element state |
+| **Non-morphing** | `replace`, `prepend`, `append`, `before`, `after` | • Direct DOM manipulation<br>• Faster execution<br>• No state preservation<br>• Complete element replacement |
 
-#### Morphing vs Non-Morphing Modes
+##### Available Modes
 
-**Morphing modes** (`outer` and `inner`) use Datastar's custom morphing algorithm to intelligently merge elements:
-- **Preserves focus** on form elements and interactive components
-- **Minimizes DOM changes** by only updating what has actually changed
-- **Maintains scroll position** and other element state
-- **Provides smooth transitions** between content updates
+| Mode | Type | Description |
+|------|------|-------------|
+| `outer` | Morphing | Morph entire element, preserving state |
+| `inner` | Morphing | Morph inner HTML only, preserving state |
+| `prepend` | Non-morphing | Insert at beginning inside target |
+| `append` | Non-morphing | Insert at end inside target |
+| `before` | Non-morphing | Insert before target element |
+| `after` | Non-morphing | Insert after target element |
+| `remove` | Non-morphing | Remove target element from DOM |
+| `replace` | Non-morphing | Replace entire element, reset state |
 
-**Non-morphing modes** (`replace`, `prepend`, `append`, `before`, `after`) perform direct DOM manipulation:
-- **Faster execution** for simple content replacement
-- **Complete replacement** of target elements
-- **No state preservation** - focus and scroll position may be lost
+#### Options
 
-| Mode             | Description                                             |
-|------------------|---------------------------------------------------------|
-| outer            | Use Datastar's morphing to merge the element into the DOM, preserving focus and minimizing element changes |
-| inner            | Use Datastar's morphing to merge the element into the innerHTML, preserving focus and minimizing element changes |
-| prepend          | Prepend the element to the selector                     |
-| append           | Append the element to the selector                      |
-| before           | Insert the element before the selector                  |
-| after            | Insert the element after the selector                   |
-| remove           | Remove the existing element from the DOM                |
-| replace | Do not morph, simply replace the whole element and reset any related state |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `selector` | string | Element's `id` | CSS selector for target element |
+| `mergeMode` | ElementMergeMode | `outer` | How to merge the element |
+| `useViewTransition` | boolean | `false` | Enable view transitions API |
 
-##### Options
-* `selector` (string) The CSS selector to use to insert the elements.  If not provided or empty, Datastar **will** default to using the `id` attribute of the element.
-* `mergeMode` (ElementMergeMode) The mode to use when merging the element into the DOM.  If not provided the Datastar client side ***will*** default to `outer`.
-* `useViewTransition` Whether to use view transitions, if not provided the Datastar client side ***will*** default to `false`.
+### Implementation
 
-#### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-patch-elements` event type.
-1. If `selector` is provided, the function ***must*** include the selector in the event data in the format `selector SELECTOR\n`, ***unless*** the selector is empty.
-2. If `mergeMode` is provided, the function ***must*** include the merge mode in the event data in the format `merge MERGE_MODE\n`, ***unless*** the value is the default of `outer`.
-3. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
-4. The function ***must*** include the elements in the event data, with each line prefixed with `elements `. This ***should*** be output after all other event data.
+***Must*** call `ServerSentEventGenerator.send` with event type `datastar-patch-elements`.
+
+**Data format** (only include non-defaults):
+- `selector SELECTOR\n` (if provided)
+- `mergeMode MERGE_MODE\n` (if not `outer`)
+- `useViewTransition true\n` (if `true`)
+- `elements HTML_LINE\n` (for each line of HTML)
+
+---
 
 
 ### `ServerSentEventGenerator.PatchSignals`
 
-```
+```typescript
 ServerSentEventGenerator.PatchSignals(
     signals: string,
     options ?: {
@@ -203,56 +221,57 @@ ServerSentEventGenerator.PatchSignals(
 
 #### Example Output
 
-Minimal:
+<details>
+<summary>Minimal Example</summary>
 
-```
-event: datastar-merge-signals
+```http
+event: datastar-patch-signals
 data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 ```
+</details>
 
-Maximal:
+<details>
+<summary>Full Example (all options)</summary>
 
-```
-event: datastar-merge-signals
+```http
+event: datastar-patch-signals
 id: 123
 retry: 2000
 data: onlyIfMissing true
 data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 ```
+</details>
 
-`PatchSignals` is a helper function to send one or more signals to the browser to be merged into the signals. This function implements [RFC 7386 JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386) semantics.
+`PatchSignals` sends signals to the browser using [RFC 7386 JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386) semantics.
 
-#### Args
+### Parameters
 
-Data is a JavaScript object or JSON string that will be sent to the browser to update signals in the signals.  The data ***must*** evaluate to a valid JavaScript.  It will be converted to signals by the Datastar client side.
+- **signals**: Valid JSON string containing the patch data
 
-#### RFC 7386 JSON Merge Patch Behavior
+### RFC 7386 JSON Merge Patch Behavior
 
-PatchSignals follows RFC 7386 JSON Merge Patch specification:
+| Operation | Behavior | Example |
+|-----------|----------|---------|
+| **Add/Update** | Set property value | `{"key": "value"}` |
+| **Remove** | Set to `null` | `{"key": null}` |
+| **Nested** | Recursive merge | `{"user": {"name": "John"}}` |
 
-* **Adding/Updating**: Properties in the patch object will be added to or update existing signals
-* **Removing**: Properties set to `null` in the patch object will **remove** the corresponding signal from the signals
-* **Nested Objects**: The merge operation works recursively on nested objects
+### Examples
 
-#### Examples
+<details>
+<summary>Signal Operations Examples</summary>
 
-**Adding a signal:**
 ```json
+// Add signal
 {"newSignal": "value"}
-```
 
-**Updating an existing signal:**
-```json
+// Update signal
 {"existingSignal": "newValue"}
-```
 
-**Removing a signal using null:**
-```json
+// Remove signal
 {"signalToRemove": null}
-```
 
-**Complex merge with nested objects:**
-```json
+// Complex nested merge
 {
   "user": {
     "name": "John",
@@ -262,37 +281,51 @@ PatchSignals follows RFC 7386 JSON Merge Patch specification:
     }
   }
 }
+// Result:
+// - user.name = "John"
+// - user.email removed
+// - user.preferences.theme = "dark"
 ```
-This would:
-- Set `user.name` to "John"
-- Remove `user.email` (due to null value)
-- Set `user.preferences.theme` to "dark"
+</details>
 
-##### Options
+### Options
 
-* `onlyIfMissing` (boolean) Whether to merge the signal only if it does not already exist.  If not provided, the Datastar client side ***will*** default to `false`, which will cause the data to be merged into the signals.
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `onlyIfMissing` | boolean | `false` | Only patch if signal doesn't exist |
 
-#### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-patch-signals` event type.
+### Implementation
 
-1. If `onlyIfMissing` is provided, the function ***must*** include it in the event data in the format `onlyIfMissing ONLY_IF_MISSING\n`, ***unless*** the value is the default of `false`.  `ONLY_IF_MISSING` should be `true` or `false` (string), depending on the value of the `onlyIfMissing` option.
-2. The function ***must*** include the signals in the event data, with each line prefixed with `signals `.  This ***should*** be output after all other event data.
+***Must*** call `ServerSentEventGenerator.send` with event type `datastar-patch-signals`.
 
+**Data format**:
+- `onlyIfMissing true\n` (only if `true`)
+- `signals JSON_LINE\n` (for each line of JSON)
 
+---
 
+## `ReadSignals`
 
-## `ReadSignals(r *http.Request, signals any) error`
+`ReadSignals` parses incoming signal data from the browser into backend objects.
 
-`ReadSignals` is a helper function to parse incoming data from the browser.  It should take the incoming request and convert into an object that can be used by the backend.
+```go
+ReadSignals(request *http.Request, signals any) error
+```
 
-#### Args
+### Parameters
 
-* `r` (http.Request) The incoming request object from the browser.  This object ***must*** be a valid Request object per the language specifics.
-* `signals` (any) The signals object that the incoming data will be extracted into.  The exact function signature will depend on the language specifics.
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `request` | HTTP Request | Language-specific request object |
+| `signals` | any | Target object/struct for unmarshaling |
 
-#### Logic
+### Implementation
 
-1. The function ***must*** parse the incoming HTTP request
-   1. If the incoming method is `GET`, the function ***must*** parse the query string's `datastar` key and treat it as a URL encoded JSON string.
-   2. Otherwise, the function ***must*** parse the body of the request as a JSON encoded string.
-   3. If the incoming data is not valid JSON, the function ***must*** return an error.
+The function ***must*** parse the incoming HTTP request based on the method:
+
+| Method | Data Location | Format | Description |
+|--------|---------------|--------|-------------|
+| `GET` | Query parameter `datastar` | URL-encoded JSON | Extract from query string |
+| Others | Request body | JSON | Parse request body directly |
+
+**Error Handling**: ***Must*** return error for invalid JSON.
