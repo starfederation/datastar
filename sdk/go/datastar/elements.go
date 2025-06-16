@@ -64,6 +64,13 @@ func WithUseViewTransitions(useViewTransition bool) MergeElementOption {
 	}
 }
 
+// WithRetryDuration overrides the [DefaultSseRetryDuration] for the element merge event.
+func WithRetryDuration(retryDuration time.Duration) MergeElementOption {
+	return func(o *mergeElementOptions) {
+		o.RetryDuration = retryDuration
+	}
+}
+
 // MergeElements sends HTML elements to the client to update the DOM tree with.
 func (sse *ServerSentEventGenerator) MergeElements(elements string, opts ...MergeElementOption) error {
 	options := &mergeElementOptions{

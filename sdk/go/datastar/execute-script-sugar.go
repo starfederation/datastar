@@ -98,9 +98,15 @@ func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts .
 	sb.WriteString("</script>")
 
 	// Use MergeElements to send the script
-	mergeOpts := make([]MergeElementOption, 0, 2)
+	mergeOpts := []MergeElementOption{
+		WithSelector("body"),
+		WithMergeAppend(),
+	}
 	if options.EventID != "" {
 		mergeOpts = append(mergeOpts, WithMergeElementsEventID(options.EventID))
+	}
+	if options.RetryDuration > 0 {
+		mergeOpts = append(mergeOpts, WithRetryDuration(options.RetryDuration))
 	}
 
 	return sse.MergeElements(sb.String(), mergeOpts...)
