@@ -14,6 +14,17 @@ function activate(context) {
         return;
     }
 
+    // Load package.json to get native snippet languages
+    const packagePath = path.join(__dirname, '..', 'package.json');
+    let nativeSnippetLanguages = [];
+    try {
+        const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+        nativeSnippetLanguages = packageJson.contributes.snippets.map(s => s.language);
+    } catch (error) {
+        console.error('Failed to load package.json for native snippet languages:', error);
+        // Fallback to empty array - custom provider will handle all languages
+    }
+
     // Register completion provider for custom file extensions and languages
     const provider = vscode.languages.registerCompletionItemProvider(
         { scheme: 'file' },
@@ -29,14 +40,14 @@ function activate(context) {
                 const fileName = document.fileName;
                 const languageId = document.languageId;
 
-                // Check if current file should have Datastar support
+                // Only provide custom completions for file extensions or languages not covered by native snippets
                 const shouldProvideSnippets = enabledLanguages.some(item => {
-                    // If item starts with dot, treat as file extension
+                    // If item starts with dot, treat as file extension (always provide for these)
                     if (item.startsWith('.')) {
                         return fileName.endsWith(item);
                     }
-                    // Otherwise treat as language ID
-                    return languageId === item;
+                    // For language IDs, only provide if not already covered by native snippets
+                    return languageId === item && !nativeSnippetLanguages.includes(item);
                 });
 
                 if (!shouldProvideSnippets) {
