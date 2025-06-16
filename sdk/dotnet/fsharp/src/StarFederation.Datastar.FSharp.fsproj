@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <AssemblyName>StarFederation.Datastar</AssemblyName>
-        <Version>1.0.0-beta.5</Version>
-        <RootNamespace>StarFederation.Datastar</RootNamespace>
+        <AssemblyName>StarFederation.Datastar.FSharp</AssemblyName>
+        <Version>1.0.0-beta.1</Version>
+        <RootNamespace>StarFederation.Datastar.FSharp</RootNamespace>
         <Nullable>disabled</Nullable>
 
         <!-- General info -->
@@ -18,7 +18,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <!-- NuGet config -->
-        <PackageId>StarFederation.Datastar</PackageId>
+        <PackageId>StarFederation.Datastar.FSharp</PackageId>
         <PackageTags>datastar;datastar-sharp;fsharp;functional;asp.net core;asp.net;.net core;routing;web;csharp</PackageTags>
         <PackageProjectUrl>https://github.com/starfederation/datastar</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -32,7 +32,7 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
-        <Title>StarFederation.Datastar</Title>
+        <Title>StarFederation.Datastar.FSharp</Title>
         <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     </PropertyGroup>
 
@@ -54,14 +54,6 @@
         <Compile Include="Types.fs" />
         <Compile Include="ServerSentEventGenerator.fs" />
         <Compile Include="HttpHandlers.fs" />
-        <Compile Include="Scripts\BrowserConsole.fs" />
-        <Compile Include="Scripts\Redirect.fs" />
-        <Compile Include="DependencyInjection\Services.fs" />
-        <Compile Include="DependencyInjection\ServicesProvider.fs" />
-        <Compile Include="DependencyInjection\ServerSentEventScriptExtensions.fs" />
-        <Compile Include="ModelBinding\FromSignalAttribute.fs" />
-        <Compile Include="ModelBinding\SignalsModelBinder.fs"/>
-        <Compile Include="ModelBinding\MvcServiceProvider.fs" />
     </ItemGroup>
 
 </Project>
