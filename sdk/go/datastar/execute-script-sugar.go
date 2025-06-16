@@ -9,6 +9,94 @@ import (
 	"time"
 )
 
+// executeScriptOptions hold script options that will be translated to [SSEEventOptions].
+type executeScriptOptions struct {
+	EventID       string
+	AutoRemove    *bool
+	Attributes    []string
+	RetryDuration time.Duration
+}
+
+// ExecuteScriptOption configures script execution event that will be sent to the client.
+type ExecuteScriptOption func(*executeScriptOptions)
+
+// WithExecuteScriptEventID configures an optional event ID for the script execution event.
+// The client message field [lastEventId] will be set to this value.
+// If the next event does not have an event ID, the last used event ID will remain.
+//
+// [lastEventId]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/lastEventId
+func WithExecuteScriptEventID(id string) ExecuteScriptOption {
+	return func(o *executeScriptOptions) {
+		o.EventID = id
+	}
+}
+
+// WithExecuteScriptAutoRemove requires the client to eliminate the script element after its execution.
+func WithExecuteScriptAutoRemove(autoremove bool) ExecuteScriptOption {
+	return func(o *executeScriptOptions) {
+		o.AutoRemove = &autoremove
+	}
+}
+
+// WithExecuteScriptAttributes overrides the default script attribute
+// value `type="module"`, which renders as `<script type="module">` in client's browser.
+func WithExecuteScriptAttributes(attributes ...string) ExecuteScriptOption {
+	return func(o *executeScriptOptions) {
+		o.Attributes = attributes
+	}
+}
+
+// WithExecuteScriptAttributeKVs is an alternative option for [WithExecuteScriptAttributes].
+// Even parameters are keys, odd parameters are their values.
+func WithExecuteScriptAttributeKVs(kvs ...string) ExecuteScriptOption {
+	if len(kvs)%2 != 0 {
+		panic("WithExecuteScriptAttributeKVs requires an even number of arguments")
+	}
+	attributes := make([]string, 0, len(kvs)/2)
+	for i := 0; i < len(kvs); i += 2 {
+		attribute := fmt.Sprintf(`%s="%s"`, kvs[i], kvs[i+1])
+		attributes = append(attributes, attribute)
+	}
+	return WithExecuteScriptAttributes(attributes...)
+}
+
+// ExecuteScript runs a script in the client browser by using MergeElements to send a <script> element.
+// This is a sugar helper that maintains backward compatibility while using the standard MergeElements approach.
+func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts ...ExecuteScriptOption) error {
+	options := &executeScriptOptions{
+		RetryDuration: DefaultSseRetryDuration,
+	}
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	// Build the script element
+	sb := strings.Builder{}
+	sb.WriteString("<script ")
+
+	for _, attribute := range options.Attributes {
+		sb.WriteString(attribute)
+		sb.WriteString(" ")
+	}
+
+	// Add data-datastar-autoremove attribute if needed
+	if options.AutoRemove == nil || *options.AutoRemove {
+		sb.WriteString(`data-on-load="el.remove()"`)
+	}
+
+	sb.WriteString(">")
+	sb.WriteString(scriptContents)
+	sb.WriteString("</script>")
+
+	// Use MergeElements to send the script
+	mergeOpts := make([]MergeElementOption, 0, 2)
+	if options.EventID != "" {
+		mergeOpts = append(mergeOpts)
+	}
+
+	return sse.MergeElements(sb.String(), mergeOpts...)
+}
+
 // ConsoleLog is a convenience method for [see.ExecuteScript].
 // It is equivalent to calling [see.ExecuteScript] with [see.WithScript] option set to `console.log(msg)`.
 func (sse *ServerSentEventGenerator) ConsoleLog(msg string, opts ...ExecuteScriptOption) error {

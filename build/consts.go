@@ -141,11 +141,6 @@ var Consts = &ConstTemplateData{
 			Description: "Should a given set of signals merge if they are missing?",
 			Value:       false,
 		},
-		{
-			Name:        toolbelt.ToCasedString("executeScriptAutoRemove"),
-			Description: "Should script element remove itself after execution?",
-			Value:       true,
-		},
 	},
 	DefaultDurations: []*DefaultDuration{
 		{
@@ -154,13 +149,7 @@ var Consts = &ConstTemplateData{
 			Duration:    1 * time.Second,
 		},
 	},
-	DefaultStrings: []*DefaultString{
-		{
-			Name:        toolbelt.ToCasedString("executeScriptAttributes"),
-			Description: `The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.`,
-			Value:       "type module",
-		},
-	},
+	DefaultStrings: []*DefaultString{},
 	DatalineLiterals: []toolbelt.CasedString{
 		// Shared
 		toolbelt.ToCasedString("selector"),
@@ -173,11 +162,6 @@ var Consts = &ConstTemplateData{
 		// MergeSignals
 		toolbelt.ToCasedString("signals"),
 		toolbelt.ToCasedString("onlyIfMissing"),
-
-		// ExecuteScript
-		toolbelt.ToCasedString("script"),
-		toolbelt.ToCasedString("attributes"),
-		toolbelt.ToCasedString("autoRemove"),
 	},
 	Enums: []*EnumDefinition{
 		{
@@ -230,11 +214,6 @@ var Consts = &ConstTemplateData{
 					Name:        toolbelt.ToCasedString("MergeSignals"),
 					Description: "An event for merging signals.",
 					Value:       "datastar-merge-signals",
-				},
-				{
-					Name:        toolbelt.ToCasedString("ExecuteScript"),
-					Description: "An event for executing <script/> elements in the browser.",
-					Value:       "datastar-execute-script",
 				},
 			},
 		},

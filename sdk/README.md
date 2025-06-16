@@ -62,7 +62,6 @@ Currently valid values are
 |---------------------------|-------------------------------------|
 | datastar-merge-elements   | Merges HTML elements into the DOM   |
 | datastar-merge-signals    | Merges signals into the signals       |
-| datastar-execute-script   | Executes JavaScript in the browser  |
 
 ##### Options
 * `eventId` (string) Each event ***may*** include an `eventId`.  This can be used by the backend to replay events.  This is part of the SSE spec and is used to tell the browser how to handle the event.  For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
@@ -117,6 +116,8 @@ data: elements </div>
 ```
 
 `MergeElements` is a helper function to send HTML elements to the browser to be merged into the DOM. To remove elements, use the `remove` merge mode.
+
+**Note:** To execute JavaScript, send a `<script>` element using MergeElements. The browser will automatically execute the script when it's added to the DOM.
 
 #### Elements vs Fragments: Datastar vs HTMX
 
@@ -270,55 +271,6 @@ When called the function ***must*** call `ServerSentEventGenerator.send` with th
 
 
 
-### `ServerSentEventGenerator.ExecuteScript`
-
-```
-ServerSentEventGenerator.ExecuteScript(
-    script: string,
-    options?: {
-        autoRemove?: boolean,
-        attributes?: string,
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-    }
-)
-```
-
-#### Example Output
-
-Minimal:
-
-```
-event: datastar-execute-script
-data: script window.location = "https://data-star.dev"
-```
-
-Maximal:
-
-```
-event: datastar-execute-script
-id: 123
-retry: 2000
-data: autoRemove false
-data: attributes type text/javascript
-data: script window.location = "https://data-star.dev"
-```
-
-#### Args
-
-`script` is a string that represents the JavaScript to be executed by the browser.
-
-##### Options
-
-* `autoRemove` Whether to remove the script after execution, if not provided the Datastar client side ***will*** default to `true`.
-* `attributes` A line separated list of attributes to add to the `script` element, if not provided the Datastar client side ***will*** default to `type module`. Each item in the array should be a string in the format `key value`.
-
-#### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-execute-script` event type.
-
-1. If `autoRemove` is provided, the function ***must*** include the auto remove script value in the event data in the format `autoRemove AUTO_REMOVE\n`, ***unless*** the value is the default of `true`.
-2. If `attributes` is provided, the function ***must*** include the attributes in the event data, with each line prefixed with `attributes `, ***unless*** the attributes value is the default of `type module`.
-3. The function ***must*** include the script in the event data, with each line prefixed with `script `.  This ***should*** be output after all other event data.
 
 ## `ReadSignals(r *http.Request, signals any) error`
 
