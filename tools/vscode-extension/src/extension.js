@@ -45,9 +45,7 @@ function activate(context) {
 
                 return createCompletionItems();
             }
-        },
-        // Trigger characters for Datastar attributes
-        'd', 'a', '-'
+        }
     );
 
     context.subscriptions.push(provider);
