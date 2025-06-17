@@ -4,33 +4,27 @@ namespace StarFederation.Datastar.FSharp
 
 open System
 
-type FragmentMergeMode =
-/// Morphs the fragment into the existing element using idiomorph.
-| Morph
-/// Replaces the inner HTML of the existing element.
-| Inner
-/// Replaces the outer HTML of the existing element.
+type ElementMergeMode =
+/// Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
 | Outer
-/// Prepends the fragment to the existing element.
+/// Morphs the element into the innerHTML using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+| Inner
+/// Removes the existing element from the DOM.
+| Remove
+/// Prepends the element inside the existing element.
 | Prepend
-/// Appends the fragment to the existing element.
+/// Appends the element inside the existing element.
 | Append
-/// Inserts the fragment before the existing element.
+/// Inserts the element before the existing element.
 | Before
-/// Inserts the fragment after the existing element.
+/// Inserts the element after the existing element.
 | After
-/// Upserts the attributes of the existing element.
-| UpsertAttributes
 
 type EventType =
-/// An event for merging HTML fragments into the DOM.
-| MergeFragments
+/// An event for merging HTML elements into the DOM.
+| MergeElements
 /// An event for merging signals.
 | MergeSignals
-/// An event for removing HTML fragments from the DOM.
-| RemoveFragments
-/// An event for removing signals.
-| RemoveSignals
 /// An event for executing &lt;script/&gt; elements in the browser.
 | ExecuteScript
 
@@ -42,12 +36,10 @@ module Consts =
     /// Default: TimeSpan.FromMilliseconds 1000
     let DefaultSseRetryDuration = TimeSpan.FromMilliseconds 1000
 
+    /// Default: outer - Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+    let DefaultElementMergeMode = Outer
 
-    /// Default: morph - Morphs the fragment into the existing element using idiomorph.
-    let DefaultFragmentMergeMode = Morph
-    
-
-    let [<Literal>] DefaultFragmentsUseViewTransitions = false
+    let [<Literal>] DefaultElementsUseViewTransitions = false
     let [<Literal>] DefaultMergeSignalsOnlyIfMissing = false
     let [<Literal>] DefaultExecuteScriptAutoRemove = true
 
@@ -55,32 +47,28 @@ module Consts =
 
     let [<Literal>] DatastarDatalineSelector = "selector"
     let [<Literal>] DatastarDatalineMergeMode = "mergeMode"
-    let [<Literal>] DatastarDatalineFragments = "fragments"
+    let [<Literal>] DatastarDatalineElements = "elements"
     let [<Literal>] DatastarDatalineUseViewTransition = "useViewTransition"
     let [<Literal>] DatastarDatalineSignals = "signals"
     let [<Literal>] DatastarDatalineOnlyIfMissing = "onlyIfMissing"
-    let [<Literal>] DatastarDatalinePaths = "paths"
     let [<Literal>] DatastarDatalineScript = "script"
     let [<Literal>] DatastarDatalineAttributes = "attributes"
     let [<Literal>] DatastarDatalineAutoRemove = "autoRemove"
 
-    module FragmentMergeMode =
+    module ElementMergeMode =
         let toString this =
             match this with
-                | FragmentMergeMode.Morph -> "morph"
-                | FragmentMergeMode.Inner -> "inner"
-                | FragmentMergeMode.Outer -> "outer"
-                | FragmentMergeMode.Prepend -> "prepend"
-                | FragmentMergeMode.Append -> "append"
-                | FragmentMergeMode.Before -> "before"
-                | FragmentMergeMode.After -> "after"
-                | FragmentMergeMode.UpsertAttributes -> "upsertAttributes"
+                | ElementMergeMode.Outer -> "outer"
+                | ElementMergeMode.Inner -> "inner"
+                | ElementMergeMode.Remove -> "remove"
+                | ElementMergeMode.Prepend -> "prepend"
+                | ElementMergeMode.Append -> "append"
+                | ElementMergeMode.Before -> "before"
+                | ElementMergeMode.After -> "after"
 
     module EventType =
         let toString this =
             match this with
-                | EventType.MergeFragments -> "datastar-merge-fragments"
+                | EventType.MergeElements -> "datastar-merge-elements"
                 | EventType.MergeSignals -> "datastar-merge-signals"
-                | EventType.RemoveFragments -> "datastar-remove-fragments"
-                | EventType.RemoveSignals -> "datastar-remove-signals"
                 | EventType.ExecuteScript -> "datastar-execute-script"

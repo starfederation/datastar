@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/starfederation/datastar/sdk/go/datastar"
 )
@@ -23,10 +22,7 @@ func HotReloadHandler(w http.ResponseWriter, r *http.Request) {
 		// Refresh the client page as soon as connection
 		// is established. This will occur only once
 		// after the server starts.
-		sse.ExecuteScript(
-			"window.location.reload()",
-			datastar.WithExecuteScriptRetryDuration(time.Second),
-		)
+		sse.ExecuteScript("window.location.reload()")
 	})
 
 	// Freeze the event stream until the connection

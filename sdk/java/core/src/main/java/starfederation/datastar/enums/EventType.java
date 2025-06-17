@@ -5,17 +5,11 @@ package starfederation.datastar.enums;
  */
 public enum EventType {
 
-    // An event for merging HTML fragments into the DOM.
-    MergeFragments("datastar-merge-fragments"),
+    // An event for merging HTML elements into the DOM.
+    MergeElements("datastar-merge-elements"),
 
     // An event for merging signals.
     MergeSignals("datastar-merge-signals"),
-
-    // An event for removing HTML fragments from the DOM.
-    RemoveFragments("datastar-remove-fragments"),
-
-    // An event for removing signals.
-    RemoveSignals("datastar-remove-signals"),
 
     // An event for executing &lt;script/&gt; elements in the browser.
     ExecuteScript("datastar-execute-script");

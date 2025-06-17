@@ -61,7 +61,7 @@ func main() {
 				hexString := hex.EncodeToString(bytes)
 				frag := fmt.Sprintf(`<span id="feed" style="color:#%s;border:1px solid #%s;border-radius:0.25rem;padding:1rem;">%s</span>`, hexString, hexString, hexString)
 
-				sse.MergeFragments(frag)
+				sse.MergeElements(frag)
 			}
 		}
 	})

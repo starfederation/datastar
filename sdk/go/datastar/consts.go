@@ -7,8 +7,8 @@ import "time"
 const (
     DatastarKey = "datastar"
     Version                   = "1.0.0-beta.11"
-    VersionClientByteSize     = 40026
-    VersionClientByteSizeGzip = 14900
+    VersionClientByteSize     = 39752
+    VersionClientByteSizeGzip = 14841
 
     //region Default durations
 
@@ -26,12 +26,11 @@ const (
 
     //region Dataline literals
     SelectorDatalineLiteral = "selector "
-    MergeModeDatalineLiteral = "mergeMode "
-    FragmentsDatalineLiteral = "fragments "
+    ModeDatalineLiteral = "mode "
+    ElementsDatalineLiteral = "elements "
     UseViewTransitionDatalineLiteral = "useViewTransition "
     SignalsDatalineLiteral = "signals "
     OnlyIfMissingDatalineLiteral = "onlyIfMissing "
-    PathsDatalineLiteral = "paths "
     ScriptDatalineLiteral = "script "
     AttributesDatalineLiteral = "attributes "
     AutoRemoveDatalineLiteral = "autoRemove "
@@ -41,8 +40,8 @@ const (
 var (
     //region Default booleans
 
-    // Should fragments be merged using the ViewTransition API?
-    DefaultFragmentsUseViewTransitions = false
+    // Should elements be merged using the ViewTransition API?
+    DefaultElementsUseViewTransitions = false
 
     // Should a given set of signals merge if they are missing?
     DefaultMergeSignalsOnlyIfMissing = false
@@ -55,59 +54,50 @@ var (
 
 //region Enums
 
-//region The mode in which a fragment is merged into the DOM.
-type FragmentMergeMode string
+//region The mode in which an element is patched into the DOM.
+type ElementPatchMode string
 
 const (
-    // Default value for FragmentMergeMode
-    // Morphs the fragment into the existing element using idiomorph.
-    DefaultFragmentMergeMode = FragmentMergeModeMorph
+    // Default value for ElementPatchMode
+    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    DefaultElementPatchMode = ElementPatchModeOuter
 
-    // Morphs the fragment into the existing element using idiomorph.
-    FragmentMergeModeMorph FragmentMergeMode = "morph"
+    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    ElementPatchModeOuter ElementPatchMode = "outer"
 
-    // Replaces the inner HTML of the existing element.
-    FragmentMergeModeInner FragmentMergeMode = "inner"
+    // Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    ElementPatchModeInner ElementPatchMode = "inner"
 
-    // Replaces the outer HTML of the existing element.
-    FragmentMergeModeOuter FragmentMergeMode = "outer"
+    // Removes the existing element from the DOM.
+    ElementPatchModeRemove ElementPatchMode = "remove"
 
-    // Prepends the fragment to the existing element.
-    FragmentMergeModePrepend FragmentMergeMode = "prepend"
+    // Prepends the element inside the existing element.
+    ElementPatchModePrepend ElementPatchMode = "prepend"
 
-    // Appends the fragment to the existing element.
-    FragmentMergeModeAppend FragmentMergeMode = "append"
+    // Appends the element inside the existing element.
+    ElementPatchModeAppend ElementPatchMode = "append"
 
-    // Inserts the fragment before the existing element.
-    FragmentMergeModeBefore FragmentMergeMode = "before"
+    // Inserts the element before the existing element.
+    ElementPatchModeBefore ElementPatchMode = "before"
 
-    // Inserts the fragment after the existing element.
-    FragmentMergeModeAfter FragmentMergeMode = "after"
+    // Inserts the element after the existing element.
+    ElementPatchModeAfter ElementPatchMode = "after"
 
-    // Upserts the attributes of the existing element.
-    FragmentMergeModeUpsertAttributes FragmentMergeMode = "upsertAttributes"
+    // Do not morph, simply replace the whole element and reset any related state.
+    ElementPatchModeReplace ElementPatchMode = "replace"
 
 )
-//endregion FragmentMergeMode
+//endregion ElementPatchMode
 
 //region The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 type EventType string
 
 const (
-    // An event for merging HTML fragments into the DOM.
-    EventTypeMergeFragments EventType = "datastar-merge-fragments"
+    // An event for patching HTML elements into the DOM.
+    EventTypePatchElements EventType = "datastar-patch-elements"
 
-    // An event for merging signals.
-    EventTypeMergeSignals EventType = "datastar-merge-signals"
-
-    // An event for removing HTML fragments from the DOM.
-    EventTypeRemoveFragments EventType = "datastar-remove-fragments"
-
-    // An event for removing signals.
-    EventTypeRemoveSignals EventType = "datastar-remove-signals"
-
-    // An event for executing <script/> elements in the browser.
-    EventTypeExecuteScript EventType = "datastar-execute-script"
+    // An event for patching signals.
+    EventTypePatchSignals EventType = "datastar-patch-signals"
 
 )
 //endregion EventType

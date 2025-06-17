@@ -9,6 +9,109 @@ import (
 	"time"
 )
 
+// executeScriptOptions hold script options that will be translated to [SSEEventOptions].
+type executeScriptOptions struct {
+	EventID       string
+	AutoRemove    *bool
+	Attributes    []string
+	RetryDuration time.Duration
+}
+
+// ExecuteScriptOption configures script execution event that will be sent to the client.
+type ExecuteScriptOption func(*executeScriptOptions)
+
+// WithExecuteScriptEventID configures an optional event ID for the script execution event.
+// The client message field [lastEventId] will be set to this value.
+// If the next event does not have an event ID, the last used event ID will remain.
+//
+// [lastEventId]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/lastEventId
+func WithExecuteScriptEventID(id string) ExecuteScriptOption {
+	return func(o *executeScriptOptions) {
+		o.EventID = id
+	}
+}
+
+// WithExecuteScriptRetryDuration overrides the [DefaultSseRetryDuration] for this script
+// execution only.
+func WithExecuteScriptRetryDuration(retryDuration time.Duration) ExecuteScriptOption {
+	return func(o *executeScriptOptions) {
+		o.RetryDuration = retryDuration
+	}
+}
+
+// WithExecuteScriptAutoRemove requires the client to eliminate the script element after its execution.
+func WithExecuteScriptAutoRemove(autoremove bool) ExecuteScriptOption {
+	return func(o *executeScriptOptions) {
+		o.AutoRemove = &autoremove
+	}
+}
+
+// WithExecuteScriptAttributes sets the script element attributes.
+// Each attribute should be a complete key="value" pair (e.g., `type="module"`).
+func WithExecuteScriptAttributes(attributes ...string) ExecuteScriptOption {
+	return func(o *executeScriptOptions) {
+		o.Attributes = attributes
+	}
+}
+
+// WithExecuteScriptAttributeKVs is an alternative option for [WithExecuteScriptAttributes].
+// Even parameters are keys, odd parameters are their values.
+func WithExecuteScriptAttributeKVs(kvs ...string) ExecuteScriptOption {
+	if len(kvs)%2 != 0 {
+		panic("WithExecuteScriptAttributeKVs requires an even number of arguments")
+	}
+	attributes := make([]string, 0, len(kvs)/2)
+	for i := 0; i < len(kvs); i += 2 {
+		attribute := fmt.Sprintf(`%s="%s"`, kvs[i], kvs[i+1])
+		attributes = append(attributes, attribute)
+	}
+	return WithExecuteScriptAttributes(attributes...)
+}
+
+// ExecuteScript runs a script in the client browser by using PatchElements to send a <script> element.
+// This is a sugar helper that maintains backward compatibility while using the standard PatchElements approach.
+func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts ...ExecuteScriptOption) error {
+	options := &executeScriptOptions{
+		RetryDuration: DefaultSseRetryDuration,
+		Attributes:    []string{},
+	}
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	// Build the script element
+	sb := strings.Builder{}
+	sb.WriteString("<script")
+
+	for _, attribute := range options.Attributes {
+		sb.WriteString(" ")
+		sb.WriteString(attribute)
+	}
+
+	// Add data-datastar-autoremove attribute if needed
+	if options.AutoRemove == nil || *options.AutoRemove {
+		sb.WriteString(` data-on-load="el.remove()"`)
+	}
+
+	sb.WriteString(">")
+	sb.WriteString(scriptContents)
+	sb.WriteString("</script>")
+
+	// Use PatchElements to send the script
+	patchOpts := []PatchElementOption{
+		WithSelector("body"),
+		WithMergeAppend(),
+	}
+	if options.EventID != "" {
+		patchOpts = append(patchOpts, WithPatchElementsEventID(options.EventID))
+	}
+	if options.RetryDuration > 0 {
+		patchOpts = append(patchOpts, WithRetryDuration(options.RetryDuration))
+	}
+
+	return sse.PatchElements(sb.String(), patchOpts...)
+}
+
 // ConsoleLog is a convenience method for [see.ExecuteScript].
 // It is equivalent to calling [see.ExecuteScript] with [see.WithScript] option set to `console.log(msg)`.
 func (sse *ServerSentEventGenerator) ConsoleLog(msg string, opts ...ExecuteScriptOption) error {
@@ -229,6 +332,6 @@ func (sse *ServerSentEventGenerator) Prefetch(urls ...string) error {
 	return sse.ExecuteScript(
 		script,
 		WithExecuteScriptAutoRemove(false),
-		WithExecuteScriptAttributes("type speculationrules"),
+		WithExecuteScriptAttributes(`type="speculationrules"`),
 	)
 }
