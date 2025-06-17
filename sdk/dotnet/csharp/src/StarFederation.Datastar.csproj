@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AssemblyName>StarFederation.Datastar</AssemblyName>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>StarFederation.Datastar</RootNamespace>
+        <Version>1.0.0-beta.6</Version>
+        <Title>StarFederation.Datastar</Title>
+        <Authors>Greg Holden and contributors</Authors>
+        <Description>SDK for ServerSentEvents and convenience methods for Datastar</Description>
+        <PackageProjectUrl>https://github.com/starfederation/datastar</PackageProjectUrl>
+        <PackageIcon>datastar_icon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/starfederation/datastar</RepositoryUrl>
+        <PackageTags>datastar;datastar-sharp;asp.net core;asp.net;.net core;routing;web;csharp</PackageTags>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\..\fsharp\src\StarFederation.Datastar.FSharp.fsproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <None Include="..\..\assets\datastar_icon.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+        <Link>datastar_icon.png</Link>
+      </None>
+    </ItemGroup>
+
+</Project>

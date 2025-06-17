@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\..\sdk\dotnet\fsharp\src\Datastar.FSharp.fsproj" />
+      <ProjectReference Include="..\..\..\..\sdk\dotnet\csharp\src\StarFederation.Datastar.csproj" />
     </ItemGroup>
 
 </Project>
