@@ -23,7 +23,7 @@ func Build() error {
 
 	if err := errors.Join(
 		// createPluginManifest(),
-		createBundles(version),
+		//createBundles(version),
 		writeOutConsts(version),
 	); err != nil {
 		return fmt.Errorf("error creating bundles: %w", err)
@@ -135,7 +135,7 @@ func writeOutConsts(version string) error {
 		"sdk/dotnet/csharp/src/Consts.cs":                                                  csharpConsts,
 		"sdk/php/src/Consts.php":                                                           phpConsts,
 		"sdk/php/src/enums/EventType.php":                                                  phpEventType,
-		"sdk/php/src/enums/FragmentMergeMode.php":                                          phpFragmentMergeMode,
+		"sdk/php/src/enums/ElementPatchMode.php":                                           phpElementPatchMode,
 		"sdk/java/core/src/main/java/starfederation/datastar/Consts.java":                  javaConsts,
 		"sdk/java/core/src/main/java/starfederation/datastar/enums/EventType.java":         javaEventType,
 		"sdk/java/core/src/main/java/starfederation/datastar/enums/FragmentMergeMode.java": javaFragmentMergeMode,

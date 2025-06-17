@@ -16,8 +16,6 @@ export const DefaultSseRetryDurationMs = 1000;
 
 // #region Default strings
 
-// The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
-export const DefaultExecuteScriptAttributes = "type module";
 
 // #endregion
 
@@ -30,32 +28,26 @@ export const DefaultElementsUseViewTransitions = false;
 // Should a given set of signals merge if they are missing?
 export const DefaultMergeSignalsOnlyIfMissing = false;
 
-// Should script element remove itself after execution?
-export const DefaultExecuteScriptAutoRemove = true;
-
 // #endregion
 
 // #region Datalines
 
 export const DatastarDatalineSelector = "selector"
-export const DatastarDatalineMergeMode = "mergeMode"
+export const DatastarDatalineMode = "mode"
 export const DatastarDatalineElements = "elements"
 export const DatastarDatalineUseViewTransition = "useViewTransition"
 export const DatastarDatalineSignals = "signals"
 export const DatastarDatalineOnlyIfMissing = "onlyIfMissing"
-export const DatastarDatalineScript = "script"
-export const DatastarDatalineAttributes = "attributes"
-export const DatastarDatalineAutoRemove = "autoRemove"
 // #endregion
 
 
 // #region Enums
 
-// The mode in which an element is merged into the DOM.
-export const ElementMergeModes = [
-// Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+// The mode in which an element is patched into the DOM.
+export const ElementPatchModes = [
+// Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
     "outer",
-// Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+// Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
     "inner",
 // Removes the existing element from the DOM.
     "remove",
@@ -67,19 +59,19 @@ export const ElementMergeModes = [
     "before",
 // Inserts the element after the existing element.
     "after",
+// Do not morph, simply replace the whole element and reset any related state.
+    "replace",
 ] as const;
 
-// Default value for ElementMergeMode
-export const DefaultElementMergeMode = "outer";
+// Default value for ElementPatchMode
+export const DefaultElementPatchMode = "outer";
 
 // The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 export const EventTypes = [
-// An event for merging HTML elements into the DOM.
-    "datastar-merge-elements",
-// An event for merging signals.
-    "datastar-merge-signals",
-// An event for executing <script/> elements in the browser.
-    "datastar-execute-script",
+// An event for patching HTML elements into the DOM.
+    "datastar-patch-elements",
+// An event for patching signals.
+    "datastar-patch-signals",
 ] as const;
 // #endregion
 

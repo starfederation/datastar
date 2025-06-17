@@ -1,10 +1,10 @@
 <?php
 
-use starfederation\datastar\events\MergeSignals;
+use starfederation\datastar\events\PatchSignals;
 
 test('Options are correctly output', function() {
     $content = '{x: 1}';
-    $event = new MergeSignals($content, [
+    $event = new PatchSignals($content, [
         'onlyIfMissing' => true,
     ]);
     expect($event->getDataLines())
@@ -16,7 +16,7 @@ test('Options are correctly output', function() {
 
 test('Default options are not output', function() {
     $content = '{x: 1}';
-    $event = new MergeSignals($content, [
+    $event = new PatchSignals($content, [
         'onlyIfMissing' => false,
     ]);
     expect($event->getDataLines())
@@ -27,7 +27,7 @@ test('Default options are not output', function() {
 
 test('Multi-line content is correctly output', function() {
     $content = '{x: 1}';
-    $event = new MergeSignals("\n" . $content . "\n" . $content . "\n");
+    $event = new PatchSignals("\n" . $content . "\n" . $content . "\n");
     expect($event->getDataLines())
         ->toBe([
             'data: signals {x: 1}',
@@ -37,7 +37,7 @@ test('Multi-line content is correctly output', function() {
 
 test('Signals can be passed in as an array', function() {
     $signals = ['x' => 1];
-    $event = new MergeSignals($signals);
+    $event = new PatchSignals($signals);
     expect($event->getDataLines())
         ->toBe([
             'data: signals ' . json_encode($signals),

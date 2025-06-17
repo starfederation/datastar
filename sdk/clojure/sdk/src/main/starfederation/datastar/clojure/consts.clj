@@ -19,26 +19,16 @@
 ;; -----------------------------------------------------------------------------
 ;; Default values
 ;; -----------------------------------------------------------------------------
-(def default-execute-script-attributes
-  "The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character."
-  (-> "type module"
-      (string/split #" ")
-      (update 0 keyword)
-      (->> (apply array-map))))
-
 
 ;; -----------------------------------------------------------------------------
 ;; Dataline literals
 ;; -----------------------------------------------------------------------------
 (def selector-dataline-literal "selector ")
-(def merge-mode-dataline-literal "mergeMode ")
+(def mode-dataline-literal "mode ")
 (def elements-dataline-literal "elements ")
 (def use-view-transition-dataline-literal "useViewTransition ")
 (def signals-dataline-literal "signals ")
 (def only-if-missing-dataline-literal "onlyIfMissing ")
-(def script-dataline-literal "script ")
-(def attributes-dataline-literal "attributes ")
-(def auto-remove-dataline-literal "autoRemove ")
 
 
 ;; -----------------------------------------------------------------------------
@@ -52,62 +42,58 @@
   "Should a given set of signals merge if they are missing?"
   false)
 
-(def default-execute-script-auto-remove
-  "Should script element remove itself after execution?"
-  true)
-
 
 
 ;; -----------------------------------------------------------------------------
 ;; Enums
 ;; -----------------------------------------------------------------------------
-;; ElementMergeMode
+;; ElementPatchMode
 
-(def element-merge-mode-outer
-  "Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes."
+(def element-patch-mode-outer
+  "Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes."
   "outer")
 
-(def element-merge-mode-inner
-  "Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes."
+(def element-patch-mode-inner
+  "Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes."
   "inner")
 
-(def element-merge-mode-remove
+(def element-patch-mode-remove
   "Removes the existing element from the DOM."
   "remove")
 
-(def element-merge-mode-prepend
+(def element-patch-mode-prepend
   "Prepends the element inside the existing element."
   "prepend")
 
-(def element-merge-mode-append
+(def element-patch-mode-append
   "Appends the element inside the existing element."
   "append")
 
-(def element-merge-mode-before
+(def element-patch-mode-before
   "Inserts the element before the existing element."
   "before")
 
-(def element-merge-mode-after
+(def element-patch-mode-after
   "Inserts the element after the existing element."
   "after")
 
+(def element-patch-mode-replace
+  "Do not morph, simply replace the whole element and reset any related state."
+  "replace")
 
-(def default-element-merge-mode
-  "Default value for ElementMergeMode.
-  Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes."
-  element-merge-mode-outer)
+
+(def default-element-patch-mode
+  "Default value for ElementPatchMode.
+  Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes."
+  element-patch-mode-outer)
 
 
 ;; EventType
 
-(def event-type-merge-elements
-  "An event for merging HTML elements into the DOM."
-  "datastar-merge-elements")
+(def event-type-patch-elements
+  "An event for patching HTML elements into the DOM."
+  "datastar-patch-elements")
 
-(def event-type-merge-signals
-  "An event for merging signals."
-  "datastar-merge-signals")
-
-(def event-type-execute-script
-  "An event for executing <script/> elements in the browser."
-  "datastar-execute-script")
+(def event-type-patch-signals
+  "An event for patching signals."
+  "datastar-patch-signals")

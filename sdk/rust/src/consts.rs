@@ -21,22 +21,17 @@ pub const DEFAULT_SSE_RETRY_DURATION: u64 = 1000;
 
 // #region Default strings
 
-/// The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
-pub(crate) const DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES: &str = "type module";
 
 // #endregion
 
 // #region Datalines
 
 pub(crate) const SELECTOR_DATALINE_LITERAL: &str = "selector";
-pub(crate) const MERGE_MODE_DATALINE_LITERAL: &str = "mergeMode";
+pub(crate) const MODE_DATALINE_LITERAL: &str = "mode";
 pub(crate) const ELEMENTS_DATALINE_LITERAL: &str = "elements";
 pub(crate) const USE_VIEW_TRANSITION_DATALINE_LITERAL: &str = "useViewTransition";
 pub(crate) const SIGNALS_DATALINE_LITERAL: &str = "signals";
 pub(crate) const ONLY_IF_MISSING_DATALINE_LITERAL: &str = "onlyIfMissing";
-pub(crate) const SCRIPT_DATALINE_LITERAL: &str = "script";
-pub(crate) const ATTRIBUTES_DATALINE_LITERAL: &str = "attributes";
-pub(crate) const AUTO_REMOVE_DATALINE_LITERAL: &str = "autoRemove";
 
 // #endregion
 
@@ -46,20 +41,18 @@ pub(crate) const AUTO_REMOVE_DATALINE_LITERAL: &str = "autoRemove";
 pub(crate) const DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS: bool = false;
 /// Should a given set of signals merge if they are missing?
 pub(crate) const DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING: bool = false;
-/// Should script element remove itself after execution?
-pub(crate) const DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE: bool = true;
 
 // #endregion
 
 // #region Enums
 
-/// The mode in which an element is merged into the DOM.
+/// The mode in which an element is patched into the DOM.
 #[derive(Default,Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ElementMergeMode {
-    /// Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+pub enum ElementPatchMode {
+    /// Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
     #[default]
     Outer,
-    /// Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    /// Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
     Inner,
     /// Removes the existing element from the DOM.
     Remove,
@@ -71,10 +64,12 @@ pub enum ElementMergeMode {
     Before,
     /// Inserts the element after the existing element.
     After,
+    /// Do not morph, simply replace the whole element and reset any related state.
+    Replace,
 }
 
-impl ElementMergeMode {
-    /// Returns the [`ElementMergeMode`] as a string.
+impl ElementPatchMode {
+    /// Returns the [`ElementPatchMode`] as a string.
     pub(crate) const fn as_str(&self) -> &str {
         match self {
             Self::Outer => "outer",
@@ -84,27 +79,25 @@ impl ElementMergeMode {
             Self::Append => "append",
             Self::Before => "before",
             Self::After => "after",
+            Self::Replace => "replace",
         }
     }
 }
 /// The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum EventType {
-    /// An event for merging HTML elements into the DOM.
-    MergeElements,
-    /// An event for merging signals.
-    MergeSignals,
-    /// An event for executing <script/> elements in the browser.
-    ExecuteScript,
+    /// An event for patching HTML elements into the DOM.
+    PatchElements,
+    /// An event for patching signals.
+    PatchSignals,
 }
 
 impl EventType {
     /// Returns the [`EventType`] as a string.
     pub(crate) const fn as_str(&self) -> &str {
         match self {
-            Self::MergeElements => "datastar-merge-elements",
-            Self::MergeSignals => "datastar-merge-signals",
-            Self::ExecuteScript => "datastar-execute-script",
+            Self::PatchElements => "datastar-patch-elements",
+            Self::PatchSignals => "datastar-patch-signals",
         }
     }
 }

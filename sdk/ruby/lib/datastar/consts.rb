@@ -15,25 +15,16 @@ module Datastar
     # Should a given set of signals merge if they are missing?
     DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING = false
 
-    # Should script element remove itself after execution?
-    DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE = true
 
-    # The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.}
-    DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = 'type module'
-
-
-    # The mode in which an element is merged into the DOM.
-    DEFAULT_ELEMENT_MERGE_MODE = ElementMergeMode::OUTER
+    # The mode in which an element is patched into the DOM.
+    DEFAULT_ELEMENT_PATCH_MODE = ElementPatchMode::OUTER
 
     # Dataline literals.
     SELECTOR_DATALINE_LITERAL = 'selector'
-    MERGE_MODE_DATALINE_LITERAL = 'mergeMode'
+    MODE_DATALINE_LITERAL = 'mode'
     ELEMENTS_DATALINE_LITERAL = 'elements'
     USE_VIEW_TRANSITION_DATALINE_LITERAL = 'useViewTransition'
     SIGNALS_DATALINE_LITERAL = 'signals'
     ONLY_IF_MISSING_DATALINE_LITERAL = 'onlyIfMissing'
-    SCRIPT_DATALINE_LITERAL = 'script'
-    ATTRIBUTES_DATALINE_LITERAL = 'attributes'
-    AUTO_REMOVE_DATALINE_LITERAL = 'autoRemove'
   end
 end

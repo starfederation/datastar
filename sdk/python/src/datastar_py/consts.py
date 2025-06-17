@@ -11,12 +11,12 @@ class StrEnum(str, Enum):
 # region Enums
 
 
-# region The mode in which an element is merged into the DOM.
-class ElementMergeMode(StrEnum):
-    # Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+# region The mode in which an element is patched into the DOM.
+class ElementPatchMode(StrEnum):
+    # Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
     OUTER = "outer"
 
-    # Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    # Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
     INNER = "inner"
 
     # Removes the existing element from the DOM.
@@ -34,20 +34,20 @@ class ElementMergeMode(StrEnum):
     # Inserts the element after the existing element.
     AFTER = "after"
 
+    # Do not morph, simply replace the whole element and reset any related state.
+    REPLACE = "replace"
 
-# endregion ElementMergeMode
+
+# endregion ElementPatchMode
 
 
 # region The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 class EventType(StrEnum):
-    # An event for merging HTML elements into the DOM.
-    MERGE_ELEMENTS = "datastar-merge-elements"
+    # An event for patching HTML elements into the DOM.
+    PATCH_ELEMENTS = "datastar-patch-elements"
 
-    # An event for merging signals.
-    MERGE_SIGNALS = "datastar-merge-signals"
-
-    # An event for executing <script/> elements in the browser.
-    EXECUTE_SCRIPT = "datastar-execute-script"
+    # An event for patching signals.
+    PATCH_SIGNALS = "datastar-patch-signals"
 
 
 # endregion EventType
@@ -67,21 +67,16 @@ DEFAULT_SSE_RETRY_DURATION = 1000
 
 # region Default strings
 
-# The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
-DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = "type module"
 
 # endregion Default strings
 
 # region Dataline literals
 SELECTOR_DATALINE_LITERAL = "selector"
-MERGE_MODE_DATALINE_LITERAL = "mergeMode"
+MODE_DATALINE_LITERAL = "mode"
 ELEMENTS_DATALINE_LITERAL = "elements"
 USE_VIEW_TRANSITION_DATALINE_LITERAL = "useViewTransition"
 SIGNALS_DATALINE_LITERAL = "signals"
 ONLY_IF_MISSING_DATALINE_LITERAL = "onlyIfMissing"
-SCRIPT_DATALINE_LITERAL = "script"
-ATTRIBUTES_DATALINE_LITERAL = "attributes"
-AUTO_REMOVE_DATALINE_LITERAL = "autoRemove"
 # endregion Dataline literals
 
 # region Default booleans
@@ -91,8 +86,5 @@ DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS = False
 
 # Should a given set of signals merge if they are missing?
 DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING = False
-
-# Should script element remove itself after execution?
-DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE = True
 
 # endregion Default booleans

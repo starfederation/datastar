@@ -18,23 +18,14 @@ public final class Consts {
     // Should a given set of signals merge if they are missing?
     public static final boolean DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING = false;
 
-    // Should script element remove itself after execution?
-    public static final boolean DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE = true;
-
-    // The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
-    public static final String DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = "type module";
-
-    // The mode in which an element is merged into the DOM.
-    public static final FragmentMergeMode DEFAULT_ELEMENT_MERGE_MODE = FragmentMergeMode.Outer;
+    // The mode in which an element is patched into the DOM.
+    public static final FragmentMergeMode DEFAULT_ELEMENT_PATCH_MODE = FragmentMergeMode.Outer;
 
     // Dataline literals.
     public static final String SELECTOR_DATALINE_LITERAL = "selector ";
-    public static final String MERGE_MODE_DATALINE_LITERAL = "mergeMode ";
+    public static final String MODE_DATALINE_LITERAL = "mode ";
     public static final String ELEMENTS_DATALINE_LITERAL = "elements ";
     public static final String USE_VIEW_TRANSITION_DATALINE_LITERAL = "useViewTransition ";
     public static final String SIGNALS_DATALINE_LITERAL = "signals ";
     public static final String ONLY_IF_MISSING_DATALINE_LITERAL = "onlyIfMissing ";
-    public static final String SCRIPT_DATALINE_LITERAL = "script ";
-    public static final String ATTRIBUTES_DATALINE_LITERAL = "attributes ";
-    public static final String AUTO_REMOVE_DATALINE_LITERAL = "autoRemove ";
 }

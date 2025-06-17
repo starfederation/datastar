@@ -171,11 +171,11 @@ var Consts = &ConstTemplateData{
 			Values: []*EnumValueDefinition{
 				{
 					Value:       "outer",
-					Description: "Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.",
+					Description: "Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.",
 				},
 				{
 					Value:       "inner",
-					Description: "Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.",
+					Description: "Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.",
 				},
 				{
 					Value:       "remove",

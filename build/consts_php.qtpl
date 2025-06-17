@@ -3,7 +3,7 @@
 
 namespace starfederation\datastar;
 
-use starfederation\datastar\enums\FragmentMergeMode;
+use starfederation\datastar\enums\ElementPatchMode;
 
 /**
  * {%s data.DoNotEdit %}
@@ -59,7 +59,7 @@ enum EventType: string
 }
 {%- endfunc -%}
 
-{%- func phpFragmentMergeMode(data *ConstTemplateData) -%}
+{%- func phpElementPatchMode(data *ConstTemplateData) -%}
 <?php
 
 namespace starfederation\datastar\enums;
@@ -67,10 +67,10 @@ namespace starfederation\datastar\enums;
 /**
  * {%s data.DoNotEdit %}
  */
-enum FragmentMergeMode: string
+enum ElementPatchMode: string
 {
 {%- for _, enum := range data.Enums -%}
-    {%- if enum.Name.Pascal == "FragmentMergeMode" -%}
+    {%- if enum.Name.Pascal == "ElementPatchMode" -%}
         {%- for _, entry := range enum.Values %}
     // {%s entry.Description %}
     case {%s entry.Name.Pascal %} = '{%s entry.Value %}';

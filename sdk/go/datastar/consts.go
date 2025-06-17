@@ -7,8 +7,8 @@ import "time"
 const (
     DatastarKey = "datastar"
     Version                   = "1.0.0-beta.11"
-    VersionClientByteSize     = 39752
-    VersionClientByteSizeGzip = 14841
+    VersionClientByteSize     = 40026
+    VersionClientByteSizeGzip = 14900
 
     //region Default durations
 
@@ -19,8 +19,6 @@ const (
 
     //region Default strings
 
-    // The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
-    DefaultExecuteScriptAttributes = "type module"
 
     //endregion Default strings
 
@@ -31,9 +29,6 @@ const (
     UseViewTransitionDatalineLiteral = "useViewTransition "
     SignalsDatalineLiteral = "signals "
     OnlyIfMissingDatalineLiteral = "onlyIfMissing "
-    ScriptDatalineLiteral = "script "
-    AttributesDatalineLiteral = "attributes "
-    AutoRemoveDatalineLiteral = "autoRemove "
     //endregion Dataline literals
 )
 
@@ -46,9 +41,6 @@ var (
     // Should a given set of signals merge if they are missing?
     DefaultMergeSignalsOnlyIfMissing = false
 
-    // Should script element remove itself after execution?
-    DefaultExecuteScriptAutoRemove = true
-
     //endregion Default booleans
 )
 
@@ -59,13 +51,13 @@ type ElementPatchMode string
 
 const (
     // Default value for ElementPatchMode
-    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
     DefaultElementPatchMode = ElementPatchModeOuter
 
-    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
     ElementPatchModeOuter ElementPatchMode = "outer"
 
-    // Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
     ElementPatchModeInner ElementPatchMode = "inner"
 
     // Removes the existing element from the DOM.

@@ -4,10 +4,10 @@ namespace StarFederation.Datastar.FSharp
 
 open System
 
-type ElementMergeMode =
-/// Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+type ElementPatchMode =
+/// Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
 | Outer
-/// Morphs the element into the innerHTML using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+/// Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
 | Inner
 /// Removes the existing element from the DOM.
 | Remove
@@ -19,14 +19,14 @@ type ElementMergeMode =
 | Before
 /// Inserts the element after the existing element.
 | After
+/// Do not morph, simply replace the whole element and reset any related state.
+| Replace
 
 type EventType =
-/// An event for merging HTML elements into the DOM.
-| MergeElements
-/// An event for merging signals.
-| MergeSignals
-/// An event for executing &lt;script/&gt; elements in the browser.
-| ExecuteScript
+/// An event for patching HTML elements into the DOM.
+| PatchElements
+/// An event for patching signals.
+| PatchSignals
 
 
 module Consts =
@@ -36,39 +36,35 @@ module Consts =
     /// Default: TimeSpan.FromMilliseconds 1000
     let DefaultSseRetryDuration = TimeSpan.FromMilliseconds 1000
 
-    /// Default: outer - Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
-    let DefaultElementMergeMode = Outer
+
+    /// Default: outer - Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    let DefaultElementPatchMode = Outer
 
     let [<Literal>] DefaultElementsUseViewTransitions = false
     let [<Literal>] DefaultMergeSignalsOnlyIfMissing = false
-    let [<Literal>] DefaultExecuteScriptAutoRemove = true
 
-    let [<Literal>] DefaultExecuteScriptAttributes = "type module"
 
     let [<Literal>] DatastarDatalineSelector = "selector"
-    let [<Literal>] DatastarDatalineMergeMode = "mergeMode"
+    let [<Literal>] DatastarDatalineMode = "mode"
     let [<Literal>] DatastarDatalineElements = "elements"
     let [<Literal>] DatastarDatalineUseViewTransition = "useViewTransition"
     let [<Literal>] DatastarDatalineSignals = "signals"
     let [<Literal>] DatastarDatalineOnlyIfMissing = "onlyIfMissing"
-    let [<Literal>] DatastarDatalineScript = "script"
-    let [<Literal>] DatastarDatalineAttributes = "attributes"
-    let [<Literal>] DatastarDatalineAutoRemove = "autoRemove"
 
-    module ElementMergeMode =
+    module ElementPatchMode =
         let toString this =
             match this with
-                | ElementMergeMode.Outer -> "outer"
-                | ElementMergeMode.Inner -> "inner"
-                | ElementMergeMode.Remove -> "remove"
-                | ElementMergeMode.Prepend -> "prepend"
-                | ElementMergeMode.Append -> "append"
-                | ElementMergeMode.Before -> "before"
-                | ElementMergeMode.After -> "after"
+                | ElementPatchMode.Outer -> "outer"
+                | ElementPatchMode.Inner -> "inner"
+                | ElementPatchMode.Remove -> "remove"
+                | ElementPatchMode.Prepend -> "prepend"
+                | ElementPatchMode.Append -> "append"
+                | ElementPatchMode.Before -> "before"
+                | ElementPatchMode.After -> "after"
+                | ElementPatchMode.Replace -> "replace"
 
     module EventType =
         let toString this =
             match this with
-                | EventType.MergeElements -> "datastar-merge-elements"
-                | EventType.MergeSignals -> "datastar-merge-signals"
-                | EventType.ExecuteScript -> "datastar-execute-script"
+                | EventType.PatchElements -> "datastar-patch-elements"
+                | EventType.PatchSignals -> "datastar-patch-signals"

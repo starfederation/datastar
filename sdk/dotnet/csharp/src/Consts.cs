@@ -4,38 +4,32 @@ namespace StarFederation.Datastar;
 
 using System;
 
-public enum FragmentMergeMode
+public enum ElementPatchMode
 {
-    /// Morphs the fragment into the existing element using idiomorph.
-    Morph,
-    /// Replaces the inner HTML of the existing element.
-    Inner,
-    /// Replaces the outer HTML of the existing element.
+    /// Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
     Outer,
-    /// Prepends the fragment to the existing element.
+    /// Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
+    Inner,
+    /// Removes the existing element from the DOM.
+    Remove,
+    /// Prepends the element inside the existing element.
     Prepend,
-    /// Appends the fragment to the existing element.
+    /// Appends the element inside the existing element.
     Append,
-    /// Inserts the fragment before the existing element.
+    /// Inserts the element before the existing element.
     Before,
-    /// Inserts the fragment after the existing element.
+    /// Inserts the element after the existing element.
     After,
-    /// Upserts the attributes of the existing element.
-    UpsertAttributes,
+    /// Do not morph, simply replace the whole element and reset any related state.
+    Replace,
 
 }
 public enum EventType
 {
-    /// An event for merging HTML fragments into the DOM.
-    MergeFragments,
-    /// An event for merging signals.
-    MergeSignals,
-    /// An event for removing HTML fragments from the DOM.
-    RemoveFragments,
-    /// An event for removing signals.
-    RemoveSignals,
-    /// An event for executing &lt;script/&gt; elements in the browser.
-    ExecuteScript,
+    /// An event for patching HTML elements into the DOM.
+    PatchElements,
+    /// An event for patching signals.
+    PatchSignals,
 
 }
 
@@ -48,43 +42,34 @@ public static class Consts
     public static readonly TimeSpan DefaultSseRetryDuration = TimeSpan.FromMilliseconds(1000);
 
 
-    /// Default: morph - Morphs the fragment into the existing element using idiomorph.
-    public const FragmentMergeMode DefaultFragmentMergeMode = FragmentMergeMode.Morph;
+    /// Default: outer - Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    public const ElementPatchMode DefaultElementPatchMode = ElementPatchMode.Outer;
 
-    public const bool DefaultFragmentsUseViewTransitions = false;
+    public const bool DefaultElementsUseViewTransitions = false;
     public const bool DefaultMergeSignalsOnlyIfMissing = false;
-    public const bool DefaultExecuteScriptAutoRemove = true;
 
-    public const string DefaultExecuteScriptAttributes = "type module";
 
     public const string DatastarDatalineSelector = "selector";
-    public const string DatastarDatalineMergeMode = "mergeMode";
-    public const string DatastarDatalineFragments = "fragments";
+    public const string DatastarDatalineMode = "mode";
+    public const string DatastarDatalineElements = "elements";
     public const string DatastarDatalineUseViewTransition = "useViewTransition";
     public const string DatastarDatalineSignals = "signals";
     public const string DatastarDatalineOnlyIfMissing = "onlyIfMissing";
-    public const string DatastarDatalinePaths = "paths";
-    public const string DatastarDatalineScript = "script";
-    public const string DatastarDatalineAttributes = "attributes";
-    public const string DatastarDatalineAutoRemove = "autoRemove";
 
-    public static string EnumToString( FragmentMergeMode enumValue ) => enumValue switch {
-        FragmentMergeMode.Morph => "morph",
-        FragmentMergeMode.Inner => "inner",
-        FragmentMergeMode.Outer => "outer",
-        FragmentMergeMode.Prepend => "prepend",
-        FragmentMergeMode.Append => "append",
-        FragmentMergeMode.Before => "before",
-        FragmentMergeMode.After => "after",
-        FragmentMergeMode.UpsertAttributes => "upsertAttributes",
-        _ => throw new NotImplementedException($"FragmentMergeMode.{enumValue}")
+    public static string EnumToString( ElementPatchMode enumValue ) => enumValue switch {
+        ElementPatchMode.Outer => "outer",
+        ElementPatchMode.Inner => "inner",
+        ElementPatchMode.Remove => "remove",
+        ElementPatchMode.Prepend => "prepend",
+        ElementPatchMode.Append => "append",
+        ElementPatchMode.Before => "before",
+        ElementPatchMode.After => "after",
+        ElementPatchMode.Replace => "replace",
+        _ => throw new NotImplementedException($"ElementPatchMode.{enumValue}")
     };
     public static string EnumToString( EventType enumValue ) => enumValue switch {
-        EventType.MergeFragments => "datastar-merge-fragments",
-        EventType.MergeSignals => "datastar-merge-signals",
-        EventType.RemoveFragments => "datastar-remove-fragments",
-        EventType.RemoveSignals => "datastar-remove-signals",
-        EventType.ExecuteScript => "datastar-execute-script",
+        EventType.PatchElements => "datastar-patch-elements",
+        EventType.PatchSignals => "datastar-patch-signals",
         _ => throw new NotImplementedException($"EventType.{enumValue}")
     };
 }

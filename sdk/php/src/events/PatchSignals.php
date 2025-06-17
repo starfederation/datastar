@@ -8,7 +8,7 @@ namespace starfederation\datastar\events;
 use starfederation\datastar\Consts;
 use starfederation\datastar\enums\EventType;
 
-class MergeSignals implements EventInterface
+class PatchSignals implements EventInterface
 {
     use EventTrait;
 
@@ -29,7 +29,7 @@ class MergeSignals implements EventInterface
      */
     public function getEventType(): EventType
     {
-        return EventType::MergeSignals;
+        return EventType::PatchSignals;
     }
 
     /**
