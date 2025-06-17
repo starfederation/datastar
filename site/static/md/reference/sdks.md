@@ -55,8 +55,13 @@ _Author: [Felix Ingram](https://github.com/lllama)_
 
 ## Rust
 
-Rust [SDK](https://github.com/starfederation/datastar/tree/main/sdk/rust) and [examples](https://github.com/starfederation/datastar/tree/main/examples/rust).  
- _Author: [Johnathan Stevers](https://github.com/jmstevers)_
+Rust [SDK](https://github.com/starfederation/datastar/tree/main/sdk/rust) and [examples](https://github.com/starfederation/datastar/tree/main/examples/rust).
+ _Authors: [Johnathan Stevers](https://github.com/jmstevers), [Glen De Cauwsemaecker](https://github.com/glendc)_
+
+### Rama
+
+[Rama module for Datastar](https://ramaproxy.org/docs/rama/http/sse/datastar/index.html)
+and [example](https://github.com/plabayo/rama/blob/main/examples/http_sse_datastar_hello.rs)
 
 ## Ruby
 
@@ -72,15 +77,3 @@ _Author: [Patrick Marchand](https://github.com/Superpat)_
 
 Zig [SDK](https://github.com/starfederation/datastar/tree/main/sdk/zig) and [examples](https://github.com/starfederation/datastar/tree/main/examples/zig).  
  _Author: [Johnathan Stevers](https://github.com/jmstevers)_
-
----
-
-## Community SDKs
-
-Community SDKs are contributed and maintained independently. If you'd like to contribute one, please consult the contribution guidelines in the respective SDK's repository.
-
-### Rama (Rust)
-
-[Rama module for Datastar](https://ramaproxy.org/docs/rama/http/sse/datastar/index.html)
-and [example](https://github.com/plabayo/rama/blob/main/examples/http_sse_datastar_hello.rs).
-_Author: [Plabayo BV](https://github.com/plabayo)_
