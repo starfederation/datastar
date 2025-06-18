@@ -100,7 +100,7 @@ func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts .
 	// Use PatchElements to send the script
 	patchOpts := []PatchElementOption{
 		WithSelector("body"),
-		WithMergeAppend(),
+		WithModeAppend(),
 	}
 	if options.EventID != "" {
 		patchOpts = append(patchOpts, WithPatchElementsEventID(options.EventID))

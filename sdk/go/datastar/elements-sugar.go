@@ -8,8 +8,8 @@ import (
 	"github.com/valyala/bytebufferpool"
 )
 
-// ValidElementMergeTypes is a list of valid element merge modes.
-var ValidElementMergeTypes = []ElementPatchMode{
+// ValidElementPatchModes is a list of valid element patch modes.
+var ValidElementPatchModes = []ElementPatchMode{
 	ElementPatchModeOuter,
 	ElementPatchModeInner,
 	ElementPatchModeRemove,
@@ -20,8 +20,8 @@ var ValidElementMergeTypes = []ElementPatchMode{
 	ElementPatchModeReplace,
 }
 
-// ElementMergeTypeFromString converts a string to a [ElementPatchMode].
-func ElementMergeTypeFromString(s string) (ElementPatchMode, error) {
+// ElementPatchModeFromString converts a string to a [ElementPatchMode].
+func ElementPatchModeFromString(s string) (ElementPatchMode, error) {
 	switch s {
 	case "outer":
 		return ElementPatchModeOuter, nil
@@ -44,45 +44,45 @@ func ElementMergeTypeFromString(s string) (ElementPatchMode, error) {
 	}
 }
 
-// WithMergeOuter creates a PatchElementOption that merges elements using the outer mode.
-func WithMergeOuter() PatchElementOption {
-	return WithMergeMode(ElementPatchModeOuter)
+// WithModeOuter creates a PatchElementOption that merges elements using the outer mode.
+func WithModeOuter() PatchElementOption {
+	return WithMode(ElementPatchModeOuter)
 }
 
-// WithMergeInner creates a PatchElementOption that merges elements using the inner mode.
-func WithMergeInner() PatchElementOption {
-	return WithMergeMode(ElementPatchModeInner)
+// WithModeInner creates a PatchElementOption that merges elements using the inner mode.
+func WithModeInner() PatchElementOption {
+	return WithMode(ElementPatchModeInner)
 }
 
-// WithMergeRemove creates a PatchElementOption that removes elements from the DOM.
-func WithMergeRemove() PatchElementOption {
-	return WithMergeMode(ElementPatchModeRemove)
+// WithModeRemove creates a PatchElementOption that removes elements from the DOM.
+func WithModeRemove() PatchElementOption {
+	return WithMode(ElementPatchModeRemove)
 }
 
-// WithMergePrepend creates a PatchElementOption that merges elements using the prepend mode.
-func WithMergePrepend() PatchElementOption {
-	return WithMergeMode(ElementPatchModePrepend)
+// WithModePrepend creates a PatchElementOption that merges elements using the prepend mode.
+func WithModePrepend() PatchElementOption {
+	return WithMode(ElementPatchModePrepend)
 }
 
-// WithMergeAppend creates a PatchElementOption that merges elements using the append mode.
-func WithMergeAppend() PatchElementOption {
-	return WithMergeMode(ElementPatchModeAppend)
+// WithModeAppend creates a PatchElementOption that merges elements using the append mode.
+func WithModeAppend() PatchElementOption {
+	return WithMode(ElementPatchModeAppend)
 }
 
-// WithMergeBefore creates a PatchElementOption that merges elements using the before mode.
-func WithMergeBefore() PatchElementOption {
-	return WithMergeMode(ElementPatchModeBefore)
+// WithModeBefore creates a PatchElementOption that merges elements using the before mode.
+func WithModeBefore() PatchElementOption {
+	return WithMode(ElementPatchModeBefore)
 }
 
-// WithMergeAfter creates a PatchElementOption that merges elements using the after mode.
-func WithMergeAfter() PatchElementOption {
-	return WithMergeMode(ElementPatchModeAfter)
+// WithModeAfter creates a PatchElementOption that merges elements using the after mode.
+func WithModeAfter() PatchElementOption {
+	return WithMode(ElementPatchModeAfter)
 }
 
-// WithMergeReplace creates a PatchElementOption that replaces elements without morphing.
+// WithModeReplace creates a PatchElementOption that replaces elements without morphing.
 // This mode does not use morphing and will completely replace the element, resetting any related state.
-func WithMergeReplace() PatchElementOption {
-	return WithMergeMode(ElementPatchModeReplace)
+func WithModeReplace() PatchElementOption {
+	return WithMode(ElementPatchModeReplace)
 }
 
 // WithSelectorID is a convenience wrapper for [WithSelector] option
@@ -125,7 +125,7 @@ func (sse *ServerSentEventGenerator) PatchElementTempl(c TemplComponent, opts ..
 	buf := bytebufferpool.Get()
 	defer bytebufferpool.Put(buf)
 	if err := c.Render(sse.Context(), buf); err != nil {
-		return fmt.Errorf("failed to merge element: %w", err)
+		return fmt.Errorf("failed to patch element: %w", err)
 	}
 	if err := sse.PatchElements(buf.String(), opts...); err != nil {
 		return fmt.Errorf("failed to patch element: %w", err)
@@ -191,10 +191,10 @@ func DeleteSSE(urlFormat string, args ...any) string {
 }
 
 // RemoveElement is a convenience method for removing elements from the DOM.
-// It uses PatchElements with the remove merge mode and the specified selector.
+// It uses PatchElements with the remove mode and the specified selector.
 func (sse *ServerSentEventGenerator) RemoveElement(selector string, opts ...PatchElementOption) error {
 	// Prepend the remove mode option
-	allOpts := append([]PatchElementOption{WithMergeRemove(), WithSelector(selector)}, opts...)
+	allOpts := append([]PatchElementOption{WithModeRemove(), WithSelector(selector)}, opts...)
 	return sse.PatchElements("", allOpts...)
 }
 

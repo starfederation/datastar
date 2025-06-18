@@ -47,9 +47,9 @@ func WithSelector(selector string) PatchElementOption {
 	}
 }
 
-// WithMergeMode overrides the [DefaultElementPatchMode] for the element.
+// WithMode overrides the [DefaultElementPatchMode] for the element.
 // Choose a valid [ElementPatchMode].
-func WithMergeMode(merge ElementPatchMode) PatchElementOption {
+func WithMode(merge ElementPatchMode) PatchElementOption {
 	return func(o *patchElementOptions) {
 		o.MergeMode = merge
 	}
