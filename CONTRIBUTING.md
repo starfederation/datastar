@@ -38,17 +38,6 @@ SDKs must follow the [Architecture Decision Record](https://github.com/starfeder
 
 Datastar’s documentation is written in markdown files that live in [this folder](https://github.com/starfederation/datastar/tree/develop/site/static/md). Improvements to them can be submitted via pull requests.
 
-## SDKs
-
-SDKs must follow the [Architecture Decision Record](https://github.com/starfederation/datastar/blob/develop/sdk/README.md) document. Pull requests for new SDKs should also include the following:
-
-- A README file that explains how to use the SDK.
-- An entry in the [SDKs reference guide](https://github.com/starfederation/datastar/blob/develop/site/static/md/reference/sdks.md).
-- A `Language` struct in `SDKLanguages` in [`consts.go`](https://github.com/starfederation/datastar/blob/develop/build/consts.go).
-- A `consts_[language].qtpl` file for generating [constants and defaults](https://github.com/starfederation/datastar/blob/develop/build).
-- Sample [code snippets](https://github.com/starfederation/datastar/tree/develop/site/static/code_snippets) in the language of your SDK.
-- An implementation of each of the [examples](https://github.com/starfederation/datastar/tree/develop/examples).
-
 ## Building
 
 Datastar comes with instructions for building, either manually or via Docker. Read the [Building Guidelines »](BUILDING.md)
