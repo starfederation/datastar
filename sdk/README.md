@@ -144,6 +144,47 @@ data: elements </div>
 ```
 </details>
 
+<details>
+<summary>Patch elements based on their id</summary>
+
+```
+event: datastar-patch-elements
+data: elements <div id="id1">New content.</div>
+data: elements <div id="id2">Other new content.</div>
+```
+</details>
+
+<details>
+<summary>Insert a new element based on a selector</summary>
+
+```
+event: datastar-patch-elements
+data: mode append
+data: selector #mycontainer
+data: elements <div>New content</div>
+```
+</details>
+
+<details>
+<summary>Remove elements based on a selector</summary>
+
+```
+event: datastar-patch-elements
+data: mode remove
+data: selector #feed, #otherid
+```
+</details>
+
+<details>
+<summary>Remove elements without a selector</summary>
+
+```
+event: datastar-patch-elements
+data: mode remove
+data: elements <div id="first"></div><div id="second"></div>
+```
+</details>
+
 `PatchElements` sends HTML elements to the browser for DOM manipulation.
 
 > [!TIP]
@@ -161,6 +202,9 @@ data: elements </div>
 | **HTMX (Fragments)** | `Hello <strong>World</strong>` | • Partial HTML allowed<br>• May lack proper structure<br>• Requires special handling<br>• More flexible but less predictable |
 
 ### Parameters
+
+- **elements**: One or more complete HTML elements. If a selector has not been specified, each element must contain an
+  id. With ElementPatchMode remove, this parameter may be omitted when a selector is supplied.
 
 #### ElementPatchMode
 
@@ -186,35 +230,6 @@ String enum defining how elements are patched into the DOM.
 | `selector` | string | Element's `id` | CSS selector for target element. If a selector is not specified, each element must have an id specified. |
 | `mode` | ElementPatchMode | `outer` | How to patch the element |
 | `useViewTransition` | boolean | `false` | Enable view transitions API |
-
-<details>
-<summary>Element Operations Examples</summary>
-
-```
-: patch multiple elements based on their id
-event: datastar-patch-elements
-data: elements <div id="id1">New content.</div>
-data: elements <div id="id2">Other new content.</div>
-
-: insert a new element based on a selector
-event: datastar-patch-elements
-data: mode append
-data: selector #mycontainer
-data: elements <div>New content</div>
-
-: remove elements based on a selector
-: (elements are not required for remove mode with a selector)
-event: datastar-patch-elements
-data: mode remove
-data: selector #feed, #otherid
-
-: remove elements without a selector
-: (elements in the dom with corresponding ids will be removed)
-event: datastar-patch-elements
-data: mode remove
-data: elements <div id="first"></div><div id="second"></div>
-```
-</details>
 
 ### Implementation
 
