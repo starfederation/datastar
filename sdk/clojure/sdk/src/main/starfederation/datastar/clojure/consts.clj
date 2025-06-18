@@ -35,11 +35,11 @@
 ;; Default booleans
 ;; -----------------------------------------------------------------------------
 (def default-elements-use-view-transitions
-  "Should elements be merged using the ViewTransition API?"
+  "Should elements be patched using the ViewTransition API?"
   false)
 
-(def default-merge-signals-only-if-missing
-  "Should a given set of signals merge if they are missing?"
+(def default-patch-signals-only-if-missing
+  "Should a given set of signals patch if they are missing?"
   false)
 
 
@@ -50,11 +50,11 @@
 ;; ElementPatchMode
 
 (def element-patch-mode-outer
-  "Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes."
+  "Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes."
   "outer")
 
 (def element-patch-mode-inner
-  "Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes."
+  "Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes."
   "inner")
 
 (def element-patch-mode-remove
@@ -84,7 +84,7 @@
 
 (def default-element-patch-mode
   "Default value for ElementPatchMode.
-  Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes."
+  Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes."
   element-patch-mode-outer)
 
 

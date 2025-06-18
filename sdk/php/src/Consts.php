@@ -15,11 +15,11 @@ class Consts
     // The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     public const DEFAULT_SSE_RETRY_DURATION = 1000;
 
-    // Should elements be merged using the ViewTransition API?
+    // Should elements be patched using the ViewTransition API?
     public const DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS = false;
 
-    // Should a given set of signals merge if they are missing?
-    public const DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING = false;
+    // Should a given set of signals patch if they are missing?
+    public const DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING = false;
 
     // The mode in which an element is patched into the DOM.
     public const DEFAULT_ELEMENT_PATCH_MODE = ElementPatchMode::Outer;

@@ -133,12 +133,12 @@ var Consts = &ConstTemplateData{
 	DefaultBools: []*DefaultBool{
 		{
 			Name:        toolbelt.ToCasedString("elementsUseViewTransitions"),
-			Description: "Should elements be merged using the ViewTransition API?",
+			Description: "Should elements be patched using the ViewTransition API?",
 			Value:       false,
 		},
 		{
-			Name:        toolbelt.ToCasedString("mergeSignalsOnlyIfMissing"),
-			Description: "Should a given set of signals merge if they are missing?",
+			Name:        toolbelt.ToCasedString("patchSignalsOnlyIfMissing"),
+			Description: "Should a given set of signals patch if they are missing?",
 			Value:       false,
 		},
 	},
@@ -171,11 +171,11 @@ var Consts = &ConstTemplateData{
 			Values: []*EnumValueDefinition{
 				{
 					Value:       "outer",
-					Description: "Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.",
+					Description: "Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.",
 				},
 				{
 					Value:       "inner",
-					Description: "Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.",
+					Description: "Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.",
 				},
 				{
 					Value:       "remove",

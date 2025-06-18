@@ -5,9 +5,9 @@ namespace StarFederation.Datastar.FSharp
 open System
 
 type ElementPatchMode =
-/// Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+/// Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
 | Outer
-/// Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
+/// Morphs the element into the innerHTML using Datastar&#39;s morphing, preserving focus and minimizing element changes.
 | Inner
 /// Removes the existing element from the DOM.
 | Remove
@@ -37,11 +37,11 @@ module Consts =
     let DefaultSseRetryDuration = TimeSpan.FromMilliseconds 1000
 
 
-    /// Default: outer - Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    /// Default: outer - Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
     let DefaultElementPatchMode = Outer
 
     let [<Literal>] DefaultElementsUseViewTransitions = false
-    let [<Literal>] DefaultMergeSignalsOnlyIfMissing = false
+    let [<Literal>] DefaultPatchSignalsOnlyIfMissing = false
 
 
     let [<Literal>] DatastarDatalineSelector = "selector"

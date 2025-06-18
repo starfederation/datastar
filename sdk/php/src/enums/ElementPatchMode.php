@@ -8,10 +8,10 @@ namespace starfederation\datastar\enums;
 enum ElementPatchMode: string
 {
 
-    // Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
     case Outer = 'outer';
 
-    // Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the innerHTML using Datastar&#39;s morphing, preserving focus and minimizing element changes.
     case Inner = 'inner';
 
     // Removes the existing element from the DOM.

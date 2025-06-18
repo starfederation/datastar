@@ -13,10 +13,10 @@ class StrEnum(str, Enum):
 
 # region The mode in which an element is patched into the DOM.
 class ElementPatchMode(StrEnum):
-    # Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    # Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
     OUTER = "outer"
 
-    # Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
+    # Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
     INNER = "inner"
 
     # Removes the existing element from the DOM.
@@ -81,10 +81,10 @@ ONLY_IF_MISSING_DATALINE_LITERAL = "onlyIfMissing"
 
 # region Default booleans
 
-# Should elements be merged using the ViewTransition API?
+# Should elements be patched using the ViewTransition API?
 DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS = False
 
-# Should a given set of signals merge if they are missing?
-DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING = False
+# Should a given set of signals patch if they are missing?
+DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING = False
 
 # endregion Default booleans

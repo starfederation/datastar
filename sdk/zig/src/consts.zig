@@ -32,10 +32,10 @@ pub const only_if_missing_dataline_literal = "onlyIfMissing";
 
 // #region Default booleans
 
-/// Should elements be merged using the ViewTransition API?
+/// Should elements be patched using the ViewTransition API?
 pub const default_elements_use_view_transitions = false;
-/// Should a given set of signals merge if they are missing?
-pub const default_merge_signals_only_if_missing = false;
+/// Should a given set of signals patch if they are missing?
+pub const default_patch_signals_only_if_missing = false;
 
 // #endregion
 
@@ -43,9 +43,9 @@ pub const default_merge_signals_only_if_missing = false;
 
 /// The mode in which an element is patched into the DOM.
 pub const ElementPatchMode = enum {
-    /// Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    /// Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
     outer,
-    /// Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
+    /// Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
     inner,
     /// Removes the existing element from the DOM.
     remove,

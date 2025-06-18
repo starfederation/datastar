@@ -35,11 +35,11 @@ const (
 var (
     //region Default booleans
 
-    // Should elements be merged using the ViewTransition API?
+    // Should elements be patched using the ViewTransition API?
     DefaultElementsUseViewTransitions = false
 
-    // Should a given set of signals merge if they are missing?
-    DefaultMergeSignalsOnlyIfMissing = false
+    // Should a given set of signals patch if they are missing?
+    DefaultPatchSignalsOnlyIfMissing = false
 
     //endregion Default booleans
 )
@@ -51,13 +51,13 @@ type ElementPatchMode string
 
 const (
     // Default value for ElementPatchMode
-    // Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
     DefaultElementPatchMode = ElementPatchModeOuter
 
-    // Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
     ElementPatchModeOuter ElementPatchMode = "outer"
 
-    // Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
     ElementPatchModeInner ElementPatchMode = "inner"
 
     // Removes the existing element from the DOM.

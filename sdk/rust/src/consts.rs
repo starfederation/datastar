@@ -37,10 +37,10 @@ pub(crate) const ONLY_IF_MISSING_DATALINE_LITERAL: &str = "onlyIfMissing";
 
 // #region Default booleans
 
-/// Should elements be merged using the ViewTransition API?
+/// Should elements be patched using the ViewTransition API?
 pub(crate) const DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS: bool = false;
-/// Should a given set of signals merge if they are missing?
-pub(crate) const DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING: bool = false;
+/// Should a given set of signals patch if they are missing?
+pub(crate) const DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING: bool = false;
 
 // #endregion
 
@@ -49,10 +49,10 @@ pub(crate) const DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING: bool = false;
 /// The mode in which an element is patched into the DOM.
 #[derive(Default,Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ElementPatchMode {
-    /// Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    /// Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
     #[default]
     Outer,
-    /// Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
+    /// Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
     Inner,
     /// Removes the existing element from the DOM.
     Remove,

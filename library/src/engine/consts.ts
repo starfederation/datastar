@@ -24,11 +24,11 @@ export const DefaultSseRetryDurationMs = 1000;
 
 // #region Default booleans
 
-// Should elements be merged using the ViewTransition API?
+// Should elements be patched using the ViewTransition API?
 export const DefaultElementsUseViewTransitions = false;
 
-// Should a given set of signals merge if they are missing?
-export const DefaultMergeSignalsOnlyIfMissing = false;
+// Should a given set of signals patch if they are missing?
+export const DefaultPatchSignalsOnlyIfMissing = false;
 
 // #endregion
 
@@ -37,9 +37,9 @@ export const DefaultMergeSignalsOnlyIfMissing = false;
 
 // The mode in which an element is patched into the DOM.
 export const ElementPatchModes = {
-    // Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
     Outer: "outer",
-    // Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
     Inner: "inner",
     // Removes the existing element from the DOM.
     Remove: "remove",

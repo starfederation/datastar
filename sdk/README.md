@@ -147,7 +147,7 @@ data: elements </div>
 `PatchElements` sends HTML elements to the browser for DOM manipulation.
 
 > [!TIP]
-> - To remove elements, use the `remove` merge mode
+> - To remove elements, use the `remove` patch mode
 > - To execute JavaScript, send a `<script>` element - it will auto-execute when added to the DOM
 
 ### Elements vs Fragments: Key Distinction
@@ -250,7 +250,7 @@ data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":
 |-----------|----------|---------|
 | **Add/Update** | Set property value | `{"key": "value"}` |
 | **Remove** | Set to `null` | `{"key": null}` |
-| **Nested** | Recursive merge | `{"user": {"name": "John"}}` |
+| **Nested** | Recursive patch | `{"user": {"name": "John"}}` |
 
 ### Examples
 
@@ -267,7 +267,7 @@ data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":
 // Remove signal
 {"signalToRemove": null}
 
-// Complex nested merge
+// Complex nested patch
 {
   "user": {
     "name": "John",

@@ -6,9 +6,9 @@ using System;
 
 public enum ElementPatchMode
 {
-    /// Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    /// Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
     Outer,
-    /// Morphs the element into the innerHTML using Datastar’s morphing, preserving focus and minimizing element changes.
+    /// Morphs the element into the innerHTML using Datastar&#39;s morphing, preserving focus and minimizing element changes.
     Inner,
     /// Removes the existing element from the DOM.
     Remove,
@@ -42,11 +42,11 @@ public static class Consts
     public static readonly TimeSpan DefaultSseRetryDuration = TimeSpan.FromMilliseconds(1000);
 
 
-    /// Default: outer - Morphs the element into the existing element using Datastar’s morphing, preserving focus and minimizing element changes.
+    /// Default: outer - Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
     public const ElementPatchMode DefaultElementPatchMode = ElementPatchMode.Outer;
 
     public const bool DefaultElementsUseViewTransitions = false;
-    public const bool DefaultMergeSignalsOnlyIfMissing = false;
+    public const bool DefaultPatchSignalsOnlyIfMissing = false;
 
 
     public const string DatastarDatalineSelector = "selector";
