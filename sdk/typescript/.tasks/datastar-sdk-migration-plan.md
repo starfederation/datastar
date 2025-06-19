@@ -37,16 +37,21 @@ This document outlines the step-by-step migration from the current Datastar Type
   - [x] Replace `npm:type-fest` dependency with local `Jsonifiable` type
 
 #### 1.2 Abstract Class Core Changes
-- [ ] Update `src/abstractServerSentEventGenerator.ts`
-  - [ ] Rename `mergeFragments()` method → `PatchElements()`
-  - [ ] Rename `mergeSignals()` method → `PatchSignals()`
-  - [ ] Update method signatures to match new specification
-  - [ ] Change internal event type calls to use new constants
-  - [ ] Update data line generation for `elements` instead of `fragments`
-  - [ ] Update data line generation to use `DatastarDatalinePatchMode` instead of `DatastarDatalineMergeMode`
-  - [ ] Remove `removeFragments()` method (functionality moved to `PatchElements` with `remove` mode)
-  - [ ] Remove `removeSignals()` method (not in new specification)
-  - [ ] Remove `executeScript()` method (replaced by `ExecuteScript` via `PatchElements`)
+- [x] Update `src/abstractServerSentEventGenerator.ts`
+  - [x] Rename `mergeFragments()` method → `PatchElements()`
+  - [x] Rename `mergeSignals()` method → `PatchSignals()`
+  - [x] Update method signatures to match new specification
+  - [x] Change internal event type calls to use new constants
+  - [x] Update data line generation for `elements` instead of `fragments`
+  - [x] Update data line generation to use `DatastarDatalinePatchMode` instead of `DatastarDatalineMergeMode`
+  - [x] Remove `removeFragments()` method (functionality moved to `PatchElements` with `remove` mode)
+  - [x] Remove `removeSignals()` method (not in new specification)
+  - [x] Remove `executeScript()` method (replaced by `ExecuteScript` via `PatchElements`)
+  - [x] Updated all imports to use new types (`PatchElementsOptions`, `PatchSignalsOptions`, etc.)
+  - [x] Fixed dataline spacing (removed extra space in concatenation)
+  - [x] Implemented `ExecuteScript()` method (moved from Phase 3.1)
+  - [x] Updated JSDoc comments for all methods
+  - [x] Complete class rewrite for full spec compliance
 
 ### Phase 2: Implementation Updates
 
@@ -66,12 +71,12 @@ This document outlines the step-by-step migration from the current Datastar Type
 ### Phase 3: New Methods Implementation
 
 #### 3.1 Add New Methods to Abstract Class
-- [ ] Implement `ExecuteScript()` method in `abstractServerSentEventGenerator.ts`
-  - [ ] Method should create a `<script>` element via `PatchElements`
-  - [ ] Support `autoRemove` option with `data-on-load="el.remove()"`
-  - [ ] Support `attributes` option for script tag attributes
-  - [ ] Use `append` mode and `body` selector by default
-  - [ ] Handle multi-line scripts properly
+- [x] Implement `ExecuteScript()` method in `abstractServerSentEventGenerator.ts`
+  - [x] Method creates a `<script>` element via `PatchElements`
+  - [x] Supports `autoRemove` option with `data-on-load="el.remove()"`
+  - [x] Supports `attributes` option for script tag attributes
+  - [x] Uses `append` mode and `body` selector by default
+  - [x] Handles multi-line scripts properly
 
 #### 3.2 Parameter Validation and Defaults
 - [ ] Add validation for new `ElementPatchMode` values

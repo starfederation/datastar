@@ -3,17 +3,22 @@ import {
   DefaultMapping,
   EventType,
   ExecuteScriptOptions,
-  FragmentOptions,
-  MergeFragmentsOptions,
-  MergeSignalsOptions,
+  ElementOptions,
+  PatchElementsOptions,
+  PatchSignalsOptions,
+  Jsonifiable,
 } from "./types.ts";
 
 import {
+  DatastarDatalineElements,
+  DatastarDatalinePatchMode,
+  DatastarDatalineSelector,
+  DatastarDatalineSignals,
+  DatastarDatalineOnlyIfMissing,
+  DatastarDatalineUseViewTransition,
   DefaultExecuteScriptAttributes,
   DefaultSseRetryDurationMs,
 } from "./consts.ts";
-
-import type { Jsonifiable } from "npm:type-fest";
 
 /**
  * Abstract ServerSentEventGenerator class, responsible for initializing and handling
@@ -61,7 +66,7 @@ export abstract class ServerSentEventGenerator {
 
   private eachNewlineIsADataLine(prefix: string, data: string) {
     return data.split("\n").map((line) => {
-      return `${prefix} ${line}`;
+      return `${prefix}${line}`;
     });
   }
 
@@ -87,95 +92,56 @@ export abstract class ServerSentEventGenerator {
   }
 
   /**
-   * Sends a merge fragments event.
+   * Patches HTML elements into the DOM.
    *
-   * @param fragments - HTML fragments that will be merged.
-   * @param [options] - Additional options for merging.
+   * @param elements - HTML elements that will be patched.
+   * @param [options] - Additional options for patching.
    */
-  public mergeFragments(
-    data: string,
-    options?: MergeFragmentsOptions,
+  public PatchElements(
+    elements: string,
+    options?: PatchElementsOptions,
   ): ReturnType<typeof this.send> {
     const { eventId, retryDuration, ...renderOptions } = options ||
-      {} as Partial<MergeFragmentsOptions>;
+      {} as Partial<PatchElementsOptions>;
 
     const dataLines = this.eachOptionIsADataLine(renderOptions)
-      .concat(this.eachNewlineIsADataLine("fragments", data));
+      .concat(this.eachNewlineIsADataLine(DatastarDatalineElements, elements));
 
-    return this.send("datastar-merge-fragments", dataLines, {
+    return this.send("datastar-patch-elements", dataLines, {
       eventId,
       retryDuration,
     });
   }
 
   /**
-   * Sends a remove fragments event.
+   * Patches signals into the signal store.
    *
-   * @param selector - CSS selector of fragments to remove.
-   * @param [options] - Additional options for removing.
+   * @param signals - JSON string containing signal data to patch.
+   * @param [options] - Additional options for patching.
    */
-  public removeFragments(selector: string, options?: FragmentOptions) {
-    const { eventId, retryDuration, ...eventOptions } = options ||
-      {} as Partial<FragmentOptions>;
-    const dataLines = this.eachOptionIsADataLine(eventOptions)
-      .concat(this.eachNewlineIsADataLine("selector", selector));
-
-    return this.send("datastar-remove-fragments", dataLines, {
-      eventId,
-      retryDuration,
-    });
-  }
-
-  /**
-   * Sends a merge signals event.
-   *
-   * @param data - Data object or json string that will be merged into the client's signals.
-   * @param [options] - Additional options for merging.
-   */
-  public mergeSignals(
-    data: Record<string, Jsonifiable> | string,
-    options?: MergeSignalsOptions,
+  public PatchSignals(
+    signals: string,
+    options?: PatchSignalsOptions,
   ): ReturnType<typeof this.send> {
     const { eventId, retryDuration, ...eventOptions } = options ||
-      {} as Partial<MergeSignalsOptions>;
+      {} as Partial<PatchSignalsOptions>;
 
-    const signals = typeof data === "string" ? data : JSON.stringify(data);
     const dataLines = this.eachOptionIsADataLine(eventOptions)
-      .concat(this.eachNewlineIsADataLine("signals", signals));
+      .concat(this.eachNewlineIsADataLine(DatastarDatalineSignals, signals));
 
-    return this.send("datastar-merge-signals", dataLines, {
+    return this.send("datastar-patch-signals", dataLines, {
       eventId,
       retryDuration,
     });
   }
 
   /**
-   * Sends a remove signals event.
-   *
-   * @param paths - An array of paths or a string containing space separated paths.
-   * @param [options] - Additional options for removing signals.
-   */
-  public removeSignals(
-    paths: string[] | string,
-    options?: DatastarEventOptions,
-  ): ReturnType<typeof this.send> {
-    const eventOptions = options || {} as DatastarEventOptions;
-    const pathsArray = typeof paths === "string"
-      ? paths.split(" ")
-      : paths.flatMap((path) => path.split(" "));
-
-    const dataLines = pathsArray.map((path) => `paths ${path}`);
-
-    return this.send("datastar-remove-signals", dataLines, eventOptions);
-  }
-
-  /**
-   * Executes a script on the client-side.
+   * Executes a script on the client-side by creating a script element via PatchElements.
    *
    * @param script - Script code to execute.
    * @param [options] - Additional options for execution.
    */
-  public executeScript(
+  public ExecuteScript(
     script: string,
     options?: ExecuteScriptOptions,
   ): ReturnType<typeof this.send> {
@@ -183,29 +149,41 @@ export abstract class ServerSentEventGenerator {
       eventId,
       retryDuration,
       attributes,
+      autoRemove,
       ...eventOptions
     } = options || {} as Partial<ExecuteScriptOptions>;
-    const attributesArray = attributes instanceof Array
-      ? attributes
-      : this.eachOptionIsADataLine(attributes ?? {});
 
-    const attributesDataLines = attributesArray.filter((line) => {
-      const parts = line.split(" ");
-      const defaultParts = DefaultExecuteScriptAttributes.split(" ");
-      if (parts[0] === defaultParts[0] && parts[1]) {
-        return parts[1] !== defaultParts[1];
+    // Build script tag
+    let scriptTag = '<script';
+    
+    // Add attributes if provided
+    if (attributes) {
+      if (Array.isArray(attributes)) {
+        for (const attr of attributes) {
+          scriptTag += ` ${attr}`;
+        }
+      } else {
+        for (const [key, value] of Object.entries(attributes)) {
+          scriptTag += ` ${key}="${value}"`;
+        }
       }
-      return true;
-    }).map((line) => `attributes ${line}`);
+    }
 
-    const dataLines = attributesDataLines.concat(
-      this.eachOptionIsADataLine(eventOptions),
-      this.eachNewlineIsADataLine("script", script),
-    );
+    // Add auto-remove attribute if needed (default is false per spec)
+    if (autoRemove === true) {
+      scriptTag += ' data-on-load="el.remove()"';
+    }
 
-    return this.send("datastar-execute-script", dataLines, {
+    scriptTag += `>${script}</script>`;
+
+    // Use PatchElements with body selector and append mode
+    const patchOptions: PatchElementsOptions = {
+      [DatastarDatalineSelector]: 'body',
+      [DatastarDatalinePatchMode]: 'append',
       eventId,
       retryDuration,
-    });
+    };
+
+    return this.PatchElements(scriptTag, patchOptions);
   }
 }
