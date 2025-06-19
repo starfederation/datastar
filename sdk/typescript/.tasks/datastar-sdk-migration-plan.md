@@ -97,43 +97,58 @@ This document outlines the step-by-step migration from the current Datastar Type
 - [x] Ensure proper JSON validation for signals parameter ✓ (added `validateJSON`)
 - [x] Validate script attributes format and allowed values ✓ (added `validateScriptAttributes`)
 
-### Phase 4: Testing and Examples
+### Phase 4: Test Suite Updates
 
-#### 4.1 Update Examples
+#### 4.1 Update Existing Tests
+- [ ] Update existing tests in `test/` directory
+  - [ ] Change method names in test cases (`mergeFragments` → `PatchElements`, etc.)
+  - [ ] Update expected event types in assertions
+  - [ ] Update parameter names to use new constants
+  - [ ] Test parameter validation functionality
+  - [ ] Test default value behavior
+
+#### 4.2 Add New Test Cases for Specification Compliance
+- [ ] Add tests for new `ElementPatchMode` values
+  - [ ] Test `outer`, `inner`, `replace`, `prepend`, `append`, `before`, `after`, `remove` modes
+  - [ ] Test `remove` mode with and without selector
+  - [ ] Test nested element patching
+- [ ] Add tests for `ExecuteScript` functionality
+  - [ ] Test script execution with and without autoRemove
+  - [ ] Test script attributes handling
+  - [ ] Test multi-line scripts
+- [ ] Add tests for `PatchSignals` functionality
+  - [ ] Test signal patching with onlyIfMissing
+  - [ ] Test JSON validation
+  - [ ] Test RFC 7386 JSON Merge Patch semantics
+- [ ] Add parameter validation tests
+  - [ ] Test validation error cases
+  - [ ] Test edge cases and boundary conditions
+
+### Phase 5: Examples and Documentation Updates
+
+#### 5.1 Update Examples (After Tests Pass)
 - [ ] Update `examples/node/node.js`
   - [ ] Change `mergeFragments` → `PatchElements`
+  - [ ] Change `mergeSignals` → `PatchSignals`
   - [ ] Update method calls to use new parameter names
   - [ ] Test with new element modes if applicable
+  - [ ] Add examples of `ExecuteScript` usage
 
 - [ ] Update `examples/deno/deno.ts`
   - [ ] Change `mergeFragments` → `PatchElements`
+  - [ ] Change `mergeSignals` → `PatchSignals`
   - [ ] Update method calls to use new parameter names
   - [ ] Test with new element modes if applicable
+  - [ ] Add examples of `ExecuteScript` usage
 
 - [ ] Update `examples/bun/bun.ts`
   - [ ] Change `mergeFragments` → `PatchElements`
+  - [ ] Change `mergeSignals` → `PatchSignals`
   - [ ] Update method calls to use new parameter names
   - [ ] Test with new element modes if applicable
+  - [ ] Add examples of `ExecuteScript` usage
 
-#### 4.2 Test Suite Updates
-- [ ] Update existing tests in `test/` directory
-  - [ ] Change method names in test cases
-  - [ ] Update expected event types in assertions
-  - [ ] Add tests for new `ElementPatchMode` values
-  - [ ] Add tests for `ExecuteScript` functionality
-  - [ ] Test parameter validation
-  - [ ] Test default value behavior
-
-- [ ] Add new test cases for specification compliance
-  - [ ] Test `remove` mode with and without selector
-  - [ ] Test nested element patching
-  - [ ] Test view transition integration
-  - [ ] Test script execution with autoRemove
-  - [ ] Test signal patching with onlyIfMissing
-
-### Phase 5: Documentation and Build
-
-#### 5.1 Documentation Updates
+#### 5.2 Documentation Updates
 - [ ] Update `README.md`
   - [ ] Change all method examples from `mergeFragments` → `PatchElements`
   - [ ] Change all method examples from `mergeSignals` → `PatchSignals`
@@ -141,32 +156,35 @@ This document outlines the step-by-step migration from the current Datastar Type
   - [ ] Add documentation for new `ExecuteScript` method
   - [ ] Update parameter documentation
   - [ ] Add examples of new element patch modes
+  - [ ] Document parameter validation behavior
 
 - [ ] Update inline code documentation (JSDoc comments)
   - [ ] Update method descriptions
   - [ ] Update parameter descriptions
   - [ ] Add examples for new functionality
+  - [ ] Document validation error scenarios
 
-#### 5.2 Build and Package Updates
+### Phase 6: Build and Final Validation
+
+#### 6.1 Build and Package Updates
 - [ ] Update `build.ts` if necessary for new file structure
 - [ ] Update `package.json` version and descriptions
 - [ ] Verify Deno, Node.js, and Bun compatibility
 - [ ] Test build process for all targets
 
-### Phase 6: Validation and Testing
-
-#### 6.1 Integration Testing
+#### 6.2 Integration Testing
 - [ ] Test with actual Datastar frontend library
 - [ ] Verify SSE event format matches expected client-side parsing
-- [ ] Test all element patch modes (`outer`, `inner`, `replace`, `prepend`, `append`, `before`, `after`, `remove`)
+- [ ] Test all element patch modes in browser environment
 - [ ] Test view transitions integration
-- [ ] Test script execution and auto-removal
+- [ ] Test script execution and auto-removal in browser
 
-#### 6.2 Cross-Runtime Testing
-- [ ] Test Node.js implementation with examples
-- [ ] Test Deno implementation with examples  
-- [ ] Test Bun implementation with examples
+#### 6.3 Cross-Runtime Testing
+- [ ] Test Node.js implementation with updated examples
+- [ ] Test Deno implementation with updated examples  
+- [ ] Test Bun implementation with updated examples
 - [ ] Verify consistent behavior across all runtimes
+- [ ] Performance testing and validation
 
 ---
 
