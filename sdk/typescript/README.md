@@ -94,7 +94,8 @@ Each example creates a simple web server demonstrating:
 3. Follow the instructions in the example's README file
 4. Visit `http://localhost:3000` in your browser
 
-> **Note:** The `npm run serve-*` and `deno task serve-*` commands in the root directory are for SDK development and testing, not for running the user examples.
+> [!NOTE]
+> The `npm run serve-*` and `deno task serve-*` commands in the root directory are for SDK development and testing, not for running the user examples.
 
 ## API Reference
 
@@ -137,7 +138,8 @@ Creates a Server-Sent Event stream for real-time communication.
 }
 ```
 
-> **Important:** When `keepalive: true` is set, the stream will not be closed automatically after the callback finishes. You are responsible for calling `stream.close()` to end the stream.
+> [!IMPORTANT]
+> When `keepalive: true` is set, the stream will not be closed automatically after the callback finishes. You are responsible for calling `stream.close()` to end the stream.
 
 #### Stream Instance Methods
 
@@ -176,6 +178,9 @@ The above will pick the version from the [src/consts.ts](src/consts.ts) file. If
 ```bash
 deno run -A build.ts VERSION
 ```
+
+> [!NOTE]
+> **For Developers:** The build process includes test files in the `npm/` directory for local testing, but they are excluded from the published npm package via `.npmignore`. Test files are built into `npm/esm/test/` and `npm/script/test/` directories to support the test scripts (`npm run test-node`, etc.), but these directories are not included when publishing to the npm registry.
 
 ### Testing
 
