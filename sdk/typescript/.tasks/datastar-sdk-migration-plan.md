@@ -56,17 +56,23 @@ This document outlines the step-by-step migration from the current Datastar Type
 ### Phase 2: Implementation Updates
 
 #### 2.1 Runtime-Specific Implementations
-- [ ] Update `src/node/serverSentEventGenerator.ts`
-  - [ ] Verify constructor and streaming logic compatibility
-  - [ ] Ensure `readSignals` method follows new specification requirements
-  - [ ] Test HTTP method handling (GET vs POST)
-  - [ ] Update error handling to match specification
+- [x] Update `src/node/serverSentEventGenerator.ts`
+  - [x] Verify constructor sets required headers per spec: `Cache-Control: no-cache`, `Content-Type: text/event-stream`, `Connection: keep-alive` (HTTP/1.1 only) ✓ (using `sseHeaders`)
+  - [x] Ensure immediate flush after setting headers (per spec requirement) ✓ (added `res.flushHeaders()`)
+  - [x] Update `readSignals` method to handle GET requests with `datastar` query parameter as URL-encoded JSON ✓ (already implemented correctly)
+  - [x] Update `readSignals` method to handle non-GET requests by parsing request body as JSON ✓ (improved validation)
+  - [x] Ensure error handling follows spec requirement: "Must return error for invalid JSON" ✓ (proper error handling with Record validation)
+  - [x] Replace `npm:type-fest` import with local `Jsonifiable` type (from types.ts) ✓
+  - [x] Verify ordered delivery mechanism (thread safety requirement) ✓ (Node.js single-threaded nature provides ordering)
 
-- [ ] Update `src/web/serverSentEventGenerator.ts`
-  - [ ] Verify constructor and streaming logic compatibility  
-  - [ ] Ensure `readSignals` method follows new specification requirements
-  - [ ] Test HTTP method handling (GET vs POST)
-  - [ ] Update error handling to match specification
+- [x] Update `src/web/serverSentEventGenerator.ts`
+  - [x] Verify constructor sets required headers per spec: `Cache-Control: no-cache`, `Content-Type: text/event-stream`, `Connection: keep-alive` (HTTP/1.1 only) ✓ (using `sseHeaders` via deepmerge)
+  - [x] Ensure immediate flush after setting headers (per spec requirement) ✓ (Web API handles this automatically)
+  - [x] Update `readSignals` method to handle GET requests with `datastar` query parameter as URL-encoded JSON ✓ (already implemented correctly)
+  - [x] Update `readSignals` method to handle non-GET requests by parsing request body as JSON ✓ (already implemented correctly)
+  - [x] Ensure error handling follows spec requirement: "Must return error for invalid JSON" ✓ (proper error handling with Record validation)
+  - [x] Replace `type-fest` import with local `Jsonifiable` type (from types.ts) ✓
+  - [x] Verify ordered delivery mechanism (thread safety requirement) ✓ (Web Streams API provides ordering guarantees)
 
 ### Phase 3: New Methods Implementation
 

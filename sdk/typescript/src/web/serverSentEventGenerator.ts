@@ -1,7 +1,6 @@
-import { DatastarEventOptions, EventType, sseHeaders, StreamOptions } from "../types.ts";
+import { DatastarEventOptions, EventType, sseHeaders, StreamOptions, Jsonifiable } from "../types.ts";
 import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator.ts";
 
-import type { Jsonifiable } from "type-fest";
 import { deepmerge } from "deepmerge-ts";
 
 function isRecord(obj: unknown): obj is Record<string, Jsonifiable> {
