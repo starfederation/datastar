@@ -85,13 +85,17 @@ This document outlines the step-by-step migration from the current Datastar Type
   - [x] Handles multi-line scripts properly
 
 #### 3.2 Parameter Validation and Defaults
-- [ ] Add validation for new `ElementPatchMode` values
-- [ ] Implement proper defaults according to specification:
-  - [ ] Default `mode`: `outer`
-  - [ ] Default `useViewTransition`: `false`
-  - [ ] Default `onlyIfMissing`: `false`
-  - [ ] Default `autoRemove`: `false` (for ExecuteScript)
-- [ ] Add parameter validation for required fields
+- [x] Verify defaults match specification requirements:
+  - [x] Default `mode`: `outer` (ElementPatchMode) ✓ (verified in constants)
+  - [x] Default `useViewTransition`: `false` ✓ (verified in constants) 
+  - [x] Default `onlyIfMissing`: `false` ✓ (verified in constants)
+  - [x] Default `autoRemove`: `false` (for ExecuteScript) ✓ (verified in constants)
+  - [x] Default `retryDuration`: `1000` (milliseconds) ✓ (verified in constants)
+- [x] Add validation for `ElementPatchMode` enum values in abstract class ✓ (added `validateElementPatchMode`)
+- [x] Add validation for required fields (elements parameter, signals parameter, script parameter) ✓ (added `validateRequired`)
+- [x] Add validation for selector format and requirements per spec ✓ (added validation for remove mode selector logic)
+- [x] Ensure proper JSON validation for signals parameter ✓ (added `validateJSON`)
+- [x] Validate script attributes format and allowed values ✓ (added `validateScriptAttributes`)
 
 ### Phase 4: Testing and Examples
 
