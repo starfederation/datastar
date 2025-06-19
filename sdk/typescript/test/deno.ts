@@ -1,6 +1,6 @@
-import { VERSION } from "../consts.ts";
+import { VERSION } from "../src/consts.ts";
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
-import { ServerSentEventGenerator } from "./serverSentEventGenerator.ts";
+import { ServerSentEventGenerator } from "../src/web/serverSentEventGenerator.ts";
 import type { Jsonifiable } from "npm:type-fest";
 
 // This server is used for testing the web standard based sdk

@@ -8,11 +8,8 @@ set -e  # Exit on any error
 # Change to the typescript SDK directory
 cd "$(dirname "$0")/.."
 
-echo "Building package first..."
-deno run -A build.ts
-
 echo "Starting Bun test server from built package..."
-bun run src/web/bun.ts &
+bun run test/bun.ts &
 SERVER_PID=$!
 
 # Function to cleanup server on exit

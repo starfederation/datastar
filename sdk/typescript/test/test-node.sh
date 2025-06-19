@@ -12,7 +12,7 @@ echo "Building Node.js SDK..."
 deno run -A build.ts
 
 echo "Starting Node.js test server..."
-node npm/esm/node/node.js &
+node npm/esm/test/node.js &
 SERVER_PID=$!
 
 # Function to cleanup server on exit

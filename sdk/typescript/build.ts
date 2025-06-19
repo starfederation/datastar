@@ -7,8 +7,8 @@ await emptyDir("./npm");
 await build({
   entryPoints: [
     "./src/node/serverSentEventGenerator.ts",
-    "./src/node/node.ts",
     "./src/web/serverSentEventGenerator.ts",
+    "./test/node.ts",
   ],
   outDir: "./npm",
   shims: {

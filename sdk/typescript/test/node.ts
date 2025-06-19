@@ -1,6 +1,6 @@
-import { VERSION } from "../consts.ts";
+import { VERSION } from "../src/consts.ts";
 import { createServer } from "node:http";
-import { ServerSentEventGenerator } from "./serverSentEventGenerator.ts";
+import { ServerSentEventGenerator } from "../src/node/serverSentEventGenerator.ts";
 import type { Jsonifiable } from "npm:type-fest";
 
 const hostname = "127.0.0.1";

@@ -9,7 +9,7 @@ set -e  # Exit on any error
 cd "$(dirname "$0")/.."
 
 echo "Starting Deno test server..."
-deno run --allow-net src/web/deno.ts &
+deno run --allow-net test/deno.ts &
 SERVER_PID=$!
 
 # Function to cleanup server on exit

@@ -1,5 +1,5 @@
-import { ServerSentEventGenerator } from "./serverSentEventGenerator";
-import { VERSION } from "../consts";
+import { ServerSentEventGenerator } from "../src/web/serverSentEventGenerator";
+import { VERSION } from "../src/consts";
 
 // This server is used for testing the Bun web standard based sdk
 const server = Bun.serve({
