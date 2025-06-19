@@ -35,7 +35,7 @@ The core mechanics of Datastar’s SSE support is
 
 ## ServerSentEventGenerator
 
-**Required**: A `ServerSentEventGenerator` namespace/class/struct (implementation varies by language).
+**Required**: A `ServerSentEventGenerator` namespace/class/struct (implementation may vary by language).
 
 ---
 
@@ -90,9 +90,9 @@ String enum of supported events:
 ***Must*** write to response buffer in this exact order:
 
 1. `event: EVENT_TYPE\n`
-2. `id: EVENT_ID\n` (if eventId provided)
-3. `retry: RETRY_DURATION\n` (***unless*** default 1000ms)
-4. `data: DATA\n` (for each dataLine)
+2. `id: EVENT_ID\n` (if `eventId` provided)
+3. `retry: RETRY_DURATION\n` (***unless*** default of `1000`)
+4. `data: DATA\n` (for each of the `dataLines`)
 5. `\n` (end of event)
 6. ***Should*** flush immediately (note: compression middleware may interfere)
 
@@ -120,7 +120,7 @@ ServerSentEventGenerator.PatchElements(
 <details>
 <summary>Minimal Example</summary>
 
-```http
+```
 event: datastar-patch-elements
 data: elements <div id="feed"><span>1</span></div>
 
@@ -130,7 +130,7 @@ data: elements <div id="feed"><span>1</span></div>
 <details>
 <summary>Full Example (all options)</summary>
 
-```http
+```
 event: datastar-patch-elements
 id: 123
 retry: 2000
@@ -145,7 +145,7 @@ data: elements </div>
 </details>
 
 <details>
-<summary>Patch elements based on their id</summary>
+<summary>Patch elements based on their ID</summary>
 
 ```
 event: datastar-patch-elements
@@ -189,7 +189,7 @@ data: elements <div id="first"></div><div id="second"></div>
 
 > [!TIP]
 > - To remove elements, use the `remove` patch mode
-> - To execute JavaScript, send a `<script>` element - it will auto-execute when added to the DOM
+> - To execute JavaScript, send a `&lt;script&gt;` element - it will auto-execute when added to the DOM
 
 ### Elements vs Fragments: Key Distinction
 
@@ -203,8 +203,7 @@ data: elements <div id="first"></div><div id="second"></div>
 
 ### Parameters
 
-- **elements**: One or more complete HTML elements. If a selector has not been specified, each element must contain an
-  id. With ElementPatchMode remove, this parameter may be omitted when a selector is supplied.
+- **elements**: One or more complete HTML elements. If a selector has not been specified, each top-level element must contain an ID. With ElementPatchMode `remove`, this parameter may be omitted when a selector is supplied.
 
 #### ElementPatchMode
 
@@ -212,10 +211,10 @@ String enum defining how elements are patched into the DOM.
 
 ##### Available Modes
 
-| Mode |Is Morphed? | Description |
+| Mode | Morphed? | Description |
 |------|------|-------------|
-| `outer` | ✔️ | Morph entire element, preserving state |
-| `inner` | ✔️ | Morph inner HTML only, preserving state |
+| `outer` | ✅ | Morph entire element, preserving state |
+| `inner` | ✅ | Morph inner HTML only, preserving state |
 | `replace` | 🚫 | Replace entire element, reset state |
 | `prepend` | 🚫 | Insert at beginning inside target |
 | `append` | 🚫 | Insert at end inside target |
@@ -243,7 +242,6 @@ String enum defining how elements are patched into the DOM.
 
 ---
 
-
 ### `ServerSentEventGenerator.PatchSignals`
 
 ```typescript
@@ -262,7 +260,7 @@ ServerSentEventGenerator.PatchSignals(
 <details>
 <summary>Minimal Example</summary>
 
-```http
+```
 event: datastar-patch-signals
 data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 
@@ -272,7 +270,7 @@ data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":
 <details>
 <summary>Full Example (all options)</summary>
 
-```http
+```
 event: datastar-patch-signals
 id: 123
 retry: 2000
@@ -286,7 +284,7 @@ data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":
 
 ### Parameters
 
-- **signals**: Valid JSON string containing the patch data
+- **signals**: A valid JSON string containing the patch data
 
 ### RFC 7386 JSON Merge Patch Behavior
 
@@ -301,7 +299,7 @@ data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":
 <details>
 <summary>Signal Operations Examples</summary>
 
-```json
+```
 // Add signal
 {"newSignal": "value"}
 
