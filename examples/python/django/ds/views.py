@@ -32,7 +32,7 @@ HTML_ASGI = """\
             class="time"
             data-on-load="@get('/updates')"
             >
-            Current time from fragment: <span id="currentTime">CURRENT_TIME</span>
+            Current time from element: <span id="currentTime">CURRENT_TIME</span>
             </div>
             <div
             class="time"
@@ -56,11 +56,11 @@ async def updates_asgi(request):
 
     async def time_updates():
         while True:
-            yield ServerSentEventGenerator.merge_fragments(
+            yield ServerSentEventGenerator.patch_elements(
                 f"""<span id="currentTime">{datetime.now().isoformat()}"""
             )
             await asyncio.sleep(1)
-            yield ServerSentEventGenerator.merge_signals(
+            yield ServerSentEventGenerator.patch_signals(
                 {"currentTime": f"{datetime.now().isoformat()}"}
             )
             await asyncio.sleep(1)
@@ -92,7 +92,7 @@ HTML_WSGI = """\
             class="time"
             data-on-load="@get('/updates-wsgi/')"
             >
-            Current time from fragment: <span id="currentTime">CURRENT_TIME</span>
+            Current time from element: <span id="currentTime">CURRENT_TIME</span>
             </div>
             <div
             class="time"
@@ -112,11 +112,11 @@ def home_wsgi(request):
 def updates_wsgi(request):
     def time_updates():
         while True:
-            yield ServerSentEventGenerator.merge_fragments(
+            yield ServerSentEventGenerator.patch_elements(
                 f"""<span id="currentTime">{datetime.now().isoformat()}"""
             )
             time.sleep(0.5)
-            yield ServerSentEventGenerator.merge_signals(
+            yield ServerSentEventGenerator.patch_signals(
                 {"currentTime": f"{datetime.now().isoformat()}"}
             )
             time.sleep(0.5)

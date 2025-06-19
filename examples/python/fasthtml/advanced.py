@@ -90,11 +90,11 @@ def GreatTable(pattern=default_pattern):
     )
 
 
-# Define an asynchronous function that uses the Python SDK's merge_fragments method to merge the
+# Define an asynchronous function that uses the Python SDK's patch_elements method to patch the
 # rendered table into the DOM with the request's 'filter' value
 @app.post
 async def table(filter: str):
-    return DatastarResponse(ServerSentEventGenerator.merge_fragments(GreatTable(filter)))
+    return DatastarResponse(ServerSentEventGenerator.patch_elements(GreatTable(filter)))
 
 
 # Define default route which returns a FastTag from a GET request.
@@ -111,7 +111,7 @@ def index():
             Section(
                 H2("Demonstration: Long-lived GET Request to Generator Function"),
                 Div(data_on_load=f"@get('{time}')", cls="time")(
-                    "Current time from fragment: ",
+                    "Current time from element: ",
                     Span(id="currentTime")(now),
                 ),
             ),
@@ -146,11 +146,11 @@ def index():
     )
 
 
-# Define an async function that yields a merge_fragments command every second
+# Define an async function that yields a patch_elements command every second
 async def clock():
     while True:
         now = datetime.isoformat(datetime.now())
-        yield ServerSentEventGenerator.merge_fragments(Span(id="currentTime")(now))
+        yield ServerSentEventGenerator.patch_elements(Span(id="currentTime")(now))
         await asyncio.sleep(1)
 
 
@@ -164,7 +164,7 @@ async def hello():
     async def _():
         # Simulate load time
         await asyncio.sleep(1)
-        yield ServerSentEventGenerator.merge_fragments(HELLO_BUTTON)
+        yield ServerSentEventGenerator.patch_elements(HELLO_BUTTON)
 
     return DatastarResponse(_())
 
@@ -184,7 +184,7 @@ async def reset():
 
     async def _():
         await asyncio.sleep(1)
-        yield ServerSentEventGenerator.merge_fragments(reset_and_hello)
+        yield ServerSentEventGenerator.patch_elements(reset_and_hello)
 
     return DatastarResponse(_())
 
