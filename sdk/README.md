@@ -118,71 +118,71 @@ ServerSentEventGenerator.PatchElements(
 #### Example Output
 
 <details>
-<summary>Minimal Example</summary>
+  <summary>Minimal Example</summary>
 
-```
-event: datastar-patch-elements
-data: elements <div id="feed"><span>1</span></div>
+  ```
+  event: datastar-patch-elements
+  data: elements <div id="feed"><span>1</span></div>
 
-```
+  ```
 </details>
 
 <details>
-<summary>Full Example (all options)</summary>
+  <summary>Full Example (all options)</summary>
 
-```
-event: datastar-patch-elements
-id: 123
-retry: 2000
-data: mode inner
-data: selector #feed
-data: useViewTransition true
-data: elements <div id="feed">
-data: elements     <span>1</span>
-data: elements </div>
+  ```
+  event: datastar-patch-elements
+  id: 123
+  retry: 2000
+  data: mode inner
+  data: selector #feed
+  data: useViewTransition true
+  data: elements <div id="feed">
+  data: elements     <span>1</span>
+  data: elements </div>
 
-```
+  ```
 </details>
 
 <details>
-<summary>Patch elements based on their ID</summary>
+  <summary>Patch elements based on their ID</summary>
 
-```
-event: datastar-patch-elements
-data: elements <div id="id1">New content.</div>
-data: elements <div id="id2">Other new content.</div>
-```
+  ```
+  event: datastar-patch-elements
+  data: elements <div id="id1">New content.</div>
+  data: elements <div id="id2">Other new content.</div>
+  ```
 </details>
 
 <details>
-<summary>Insert a new element based on a selector</summary>
+  <summary>Insert a new element based on a selector</summary>
 
-```
-event: datastar-patch-elements
-data: mode append
-data: selector #mycontainer
-data: elements <div>New content</div>
-```
+  ```
+  event: datastar-patch-elements
+  data: mode append
+  data: selector #mycontainer
+  data: elements <div>New content</div>
+  ```
 </details>
 
 <details>
-<summary>Remove elements based on a selector</summary>
+  <summary>Remove elements based on a selector</summary>
 
-```
-event: datastar-patch-elements
-data: mode remove
-data: selector #feed, #otherid
-```
+  ```
+  event: datastar-patch-elements
+  data: mode remove
+  data: selector #feed, #otherid
+  ```
 </details>
 
 <details>
-<summary>Remove elements without a selector</summary>
+  <summary>Remove elements without a selector</summary>
 
-```
-event: datastar-patch-elements
-data: mode remove
-data: elements <div id="first"></div><div id="second"></div>
-```
+  ```
+  event: datastar-patch-elements
+  data: mode remove
+  data: elements <div id="first"></div><div id="second"></div>
+  ```
 </details>
 
 `PatchElements` sends HTML elements to the browser for DOM manipulation.
@@ -258,26 +258,26 @@ ServerSentEventGenerator.PatchSignals(
 #### Example Output
 
 <details>
-<summary>Minimal Example</summary>
+  <summary>Minimal Example</summary>
 
-```
-event: datastar-patch-signals
-data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
+  ```
+  event: datastar-patch-signals
+  data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 
-```
+  ```
 </details>
 
 <details>
-<summary>Full Example (all options)</summary>
+  <summary>Full Example (all options)</summary>
 
-```
-event: datastar-patch-signals
-id: 123
-retry: 2000
-data: onlyIfMissing true
-data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
+  ```
+  event: datastar-patch-signals
+  id: 123
+  retry: 2000
+  data: onlyIfMissing true
+  data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 
-```
+  ```
 </details>
 
 `PatchSignals` sends signals to the browser using [RFC 7386 JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386) semantics.
@@ -292,38 +292,34 @@ data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":
 |-----------|----------|---------|
 | **Add/Update** | Set property value | `{"key": "value"}` |
 | **Remove** | Set to `null` | `{"key": null}` |
-| **Nested** | Recursive patch | `{"user": {"name": "John"}}` |
+| **Nested** | Recursive patch | `{"user": {"name": "Johnny"}}` |
 
 ### Examples
 
 <details>
-<summary>Signal Operations Examples</summary>
+  <summary>Signal Operations Examples</summary>
 
-```
-// Add signal
-{"newSignal": "value"}
+  ```
+  // Add signal
+  {"newSignal": "value"}
 
-// Update signal
-{"existingSignal": "newValue"}
+  // Update signal
+  {"existingSignal": "newValue"}
 
-// Remove signal
-{"signalToRemove": null}
+  // Remove signal
+  {"signalToRemove": null}
 
-// Complex nested patch
-{
-  "user": {
-    "name": "John",
-    "email": null,
-    "preferences": {
-      "theme": "dark"
+  // Complex nested patch
+  {
+    "user": {
+      "name": "Johnny",
+      "email": null,
+      "preferences": {
+        "theme": "dark"
+      }
     }
   }
-}
-// Result:
-// - user.name = "John"
-// - user.email removed
-// - user.preferences.theme = "dark"
-```
+  ```
 </details>
 
 ### Options
