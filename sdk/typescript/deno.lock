@@ -1,5 +1,5 @@
 {
-  "version": "4",
+  "version": "5",
   "specifiers": {
     "jsr:@david/code-block-writer@^13.0.2": "13.0.3",
     "jsr:@deno/cache-dir@~0.10.3": "0.10.3",
@@ -22,6 +22,7 @@
     "jsr:@ts-morph/bootstrap@0.24": "0.24.0",
     "jsr:@ts-morph/common@0.24": "0.24.0",
     "npm:@types/node@^22.10.2": "22.10.5",
+    "npm:datastar-sdk@*": "1.0.0-beta.11",
     "npm:deepmerge-ts@^7.1.4": "7.1.4",
     "npm:type-fest@^4.32.0": "4.32.0",
     "npm:typescript@~5.6.2": "5.6.3"
@@ -130,6 +131,13 @@
         "undici-types"
       ]
     },
+    "datastar-sdk@1.0.0-beta.11": {
+      "integrity": "sha512-rIhUd4Myz5Cvf3DI6d8Hgk9J3jFnuqkHyRl5sdWMlXKnNJesP4cthXl8iwA9/KcEKVWIn3fjCu852DVc6D4npQ==",
+      "dependencies": [
+        "deepmerge-ts",
+        "type-fest"
+      ]
+    },
     "deepmerge-ts@7.1.4": {
       "integrity": "sha512-fxqo6nHGQ9zOVgI4KXqtWXJR/yCLtC7aXIVq+6jc8tHPFUxlFmuUcm2kC4vztQ+LJxQ3gER/XAWearGYQ8niGA=="
     },
@@ -137,7 +145,8 @@
       "integrity": "sha512-rfgpoi08xagF3JSdtJlCwMq9DGNDE0IMh3Mkpc1wUypg9vPi786AiqeBBKcqvIkq42azsBM85N490fyZjeUftw=="
     },
     "typescript@5.6.3": {
-      "integrity": "sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw=="
+      "integrity": "sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==",
+      "bin": true
     },
     "undici-types@6.20.0": {
       "integrity": "sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg=="

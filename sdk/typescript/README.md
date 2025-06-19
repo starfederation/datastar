@@ -1,96 +1,274 @@
-# TypeScript SDK for Datastar
+<p align="center"><img width="150" src="https://putyourlightson.com/assets/logos/datastar.svg"></p>
 
-Implements the [SDK spec](../README.md) and exposes an abstract
-ServerSentEventGenerator class that can be used to implement runtime specific
-classes. NodeJS and web standard runtimes are currently implemented.
+# Datastar TypeScript SDK
 
-Currently it only exposes an http1 server, if you want http2 I recommend you use
-a reverse proxy until http2 support is added.
+![Static Badge](https://img.shields.io/badge/run_time-node_js-2a682d?logo=nodedotjs&labelColor=black) ![Static Badge](https://img.shields.io/badge/run_time-deno-6affaf?logo=deno&labelColor=black) ![Static Badge](https://img.shields.io/badge/run_time-bun-f672b6?logo=bun&labelColor=black)
 
-Deno is used for building the npm package: `deno run -A build.ts VERSION`
+A TypeScript SDK for building reactive web applications with [Datastar](https://github.com/starfederation/datastar).
 
-Usage is straightforward:
+Implements the [SDK spec](../README.md) and exposes an abstract ServerSentEventGenerator class that can be used to implement runtime specific classes. NodeJS and web standard runtimes are currently implemented.
+
+Currently it only exposes an http1 server, if you want http2 I recommend you use a reverse proxy until http2 support is added.
+
+## Features
+
+- **Multi-runtime support**: Works with Node.js, Deno, and Bun
+- **TypeScript support**: Full type safety and IntelliSense
+
+## Quick Start
+
+### Installation & Import
+
+**Node.js:**
+```bash
+npm install datastar-sdk
+```
+```javascript
+import { ServerSentEventGenerator } from "datastar-sdk/node";
+```
+
+**Deno:**
+```typescript
+// No installation needed, import directly from npm
+import { ServerSentEventGenerator } from "npm:datastar-sdk/web";
+```
+
+**Bun:**
+```bash
+bun add datastar-sdk
+```
+```javascript
+import { ServerSentEventGenerator } from "datastar-sdk/web";
+```
+
+### Basic Usage
+
+Here's a simple example in Node showing how to read client signals and send back fragment updates:
 
 ```javascript
-// this example is for node
+import { ServerSentEventGenerator } from "datastar-sdk/node";
+
+// Read signals from the client request
 const reader = await ServerSentEventGenerator.readSignals(req);
 
 if (!reader.success) {
-    console.error('Error while reading signals', reader.error);
-    res.end('Error while reading signals`);
+    console.error('Error reading signals:', reader.error);
     return;
 }
 
-if (!('foo' in reader.signals)) {
-    console.error('The foo signal is not present');
-    res.end('The foo signal is not present');
-    return;
-}
-
+// Stream updates back to the client
 ServerSentEventGenerator.stream(req, res, (stream) => {
-     stream.mergeSignals({ foo: reader.signals.foo });
-     stream.mergeFragments(`<div id="toMerge">Hello <span data-text="$foo">${reader.signals.foo}</span></div>`);
+    // Merge signals
+    stream.mergeSignals({ foo: reader.signals.foo });
+    
+    // Update DOM fragments
+    stream.mergeFragments(`
+        <div id="toMerge">
+            Hello <span data-text="$foo">${reader.signals.foo}</span>
+        </div>
+    `);
 });
 ```
 
-The stream static method can receive an extra `options` object that can contain
-onError and onAbort callbacks as well as the keepalive option. The keepalive
-option will stop the stream from being closed once the onStart callback is
-finished. That means the user is responsible for ending the stream with
-`this.close()`.
+See examples for other runtimes below.
 
 ## Examples
 
-Follow the links for more complete (and executable) examples
+### Runtime-Specific Examples
 
-- [NodeJS](./examples/node.js)
-- [Deno](./examples/deno.ts)
+| Runtime | Example Location | How to Run | Try Online |
+|---------|-----------------|------------|------------|
+| **Node.js** | `examples/node/node.js` | [Instructions](examples/node/README.md) | [StackBlitz](https://stackblitz.com/edit/node-datastar) |
+| **Deno** | `examples/deno/deno.ts` | [Instructions](examples/deno/README.md) | [Val.town](https://www.val.town/x/eduwass/datastar-deno/code/main.tsx) |
+| **Bun** | `examples/bun/bun.ts` | [Instructions](examples/bun/README.md) | [Replit](https://replit.com/@eduwass/Bun-Datastar) |
 
-## Frameworks / Alternate runtimes
+Each example creates a simple web server demonstrating:
+- Signal handling from client requests
+- Fragment merging for DOM updates
+- Real-time communication via Server-Sent Events
 
-If you can't simply use the node / web versions, then you can extend the
-abstract class in `./src/abstractServerSentEventGenerator.ts`. You will need to
-provide implementations of the `constructor`, `readSignals`, `stream` and `send`
-methods.
+### Running Examples
 
-## Testing
+1. Clone the repository
+2. Navigate to the specific example directory (e.g., `examples/node/`)
+3. Follow the instructions in the example's README file
+4. Visit `http://localhost:3000` in your browser
 
-A shell based testing suite is provided; see the [readme](../test/README.md) for
-more information.
+> **Note:** The `npm run serve-*` and `deno task serve-*` commands in the root directory are for SDK development and testing, not for running the user examples.
 
-### Testing node
+## API Reference
 
-Start by building and running the node server
+### ServerSentEventGenerator
 
-```shell
-$ deno run -A build.ts xxx
-$ node ./npm/esm/node/node.js
+The main class for handling Datastar communication.
+
+#### Static Methods
+
+##### `readSignals(request)`
+Reads signals from a client request.
+
+**Parameters:**
+- `request`: HTTP request object
+
+**Returns:**
+```typescript
+{
+    success: boolean;
+    signals?: Record<string, any>;
+    error?: string;
+}
 ```
 
-Then run the test suite
+##### `stream(request, response, callback, options?)`
+Creates a Server-Sent Event stream for real-time communication.
 
-```shell
-$ cd ../test
-$ ./test-all.sh http://127.0.0.1:3000
-Running tests with argument: http://127.0.0.1:3000
-Processing GET cases...
-Processing POST cases...
+**Parameters:**
+- `request`: HTTP request object
+- `response`: HTTP response object
+- `callback`: Function that receives a stream instance
+- `options`: Optional configuration object
+
+**Options:**
+```typescript
+{
+    onError?: (error: Error) => void;
+    onAbort?: () => void;
+    keepalive?: boolean;
+}
 ```
 
-### Testing deno
+> **Important:** When `keepalive: true` is set, the stream will not be closed automatically after the callback finishes. You are responsible for calling `stream.close()` to end the stream.
 
-Start by running the deno server
+#### Stream Instance Methods
 
-```shell
-$ deno --allow-net  ./src/web/deno.ts
+##### `mergeSignals(signals)`
+Merges signals with the client state.
+
+**Parameters:**
+- `signals`: Object containing signal key-value pairs
+
+##### `mergeFragments(html)`
+Sends HTML fragments to update the client DOM.
+
+**Parameters:**
+- `html`: HTML string to merge into the client
+
+##### `close()`
+Closes the SSE stream (only needed when `keepalive: true`).
+
+## Development
+
+### Prerequisites
+
+To develop or contribute to this SDK, you'll need:
+- [Deno](https://deno.land/) (primary development environment)
+- [Node.js](https://nodejs.org/) (for Node.js compatibility testing)
+- [Bun](https://bun.sh/) (for Bun compatibility testing)
+
+### Building
+
+Build the npm package:
+```bash
+deno run -A build.ts
 ```
 
-Then run the test suite
-
-```shell
-$ cd ../test
-$ ./test-all.sh http://localhost:8000/
-Running tests with argument: http://localhost:8000/
-Processing GET cases...
-Processing POST cases...
+The above will pick the version from the [src/consts.ts](src/consts.ts) file. If you want to specify the version, use:
+```bash
+deno run -A build.ts VERSION
 ```
+
+### Testing
+
+#### Automated Testing
+
+Run tests for all runtimes:
+```bash
+# Node.js
+npm run test-node
+
+# Deno
+deno task test-deno
+
+# Bun
+bun run test-bun
+```
+
+#### Manual Testing
+
+Start a development server:
+```bash
+# Node.js
+npm run serve-node
+
+# Deno
+deno task serve-deno
+
+# Bun
+bun run serve-bun
+```
+
+Then run the test suite manually:
+```bash
+cd ../test
+./test-all.sh http://127.0.0.1:3000
+```
+
+### Project Structure
+
+```
+typescript/
+├── src/
+│   ├── node/           # Node.js-specific implementation
+│   ├── web/            # Web standards implementation (Deno/Bun)
+│   └── abstract/       # Abstract base classes
+├── examples/
+│   ├── node/           # Node.js example
+│   ├── deno/           # Deno example
+│   └── bun/            # Bun example
+└── test/               # Test suite
+```
+
+## Runtime Support
+
+### Node.js
+- Import: `datastar-sdk/node`
+- Requires: Node.js 18+
+- Uses Node.js-specific HTTP APIs
+
+### Deno
+- Import: `npm:datastar-sdk/web`
+- Requires: Deno 1.30+
+- Uses Web Standards APIs
+
+### Bun
+- Import: `datastar-sdk/web`
+- Requires: Bun 1.0+
+- Uses Web Standards APIs
+
+## Custom Implementations
+
+To support additional runtimes or frameworks, extend the abstract `ServerSentEventGenerator` class from `./src/abstractServerSentEventGenerator.ts`.
+
+You'll need to implement:
+- `constructor`: Initialize runtime-specific components
+- `readSignals`: Parse signals from requests
+- `stream`: Create SSE streams
+- `send`: Send data to clients
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run the test suite for all runtimes
+5. Submit a pull request
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
+
+## Links
+
+- [Datastar Documentation](https://github.com/starfederation/datastar)
+- [GitHub Repository](https://github.com/starfederation/datastar)
+- [npm Package](https://www.npmjs.com/package/datastar-sdk)

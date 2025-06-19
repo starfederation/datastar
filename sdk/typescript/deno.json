@@ -1,5 +1,12 @@
 {
   "imports": {
     "@deno/dnt": "jsr:@deno/dnt@^0.41.3"
-  }
+  },
+  "tasks": {
+    "check": "deno lint && deno check src/node/node.ts && deno check src/web/deno.ts && bun run --check src/web/bun.ts",
+    "build": "deno run -A build.ts",
+    "serve-deno": "deno run -A src/web/deno.ts",
+    "test-deno": "./test/test-deno.sh"
+  },
+  "nodeModulesDir": "auto"
 }

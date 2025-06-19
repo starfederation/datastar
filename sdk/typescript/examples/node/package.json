@@ -1,0 +1,14 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "main": "node.js",
+  "scripts": {
+    "start": "node node.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "datastar-sdk": "^1.0.0-beta.11"
+  }
+}

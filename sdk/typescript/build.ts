@@ -1,11 +1,13 @@
 // ex. scripts/build_npm.ts
 import { build, emptyDir } from "@deno/dnt";
+import { VERSION } from "./src/consts.ts";
 
 await emptyDir("./npm");
 
 await build({
   entryPoints: [
     "./src/node/serverSentEventGenerator.ts",
+    "./src/node/node.ts",
     "./src/web/serverSentEventGenerator.ts",
   ],
   outDir: "./npm",
@@ -16,7 +18,7 @@ await build({
   package: {
     // package.json properties
     name: "@starfederation/datastar-sdk",
-    version: Deno.args[0],
+    version: Deno.args[0] || VERSION,
     description: "Cross-runtime Javascript SDK for Datastar",
     license: "MIT",
     repository: {

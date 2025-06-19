@@ -14,6 +14,24 @@ serve(async (req: Request) => {
         headers: { "Content-Type": "text/html" },
       },
     );
+  } else if (url.pathname.includes("/merge")) {
+    const reader = await ServerSentEventGenerator.readSignals(req);
+
+    if (!reader.success) {
+      console.error("Error while reading signals", reader.error);
+      return new Response(`Error while reading signals`);
+    }
+
+    if (!("foo" in reader.signals)) {
+      console.error("The foo signal is not present");
+      return new Response("The foo signal is not present");
+    }
+
+    return ServerSentEventGenerator.stream((stream) => {
+      stream.mergeFragments(
+        `<div id="toMerge">Hello ${reader.signals.foo}</div>`,
+      );
+    });
   } else if (url.pathname.includes("/test")) {
     const reader = await ServerSentEventGenerator.readSignals(req);
     if (reader.success === true) {
