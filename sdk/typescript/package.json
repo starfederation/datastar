@@ -23,6 +23,15 @@
     "url": "https://github.com/starfederation/datastar/issues"
   },
   "homepage": "https://github.com/starfederation/datastar#readme",
+  "files": [
+    "npm/script/src/",
+    "npm/script/package.json",
+    "npm/esm/src/",
+    "npm/esm/package.json",
+    "npm/package.json",
+    "npm/README.md",
+    "README.md"
+  ],
   "dependencies": {
     "deepmerge-ts": "^7.1.4"
   },
