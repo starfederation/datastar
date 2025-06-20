@@ -1,57 +1,49 @@
 namespace StarFederation.Datastar.FSharp
 
+open System
 open StarFederation.Datastar.FSharp.Utility
 
 [<AbstractClass; Sealed>]
 type ServerSentEventGenerator =
-    static member MergeFragments(fragments, options:MergeFragmentsOptions) =
-        { EventType = MergeFragments
+    static member PatchElements(elements, options:PatchElementsOptions) =
+        { EventType = PatchElements
           Id = options.EventId
           Retry = options.Retry
           DataLines = [|
             if (options.Selector |> ValueOption.isSome) then $"{Consts.DatastarDatalineSelector} {options.Selector |> ValueOption.get |> Selector.value}"
-            if (options.MergeMode <> Consts.DefaultFragmentMergeMode) then $"{Consts.DatastarDatalineMergeMode} {options.MergeMode |> Consts.FragmentMergeMode.toString}"
-            if (options.UseViewTransition <> Consts.DefaultFragmentsUseViewTransitions) then $"{Consts.DatastarDatalineUseViewTransition} %A{options.UseViewTransition}"
-            yield! (fragments |> String.split String.newLines |> Seq.map (fun fragmentLine -> $"{Consts.DatastarDatalineFragments} %s{fragmentLine}"))
+            if (options.PatchMode <> Consts.DefaultElementPatchMode) then $"{Consts.DatastarDatalineMode} {options.PatchMode |> Consts.ElementPatchMode.toString}"
+            if (options.UseViewTransition <> Consts.DefaultElementsUseViewTransitions) then $"{Consts.DatastarDatalineUseViewTransition} %A{options.UseViewTransition}"
+            yield! (elements |> String.split String.newLines |> Seq.map (fun elementLine -> $"{Consts.DatastarDatalineElements} %s{elementLine}"))
             |] }
-    static member MergeFragments fragments = ServerSentEventGenerator.MergeFragments (fragments, MergeFragmentsOptions.defaults)
+    static member PatchElements elements = ServerSentEventGenerator.PatchElements (elements, PatchElementsOptions.defaults)
 
-    static member RemoveFragments(selector, options:RemoveFragmentsOptions) =
-        { EventType = RemoveFragments
+    static member RemoveElement(selector, options:RemoveElementOptions) =
+        { EventType = PatchElements
           Id = options.EventId
           Retry = options.Retry
           DataLines = [|
             $"{Consts.DatastarDatalineSelector} {selector |> Selector.value}"
-            if (options.UseViewTransition <> Consts.DefaultFragmentsUseViewTransitions) then $"{Consts.DatastarDatalineUseViewTransition} %A{options.UseViewTransition}"
+            $"{Consts.DatastarDatalineMode} {ElementPatchMode.Remove |> Consts.ElementPatchMode.toString}"
+            if (options.UseViewTransition <> Consts.DefaultElementsUseViewTransitions) then $"{Consts.DatastarDatalineUseViewTransition} %A{options.UseViewTransition}"
             |] }
-    static member RemoveFragments selector = ServerSentEventGenerator.RemoveFragments(selector, RemoveFragmentsOptions.defaults)
+    static member RemoveElement selector = ServerSentEventGenerator.RemoveElement(selector, RemoveElementOptions.defaults)
 
-    static member MergeSignals(signals, options:MergeSignalsOptions) =
-        { EventType = MergeSignals
+    static member PatchSignals(signals, options:PatchSignalsOptions) =
+        { EventType = PatchSignals
           Id = options.EventId
           Retry = options.Retry
           DataLines = [|
-            if (options.OnlyIfMissing <> Consts.DefaultMergeSignalsOnlyIfMissing) then $"{Consts.DatastarDatalineOnlyIfMissing} %A{options.OnlyIfMissing}"
+            if (options.OnlyIfMissing <> Consts.DefaultPatchSignalsOnlyIfMissing) then $"{Consts.DatastarDatalineOnlyIfMissing} %A{options.OnlyIfMissing}"
             yield! signals |> Signals.value |> String.split String.newLines |> Seq.map (fun dataLine -> $"{Consts.DatastarDatalineSignals} %s{dataLine}")
             |] }
-    static member MergeSignals signals = ServerSentEventGenerator.MergeSignals(signals, MergeSignalsOptions.defaults)
+    static member PatchSignals signals = ServerSentEventGenerator.PatchSignals(signals, PatchSignalsOptions.defaults)
 
-    static member RemoveSignals(signalPaths, options:EventOptions) =
-        let paths' = signalPaths |> Seq.map SignalPath.value |> String.concat " "
-        { EventType = RemoveSignals
-          Id = options.EventId
-          Retry = options.Retry
-          DataLines = [| $"{Consts.DatastarDatalinePaths} {paths'}" |] }
-    static member RemoveSignals signalPaths = ServerSentEventGenerator.RemoveSignals(signalPaths, EventOptions.defaults)
-
-    static member ExecuteScript(script, options:ExecuteScriptOptions) =
-        { EventType = ExecuteScript
+    static member ExecuteScript(script: string, options:ExecuteScriptOptions) =
+        let script = if script.StartsWith("<script>", StringComparison.CurrentCultureIgnoreCase) then script else $"<script>{script}</script>"
+        { EventType = PatchElements
           Id = options.EventId
           Retry = options.Retry
           DataLines = [|
-            if (options.AutoRemove <> Consts.DefaultExecuteScriptAutoRemove) then $"{Consts.DatastarDatalineAutoRemove} %A{options.AutoRemove}"
-            if (not <| Seq.forall2 (=) options.Attributes [| Consts.DefaultExecuteScriptAttributes |] ) then
-                yield! options.Attributes |> Seq.map (fun attr -> $"{Consts.DefaultExecuteScriptAttributes} {attr}")
-            yield! script |> String.split String.newLines |> Seq.map (fun scriptLine -> $"{Consts.DatastarDatalineScript} %s{scriptLine}")
+            yield! (script |> String.split String.newLines |> Seq.map (fun scriptLine -> $"{Consts.DatastarDatalineElements} %s{scriptLine}"))
             |] }
     static member ExecuteScript script = ServerSentEventGenerator.ExecuteScript(script, ExecuteScriptOptions.defaults)

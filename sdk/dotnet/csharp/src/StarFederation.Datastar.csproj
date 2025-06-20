@@ -6,7 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>StarFederation.Datastar</RootNamespace>
-        <Version>1.0.0-beta.6</Version>
+        <Version>1.0.0-beta.7</Version>
         <Title>StarFederation.Datastar</Title>
         <Authors>Greg Holden and contributors</Authors>
         <Description>SDK for ServerSentEvents and convenience methods for Datastar</Description>

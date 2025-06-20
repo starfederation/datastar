@@ -3,6 +3,7 @@ namespace StarFederation.Datastar.FSharp
 open System
 open System.Collections.Generic
 open System.IO
+open System.Text
 open System.Text.Json
 open System.Text.Json.Nodes
 open System.Text.RegularExpressions
@@ -31,26 +32,21 @@ type SignalPath = string
 /// </summary>
 type Selector = string
 
-type MergeFragmentsOptions =
+type PatchElementsOptions =
     { Selector: Selector voption
-      MergeMode: FragmentMergeMode
+      PatchMode: ElementPatchMode
       UseViewTransition: bool
       EventId: string voption
       Retry: TimeSpan }
-type MergeSignalsOptions =
+type PatchSignalsOptions =
     { OnlyIfMissing: bool
       EventId: string voption
       Retry: TimeSpan }
-type RemoveFragmentsOptions =
+type RemoveElementOptions =
     { UseViewTransition: bool
       EventId: string voption
       Retry: TimeSpan }
-type ExecuteScriptOptions =
-    { AutoRemove: bool
-      Attributes: string[]
-      EventId: string voption
-      Retry: TimeSpan }
-type EventOptions = { EventId: string voption; Retry: TimeSpan }
+type ExecuteScriptOptions = { EventId: string voption; Retry: TimeSpan }
 
 /// <summary>
 /// Read the signals from the request
@@ -76,7 +72,7 @@ type ISendServerEvent =
     abstract SendServerEvent : ServerSentEvent * CancellationToken -> Task
 
 module ServerSentEvent =
-    let serialize sse =
+    let private lines sse =
         seq {
             $"event: {sse.EventType |> Consts.EventType.toString}"
 
@@ -89,7 +85,11 @@ module ServerSentEvent =
             yield! sse.DataLines |> Array.map (fun dataLine -> $"data: {dataLine}")
 
             ""; ""; ""
-        } |> String.concat "\n"
+        }
+    let serializeAsBytes sse =
+        lines sse
+        |> Seq.map (fun line -> Seq.append (Encoding.UTF8.GetBytes line) "\n"B)
+        |> Seq.concat
 
 module Signals =
     let value (signals:Signals) : string = signals.ToString()
@@ -139,33 +139,27 @@ module Selector =
         else failwith $"{selectorString} is not a valid selector"
     let create = sel
 
-module MergeFragmentsOptions =
+module PatchElementsOptions =
     let defaults =
         { Selector = ValueNone
-          MergeMode = Consts.DefaultFragmentMergeMode
-          UseViewTransition = Consts.DefaultFragmentsUseViewTransitions
+          PatchMode = Consts.DefaultElementPatchMode
+          UseViewTransition = Consts.DefaultElementsUseViewTransitions
           EventId = ValueNone
           Retry = Consts.DefaultSseRetryDuration }
 
-module MergeSignalsOptions =
+module RemoveElementOptions =
     let defaults =
-        { OnlyIfMissing = Consts.DefaultMergeSignalsOnlyIfMissing
+        { UseViewTransition = Consts.DefaultElementsUseViewTransitions
           EventId = ValueNone
           Retry = Consts.DefaultSseRetryDuration }
 
-module RemoveFragmentsOptions =
+module PatchSignalsOptions =
     let defaults =
-        { UseViewTransition = Consts.DefaultFragmentsUseViewTransitions
+        { OnlyIfMissing = Consts.DefaultPatchSignalsOnlyIfMissing
           EventId = ValueNone
           Retry = Consts.DefaultSseRetryDuration }
 
 module ExecuteScriptOptions =
     let defaults =
-        { AutoRemove = Consts.DefaultExecuteScriptAutoRemove
-          Attributes = [| Consts.DefaultExecuteScriptAttributes |]
-          EventId = ValueNone
+        { EventId = ValueNone
           Retry = Consts.DefaultSseRetryDuration }
-
-module EventOptions =
-    let defaults = { EventId = ValueNone; Retry = Consts.DefaultSseRetryDuration }
-

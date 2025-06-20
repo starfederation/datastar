@@ -3,67 +3,67 @@ using Core = StarFederation.Datastar.FSharp;
 
 namespace StarFederation.Datastar.DependencyInjection;
 
-public class MergeFragmentsOptions
+public class PatchElementsOptions
 {
     public string? Selector { get; init; } = null;
-    public FragmentMergeMode MergeMode { get; init; } = Consts.DefaultFragmentMergeMode;
-    public bool UseViewTransition { get; init; } = Consts.DefaultFragmentsUseViewTransitions;
+    public ElementPatchMode PatchMode { get; init; } = Consts.DefaultElementPatchMode;
+    public bool UseViewTransition { get; init; } = Consts.DefaultElementsUseViewTransitions;
     public string? EventId { get; init; } = null;
     public TimeSpan Retry { get; init; } = Consts.DefaultSseRetryDuration;
 
-    public static implicit operator FSharpValueOption<Core.MergeFragmentsOptions>(MergeFragmentsOptions options) => ToFSharp(options);
-    public static implicit operator Core.MergeFragmentsOptions(MergeFragmentsOptions options) => ToFSharp(options);
+    public static implicit operator FSharpValueOption<Core.PatchElementsOptions>(PatchElementsOptions options) => ToFSharp(options);
+    public static implicit operator Core.PatchElementsOptions(PatchElementsOptions options) => ToFSharp(options);
 
-    private static Core.MergeFragmentsOptions ToFSharp(MergeFragmentsOptions options)
+    private static Core.PatchElementsOptions ToFSharp(PatchElementsOptions options)
     {
-        return new Core.MergeFragmentsOptions(
+        return new Core.PatchElementsOptions(
             options.Selector ?? FSharpValueOption<string>.ValueNone,
-            From(options.MergeMode),
+            From(options.PatchMode),
             options.UseViewTransition,
             options.EventId ?? FSharpValueOption<string>.ValueNone,
             options.Retry
         );
 
-        static Core.FragmentMergeMode From(FragmentMergeMode fragmentMergeMode) => fragmentMergeMode switch
+        static Core.ElementPatchMode From(ElementPatchMode patchElementsMode) => patchElementsMode switch
         {
-            FragmentMergeMode.Morph => Core.FragmentMergeMode.Morph,
-            FragmentMergeMode.Inner => Core.FragmentMergeMode.Inner,
-            FragmentMergeMode.Outer => Core.FragmentMergeMode.Outer,
-            FragmentMergeMode.Prepend => Core.FragmentMergeMode.Prepend,
-            FragmentMergeMode.Append => Core.FragmentMergeMode.Append,
-            FragmentMergeMode.Before => Core.FragmentMergeMode.Before,
-            FragmentMergeMode.After => Core.FragmentMergeMode.After,
-            FragmentMergeMode.UpsertAttributes => Core.FragmentMergeMode.UpsertAttributes,
-            _ => throw new ArgumentOutOfRangeException(nameof(fragmentMergeMode), fragmentMergeMode, message: null)
+            ElementPatchMode.Inner => Core.ElementPatchMode.Inner,
+            ElementPatchMode.Outer => Core.ElementPatchMode.Outer,
+            ElementPatchMode.Prepend => Core.ElementPatchMode.Prepend,
+            ElementPatchMode.Append => Core.ElementPatchMode.Append,
+            ElementPatchMode.Before => Core.ElementPatchMode.Before,
+            ElementPatchMode.After => Core.ElementPatchMode.After,
+            ElementPatchMode.Remove => Core.ElementPatchMode.Remove,
+            ElementPatchMode.Replace => Core.ElementPatchMode.Replace,
+            _ => throw new ArgumentOutOfRangeException(nameof(patchElementsMode), patchElementsMode, null)
         };
     }
 }
 
-public class MergeSignalsOptions
+public class PatchSignalsOptions
 {
-    public bool OnlyIfMissing { get; init; } = Consts.DefaultMergeSignalsOnlyIfMissing;
+    public bool OnlyIfMissing { get; init; } = Consts.DefaultPatchSignalsOnlyIfMissing;
     public string? EventId { get; init; } = null;
     public TimeSpan Retry { get; init; } = Consts.DefaultSseRetryDuration;
 
-    public static implicit operator Core.MergeSignalsOptions(MergeSignalsOptions options) => ToFSharp(options);
-    public static implicit operator FSharpValueOption<Core.MergeSignalsOptions>(MergeSignalsOptions options) => ToFSharp(options);
+    public static implicit operator Core.PatchSignalsOptions(PatchSignalsOptions options) => ToFSharp(options);
+    public static implicit operator FSharpValueOption<Core.PatchSignalsOptions>(PatchSignalsOptions options) => ToFSharp(options);
 
-    private static Core.MergeSignalsOptions ToFSharp(MergeSignalsOptions options) => new(
+    private static Core.PatchSignalsOptions ToFSharp(PatchSignalsOptions options) => new(
         options.OnlyIfMissing,
         options.EventId ?? FSharpValueOption<string>.ValueNone,
         options.Retry);
 }
 
-public class RemoveFragmentsOptions
+public class RemoveFragmentOptions
 {
-    public bool UseViewTransition { get; init; } = Consts.DefaultFragmentsUseViewTransitions;
+    public bool UseViewTransition { get; init; } = Consts.DefaultElementsUseViewTransitions;
     public string? EventId { get; init; } = null;
     public TimeSpan Retry { get; init; } = Consts.DefaultSseRetryDuration;
 
-    public static implicit operator Core.RemoveFragmentsOptions(RemoveFragmentsOptions options) => ToFSharp(options);
-    public static implicit operator FSharpValueOption<Core.RemoveFragmentsOptions>(RemoveFragmentsOptions options) => ToFSharp(options);
+    public static implicit operator Core.RemoveElementOptions(RemoveFragmentOptions options) => ToFSharp(options);
+    public static implicit operator FSharpValueOption<Core.RemoveElementOptions>(RemoveFragmentOptions options) => ToFSharp(options);
 
-    private static Core.RemoveFragmentsOptions ToFSharp(RemoveFragmentsOptions options) => new(
+    private static Core.RemoveElementOptions ToFSharp(RemoveFragmentOptions options) => new(
         options.UseViewTransition,
         options.EventId ?? FSharpValueOption<string>.ValueNone,
         options.Retry);
@@ -71,8 +71,6 @@ public class RemoveFragmentsOptions
 
 public class ExecuteScriptOptions
 {
-    public bool AutoRemove { get; init; } = Consts.DefaultExecuteScriptAutoRemove;
-    public string[] Attributes { get; init; } = [];
     public string? EventId { get; init; } = null;
     public TimeSpan Retry { get; init; } = Consts.DefaultSseRetryDuration;
 
@@ -80,19 +78,6 @@ public class ExecuteScriptOptions
     public static implicit operator FSharpValueOption<Core.ExecuteScriptOptions>(ExecuteScriptOptions options) => ToFSharp(options);
 
     private static Core.ExecuteScriptOptions ToFSharp(ExecuteScriptOptions options) => new(
-        options.AutoRemove,
-        options.Attributes,
         options.EventId ?? FSharpValueOption<string>.ValueNone,
         options.Retry);
-}
-
-public class EventOptions
-{
-    public string? EventId { get; init; } = null;
-    public TimeSpan Retry { get; init; } = Consts.DefaultSseRetryDuration;
-
-    public static implicit operator Core.EventOptions(EventOptions options) => ToFSharp(options);
-    public static implicit operator FSharpValueOption<Core.EventOptions>(EventOptions options) => ToFSharp(options);
-
-    private static Core.EventOptions ToFSharp(EventOptions options) => new(options.EventId, options.Retry);
 }

@@ -9,6 +9,13 @@ open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Primitives
 open Microsoft.Net.Http.Headers
 
+module JsonSerializerOptions =
+    /// JsonSerializerOptions but case insensitive
+    let SignalsDefault =
+        let options = JsonSerializerOptions()
+        options.PropertyNameCaseInsensitive <- true
+        options
+
 /// Implementation of ISendServerEvent, for sending SSEs to the HttpResponse
 [<Sealed>]
 type ServerSentEventHttpHandler (httpResponse:HttpResponse) =
@@ -28,32 +35,32 @@ type ServerSentEventHttpHandler (httpResponse:HttpResponse) =
                 yield! additionalHeaders
                 } |> Seq.iter (setHeader httpResponse)
             do! httpResponse.StartAsync(cancellationToken)
-            do! httpResponse.Body.FlushAsync(cancellationToken)
+            return! httpResponse.BodyWriter.FlushAsync(cancellationToken)
             }
         task :> Task
-    static member StartServerEventStream (httpResponse, additionalHeader) = ServerSentEventHttpHandler.StartServerEventStream(httpResponse, additionalHeader, CancellationToken.None)
+    static member StartServerEventStream (httpResponse, additionalHeader) = ServerSentEventHttpHandler.StartServerEventStream(httpResponse, additionalHeader, httpResponse.HttpContext.RequestAborted)
 
     static member SendServerEvent (httpResponse:HttpResponse, sse, cancellationToken:CancellationToken) =
         let task = task {
-            let serializedEvent = sse |> ServerSentEvent.serialize |> Encoding.UTF8.GetBytes
-            return! httpResponse.BodyWriter.WriteAsync(serializedEvent, cancellationToken)
+            let serializedSse = sse |> ServerSentEvent.serializeAsBytes |> Seq.toArray
+            return! httpResponse.BodyWriter.WriteAsync(serializedSse, cancellationToken)
             }
         task :> Task
-    static member SendServerEvent (sse, httpResponse) = ServerSentEventHttpHandler.SendServerEvent(httpResponse, sse, CancellationToken.None)
+    static member SendServerEvent (sse, httpResponse) = ServerSentEventHttpHandler.SendServerEvent(httpResponse, sse, httpResponse.HttpContext.RequestAborted)
 
     interface ISendServerEvent with
 
         member this.StartServerEventStream (additionalHeaders, cancellationToken) =
             lock _startResponseLock (fun () -> if _startResponseTask = null then _startResponseTask <- ServerSentEventHttpHandler.StartServerEventStream(httpResponse, additionalHeaders, cancellationToken))
             _startResponseTask
-        member this.StartServerEventStream(additionalHeaders) = (this:>ISendServerEvent).StartServerEventStream(additionalHeaders, CancellationToken.None)
-        member this.StartServerEventStream() = (this:>ISendServerEvent).StartServerEventStream(Array.empty, CancellationToken.None)
+        member this.StartServerEventStream(additionalHeaders) = (this:>ISendServerEvent).StartServerEventStream(additionalHeaders, httpResponse.HttpContext.RequestAborted)
+        member this.StartServerEventStream() = (this:>ISendServerEvent).StartServerEventStream(Array.empty, httpResponse.HttpContext.RequestAborted)
 
         member this.SendServerEvent(sse, cancellationToken) = task {
             do! (this :> ISendServerEvent).StartServerEventStream(Array.empty, cancellationToken)
             return! ServerSentEventHttpHandler.SendServerEvent(httpResponse, sse, cancellationToken)
             }
-        member this.SendServerEvent(sse) = (this:>ISendServerEvent).SendServerEvent(sse, CancellationToken.None)
+        member this.SendServerEvent(sse) = (this:>ISendServerEvent).SendServerEvent(sse, httpResponse.HttpContext.RequestAborted)
 
 /// Implementation of IReadSignals, for reading the Signals from the HttpRequest
 [<Sealed>]
@@ -81,7 +88,7 @@ type SignalsHttpHandler (httpRequest:HttpRequest) =
             with _ -> return Signals.empty
         }
 
-    static member ReadSignalsAsync (httpRequest:HttpRequest) = SignalsHttpHandler.ReadSignalsAsync(httpRequest, CancellationToken.None)
+    static member ReadSignalsAsync (httpRequest:HttpRequest) = SignalsHttpHandler.ReadSignalsAsync(httpRequest, httpRequest.HttpContext.RequestAborted)
 
     static member ReadSignalsAsync<'T> (httpRequest:HttpRequest, jsonSerializerOptions:JsonSerializerOptions, cancellationToken:CancellationToken) = task {
         try
@@ -98,9 +105,9 @@ type SignalsHttpHandler (httpRequest:HttpRequest) =
         with _ -> return ValueNone
         }
 
-    static member ReadSignalsAsync<'T> (httpRequest:HttpRequest, cancellationToken:CancellationToken) = SignalsHttpHandler.ReadSignalsAsync<'T>(httpRequest, JsonSerializerOptions.Default, cancellationToken)
-    static member ReadSignalsAsync<'T> (httpRequest:HttpRequest, jsonSerializerOptions:JsonSerializerOptions) = SignalsHttpHandler.ReadSignalsAsync<'T>(httpRequest, jsonSerializerOptions, CancellationToken.None)
-    static member ReadSignalsAsync<'T> (httpRequest:HttpRequest) = SignalsHttpHandler.ReadSignalsAsync<'T>(httpRequest, JsonSerializerOptions.Default)
+    static member ReadSignalsAsync<'T> (httpRequest:HttpRequest, cancellationToken:CancellationToken) = SignalsHttpHandler.ReadSignalsAsync<'T>(httpRequest, JsonSerializerOptions.SignalsDefault, cancellationToken)
+    static member ReadSignalsAsync<'T> (httpRequest:HttpRequest, jsonSerializerOptions:JsonSerializerOptions) = SignalsHttpHandler.ReadSignalsAsync<'T>(httpRequest, jsonSerializerOptions, httpRequest.HttpContext.RequestAborted)
+    static member ReadSignalsAsync<'T> (httpRequest:HttpRequest) = SignalsHttpHandler.ReadSignalsAsync<'T>(httpRequest, JsonSerializerOptions.SignalsDefault)
 
     interface IReadSignals with
         member this.GetSignalsStream() = SignalsHttpHandler.GetSignalsStream(httpRequest)

@@ -1,25 +1,22 @@
 
-using System.Security.Cryptography;
 using System.Text.Json;
-using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using Core = StarFederation.Datastar.FSharp;
 
 namespace StarFederation.Datastar.DependencyInjection;
 
-public interface IDatastarServerSentEventService
+public interface IDatastarService
 {
-    void AddHeaders(params KeyValuePair<string, string>[] httpHeaders);
-    Task StartServerEventStream();
-    Task MergeFragmentsAsync(string fragments, MergeFragmentsOptions? options = null);
-    Task RemoveFragmentsAsync(string selector, RemoveFragmentsOptions? options = null);
-    Task MergeSignalsAsync(string dataSignals, MergeSignalsOptions? options = null);
-    Task RemoveSignalsAsync(IEnumerable<string> paths, EventOptions? options = null);
+    Task StartServerEventStream(params (string, string)[] additionalHeaders);
+    Task StartServerEventStream(params KeyValuePair<string, string>[] additionalHeaders);
+    Task PatchElementsAsync(string fragments, PatchElementsOptions? options = null);
+    Task RemoveElementAsync(string selector, RemoveFragmentOptions? options = null);
+    /// <summary>
+    /// Note: If TType is string then it is assumed that it is an already serialized Signals, otherwise serialize with jsonSerializerOptions
+    /// </summary>
+    Task PatchSignalsAsync<TType>(TType signals, JsonSerializerOptions? jsonSerializerOptions = null, PatchSignalsOptions? patchSignalsOptions = null);
     Task ExecuteScriptAsync(string script, ExecuteScriptOptions? options = null);
-}
 
-public interface IDatastarSignalsReaderService
-{
     /// <summary>
     /// Get the serialized signals as a stream
     /// </summary>
@@ -38,38 +35,37 @@ public interface IDatastarSignalsReaderService
     Task<TType?> ReadSignalsAsync<TType>(JsonSerializerOptions? options = null);
 }
 
-internal class ServerSentEventService(Core.ISendServerEvent handler) : IDatastarServerSentEventService
+internal class DatastarService(Core.ISendServerEvent sendServerEventHandler, Core.IReadSignals signalsHandler) : IDatastarService
 {
-    public void AddHeaders(params KeyValuePair<string, string>[] httpHeaders) => _additionalHeaders.AddRange(httpHeaders ?? []);
+    public Task StartServerEventStream(params (string, string)[] additionalHeaders)
+        => sendServerEventHandler.StartServerEventStream(additionalHeaders.Select(kv => kv.AsTuple()).ToArray());
 
-    public Task StartServerEventStream() => handler.StartServerEventStream(_additionalHeaders.Select(kv => kv.AsTuple()).ToArray());
+    public Task StartServerEventStream(params KeyValuePair<string, string>[] additionalHeaders)
+        => sendServerEventHandler.StartServerEventStream(additionalHeaders.Select(kv => kv.AsTuple()).ToArray());
 
-    public Task MergeFragmentsAsync(string fragments, MergeFragmentsOptions? options = null) => handler.SendServerEvent(Core.ServerSentEventGenerator.MergeFragments(fragments, options ?? new()));
+    public Task PatchElementsAsync(string fragments, PatchElementsOptions? options = null)
+        => sendServerEventHandler.SendServerEvent(Core.ServerSentEventGenerator.PatchElements(fragments, options ?? new()));
 
-    public Task RemoveFragmentsAsync(string selector, RemoveFragmentsOptions? options = null) => handler.SendServerEvent(Core.ServerSentEventGenerator.RemoveFragments(selector, options ?? new()));
+    public Task RemoveElementAsync(string selector, RemoveFragmentOptions? options = null)
+        => sendServerEventHandler.SendServerEvent(Core.ServerSentEventGenerator.RemoveElement(selector, options ?? new()));
 
-    public Task MergeSignalsAsync(string dataSignals, MergeSignalsOptions? options = null) => handler.SendServerEvent(Core.ServerSentEventGenerator.MergeSignals(dataSignals, options ?? new()));
+    public Task PatchSignalsAsync<TType>(TType signals, JsonSerializerOptions? jsonSerializerOptions = null, PatchSignalsOptions? patchSignalsOptions = null)
+        => sendServerEventHandler.SendServerEvent(Core.ServerSentEventGenerator.PatchSignals(signals as string ?? JsonSerializer.Serialize(signals, jsonSerializerOptions), patchSignalsOptions ?? new()));
 
-    public Task RemoveSignalsAsync(IEnumerable<string> paths, EventOptions? options = null) => handler.SendServerEvent(Core.ServerSentEventGenerator.RemoveSignals(paths, options ?? new()));
+    public Task ExecuteScriptAsync(string script, ExecuteScriptOptions? options = null)
+        => sendServerEventHandler.SendServerEvent(Core.ServerSentEventGenerator.ExecuteScript(script, options ?? new()));
 
-    public Task ExecuteScriptAsync(string script, ExecuteScriptOptions? options = null) => handler.SendServerEvent(Core.ServerSentEventGenerator.ExecuteScript(script, options ?? new()));
-
-    private List<KeyValuePair<string, string>> _additionalHeaders = new();
-}
-
-internal class SignalsReaderService(Core.IReadSignals handler) : IDatastarSignalsReaderService
-{
-    public Stream GetSignalsStream() => handler.GetSignalsStream();
+    public Stream GetSignalsStream() => signalsHandler.GetSignalsStream();
 
     public async Task<string?> ReadSignalsAsync()
     {
-        string? signals = await handler.ReadSignalsAsync();
+        string? signals = await signalsHandler.ReadSignalsAsync();
         return String.IsNullOrEmpty(signals) ? null : signals;
     }
 
     public async Task<TType?> ReadSignalsAsync<TType>(JsonSerializerOptions? jsonSerializerOptions = null)
     {
-        FSharpValueOption<TType> read = await handler.ReadSignalsAsync<TType>(jsonSerializerOptions ?? JsonSerializerOptions.Default);
-        return read.IsSome ? read.Value : default(TType?);
+        FSharpValueOption<TType> read = await signalsHandler.ReadSignalsAsync<TType>(jsonSerializerOptions ?? Core.JsonSerializerOptions.SignalsDefault);
+        return read.IsSome ? read.Value : default;
     }
 }
