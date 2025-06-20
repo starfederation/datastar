@@ -22,18 +22,18 @@ public class Program
         WebApplication app = builder.Build();
         app.UseStaticFiles();
 
-        app.MapGet("/hello-world", async (IDatastarServerSentEventService sse, IDatastarSignalsReaderService signals) =>
+        app.MapGet("/hello-world", async (IDatastarService sse) =>
         {
-            Signals mySignals = await signals.ReadSignalsAsync<Signals>();
+            Signals? mySignals = await sse.ReadSignalsAsync<Signals>();
             for (int index = 0; index < Message.Length; ++index)
             {
-                await sse.MergeFragmentsAsync($"""<div id="message">{Message[..index]}</div>""");
+                await sse.PatchElementsAsync($"""<div id="message">{Message[..index]}</div>""");
                 if (!char.IsWhiteSpace(Message[index]))
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(mySignals.Delay.GetValueOrDefault(0)));
+                    await Task.Delay(TimeSpan.FromMilliseconds(mySignals!.Delay.GetValueOrDefault(0)));
                 }
             }
-            await sse.MergeFragmentsAsync($"""<div id="message">{Message}</div>""");
+            await sse.PatchElementsAsync($"""<div id="message">{Message}</div>""");
         });
 
         app.Run();

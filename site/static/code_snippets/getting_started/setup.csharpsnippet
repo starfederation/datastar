@@ -1,0 +1,13 @@
+using StarFederation.Datastar.DependencyInjection;
+
+// Adds Datastar as a service
+builder.Services.AddDatastar();
+
+app.MapGet("/", async (IDatastarService datastarService) =>
+{
+    // Patch HTML DOM with new element.
+    await datastarService.PatchElementsAsync(@"<div id=""question"">What do you put in a toaster?</div>");
+
+    // Patch new signals into the existing signals.
+    await datastarService.PatchSignalsAsync("{response: '', answer: 'bread'}");
+});
