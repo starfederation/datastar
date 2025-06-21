@@ -36,14 +36,14 @@
              limit 1
              new-offset (+ offset limit)]
 
-         (d*/merge-fragment! sse
+         (d*/patch-elements! sse
                              (html [:div "Item " new-offset])
                              {d*/selector   "#list"
-                              d*/merge-mode d*/mm-append})
+                              d*/patch-mode d*/pm-append})
 
          (if (< new-offset max-offset)
-           (d*/merge-signals! sse (write-json-str {"offset" new-offset}))
-           (d*/remove-fragment! sse "#load-more"))
+           (d*/patch-signals! sse (write-json-str {"offset" new-offset}))
+           (d*/remove-element! sse "#load-more"))
 
          (d*/close-sse! sse)))}))
 

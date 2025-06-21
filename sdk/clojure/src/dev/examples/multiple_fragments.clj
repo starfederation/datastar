@@ -25,6 +25,8 @@
       [:input {:type "text" :data-bind-input true}]
       [:button {:data-on-click (d*/sse-get "/endpoint")} "Send input"]
       [:br]
+      [:span {:data-text "$input"}]
+      [:br]
       [:div "res: " (res "res-1" "")]
       [:div "duplicate res: " (res "res-2" "")]])))
 
@@ -33,7 +35,7 @@
   (ruresp/response page))
 
 
-(defn ->fragments [input-val]
+(defn ->elements [input-val]
   [(h/html (res "res-1" input-val))
    (h/html (res "res-2" input-val))])
 
@@ -46,13 +48,14 @@
        {ac/on-open
         (fn [sse]
           (d*/with-open-sse sse
-            (d*/merge-fragments! sse (->fragments input-val))))}))))
+            (d*/patch-elements-seq! sse (->elements input-val))))}))))
 
 
 (defn ->router [->sse-response]
   (rr/router
     [["/" {:handler home}]
-     ["/endpoint" {:handler (->endpoint ->sse-response)}]]))
+     ["/endpoint" {:handler (->endpoint ->sse-response)}]
+     c/datastar-route]))
 
 
 (def default-handler (rr/create-default-handler))

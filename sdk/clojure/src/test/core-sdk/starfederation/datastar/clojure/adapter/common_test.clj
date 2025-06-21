@@ -40,7 +40,7 @@
 
 (defdescribe reading-bytes
   (specify "We can do str -> bytes -> str"
-    (let [original (str (d*/merge-fragment! (at/->sse-gen) "msg"))]
+    (let [original (str (d*/patch-elements! (at/->sse-gen) "msg"))]
       (expect
         (= original
            (-> original

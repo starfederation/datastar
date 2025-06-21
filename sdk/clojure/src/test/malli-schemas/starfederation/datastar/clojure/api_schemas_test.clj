@@ -1,13 +1,11 @@
-(ns test.api-schemas-test
+(ns starfederation.datastar.clojure.api-schemas-test
   (:require
     [lazytest.core :as lt :refer [defdescribe describe expect it]]
     [malli.instrument :as mi]
     [starfederation.datastar.clojure.adapter.test :as at]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.api-schemas]
-    [starfederation.datastar.clojure.api.fragments :as frags])
-  (:import
-    clojure.lang.ExceptionInfo))
+    [starfederation.datastar.clojure.api.elements :as elements]
+    [starfederation.datastar.clojure.api-schemas]))
 
 
 (def with-malli
@@ -39,17 +37,18 @@
 
 
 (def dumy-script "console.log('hello')")
-#_{:clj-kondo/ignore true}
+
 (def thunk-wrong-script-type #(d*/execute-script! sse-gen :test))
 (def thunk-wrong-option-type #(d*/execute-script! sse-gen dumy-script {d*/auto-remove :test}))
 
 
-(defdescribe malli-schemas
+(defdescribe test-malli-schemas
   (describe "without malli"
     (it "error can go through"
-      (expect (lt/throws? ExceptionInfo thunk-wrong-script-type))
-      (expect (= (d*/execute-script! sse-gen dumy-script {d*/auto-remove :wrong-type})
-                 "event: datastar-execute-script\ndata: script console.log('hello')\n\n\n"))))
+      (expect (= (thunk-wrong-script-type)
+                 "event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script data-effect=\"el.remove()\">:test</script>\n\n"))
+      (expect (= (thunk-wrong-option-type)
+                 "event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script data-effect=\"el.remove()\">console.log('hello')</script>\n\n"))))
 
   (describe "with malli"
     {:context [with-malli]}
@@ -61,12 +60,10 @@
 
   (describe "Schemas not required"
     (it "doesn't trigger instrumentation"
-      (expect (= (frags/->merge-fragment "" {d*/retry-duration :test})
+      (expect (= (elements/->patch-elements "" {d*/retry-duration :test})
                  [])))))
 
-
-
-
-
-
+(comment
+  (require '[lazytest.repl :as ltr])
+  (ltr/run-test-var #'test-malli-schemas))
 

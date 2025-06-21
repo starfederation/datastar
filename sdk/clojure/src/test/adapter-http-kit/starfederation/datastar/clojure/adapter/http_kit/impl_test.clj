@@ -4,6 +4,7 @@
     [org.httpkit.server :as hk-server]
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.adapter.common :as ac]
+    [starfederation.datastar.clojure.adapter.test :as at]
     [starfederation.datastar.clojure.adapter.http-kit.impl :as impl]
     [starfederation.datastar.clojure.adapter.common-test :refer [read-bytes]])
   (:import
@@ -69,15 +70,18 @@
     (impl/->sse-gen c send!)))
 
 
+(def expected-event-result
+  (d*/patch-elements! (at/->sse-gen) "msg"))
+
 (defn send-SSE-event [opts]
   (let [baos (ByteArrayOutputStream.)]
     (with-open [_baos baos
                 sse-gen ^Closeable (->sse-gen baos opts)]
-      (d*/merge-fragment! sse-gen "msg" {}))
+      (d*/patch-elements! sse-gen "msg" {}))
 
     (expect
       (= (read-bytes baos opts)
-         "event: datastar-merge-fragments\ndata: fragments msg\n\n\n"))))
+         expected-event-result))))
 
 
 (defdescribe simple-test
@@ -86,7 +90,7 @@
  
   (it "We can send events using a persistent buffered reader"
     (send-SSE-event {ac/write-profile ac/buffered-writer-profile}))
-   
+ 
   (it "We can send gziped events using a temp buffer"
     (send-SSE-event {ac/write-profile ac/gzip-profile :gzip? true}))
  

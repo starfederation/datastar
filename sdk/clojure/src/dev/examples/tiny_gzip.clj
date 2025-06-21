@@ -47,7 +47,7 @@
 
 (defn send-val! [sse v]
   (try
-    (d*/merge-fragment! sse (h/html (render-val v)))
+    (d*/patch-elements! sse (h/html (render-val v)))
     (catch Exception e
       (println e))))
 
@@ -96,8 +96,8 @@
     [["/" {:handler home}]
      ["/change-val" {:handler (->change-val ->sse-response)
                      :middleware [reitit-params/parameters-middleware]}]
-     ["/updates" {:handler (->updates ->sse-response opts)}]]))
-
+     ["/updates" {:handler (->updates ->sse-response opts)}]
+     c/datastar-route]))
 
 (def default-handler (rr/create-default-handler))
 

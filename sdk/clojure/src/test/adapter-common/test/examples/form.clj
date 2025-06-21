@@ -12,6 +12,12 @@
 ;; -----------------------------------------------------------------------------
 ;; Views
 ;; -----------------------------------------------------------------------------
+(def input-id :input1)
+(def get-button-id :get-form)
+(def post-button-id :post-form)
+(def form-result-id :form-result)
+
+
 (defn form-get [url]
   (d*/sse-get url "{contentType: 'form'}"))
 
@@ -22,8 +28,7 @@
 
 (defn result-area [res]
   (hc/compile
-    [:span {:id "form-result"} res]))
-
+    [:span {:id form-result-id} res]))
 
 (defn form-page []
   (common/scaffold
@@ -32,20 +37,19 @@
        [:h2 "Form page"]
        [:form {:action ""}
         [:h3 "D* post form"]
-        [:label {:for "input-1"} "Enter text"]
+        [:label {:for input-id} "Enter text"]
         [:br]
 
         [:input {:type "text"
-                 :id "input-1"
-                 :name "input-1"
-                 :data-bind-input-1 true}]
+                 :id   input-id
+                 :name input-id}]
         [:br]
-        [:button {:id "get-form"
+        [:button {:id get-button-id
                   :data-on-click (form-get "/form/endpoint")}
          "Form get"]
 
         [:br]
-        [:button {:id "post-form"
+        [:button {:id post-button-id
                   :data-on-click (form-post "/form/endpoint")}
          "Form post"]
 
@@ -66,12 +70,12 @@
 
 
 (defn process-endpoint [request ->sse-response]
-  (let [input-val (get-in request [:params "input-1"])]
+  (let [input-val (get-in request [:params (name input-id)])]
     (->sse-response request
       {ac/on-open
        (fn [sse-gen]
          (d*/with-open-sse sse-gen
-           (d*/merge-fragment! sse-gen (h/html (result-area input-val)))))})))
+           (d*/patch-elements! sse-gen (h/html (result-area input-val)))))})))
 
 
 (defn ->endpoint [->sse-response]

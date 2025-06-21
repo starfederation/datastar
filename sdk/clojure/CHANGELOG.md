@@ -1,5 +1,29 @@
 # Release notes for the Clojure SDK
 
+## 2025-06-22
+
+### Changed
+
+- The public API has seen it's main functions renamed following the new SDK ADR.
+  Several functions have been renamed or removed:
+
+  | Old                 | new                   |
+  | ------------------- | --------------------- |
+  | `merge-fragment!`   | `patch-elements!`     |
+  | `merge-fragments!`  | `patch-elements-seq!` |
+  | `remove-fragments!` | `remove-element!`     |
+  | `merge-signals!`    | `patch-signals!`      |
+  | `remove-signals`    | removed               |
+
+- All the examples and snippets have been updated following the ADR changes.
+
+### Fixed
+
+- The clj-kondo config file for the SDK has been moved in a
+  `clj-kondo.exports/starfederation.datastar.clojure/sdk` directory. This change
+  allows for other projects to use
+  `starfederation.datastar.clojure/XXXX/config.edn` for their clj-kondo config.
+
 ## 2025-04-07
 
 ### Added

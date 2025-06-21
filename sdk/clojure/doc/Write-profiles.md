@@ -47,7 +47,7 @@ When using the `->sse-response` function we can do:
      on-open
      (fn [sse]
        (d*/with-open-sse sse
-         (d*/merge-fragment! sse "some big fragment")))}))
+         (d*/patch-elements! sse "some big element")))}))
 ```
 
 This response will have the right `Content-Encoding` header and will compress

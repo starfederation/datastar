@@ -44,7 +44,7 @@
   {:animator nil
    :animation-tick 100
    :clock 0
-   :size {:x 50 :y 50}
+   :size {:x 10 :y 10}
    :color :r
    :pings []})
 
@@ -52,6 +52,10 @@
 
 (def default-ping-duration 20)
 (def default-ping-speed 0.5)
+
+
+(defn resize [state x y]
+  (assoc state :size {:x x :y y}))
 
 
 (defn ->ping [state pos duration speed]

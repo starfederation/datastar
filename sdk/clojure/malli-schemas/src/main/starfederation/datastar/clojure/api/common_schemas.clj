@@ -12,11 +12,8 @@
 
 (def event-type-schema
   [:enum
-   consts/event-type-merge-fragments
-   consts/event-type-remove-fragments
-   consts/event-type-merge-signals
-   consts/event-type-remove-signals
-   consts/event-type-execute-script])
+   consts/event-type-patch-elements
+   consts/event-type-patch-signals])
 
 (def data-lines-schema [:seqable :string])
 
@@ -32,50 +29,45 @@
   (m/validate sse-options-schema {common/id 1}))
 
 ;; -----------------------------------------------------------------------------
-(def fragment-schema :string)
-(def fragments-schema [:seqable :string])
+(def elements-schema :string)
+(def elements-seq-schema [:seqable :string])
 
 
-(def merge-modes-schema
+(def patch-modes-schema
   [:enum
-   consts/fragment-merge-mode-morph
-   consts/fragment-merge-mode-inner
-   consts/fragment-merge-mode-outer
-   consts/fragment-merge-mode-prepend
-   consts/fragment-merge-mode-append
-   consts/fragment-merge-mode-before
-   consts/fragment-merge-mode-after
-   consts/fragment-merge-mode-upsert-attributes])
+   consts/element-patch-mode-outer
+   consts/element-patch-mode-inner
+   consts/element-patch-mode-replace
+   consts/element-patch-mode-prepend
+   consts/element-patch-mode-append
+   consts/element-patch-mode-before
+   consts/element-patch-mode-after
+   consts/element-patch-mode-remove])
 
 (comment
-  (m/validate merge-modes-schema consts/fragment-merge-mode-after)
-  (m/validate merge-modes-schema "toto"))
+  (m/validate patch-modes-schema consts/element-patch-mode-after)
+  (m/validate patch-modes-schema "toto"))
 
 
-(def merge-fragment-options-schemas
+(def patch-element-options-schemas
   (mu/merge
     sse-options-schema
     (mu/optional-keys
       [:map
        [common/selector :string]
-       [common/merge-mode merge-modes-schema]
+       [common/patch-mode patch-modes-schema]
        [common/use-view-transition :boolean]])))
 
 ;; -----------------------------------------------------------------------------
 (def selector-schema :string)
 
-(def remove-fragments-options-schemas
-  (mu/merge
-    sse-options-schema
-    (mu/optional-keys
-      [:map
-       [common/use-view-transition :boolean]])))
+(def remove-element-options-schemas patch-element-options-schemas)
 
 
 ;; -----------------------------------------------------------------------------
 (def signals-schema :string)
 
-(def merge-signals-options-schemas
+(def patch-signals-options-schemas
   (mu/merge
     sse-options-schema
     (mu/optional-keys
@@ -85,8 +77,6 @@
 
 ;; -----------------------------------------------------------------------------
 (def signal-paths-schema [:seqable :string])
-
-(def remove-signals-options-schemas sse-options-schema)
 
 ;; -----------------------------------------------------------------------------
 (def script-content-schema :string)

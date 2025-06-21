@@ -5,9 +5,6 @@
     [starfederation.datastar.clojure.api.signals]))
 
 
-(m/=> starfederation.datastar.clojure.api.signals/->merge-signals
-      [:-> cs/signals-schema cs/merge-signals-options-schemas cs/data-lines-schema])
+(m/=> starfederation.datastar.clojure.api.signals/->patch-signals
+      [:-> cs/signals-schema cs/patch-signals-options-schemas cs/data-lines-schema])
 
-
-(m/=> starfederation.datastar.clojure.api.signals/->remove-signals
-      [:-> cs/signal-paths-schema cs/data-lines-schema])

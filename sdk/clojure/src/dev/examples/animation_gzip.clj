@@ -1,9 +1,11 @@
 (ns examples.animation-gzip
   (:require
+    [dev.onionpancakes.chassis.core :as h]
     [examples.animation-gzip.handlers :as handlers]
     [examples.animation-gzip.rendering :as rendering]
     [examples.animation-gzip.state :as state]
     [examples.animation-gzip.brotli :as brotli]
+    [examples.common :as c]
     [examples.utils :as u]
     [reitit.ring :as rr]
     [reitit.ring.middleware.exception :as reitit-exception]
@@ -21,38 +23,40 @@
 
 (defn send-frame! [sse frame]
   (try
-    (d*/merge-fragment! sse frame)
+    (d*/patch-elements! sse frame)
     (catch Exception e
       (println e))))
 
 
-(defn broadcast-new-frame! [current-state]
+(defn broadcast-new-frame! [frame]
   (let [sses @state/!conns]
-    (when (seq sses)
-      (let [frame (rendering/render-content current-state)]
-        (doseq [sse sses]
-          (send-frame! sse frame))))))
+    (doseq [sse sses]
+      (send-frame! sse frame))))
 
 
 (defn install-watch! []
   (add-watch state/!state ::watch
              (fn [_k _ref old new]
                (when-not (identical? old new)
-                 (broadcast-new-frame! new)))))
+                 (let [frame (rendering/render-content new)]
+                  (broadcast-new-frame! frame))))))
 
 (install-watch!)
 
 
 (defn ->routes [->sse-response opts]
   [["/" handlers/home-handler]
-   ["/ping/:id" {:handler (handlers/->ping-handler ->sse-response)
+   ["/ping/:id" {:handler handlers/ping-handler
                  :middleware [reitit-params/parameters-middleware]}]
-   ["/random-10" (handlers/->random-pings-handler ->sse-response)]
-   ["/reset"     (handlers/->reset-handler ->sse-response)]
-   ["/play"      (handlers/->play-handler ->sse-response)]
-   ["/pause"     (handlers/->pause-handler ->sse-response)]
+   ["/random-10" handlers/random-pings-handler]
+   ["/reset"     handlers/reset-handler]
+   ["/step1"     handlers/step-handler]
+   ["/play"      handlers/play-handler]
+   ["/pause"     handlers/pause-handler]
    ["/updates"   (handlers/->updates-handler ->sse-response opts)]
-   ["/refresh"   (handlers/->refresh-handler ->sse-response opts)]])
+   ["/refresh"   handlers/refresh-handler]
+   ["/resize"    handlers/resize-handler]
+   c/datastar-route])
 
 
 (defn ->router [->sse-handler opts]
@@ -90,6 +94,14 @@
   state/!conns
   (reset! state/!conns #{})
 
+  (-> state/!state
+      deref
+      rendering/page)
+  (state/resize! 10 10)
+  (state/resize! 20 20)
+  (state/resize! 25 25)
+  (state/resize! 30 30)
+  (state/resize! 50 50)
   (state/reset-state!)
   (state/add-random-pings!)
   (state/step-state!)

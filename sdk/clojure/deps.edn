@@ -1,7 +1,9 @@
 {:paths []
  
  :deps {sdk/sdk                             {:local/root "./sdk"}
+        io.github.tonsky/clojure-plus       {:mvn/version "1.6.1"}
         io.github.paintparty/fireworks      {:mvn/version "0.10.4"}
+        mvxcvi/puget                        {:mvn/version "1.3.4"}
         com.taoensso/telemere               {:mvn/version "1.0.0-RC3"}
         com.aayushatharva.brotli4j/brotli4j {:mvn/version "1.18.0"}}
 
