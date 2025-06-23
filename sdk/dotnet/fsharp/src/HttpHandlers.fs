@@ -4,6 +4,7 @@ open System.IO
 open System.Text
 open System.Text.Json
 open System.Threading
+open System.Threading.Channels
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Primitives
@@ -21,6 +22,7 @@ module JsonSerializerOptions =
 type ServerSentEventHttpHandler (httpResponse:HttpResponse) =
     let mutable _startResponseTask : Task = null
     let _startResponseLock = obj()
+    let _sendEventChannel = Channel.CreateUnbounded<ServerSentEvent>()
 
     static member StartServerEventStream (httpResponse:HttpResponse, additionalHeaders:(string * string)[], cancellationToken:CancellationToken) =
         let task = backgroundTask {
@@ -49,7 +51,6 @@ type ServerSentEventHttpHandler (httpResponse:HttpResponse) =
     static member SendServerEvent (sse, httpResponse) = ServerSentEventHttpHandler.SendServerEvent(httpResponse, sse, httpResponse.HttpContext.RequestAborted)
 
     interface ISendServerEvent with
-
         member this.StartServerEventStream (additionalHeaders, cancellationToken) =
             lock _startResponseLock (fun () -> if _startResponseTask = null then _startResponseTask <- ServerSentEventHttpHandler.StartServerEventStream(httpResponse, additionalHeaders, cancellationToken))
             _startResponseTask
@@ -57,10 +58,15 @@ type ServerSentEventHttpHandler (httpResponse:HttpResponse) =
         member this.StartServerEventStream() = (this:>ISendServerEvent).StartServerEventStream(Array.empty, httpResponse.HttpContext.RequestAborted)
 
         member this.SendServerEvent(sse, cancellationToken) = task {
-            do! (this :> ISendServerEvent).StartServerEventStream(Array.empty, cancellationToken)
+            do! _sendEventChannel.Writer.WriteAsync(sse, cancellationToken)
+            do!
+                if _startResponseTask <> null
+                then _startResponseTask
+                else (this :> ISendServerEvent).StartServerEventStream(Array.empty, cancellationToken)
+            let! sse = _sendEventChannel.Reader.ReadAsync(cancellationToken)
             return! ServerSentEventHttpHandler.SendServerEvent(httpResponse, sse, cancellationToken)
             }
-        member this.SendServerEvent(sse) = (this:>ISendServerEvent).SendServerEvent(sse, httpResponse.HttpContext.RequestAborted)
+        member this.SendServerEvent(sse) = (this :> ISendServerEvent).SendServerEvent(sse, httpResponse.HttpContext.RequestAborted)
 
 /// Implementation of IReadSignals, for reading the Signals from the HttpRequest
 [<Sealed>]
