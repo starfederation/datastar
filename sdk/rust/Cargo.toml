@@ -8,13 +8,50 @@ description = "Datastar SDK for Rust"
 documentation = "https://docs.rs/datastar"
 edition = "2024"
 homepage = "https://data-star.dev"
-keywords = ["datastar", "backend", "axum", "rama", "rocket"]
+keywords = ["datastar", "backend", "axum", "rocket"]
 license = "MIT OR Apache-2.0"
 name = "datastar"
 readme = "README.md"
 repository = "https://github.com/starfederation/datastar"
-version = "0.2.1"
+version = "0.3.0"
 rust-version = "1.85.0"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+axum = ["dep:axum", "dep:serde", "dep:serde_json"]
+http2 = []
+rocket = ["dep:rocket"]
+tracing = ["dep:tracing"]
+
+[dependencies]
+axum = { version = "0.8.3", default-features = false, optional = true, features = [
+    "query",
+    "tokio",
+    "json",
+] }
+rocket = { version = "0.5.1", default-features = false, optional = true }
+serde = { version = "1", default-features = false, optional = true, features = [
+    "derive",
+] }
+serde_json = { version = "1", default-features = false, optional = true, features = [
+    "std",
+] }
+tracing = { version = "0.1.41", optional = true }
+
+[dev-dependencies]
+async-stream = { version = "0.3.6", default-features = false }
+axum = { version = "0.8.3" }
+reqwest = { version = "0.12.15", features = ["json", "stream"] }
+rocket = { version = "0.5.1", features = ["json"] }
+serde = { version = "1", default-features = false, features = ["derive"] }
+serde_json = { version = "1", default-features = false, features = ["std"] }
+tokio = { version = "1.44.2", features = ["full"] }
+tokio-stream = { version = "0.1.17" }
+tracing = { version = "0.1.41" }
+tracing-test = { version = "0.2.5" }
 
 [lints.rust]
 unreachable_pub = "deny"
@@ -50,64 +87,6 @@ unnested_or_patterns = "warn"
 str_to_string = "warn"
 type_complexity = "allow"
 
-[dependencies]
-axum = { version = "0.8.3", default-features = false, optional = true, features = [
-    "query",
-    "tokio",
-    "json",
-] }
-bytes = { version = "1", default-features = false, optional = true }
-futures-util = { version = "0.3", default-features = false }
-http-body = { version = "1.0", default-features = false, optional = true }
-pin-project-lite = { version = "0.2", default-features = false, optional = true }
-rama = { version = "0.2", default-features = false, optional = true, features = [
-    "http",
-] }
-rocket = { version = "0.5.1", default-features = false, optional = true }
-serde = { version = "1", default-features = false, optional = true, features = [
-    "derive",
-] }
-serde_json = { version = "1", default-features = false, optional = true, features = [
-    "std",
-] }
-sync_wrapper = { version = "1", default-features = false, optional = true }
-tracing = { version = "0.1.41", optional = true }
-
-[dev-dependencies]
-async-stream = { version = "0.3.6", default-features = false }
-axum = { version = "0.8.3" }
-rama = { version = "0.2", features = ["http-full"] }
-reqwest = { version = "0.12.15", features = ["json", "stream"] }
-rocket = { version = "0.5.1", features = ["json"] }
-serde = { version = "1", default-features = false, features = ["derive"] }
-serde_json = { version = "1", default-features = false, features = ["std"] }
-tokio = { version = "1.44.2", features = ["full"] }
-tokio-stream = { version = "0.1.17" }
-tracing = { version = "0.1.41" }
-tracing-test = { version = "0.2.5" }
-
-[features]
-axum = [
-    "dep:axum",
-    "dep:http-body",
-    "dep:pin-project-lite",
-    "dep:serde",
-    "dep:serde_json",
-    "dep:sync_wrapper",
-]
-http2 = []
-rocket = ["dep:rocket"]
-rama = [
-    "tracing",              # rama _always_ comes with tracing
-    "dep:rama",
-    "dep:serde",
-    "dep:serde_json",
-    "dep:pin-project-lite",
-    "dep:bytes",
-    "dep:sync_wrapper",
-]
-tracing = ["dep:tracing"]
-
 [profile.dev]
 opt-level = 1
 
@@ -117,7 +96,3 @@ opt-level = 3
 [profile.release]
 codegen-units = 1
 lto = "thin"
-
-[package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
