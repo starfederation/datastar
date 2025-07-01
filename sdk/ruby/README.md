@@ -106,6 +106,15 @@ sse.patch_elements(
 )
 ```
 
+You can patch multiple elements at once by passing an array of elements (or components):
+
+```ruby
+sse.patch_elements([
+  %(<div id="foo">\n<span>hello</span>\n</div>),
+  %(<div id="bar">\n<span>world</span>\n</div>)
+])
+```
+
 #### `remove_elements`
 
 Sugar on top of `#patch_elements`
