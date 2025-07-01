@@ -391,7 +391,7 @@ ServerSentEventGenerator.ExecuteScript(
 
 ### Implementation
 
-***Must*** call `ServerSentEventGenerator.send` with event type `datastar-patch-elements`, sending a `script` tag containing the JavaScript to execute. If `autoRemove` is `true`, `data-on-load="el.remove()"` must be added to the `script` tag. If `attributes` exist, they must be added to the `script` tag.
+***Must*** call `ServerSentEventGenerator.send` with event type `datastar-patch-elements`, sending a `script` tag containing the JavaScript to execute. If `autoRemove` is `true`, `data-effect="el.remove()"` must be added to the `script` tag. If `attributes` exist, they must be added to the `script` tag. 
 
 **Data format** (only include non-defaults):
 - `selector body\n`
