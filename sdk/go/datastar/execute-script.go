@@ -69,7 +69,6 @@ func WithExecuteScriptAttributeKVs(kvs ...string) ExecuteScriptOption {
 }
 
 // ExecuteScript runs a script in the client browser by using PatchElements to send a <script> element.
-// This is a sugar helper that maintains backward compatibility while using the standard PatchElements approach.
 func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts ...ExecuteScriptOption) error {
 	options := &executeScriptOptions{
 		RetryDuration: DefaultSseRetryDuration,
