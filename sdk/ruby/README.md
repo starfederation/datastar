@@ -138,6 +138,18 @@ Sugar on top of `#patch_elements`. Appends a temporary `<script>` tag to the DOM
 sse.execute_script(%(alert('Hello World!'))
 ```
 
+Pass `attributes` that will be added to the `<script>` tag:
+
+```ruby
+sse.execute_script(%(alert('Hello World!')), attributes: { type: 'text/javascript' })
+```
+
+These script tags are automatically removed after execution, so they can be used to run one-off scripts in the browser. Pass `auto_remove: false` if you want to keep the script tag in the DOM.
+
+```ruby
+sse.execute_script(%(alert('Hello World!')), auto_remove: false)
+```
+
 #### `signals`
 See https://data-star.dev/guide/getting_started#data-signals
 
