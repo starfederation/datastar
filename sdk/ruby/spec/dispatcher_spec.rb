@@ -62,6 +62,16 @@ RSpec.describe Datastar::Dispatcher do
     expect(dispatcher.sse?).to be(false)
   end
 
+  describe '#patch_elements' do
+    it 'produces a streameable response body with D* fragments' do
+      dispatcher.patch_elements %(<div id="foo">\n<span>hello</span>\n</div>\n)
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq(["event: datastar-patch-elements\ndata: elements <div id=\"foo\">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n\n"])
+    end
+  end
+
   describe '#merge_fragments' do
     it 'produces a streameable response body with D* fragments' do
       dispatcher.merge_fragments %(<div id="foo">\n<span>hello</span>\n</div>\n)

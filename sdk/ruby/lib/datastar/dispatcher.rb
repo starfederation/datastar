@@ -135,6 +135,12 @@ module Datastar
       end
     end
 
+    def patch_elements(elements, options = BLANK_OPTIONS)
+      stream_no_heartbeat do |sse|
+        sse.patch_elements(elements, options)
+      end
+    end
+
     # One-off remove fragments from the UI
     # See https://data-star.dev/reference/sse_events#datastar-remove-fragments
     # @example

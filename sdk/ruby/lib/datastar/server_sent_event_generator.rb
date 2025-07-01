@@ -65,6 +65,26 @@ module Datastar
       write(buffer)
     end
 
+    def patch_elements(elements, options = BLANK_OPTIONS)
+      # Support Phlex components
+      # And Rails' #render_in interface
+      elements = if elements.respond_to?(:render_in)
+        elements.render_in(view_context)
+      elsif elements.respond_to?(:call)
+        elements.call(view_context:)
+      else
+        elements.to_s
+      end
+
+      element_lines = elements.to_s.split("\n")
+
+      buffer = +"event: datastar-patch-elements\n"
+      build_options(options, buffer)
+      element_lines.each { |line| buffer << "data: elements #{line}\n" }
+
+      write(buffer)
+    end
+
     def remove_fragments(selector, options = BLANK_OPTIONS)
       buffer = +"event: datastar-remove-fragments\n"
       build_options(options, buffer)
