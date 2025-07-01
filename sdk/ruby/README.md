@@ -97,7 +97,7 @@ See https://data-star.dev/reference/sse_events#datastar-patch-elements
 sse.patch_elements(%(<div id="foo">\n<span>hello</span>\n</div>))
 
 # or a Phlex view object
-sse.patch_elements(UserComponet.new)
+sse.patch_elements(UserComponent.new)
 
 # Or pass options
 sse.patch_elements(
