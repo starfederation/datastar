@@ -72,10 +72,10 @@ module Datastar
       )
     end
 
-    def merge_signals(signals, options = BLANK_OPTIONS)
+    def patch_signals(signals, options = BLANK_OPTIONS)
       signals = JSON.dump(signals) unless signals.is_a?(String)
 
-      buffer = +"event: datastar-merge-signals\n"
+      buffer = +"event: datastar-patch-signals\n"
       build_options(options, buffer)
       buffer << "data: signals #{signals}\n"
       write(buffer)

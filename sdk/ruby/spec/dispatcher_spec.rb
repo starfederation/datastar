@@ -164,29 +164,29 @@ RSpec.describe Datastar::Dispatcher do
     end
   end
 
-  describe '#merge_signals' do
+  describe '#patch_signals' do
     it 'produces a streameable response body with D* signals' do
-      dispatcher.merge_signals %({ "foo": "bar" })
+      dispatcher.patch_signals %({ "foo": "bar" })
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-signals\ndata: signals { "foo": "bar" }\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals { "foo": "bar" }\n\n\n)])
     end
 
     it 'takes a Hash of signals' do
-      dispatcher.merge_signals(foo: 'bar')
+      dispatcher.patch_signals(foo: 'bar')
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-signals\ndata: signals {"foo":"bar"}\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals {"foo":"bar"}\n\n\n)])
     end
 
     it 'takes D* options' do
-      dispatcher.merge_signals({foo: 'bar'}, event_id: 72, retry_duration: 2000, only_if_missing: true)
+      dispatcher.patch_signals({foo: 'bar'}, event_id: 72, retry_duration: 2000, only_if_missing: true)
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-signals\nid: 72\nretry: 2000\ndata: onlyIfMissing true\ndata: signals {"foo":"bar"}\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\nid: 72\nretry: 2000\ndata: onlyIfMissing true\ndata: signals {"foo":"bar"}\n\n\n)])
     end
   end
 
@@ -329,19 +329,19 @@ RSpec.describe Datastar::Dispatcher do
       end
       dispatcher.stream do |sse|
         sse.patch_elements %(<div id="foo">\n<span>hello</span>\n</div>\n)
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
 
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
       expect(socket.lines.size).to eq(2)
       expect(socket.lines[0]).to eq("event: datastar-patch-elements\ndata: elements <div id=\"foo\">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n\n")
-      expect(socket.lines[1]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
+      expect(socket.lines[1]).to eq("event: datastar-patch-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
     end
 
     it 'returns a Rack array response' do
       status, headers, _body = dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
       expect(status).to eq(200)
       expect(headers['content-type']).to eq('text/event-stream')
@@ -430,7 +430,7 @@ RSpec.describe Datastar::Dispatcher do
       connected = false
       dispatcher.on_connect { |conn| connected = true }
       dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
@@ -444,7 +444,7 @@ RSpec.describe Datastar::Dispatcher do
         .on_client_disconnect { |conn| events << false }
 
       dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
       socket = TestSocket.new
       allow(socket).to receive(:<<).and_raise(Errno::EPIPE, 'Socket closed')
@@ -476,7 +476,7 @@ RSpec.describe Datastar::Dispatcher do
         .on_server_disconnect { |conn| events << false }
 
       dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
       socket = TestSocket.new
       
@@ -490,7 +490,7 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.on_error { |ex| errors << ex }
 
       dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
       socket = TestSocket.new
       allow(socket).to receive(:<<).and_raise(ArgumentError, 'Invalid argument')
@@ -507,7 +507,7 @@ RSpec.describe Datastar::Dispatcher do
       allow(socket).to receive(:<<).and_raise(ArgumentError, 'Invalid argument')
       
       dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
       dispatcher.response.body.call(socket)
       expect(errs.first).to be_a(ArgumentError)

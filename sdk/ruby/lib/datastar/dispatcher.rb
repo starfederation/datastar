@@ -150,17 +150,17 @@ module Datastar
       end
     end
 
-    # One-off merge signals in the UI
-    # See https://data-star.dev/reference/sse_events#datastar-merge-signals
+    # One-off patch signals in the UI
+    # See https://data-star.dev/reference/sse_events#datastar-patch-signals
     # @example
     #
-    #  datastar.merge_signals(count: 1, toggle: true)
+    #  datastar.patch_signals(count: 1, toggle: true)
     #
     # @param signals [Hash] signals to merge
     # @param options [Hash] the options to send with the message
-    def merge_signals(signals, options = BLANK_OPTIONS)
+    def patch_signals(signals, options = BLANK_OPTIONS)
       stream_no_heartbeat do |sse|
-        sse.merge_signals(signals, options)
+        sse.patch_signals(signals, options)
       end
     end
 
