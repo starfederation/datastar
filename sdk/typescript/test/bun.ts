@@ -27,7 +27,7 @@ const server = Bun.serve({
       }
 
       return ServerSentEventGenerator.stream((stream) => {
-        stream.mergeFragments(
+        stream.PatchElements(
           `<div id="toMerge">Hello ${reader.signals.foo}</div>`,
         );
       });
@@ -43,9 +43,9 @@ const server = Bun.serve({
       }
     } else if (url.pathname.includes("await")) {
       return ServerSentEventGenerator.stream(async (stream) => {
-        stream.mergeFragments('<div id="toMerge">Merged</div>');
+        stream.PatchElements('<div id="toMerge">Merged</div>');
         await delay(5000);
-        stream.mergeFragments('<div id="toMerge">After 5 seconds</div>');
+        stream.PatchElements('<div id="toMerge">After 5 seconds</div>');
       });
     }
 
@@ -77,31 +77,25 @@ function testEvents(stream, events) {
       case "mergeFragments":
         if (e !== null && typeof e === "object" && "fragments" in e) {
           const { fragments, ...options } = e;
-          stream.mergeFragments(fragments, options || undefined);
+          stream.PatchElements(fragments, options || undefined);
         }
         break;
       case "removeFragments":
         if (e !== null && typeof e === "object" && "selector" in e) {
           const { selector, ...options } = e;
-          stream.removeFragments(selector, options || undefined);
+          stream.PatchElements(selector, options || undefined);
         }
         break;
       case "mergeSignals":
         if (e !== null && typeof e === "object" && "signals" in e) {
           const { signals, ...options } = e;
-          stream.mergeSignals(signals, options || undefined);
+          stream.PatchSignals(JSON.stringify(signals), options || undefined);
         }
         break;
       case "removeSignals":
         if (e !== null && typeof e === "object" && "paths" in e) {
           const { paths, ...options } = e;
-          stream.removeSignals(paths, options || undefined);
-        }
-        break;
-      case "executeScript":
-        if (e !== null && typeof e === "object" && "script" in e) {
-          const { script, ...options } = e;
-          stream.executeScript(script, options || undefined);
+          stream.PatchSignals(JSON.stringify(paths), options || undefined);
         }
         break;
     }

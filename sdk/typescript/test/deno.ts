@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
 import { ServerSentEventGenerator } from "../src/web/serverSentEventGenerator.ts";
-import type { Jsonifiable } from "npm:type-fest";
+import type { Jsonifiable } from "../src/types.ts";
 
 // This server is used for testing the web standard based sdk
 serve(async (req: Request) => {
@@ -27,7 +27,7 @@ serve(async (req: Request) => {
     }
 
     return ServerSentEventGenerator.stream((stream) => {
-      stream.mergeFragments(
+      stream.PatchElements(
         `<div id="toMerge">Hello ${reader.signals.foo}</div>`,
       );
     });
@@ -43,9 +43,9 @@ serve(async (req: Request) => {
     }
   } else if (url.pathname.includes("await")) {
     return ServerSentEventGenerator.stream(async (stream) => {
-      stream.mergeFragments('<div id="toMerge">Merged</div>');
+      stream.PatchElements('<div id="toMerge">Merged</div>');
       await delay(5000);
-      stream.mergeFragments('<div id="toMerge">After 5 seconds</div>');
+      stream.PatchElements('<div id="toMerge">After 5 seconds</div>');
     });
   }
 
@@ -79,20 +79,20 @@ function testEvents(
       case "mergeFragments":
         if (e !== null && typeof e === "object" && "fragments" in e) {
           const { fragments, ...options } = e;
-          stream.mergeFragments(fragments as string, options || undefined);
+          stream.PatchElements(fragments as string, options || undefined);
         }
         break;
       case "removeFragments":
         if (e !== null && typeof e === "object" && "selector" in e) {
           const { selector, ...options } = e;
-          stream.removeFragments(selector as string, options || undefined);
+          stream.PatchElements(selector as string, options || undefined);
         }
         break;
       case "mergeSignals":
         if (e !== null && typeof e === "object" && "signals" in e) {
           const { signals, ...options } = e;
-          stream.mergeSignals(
-            signals as Record<string, Jsonifiable>,
+          stream.PatchSignals(
+            JSON.stringify(signals),
             options || undefined,
           );
         }
@@ -100,13 +100,7 @@ function testEvents(
       case "removeSignals":
         if (e !== null && typeof e === "object" && "paths" in e) {
           const { paths, ...options } = e;
-          stream.removeSignals(paths as string[], options || undefined);
-        }
-        break;
-      case "executeScript":
-        if (e !== null && typeof e === "object" && "script" in e) {
-          const { script, ...options } = e;
-          stream.executeScript(script as string, options || undefined);
+          stream.PatchSignals(JSON.stringify(paths), options || undefined);
         }
         break;
     }
