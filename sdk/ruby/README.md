@@ -115,25 +115,27 @@ Sugar on top of `#patch_elements`
 sse.remove_elements('#users')
 ```
 
-#### `merge_signals`
- See https://data-star.dev/reference/sse_events#datastar-merge-signals
+#### `patch_signals`
+ See https://data-star.dev/reference/sse_events#datastar-patch-signals
 
 ```ruby
-sse.merge_signals(count: 4, user: { name: 'John' })
+sse.patch_signals(count: 4, user: { name: 'John' })
 ```
 
 #### `remove_signals`
- See https://data-star.dev/reference/sse_events#datastar-remove-signals
+
+Sugar on top of `#patch_signals`
 
 ```ruby
 sse.remove_signals(['user.name', 'user.email'])
 ```
 
 #### `execute_script`
-See https://data-star.dev/reference/sse_events#datastar-execute-script
+
+Sugar on top of `#patch_elements`. Appends a temporary `<script>` tag to the DOM, which will execute the script in the browser.
 
 ```ruby
-sse.execute_scriprt(%(alert('Hello World!'))
+sse.execute_script(%(alert('Hello World!'))
 ```
 
 #### `signals`
