@@ -40,8 +40,9 @@ class ServerSentEventGenerator
     public static function readSignals(): array
     {
         $input = $_GET[Consts::DATASTAR_KEY] ?? file_get_contents('php://input');
-
-        return $input ? json_decode($input, true) : [];
+        $signals = $input ? json_decode($input, true) : [];
+        
+        return is_array($signals) ? $signals : [];
     }
 
     /**
@@ -105,7 +106,7 @@ class ServerSentEventGenerator
 
         $autoRemove = $options['autoRemove'] ?? false;
         if ($autoRemove === true) {
-             $elements .= ' data-on-load="el.remove()"';
+             $elements .= ' onload="this.remove()"';
         }
 
         $elements .= '>' . $script . '</script>';
