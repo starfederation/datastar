@@ -41,7 +41,7 @@ class ServerSentEventGenerator
     {
         $input = $_GET[Consts::DATASTAR_KEY] ?? file_get_contents('php://input');
         $signals = $input ? json_decode($input, true) : [];
-        
+
         return is_array($signals) ? $signals : [];
     }
 
@@ -111,10 +111,10 @@ class ServerSentEventGenerator
 
         $elements .= '>' . $script . '</script>';
 
-        $options['selector'] = 'body';
-        $options['mode'] = ElementPatchMode::Append;
-
-        return $this->patchElements($elements, $options);
+        return $this->patchElements($elements, [
+            'selector' => 'body',
+            'mode' => ElementPatchMode::Append,
+        ]);
     }
 
     /**
