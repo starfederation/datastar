@@ -142,6 +142,14 @@ RSpec.describe Datastar::Dispatcher do
       expect(socket.open).to be(false)
       expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: mode remove\ndata: selector #list-item-1\n\n\n)])
     end
+
+    it 'takes an array of selectors' do
+      dispatcher.remove_elements(%w[#item1 #item2])
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: mode remove\ndata: selector #item1, #item2\n\n\n)])
+    end
   end
 
   describe '#merge_signals' do

@@ -127,6 +127,12 @@ module Datastar
             default_value = ATTRIBUTE_DEFAULTS[kk.to_s]
             buffer << "data: #{k} #{kk} #{vv}\n" unless vv == default_value
           end
+        elsif v.is_a?(Array)
+          if k == Consts::SELECTOR_DATALINE_LITERAL
+            buffer << "data: #{k} #{v.join(', ')}\n"
+          else
+            buffer << "data: #{k} #{v.join(' ')}\n"
+          end
         else
           default_value = OPTION_DEFAULTS[k]
           buffer << "data: #{k} #{v}\n" unless v == default_value
