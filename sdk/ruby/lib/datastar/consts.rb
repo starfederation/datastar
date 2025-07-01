@@ -9,19 +9,49 @@ module Datastar
     # The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     DEFAULT_SSE_RETRY_DURATION = 1000
 
+<<<<<<< HEAD
     # Should elements be patched using the ViewTransition API?
     DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS = false
 
     # Should a given set of signals patch if they are missing?
     DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING = false
 
+    # The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.}
+    DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = 'type module'
+
+    module ElementPatchMode
+
+      # Morphs the fragment into the existing element using idiomorph.
+      MORPH = 'morph'
+
+      # Replaces the inner HTML of the existing element.
+      INNER = 'inner'
+
+      # Replaces the outer HTML of the existing element.
+      OUTER = 'outer'
+
+      # Prepends the fragment to the existing element.
+      PREPEND = 'prepend'
+
+      # Appends the fragment to the existing element.
+      APPEND = 'append'
+
+      # Inserts the fragment before the existing element.
+      BEFORE = 'before'
+
+      # Inserts the fragment after the existing element.
+      AFTER = 'after'
+
+      # Upserts the attributes of the existing element.
+      UPSERT_ATTRIBUTES = 'upsertAttributes'
+    end
 
     # The mode in which an element is patched into the DOM.
-    DEFAULT_ELEMENT_PATCH_MODE = ElementPatchMode::OUTER
+    DEFAULT_ELEMENT_PATCH_MODE = ElementPatchMode::MORPH
 
     # Dataline literals.
     SELECTOR_DATALINE_LITERAL = 'selector'
-    MODE_DATALINE_LITERAL = 'mode'
+    PATCH_MODE_DATALINE_LITERAL = 'mode'
     ELEMENTS_DATALINE_LITERAL = 'elements'
     USE_VIEW_TRANSITION_DATALINE_LITERAL = 'useViewTransition'
     SIGNALS_DATALINE_LITERAL = 'signals'

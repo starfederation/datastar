@@ -16,8 +16,8 @@ module Datastar
     OPTION_DEFAULTS = {
       'retry' => Consts::DEFAULT_SSE_RETRY_DURATION,
       Consts::AUTO_REMOVE_DATALINE_LITERAL => Consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE,
-      Consts::MERGE_MODE_DATALINE_LITERAL => Consts::DEFAULT_FRAGMENT_MERGE_MODE,
-      Consts::USE_VIEW_TRANSITION_DATALINE_LITERAL => Consts::DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS,
+      Consts::PATCH_MODE_DATALINE_LITERAL => Consts::DEFAULT_ELEMENT_PATCH_MODE,
+      Consts::USE_VIEW_TRANSITION_DATALINE_LITERAL => Consts::DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS,
       Consts::ONLY_IF_MISSING_DATALINE_LITERAL => Consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING,
     }.freeze
 
@@ -80,7 +80,7 @@ module Datastar
 
       buffer = +"event: datastar-patch-elements\n"
       build_options(options, buffer)
-      element_lines.each { |line| buffer << "data: elements #{line}\n" }
+      element_lines.each { |line| buffer << "data: #{Consts::ELEMENTS_DATALINE_LITERAL} #{line}\n" }
 
       write(buffer)
     end
