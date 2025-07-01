@@ -10,6 +10,7 @@ gem 'rake', '~> 13.0'
 gem 'rspec', '~> 3.0'
 
 gem 'debug'
+gem 'logger'
 
 group :test do
   # Async to test Datastar::AsyncExecutor

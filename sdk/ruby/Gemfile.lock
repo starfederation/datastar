@@ -33,6 +33,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.9.1)
+    logger (1.7.0)
     metrics (0.12.1)
     nio4r (2.7.4)
     pp (0.6.2)
@@ -73,6 +74,7 @@ DEPENDENCIES
   async
   datastar!
   debug
+  logger
   puma
   rake (~> 13.0)
   rspec (~> 3.0)
