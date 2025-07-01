@@ -2,23 +2,20 @@ import {
   DatastarEventOptions,
   DefaultMapping,
   EventType,
-  ElementOptions,
   PatchElementsOptions,
   PatchSignalsOptions,
   Jsonifiable,
   ElementPatchMode,
-} from "./types";
+} from "./types.ts";
 
 import {
   DatastarDatalineElements,
   DatastarDatalinePatchMode,
   DatastarDatalineSelector,
   DatastarDatalineSignals,
-  DatastarDatalineOnlyIfMissing,
-  DatastarDatalineUseViewTransition,
   DefaultSseRetryDurationMs,
   ElementPatchModes,
-} from "./consts";
+} from "./consts.ts";
 
 /**
  * Abstract ServerSentEventGenerator class, responsible for initializing and handling
@@ -121,7 +118,7 @@ export abstract class ServerSentEventGenerator {
 
   private hasDefaultValue(key: string, val: unknown): boolean {
     if (key in DefaultMapping) {
-      return val === DefaultMapping[key as keyof typeof DefaultMapping];
+      return val === (DefaultMapping as Record<string, unknown>)[key];
     }
 
     return false;
@@ -145,14 +142,15 @@ export abstract class ServerSentEventGenerator {
       {} as Partial<PatchElementsOptions>;
 
     // Validate patch mode if provided
-    if (renderOptions[DatastarDatalinePatchMode]) {
-      this.validateElementPatchMode(renderOptions[DatastarDatalinePatchMode]);
+    const patchMode = (renderOptions as Record<string, unknown>)[DatastarDatalinePatchMode] as string;
+    if (patchMode) {
+      this.validateElementPatchMode(patchMode);
     }
 
     // Per spec: If no selector specified, elements must have IDs (this validation would be complex
     // and is better handled client-side, but we ensure elements is not empty)
-    const selector = renderOptions[DatastarDatalineSelector];
-    if (!selector && renderOptions[DatastarDatalinePatchMode] === 'remove') {
+    const selector = (renderOptions as Record<string, unknown>)[DatastarDatalineSelector] as string;
+    if (!selector && patchMode === 'remove') {
       // For remove mode, elements parameter may be omitted when selector is supplied
       // but since we have no selector, we need elements with IDs
       if (!elements || elements.trim() === '') {

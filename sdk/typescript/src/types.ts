@@ -10,7 +10,7 @@ import {
   DefaultPatchSignalsOnlyIfMissing,
   EventTypes,
   ElementPatchModes,
-} from "./consts";
+} from "./consts.ts";
 
 // Simple Jsonifiable type definition to replace npm:type-fest dependency
 export type Jsonifiable = 
@@ -28,7 +28,7 @@ export type EventType = typeof EventTypes[number];
 export type StreamOptions = Partial<{
   onError: (error: unknown) => Promise<void> | void;
   onAbort: (reason?: string) => Promise<void> | void;
-  responseInit: ResponseInit;
+  responseInit: Record<string, unknown>;
   keepalive: boolean;
 }>
 
