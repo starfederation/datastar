@@ -104,15 +104,15 @@ String enum of supported events:
 
 ```go
 ServerSentEventGenerator.PatchElements(
-    elements: string,
-    options?: {
-        selector?: string,
-        mode?: ElementPatchMode,
-        useViewTransition?: boolean,
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-     }
- )
+  elements: string,
+  options?: {
+    selector?: string,
+    mode?: ElementPatchMode,
+    useViewTransition?: boolean,
+    eventId?: string,
+    retryDuration?: durationInMilliseconds
+  }
+)
 ```
 
 #### Example Output
@@ -246,13 +246,13 @@ String enum defining how elements are patched into the DOM.
 
 ```go
 ServerSentEventGenerator.PatchSignals(
-    signals: string,
-    options ?: {
-        onlyIfMissing?: boolean,
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-     }
- )
+  signals: string,
+  options ?: {
+    onlyIfMissing?: boolean,
+    eventId?: string,
+    retryDuration?: durationInMilliseconds
+  }
+)
 ```
 
 #### Example Output
@@ -335,6 +335,68 @@ ServerSentEventGenerator.PatchSignals(
 **Data format**:
 - `onlyIfMissing true\n` (only if `true`)
 - `signals JSON_LINE\n` (for each line of JSON)
+
+---
+
+### `ServerSentEventGenerator.ExecuteScript`
+
+```go
+ServerSentEventGenerator.ExecuteScript(
+  script: string,
+  options?: {
+    autoRemove?: boolean,
+    attributes?: []string,
+    eventId?: string,
+    retryDuration?: durationInMilliseconds
+  }
+)
+```
+
+#### Example Output
+
+<details>
+  <summary>Minimal Example</summary>
+
+  ```
+  event: datastar-patch-elements
+  data: mode append
+  data: selector body
+  data: elements <script>console.log('Here')</script>
+  ```
+</details>
+
+<details>
+  <summary>Full Example (all options)</summary>
+
+  ```
+  event: datastar-patch-elements
+  id: 123
+  retry: 2000
+  data: mode append
+  data: selector body
+  data: elements <script type="application/javascript" data-effect="el.remove()">console.log('Here')</script>
+  ```
+</details>
+
+### Parameters
+
+- **script**: One or more lines of JavaScript.
+
+### Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `autoRemove` | boolean | `true` | Removes the script tag after executing |
+| `attributes` | []string | - | Attributes to add to the script tag |
+
+### Implementation
+
+***Must*** call `ServerSentEventGenerator.send` with event type `datastar-patch-elements`, sending a `script` tag containing the JavaScript to execute. If `autoRemove` is `true`, `data-on-load="el.remove()"` must be added to the `script` tag. If `attributes` exist, they must be added to the `script` tag.
+
+**Data format** (only include non-defaults):
+- `selector body\n`
+- `mode append\n`
+- `elements SCRIPT_TAG\n`
 
 ---
 
