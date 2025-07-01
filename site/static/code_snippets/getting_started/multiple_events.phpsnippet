@@ -1,4 +1,0 @@
-$sse->mergeFragments('<div id="question">...</div>');
-$sse->mergeFragments('<div id="instructions">...</div>');
-$sse->mergeSignals(['answer' => '...']);
-$sse->mergeSignals(['prize' => '...']);
