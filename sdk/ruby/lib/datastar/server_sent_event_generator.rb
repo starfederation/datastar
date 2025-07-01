@@ -15,10 +15,9 @@ module Datastar
 
     OPTION_DEFAULTS = {
       'retry' => Consts::DEFAULT_SSE_RETRY_DURATION,
-      Consts::AUTO_REMOVE_DATALINE_LITERAL => Consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE,
       Consts::PATCH_MODE_DATALINE_LITERAL => Consts::DEFAULT_ELEMENT_PATCH_MODE,
       Consts::USE_VIEW_TRANSITION_DATALINE_LITERAL => Consts::DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS,
-      Consts::ONLY_IF_MISSING_DATALINE_LITERAL => Consts::DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING,
+      Consts::ONLY_IF_MISSING_DATALINE_LITERAL => Consts::DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING,
     }.freeze
 
     # ATTRIBUTE_DEFAULTS = {
@@ -93,7 +92,7 @@ module Datastar
 
     def execute_script(script, options = BLANK_OPTIONS)
       options = options.dup
-      auto_remove = options.key?(:auto_remove) ? options.delete(:auto_remove) : Consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE
+      auto_remove = options.key?(:auto_remove) ? options.delete(:auto_remove) : true
       attributes = options.delete(:attributes) || BLANK_OPTIONS
       script_tag = +"<script"
       attributes.each do |k, v|
