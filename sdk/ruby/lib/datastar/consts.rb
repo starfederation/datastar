@@ -20,15 +20,14 @@ module Datastar
     DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = 'type module'
 
     module ElementPatchMode
-
-      # Morphs the fragment into the existing element using idiomorph.
-      MORPH = 'morph'
+      # Replaces the outer HTML of the existing element.
+      OUTER = 'outer'
 
       # Replaces the inner HTML of the existing element.
       INNER = 'inner'
 
-      # Replaces the outer HTML of the existing element.
-      OUTER = 'outer'
+      # Replace entire element, reset state
+      REPLACE = 'replace'
 
       # Prepends the fragment to the existing element.
       PREPEND = 'prepend'
@@ -44,13 +43,10 @@ module Datastar
 
       # Removes the element
       REMOVE = 'remove'
-
-      # Upserts the attributes of the existing element.
-      UPSERT_ATTRIBUTES = 'upsertAttributes'
     end
 
     # The mode in which an element is patched into the DOM.
-    DEFAULT_ELEMENT_PATCH_MODE = ElementPatchMode::MORPH
+    DEFAULT_ELEMENT_PATCH_MODE = ElementPatchMode::OUTER
 
     # Dataline literals.
     SELECTOR_DATALINE_LITERAL = 'selector'
