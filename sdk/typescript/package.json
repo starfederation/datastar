@@ -1,6 +1,6 @@
 {
   "name": "@starfederation/datastar-sdk",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-RC.12",
   "description": "TypeScript SDK for Datastar",
   "scripts": {
     "check": "deno lint && deno check src/node/node.ts && deno check src/web/deno.ts && bun run --check src/web/bun.ts",
