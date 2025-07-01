@@ -1,4 +1,3 @@
-import { VERSION } from "../src/consts.ts";
 import { createServer } from "node:http";
 import { ServerSentEventGenerator } from "../src/node/serverSentEventGenerator.ts";
 import type { Jsonifiable } from "npm:type-fest";
@@ -11,7 +10,7 @@ const server = createServer(async (req, res) => {
   if (req.url === "/") {
     res.setHeader("Content-Type", "text/html");
     res.end(
-      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v${VERSION}/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
+      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@release-candidate/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
     );
   } else if (req.url?.includes("/merge")) {
     const reader = await ServerSentEventGenerator.readSignals(req);
