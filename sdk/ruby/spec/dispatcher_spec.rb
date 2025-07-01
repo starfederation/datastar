@@ -191,12 +191,12 @@ RSpec.describe Datastar::Dispatcher do
   end
 
   describe '#remove_signals' do
-    it 'produces a streameable response body with D* remove-signals' do
+    it 'sets signal values to null via #patch_signals' do
       dispatcher.remove_signals ['user.name', 'user.email']
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-remove-signals\ndata: paths user.name\ndata: paths user.email\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals {"user":{"name":null,"email":null}}\n\n\n)])
     end
 
     it 'takes D* options' do
@@ -204,7 +204,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-remove-signals\nid: 72\nretry: 2000\ndata: paths user.name\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\nid: 72\nretry: 2000\ndata: signals {"user":{"name":null}}\n\n\n)])
     end
   end
 

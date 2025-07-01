@@ -19,6 +19,8 @@ module Datastar
     # The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.}
     DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = 'type module'
 
+    SIGNAL_SEPARATOR = '.'
+
     module ElementPatchMode
       # Replaces the outer HTML of the existing element.
       OUTER = 'outer'

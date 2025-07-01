@@ -83,11 +83,12 @@ module Datastar
 
     def remove_signals(paths, options = BLANK_OPTIONS)
       paths = [paths].flatten
+      signals = paths.each.with_object({}) do |path, acc|
+        parts = path.split(Consts::SIGNAL_SEPARATOR)
+        set_nested_value(acc, parts, nil)
+      end
 
-      buffer = +"event: datastar-remove-signals\n"
-      build_options(options, buffer)
-      paths.each { |path| buffer << "data: paths #{path}\n" }
-      write(buffer)
+      patch_signals(signals, options)
     end
 
     def execute_script(script, options = BLANK_OPTIONS)
@@ -158,6 +159,16 @@ module Datastar
 
     def camelize(str)
       str.to_s.split('_').map.with_index { |word, i| i == 0 ? word : word.capitalize }.join
+    end
+
+    def set_nested_value(hash, path, value)
+      # Navigate to the parent hash using all but the last segment
+      parent = path[0...-1].reduce(hash) do |current_hash, key|
+        current_hash[key] ||= {}
+      end
+
+      # Set the final key to the value
+      parent[path.last] = value
     end
   end
 end
