@@ -120,7 +120,7 @@ class ServerSentEventGenerator:
     def execute_script(
         cls,
         script: str,
-        auto_remove: bool = False,
+        auto_remove: bool = True,
         attributes: list[str] | None = None,
         event_id: str | None = None,
         retry_duration: int | None = None,
