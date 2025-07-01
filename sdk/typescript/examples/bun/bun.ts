@@ -31,7 +31,7 @@ const server = Bun.serve({
       }
 
       return ServerSentEventGenerator.stream((stream) => {
-        stream.mergeFragments(
+        stream.PatchElements(
           `<div id="toMerge">Hello ${reader.signals.foo}</div>`,
         );
       });

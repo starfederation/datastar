@@ -28,7 +28,7 @@ const server = createServer(async (req, res) => {
     }
 
     ServerSentEventGenerator.stream(req, res, (stream) => {
-      stream.mergeFragments(
+      stream.PatchElements(
         `<div id="toMerge">Hello ${reader.signals.foo}</div>`,
       );
     });
