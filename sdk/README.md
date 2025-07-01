@@ -14,7 +14,7 @@ Provide a language-agnostic SDK with these principles:
 ### Naming Rationale
 
 **Why "Patch" instead of "Merge":**
-The prefix "Patch" was chosen to better reflect the non-idempotent nature of these operations. Unlike PUT requests that replace entire resources, PATCH requests apply partial modifications. This aligns with our SDK's behavior where operations modify specific parts of the DOM or signal state rather than replacing them entirely.
+The prefix "Patch" was chosen to better reflect the non-idempotent nature of these operations. Unlike PUT requests that replace entire resources, PATCH requests apply partial modifications. This aligns with our SDKs behavior where operations modify specific parts of the DOM or signal state rather than replacing them entirely.
 
 **Why "Elements" instead of "Fragments":**
 We use "Elements" because it accurately describes what the SDK handles - complete HTML elements, not arbitrary DOM nodes like text nodes or document fragments. This naming matches the actual intent and constraints of the system, making the API clearer and more predictable for developers.
@@ -54,7 +54,7 @@ The core mechanics of Datastar’s SSE support is
 
 ### `ServerSentEventGenerator.send`
 
-```typescript
+```
 ServerSentEventGenerator.send(
     eventType: EventType,
     dataLines: string[],
@@ -102,7 +102,7 @@ String enum of supported events:
 
 ### `ServerSentEventGenerator.PatchElements`
 
-```typescript
+```go
 ServerSentEventGenerator.PatchElements(
     elements: string,
     options?: {
@@ -189,7 +189,7 @@ ServerSentEventGenerator.PatchElements(
 
 > [!TIP]
 > - To remove elements, use the `remove` patch mode
-> - To execute JavaScript, send a `&lt;script&gt;` element - it will auto-execute when added to the DOM
+> - To execute JavaScript, send a `<script>` element – it will auto-execute when added to the DOM
 
 ### Elements vs Fragments: Key Distinction
 
@@ -226,7 +226,7 @@ String enum defining how elements are patched into the DOM.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `selector` | string | Element's `id` | CSS selector for target element. If a selector is not specified, each element must have an id specified. |
+| `selector` | string | Element ID | CSS selector for target element. If a selector is not specified, each element must have an ID specified. |
 | `mode` | ElementPatchMode | `outer` | How to patch the element |
 | `useViewTransition` | boolean | `false` | Enable view transitions API |
 
@@ -244,7 +244,7 @@ String enum defining how elements are patched into the DOM.
 
 ### `ServerSentEventGenerator.PatchSignals`
 
-```typescript
+```go
 ServerSentEventGenerator.PatchSignals(
     signals: string,
     options ?: {
@@ -326,7 +326,7 @@ ServerSentEventGenerator.PatchSignals(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `onlyIfMissing` | boolean | `false` | Only patch if signal doesn't exist |
+| `onlyIfMissing` | boolean | `false` | Patches only signals that don’t already exist |
 
 ### Implementation
 

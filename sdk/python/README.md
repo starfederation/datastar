@@ -27,6 +27,7 @@ it in your route handler:
 ```python
 from datastar_py import ServerSentEventGenerator as SSE
 
+
 # ... various app setup.
 # The example below is for the Quart framework, and is only using the event generation helpers.
 
@@ -34,11 +35,11 @@ from datastar_py import ServerSentEventGenerator as SSE
 async def updates():
     async def time_updates():
         while True:
-            yield SSE.merge_fragments(
+            yield SSE.patch_elements(
                 [f"""<span id="currentTime">{datetime.now().isoformat()}"""]
             )
             await asyncio.sleep(1)
-            yield SSE.merge_signals({"currentTime": f"{datetime.now().isoformat()}"})
+            yield SSE.patch_signals({"currentTime": f"{datetime.now().isoformat()}"})
             await asyncio.sleep(1)
 
     response = await make_response(time_updates(), SSE_HEADERS)
@@ -56,29 +57,32 @@ response class is imported from the appropriate framework package.
 e.g. `from datastar_py.quart import DatastarResponse` The containing functions
 are not shown here, as they will differ per framework.
 
-
 ```python
 # 0 events, a 204
 return DatastarResponse()
 # 1 event
-return DatastarResponse(ServerSentEventGenerator.merge_fragments("<div id='mydiv'></div>"))
+return DatastarResponse(ServerSentEventGenerator.patch_elements("<div id='mydiv'></div>"))
 # 2 events
 return DatastarResponse([
-    ServerSentEventGenerator.merge_fragments("<div id='mydiv'></div>"),
-    ServerSentEventGenerator.merge_signals({"mysignal": "myval"}),
+    ServerSentEventGenerator.patch_elements("<div id='mydiv'></div>"),
+    ServerSentEventGenerator.patch_signals({"mysignal": "myval"}),
 ])
+
+
 # N events, a long lived stream (for all frameworks but sanic)
 async def updates():
     while True:
-        yield ServerSentEventGenerator.merge_fragments("<div id='mydiv'></div>")
+        yield ServerSentEventGenerator.patch_elements("<div id='mydiv'></div>")
         await asyncio.sleep(1)
+
+
 return DatastarResponse(updates())
 # A long lived stream for sanic
 response = await datastar_respond(request)
 # which is just a helper for the following
 # response = await request.respond(DatastarResponse())
 while True:
-    await response.send(ServerSentEventGenerator.merge_fragments("<div id='mydiv'></div>"))
+    await response.send(ServerSentEventGenerator.patch_elements("<div id='mydiv'></div>"))
     await asyncio.sleep(1)
 ```
 

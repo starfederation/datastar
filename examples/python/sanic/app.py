@@ -10,7 +10,7 @@
 import asyncio
 from datetime import datetime
 
-from datastar_py.consts import FragmentMergeMode
+from datastar_py.consts import ElementPatchMode
 from datastar_py.sanic import (
     DatastarResponse,
     ServerSentEventGenerator,
@@ -46,10 +46,10 @@ HTML = """\
         class="container"
             data-on-load="@get('/updates')"
         >
-            <button data-on-click="@get('/add_fragment')">Add fragment timer</button>
+            <button data-on-click="@get('/add_element')">Add element timer</button>
             <button data-on-click="@get('/add_signal')">Add signal timer</button>
-            <div class="time fragment">
-            Current time from fragment: CURRENT_TIME
+            <div class="time element">
+            Current time from element: CURRENT_TIME
             </div>
             <div class="time signal" >
             Current time from signal: <span data-text="$currentTime">CURRENT_TIME</span>
@@ -68,29 +68,29 @@ async def hello_world(request):
 @app.get("/add_signal")
 async def add_signal(request):
     return DatastarResponse(
-        ServerSentEventGenerator.merge_fragments(
+        ServerSentEventGenerator.patch_elements(
             """
             <div class="time signal">
             Current time from signal: <span data-text="$currentTime">CURRENT_TIME</span>
             </div>
             """,
             selector="#timers",
-            merge_mode=FragmentMergeMode.APPEND,
+            mode=ElementPatchMode.APPEND,
         )
     )
 
 
-@app.get("/add_fragment")
-async def add_fragment(request):
+@app.get("/add_element")
+async def add_element(request):
     return DatastarResponse(
-        ServerSentEventGenerator.merge_fragments(
+        ServerSentEventGenerator.patch_elements(
             f"""\
-            <div class="time fragment">
-            Current time from fragment: {datetime.now().isoformat()}
+            <div class="time element">
+            Current time from element: {datetime.now().isoformat()}
             </div>
             """,
             selector="#timers",
-            merge_mode=FragmentMergeMode.APPEND,
+            mode=ElementPatchMode.APPEND,
         )
     )
 
@@ -105,18 +105,18 @@ async def updates(request):
 
     while True:
         await response.send(
-            ServerSentEventGenerator.merge_fragments(
+            ServerSentEventGenerator.patch_elements(
                 f"""
-                <div class="time fragment" >
-                Current time from fragment: {datetime.now().isoformat()}
+                <div class="time element" >
+                Current time from element: {datetime.now().isoformat()}
                 </div>
                 """,
-                selector=".fragment",
+                selector=".element",
             )
         )
         await asyncio.sleep(1)
         await response.send(
-            ServerSentEventGenerator.merge_signals(
+            ServerSentEventGenerator.patch_signals(
                 {"currentTime": f"{datetime.now().isoformat()}"}
             )
         )
