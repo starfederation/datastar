@@ -15,43 +15,13 @@ module Datastar
     # Should a given set of signals patch if they are missing?
     DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING = false
 
-    # The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.}
-    DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = 'type module'
-
-    SIGNAL_SEPARATOR = '.'
-
-    module ElementPatchMode
-      # Replaces the outer HTML of the existing element.
-      OUTER = 'outer'
-
-      # Replaces the inner HTML of the existing element.
-      INNER = 'inner'
-
-      # Replace entire element, reset state
-      REPLACE = 'replace'
-
-      # Prepends the fragment to the existing element.
-      PREPEND = 'prepend'
-
-      # Appends the fragment to the existing element.
-      APPEND = 'append'
-
-      # Inserts the fragment before the existing element.
-      BEFORE = 'before'
-
-      # Inserts the fragment after the existing element.
-      AFTER = 'after'
-
-      # Removes the element
-      REMOVE = 'remove'
-    end
 
     # The mode in which an element is patched into the DOM.
     DEFAULT_ELEMENT_PATCH_MODE = ElementPatchMode::OUTER
 
     # Dataline literals.
     SELECTOR_DATALINE_LITERAL = 'selector'
-    PATCH_MODE_DATALINE_LITERAL = 'mode'
+    MODE_DATALINE_LITERAL = 'mode'
     ELEMENTS_DATALINE_LITERAL = 'elements'
     USE_VIEW_TRANSITION_DATALINE_LITERAL = 'useViewTransition'
     SIGNALS_DATALINE_LITERAL = 'signals'

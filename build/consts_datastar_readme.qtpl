@@ -1,8 +1,9 @@
+{% import "strings" %}
 {% import "github.com/dustin/go-humanize" %}
 
 {%- func datastarREADME(data *ConstTemplateData) -%}
 <!-- {%s data.DoNotEdit %} -->
-[![Version](https://img.shields.io/github/package-json/v/starfederation/datastar?filename=library/package.json)](https://github.com/starfederation/datastar/releases)
+[![Version](https://img.shields.io/badge/version-{%s strings.ReplaceAll(data.Version, "-", "–") %}-orange)](https://github.com/starfederation/datastar/releases)
 [![License](https://img.shields.io/github/license/starfederation/datastar)](https://github.com/starfederation/datastar/blob/main/LICENSE)
 [![Stars](https://img.shields.io/github/stars/starfederation/datastar?style=flat)](https://github.com/starfederation/datastar/stargazers)
 
