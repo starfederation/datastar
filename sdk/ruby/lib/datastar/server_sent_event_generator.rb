@@ -98,7 +98,7 @@ module Datastar
       attributes.each do |k, v|
         script_tag << %( #{camelize(k)}="#{v}")
       end
-      script_tag << %( onload="this.remove()") if auto_remove
+      script_tag << %( data-effect="el.remove()") if auto_remove
       script_tag << ">#{script}</script>"
 
       options[Consts::SELECTOR_DATALINE_LITERAL] = 'body'
