@@ -31,4 +31,5 @@ class Consts
     public const USE_VIEW_TRANSITION_DATALINE_LITERAL = 'useViewTransition ';
     public const SIGNALS_DATALINE_LITERAL = 'signals ';
     public const ONLY_IF_MISSING_DATALINE_LITERAL = 'onlyIfMissing ';
+    public const PATHS_DATALINE_LITERAL = 'paths ';
 }

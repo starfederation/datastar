@@ -29,6 +29,7 @@
 (def use-view-transition-dataline-literal "useViewTransition ")
 (def signals-dataline-literal "signals ")
 (def only-if-missing-dataline-literal "onlyIfMissing ")
+(def paths-dataline-literal "paths ")
 
 
 ;; -----------------------------------------------------------------------------
@@ -50,19 +51,23 @@
 ;; ElementPatchMode
 
 (def element-patch-mode-outer
-  "Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes."
+  "Morphs the element into the existing element."
   "outer")
 
 (def element-patch-mode-inner
-  "Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes."
+  "Replaces the inner HTML of the existing element."
   "inner")
 
 (def element-patch-mode-remove
-  "Removes the existing element from the DOM."
+  "Removes the existing element."
   "remove")
 
+(def element-patch-mode-replace
+  "Replaces the existing element with the new element."
+  "replace")
+
 (def element-patch-mode-prepend
-  "Prepends the element inside the existing element."
+  "Prepends the element inside to the existing element."
   "prepend")
 
 (def element-patch-mode-append
@@ -77,14 +82,10 @@
   "Inserts the element after the existing element."
   "after")
 
-(def element-patch-mode-replace
-  "Do not morph, simply replace the whole element and reset any related state."
-  "replace")
-
 
 (def default-element-patch-mode
   "Default value for ElementPatchMode.
-  Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes."
+  Morphs the element into the existing element."
   element-patch-mode-outer)
 
 

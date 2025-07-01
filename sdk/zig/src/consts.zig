@@ -27,6 +27,7 @@ pub const elements_dataline_literal = "elements";
 pub const use_view_transition_dataline_literal = "useViewTransition";
 pub const signals_dataline_literal = "signals";
 pub const only_if_missing_dataline_literal = "onlyIfMissing";
+pub const paths_dataline_literal = "paths";
 
 // #endregion
 
@@ -43,13 +44,15 @@ pub const default_patch_signals_only_if_missing = false;
 
 /// The mode in which an element is patched into the DOM.
 pub const ElementPatchMode = enum {
-    /// Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    /// Morphs the element into the existing element.
     outer,
-    /// Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    /// Replaces the inner HTML of the existing element.
     inner,
-    /// Removes the existing element from the DOM.
+    /// Removes the existing element.
     remove,
-    /// Prepends the element inside the existing element.
+    /// Replaces the existing element with the new element.
+    replace,
+    /// Prepends the element inside to the existing element.
     prepend,
     /// Appends the element inside the existing element.
     append,
@@ -57,8 +60,6 @@ pub const ElementPatchMode = enum {
     before,
     /// Inserts the element after the existing element.
     after,
-    /// Do not morph, simply replace the whole element and reset any related state.
-    replace,
 
     pub fn format(
         self: @This(),
@@ -74,11 +75,11 @@ pub const ElementPatchMode = enum {
                 .outer => "outer",
                 .inner => "inner",
                 .remove => "remove",
+                .replace => "replace",
                 .prepend => "prepend",
                 .append => "append",
                 .before => "before",
                 .after => "after",
-                .replace => "replace",
             },
         );
     }

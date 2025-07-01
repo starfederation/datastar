@@ -37,13 +37,15 @@ export const DefaultPatchSignalsOnlyIfMissing = false;
 
 // The mode in which an element is patched into the DOM.
 export const ElementPatchModes = {
-    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the existing element.
     Outer: "outer",
-    // Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    // Replaces the inner HTML of the existing element.
     Inner: "inner",
-    // Removes the existing element from the DOM.
+    // Removes the existing element.
     Remove: "remove",
-    // Prepends the element inside the existing element.
+    // Replaces the existing element with the new element.
+    Replace: "replace",
+    // Prepends the element inside to the existing element.
     Prepend: "prepend",
     // Appends the element inside the existing element.
     Append: "append",
@@ -51,8 +53,6 @@ export const ElementPatchModes = {
     Before: "before",
     // Inserts the element after the existing element.
     After: "after",
-    // Do not morph, simply replace the whole element and reset any related state.
-    Replace: "replace",
 } as const;
 
 // Default value for ElementPatchMode

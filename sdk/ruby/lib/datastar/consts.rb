@@ -26,5 +26,6 @@ module Datastar
     USE_VIEW_TRANSITION_DATALINE_LITERAL = 'useViewTransition'
     SIGNALS_DATALINE_LITERAL = 'signals'
     ONLY_IF_MISSING_DATALINE_LITERAL = 'onlyIfMissing'
+    PATHS_DATALINE_LITERAL = 'paths'
   end
 end

@@ -46,17 +46,17 @@ type Language struct {
 }
 
 type ConstTemplateData struct {
-	DoNotEdit                 string
-	SDKLanguages              []Language
-	Version                   string
-	VersionClientByteSize     int
-	VersionClientByteSizeGzip int
-	DatastarKey               string
-	DatalineLiterals          []toolbelt.CasedString
-	DefaultBools              []*DefaultBool
-	DefaultDurations          []*DefaultDuration
-	DefaultStrings            []*DefaultString
-	Enums                     []*EnumDefinition
+	DoNotEdit                   string
+	SDKLanguages                []Language
+	Version                     string
+	VersionClientByteSize       int
+	VersionClientByteSizeBrotli int
+	DatastarKey                 string
+	DatalineLiterals            []toolbelt.CasedString
+	DefaultBools                []*DefaultBool
+	DefaultDurations            []*DefaultDuration
+	DefaultStrings              []*DefaultString
+	Enums                       []*EnumDefinition
 }
 
 var Consts = &ConstTemplateData{
@@ -162,6 +162,9 @@ var Consts = &ConstTemplateData{
 		// PatchSignals
 		toolbelt.ToCasedString("signals"),
 		toolbelt.ToCasedString("onlyIfMissing"),
+
+		// RemoveSignals
+		toolbelt.ToCasedString("paths"),
 	},
 	Enums: []*EnumDefinition{
 		{
@@ -171,19 +174,23 @@ var Consts = &ConstTemplateData{
 			Values: []*EnumValueDefinition{
 				{
 					Value:       "outer",
-					Description: "Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.",
+					Description: "Morphs the element into the existing element.",
 				},
 				{
 					Value:       "inner",
-					Description: "Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.",
+					Description: "Replaces the inner HTML of the existing element.",
 				},
 				{
 					Value:       "remove",
-					Description: "Removes the existing element from the DOM.",
+					Description: "Removes the existing element.",
+				},
+				{
+					Value:       "replace",
+					Description: "Replaces the existing element with the new element.",
 				},
 				{
 					Value:       "prepend",
-					Description: "Prepends the element inside the existing element.",
+					Description: "Prepends the element inside to the existing element.",
 				},
 				{
 					Value:       "append",
@@ -196,10 +203,6 @@ var Consts = &ConstTemplateData{
 				{
 					Value:       "after",
 					Description: "Inserts the element after the existing element.",
-				},
-				{
-					Value:       "replace",
-					Description: "Do not morph, simply replace the whole element and reset any related state.",
 				},
 			},
 		},
