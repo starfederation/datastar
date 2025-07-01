@@ -90,7 +90,7 @@ func (sse *ServerSentEventGenerator) ExecuteScript(scriptContents string, opts .
 
 	// Add data-datastar-autoremove attribute if needed
 	if options.AutoRemove == nil || *options.AutoRemove {
-		sb.WriteString(` data-on-load="el.remove()"`)
+		sb.WriteString(` data-effect="el.remove()"`)
 	}
 
 	sb.WriteString(">")

@@ -106,7 +106,7 @@ class ServerSentEventGenerator
 
         $autoRemove = $options['autoRemove'] ?? true;
         if ($autoRemove === true) {
-             $elements .= ' data-on-load="el.remove()"';
+             $elements .= ' data-effect="el.remove()"';
         }
 
         $elements .= '>' . $script . '</script>';
