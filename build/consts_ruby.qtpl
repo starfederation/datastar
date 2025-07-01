@@ -19,16 +19,17 @@ module Datastar
     DEFAULT_{%s s.Name.ScreamingSnake %} = '{%s s.Value %}'
     {%- endfor -%}
 
+    module ElementPatchMode
     {%- for _, enum := range data.Enums -%}
-        {%- if enum.Name.Pascal == "FragmentMergeMode" -%}
-    module FragmentMergeMode
-            {%- for _, entry := range enum.Values %}
+      {%- if enum.Name.Pascal == "ElementPatchMode" -%}
+        {%- for _, entry := range enum.Values %}
       # {%s entry.Description %}
-      {%s entry.Name.ScreamingSnake %} = '{%s entry.Value %}'
-            {%- endfor -%}
-    end
-        {%- endif -%}
+      {%s entry.Name.ScreamingSnake %} = '{%s entry.Value %}';
+        {%- endfor -%}
+      {%- endif -%}
     {%- endfor -%}
+    end
+
     {%- for _, enum := range data.Enums -%}
       {%- if enum.Default != nil %}
     # {%s= enum.Description %}

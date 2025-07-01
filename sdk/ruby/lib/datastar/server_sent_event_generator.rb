@@ -15,7 +15,7 @@ module Datastar
 
     OPTION_DEFAULTS = {
       'retry' => Consts::DEFAULT_SSE_RETRY_DURATION,
-      Consts::PATCH_MODE_DATALINE_LITERAL => Consts::DEFAULT_ELEMENT_PATCH_MODE,
+      Consts::MODE_DATALINE_LITERAL => Consts::DEFAULT_ELEMENT_PATCH_MODE,
       Consts::USE_VIEW_TRANSITION_DATALINE_LITERAL => Consts::DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS,
       Consts::ONLY_IF_MISSING_DATALINE_LITERAL => Consts::DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING,
     }.freeze
@@ -23,11 +23,11 @@ module Datastar
     # ATTRIBUTE_DEFAULTS = {
     #   'type' => 'module'
     # }.freeze
-    ATTRIBUTE_DEFAULTS = Consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES
-      .split("\n")
-      .map { |attr| attr.split(' ') }
-      .to_h
-      .freeze
+    ATTRIBUTE_DEFAULTS = {
+      'type' => 'module'
+    }.freeze
+
+    SIGNAL_SEPARATOR = '.'
 
     attr_reader :signals
 
@@ -65,7 +65,7 @@ module Datastar
       patch_elements(
         nil, 
         options.merge(
-          Consts::PATCH_MODE_DATALINE_LITERAL => Consts::ElementPatchMode::REMOVE,
+          Consts::MODE_DATALINE_LITERAL => Consts::ElementPatchMode::REMOVE,
           selector:
         )
       )
@@ -83,7 +83,7 @@ module Datastar
     def remove_signals(paths, options = BLANK_OPTIONS)
       paths = [paths].flatten
       signals = paths.each.with_object({}) do |path, acc|
-        parts = path.split(Consts::SIGNAL_SEPARATOR)
+        parts = path.split(SIGNAL_SEPARATOR)
         set_nested_value(acc, parts, nil)
       end
 
@@ -102,7 +102,7 @@ module Datastar
       script_tag << ">#{script}</script>"
 
       options[Consts::SELECTOR_DATALINE_LITERAL] = 'body'
-      options[Consts::PATCH_MODE_DATALINE_LITERAL] = Consts::ElementPatchMode::APPEND
+      options[Consts::MODE_DATALINE_LITERAL] = Consts::ElementPatchMode::APPEND
 
       patch_elements(script_tag, options)
     end
