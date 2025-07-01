@@ -2,7 +2,7 @@
 
 export const DATASTAR = "datastar" as const;
 export const DATASTAR_REQUEST = "Datastar-Request";
-export const VERSION = "1.0.0-beta.11";
+export const VERSION = "1.0.0-RC.12";
 
 // #region Defaults
 
@@ -10,14 +10,6 @@ export const VERSION = "1.0.0-beta.11";
 
 // The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
 export const DefaultSseRetryDurationMs = 1000;
-
-// #endregion
-
-
-// #region Default strings
-
-// The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
-export const DefaultExecuteScriptAttributes = "type module";
 
 // #endregion
 
@@ -30,9 +22,6 @@ export const DefaultElementsUseViewTransitions = false;
 // Should a given set of signals patch if they are missing?
 export const DefaultPatchSignalsOnlyIfMissing = false;
 
-// Should script element remove itself after execution?
-export const DefaultExecuteScriptAutoRemove = false;
-
 // #endregion
 
 // #region Datalines
@@ -44,9 +33,6 @@ export const DatastarDatalineUseViewTransition = "useViewTransition"
 export const DatastarDatalineSignals = "signals"
 export const DatastarDatalineOnlyIfMissing = "onlyIfMissing"
 export const DatastarDatalinePaths = "paths"
-export const DatastarDatalineScript = "script"
-export const DatastarDatalineAttributes = "attributes"
-export const DatastarDatalineAutoRemove = "autoRemove"
 // #endregion
 
 

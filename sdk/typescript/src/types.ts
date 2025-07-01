@@ -1,22 +1,16 @@
 import {
-  DatastarDatalineAttributes,
-  DatastarDatalineAutoRemove,
   DatastarDatalineElements,
   DatastarDatalinePatchMode,
   DatastarDatalineOnlyIfMissing,
-  DatastarDatalinePaths,
-  DatastarDatalineScript,
   DatastarDatalineSelector,
   DatastarDatalineSignals,
   DatastarDatalineUseViewTransition,
-  DefaultExecuteScriptAttributes,
-  DefaultExecuteScriptAutoRemove,
   DefaultElementPatchMode,
   DefaultElementsUseViewTransitions,
   DefaultPatchSignalsOnlyIfMissing,
   EventTypes,
   ElementPatchModes,
-} from "./consts.ts";
+} from "./consts";
 
 // Simple Jsonifiable type definition to replace npm:type-fest dependency
 export type Jsonifiable = 
@@ -68,44 +62,6 @@ export interface PatchSignalsEvent {
   [DatastarDatalineSignals]: Record<string, Jsonifiable>;
 }
 
-type ScriptAttributes = {
-  type?: "module" | "importmap" | "speculationrules" | "text/javascript";
-  refererpolicy:
-    | "no-referrer"
-    | "no-referrer-when-downgrade"
-    | "origin"
-    | "origin-when-cross-origin"
-    | "same-origin"
-    | "strict-origin"
-    | "strict-origin-when-cross-origin"
-    | "unsafe-url";
-  nonce?: string;
-  nomodule?: boolean;
-  integrity?: string;
-  fetchpriority?: "high" | "low" | "auto";
-  crossorigin?: "anonymous" | "use-credentials";
-  blocking?: boolean;
-  attributionsrc?: boolean | string;
-  src?: string;
-} & {
-  src: string;
-  defer: true;
-} & {
-  src: string;
-  async: true;
-};
-
-export interface ExecuteScriptOptions extends DatastarEventOptions {
-  [DatastarDatalineAutoRemove]?: boolean;
-  [DatastarDatalineAttributes]?: ScriptAttributes | string[];
-}
-
-export interface ExecuteScriptEvent {
-  event: "datastar-patch-elements";
-  options: ExecuteScriptOptions;
-  [DatastarDatalineScript]: string;
-}
-
 export const sseHeaders = {
   "Cache-Control": "no-cache",
   "Connection": "keep-alive",
@@ -113,7 +69,6 @@ export const sseHeaders = {
 } as const;
 
 export type MultilineDatalinePrefix =
-  | typeof DatastarDatalineScript
   | typeof DatastarDatalineElements
   | typeof DatastarDatalineSignals;
 
@@ -121,24 +76,14 @@ export type DatastarEventOptionsUnion =
   | PatchElementsOptions
   | ElementOptions
   | PatchSignalsOptions
-  | DatastarEventOptions
-  | ExecuteScriptOptions;
+  | DatastarEventOptions;
 
 export type DatastarEvent =
   | PatchElementsEvent
-  | PatchSignalsEvent
-  | ExecuteScriptEvent;
-
-const defaultScriptAttributes: Record<string, string> = {};
-const scriptParts = DefaultExecuteScriptAttributes.split(" ");
-if (scriptParts.length >= 2 && scriptParts[0] && scriptParts[1]) {
-  defaultScriptAttributes[scriptParts[0]] = scriptParts[1];
-}
+  | PatchSignalsEvent;
 
 export const DefaultMapping = {
   [DatastarDatalinePatchMode]: DefaultElementPatchMode,
   [DatastarDatalineUseViewTransition]: DefaultElementsUseViewTransitions,
   [DatastarDatalineOnlyIfMissing]: DefaultPatchSignalsOnlyIfMissing,
-  [DatastarDatalineAttributes]: defaultScriptAttributes,
-  [DatastarDatalineAutoRemove]: DefaultExecuteScriptAutoRemove,
 } as const;

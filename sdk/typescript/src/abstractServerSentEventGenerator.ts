@@ -2,13 +2,12 @@ import {
   DatastarEventOptions,
   DefaultMapping,
   EventType,
-  ExecuteScriptOptions,
   ElementOptions,
   PatchElementsOptions,
   PatchSignalsOptions,
   Jsonifiable,
   ElementPatchMode,
-} from "./types.ts";
+} from "./types";
 
 import {
   DatastarDatalineElements,
@@ -17,10 +16,9 @@ import {
   DatastarDatalineSignals,
   DatastarDatalineOnlyIfMissing,
   DatastarDatalineUseViewTransition,
-  DefaultExecuteScriptAttributes,
   DefaultSseRetryDurationMs,
   ElementPatchModes,
-} from "./consts.ts";
+} from "./consts";
 
 /**
  * Abstract ServerSentEventGenerator class, responsible for initializing and handling
@@ -65,25 +63,6 @@ export abstract class ServerSentEventGenerator {
   private validateRequired(value: string | undefined, paramName: string): asserts value is string {
     if (!value || value.trim() === '') {
       throw new Error(`${paramName} is required and cannot be empty`);
-    }
-  }
-
-  /**
-   * Validates script attributes format.
-   * @param attributes - The attributes to validate
-   * @throws {Error} If the attributes format is invalid
-   */
-  private validateScriptAttributes(attributes: any): void {
-    if (attributes && !Array.isArray(attributes) && typeof attributes !== 'object') {
-      throw new Error('Script attributes must be an array of strings or an object');
-    }
-    
-    if (Array.isArray(attributes)) {
-      for (const attr of attributes) {
-        if (typeof attr !== 'string') {
-          throw new Error('All script attributes in array must be strings');
-        }
-      }
     }
   }
 
@@ -217,66 +196,5 @@ export abstract class ServerSentEventGenerator {
       eventId,
       retryDuration,
     });
-  }
-
-  /**
-   * Executes a script on the client-side by creating a script element via PatchElements.
-   *
-   * @param script - Script code to execute.
-   * @param [options] - Additional options for execution.
-   * @throws {Error} If validation fails
-   */
-  public ExecuteScript(
-    script: string,
-    options?: ExecuteScriptOptions,
-  ): ReturnType<typeof this.send> {
-    // Validate required parameters
-    this.validateRequired(script, 'script');
-
-    const {
-      eventId,
-      retryDuration,
-      attributes,
-      autoRemove,
-      ...eventOptions
-    } = options || {} as Partial<ExecuteScriptOptions>;
-
-    // Validate script attributes if provided
-    if (attributes) {
-      this.validateScriptAttributes(attributes);
-    }
-
-    // Build script tag
-    let scriptTag = '<script';
-    
-    // Add attributes if provided
-    if (attributes) {
-      if (Array.isArray(attributes)) {
-        for (const attr of attributes) {
-          scriptTag += ` ${attr}`;
-        }
-      } else {
-        for (const [key, value] of Object.entries(attributes)) {
-          scriptTag += ` ${key}="${value}"`;
-        }
-      }
-    }
-
-    // Add auto-remove attribute if needed (default is false per spec)
-    if (autoRemove === true) {
-      scriptTag += ' data-on-load="el.remove()"';
-    }
-
-    scriptTag += `>${script}</script>`;
-
-    // Use PatchElements with body selector and append mode
-    const patchOptions: PatchElementsOptions = {
-      [DatastarDatalineSelector]: 'body',
-      [DatastarDatalinePatchMode]: 'append',
-      eventId,
-      retryDuration,
-    };
-
-    return this.PatchElements(scriptTag, patchOptions);
   }
 }
