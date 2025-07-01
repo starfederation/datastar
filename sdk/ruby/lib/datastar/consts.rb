@@ -9,7 +9,6 @@ module Datastar
     # The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     DEFAULT_SSE_RETRY_DURATION = 1000
 
-<<<<<<< HEAD
     # Should elements be patched using the ViewTransition API?
     DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS = false
 
