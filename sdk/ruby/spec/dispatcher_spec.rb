@@ -208,36 +208,20 @@ RSpec.describe Datastar::Dispatcher do
   end
 
   describe '#execute_script' do
-    it 'produces a streameable response body with D* execute-script' do
+    it 'appends a <script> tag via patch-elements' do
       dispatcher.execute_script %(alert('hello'))
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: script alert('hello')\n\n\n)])
-    end
-
-    it 'splits multi-line script into multiple data lines' do
-      dispatcher.execute_script %(alert('hello');\nalert('world'))
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: script alert('hello');\ndata: script alert('world')\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script onload="this.remove()">alert('hello')</script>\n\n\n)])
     end
 
     it 'takes D* options' do
-      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: !Datastar::Consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE
+      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: false
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\nid: 72\ndata: autoRemove false\ndata: script alert('hello')\n\n\n)])
-    end
-
-    it 'omits autoRemove true' do
-      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: Datastar::Consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\nid: 72\ndata: script alert('hello')\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: selector body\ndata: mode append\ndata: elements <script>alert('hello')</script>\n\n\n)])
     end
 
     it 'takes attributes Hash' do
@@ -245,15 +229,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: attributes type text/javascript\ndata: attributes title alert\ndata: script alert('hello')\n\n\n)])
-    end
-
-    it 'takes attributes Hash' do
-      dispatcher.execute_script %(alert('hello')), attributes: { type: 'module', title: 'alert' }
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: attributes title alert\ndata: script alert('hello')\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script type="text/javascript" title="alert" onload="this.remove()">alert('hello')</script>\n\n\n)])
     end
   end
 
@@ -263,7 +239,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: script setTimeout(() => { window.location = '/guide' })\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script onload="this.remove()">setTimeout(() => { window.location = '/guide' })</script>\n\n\n)])
     end
   end
 

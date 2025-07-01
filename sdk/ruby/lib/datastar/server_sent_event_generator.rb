@@ -91,13 +91,20 @@ module Datastar
     end
 
     def execute_script(script, options = BLANK_OPTIONS)
-      buffer = +"event: datastar-execute-script\n"
-      build_options(options, buffer)
-      scripts = script.to_s.split("\n")
-      scripts.each do |sc|
-        buffer << "data: script #{sc}\n"
+      options = options.dup
+      auto_remove = options.key?(:auto_remove) ? options.delete(:auto_remove) : Consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE
+      attributes = options.delete(:attributes) || BLANK_OPTIONS
+      script_tag = +"<script"
+      attributes.each do |k, v|
+        script_tag << %( #{camelize(k)}="#{v}")
       end
-      write(buffer)
+      script_tag << %( onload="this.remove()") if auto_remove
+      script_tag << ">#{script}</script>"
+
+      options[Consts::SELECTOR_DATALINE_LITERAL] = 'body'
+      options[Consts::PATCH_MODE_DATALINE_LITERAL] = Consts::ElementPatchMode::APPEND
+
+      patch_elements(script_tag, options)
     end
 
     def redirect(url)
