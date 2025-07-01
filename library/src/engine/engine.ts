@@ -1,31 +1,782 @@
-import { Hash, attrHash, elUniqId, walkDOM } from '../utils/dom'
-import { camel } from '../utils/text'
-import { effect } from '../vendored/preact-core'
-import { DSP, DSS } from './consts'
+import { findClosestScoped, isHTMLOrSVG } from '../utils/dom'
+import { isEmpty, isPojo, pathToObj } from '../utils/paths'
+import { camel, snake } from '../utils/text'
+import { DATASTAR, DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
-import { SignalsRoot } from './signals'
-import {
-  type ActionPlugin,
-  type ActionPlugins,
-  type AttributePlugin,
-  type DatastarPlugin,
-  type GlobalInitializer,
-  type HTMLorSVGElement,
-  type InitContext,
-  type OnRemovalFn,
-  PluginType,
-  Requirement,
-  type RuntimeContext,
-  type RuntimeExpressionFunction,
-  type WatcherPlugin,
+import type {
+  ActionPlugins,
+  AttributePlugin,
+  Computed,
+  DatastarPlugin,
+  Effect,
+  HTMLOrSVG,
+  InitContext,
+  JSONPatch,
+  OnRemovalFn,
+  RuntimeContext,
+  RuntimeExpressionFunction,
+  Signal,
+  SignalFilterOptions,
 } from './types'
+import { DATASTAR_SIGNAL_PATCH_EVENT } from './types'
 
-const signals: SignalsRoot = new SignalsRoot()
+/**
+ * Custom signals implementation based on Alien Signals
+ */
+
+interface ReactiveNode {
+  deps_?: Link
+  depsTail_?: Link
+  subs_?: Link
+  subsTail_?: Link
+  flags_: ReactiveFlags
+}
+
+interface Link {
+  dep_: ReactiveNode
+  sub_: ReactiveNode
+  prevSub_?: Link
+  nextSub_?: Link
+  prevDep_?: Link
+  nextDep_?: Link
+}
+
+interface Stack<T> {
+  value_: T
+  prev_?: Stack<T>
+}
+
+enum ReactiveFlags {
+  None = 0,
+  Mutable = 1 << 0,
+  Watching = 1 << 1,
+  RecursedCheck = 1 << 2,
+  Recursed = 1 << 3,
+  Dirty = 1 << 4,
+  Pending = 1 << 5,
+}
+
+enum EffectFlags {
+  Queued = 1 << 6,
+}
+
+interface AlienEffect extends ReactiveNode {
+  fn_(): void
+}
+
+interface AlienComputed<T = any> extends ReactiveNode {
+  value_?: T
+  getter(previousValue?: T): T
+}
+
+interface AlienSignal<T = any> extends ReactiveNode {
+  previousValue: T
+  value_: T
+}
+
+let currentPatch: Record<string, any> = {}
+const queuedEffects: (AlienEffect | undefined)[] = []
+let batchDepth = 0
+let notifyIndex = 0
+let queuedEffectsLength = 0
+let activeSub: ReactiveNode | undefined
+
+const startBatch = (): void => {
+  batchDepth++
+}
+const endBatch = (): void => {
+  if (!--batchDepth) {
+    flush()
+    dispatch()
+  }
+}
+
+const signal = <T>(initialValue?: T): Signal<T> => {
+  return signalOper.bind(0, {
+    previousValue: initialValue,
+    value_: initialValue,
+    flags_: 1 satisfies ReactiveFlags.Mutable,
+  }) as Signal<T>
+}
+
+const computedSymbol = Symbol('computed')
+const computed = <T>(getter: (previousValue?: T) => T): Computed<T> => {
+  const c = computedOper.bind(0, {
+    flags_: 17 as ReactiveFlags.Mutable | ReactiveFlags.Dirty,
+    getter,
+  }) as Computed<T>
+  // @ts-ignore
+  c[computedSymbol] = 1
+  return c
+}
+
+const effect = (fn: () => void): Effect => {
+  const e: AlienEffect = {
+    fn_: fn,
+    flags_: 2 satisfies ReactiveFlags.Watching,
+  }
+  if (activeSub) {
+    link(e, activeSub)
+  }
+  const prev = setCurrentSub(e)
+  try {
+    e.fn_()
+  } finally {
+    setCurrentSub(prev)
+  }
+  return effectOper.bind(0, e)
+}
+
+const peek = <T>(fn: () => T): T => {
+  const prev = setCurrentSub(undefined)
+  try {
+    return fn()
+  } finally {
+    setCurrentSub(prev)
+  }
+}
+
+const flush = () => {
+  while (notifyIndex < queuedEffectsLength) {
+    const effect = queuedEffects[notifyIndex]!
+    queuedEffects[notifyIndex++] = undefined
+    run(effect, (effect.flags_ &= ~EffectFlags.Queued))
+  }
+  notifyIndex = 0
+  queuedEffectsLength = 0
+}
+
+const update = (signal: AlienSignal | AlienComputed): boolean => {
+  if ('getter' in signal) {
+    return updateComputed(signal)
+  }
+  return updateSignal(signal, signal.value_)
+}
+
+const setCurrentSub = (sub?: ReactiveNode): ReactiveNode | undefined => {
+  const prevSub = activeSub
+  activeSub = sub
+  return prevSub
+}
+
+const updateComputed = (c: AlienComputed): boolean => {
+  const prevSub = setCurrentSub(c)
+  startTracking(c)
+  try {
+    const oldValue = c.value_
+    return oldValue !== (c.value_ = c.getter(oldValue))
+  } finally {
+    setCurrentSub(prevSub)
+    endTracking(c)
+  }
+}
+
+const updateSignal = (s: AlienSignal, value: any): boolean => {
+  s.flags_ = 1 satisfies ReactiveFlags.Mutable
+  return s.previousValue !== (s.previousValue = value)
+}
+
+const notify = (e: AlienEffect): void => {
+  const flags = e.flags_
+  if (!(flags & EffectFlags.Queued)) {
+    e.flags_ = flags | EffectFlags.Queued
+    const subs = e.subs_
+    if (subs) {
+      notify(subs.sub_ as AlienEffect)
+    } else {
+      queuedEffects[queuedEffectsLength++] = e
+    }
+  }
+}
+
+const run = (e: AlienEffect, flags: ReactiveFlags): void => {
+  if (
+    flags & (16 satisfies ReactiveFlags.Dirty) ||
+    (flags & (32 satisfies ReactiveFlags.Pending) && checkDirty(e.deps_!, e))
+  ) {
+    const prev = setCurrentSub(e)
+    startTracking(e)
+    try {
+      e.fn_()
+    } finally {
+      setCurrentSub(prev)
+      endTracking(e)
+    }
+    return
+  }
+  if (flags & (32 satisfies ReactiveFlags.Pending)) {
+    e.flags_ = flags & ~(32 satisfies ReactiveFlags.Pending)
+  }
+  let link = e.deps_
+  while (link) {
+    const dep = link.dep_
+    const depFlags = dep.flags_
+    if (depFlags & EffectFlags.Queued) {
+      run(dep as AlienEffect, (dep.flags_ = depFlags & ~EffectFlags.Queued))
+    }
+    link = link.nextDep_
+  }
+}
+
+const computedOper = <T>(c: AlienComputed<T>): T => {
+  const flags = c.flags_
+  if (
+    flags & (16 satisfies ReactiveFlags.Dirty) ||
+    (flags & (32 satisfies ReactiveFlags.Pending) && checkDirty(c.deps_!, c))
+  ) {
+    if (updateComputed(c)) {
+      const subs = c.subs_
+      if (subs) {
+        shallowPropagate(subs)
+      }
+    }
+  } else if (flags & (32 satisfies ReactiveFlags.Pending)) {
+    c.flags_ = flags & ~(32 satisfies ReactiveFlags.Pending)
+  }
+  if (activeSub) {
+    link(c, activeSub)
+  }
+  return c.value_!
+}
+
+const signalOper = <T>(s: AlienSignal<T>, ...value: [T]): T | boolean => {
+  if (value.length) {
+    const newValue = value[0]
+    if (s.value_ !== (s.value_ = newValue)) {
+      s.flags_ = 17 as ReactiveFlags.Mutable | ReactiveFlags.Dirty
+      const subs = s.subs_
+      if (subs) {
+        propagate(subs)
+        if (!batchDepth) {
+          flush()
+        }
+      }
+      return true
+    }
+    return false
+  }
+  const currentValue = s.value_
+  if (s.flags_ & (16 satisfies ReactiveFlags.Dirty)) {
+    if (updateSignal(s, currentValue)) {
+      const subs_ = s.subs_
+      if (subs_) {
+        shallowPropagate(subs_)
+      }
+    }
+  }
+  if (activeSub) {
+    link(s, activeSub)
+  }
+  return currentValue
+}
+
+const effectOper = (e: AlienEffect): void => {
+  let dep = e.deps_
+  while (dep) {
+    dep = unlink(dep, e)
+  }
+  const sub = e.subs_
+  if (sub) {
+    unlink(sub)
+  }
+  e.flags_ = 0 satisfies ReactiveFlags.None
+}
+
+const link = (dep: ReactiveNode, sub: ReactiveNode): void => {
+  const prevDep = sub.depsTail_
+  if (prevDep && prevDep.dep_ === dep) {
+    return
+  }
+  let nextDep: Link | undefined
+  const recursedCheck = sub.flags_ & (4 satisfies ReactiveFlags.RecursedCheck)
+  if (recursedCheck) {
+    nextDep = prevDep ? prevDep.nextDep_ : sub.deps_
+    if (nextDep && nextDep.dep_ === dep) {
+      sub.depsTail_ = nextDep
+      return
+    }
+  }
+  const prevSub = dep.subsTail_
+  if (
+    prevSub &&
+    prevSub.sub_ === sub &&
+    (!recursedCheck || isValidLink(prevSub, sub))
+  ) {
+    return
+  }
+  const newLink =
+    (sub.depsTail_ =
+    dep.subsTail_ =
+      {
+        dep_: dep,
+        sub_: sub,
+        prevDep_: prevDep,
+        nextDep_: nextDep,
+        prevSub_: prevSub,
+      })
+  if (nextDep) {
+    nextDep.prevDep_ = newLink
+  }
+  if (prevDep) {
+    prevDep.nextDep_ = newLink
+  } else {
+    sub.deps_ = newLink
+  }
+  if (prevSub) {
+    prevSub.nextSub_ = newLink
+  } else {
+    dep.subs_ = newLink
+  }
+}
+
+const unlink = (link: Link, sub_ = link.sub_): Link | undefined => {
+  const dep_ = link.dep_
+  const prevDep_ = link.prevDep_
+  const nextDep_ = link.nextDep_
+  const nextSub_ = link.nextSub_
+  const prevSub_ = link.prevSub_
+  if (nextDep_) {
+    nextDep_.prevDep_ = prevDep_
+  } else {
+    sub_.depsTail_ = prevDep_
+  }
+  if (prevDep_) {
+    prevDep_.nextDep_ = nextDep_
+  } else {
+    sub_.deps_ = nextDep_
+  }
+  if (nextSub_) {
+    nextSub_.prevSub_ = prevSub_
+  } else {
+    dep_.subsTail_ = prevSub_
+  }
+  if (prevSub_) {
+    prevSub_.nextSub_ = nextSub_
+  } else if (!(dep_.subs_ = nextSub_)) {
+    if ('getter' in dep_) {
+      let toRemove = dep_.deps_
+      if (toRemove) {
+        dep_.flags_ = 17 as ReactiveFlags.Mutable | ReactiveFlags.Dirty
+        do {
+          toRemove = unlink(toRemove, dep_)
+        } while (toRemove)
+      }
+    } else if (!('previousValue' in dep_)) {
+      effectOper(dep_ as AlienEffect)
+    }
+  }
+  return nextDep_
+}
+
+const propagate = (link: Link): void => {
+  let next = link.nextSub_
+  let stack: Stack<Link | undefined> | undefined
+
+  top: while (true) {
+    const sub = link.sub_
+
+    let flags = sub.flags_
+
+    if (flags & (3 as ReactiveFlags.Mutable | ReactiveFlags.Watching)) {
+      if (
+        !(
+          flags &
+          (60 as
+            | ReactiveFlags.RecursedCheck
+            | ReactiveFlags.Recursed
+            | ReactiveFlags.Dirty
+            | ReactiveFlags.Pending)
+        )
+      ) {
+        sub.flags_ = flags | (32 satisfies ReactiveFlags.Pending)
+      } else if (
+        !(flags & (12 as ReactiveFlags.RecursedCheck | ReactiveFlags.Recursed))
+      ) {
+        flags = 0 satisfies ReactiveFlags.None
+      } else if (!(flags & (4 satisfies ReactiveFlags.RecursedCheck))) {
+        sub.flags_ =
+          (flags & ~(8 satisfies ReactiveFlags.Recursed)) |
+          (32 satisfies ReactiveFlags.Pending)
+      } else if (
+        !(flags & (48 as ReactiveFlags.Dirty | ReactiveFlags.Pending)) &&
+        isValidLink(link, sub)
+      ) {
+        sub.flags_ =
+          flags | (40 as ReactiveFlags.Recursed | ReactiveFlags.Pending)
+        flags &= 1 satisfies ReactiveFlags.Mutable
+      } else {
+        flags = 0 satisfies ReactiveFlags.None
+      }
+
+      if (flags & (2 satisfies ReactiveFlags.Watching)) {
+        notify(sub as AlienEffect)
+      }
+
+      if (flags & (1 satisfies ReactiveFlags.Mutable)) {
+        const subSubs = sub.subs_
+        if (subSubs) {
+          link = subSubs
+          if (subSubs.nextSub_) {
+            stack = { value_: next, prev_: stack }
+            next = link.nextSub_
+          }
+          continue
+        }
+      }
+    }
+
+    if ((link = next!)) {
+      next = link.nextSub_
+      continue
+    }
+
+    while (stack) {
+      link = stack.value_!
+      stack = stack.prev_
+      if (link) {
+        next = link.nextSub_
+        continue top
+      }
+    }
+
+    break
+  }
+}
+
+const startTracking = (sub: ReactiveNode): void => {
+  sub.depsTail_ = undefined
+  sub.flags_ =
+    (sub.flags_ &
+      ~(56 as
+        | ReactiveFlags.Recursed
+        | ReactiveFlags.Dirty
+        | ReactiveFlags.Pending)) |
+    (4 satisfies ReactiveFlags.RecursedCheck)
+}
+
+const endTracking = (sub: ReactiveNode): void => {
+  const depsTail_ = sub.depsTail_
+  let toRemove = depsTail_ ? depsTail_.nextDep_ : sub.deps_
+  while (toRemove) {
+    toRemove = unlink(toRemove, sub)
+  }
+  sub.flags_ &= ~(4 satisfies ReactiveFlags.RecursedCheck)
+}
+
+const checkDirty = (link: Link, sub: ReactiveNode): boolean => {
+  let stack: Stack<Link> | undefined
+  let checkDepth = 0
+
+  top: while (true) {
+    const dep = link.dep_
+    const depFlags = dep.flags_
+
+    let dirty = false
+
+    if (sub.flags_ & (16 satisfies ReactiveFlags.Dirty)) {
+      dirty = true
+    } else if (
+      (depFlags & (17 as ReactiveFlags.Mutable | ReactiveFlags.Dirty)) ===
+      (17 as ReactiveFlags.Mutable | ReactiveFlags.Dirty)
+    ) {
+      if (update(dep as AlienSignal | AlienComputed)) {
+        const subs = dep.subs_!
+        if (subs.nextSub_) {
+          shallowPropagate(subs)
+        }
+        dirty = true
+      }
+    } else if (
+      (depFlags & (33 as ReactiveFlags.Mutable | ReactiveFlags.Pending)) ===
+      (33 as ReactiveFlags.Mutable | ReactiveFlags.Pending)
+    ) {
+      if (link.nextSub_ || link.prevSub_) {
+        stack = { value_: link, prev_: stack }
+      }
+      link = dep.deps_!
+      sub = dep
+      ++checkDepth
+      continue
+    }
+
+    if (!dirty && link.nextDep_) {
+      link = link.nextDep_
+      continue
+    }
+
+    while (checkDepth) {
+      --checkDepth
+      const firstSub = sub.subs_!
+      const hasMultipleSubs = firstSub.nextSub_
+      if (hasMultipleSubs) {
+        link = stack!.value_
+        stack = stack!.prev_
+      } else {
+        link = firstSub
+      }
+      if (dirty) {
+        if (update(sub as AlienSignal | AlienComputed)) {
+          if (hasMultipleSubs) {
+            shallowPropagate(firstSub)
+          }
+          sub = link.sub_
+          continue
+        }
+      } else {
+        sub.flags_ &= ~(32 satisfies ReactiveFlags.Pending)
+      }
+      sub = link.sub_
+      if (link.nextDep_) {
+        link = link.nextDep_
+        continue top
+      }
+      dirty = false
+    }
+
+    return dirty
+  }
+}
+
+const shallowPropagate = (link: Link): void => {
+  do {
+    const sub = link.sub_
+    const nextSub = link.nextSub_
+    const subFlags = sub.flags_
+    if (
+      (subFlags & (48 as ReactiveFlags.Pending | ReactiveFlags.Dirty)) ===
+      (32 satisfies ReactiveFlags.Pending)
+    ) {
+      sub.flags_ = subFlags | (16 satisfies ReactiveFlags.Dirty)
+      if (subFlags & (2 satisfies ReactiveFlags.Watching)) {
+        notify(sub as AlienEffect)
+      }
+    }
+    link = nextSub!
+  } while (link)
+}
+
+const isValidLink = (checkLink: Link, sub: ReactiveNode): boolean => {
+  const depsTail = sub.depsTail_
+  if (depsTail) {
+    let link = sub.deps_!
+    do {
+      if (link === checkLink) {
+        return true
+      }
+      if (link === depsTail) {
+        break
+      }
+      link = link.nextDep_!
+    } while (link)
+  }
+  return false
+}
+
+const getPath = <T = any>(path: string): T =>
+  path.split('.').reduce((acc, key) => acc[key], root) as T
+
+const hasPath = (path: string): boolean =>
+  peek(
+    () =>
+      path
+        .split('.')
+        .reduce(
+          (obj, key) => (obj && Object.hasOwn(obj, key) ? obj[key] : undefined),
+          root,
+        ) !== undefined,
+  )
+
+const deep = (value: any, prefix = ''): any => {
+  const isArr = Array.isArray(value)
+  if (isArr || isPojo(value)) {
+    const deepObj = (isArr ? [] : {}) as Record<string, Signal>
+    for (const key in value) {
+      deepObj[key] = signal(
+        deep((value as Record<string, Signal>)[key], `${prefix + key}.`),
+      )
+    }
+    const keys = signal(0)
+    return new Proxy(deepObj, {
+      get: (_, prop: string) => {
+        if (prop === 'toJSON' && !Object.hasOwn(deepObj, prop)) {
+          return
+        }
+        if (isArr && prop in Array.prototype) {
+          keys()
+          return deepObj[prop]
+        }
+        if (!Object.hasOwn(deepObj, prop)) {
+          deepObj[prop] = signal('')
+          dispatch({ [prefix + prop]: '' })
+          keys(keys() + 1)
+        }
+        return deepObj[prop]()
+      },
+      set: (_, prop: string, newValue) => {
+        if (isArr && prop === 'length') {
+          deepObj[prop] = newValue
+          dispatch({ [prefix.slice(0, -1)]: deepObj })
+          keys(keys() + 1)
+          return true
+        }
+
+        if (Object.hasOwn(deepObj, prop)) {
+          if (newValue === null || newValue === undefined) {
+            delete deepObj[prop]
+            dispatch({ [prefix + prop]: null })
+            keys(keys() + 1)
+            return true
+          }
+          if (deepObj[prop](deep(newValue, `${prefix + prop}.`))) {
+            dispatch({ [prefix + prop]: newValue })
+          }
+        } else {
+          if (newValue === null || newValue === undefined) {
+            return true
+          }
+          if (Object.hasOwn(newValue, computedSymbol)) {
+            deepObj[prop] = newValue
+            dispatch({ [prefix + prop]: '' })
+          } else {
+            deepObj[prop] = signal(deep(newValue, `${prefix + prop}.`))
+            dispatch({ [prefix + prop]: newValue })
+          }
+
+          keys(keys() + 1)
+        }
+
+        return true
+      },
+      deleteProperty: (_, prop: string) => {
+        if (Object.hasOwn(deepObj, prop)) {
+          delete deepObj[prop]
+          dispatch({ [prefix + prop]: null })
+          keys(keys() + 1)
+        }
+
+        return true
+      },
+      ownKeys: () => {
+        keys()
+        return Reflect.ownKeys(deepObj)
+      },
+      has(_, prop) {
+        keys()
+        return prop in deepObj
+      },
+    })
+  }
+  return value
+}
+
+const dispatch = (obj?: Record<string, any>) => {
+  if (obj) {
+    pathToObj(currentPatch, obj)
+  }
+  if (!batchDepth && !isEmpty(currentPatch)) {
+    const oldPatch = currentPatch
+    currentPatch = {}
+    document.dispatchEvent(
+      new CustomEvent<JSONPatch>(DATASTAR_SIGNAL_PATCH_EVENT, {
+        detail: oldPatch,
+      }),
+    )
+  }
+}
+
+const mergePatch = (
+  patch: Record<string, any>,
+  { ifMissing }: { ifMissing?: boolean } = {},
+): void => {
+  startBatch()
+  for (const key in patch) {
+    if (patch[key] === null || patch[key] === undefined) {
+      if (!ifMissing) {
+        delete root[key]
+      }
+    } else {
+      mergeInner(patch[key], key, root, '', ifMissing)
+    }
+  }
+  endBatch()
+}
+
+const mergeInner = (
+  patch: any,
+  target: string,
+  targetParent: Record<string, any>,
+  prefix: string,
+  ifMissing: boolean | undefined,
+): void => {
+  if (isPojo(patch)) {
+    if (
+      !(
+        Object.hasOwn(targetParent, target) &&
+        (isPojo(targetParent[target]) || Array.isArray(targetParent[target]))
+      )
+    ) {
+      targetParent[target] = {}
+    }
+
+    for (const key in patch) {
+      if (patch[key] === null || patch[key] === undefined) {
+        if (!ifMissing) {
+          delete targetParent[target][key]
+        }
+      } else {
+        mergeInner(
+          patch[key],
+          key,
+          targetParent[target],
+          `${prefix + target}.`,
+          ifMissing,
+        )
+      }
+    }
+  } else if (!(ifMissing && Object.hasOwn(targetParent, target))) {
+    targetParent[target] = patch
+  }
+}
+
+function filtered(
+  { include = /.*/, exclude = /(?!)/ }: SignalFilterOptions = {},
+  obj: JSONPatch = root,
+) {
+  const inc = RegExp(include)
+  const exc = RegExp(exclude)
+
+  // We need to find all valid signal paths in the object
+  const pathObj: Record<string, any> = {}
+  const stack: Array<[any, string]> = [[obj, '']]
+
+  while (stack.length) {
+    const [node, prefix] = stack.pop()!
+
+    for (const key in node) {
+      if (isPojo(node[key])) {
+        stack.push([node[key], `${prefix + key}.`])
+      } else if (inc.test(prefix + key) && !exc.test(prefix + key)) {
+        pathObj[prefix + key] = getPath(prefix + key)
+      }
+    }
+  }
+
+  return pathToObj({}, pathObj)
+}
+
+const root: Record<string, any> = deep({})
+
+/**
+ * Turn data-* attributes into reactive expressions
+ * This is the core of the Datastar
+ */
+
 const actions: ActionPlugins = {}
 const plugins: AttributePlugin[] = []
+let pluginRegexs: RegExp[] = []
 
-// Map of cleanup functions by element ID, keyed by a dataset key-value hash
-const removals = new Map<string, Map<number, OnRemovalFn>>()
+// Map of cleanup functions by element, keyed by a dataset key-value hash
+const removals = new Map<HTMLOrSVG, Map<string, OnRemovalFn>>()
 
 let mutationObserver: MutationObserver | null = null
 
@@ -33,41 +784,34 @@ let alias = ''
 export function setAlias(value: string) {
   alias = value
 }
+export function aliasify(name: string) {
+  return alias ? `data-${alias}-${name}` : `data-${name}`
+}
 
 export function load(...pluginsToLoad: DatastarPlugin[]) {
   for (const plugin of pluginsToLoad) {
     const ctx: InitContext = {
       plugin,
-      signals,
-      effect: (cb: () => void): OnRemovalFn => effect(cb),
       actions,
-      removals,
-      applyToElement,
+      root,
+      filtered,
+      signal,
+      computed,
+      effect,
+      mergePatch,
+      peek,
+      getPath,
+      hasPath,
     }
-
-    let globalInitializer: GlobalInitializer | undefined
-    switch (plugin.type) {
-      case PluginType.Action: {
-        actions[plugin.name] = plugin as ActionPlugin
-        break
-      }
-      case PluginType.Attribute: {
-        const ap = plugin as AttributePlugin
-        plugins.push(ap)
-        globalInitializer = ap.onGlobalInit
-        break
-      }
-      case PluginType.Watcher: {
-        const wp = plugin as WatcherPlugin
-        globalInitializer = wp.onGlobalInit
-        break
-      }
-      default: {
-        throw initErr('InvalidPluginType', ctx)
-      }
-    }
-    if (globalInitializer) {
-      globalInitializer(ctx)
+    if (plugin.type === 'action') {
+      actions[plugin.name] = plugin
+    } else if (plugin.type === 'attribute') {
+      plugins.push(plugin)
+      plugin.onGlobalInit?.(ctx)
+    } else if (plugin.type === 'watcher') {
+      plugin.onGlobalInit?.(ctx)
+    } else {
+      throw initErr('InvalidPluginType', ctx)
     }
   }
 
@@ -77,302 +821,332 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
     if (lenDiff !== 0) return lenDiff
     return a.name.localeCompare(b.name)
   })
+
+  pluginRegexs = plugins.map((plugin) => RegExp(`^${plugin.name}([A-Z]|_|$)`))
 }
 
-// Apply all plugins to all elements in the DOM
-export function apply() {
+function applyEls(els: Iterable<HTMLOrSVG>): void {
+  for (const el of els) {
+    for (const key in el.dataset) {
+      applyAttributePlugin(el, key, el.dataset[key]!)
+    }
+  }
+}
+
+// Apply all plugins to the entire DOM or a provided element
+export function apply(root: HTMLOrSVG = document.body) {
   // Delay applying plugins to give custom plugins a chance to load
   queueMicrotask(() => {
-    applyToElement(document.documentElement)
-    observe()
-  })
-}
+    applyEls([root])
+    applyEls(root.querySelectorAll<HTMLOrSVG>('*'))
 
-// Apply all plugins to the element and its children
-function applyToElement(rootElement: HTMLorSVGElement) {
-  walkDOM(rootElement, (el) => {
-    // Check if the element has any data attributes already
-    const toApply = new Array<string>()
-    const elCleanups = removals.get(el.id) || new Map()
-    const toCleanup = new Map<number, OnRemovalFn>([...elCleanups])
-    const hashes = new Map<string, number>()
-
-    // Apply the plugins to the element in order of application
-    // since DOMStringMap is ordered, we can be deterministic
-    for (const datasetKey of Object.keys(el.dataset)) {
-      // Ignore data attributes that don’t start with the alias
-      if (!datasetKey.startsWith(alias)) {
-        break
-      }
-
-      const datasetValue = el.dataset[datasetKey] || ''
-      const currentHash = attrHash(datasetKey, datasetValue)
-      hashes.set(datasetKey, currentHash)
-
-      // If the hash hasn't changed, ignore
-      // otherwise keep the old cleanup and add new to applys
-      if (elCleanups.has(currentHash)) {
-        toCleanup.delete(currentHash)
-      } else {
-        toApply.push(datasetKey)
-      }
+    // Monitor the entire document body or a provided element for changes
+    // https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver/observe
+    if (!mutationObserver) {
+      mutationObserver = new MutationObserver(observe)
+      mutationObserver.observe(root, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+      })
     }
-
-    // Clean up any old plugins and apply the new ones
-    for (const [_, cleanup] of toCleanup) {
-      cleanup()
-    }
-    for (const key of toApply) {
-      const h = hashes.get(key)!
-      applyAttributePlugin(el, key, h)
-    }
-  })
-}
-
-// Set up a mutation observer to run plugin removal and apply functions
-function observe() {
-  if (mutationObserver) {
-    return
-  }
-
-  mutationObserver = new MutationObserver((mutations) => {
-    const toRemove = new Set<HTMLorSVGElement>()
-    const toApply = new Set<HTMLorSVGElement>()
-    for (const { target, type, addedNodes, removedNodes } of mutations) {
-      switch (type) {
-        case 'childList':
-          {
-            for (const node of removedNodes) {
-              toRemove.add(node as HTMLorSVGElement)
-            }
-            for (const node of addedNodes) {
-              toApply.add(node as HTMLorSVGElement)
-            }
-          }
-          break
-        case 'attributes': {
-          toApply.add(target as HTMLorSVGElement)
-
-          break
-        }
-      }
-    }
-    for (const el of toRemove) {
-      const elTracking = removals.get(el.id)
-      if (elTracking) {
-        for (const [hash, cleanup] of elTracking) {
-          cleanup()
-          elTracking.delete(hash)
-        }
-        if (elTracking.size === 0) {
-          removals.delete(el.id)
-        }
-      }
-    }
-    for (const el of toApply) {
-      applyToElement(el)
-    }
-  })
-
-  mutationObserver.observe(document.body, {
-    attributes: true,
-    attributeOldValue: true,
-    childList: true,
-    subtree: true,
   })
 }
 
 function applyAttributePlugin(
-  el: HTMLorSVGElement,
-  camelCasedKey: string,
-  hash: number,
-) {
-  // Extract the raw key from the dataset
-  const rawKey = camel(camelCasedKey.slice(alias.length))
+  el: HTMLOrSVG,
+  attrKey: string,
+  value: string,
+): void {
+  const rawKey = camel(alias ? attrKey.slice(alias.length) : attrKey)
+  const plugin = plugins.find((_, i) => pluginRegexs[i].test(rawKey))
+  if (plugin) {
+    // Extract the key and modifiers
+    let [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/__+/)
 
-  // Find the plugin that matches, since the plugins are sorted by length descending and alphabetically. The first match will be the most specific.
-  const plugin = plugins.find((p) => {
-    // Ignore keys with the plugin name as a prefix (ignores `classes` but not `classBold`)
-    const regex = new RegExp(`^${p.name}([A-Z]|_|$)`)
-    return regex.test(rawKey)
-  })
-
-  // Skip if no plugin is found
-  if (!plugin) return
-
-  // Ensure the element has an id
-  if (!el.id.length) el.id = elUniqId(el)
-
-  // Extract the key and modifiers
-  let [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/\_\_+/)
-
-  const hasKey = key.length > 0
-  if (hasKey) {
-    key = camel(key)
-  }
-  const value = el.dataset[camelCasedKey] || ''
-  const hasValue = value.length > 0
-
-  // Create the runtime context
-  const ctx: RuntimeContext = {
-    signals,
-    applyToElement,
-    effect: (cb: () => void): OnRemovalFn => effect(cb),
-    actions,
-    removals,
-    genRX: () => genRX(ctx, ...(plugin.argNames || [])),
-    plugin,
-    el,
-    rawKey,
-    key,
-    value,
-    mods: new Map(),
-  }
-
-  // Check the requirements
-  const keyReq = plugin.keyReq || Requirement.Allowed
-  if (hasKey) {
-    if (keyReq === Requirement.Denied) {
-      throw runtimeErr(`${plugin.name}KeyNotAllowed`, ctx)
+    const hasKey = !!key
+    if (hasKey) {
+      key = camel(key)
     }
-  } else if (keyReq === Requirement.Must) {
-    throw runtimeErr(`${plugin.name}KeyRequired`, ctx)
-  }
+    const hasValue = !!value
 
-  const valReq = plugin.valReq || Requirement.Allowed
-  if (hasValue) {
-    if (valReq === Requirement.Denied) {
-      throw runtimeErr(`${plugin.name}ValueNotAllowed`, ctx)
+    // Create the runtime context
+    const ctx: RuntimeContext = {
+      el,
+      rawKey,
+      key,
+      value,
+      mods: new Map(),
+      root,
+      filtered,
+      mergePatch,
+      signal,
+      computed,
+      effect,
+      plugin,
+      actions,
+      peek,
+      getPath,
+      hasPath,
+      runtimeErr: 0 as any,
+      rx: 0 as any,
     }
-  } else if (valReq === Requirement.Must) {
-    throw runtimeErr(`${plugin.name}ValueRequired`, ctx)
-  }
+    ctx.runtimeErr = runtimeErr.bind(0, ctx)
+    ctx.rx = generateReactiveExpression(ctx)
 
-  // Check for exclusive requirements
-  if (keyReq === Requirement.Exclusive || valReq === Requirement.Exclusive) {
-    if (hasKey && hasValue) {
-      throw runtimeErr(`${plugin.name}KeyAndValueProvided`, ctx)
+    // Check the requirements
+    const keyReq = plugin.keyReq || 'allowed'
+    if (hasKey) {
+      if (keyReq === 'denied') {
+        throw ctx.runtimeErr(`${plugin.name}KeyNotAllowed`)
+      }
+    } else if (keyReq === 'must') {
+      throw ctx.runtimeErr(`${plugin.name}KeyRequired`)
     }
-    if (!hasKey && !hasValue) {
-      throw runtimeErr(`${plugin.name}KeyOrValueRequired`, ctx)
+
+    const valReq = plugin.valReq || 'allowed'
+    if (hasValue) {
+      if (valReq === 'denied') {
+        throw ctx.runtimeErr(`${plugin.name}ValueNotAllowed`)
+      }
+    } else if (valReq === 'must') {
+      throw ctx.runtimeErr(`${plugin.name}ValueRequired`)
+    }
+
+    // Check for exclusive requirements
+    if (keyReq === 'exclusive' || valReq === 'exclusive') {
+      if (hasKey && hasValue) {
+        throw ctx.runtimeErr(`${plugin.name}KeyAndValueProvided`)
+      }
+      if (!hasKey && !hasValue) {
+        throw ctx.runtimeErr(`${plugin.name}KeyOrValueRequired`)
+      }
+    }
+
+    for (const rawMod of rawModifiers) {
+      const [label, ...mod] = rawMod.split('.')
+      ctx.mods.set(camel(label), new Set(mod.map((t) => t.toLowerCase())))
+    }
+
+    startBatch()
+    const cleanup = plugin.onLoad(ctx)
+    endBatch()
+    if (cleanup) {
+      let cleanups = removals.get(el)
+      if (cleanups) {
+        cleanups.get(rawKey)?.()
+      } else {
+        cleanups = new Map()
+        removals.set(el, cleanups)
+      }
+      cleanups.set(rawKey, cleanup)
     }
   }
-
-  for (const rawMod of rawModifiers) {
-    const [label, ...mod] = rawMod.split('.')
-    ctx.mods.set(camel(label), new Set(mod.map((t) => t.toLowerCase())))
-  }
-
-  // Load the plugin
-  const cleanup = plugin.onLoad(ctx) ?? (() => {})
-
-  // Store the cleanup function
-  let elTracking = removals.get(el.id)
-  if (!elTracking) {
-    elTracking = new Map()
-    removals.set(el.id, elTracking)
-  }
-  elTracking.set(hash, cleanup)
 }
 
-function genRX(
-  ctx: RuntimeContext,
-  ...argNames: string[]
-): RuntimeExpressionFunction {
-  let userExpression = ''
+// Set up a mutation observer to run plugin removal and apply functions
+function observe(mutations: MutationRecord[]) {
+  const ignore = `[${aliasify('ignore')}]`
 
-  // This regex allows Datastar expressions to support nested
-  // regex and strings that contain ; without breaking.
-  //
-  // Each of these regex defines a block type we want to match
-  // (importantly we ignore the content within these blocks):
-  //
-  // regex            \/(\\\/|[^\/])*\/
-  // double quotes      "(\\"|[^\"])*"
-  // single quotes      '(\\'|[^'])*'
-  // ticks              `(\\`|[^`])*`
-  // iife               \(\s*((function)\s*\(\s*\)|(\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;)\{]*)\s*\)\s*\(\s*\)
-  //
-  // The iife support is (intentionally) limited. It only supports
-  // function and arrow syntax with no arguments, and does not support nested
-  // IIFEs.
-  //
-  // We also want to match the non delimiter part of statements
-  // note we only support ; statement delimiters:
-  //
-  // [^;]
-  //
-  const statementRe =
-    /(\/(\\\/|[^\/])*\/|"(\\"|[^\"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|\(\s*((function)\s*\(\s*\)|(\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;)\{]*)\s*\)\s*\(\s*\)|[^;])+/gm
-  const statements = ctx.value.trim().match(statementRe)
-  if (statements) {
-    const lastIdx = statements.length - 1
-    const last = statements[lastIdx].trim()
-    if (!last.startsWith('return')) {
-      statements[lastIdx] = `return (${last});`
+  for (const {
+    target,
+    type,
+    attributeName,
+    addedNodes,
+    removedNodes,
+  } of mutations) {
+    if (type === 'childList') {
+      for (const node of removedNodes) {
+        if (isHTMLOrSVG(node)) {
+          const cleanups = removals.get(node)
+          // If removals has el, delete it and run all cleanup functions
+          if (removals.delete(node)) {
+            for (const cleanup of cleanups!.values()) {
+              cleanup()
+            }
+            cleanups!.clear()
+          }
+        }
+      }
+
+      for (const node of addedNodes) {
+        if (isHTMLOrSVG(node)) {
+          applyEls([node])
+          applyEls(node.querySelectorAll<HTMLOrSVG>('*'))
+        }
+      }
+    } else if (type === 'attributes') {
+      // If el has a parent with data-ignore, skip it
+      if (isHTMLOrSVG(target) && !target.closest(ignore)) {
+        const key = camel(attributeName!.slice(5))
+        const value = target.getAttribute(attributeName!)
+        if (value === null) {
+          const cleanups = removals.get(target)
+          if (cleanups) {
+            cleanups.get(key)?.()
+            cleanups.delete(key)
+          }
+        } else {
+          applyAttributePlugin(target, key, value)
+        }
+      }
     }
-    userExpression = statements.join(';\n')
   }
+}
+
+function generateReactiveExpression(
+  ctx: RuntimeContext,
+): RuntimeExpressionFunction {
+  let expr = ''
+
+  const attrPlugin = (ctx.plugin as AttributePlugin) || undefined
+
+  // plugin is guaranteed to be an attribute plugin
+  if (attrPlugin?.isExpr) {
+    // This regex allows Datastar expressions to support nested
+    // regex and strings that contain ; without breaking.
+    //
+    // Each of these regex defines a block type we want to match
+    // (importantly we ignore the content within these blocks):
+    //
+    // regex            \/(\\\/|[^\/])*\/
+    // double quotes      "(\\"|[^\"])*"
+    // single quotes      '(\\'|[^'])*'
+    // ticks              `(\\`|[^`])*`
+    // iife               \(\s*((function)\s*\(\s*\)|(\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;)\{]*)\s*\)\s*\(\s*\)
+    //
+    // The iife support is (intentionally) limited. It only supports
+    // function and arrow syntax with no arguments, and no nested IIFEs.
+    //
+    // We also want to match the non delimiter part of statements
+    // note we only support ; statement delimiters:
+    //
+    // [^;]
+    //
+    const statementRe =
+      /(\/(\\\/|[^/])*\/|"(\\"|[^"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|\(\s*((function)\s*\(\s*\)|(\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm
+    const statements = ctx.value.trim().match(statementRe)
+    if (statements) {
+      const lastIdx = statements.length - 1
+      const last = statements[lastIdx].trim()
+      if (!last.startsWith('return')) {
+        statements[lastIdx] = `return (${last});`
+      }
+      expr = statements.join(';\n')
+    }
+  } else {
+    expr = ctx.value.trim()
+  }
+
+  // Handle $$ syntax - converts $$signal to $context.signal for context signals
+  expr = expr.replace(
+    // Regex: matches $$ followed by valid signal names (including nested like $$foo.bar)
+    /\$\$([a-zA-Z_][\w.-]*(?:\.[a-zA-Z_][\w.-]*)*?)(?=\s|$|[^\w.-])/g,
+    // s = captured signal name after $$
+    (_, s) => {
+      const scope = findClosestScoped(ctx.el)
+      return scope ? `$${scope}.${s}` : `$${s}` // if no scope: $signal for global scope
+    },
+  )
+
+  expr = expr.replace(
+    /\$([a-zA-Z_][\w.-]*(?:\.[a-zA-Z_][\w.-]*)*?)(?=\s|$|[^\w.-])/g,
+    (match, signalName) => {
+      // If the signal name ends with a hyphen followed by a $, it's likely two separate signals
+      // So we should not include the trailing hyphen in this signal name
+      if (
+        signalName.endsWith('-') &&
+        match.length < expr.length &&
+        expr[expr.indexOf(match) + match.length] === '$'
+      ) {
+        signalName = signalName.slice(0, -1)
+        const parts = signalName.split('.')
+        return `${parts.reduce((acc: string, part: string) => `${acc}['${part}']`, '$')}-`
+      }
+
+      const parts = signalName.split('.')
+      return parts.reduce(
+        (acc: string, part: string) => `${acc}['${part}']`,
+        '$',
+      )
+    },
+  )
 
   // Ignore any escaped values
   const escaped = new Map<string, string>()
-  const escapeRe = new RegExp(`(?:${DSP})(.*?)(?:${DSS})`, 'gm')
-  for (const match of userExpression.matchAll(escapeRe)) {
+  const escapeRe = RegExp(`(?:${DSP})(.*?)(?:${DSS})`, 'gm')
+  for (const match of expr.matchAll(escapeRe)) {
     const k = match[1]
-    const v = new Hash('dsEscaped').with(k).string
+    const v = `dsEscaped${djb2(k)}`
     escaped.set(v, k)
-    userExpression = userExpression.replace(DSP + k + DSS, v)
+    expr = expr.replace(DSP + k + DSS, v)
   }
 
-  const fnCall = /@(\w*)\(/gm
-  const matches = userExpression.matchAll(fnCall)
-  const methodsCalled = new Set<string>()
-  for (const match of matches) {
-    methodsCalled.add(match[1])
+  const nameGen = (prefix: string, name: string) => {
+    return `${prefix}${snake(name).replaceAll(/\./g, '_')}`
   }
 
   // Replace any action calls
-  const actionsRe = new RegExp(`@(${Object.keys(actions).join('|')})\\(`, 'gm')
+  const actionsCalled = new Set<string>()
+  const actionsRe = RegExp(`@(${Object.keys(actions).join('|')})\\(`, 'gm')
+  const actionMatches = [...expr.matchAll(actionsRe)]
+  const actionNames = new Set<string>()
+  const actionFns = new Set<(...args: any[]) => any>()
+  if (actionMatches.length) {
+    const actionPrefix = `${DATASTAR}Act_`
+    for (const match of actionMatches) {
+      const actionName = match[1]
+      const action = actions[actionName]
+      if (!action) {
+        continue
+      }
+      actionsCalled.add(actionName)
 
-  // Add ctx to action calls
-  userExpression = userExpression.replaceAll(
-    actionsRe,
-    'ctx.actions.$1.fn(ctx,',
-  )
+      const name = nameGen(actionPrefix, actionName)
 
-  // Replace any signal calls
-  const signalNames = ctx.signals.paths()
-  if (signalNames.length) {
-    // Match any valid `$signalName` followed by a non-word character or end of string
-    const signalsRe = new RegExp(`\\$(${signalNames.join('|')})(\\W|$)`, 'gm')
-    userExpression = userExpression.replaceAll(
-      signalsRe,
-      `ctx.signals.signal('$1').value$2`,
-    )
+      // Add ctx to action calls
+      expr = expr.replace(`@${actionName}(`, `${name}(`)
+      actionNames.add(name)
+      actionFns.add((...args: any[]) => action.fn(ctx, ...args))
+    }
   }
 
   // Replace any escaped values
   for (const [k, v] of escaped) {
-    userExpression = userExpression.replace(k, v)
+    expr = expr.replace(k, v)
   }
 
-  const fnContent = `return (() => {\n${userExpression}\n})()` // Wrap in IIFE
-  ctx.fnContent = fnContent
+  ctx.fnContent = expr
 
   try {
-    const fn = new Function('ctx', ...argNames, fnContent)
+    const fn = Function(
+      'el',
+      '$',
+      ...(attrPlugin?.argNames || []),
+      ...actionNames,
+      expr,
+    )
     return (...args: any[]) => {
       try {
-        return fn(ctx, ...args)
-      } catch (error: any) {
-        throw runtimeErr('ExecuteExpression', ctx, {
-          error: error.message,
+        return fn(ctx.el, root, ...args, ...actionFns)
+      } catch (e: any) {
+        throw ctx.runtimeErr('ExecuteExpression', {
+          error: e.message,
         })
       }
     }
   } catch (error: any) {
-    throw runtimeErr('GenerateExpression', ctx, {
+    throw ctx.runtimeErr('GenerateExpression', {
       error: error.message,
     })
   }
+}
+
+function djb2(str: string) {
+  let hash = 5831
+  let i = str.length
+  while (i--) {
+    hash += (hash << 5) + str.charCodeAt(i)
+  }
+  return (hash >>> 0).toString(36)
 }

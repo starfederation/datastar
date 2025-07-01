@@ -1,18 +1,26 @@
 import type { EventCallbackHandler, Modifiers } from '../engine/types'
 import { tagHas, tagToMs } from './tags'
 
+export function delay(
+  callback: EventCallbackHandler,
+  wait: number,
+): EventCallbackHandler {
+  return (...args: any[]) => {
+    setTimeout(() => {
+      callback(...args)
+    }, wait)
+  }
+}
+
 export function debounce(
   callback: EventCallbackHandler,
   wait: number,
   leading = false,
   trailing = true,
 ): EventCallbackHandler {
-  let timer = -1
-
-  const resetTimer = () => timer && clearTimeout(timer)
-
+  let timer = 0
   return (...args: any[]) => {
-    resetTimer()
+    timer && clearTimeout(timer)
 
     if (leading && !timer) {
       callback(...args)
@@ -22,7 +30,7 @@ export function debounce(
       if (trailing) {
         callback(...args)
       }
-      resetTimer()
+      timer && clearTimeout(timer)
     }, wait)
   }
 }
@@ -56,6 +64,12 @@ export function modifyTiming(
   callback: EventCallbackHandler,
   mods: Modifiers,
 ): EventCallbackHandler {
+  const delayArgs = mods.get('delay')
+  if (delayArgs) {
+    const wait = tagToMs(delayArgs)
+    callback = delay(callback, wait)
+  }
+
   const debounceArgs = mods.get('debounce')
   if (debounceArgs) {
     const wait = tagToMs(debounceArgs)

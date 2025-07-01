@@ -23,7 +23,7 @@ func Build() error {
 
 	if err := errors.Join(
 		// createPluginManifest(),
-		//createBundles(version),
+		createBundles(version),
 		writeOutConsts(version),
 	); err != nil {
 		return fmt.Errorf("error creating bundles: %w", err)

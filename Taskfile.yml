@@ -69,12 +69,6 @@ tasks:
       - "bundles/**/*"
     cmds:
       - go run build/cmd/build/main.go
-      - cp -r bundles/* site/static/js/
-      - mkdir -p library/dist/
-      - cp -r bundles/* library/dist/
-      - mkdir -p site/static/librarySource
-      - rm -rf site/static/librarySource/*
-      - cp -r library/src/* site/static/librarySource/
 
   library:
     dir: library

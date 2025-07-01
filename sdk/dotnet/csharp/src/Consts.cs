@@ -36,7 +36,7 @@ public enum EventType
 public static class Consts
 {
     public const string DatastarKey = "datastar";
-    public const string Version     = "1.0.0-beta.11";
+    public const string Version     = "1.0.0-RC.12";
 
     /// Default: TimeSpan.FromMilliseconds 1000
     public static readonly TimeSpan DefaultSseRetryDuration = TimeSpan.FromMilliseconds(1000);
