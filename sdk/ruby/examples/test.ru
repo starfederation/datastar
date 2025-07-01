@@ -46,7 +46,7 @@ run do |env|
         sse.execute_script(arg, event)
       when 'mergeFragments'
         arg = event.delete('fragments')
-        sse.merge_fragments(arg, event)
+        sse.patch_elements(arg, event)
       when 'removeFragments'
         arg = event.delete('selector')
         sse.remove_fragments(arg, event)

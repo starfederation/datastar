@@ -25,7 +25,7 @@ run do |env|
 
     datastar.stream do |sse|
       message.size.times do |i|
-        sse.merge_fragments(%(<div id="message">#{message[0..i]}</div>))
+        sse.patch_elements(%(<div id="message">#{message[0..i]}</div>))
         sleep delay
       end
     end

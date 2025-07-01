@@ -126,70 +126,6 @@ RSpec.describe Datastar::Dispatcher do
     end
   end
 
-  describe '#merge_fragments' do
-    it 'produces a streameable response body with D* fragments' do
-      dispatcher.merge_fragments %(<div id="foo">\n<span>hello</span>\n</div>\n)
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(socket.open).to be(false)
-      expect(socket.lines).to eq(["event: datastar-merge-fragments\ndata: fragments <div id=\"foo\">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n"])
-    end
-
-    it 'takes D* options' do
-      dispatcher.merge_fragments(
-        %(<div id="foo">\n<span>hello</span>\n</div>\n),
-        id: 72,
-        retry_duration: 2000
-      )
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n)])
-    end
-
-    it 'omits retry if using default value' do
-      dispatcher.merge_fragments(
-        %(<div id="foo">\n<span>hello</span>\n</div>\n),
-        id: 72,
-        retry_duration: 1000
-      )
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n)])
-    end
-
-    it 'works with #call(view_context:) interfaces' do
-      template_class = Class.new do
-        def self.call(view_context:) = %(<div id="foo">\n<span>#{view_context}</span>\n</div>\n)
-      end
-
-      dispatcher.merge_fragments(
-        template_class,
-        id: 72,
-        retry_duration: 2000
-      )
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: fragments <div id="foo">\ndata: fragments <span>#{view_context}</span>\ndata: fragments </div>\n\n\n)])
-    end
-
-    it 'works with #render_in(view_context, &) interfaces' do
-      template_class = Class.new do
-        def self.render_in(view_context) = %(<div id="foo">\n<span>#{view_context}</span>\n</div>\n)
-      end
-
-      dispatcher.merge_fragments(
-        template_class,
-        id: 72,
-        retry_duration: 2000
-      )
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: fragments <div id="foo">\ndata: fragments <span>#{view_context}</span>\ndata: fragments </div>\n\n\n)])
-    end
-  end
-
   describe '#remove_fragments' do
     it 'produces D* remove fragments' do
       dispatcher.remove_fragments('#list-item-1')
@@ -392,20 +328,23 @@ RSpec.describe Datastar::Dispatcher do
   describe '#stream' do
     it 'writes multiple events to socket' do
       socket = TestSocket.new
+      dispatcher.on_error do |ex|
+        raise ex
+      end
       dispatcher.stream do |sse|
-        sse.merge_fragments %(<div id="foo">\n<span>hello</span>\n</div>\n)
+        sse.patch_elements %(<div id="foo">\n<span>hello</span>\n</div>\n)
         sse.merge_signals(foo: 'bar')
       end
 
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
       expect(socket.lines.size).to eq(2)
-      expect(socket.lines[0]).to eq("event: datastar-merge-fragments\ndata: fragments <div id=\"foo\">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n")
+      expect(socket.lines[0]).to eq("event: datastar-patch-elements\ndata: elements <div id=\"foo\">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n\n")
       expect(socket.lines[1]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
     end
 
     it 'returns a Rack array response' do
-      status, headers, body = dispatcher.stream do |sse|
+      status, headers, _body = dispatcher.stream do |sse|
         sse.merge_signals(foo: 'bar')
       end
       expect(status).to eq(200)

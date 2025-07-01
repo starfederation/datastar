@@ -10,7 +10,7 @@ module DispatcherExamples
 
       dispatcher.stream do |sse|
         sleep 0.01
-        sse.merge_fragments %(<div id="foo">\n<span>hello</span>\n</div>\n)
+        sse.patch_elements %(<div id="foo">\n<span>hello</span>\n</div>\n)
       end
 
       dispatcher.stream do |sse|
@@ -22,7 +22,7 @@ module DispatcherExamples
       expect(socket.open).to be(false)
       expect(socket.lines.size).to eq(2)
       expect(socket.lines[0]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
-      expect(socket.lines[1]).to eq("event: datastar-merge-fragments\ndata: fragments <div id=\"foo\">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n")
+      expect(socket.lines[1]).to eq("event: datastar-patch-elements\ndata: elements <div id=\"foo\">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n\n")
       expect(disconnects).to eq([true])
     end
 

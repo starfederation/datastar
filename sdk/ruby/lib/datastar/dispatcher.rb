@@ -10,14 +10,14 @@ module Datastar
   #  datastar = Datastar.new(request:, response:, view_context: self)
   #
   #  # One-off fragment response
-  #  datastar.merge_fragments(template)
+  #  datastar.patch_elements(template)
   #
   #  # Streaming response with multiple messages
   #  datastar.stream do |sse|
-  #    sse.merge_fragments(template)
+  #    sse.patch_elements(template)
   #    10.times do |i|
   #      sleep 0.1
-  #      sse.merge_signals(count: i)
+  #      sse.patch_signals(count: i)
   #    end
   #  end
   #
@@ -119,22 +119,16 @@ module Datastar
       @signals ||= parse_signals(request).freeze
     end
 
-    # Send one-off fragments to the UI
-    # See https://data-star.dev/reference/sse_events#datastar-merge-fragments
+    # Send one-off elements to the UI
+    # See https://data-star.dev/reference/sse_events#datastar-patch-elements
     # @example
     #
-    #  datastar.merge_fragments(%(<div id="foo">\n<span>hello</span>\n</div>\n))
+    #  datastar.patch_elements(%(<div id="foo">\n<span>hello</span>\n</div>\n))
     #  # or a Phlex view object
-    #  datastar.merge_fragments(UserComponet.new)
+    #  datastar.patch_elements(UserComponet.new)
     #
-    # @param fragments [String, #call(view_context: Object) => Object] the HTML fragment or object
+    # @param elements [String, #call(view_context: Object) => Object] the HTML elements or object
     # @param options [Hash] the options to send with the message
-    def merge_fragments(fragments, options = BLANK_OPTIONS)
-      stream_no_heartbeat do |sse|
-        sse.merge_fragments(fragments, options)
-      end
-    end
-
     def patch_elements(elements, options = BLANK_OPTIONS)
       stream_no_heartbeat do |sse|
         sse.patch_elements(elements, options)
@@ -215,9 +209,9 @@ module Datastar
     #
     #  datastar.stream do |sse|
     #    total = 300
-    #    sse.merge_fragments(%(<progress data-signal-progress="0" id="progress" max="#{total}" data-attr-value="$progress">0</progress>))
+    #    sse.patch_elements(%(<progress data-signal-progress="0" id="progress" max="#{total}" data-attr-value="$progress">0</progress>))
     #    total.times do |i|
-    #      sse.merge_signals(progress: i)
+    #      sse.patch_signals(progress: i)
     #    end
     #  end
     #

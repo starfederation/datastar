@@ -45,26 +45,6 @@ module Datastar
       @stream << MSG_END
     end
 
-    def merge_fragments(fragments, options = BLANK_OPTIONS)
-      # Support Phlex components
-      # And Rails' #render_in interface
-      fragments = if fragments.respond_to?(:render_in)
-        fragments.render_in(view_context)
-      elsif fragments.respond_to?(:call)
-        fragments.call(view_context:)
-      else
-        fragments.to_s
-      end
-
-      fragment_lines = fragments.to_s.split("\n")
-
-      buffer = +"event: datastar-merge-fragments\n"
-      build_options(options, buffer)
-      fragment_lines.each { |line| buffer << "data: fragments #{line}\n" }
-
-      write(buffer)
-    end
-
     def patch_elements(elements, options = BLANK_OPTIONS)
       # Support Phlex components
       # And Rails' #render_in interface
