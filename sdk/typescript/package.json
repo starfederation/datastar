@@ -5,9 +5,9 @@
   "scripts": {
     "check": "deno lint && deno check src/node/node.ts && deno check src/web/deno.ts && bun run --check src/web/bun.ts",
     "build": "deno run -A build.ts",
-    "serve-deno": "deno run -A src/web/deno.ts",
-    "serve-bun": "bun run src/web/bun.ts",
-    "serve-node": "deno run -A build.ts && node npm/esm/node/node.js",
+    "serve-deno": "deno run -A test/deno.ts",
+    "serve-bun": "bun run test/bun.ts",
+    "serve-node": "deno run -A build.ts && node npm/esm/test/node.js",
     "test-node": "./test/test-node.sh",
     "test-deno": "./test/test-deno.sh",
     "test-bun": "./test/test-bun.sh"
