@@ -63,7 +63,7 @@ RSpec.describe Datastar::Dispatcher do
   end
 
   describe '#patch_elements' do
-    it 'produces a streameable response body with D* fragments' do
+    it 'produces a streameable response body with D* elements' do
       dispatcher.patch_elements %(<div id="foo">\n<span>hello</span>\n</div>\n)
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
@@ -75,12 +75,13 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.patch_elements(
         %(<div id="foo">\n<span>hello</span>\n</div>\n),
         id: 72,
-        retry_duration: 2000
+        retry_duration: 2000,
+        use_view_transition: true,
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: elements <div id="foo">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: useViewTransition true\ndata: elements <div id="foo">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n\n)])
     end
 
     it 'omits retry if using default value' do
