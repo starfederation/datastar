@@ -99,7 +99,7 @@ export abstract class ServerSentEventGenerator {
 
   private eachNewlineIsADataLine(prefix: string, data: string) {
     return data.split("\n").map((line) => {
-      return `${prefix}${line}`;
+      return `${prefix} ${line}`;
     });
   }
 
