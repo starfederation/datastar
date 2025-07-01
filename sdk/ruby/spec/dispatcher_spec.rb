@@ -56,10 +56,14 @@ RSpec.describe Datastar::Dispatcher do
 
   specify '#sse?' do
     expect(dispatcher.sse?).to be(true)
-    request = build_request('/events', headers: { 'HTTP_ACCEPT' => 'application/json' })
 
+    request = build_request('/events', headers: { 'HTTP_ACCEPT' => 'application/json' })
     dispatcher = Datastar.new(request:, response:, view_context:)
     expect(dispatcher.sse?).to be(false)
+
+    request = build_request('/events', headers: { 'HTTP_ACCEPT' => 'text/event-stream,application/json' })
+    dispatcher = Datastar.new(request:, response:, view_context:)
+    expect(dispatcher.sse?).to be(true)
   end
 
   describe '#patch_elements' do

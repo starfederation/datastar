@@ -24,6 +24,7 @@ module Datastar
   class Dispatcher
     BLANK_BODY = [].freeze
     SSE_CONTENT_TYPE = 'text/event-stream'
+    SSE_ACCEPT_EXP = /text\/event-stream/
     HTTP_ACCEPT = 'HTTP_ACCEPT'
     HTTP1 = 'HTTP/1.1'
 
@@ -72,7 +73,7 @@ module Datastar
     # Check if the request accepts SSE responses
     # @return [Boolean]
     def sse?
-      @request.get_header(HTTP_ACCEPT) == SSE_CONTENT_TYPE
+      !!(@request.get_header(HTTP_ACCEPT).to_s =~ SSE_ACCEPT_EXP)
     end
 
     # Register an on-connect callback
