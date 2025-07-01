@@ -49,7 +49,7 @@ run do |env|
         sse.patch_elements(arg, event)
       when 'removeFragments'
         arg = event.delete('selector')
-        sse.remove_fragments(arg, event)
+        sse.remove_elements(arg, event)
       end
     end
   end

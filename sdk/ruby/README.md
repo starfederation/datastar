@@ -106,11 +106,13 @@ sse.patch_elements(
 )
 ```
 
-#### `remove_fragments`
- See https://data-star.dev/reference/sse_events#datastar-remove-fragments
+#### `remove_elements`
+
+Sugar on top of `#patch_elements`
+ See https://data-star.dev/reference/sse_events#datastar-patch-elements
 
 ```ruby
-sse.remove_fragments('#users')
+sse.remove_elements('#users')
 ```
 
 #### `merge_signals`
