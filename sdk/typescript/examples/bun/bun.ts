@@ -12,7 +12,7 @@ const server = Bun.serve({
       );
     },
     "/merge": async (req: Request) => {
-      const reader = await ServerSentEventGenerator.readSignals(req);
+      const reader = await ServerSentEventGenerator.ReadSignals(req);
 
       if (!reader.success) {
         console.error("Error while reading signals", reader.error);

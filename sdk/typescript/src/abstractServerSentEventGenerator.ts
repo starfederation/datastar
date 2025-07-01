@@ -22,7 +22,7 @@ import {
  * server-sent events (SSE) as well as reading signals sent by the client.
  *
  * The concrete implementation must override the send and constructor methods as well
- * as implement readSignals and stream static methods.
+ * as implement ReadSignals and stream static methods.
  */
 export abstract class ServerSentEventGenerator {
   protected constructor() {}

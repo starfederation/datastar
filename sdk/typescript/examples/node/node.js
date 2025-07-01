@@ -12,7 +12,7 @@ const server = createServer(async (req, res) => {
       `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@release-candidate/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
     );
   } else if (req.url?.includes("/merge")) {
-    const reader = await ServerSentEventGenerator.readSignals(req);
+    const reader = await ServerSentEventGenerator.ReadSignals(req);
 
     if (!reader.success) {
       console.error("Error while reading signals", reader.error);

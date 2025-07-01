@@ -101,7 +101,7 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
    *
    * @returns An object containing a success boolean and either the client's signals or an error message.
    */
-  static async readSignals(request: IncomingMessage): Promise<
+  static async ReadSignals(request: IncomingMessage): Promise<
     | { success: true; signals: Record<string, Jsonifiable> }
     | { success: false; error: string }
   > {

@@ -43,13 +43,13 @@ import { ServerSentEventGenerator } from "datastar-sdk/web";
 
 ### Basic Usage
 
-Here's a simple example in Node showing how to read client signals and send back fragment updates:
+Here's a simple example in Node showing how to read client signals and send back element patches:
 
 ```javascript
 import { ServerSentEventGenerator } from "datastar-sdk/node";
 
 // Read signals from the client request
-const reader = await ServerSentEventGenerator.readSignals(req);
+const reader = await ServerSentEventGenerator.ReadSignals(req);
 
 if (!reader.success) {
     console.error('Error reading signals:', reader.error);
@@ -58,15 +58,15 @@ if (!reader.success) {
 
 // Stream updates back to the client
 ServerSentEventGenerator.stream(req, res, (stream) => {
-    // Merge signals
-    stream.mergeSignals({ foo: reader.signals.foo });
+    // Patch signals
+    stream.PatchSignals(JSON.stringify({ foo: reader.signals.foo }));
     
-    // Update DOM fragments
-    stream.mergeFragments(`
+    // Patch DOM elements
+    stream.PatchElements(`
         <div id="toMerge">
             Hello <span data-text="$foo">${reader.signals.foo}</span>
         </div>
-    `);
+    `, { mode: "outer" });
 });
 ```
 
@@ -84,7 +84,7 @@ See examples for other runtimes below.
 
 Each example creates a simple web server demonstrating:
 - Signal handling from client requests
-- Fragment merging for DOM updates
+- Element patching for DOM updates
 - Real-time communication via Server-Sent Events
 
 ### Running Examples
@@ -105,7 +105,7 @@ The main class for handling Datastar communication.
 
 #### Static Methods
 
-##### `readSignals(request)`
+##### `ReadSignals(request)`
 Reads signals from a client request.
 
 **Parameters:**
@@ -143,20 +143,34 @@ Creates a Server-Sent Event stream for real-time communication.
 
 #### Stream Instance Methods
 
-##### `mergeSignals(signals)`
-Merges signals with the client state.
+##### `PatchSignals(signals, options?)`
+Patches signals into the client signal store.
 
 **Parameters:**
-- `signals`: Object containing signal key-value pairs
+- `signals`: JSON string containing signal data to patch
+- `options`: Optional configuration object with `onlyIfMissing` boolean
 
-##### `mergeFragments(html)`
-Sends HTML fragments to update the client DOM.
+**Example:**
+```javascript
+stream.PatchSignals(JSON.stringify({ foo: "bar", count: 42 }));
+```
+
+##### `PatchElements(elements, options?)`
+Patches HTML elements into the client DOM.
 
 **Parameters:**
-- `html`: HTML string to merge into the client
+- `elements`: HTML string containing elements to patch
+- `options`: Optional configuration object with `mode` and `selector`
 
-##### `close()`
-Closes the SSE stream (only needed when `keepalive: true`).
+**Options:**
+- `mode`: Patch mode - "outer", "inner", "replace", "prepend", "append", "before", "after", "remove"
+- `selector`: CSS selector for targeting elements (required for some modes)
+- `useViewTransition`: Whether to use View Transition API
+
+**Example:**
+```javascript
+stream.PatchElements('<div id="myDiv">Updated content</div>', { mode: "outer" });
+```
 
 ## Development
 
@@ -256,9 +270,13 @@ To support additional runtimes or frameworks, extend the abstract `ServerSentEve
 
 You'll need to implement:
 - `constructor`: Initialize runtime-specific components
-- `readSignals`: Parse signals from requests
+- `ReadSignals`: Parse signals from requests  
 - `stream`: Create SSE streams
 - `send`: Send data to clients
+
+The abstract class provides these public methods:
+- `PatchElements(elements, options?)`: Patch HTML elements
+- `PatchSignals(signals, options?)`: Patch signal data
 
 ## Contributing
 

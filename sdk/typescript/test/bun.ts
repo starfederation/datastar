@@ -13,8 +13,8 @@ const server = Bun.serve({
           headers: { "Content-Type": "text/html" },
         },
       );
-    } else if (url.pathname.includes("/merge")) {
-      const reader = await ServerSentEventGenerator.readSignals(req);
+      } else if (url.pathname.includes("/merge")) {
+    const reader = await ServerSentEventGenerator.ReadSignals(req);
 
       if (!reader.success) {
         console.error("Error while reading signals", reader.error);
@@ -31,8 +31,8 @@ const server = Bun.serve({
           `<div id="toMerge">Hello ${reader.signals.foo}</div>`,
         );
       });
-    } else if (url.pathname.includes("/test")) {
-      const reader = await ServerSentEventGenerator.readSignals(req);
+      } else if (url.pathname.includes("/test")) {
+    const reader = await ServerSentEventGenerator.ReadSignals(req);
       if (reader.success === true) {
         const events = reader.signals.events;
         if (isEventArray(events)) {
