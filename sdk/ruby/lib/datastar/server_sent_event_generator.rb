@@ -65,11 +65,14 @@ module Datastar
       write(buffer)
     end
 
-    def remove_fragments(selector, options = BLANK_OPTIONS)
-      buffer = +"event: datastar-remove-fragments\n"
-      build_options(options, buffer)
-      buffer << "data: selector #{selector}\n"
-      write(buffer)
+    def remove_elements(selector, options = BLANK_OPTIONS)
+      patch_elements(
+        nil, 
+        options.merge(
+          Consts::PATCH_MODE_DATALINE_LITERAL => Consts::ElementPatchMode::REMOVE,
+          selector:
+        )
+      )
     end
 
     def merge_signals(signals, options = BLANK_OPTIONS)

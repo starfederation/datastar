@@ -126,21 +126,21 @@ RSpec.describe Datastar::Dispatcher do
     end
   end
 
-  describe '#remove_fragments' do
-    it 'produces D* remove fragments' do
-      dispatcher.remove_fragments('#list-item-1')
+  describe '#remove_elements' do
+    it 'produces D* patch elements with "remove" mode' do
+      dispatcher.remove_elements('#list-item-1')
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-remove-fragments\ndata: selector #list-item-1\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: mode remove\ndata: selector #list-item-1\n\n\n)])
     end
 
     it 'takes D* options' do
-      dispatcher.remove_fragments('#list-item-1', id: 72)
+      dispatcher.remove_elements('#list-item-1', id: 72)
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-remove-fragments\nid: 72\ndata: selector #list-item-1\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: mode remove\ndata: selector #list-item-1\n\n\n)])
     end
   end
 

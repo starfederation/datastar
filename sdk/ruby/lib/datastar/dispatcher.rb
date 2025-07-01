@@ -135,17 +135,18 @@ module Datastar
       end
     end
 
-    # One-off remove fragments from the UI
-    # See https://data-star.dev/reference/sse_events#datastar-remove-fragments
+    # One-off remove elements from the UI
+    # Sugar on top of patch-elements with mode: 'remove'
+    # See https://data-star.dev/reference/sse_events#datastar-patch-elements
     # @example
     #
-    #  datastar.remove_fragments('#users')
+    #  datastar.remove_elements('#users')
     #
     # @param selector [String] a CSS selector for the fragment to remove
     # @param options [Hash] the options to send with the message
-    def remove_fragments(selector, options = BLANK_OPTIONS)
+    def remove_elements(selector, options = BLANK_OPTIONS)
       stream_no_heartbeat do |sse|
-        sse.remove_fragments(selector, options)
+        sse.remove_elements(selector, options)
       end
     end
 
