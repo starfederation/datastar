@@ -104,7 +104,7 @@ class ServerSentEventGenerator
              $elements .= ' ' . $name . '="' . htmlspecialchars($value, ENT_QUOTES) . '"';
         }
 
-        $autoRemove = $options['autoRemove'] ?? false;
+        $autoRemove = $options['autoRemove'] ?? true;
         if ($autoRemove === true) {
              $elements .= ' onload="this.remove()"';
         }
