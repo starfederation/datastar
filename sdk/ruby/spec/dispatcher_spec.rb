@@ -124,6 +124,17 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.response.body.call(socket)
       expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: elements <div id="foo">\ndata: elements <span>#{view_context}</span>\ndata: elements </div>\n\n\n)])
     end
+
+    it 'accepts an array of elements' do
+      dispatcher.patch_elements([
+        %(<div id="foo">Hello</div>),
+        %(<div id="bar">Bye</div>)
+      ])
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq(["event: datastar-patch-elements\ndata: elements <div id=\"foo\">Hello</div>\ndata: elements <div id=\"bar\">Bye</div>\n\n\n"])
+    end
   end
 
   describe '#remove_elements' do

@@ -46,17 +46,14 @@ module Datastar
     end
 
     def patch_elements(elements, options = BLANK_OPTIONS)
-      # Support Phlex components
-      # And Rails' #render_in interface
-      elements = if elements.respond_to?(:render_in)
-        elements.render_in(view_context)
-      elsif elements.respond_to?(:call)
-        elements.call(view_context:)
-      else
-        elements.to_s
+      elements = Array(elements).compact
+      rendered_elements = elements.map do |element|
+        render_element(element)
       end
 
-      element_lines = elements.to_s.split("\n")
+      element_lines = rendered_elements.flat_map do |el|
+        el.to_s.split("\n")
+      end
 
       buffer = +"event: datastar-patch-elements\n"
       build_options(options, buffer)
@@ -115,6 +112,18 @@ module Datastar
     private
 
     attr_reader :view_context, :stream
+
+    # Support Phlex components
+    # And Rails' #render_in interface
+    def render_element(element)
+      if element.respond_to?(:render_in)
+        element.render_in(view_context)
+      elsif element.respond_to?(:call)
+        element.call(view_context:)
+      else
+        element
+      end
+    end
 
     def build_options(options, buffer)
       options.each do |k, v|
