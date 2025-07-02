@@ -1,7 +1,7 @@
-(ns examples.animation-gzip
+(ns examples.http-kit2.animation
   (:require
     [examples.animation-gzip.broadcast :as broadcast]
-    [examples.animation-gzip.handlers :as handlers]
+    [examples.animation-gzip.handlers  :as handlers]
     [examples.animation-gzip.rendering :as rendering]
     [examples.animation-gzip.state :as state]
     [examples.common :as c]
@@ -9,17 +9,17 @@
     [reitit.ring :as rr]
     [reitit.ring.middleware.exception :as reitit-exception]
     [reitit.ring.middleware.parameters :as reitit-params]
-    [starfederation.datastar.clojure.adapter.http-kit :as hk-gen]
+    [starfederation.datastar.clojure.adapter.http-kit2 :as hk-gen]
     [starfederation.datastar.clojure.adapter.http-kit-schemas]
     [starfederation.datastar.clojure.adapter.ring :as ring-gen]
     [starfederation.datastar.clojure.adapter.ring-schemas]
-    [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.api-schemas]
     [starfederation.datastar.clojure.brotli :as brotli]))
 
 ;; This example let's use play with fat updates and compression
 ;; to get an idea of the gains compression can help use achieve
 ;; in terms of network usage.
+
 (broadcast/install-watch!)
 
 
@@ -32,7 +32,8 @@
    ["/step1"     handlers/step-handler]
    ["/play"      handlers/play-handler]
    ["/pause"     handlers/pause-handler]
-   ["/updates"   (handlers/->updates-handler ->sse-response opts)]
+   ["/updates"   {:handler (handlers/->updates-handler ->sse-response opts)
+                  :middleware [[hk-gen/start-responding-middleware]]}]
    ["/refresh"   handlers/refresh-handler]
    ["/resize"    handlers/resize-handler]
    c/datastar-route])

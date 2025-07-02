@@ -174,8 +174,9 @@
   needed to run the test (see [[setup-persistent-see-state]])."
   [->sse-response server-opts]
   (lt/around [f]
-    (let [{:keys [get-port]} server-opts
-          {:keys [!conn latch handler]} (setup-persistent-see-state ->sse-response)]
+    (let [{:keys [get-port wrap]} server-opts
+          {:keys [!conn latch handler]} (setup-persistent-see-state ->sse-response)
+          handler (cond-> handler wrap wrap)]
       (u/with-server server handler (dissoc server-opts :get-port)
         (binding [*ctx* {:port (get-port server)
                          :!conn !conn}]

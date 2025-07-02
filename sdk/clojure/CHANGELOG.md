@@ -26,7 +26,19 @@
 
 ### Added
 
+- There is a new http-kit API that allows a more natural ring response model when
+  using SSE. With the current API the status and headers for a response are
+  sent directly while `->sse-response` is running, the `on-open` callback runs
+  just after. For instance that any middleware that would add headers after the
+  execution of the `->sse-response` function won't work, the initial response
+  being already sent.
+  The new `starfederation.datastar.clojure.adapter.http-kit2`
+  API changes this behavior. In this new api the initial response is not sent
+  during `->sse-response`. Instead a middleware takes care of sending it and
+  only then calls the `on-open` callback. If this middleware is the last to run
+  on the return any addition to the response map will be taken into account.
 - A new library providing Brotli write profile has been added.
+
 ## 2025-04-07
 
 ### Added
