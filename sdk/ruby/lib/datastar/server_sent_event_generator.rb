@@ -20,13 +20,6 @@ module Datastar
       Consts::ONLY_IF_MISSING_DATALINE_LITERAL => Consts::DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING,
     }.freeze
 
-    # ATTRIBUTE_DEFAULTS = {
-    #   'type' => 'module'
-    # }.freeze
-    ATTRIBUTE_DEFAULTS = {
-      'type' => 'module'
-    }.freeze
-
     SIGNAL_SEPARATOR = '.'
 
     attr_reader :signals
@@ -140,8 +133,7 @@ module Datastar
           buffer << "#{sse_key}: #{v}\n" unless v == default_value
         elsif v.is_a?(Hash)
           v.each do |kk, vv| 
-            default_value = ATTRIBUTE_DEFAULTS[kk.to_s]
-            buffer << "data: #{k} #{kk} #{vv}\n" unless vv == default_value
+            buffer << "data: #{k} #{kk} #{vv}\n"
           end
         elsif v.is_a?(Array)
           if k == Consts::SELECTOR_DATALINE_LITERAL
