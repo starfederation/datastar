@@ -127,7 +127,7 @@ class ServerSentEventGenerator:
     ) -> DatastarEvent:
         attribute_string = ""
         if auto_remove:
-            attribute_string += " onload='this.remove()'"
+            attribute_string += " data-effect='el.remove()'"
         if attributes:
             attribute_string += " " + " ".join(attributes)
         script_tag = f"<script{attribute_string}>{script}</script>"
