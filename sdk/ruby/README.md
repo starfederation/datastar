@@ -106,6 +106,15 @@ sse.patch_elements(
 )
 ```
 
+You can patch multiple elements at once by passing an array of elements (or components):
+
+```ruby
+sse.patch_elements([
+  %(<div id="foo">\n<span>hello</span>\n</div>),
+  %(<div id="bar">\n<span>world</span>\n</div>)
+])
+```
+
 #### `remove_elements`
 
 Sugar on top of `#patch_elements`
@@ -353,6 +362,12 @@ Now run the test bash scripts in the `sdk/test` directory in this repo.
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+### Building
+
+To build `consts.rb` file from template, run Docker and run `make task build`
+
+The template is located at `build/consts_ruby.gtpl`.
 
 ## Contributing
 

@@ -218,7 +218,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script onload="this.remove()">alert('hello')</script>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script data-effect="el.remove()">alert('hello')</script>\n\n\n)])
     end
 
     it 'takes D* options' do
@@ -234,7 +234,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script type="text/javascript" title="alert" onload="this.remove()">alert('hello')</script>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script type="text/javascript" title="alert" data-effect="el.remove()">alert('hello')</script>\n\n\n)])
     end
   end
 
@@ -244,7 +244,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script onload="this.remove()">setTimeout(() => { window.location = '/guide' })</script>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script data-effect="el.remove()">setTimeout(() => { window.location = '/guide' })</script>\n\n\n)])
     end
   end
 
