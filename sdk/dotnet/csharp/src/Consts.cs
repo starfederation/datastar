@@ -55,7 +55,6 @@ public static class Consts
     public const string DatastarDatalineUseViewTransition = "useViewTransition";
     public const string DatastarDatalineSignals = "signals";
     public const string DatastarDatalineOnlyIfMissing = "onlyIfMissing";
-    public const string DatastarDatalinePaths = "paths";
 
     public static string EnumToString( ElementPatchMode enumValue ) => enumValue switch {
         ElementPatchMode.Outer => "outer",

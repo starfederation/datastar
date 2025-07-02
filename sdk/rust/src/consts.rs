@@ -32,7 +32,6 @@ pub(crate) const ELEMENTS_DATALINE_LITERAL: &str = "elements";
 pub(crate) const USE_VIEW_TRANSITION_DATALINE_LITERAL: &str = "useViewTransition";
 pub(crate) const SIGNALS_DATALINE_LITERAL: &str = "signals";
 pub(crate) const ONLY_IF_MISSING_DATALINE_LITERAL: &str = "onlyIfMissing";
-pub(crate) const PATHS_DATALINE_LITERAL: &str = "paths";
 
 // #endregion
 

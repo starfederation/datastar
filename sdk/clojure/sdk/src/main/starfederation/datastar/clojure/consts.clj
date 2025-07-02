@@ -29,7 +29,6 @@
 (def use-view-transition-dataline-literal "useViewTransition ")
 (def signals-dataline-literal "signals ")
 (def only-if-missing-dataline-literal "onlyIfMissing ")
-(def paths-dataline-literal "paths ")
 
 
 ;; -----------------------------------------------------------------------------

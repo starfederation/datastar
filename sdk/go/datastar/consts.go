@@ -29,7 +29,6 @@ const (
     UseViewTransitionDatalineLiteral = "useViewTransition "
     SignalsDatalineLiteral = "signals "
     OnlyIfMissingDatalineLiteral = "onlyIfMissing "
-    PathsDatalineLiteral = "paths "
     //endregion Dataline literals
 )
 

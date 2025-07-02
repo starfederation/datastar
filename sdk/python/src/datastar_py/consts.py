@@ -77,7 +77,6 @@ ELEMENTS_DATALINE_LITERAL = "elements"
 USE_VIEW_TRANSITION_DATALINE_LITERAL = "useViewTransition"
 SIGNALS_DATALINE_LITERAL = "signals"
 ONLY_IF_MISSING_DATALINE_LITERAL = "onlyIfMissing"
-PATHS_DATALINE_LITERAL = "paths"
 # endregion Dataline literals
 
 # region Default booleans

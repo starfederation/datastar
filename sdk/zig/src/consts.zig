@@ -27,7 +27,6 @@ pub const elements_dataline_literal = "elements";
 pub const use_view_transition_dataline_literal = "useViewTransition";
 pub const signals_dataline_literal = "signals";
 pub const only_if_missing_dataline_literal = "onlyIfMissing";
-pub const paths_dataline_literal = "paths";
 
 // #endregion
 

@@ -50,7 +50,6 @@ module Consts =
     let [<Literal>] DatastarDatalineUseViewTransition = "useViewTransition"
     let [<Literal>] DatastarDatalineSignals = "signals"
     let [<Literal>] DatastarDatalineOnlyIfMissing = "onlyIfMissing"
-    let [<Literal>] DatastarDatalinePaths = "paths"
 
     module ElementPatchMode =
         let toString this =

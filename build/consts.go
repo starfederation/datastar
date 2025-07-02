@@ -162,9 +162,6 @@ var Consts = &ConstTemplateData{
 		// PatchSignals
 		toolbelt.ToCasedString("signals"),
 		toolbelt.ToCasedString("onlyIfMissing"),
-
-		// RemoveSignals
-		toolbelt.ToCasedString("paths"),
 	},
 	Enums: []*EnumDefinition{
 		{

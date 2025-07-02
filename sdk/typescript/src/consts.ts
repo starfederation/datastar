@@ -38,7 +38,6 @@ export const DatastarDatalineElements = "elements"
 export const DatastarDatalineUseViewTransition = "useViewTransition"
 export const DatastarDatalineSignals = "signals"
 export const DatastarDatalineOnlyIfMissing = "onlyIfMissing"
-export const DatastarDatalinePaths = "paths"
 // #endregion
 
 
