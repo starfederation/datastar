@@ -4,7 +4,6 @@
     [examples.animation-gzip.handlers :as handlers]
     [examples.animation-gzip.rendering :as rendering]
     [examples.animation-gzip.state :as state]
-    [examples.animation-gzip.brotli :as brotli]
     [examples.common :as c]
     [examples.utils :as u]
     [reitit.ring :as rr]
@@ -15,7 +14,8 @@
     [starfederation.datastar.clojure.adapter.ring :as ring-gen]
     [starfederation.datastar.clojure.adapter.ring-schemas]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.api-schemas]))
+    [starfederation.datastar.clojure.api-schemas]
+    [starfederation.datastar.clojure.brotli :as brotli]))
 
 ;; This example let's use play with fat updates and compression
 ;; to get an idea of the gains compression can help use achieve
@@ -71,7 +71,7 @@
 
 
 (def handler-http-kit (->handler hk-gen/->sse-response
-                                 {hk-gen/write-profile hk-gen/gzip-profile}))
+                                 {hk-gen/write-profile (brotli/->brotli-profile)}))
 
 (def handler-ring (->handler ring-gen/->sse-response
                              {ring-gen/write-profile ring-gen/gzip-profile}))

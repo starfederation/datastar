@@ -24,6 +24,9 @@
   allows for other projects to use
   `starfederation.datastar.clojure/XXXX/config.edn` for their clj-kondo config.
 
+### Added
+
+- A new library providing Brotli write profile has been added.
 ## 2025-04-07
 
 ### Added
