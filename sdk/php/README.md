@@ -37,10 +37,15 @@ $sse = new ServerSentEventGenerator();
 // If your framework has its own way of sending response headers, manually send the headers returned by `ServerSentEventGenerator::headers()` instead.
 $sse->sendHeaders();
 
-// Patches HTML elements into the DOM.
+// Patches elements into the DOM.
 $sse->patchElements('<div></div>', [
     'selector' => '#my-div',
     'mode' => ElementPatchMode::Append,
+    'useViewTransition' => true,
+]);
+
+// Patches elements into the DOM.
+$sse->removeElements('#my-div', [
     'useViewTransition' => true,
 ]);
 
