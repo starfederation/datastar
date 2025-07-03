@@ -19,6 +19,7 @@
 
 ### Fixed
 
+- A superflous newline character was send when marking the end of a SSE event
 - The clj-kondo config file for the SDK has been moved in a
   `clj-kondo.exports/starfederation.datastar.clojure/sdk` directory. This change
   allows for other projects to use
