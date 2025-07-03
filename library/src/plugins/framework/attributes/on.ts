@@ -18,7 +18,7 @@ export const On: AttributePlugin = {
   valReq: 'must',
   argNames: ['evt'],
   onLoad: (ctx) => {
-    const { el, key, mods, rx } = ctx
+    const { el, key, mods, rx, startBatch, endBatch } = ctx
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
     let callback = (evt?: Event) => {
@@ -37,7 +37,9 @@ export const On: AttributePlugin = {
         }
         ctx.evt = evt
       }
+      startBatch()
       rx(evt)
+      endBatch()
     }
     callback = modifyTiming(callback, mods)
     callback = modifyViewTransition(callback, mods)

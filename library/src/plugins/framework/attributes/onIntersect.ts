@@ -12,8 +12,12 @@ export const OnIntersect: AttributePlugin = {
   type: 'attribute',
   name: 'onIntersect',
   keyReq: 'denied',
-  onLoad: ({ el, mods, rx }) => {
-    let callback = () => rx()
+  onLoad: ({ el, mods, rx, startBatch, endBatch }) => {
+    let callback = () => {
+      startBatch()
+      rx()
+      endBatch()
+    }
     callback = modifyTiming(callback, mods)
     callback = modifyViewTransition(callback, mods)
     const options = { threshold: 0 }

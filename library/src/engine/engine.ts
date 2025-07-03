@@ -119,9 +119,11 @@ const effect = (fn: () => void): Effect => {
     link(e, activeSub)
   }
   const prev = setCurrentSub(e)
+  startBatch()
   try {
     e.fn_()
   } finally {
+    endBatch()
     setCurrentSub(prev)
   }
   return effectOper.bind(0, e)
@@ -196,9 +198,11 @@ const run = (e: AlienEffect, flags: ReactiveFlags): void => {
   ) {
     const prev = setCurrentSub(e)
     startTracking(e)
+    startBatch()
     try {
       e.fn_()
     } finally {
+      endBatch()
       setCurrentSub(prev)
       endTracking(e)
     }
@@ -742,9 +746,6 @@ function filtered(
   { include = /.*/, exclude = /(?!)/ }: SignalFilterOptions = {},
   obj: JSONPatch = root,
 ) {
-  const inc = RegExp(include)
-  const exc = RegExp(exclude)
-
   // We need to find all valid signal paths in the object
   const pathObj: Record<string, any> = {}
   const stack: Array<[any, string]> = [[obj, '']]
@@ -755,7 +756,7 @@ function filtered(
     for (const key in node) {
       if (isPojo(node[key])) {
         stack.push([node[key], `${prefix + key}.`])
-      } else if (inc.test(prefix + key) && !exc.test(prefix + key)) {
+      } else if (include.test(prefix + key) && !exclude.test(prefix + key)) {
         pathObj[prefix + key] = getPath(prefix + key)
       }
     }
@@ -802,6 +803,8 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
       peek,
       getPath,
       hasPath,
+      startBatch,
+      endBatch,
     }
     if (plugin.type === 'action') {
       actions[plugin.name] = plugin
@@ -826,9 +829,12 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
 }
 
 function applyEls(els: Iterable<HTMLOrSVG>): void {
+  const ignore = `[${aliasify('ignore')}]`
   for (const el of els) {
-    for (const key in el.dataset) {
-      applyAttributePlugin(el, key, el.dataset[key]!)
+    if (!el.closest(ignore)) {
+      for (const key in el.dataset) {
+        applyAttributePlugin(el, key, el.dataset[key]!)
+      }
     }
   }
 }
@@ -872,22 +878,24 @@ function applyAttributePlugin(
 
     // Create the runtime context
     const ctx: RuntimeContext = {
+      plugin,
+      actions,
+      root,
+      filtered,
+      signal,
+      computed,
+      effect,
+      mergePatch,
+      peek,
+      getPath,
+      hasPath,
+      startBatch,
+      endBatch,
       el,
       rawKey,
       key,
       value,
       mods: new Map(),
-      root,
-      filtered,
-      mergePatch,
-      signal,
-      computed,
-      effect,
-      plugin,
-      actions,
-      peek,
-      getPath,
-      hasPath,
       runtimeErr: 0 as any,
       rx: 0 as any,
     }
@@ -928,9 +936,7 @@ function applyAttributePlugin(
       ctx.mods.set(camel(label), new Set(mod.map((t) => t.toLowerCase())))
     }
 
-    startBatch()
     const cleanup = plugin.onLoad(ctx)
-    endBatch()
     if (cleanup) {
       let cleanups = removals.get(el)
       if (cleanups) {

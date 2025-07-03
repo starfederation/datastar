@@ -12,7 +12,7 @@ export const Ref: AttributePlugin = {
   name: 'ref',
   keyReq: 'exclusive',
   valReq: 'exclusive',
-  onLoad: ({ key, mods, value, el, mergePatch }) => {
+  onLoad: ({ el, key, mods, value, mergePatch }) => {
     let signalName = key ? modifyCasing(key, mods) : value
     signalName = modifyScope(signalName, el, mods)
 

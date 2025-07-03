@@ -11,8 +11,12 @@ export const OnInterval: AttributePlugin = {
   name: 'onInterval',
   keyReq: 'denied',
   valReq: 'must',
-  onLoad: ({ mods, rx }) => {
-    let callback = () => rx()
+  onLoad: ({ mods, rx, startBatch, endBatch }) => {
+    let callback = () => {
+      startBatch()
+      rx()
+      endBatch()
+    }
     callback = modifyViewTransition(callback, mods)
     let duration = 1000
     const durationArgs = mods.get('duration')

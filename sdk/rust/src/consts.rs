@@ -8,7 +8,7 @@ pub(crate) const DATASTAR_KEY: &str = "datastar";
 #[allow(unused)]
 pub(crate) const DATASTAR_REQ_HEADER_STR: &str = "datastar-request";
 #[expect(unused)]
-pub(crate) const VERSION: &str = "1.0.0-RC.12";
+pub(crate) const VERSION: &str = "1.0.0-RC.13";
 
 // #region Defaults
 
