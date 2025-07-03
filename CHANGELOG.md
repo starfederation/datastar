@@ -4,7 +4,7 @@ Each tagged version of Datastar is accompanied by a release note. Read the [rele
 
 # WIP Release Notes
 
-## v1.0.0-RC.12
+## v1.0.0-RC.X
 
 Some plugins are now available under [Datastar Pro](https://data-star.dev/reference/datastar_pro), which adds functionality to the the free open source Datastar framework. These plugins are available under a commercial license that helps fund our open source work.
 
@@ -21,14 +21,13 @@ SSE event handling has also changed, in addition to all of the **SDKs**. Please 
 - Added a `data-preserve-attr` attribute that preserves the client side state of an attribute through a morph.
 - Added a `data-scope` attribute that allows setting a scope for signals.
 - Added a `data-on-resize` attribute (PRO) that attaches a [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) to the element, and executes the expression each time the element’s dimensions change.
-- Added a `data-query-string` attribute (PRO) that syncs the query string with signal values, including optional history support.
 - Added a `data-on-signal-patch` attribute (PRO) that executes an expression when a signal patch takes place.
 - Added a `data-on-signal-patch-filter` attribute (PRO) for filtering the signals that cause the expression in `data-on-signal-patch` to be executed.
+- Added a `data-query-string` attribute (PRO) that syncs the query string with signal values, including optional history support.
 - Added a `datastar-upload-progress` event (PRO) for monitoring file upload progress.
-- Added a `filterSignals` option to SSE actions that filters the signals send to the backend based on include and exclude regular expression.
-- Added a `__scoped` modifier that scopes signals created by an attribute to the closest defined scope.
+- Added a `filterSignals` option to SSE actions that filters the signals send to the backend based on include and exclude regular expressions.
+- Added a `__scoped` modifier that scopes signals created by an attribute to the closest scope defined by `data-scope`.
 - Added a `__trust` modifier to the `data-on` attribute, which runs the expression even if the [`isTrusted`](https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted) property on the event is `false`.
-- Added an `isExpr` flag to attribute plugins to indicate whether an attribute’s value is an expression or not.
 - The URL passed into SSE actions (`@get`, `@post`, etc.) is now treated as a relative URI.
 - The default `Content-Type` header sent with `form` requests is now `application/x-www-form-urlencoded`.
 - The value of a clicked button element is now included in the request when using the `form` content type.
@@ -36,21 +35,21 @@ SSE event handling has also changed, in addition to all of the **SDKs**. Please 
 - The `data-attr` attribute now renders `true` as `""` instead of `"true"` (e.g. `checked=""` instead of `checked="true"`).
 - The `data-attr` attribute now preserves the string literals `"false"`, `"null"`, and `"undefined"` when using a key.
 - Fixed a bug when using the `__debounce.leading` modifier with the `data-on` attribute.
-- Removed the `data-on-signal-change` attribute. Use the new `data-on-signal-patch` attribute instead.
+- Removed the `data-on-signal-change` attribute. Use the new `data-effect` or `data-on-signal-patch` attribute instead.
 - Removed the `datastar-signal-change` event. Use the new `datastar-signal-patch` event instead.
 - Removed the `includeLocal` option in backend action requests. Use the `filterSignals` option instead.
-- Removed the variable `ctx` from data attributes. Use the new `el` variable to access the element the attribute is attached to, use the new `$` variable to access the signal root, or the `data-json-signals` attribute to output all signals.
-- Removed the auto generated IDs that were assigned to elements using data attributes.
+- Removed the variable `ctx` from data attributes. Use the new `el` variable to access the element the attribute is attached to, use the new `$` variable to access the signal root, or the new `data-json-signals` attribute to output all signals.
 - Removed support for adding a dollar sign prefix to signal names in the value of the `data-bind`, `data-ref`, and `data-indicator` attributes.
+- Removed the auto generated IDs that were assigned to elements using data attributes.
 
 ## Changes to SSE Event Handling
 
-- Renamed the `MergeFragments` and `MergeSignals` watchers to `PatchElements` and `PatchSignals` respectively.
-- Renamed the `mergeMode` option of the `PatchElements` watcher to `mode`.
+- Renamed the `datastar-merge-fragments` and `datastar-merge-signals` SSE events to `datastar-patch-elements` and `datastar-patch-signals` respectively.
+- Renamed the `mergeMode` parameter of the `datastar-patch-elements` SSE event to `mode`.
 - Renamed the `morph` mode to `outer`.
 - Renamed the `outer` mode to `replace`.
 - The `inner` mode now morphs the element’s inner HTML.
 - Removed the `upsertAttributes` mode.
 - Added the `remove` mode.
-- The `PatchSignals` watcher now patches (adds/updates/removes) signals according to the <a href="https://datatracker.ietf.org/doc/rfc7396/" target="_blank" rel="noopener noreferrer">JSON Merge Patch RFC 7396</a>.
+- The `datastar-patch-signals` SSE event now patches (adds/updates/removes) signals according to the <a href="https://datatracker.ietf.org/doc/rfc7396/" target="_blank" rel="noopener noreferrer">JSON Merge Patch RFC 7396</a>.
 - Removed the `RemoveFragments`, `RemoveSignals`, and `ExecuteScript` watchers.
