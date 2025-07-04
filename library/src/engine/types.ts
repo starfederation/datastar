@@ -74,6 +74,8 @@ export type InitContext = {
   peek: <T>(fn: () => T) => T // returns the current state of the signal without subscribing
   getPath: <T = any>(path: string) => T // get a value from the root
   hasPath: (path: string) => boolean // check if a path exists from the root
+  startBatch: () => void // starts a signal batch
+  endBatch: () => void // ends a signal batch
 }
 
 export type HTMLOrSVG = Element & (HTMLElement | SVGElement)
@@ -99,10 +101,10 @@ export type RuntimeExpressionFunction = (
 
 export type EventCallbackHandler = (...args: any[]) => void
 
-export type SignalFilter = string | RegExp
+export type SignalFilter = RegExp
 export type SignalFilterOptions = {
-  include?: SignalFilter
-  exclude?: SignalFilter
+  include?: RegExp
+  exclude?: RegExp
 }
 
 export type Signal<T = any> = {

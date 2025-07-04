@@ -4,7 +4,7 @@
 module Datastar
   module Consts
     DATASTAR_KEY = 'datastar'
-    VERSION = '1.0.0-RC.12'
+    VERSION = '1.0.0-RC.13'
 
     # The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     DEFAULT_SSE_RETRY_DURATION = 1000
@@ -14,6 +14,33 @@ module Datastar
 
     # Should a given set of signals patch if they are missing?
     DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING = false
+
+    module ElementPatchMode
+
+      # Morphs the element into the existing element.
+      OUTER = 'outer';
+
+      # Replaces the inner HTML of the existing element.
+      INNER = 'inner';
+
+      # Removes the existing element.
+      REMOVE = 'remove';
+
+      # Replaces the existing element with the new element.
+      REPLACE = 'replace';
+
+      # Prepends the element inside to the existing element.
+      PREPEND = 'prepend';
+
+      # Appends the element inside the existing element.
+      APPEND = 'append';
+
+      # Inserts the element before the existing element.
+      BEFORE = 'before';
+
+      # Inserts the element after the existing element.
+      AFTER = 'after';
+    end
 
 
     # The mode in which an element is patched into the DOM.

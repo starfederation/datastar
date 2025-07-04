@@ -120,14 +120,14 @@ class ServerSentEventGenerator:
     def execute_script(
         cls,
         script: str,
-        auto_remove: bool = False,
+        auto_remove: bool = True,
         attributes: list[str] | None = None,
         event_id: str | None = None,
         retry_duration: int | None = None,
     ) -> DatastarEvent:
         attribute_string = ""
         if auto_remove:
-            attribute_string += " data-on-load='el.remove()'"
+            attribute_string += " data-effect='el.remove()'"
         if attributes:
             attribute_string += " " + " ".join(attributes)
         script_tag = f"<script{attribute_string}>{script}</script>"

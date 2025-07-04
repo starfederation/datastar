@@ -8,16 +8,19 @@ namespace starfederation\datastar\enums;
 enum ElementPatchMode: string
 {
 
-    // Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the existing element.
     case Outer = 'outer';
 
-    // Morphs the element into the innerHTML using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+    // Replaces the inner HTML of the existing element.
     case Inner = 'inner';
 
-    // Removes the existing element from the DOM.
+    // Removes the existing element.
     case Remove = 'remove';
 
-    // Prepends the element inside the existing element.
+    // Replaces the existing element with the new element.
+    case Replace = 'replace';
+
+    // Prepends the element inside to the existing element.
     case Prepend = 'prepend';
 
     // Appends the element inside the existing element.
@@ -28,7 +31,4 @@ enum ElementPatchMode: string
 
     // Inserts the element after the existing element.
     case After = 'after';
-
-    // Do not morph, simply replace the whole element and reset any related state.
-    case Replace = 'replace';
 }

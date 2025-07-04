@@ -44,32 +44,72 @@ function onPatchElements(
     useViewTransition,
   }: Record<string, string>,
 ) {
-  const template = document.createElement('template')
-  template.innerHTML = elements
-
-  for (const node of [...template.content.childNodes]) {
-    const type = node.nodeType
-    if (type !== 1) {
-      if (type === 3 && !node.nodeValue!.trim()) {
-        continue
-      }
-      throw initErr('NoElementsFound', ctx)
-    }
-
-    const selectorOrId = selector || `#${(node as Element).id}`
-    const targets = document.querySelectorAll(selectorOrId)
+  if (mode === ElementPatchModeRemove && selector) {
+    const targets = document.querySelectorAll(selector)
     if (!targets.length) {
       throw initErr('NoTargetsFound', ctx, {
-        selectorOrId,
+        selectorOrId: selector,
       })
     }
 
     if (useViewTransition && supportsViewTransitions) {
-      document.startViewTransition(() =>
-        applyToTargets(ctx, mode, node as HTMLOrSVG, targets),
-      )
+      document.startViewTransition(() => {
+        for (const target of targets) {
+          target.remove()
+        }
+      })
     } else {
-      applyToTargets(ctx, mode, node as HTMLOrSVG, targets)
+      for (const target of targets) {
+        target.remove()
+      }
+    }
+  } else {
+    const template = document.createElement('template')
+    template.innerHTML = elements
+
+    for (const node of [...template.content.childNodes]) {
+      const type = node.nodeType
+      if (type !== 1) {
+        if (type === 3 && !node.nodeValue!.trim()) {
+          continue
+        }
+        throw initErr('NoElementsFound', ctx)
+      }
+
+      const selectorOrId = selector || `#${(node as Element).id}`
+      const targets = document.querySelectorAll(selectorOrId)
+      if (!targets.length) {
+        throw initErr('NoTargetsFound', ctx, {
+          selectorOrId,
+        })
+      }
+
+      if (useViewTransition && supportsViewTransitions) {
+        document.startViewTransition(() =>
+          applyToTargets(ctx, mode, node as HTMLOrSVG, targets),
+        )
+      } else {
+        applyToTargets(ctx, mode, node as HTMLOrSVG, targets)
+      }
+    }
+  }
+}
+
+const scripts = new WeakSet<HTMLScriptElement>()
+function execute(target: Element): void {
+  const elScripts =
+    target instanceof HTMLScriptElement
+      ? [target]
+      : target.querySelectorAll('script')
+  for (const old of elScripts) {
+    if (!scripts.has(old)) {
+      const script = document.createElement('script')
+      for (const { name, value } of old.attributes) {
+        script.setAttribute(name, value)
+      }
+      script.text = old.text
+      old.replaceWith(script)
+      scripts.add(script)
     }
   }
 }
@@ -88,6 +128,7 @@ function applyToTargets(
       mode === ElementPatchModeInner
     ) {
       morph(target, element, mode)
+      execute(target)
     } else {
       const cloned = element.cloneNode(true) as Element
       if (mode === ElementPatchModeReplace) {
@@ -103,19 +144,7 @@ function applyToTargets(
       } else {
         throw initErr('InvalidPatchMode', ctx, { mode })
       }
-    }
-
-    const elScripts =
-      target instanceof HTMLScriptElement
-        ? [target]
-        : target.querySelectorAll('script')
-    for (const old of elScripts) {
-      const script = document.createElement('script')
-      for (const { name, value } of old.attributes) {
-        script.setAttribute(name, value)
-      }
-      script.text = old.text
-      old.replaceWith(script)
+      execute(cloned)
     }
   }
 }

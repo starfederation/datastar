@@ -1,17 +1,18 @@
 package build
 
 import (
-	"compress/gzip"
+	"bytes"
 	"errors"
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"slices"
 	"strings"
 	"time"
 
+	"github.com/andybalholm/brotli"
 	"github.com/delaneyj/toolbelt"
-	"github.com/evanw/esbuild/pkg/api"
 	"github.com/valyala/bytebufferpool"
 )
 
@@ -22,8 +23,6 @@ func Build() error {
 	}
 
 	if err := errors.Join(
-		// createPluginManifest(),
-		createBundles(version),
 		writeOutConsts(version),
 	); err != nil {
 		return fmt.Errorf("error creating bundles: %w", err)
@@ -44,48 +43,7 @@ func extractVersion() (string, error) {
 	return version, nil
 }
 
-func createBundles(version string) error {
-	log.Print("Creating bundles...")
-	defer log.Print("Bundles created!")
-
-	outDir := "./bundles"
-	os.RemoveAll(outDir)
-
-	result := api.Build(api.BuildOptions{
-		EntryPoints: []string{
-			"library/src/bundles/datastar-core.ts",
-			"library/src/bundles/datastar.ts",
-			"library/src/bundles/datastar-aliased.ts",
-		},
-		Banner: map[string]string{
-			"js": "// Datastar v" + version,
-		},
-		Outdir:            outDir,
-		Bundle:            true,
-		Write:             true,
-		LogLevel:          api.LogLevelInfo,
-		MinifyWhitespace:  true,
-		MinifyIdentifiers: true,
-		MinifySyntax:      true,
-		Format:            api.FormatESModule,
-		Sourcemap:         api.SourceMapLinked,
-		Target:            api.ES2023,
-	})
-
-	if len(result.Errors) > 0 {
-		errs := make([]error, len(result.Errors))
-		for i, err := range result.Errors {
-			errs[i] = errors.New(err.Text)
-		}
-		return errors.Join(errs...)
-	}
-
-	return nil
-}
-
 func writeOutConsts(version string) error {
-	log.Print("Extracting version...")
-
 	Consts.Version = version
 
 	build, err := os.ReadFile("bundles/datastar.js")
@@ -94,18 +52,13 @@ func writeOutConsts(version string) error {
 	}
 	Consts.VersionClientByteSize = len(build)
 
-	buf := bytebufferpool.Get()
-	defer bytebufferpool.Put(buf)
-
-	w, err := gzip.NewWriterLevel(buf, gzip.BestCompression)
+	compressed, err := compressWithBrotli(build)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("error compressing with brotli: %w", err)
 	}
-	if _, err := w.Write(build); err != nil {
-		panic(err)
-	}
-	w.Close()
-	Consts.VersionClientByteSizeGzip = buf.Len()
+	Consts.VersionClientByteSizeBrotli = len(compressed)
+
+	log.Printf("Datastar client bundle size: %d bytes (Brotli: %d bytes)", Consts.VersionClientByteSize, Consts.VersionClientByteSizeBrotli)
 
 	var zeroCased toolbelt.CasedString
 	// Make sure all enums are set up.
@@ -170,4 +123,34 @@ func writeOutConsts(version string) error {
 
 func durationToMs(d time.Duration) int {
 	return int(d.Milliseconds())
+}
+
+func compressWithBrotli(data []byte) ([]byte, error) {
+	// Check if brotli CLI is available
+	if _, err := exec.LookPath("brotli"); err == nil {
+		// Use CLI version of brotli
+		cmd := exec.Command("brotli", "-c", "-q", "11", "-")
+		cmd.Stdin = bytes.NewReader(data)
+		var out bytes.Buffer
+		cmd.Stdout = &out
+		if err := cmd.Run(); err == nil {
+			log.Print("Using brotli CLI for compression")
+			return out.Bytes(), nil
+		}
+	}
+
+	// Fallback to Go library
+	log.Print("Using Go brotli library for compression")
+	buf := bytebufferpool.Get()
+	defer bytebufferpool.Put(buf)
+
+	w := brotli.NewWriterV2(buf, brotli.BestCompression)
+	if _, err := w.Write(data); err != nil {
+		return nil, err
+	}
+	w.Close()
+
+	result := make([]byte, buf.Len())
+	copy(result, buf.Bytes())
+	return result, nil
 }

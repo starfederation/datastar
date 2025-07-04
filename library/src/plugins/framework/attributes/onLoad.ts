@@ -12,11 +12,11 @@ export const OnLoad: AttributePlugin = {
   name: 'onLoad',
   keyReq: 'denied',
   valReq: 'must',
-  onLoad: ({ rx, mods, mergePatch }) => {
+  onLoad: ({ rx, mods, startBatch, endBatch }) => {
     let callback = () => {
-      const result = rx()
-      mergePatch({}) // This will trigger a flush after the rx() call
-      return result
+      startBatch()
+      rx()
+      endBatch()
     }
     callback = modifyViewTransition(callback, mods)
     let wait = 0

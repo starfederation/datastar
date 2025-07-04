@@ -11,74 +11,56 @@ export const Class: AttributePlugin = {
   valReq: 'must',
   isExpr: true,
   onLoad: ({ key, el, effect, mods, rx }) => {
-    if (key === '') {
-      const observer = new MutationObserver(() => {
-        observer.disconnect()
-        const classes = rx<Record<string, boolean>>()
-        for (const [k, v] of Object.entries(classes)) {
-          const classNames = k.split(/\s+/)
-          if (v) {
-            el.classList.add(...classNames)
-          } else {
-            el.classList.remove(...classNames)
-          }
-        }
-        observer.observe(el, {
-          attributeFilter: ['class'],
-        })
-      })
-      const cleanup = effect(() => {
-        observer.disconnect()
-        const classes = rx<Record<string, boolean>>()
-        for (const [k, v] of Object.entries(classes)) {
-          const classNames = k.split(/\s+/)
-          if (v) {
-            el.classList.add(...classNames)
-          } else {
-            el.classList.remove(...classNames)
-          }
-        }
-        observer.observe(el, {
-          attributeFilter: ['class'],
-        })
-      })
+    // Track classes added by this attribute
+    const addedClasses = new Set<string>()
+    let isUpdating = false
 
-      return () => {
-        observer.disconnect()
-        cleanup()
-      }
-    }
-
-    // Default to kebab-case and allow modifying
-    let className = kebab(key)
-    className = modifyCasing(className, mods)
+    // Watch for external class changes (e.g., from morphing)
     const observer = new MutationObserver(() => {
-      observer.disconnect()
-      const shouldInclude = rx<boolean>()
-      if (shouldInclude) {
-        el.classList.add(className)
-      } else {
-        el.classList.remove(className)
+      if (!isUpdating) {
+        // External change detected, clear our tracking
+        addedClasses.clear()
       }
-      observer.observe(el, {
-        attributeFilter: ['class'],
-      })
     })
+
     const cleanup = effect(() => {
+      isUpdating = true
       observer.disconnect()
-      const shouldInclude = rx<boolean>()
-      if (shouldInclude) {
-        el.classList.add(className)
-      } else {
+
+      // Remove all previously added classes
+      for (const className of addedClasses) {
         el.classList.remove(className)
       }
-      observer.observe(el, {
-        attributeFilter: ['class'],
-      })
+      addedClasses.clear()
+
+      // Get classes - either from object expression or single key
+      const classes = key === '' 
+        ? rx<Record<string, boolean>>()
+        : { [modifyCasing(kebab(key), mods)]: rx<boolean>() }
+
+      // Add new classes and track them
+      for (const [k, v] of Object.entries(classes)) {
+        // We don't remove classes when v is false because
+        // we're already removing ALL previously added classes above
+        if (v) {
+          const classNames = k.split(/\s+/).filter((cn) => cn.length > 0)
+          for (const className of classNames) {
+            el.classList.add(className)
+            addedClasses.add(className)
+          }
+        }
+      }
+
+      isUpdating = false
+      observer.observe(el, { attributeFilter: ['class'] })
     })
 
     return () => {
       observer.disconnect()
+      // Clean up by removing all tracked classes
+      for (const className of addedClasses) {
+        el.classList.remove(className)
+      }
       cleanup()
     }
   },

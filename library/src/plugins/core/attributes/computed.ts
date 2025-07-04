@@ -1,6 +1,6 @@
 import type { AttributePlugin } from '../../../engine/types'
 import { pathToObj } from '../../../utils/paths'
-import { modifyCasing } from '../../../utils/text'
+import { modifyCasing, modifyScope } from '../../../utils/text'
 
 export const Computed: AttributePlugin = {
   type: 'attribute',
@@ -8,8 +8,9 @@ export const Computed: AttributePlugin = {
   keyReq: 'must',
   valReq: 'must',
   isExpr: true,
-  onLoad: ({ key, mods, rx, computed, mergePatch }) => {
-    key = modifyCasing(key, mods)
-    mergePatch(pathToObj({}, { [key]: computed(rx) }))
+  onLoad: ({ el, key, mods, rx, computed, mergePatch }) => {
+    let signalName = modifyCasing(key, mods)
+    signalName = modifyScope(signalName, el, mods)
+    mergePatch(pathToObj({}, { [signalName]: computed(rx) }))
   },
 }

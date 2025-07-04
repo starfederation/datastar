@@ -5,13 +5,15 @@ namespace StarFederation.Datastar.FSharp
 open System
 
 type ElementPatchMode =
-/// Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+/// Morphs the element into the existing element.
 | Outer
-/// Morphs the element into the innerHTML using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+/// Replaces the inner HTML of the existing element.
 | Inner
-/// Removes the existing element from the DOM.
+/// Removes the existing element.
 | Remove
-/// Prepends the element inside the existing element.
+/// Replaces the existing element with the new element.
+| Replace
+/// Prepends the element inside to the existing element.
 | Prepend
 /// Appends the element inside the existing element.
 | Append
@@ -19,8 +21,6 @@ type ElementPatchMode =
 | Before
 /// Inserts the element after the existing element.
 | After
-/// Do not morph, simply replace the whole element and reset any related state.
-| Replace
 
 type EventType =
 /// An event for patching HTML elements into the DOM.
@@ -31,13 +31,13 @@ type EventType =
 
 module Consts =
     let [<Literal>] DatastarKey               = "datastar"
-    let [<Literal>] Version                   = "1.0.0-RC.12"
+    let [<Literal>] Version                   = "1.0.0-RC.13"
 
     /// Default: TimeSpan.FromMilliseconds 1000
     let DefaultSseRetryDuration = TimeSpan.FromMilliseconds 1000
 
 
-    /// Default: outer - Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+    /// Default: outer - Morphs the element into the existing element.
     let DefaultElementPatchMode = Outer
 
     let [<Literal>] DefaultElementsUseViewTransitions = false
@@ -57,11 +57,11 @@ module Consts =
                 | ElementPatchMode.Outer -> "outer"
                 | ElementPatchMode.Inner -> "inner"
                 | ElementPatchMode.Remove -> "remove"
+                | ElementPatchMode.Replace -> "replace"
                 | ElementPatchMode.Prepend -> "prepend"
                 | ElementPatchMode.Append -> "append"
                 | ElementPatchMode.Before -> "before"
                 | ElementPatchMode.After -> "after"
-                | ElementPatchMode.Replace -> "replace"
 
     module EventType =
         let toString this =

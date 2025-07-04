@@ -7,8 +7,8 @@ namespace starfederation\datastar\events;
 
 use Exception;
 use starfederation\datastar\Consts;
-use starfederation\datastar\enums\EventType;
 use starfederation\datastar\enums\ElementPatchMode;
+use starfederation\datastar\enums\EventType;
 
 class PatchElements implements EventInterface
 {
@@ -19,9 +19,6 @@ class PatchElements implements EventInterface
     public ElementPatchMode $mode = Consts::DEFAULT_ELEMENT_PATCH_MODE;
     public bool $useViewTransition = Consts::DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS;
 
-    /**
-     * @throws Exception
-     */
     public function __construct(string $elements, array $options = [])
     {
         $this->elements = $elements;
@@ -68,9 +65,6 @@ class PatchElements implements EventInterface
         );
     }
 
-    /**
-     * @throws Exception
-     */
     private function getMode(ElementPatchMode|string $value): ElementPatchMode
     {
         $value = is_string($value) ? ElementPatchMode::tryFrom($value) : $value;
