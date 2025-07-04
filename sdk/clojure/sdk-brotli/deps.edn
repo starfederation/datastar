@@ -1,3 +1,9 @@
 {:paths ["src/main"]
  :deps {com.aayushatharva.brotli4j/brotli4j            {:mvn/version "1.18.0"}
-        io.netty/netty-buffer                          {:mvn/version "4.1.119.Final"}}}
+        io.netty/netty-buffer                          {:mvn/version "4.1.119.Final"}}
+ :aliases {:build {:deps {io.github.clojure/tools.build {:git/tag "v0.10.9"
+                                                         :git/sha "e405aac"}
+                          slipset/deps-deploy {:mvn/version "0.2.2"}}
+                   :ns-default build}
+           :neil  {:project {:name    dev.data-star.clojure/brotli
+                             :version "1.0.0-RC13"}}}}

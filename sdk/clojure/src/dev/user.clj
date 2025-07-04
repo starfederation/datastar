@@ -39,6 +39,8 @@
 
   (-> (System/getProperties)
       keys
-      sort))
+      sort)
 
-
+  (require '[clojure.tools.build.api :as b])
+  b/write-pom
+  b/copy-dir)

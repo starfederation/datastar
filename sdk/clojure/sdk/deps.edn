@@ -3,5 +3,5 @@
                                                                :git/sha "e405aac"}
                                 slipset/deps-deploy           {:mvn/version "0.2.2"}}
                    :ns-default build}
-           :neil  {:project {:name    dev.data-star/sdk
-                             :version "1.0.0-beta.11"}}}}
+           :neil  {:project {:name    dev.data-star.clojure/sdk
+                             :version "1.0.0-RC13"}}}}

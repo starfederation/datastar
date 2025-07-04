@@ -26,6 +26,7 @@ In the SDK code proper `sdk/clojure`:
 - `bb bump-version patch/minor/major`: to bump a version component across all libs
 - `bb set-version x.x.x`: to set the version component across all libs
 - `bb jar:all`: Build jars artifacts for all of the libs
+- `bb install:all`: Build jars artifacts for all of the libs and installs them locally
 - `bb jar:<lib-name>`: Build jars artifacts for one of the libs
 - `bb clean`: Clean all build artifacts
 - `bb publish:all`: Publish the artifacts to clojars.org
@@ -49,7 +50,7 @@ In the SDK code proper `sdk/clojure`:
 
 ## Release
 
-- The library artifacts are published to Clojars (http://clojars.org) under the `dev.data-star` namespace.
+- The library artifacts are published to Clojars (http://clojars.org) under the `dev.data-star.clojure` namespace.
 - The Clojars account is managed by Ben Croker, the DNS verification is managed by Delaney.
 - The Clojars deploy token is also managed by Ben and added to this repo as a GH Actions Secret
   - Secret name: `CLOJARS_USERNAME`
