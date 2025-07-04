@@ -1,8 +1,10 @@
 package starfederation.datastar.unit;
 
 import org.junit.jupiter.api.Test;
+
+import starfederation.datastar.enums.ElementPatchMode;
 import starfederation.datastar.enums.EventType;
-import starfederation.datastar.events.RemoveFragments;
+import starfederation.datastar.events.PatchElements;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,28 +12,32 @@ class RemoveFragmentsTest {
 
     @Test
     void builderShouldGenerateCorrectEvent() {
-        RemoveFragments event = RemoveFragments.builder()
+        PatchElements event = PatchElements.builder()
                 .selector("#feed")
+                .mode(ElementPatchMode.Remove)
                 .useViewTransition(true)
                 .build();
 
         String[] expectedDataLines = {
                 "selector #feed",
+                "mode remove",
                 "useViewTransition true"
         };
 
         assertArrayEquals(expectedDataLines, event.getDataLines());
-        assertEquals(EventType.RemoveFragments.toString(), event.getEventType().toString());
+        assertEquals(EventType.PatchElements, event.getEventType());
     }
 
     @Test
     void builderShouldExcludeDefaultValues() {
-        RemoveFragments event = RemoveFragments.builder()
+        PatchElements event = PatchElements.builder()
                 .selector("#feed")
+                .mode(ElementPatchMode.Remove)
                 .build();
 
         String[] expectedDataLines = {
-                "selector #feed"
+                "selector #feed",
+                "mode remove"
         };
 
         assertArrayEquals(expectedDataLines, event.getDataLines());
@@ -39,6 +45,6 @@ class RemoveFragmentsTest {
 
     @Test
     void builderShouldThrowExceptionForNullSelector() {
-        assertThrows(IllegalArgumentException.class, () -> RemoveFragments.builder().build());
+        assertThrows(IllegalArgumentException.class, () -> PatchElements.builder().build());
     }
 }

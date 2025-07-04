@@ -91,7 +91,7 @@ func writeOutConsts(version string) error {
 		"sdk/php/src/enums/ElementPatchMode.php":                                           phpElementPatchMode,
 		"sdk/java/core/src/main/java/starfederation/datastar/Consts.java":                  javaConsts,
 		"sdk/java/core/src/main/java/starfederation/datastar/enums/EventType.java":         javaEventType,
-		"sdk/java/core/src/main/java/starfederation/datastar/enums/FragmentMergeMode.java": javaFragmentMergeMode,
+		"sdk/java/core/src/main/java/starfederation/datastar/enums/ElementPatchMode.java":  javaElementPatchMode,
 		"sdk/python/src/datastar_py/consts.py":                                             pythonConsts,
 		"sdk/typescript/src/consts.ts":                                                     typescriptConsts,
 		"sdk/ruby/lib/datastar/consts.rb":                                                  rubyConsts,

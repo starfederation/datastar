@@ -2,7 +2,7 @@ package starfederation.datastar.unit;
 
 import org.junit.jupiter.api.Test;
 import starfederation.datastar.enums.EventType;
-import starfederation.datastar.events.RemoveSignals;
+import starfederation.datastar.events.PatchSignals;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,22 +10,20 @@ class RemoveSignalsTest {
 
     @Test
     void builderShouldGenerateCorrectEvent() {
-        RemoveSignals event = RemoveSignals.builder()
-                .addPath("user.name")
-                .addPath("user.email")
+        PatchSignals event = PatchSignals.builder()
+                .data("{\"user\": {\"name\": null, \"email\": null}}")
                 .build();
 
         String[] expectedDataLines = {
-                "paths user.name",
-                "paths user.email"
+                "signals {\"user\": {\"name\": null, \"email\": null}}"
         };
 
         assertArrayEquals(expectedDataLines, event.getDataLines());
-        assertEquals(EventType.RemoveSignals.toString(), event.getEventType().toString());
+        assertEquals(EventType.PatchSignals, event.getEventType());
     }
 
     @Test
     void builderShouldThrowExceptionForEmptyPaths() {
-        assertThrows(IllegalArgumentException.class, () -> RemoveSignals.builder().build());
+        assertThrows(IllegalArgumentException.class, () -> PatchSignals.builder().build());
     }
 }

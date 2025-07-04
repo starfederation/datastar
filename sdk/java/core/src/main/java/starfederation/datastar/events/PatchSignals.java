@@ -7,25 +7,24 @@ import java.util.List;
 
 import static starfederation.datastar.Consts.*;
 
-public final class MergeSignals extends AbstractDatastarEvent {
+public final class PatchSignals extends AbstractDatastarEvent {
 
-    private MergeSignals(EventType eventType, List<String> dataLines) {
+    private PatchSignals(EventType eventType, List<String> dataLines) {
         super(eventType, dataLines);
     }
 
     @Override
     public EventType getEventType() {
-        return EventType.MergeSignals;
+        return EventType.PatchSignals;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-
-    public static final class Builder extends AbstractBuilder<MergeSignals> {
+    public static final class Builder extends AbstractBuilder<PatchSignals> {
         private String data;
-        private boolean onlyIfMissing = DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING; // Default
+        private boolean onlyIfMissing = DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING; // Default
 
         public Builder data(String data) {
             this.data = data;
@@ -38,7 +37,7 @@ public final class MergeSignals extends AbstractDatastarEvent {
         }
 
         @Override
-        public MergeSignals build() {
+        public PatchSignals build() {
             if (data == null || data.isBlank()) {
                 throw new IllegalArgumentException("Data cannot be null or empty");
             }
@@ -46,14 +45,14 @@ public final class MergeSignals extends AbstractDatastarEvent {
             List<String> dataLines = new ArrayList<>();
 
             // Add onlyIfMissing if true
-            if (onlyIfMissing != DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING) {
+            if (onlyIfMissing != DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING) {
                 dataLines.add(ONLY_IF_MISSING_DATALINE_LITERAL + onlyIfMissing);
             }
 
             // Add signals data
             dataLines.add(SIGNALS_DATALINE_LITERAL + data.trim());
 
-            return new MergeSignals(EventType.MergeSignals, dataLines);
+            return new PatchSignals(EventType.PatchSignals, dataLines);
         }
     }
 }
