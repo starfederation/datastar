@@ -52,7 +52,7 @@ module Consts =
     let [<Literal>] DatastarDatalineOnlyIfMissing = "onlyIfMissing"
 
     module ElementPatchMode =
-        let toString this =
+        let inline toString this =
             match this with
                 | ElementPatchMode.Outer -> "outer"
                 | ElementPatchMode.Inner -> "inner"
@@ -64,7 +64,7 @@ module Consts =
                 | ElementPatchMode.After -> "after"
 
     module EventType =
-        let toString this =
+        let inline toString this =
             match this with
                 | EventType.PatchElements -> "datastar-patch-elements"
                 | EventType.PatchSignals -> "datastar-patch-signals"
