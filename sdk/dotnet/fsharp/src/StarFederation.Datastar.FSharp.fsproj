@@ -49,11 +49,11 @@
         <Content Include="..\..\README.md">
           <Link>README.md</Link>
         </Content>
-        <Compile Include="Utility.fs" />
         <Compile Include="Consts.fs" />
+        <Compile Include="Utility.fs" />
         <Compile Include="Types.fs" />
+        <Compile Include="ServerSentEvent.fs" />
         <Compile Include="ServerSentEventGenerator.fs" />
-        <Compile Include="HttpHandlers.fs" />
     </ItemGroup>
 
 </Project>

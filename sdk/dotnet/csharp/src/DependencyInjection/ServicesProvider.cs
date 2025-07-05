@@ -13,9 +13,8 @@ public static class ServiceCollectionExtensionMethods
             .AddScoped<IDatastarService>(svcPvd =>
             {
                 IHttpContextAccessor? httpContextAccessor = svcPvd.GetService<IHttpContextAccessor>();
-                Core.ISendServerEvent sseHttpHandler = new Core.ServerSentEventHttpHandler(httpContextAccessor!.HttpContext!.Response);
-                Core.IReadSignals signalsHttpHandler = new Core.SignalsHttpHandler(httpContextAccessor!.HttpContext!.Request);
-                return new DatastarService(sseHttpHandler, signalsHttpHandler);
+                Core.ServerSentEventGenerator serverSentEventGenerator = new(httpContextAccessor);
+                return new DatastarService(serverSentEventGenerator);
             });
         return serviceCollection;
     }
