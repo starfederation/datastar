@@ -1,0 +1,8 @@
+using StarFederation.Datastar.DependencyInjection;
+
+app.MapGet("/redirect", async (IDatastarService datastarService) =>
+{
+    await datastarService.PatchElementsAsync("""<div id="indicator">Redirecting in 3 seconds...</div>""");
+    await Task.Delay(TimeSpan.FromSeconds(3));
+    await datastarService.ExecuteScriptAsync("""window.location = "/guide";""");
+});

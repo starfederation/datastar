@@ -62,4 +62,5 @@ internal static class Utilities
     }
 
     public static Tuple<TKey, TValue> AsTuple<TKey, TValue>(this KeyValuePair<TKey, TValue> keyValuePair) => new(keyValuePair.Key, keyValuePair.Value);
+    public static Tuple<TKey, TValue> AsTuple<TKey, TValue>(this (TKey, TValue) keyValuePair) => new(keyValuePair.Item1, keyValuePair.Item2);
 }

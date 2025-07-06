@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AssemblyName>StarFederation.Datastar.FSharp</AssemblyName>
-        <Version>1.0.0-beta.1</Version>
+        <Version>1.0.0-beta.2</Version>
         <RootNamespace>StarFederation.Datastar.FSharp</RootNamespace>
         <Nullable>disabled</Nullable>
 
@@ -49,11 +49,11 @@
         <Content Include="..\..\README.md">
           <Link>README.md</Link>
         </Content>
-        <Compile Include="Utility.fs" />
         <Compile Include="Consts.fs" />
+        <Compile Include="Utility.fs" />
         <Compile Include="Types.fs" />
+        <Compile Include="ServerSentEvent.fs" />
         <Compile Include="ServerSentEventGenerator.fs" />
-        <Compile Include="HttpHandlers.fs" />
     </ItemGroup>
 
 </Project>
