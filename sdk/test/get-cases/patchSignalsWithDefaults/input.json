@@ -3,8 +3,10 @@
     {
       "type": "patchSignals",
       "signals": {
-        "one": null
-      }
+        "one": 1,
+        "two": 2
+      },
+      "onlyIfMissing": false
     }
   ]
 }

@@ -3,7 +3,8 @@
     {
       "type": "patchSignals",
       "signals": {
-        "one": null
+        "one": "first\\n signal",
+        "two": "second signal"
       }
     }
   ]
