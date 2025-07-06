@@ -50,16 +50,16 @@ impl Display for DatastarEvent {
         writeln!(f, "event: {}", self.event.as_str())?;
 
         if let Some(id) = &self.id {
-            writeln!(f, "id: {}", id)?;
+            writeln!(f, "id: {id}")?;
         }
 
         let millis = self.retry.as_millis();
         if millis != consts::DEFAULT_SSE_RETRY_DURATION as u128 {
-            writeln!(f, "retry: {}", millis)?;
+            writeln!(f, "retry: {millis}")?;
         }
 
         for line in &self.data {
-            writeln!(f, "data: {}", line)?;
+            writeln!(f, "data: {line}")?;
         }
 
         write!(f, "\n\n")?;

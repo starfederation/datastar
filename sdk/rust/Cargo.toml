@@ -27,7 +27,7 @@ rocket = ["dep:rocket"]
 tracing = ["dep:tracing"]
 
 [dependencies]
-axum = { version = "0.8.3", default-features = false, optional = true, features = [
+axum = { version = "0.8.4", default-features = false, optional = true, features = [
     "query",
     "tokio",
     "json",
@@ -43,12 +43,12 @@ tracing = { version = "0.1.41", optional = true }
 
 [dev-dependencies]
 async-stream = { version = "0.3.6", default-features = false }
-axum = { version = "0.8.3" }
-reqwest = { version = "0.12.15", features = ["json", "stream"] }
+axum = { version = "0.8.4" }
+reqwest = { version = "0.12.22", features = ["json", "stream"] }
 rocket = { version = "0.5.1", features = ["json"] }
 serde = { version = "1", default-features = false, features = ["derive"] }
 serde_json = { version = "1", default-features = false, features = ["std"] }
-tokio = { version = "1.44.2", features = ["full"] }
+tokio = { version = "1.46.1", features = ["full"] }
 tokio-stream = { version = "0.1.17" }
 tracing = { version = "0.1.41" }
 tracing-test = { version = "0.2.5" }
@@ -71,7 +71,6 @@ needless_borrow = "warn"
 match_wildcard_for_single_variants = "warn"
 if_let_mutex = "warn"
 await_holding_lock = "warn"
-match_on_vec_items = "warn"
 imprecise_flops = "warn"
 suboptimal_flops = "warn"
 lossy_float_literal = "warn"
