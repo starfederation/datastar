@@ -1,4 +1,0 @@
-sse.PatchElementsAsync(@"<div id=""question"">...</div>");
-sse.PatchElementsAsync(@"<div id=""instructions"">...</div>");
-sse.PatchSignalsAsync("{answer: '...'}");
-sse.PatchSignalsAsync("{prize: '...'}");
