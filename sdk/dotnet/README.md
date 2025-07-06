@@ -29,15 +29,15 @@ using System.Text.Json.Serialization;
 //  and to read the signals sent by the client
 builder.Services.AddDatastar();
 
-// displayDate - merging a fragment
+// displayDate - patching an element
 app.MapGet("/displayDate", async (IDatastarService datastarService) =>
 {
     string today = DateTime.Now.ToString("%y-%M-%d %h:%m:%s");
     await datastarService.PatchElementsAsync($"""<div id='target'><span id='date'><b>{today}</b><button data-on-click="@get('/removeDate')">Remove</button></span></div>""");
 });
 
-// removeDate - removing a fragment
-app.MapGet("/removeDate", async (IDatastarService datastarService) => { await datastarService.RemoveFragmentAsync("#date"); });
+// removeDate - removing an element
+app.MapGet("/removeDate", async (IDatastarService datastarService) => { await datastarService.RemoveElementAsync("#date"); });
 
 public record MySignals {
     [JsonPropertyName("input")]

@@ -10,7 +10,7 @@ public interface IDatastarService
     Task StartServerEventStreamAsync(IEnumerable<KeyValuePair<string, StringValues>>? additionalHeaders = null);
     Task StartServerEventStreamAsync(IEnumerable<KeyValuePair<string, string>>? additionalHeaders = null);
 
-    Task PatchElementsAsync(string fragments, PatchElementsOptions? options = null);
+    Task PatchElementsAsync(string elements, PatchElementsOptions? options = null);
 
     Task RemoveElementAsync(string selector, RemoveElementOptions? options = null);
 
@@ -50,8 +50,8 @@ internal class DatastarService(Core.ServerSentEventGenerator serverSentEventGene
     public Task StartServerEventStreamAsync(IEnumerable<KeyValuePair<string, string>>? additionalHeaders) =>
         serverSentEventGenerator.StartServerEventStreamAsync(additionalHeaders?.Select(kvp => new KeyValuePair<string, StringValues>(kvp.Key, new StringValues(kvp.Value))) ?? []);
 
-    public Task PatchElementsAsync(string fragments, PatchElementsOptions? options = null) =>
-        serverSentEventGenerator.PatchElementsAsync(fragments, options ?? Core.PatchElementsOptions.Defaults);
+    public Task PatchElementsAsync(string elements, PatchElementsOptions? options = null) =>
+        serverSentEventGenerator.PatchElementsAsync(elements, options ?? Core.PatchElementsOptions.Defaults);
 
     public Task RemoveElementAsync(string selector, RemoveElementOptions? options = null) =>
         serverSentEventGenerator.RemoveElementAsync(selector, options ?? Core.RemoveElementOptions.Defaults);
