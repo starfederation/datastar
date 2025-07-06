@@ -8,6 +8,7 @@ pub mod axum;
 #[cfg(feature = "rocket")]
 pub mod rocket;
 
+pub mod execute_script;
 pub mod patch_elements;
 pub mod patch_signals;
 
@@ -21,8 +22,8 @@ pub mod consts;
 /// The prelude for the `datastar` crate
 pub mod prelude {
     pub use crate::{
-        DatastarEvent, consts::ElementPatchMode, patch_elements::PatchElements,
-        patch_signals::PatchSignals,
+        DatastarEvent, consts::ElementPatchMode, execute_script::ExecuteScript,
+        patch_elements::PatchElements, patch_signals::PatchSignals,
     };
 }
 
