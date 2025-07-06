@@ -4,13 +4,17 @@
   "version": "1.0.0",
   "js-types-syntax": "typescript",
   "description-markup": "markdown",
-  "default-icon": "datastar-icon.png",
+  "default-icon": "icon.png",
   "contributions": {
     "js": {
       "datastar-bind-modifiers": [
         {
           "name": "case",
           "description": "Modify the casing of the signal name"
+        },
+        {
+          "name": "scoped",
+          "description": "Scopes the signal to the closest scope defined by `data-scope`"
         }
       ],
       "datastar-class-modifiers": [
@@ -23,12 +27,20 @@
         {
           "name": "case",
           "description": "Modify the casing of the signal name"
+        },
+        {
+          "name": "scoped",
+          "description": "Scopes the signal to the closest scope defined by `data-scope`"
         }
       ],
       "datastar-indicator-modifiers": [
         {
           "name": "case",
           "description": "Modify the casing of the signal name"
+        },
+        {
+          "name": "scoped",
+          "description": "Scopes the signal to the closest scope defined by `data-scope`"
         }
       ],
       "datastar-on-modifiers": [
@@ -93,6 +105,10 @@
           "description": "Throttle without trailing edge"
         },
         {
+          "name": "trusted",
+          "description": "Runs the expression even if the `isTrusted` property on the event is `false`"
+        },
+        {
           "name": "viewtransition",
           "description": "Wraps the expression in `document.startViewTransition()` when the View Transition API is available"
         },
@@ -113,6 +129,10 @@
         {
           "name": "once",
           "description": "Only trigger the event once"
+        },
+        {
+          "name": "viewtransition",
+          "description": "Wraps the expression in `document.startViewTransition()`"
         }
       ],
       "datastar-on-interval-modifiers": [
@@ -123,6 +143,10 @@
         {
           "name": "duration.500ms",
           "description": "Set an interval duration of 500 milliseconds"
+        },
+        {
+          "name": "viewtransition",
+          "description": "Wraps the expression in `document.startViewTransition()`"
         }
       ],
       "datastar-on-load-modifiers": [
@@ -133,9 +157,13 @@
         {
           "name": "delay.1s",
           "description": "Delay for 1 second"
+        },
+        {
+          "name": "viewtransition",
+          "description": "Wraps the expression in `document.startViewTransition()`"
         }
       ],
-      "datastar-on-raf-modifiers": [
+      "datastar-on-timing-modifiers": [
         {
           "name": "debounce",
           "description": "Debounce the event listener"
@@ -183,10 +211,20 @@
           "description": "Persists signals values in Session Storage"
         }
       ],
+      "datastar-query-string-modifiers": [
+        {
+          "name": "history",
+          "description": "Enables history support"
+        }
+      ],
       "datastar-ref-modifiers": [
         {
           "name": "case",
           "description": "Modify the casing of the signal name"
+        },
+        {
+          "name": "scoped",
+          "description": "Scopes the signal to the closest scope defined by `data-scope`"
         }
       ],
       "datastar-scroll-into-view-modifiers": [
@@ -247,6 +285,10 @@
         {
           "name": "ifmissing",
           "description": "Only set the signals if the key does not exist. This is useful for setting defaults without overwriting existing values"
+        },
+        {
+          "name": "scoped",
+          "description": "Scopes the signal to the closest scope defined by `data-scope`"
         }
       ]
     },
@@ -256,7 +298,7 @@
           "name": "data-attr-*",
           "virtual": true,
           "description": "Sets an element’s attribute value based on an expression.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-attr",
+          "doc-url": "https://data-star.dev/reference/attributes#data-attr",
           "value": {
             "kind": "expression",
             "type": [
@@ -294,7 +336,7 @@
           "name": "data-class-*",
           "virtual": true,
           "description": "Adds or removes a class from an element based on an expression.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-class",
+          "doc-url": "https://data-star.dev/reference/attributes#data-class",
           "value": {
             "kind": "expression",
             "type": [
@@ -335,7 +377,7 @@
           "name": "data-computed-*",
           "virtual": true,
           "description": "Creates a signal that is computed based on an expression.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-computed",
+          "doc-url": "https://data-star.dev/reference/attributes#data-computed",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -365,7 +407,7 @@
           "name": "data-custom-validity",
           "virtual": true,
           "description": "Adds custom validity to an element using an expression.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-custom-validity",
+          "doc-url": "https://data-star.dev/reference/attributes#data-custom-validity",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -379,10 +421,61 @@
           }
         },
         {
+          "name": "data-effect",
+          "virtual": true,
+          "description": "Executes an expression on page load and whenever any signals in the expression change.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-effect",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-effect"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-ignore",
+          "virtual": true,
+          "description": "Ignores an element and its descendants from being processed.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-ignore",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": false
+          },
+          "pattern": {
+            "template": [
+              "data-ignore"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-ignore-morph",
+          "virtual": true,
+          "description": "Ignores an element when patching an element using the `morph` mode.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-ignore-morph",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": false
+          },
+          "pattern": {
+            "template": [
+              "data-ignore-morph"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
           "name": "data-indicator-*",
           "virtual": true,
           "description": "Creates a signal to track in-flight backend requests.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-indicator",
+          "doc-url": "https://data-star.dev/reference/attributes#data-indicator",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -419,10 +512,27 @@
           }
         },
         {
+          "name": "data-json-signals",
+          "virtual": true,
+          "description": "Sets the text content of an element to a reactive JSON stringified version of signals.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-json-signals",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": false
+          },
+          "pattern": {
+            "template": [
+              "data-json-signals"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
           "name": "data-on-*",
           "virtual": true,
           "description": "Runs an expression whenever an event is triggered on an element.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on",
+          "doc-url": "https://data-star.dev/reference/attributes#data-on",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -456,7 +566,7 @@
           "name": "data-on-intersect",
           "virtual": true,
           "description": "Runs an expression on intersection with the viewport.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-intersect",
+          "doc-url": "https://data-star.dev/reference/attributes#data-on-intersect",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -483,7 +593,7 @@
           "name": "data-on-interval",
           "virtual": true,
           "description": "Runs an expression at a regular interval.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-interval",
+          "doc-url": "https://data-star.dev/reference/attributes#data-on-interval",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -510,7 +620,7 @@
           "name": "data-on-load",
           "virtual": true,
           "description": "Runs an expression whenever the element is initialised.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-load",
+          "doc-url": "https://data-star.dev/reference/attributes#data-on-load",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -537,7 +647,7 @@
           "name": "data-on-raf",
           "virtual": true,
           "description": "Runs an expression on every `requestAnimationFrame` event.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-raf",
+          "doc-url": "https://data-star.dev/reference/attributes#data-on-raf",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -547,7 +657,7 @@
             "template": [
               "data-on-raf",
               {
-                "items": "/js/datastar-on-raf-modifiers",
+                "items": "/js/datastar-on-timing-modifiers",
                 "template": [
                   "__",
                   "$...",
@@ -561,44 +671,85 @@
           }
         },
         {
-          "name": "data-on-signal-change-*",
+          "name": "data-on-resize",
           "virtual": true,
-          "description": "Runs an expression whenever a signal changes.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-on-signal-change",
+          "description": "Runs an expression whenever an element’s dimensions change.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-on-resize",
           "value": {
             "kind": "expression",
             "type": "string",
             "required": true
           },
           "pattern": {
-            "or": [
+            "template": [
+              "data-on-resize",
               {
+                "items": "/js/datastar-on-timing-modifiers",
                 "template": [
-                  "data-on-signal-change-",
-                  {
-                    "regex": "[-a-z0-9]+"
-                  }
+                  "__",
+                  "$...",
+                  "#item:modifier"
                 ],
-                "priority": "normal"
-              },
-              {
-                "template": [
-                  "data-on-signal-change"
-                ],
-                "priority": "normal"
+                "required": false,
+                "repeat": true
               }
-            ]
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-on-signal-patch",
+          "virtual": true,
+          "description": "Runs an expression whenever one or more signals are patched.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-on-signal-patch",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-on-signal-patch",
+              {
+                "items": "/js/datastar-on-timing-modifiers",
+                "template": [
+                  "__",
+                  "$...",
+                  "#item:modifier"
+                ],
+                "required": false,
+                "repeat": true
+              }
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-on-signal-patch-filter",
+          "virtual": true,
+          "description": "Filters which signals to watch when using the `data-on-signal-patch` attribute.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-on-signal-patch-filter",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-on-signal-patch-filter"
+            ],
+            "priority": "normal"
           }
         },
         {
           "name": "data-persist",
           "virtual": true,
           "description": "Persists all signals in local storage.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-persist",
+          "doc-url": "https://data-star.dev/reference/attributes#data-persist",
           "value": {
             "kind": "expression",
             "type": "string",
-            "required": true
+            "required": false
           },
           "pattern": {
             "template": [
@@ -618,10 +769,54 @@
           }
         },
         {
+          "name": "data-preserve-attr",
+          "virtual": true,
+          "description": "Preserves the value of an attribute when patching elements using the `morph` mode.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-preserve-attr",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": true
+          },
+          "pattern": {
+            "template": [
+              "data-preserve-attr"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-query-string",
+          "virtual": true,
+          "description": "Syncs query string params to signal values on page load, and syncs signal values to query string params on change.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-query-string",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": false
+          },
+          "pattern": {
+            "template": [
+              "data-query-string",
+              {
+                "items": "/js/datastar-query-string-modifiers",
+                "template": [
+                  "__",
+                  "$...",
+                  "#item:modifier"
+                ],
+                "required": false,
+                "repeat": true
+              }
+            ],
+            "priority": "normal"
+          }
+        },
+        {
           "name": "data-ref-*",
           "virtual": true,
           "description": "Creates a signal whose value references an element.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-ref",
+          "doc-url": "https://data-star.dev/reference/attributes#data-ref",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -661,7 +856,7 @@
           "name": "data-replace-url",
           "virtual": true,
           "description": "Replaces the URL in the browser with an evaluated expression.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-replace-url",
+          "doc-url": "https://data-star.dev/reference/attributes#data-replace-url",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -675,14 +870,31 @@
           }
         },
         {
-          "name": "data-scroll-into-view",
+          "name": "data-scope",
           "virtual": true,
-          "description": "Scrolls the element into view.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-scroll-into-view",
+          "description": "Sets a signal scope for the element and its descendants.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-scope",
           "value": {
             "kind": "expression",
             "type": "string",
-            "required": true
+            "required": false
+          },
+          "pattern": {
+            "template": [
+              "data-scope"
+            ],
+            "priority": "normal"
+          }
+        },
+        {
+          "name": "data-scroll-into-view",
+          "virtual": true,
+          "description": "Scrolls the element into view.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-scroll-into-view",
+          "value": {
+            "kind": "expression",
+            "type": "string",
+            "required": false
           },
           "pattern": {
             "template": [
@@ -705,7 +917,7 @@
           "name": "data-show",
           "virtual": true,
           "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-show",
+          "doc-url": "https://data-star.dev/reference/attributes#data-show",
           "value": {
             "kind": "expression",
             "type": "boolean",
@@ -722,7 +934,7 @@
           "name": "data-signals-*",
           "virtual": true,
           "description": "Merges a signal into the existing signals.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-signals",
+          "doc-url": "https://data-star.dev/reference/attributes#data-signals",
           "value": {
             "kind": "expression",
             "type": [
@@ -772,27 +984,10 @@
           }
         },
         {
-          "name": "data-star-ignore",
-          "virtual": true,
-          "description": "Ignores an element’s attributes when Datastar applies plugins.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-star-ignore",
-          "value": {
-            "kind": "expression",
-            "type": "string",
-            "required": true
-          },
-          "pattern": {
-            "template": [
-              "data-star-ignore"
-            ],
-            "priority": "normal"
-          }
-        },
-        {
           "name": "data-text",
           "virtual": true,
           "description": "Sets the text content of an element to the evaluated expression.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-text",
+          "doc-url": "https://data-star.dev/reference/attributes#data-text",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -809,7 +1004,7 @@
           "name": "data-view-transition",
           "virtual": true,
           "description": "Sets the value of `view-transition-name` for use with the View Transition API.",
-          "doc-url": "https://data-star.dev/reference/attribute_plugins#data-view-transition",
+          "doc-url": "https://data-star.dev/reference/attributes#data-view-transition",
           "value": {
             "kind": "expression",
             "type": "string",
@@ -842,7 +1037,7 @@
               "name": "data-bind-*",
               "virtual": true,
               "description": "Creates a new signal and enables two-way binding between it and the element.",
-              "doc-url": "https://data-star.dev/reference/attribute_plugins#data-bind",
+              "doc-url": "https://data-star.dev/reference/attributes#data-bind",
               "value": {
                 "kind": "expression",
                 "type": "string",

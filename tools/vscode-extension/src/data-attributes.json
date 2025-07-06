@@ -101,7 +101,7 @@
   "data-ignore": {
     "prefix": "data-ignore",
     "body": "data-ignore",
-    "description": "Ignores an element and its descendants from processing.",
+    "description": "Ignores an element and its descendants from being processed.",
     "references": [
       {
         "name": "Documentation",
@@ -233,7 +233,7 @@
   "data-on-resize": {
     "prefix": "data-on-resize",
     "body": "data-on-resize=\"${1:expression}\"",
-    "description": "Runs an expression on every `requestAnimationFrame` event.",
+    "description": "Runs an expression whenever an element’s dimensions change.",
     "references": [
       {
         "name": "Documentation",
@@ -329,17 +329,6 @@
       }
     ]
   },
-  "data-scroll-into-view": {
-    "prefix": "data-scroll-into-view",
-    "body": "data-scroll-into-view",
-    "description": "Scrolls the element into view.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-scroll-into-view"
-      }
-    ]
-  },
   "data-scope": {
     "prefix": "data-scope",
     "body": "data-scope=\"${1:expression}\"",
@@ -348,6 +337,17 @@
       {
         "name": "Documentation",
         "url": "https://data-star.dev/reference/attributes#data-scope"
+      }
+    ]
+  },
+  "data-scroll-into-view": {
+    "prefix": "data-scroll-into-view",
+    "body": "data-scroll-into-view",
+    "description": "Scrolls the element into view.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-scroll-into-view"
       }
     ]
   },

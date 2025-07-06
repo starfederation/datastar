@@ -1,6 +1,21 @@
 # Datastar Support JetBrains Plugin Changelog
 
-## [Unreleased]
+## [1.1.0] - Unreleased
+
+### Added
+
+- Added the `data-effect` attribute.
+- Added the `data-ignore` attribute.
+- Added the `data-ignore-morph` attribute.
+- Added the `data-json-signals` attribute.
+- Added the `data-on-resize` attribute.
+- Added the `data-on-signal-patch` attribute.
+- Added the `data-on-signal-patch-filter` attribute.
+- Added the `data-preserve-attr` attribute.
+- Added the `data-query-string` attribute.
+- Added the `data-scope` attribute.
+- Added the `scoped` modifier.
+- Added the `trusted` modifier.
 
 ## [1.0.2] - 2025.02.11
 
