@@ -54,16 +54,16 @@ public class PatchSignalsOptions
         options.Retry);
 }
 
-public class RemoveFragmentOptions
+public class RemoveElementOptions
 {
     public bool UseViewTransition { get; init; } = Consts.DefaultElementsUseViewTransitions;
     public string? EventId { get; init; } = null;
     public TimeSpan Retry { get; init; } = Consts.DefaultSseRetryDuration;
 
-    public static implicit operator Core.RemoveElementOptions(RemoveFragmentOptions options) => ToFSharp(options);
-    public static implicit operator FSharpValueOption<Core.RemoveElementOptions>(RemoveFragmentOptions options) => ToFSharp(options);
+    public static implicit operator Core.RemoveElementOptions(RemoveElementOptions options) => ToFSharp(options);
+    public static implicit operator FSharpValueOption<Core.RemoveElementOptions>(RemoveElementOptions options) => ToFSharp(options);
 
-    private static Core.RemoveElementOptions ToFSharp(RemoveFragmentOptions options) => new(
+    private static Core.RemoveElementOptions ToFSharp(RemoveElementOptions options) => new(
         options.UseViewTransition,
         options.EventId ?? FSharpValueOption<string>.ValueNone,
         options.Retry);
