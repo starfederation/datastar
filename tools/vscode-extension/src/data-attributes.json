@@ -6,7 +6,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-attributes"
+        "url": "https://data-star.dev/reference/attributes#data-attributes"
       }
     ]
   },
@@ -17,7 +17,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-attributes"
+        "url": "https://data-star.dev/reference/attributes#data-attributes"
       }
     ]
   },
@@ -28,7 +28,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-bind"
+        "url": "https://data-star.dev/reference/attributes#data-bind"
       }
     ]
   },
@@ -39,7 +39,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-bind"
+        "url": "https://data-star.dev/reference/attributes#data-bind"
       }
     ]
   },
@@ -50,7 +50,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-class"
+        "url": "https://data-star.dev/reference/attributes#data-class"
       }
     ]
   },
@@ -61,7 +61,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-class"
+        "url": "https://data-star.dev/reference/attributes#data-class"
       }
     ]
   },
@@ -72,7 +72,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-computed"
+        "url": "https://data-star.dev/reference/attributes#data-computed"
       }
     ]
   },
@@ -83,7 +83,40 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-custom-validity"
+        "url": "https://data-star.dev/reference/attributes#data-custom-validity"
+      }
+    ]
+  },
+  "data-effect": {
+    "prefix": "data-effect",
+    "body": "data-effect=\"${1:expression}\"",
+    "description": "Executes an expression on page load and whenever any signals in the expression change.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-effect"
+      }
+    ]
+  },
+  "data-ignore": {
+    "prefix": "data-ignore",
+    "body": "data-ignore",
+    "description": "Ignores an element and its descendants from processing.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-ignore"
+      }
+    ]
+  },
+  "data-ignore-morph": {
+    "prefix": "data-ignore-morph",
+    "body": "data-ignore-morph",
+    "description": "Ignores an element when patching an element using the `morph` mode.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-ignore-morph"
       }
     ]
   },
@@ -94,7 +127,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-indicator"
+        "url": "https://data-star.dev/reference/attributes#data-indicator"
       }
     ]
   },
@@ -105,7 +138,18 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-indicator"
+        "url": "https://data-star.dev/reference/attributes#data-indicator"
+      }
+    ]
+  },
+  "data-json-signals": {
+    "prefix": "data-json-signals",
+    "body": "data-json-signals=\"${1:expression}\"",
+    "description": "Sets the text content of an element to a reactive JSON stringified version of signals.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-json-signals"
       }
     ]
   },
@@ -116,7 +160,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
+        "url": "https://data-star.dev/reference/attributes#data-on"
       }
     ]
   },
@@ -127,7 +171,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
+        "url": "https://data-star.dev/reference/attributes#data-on"
       }
     ]
   },
@@ -138,7 +182,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on"
+        "url": "https://data-star.dev/reference/attributes#data-on"
       }
     ]
   },
@@ -149,7 +193,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on-intersect"
+        "url": "https://data-star.dev/reference/attributes#data-on-intersect"
       }
     ]
   },
@@ -160,7 +204,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on-interval"
+        "url": "https://data-star.dev/reference/attributes#data-on-interval"
       }
     ]
   },
@@ -171,7 +215,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on-load"
+        "url": "https://data-star.dev/reference/attributes#data-on-load"
       }
     ]
   },
@@ -182,29 +226,40 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on-raf"
+        "url": "https://data-star.dev/reference/attributes#data-on-raf"
       }
     ]
   },
-  "data-on-signal-change": {
-    "prefix": "data-on-signal-change",
-    "body": "data-on-signal-change=\"${1:expression}\"",
-    "description": "Runs an expression whenever a signal changes.",
+  "data-on-resize": {
+    "prefix": "data-on-resize",
+    "body": "data-on-resize=\"${1:expression}\"",
+    "description": "Runs an expression on every `requestAnimationFrame` event.",
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on-signal-change"
+        "url": "https://data-star.dev/reference/attributes#data-on-resize"
       }
     ]
   },
-  "data-on-signal-change-*": {
-    "prefix": "data-on-signal-change-*",
-    "body": "data-on-signal-change-${1:name}=\"${2:expression}\"",
-    "description": "Runs an expression whenever a specific signal changes.",
+  "data-on-signal-patch": {
+    "prefix": "data-on-signal-patch",
+    "body": "data-on-signal-patch=\"${1:expression}\"",
+    "description": "Runs an expression whenever one or more signals are patched.",
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-on-signal-change"
+        "url": "https://data-star.dev/reference/attributes#data-on-signal-patch"
+      }
+    ]
+  },
+  "data-on-signal-patch-filter": {
+    "prefix": "data-on-signal-patch-filter",
+    "body": "data-on-signal-patch-filter=\"${1:expression}\"",
+    "description": "Filters which signals to watch when using the `data-on-signal-patch` attribute.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-on-signal-change"
       }
     ]
   },
@@ -215,7 +270,29 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-persist"
+        "url": "https://data-star.dev/reference/attributes#data-persist"
+      }
+    ]
+  },
+  "data-preserve-attr": {
+    "prefix": "data-preserve-attr",
+    "body": "data-preserve-attr=\"\"",
+    "description": "Preserves the value of an attribute when patching elements using the `morph` mode.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-preserve-attr"
+      }
+    ]
+  },
+  "data-query-string": {
+    "prefix": "data-query-string",
+    "body": "data-query-string=\"\"",
+    "description": "Syncs query string params to signal values on page load, and syncs signal values to query string params on change.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-query-string"
       }
     ]
   },
@@ -226,7 +303,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-ref"
+        "url": "https://data-star.dev/reference/attributes#data-ref"
       }
     ]
   },
@@ -237,7 +314,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-ref"
+        "url": "https://data-star.dev/reference/attributes#data-ref"
       }
     ]
   },
@@ -248,7 +325,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-replace-url"
+        "url": "https://data-star.dev/reference/attributes#data-replace-url"
       }
     ]
   },
@@ -259,7 +336,18 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-scroll-into-view"
+        "url": "https://data-star.dev/reference/attributes#data-scroll-into-view"
+      }
+    ]
+  },
+  "data-scope": {
+    "prefix": "data-scope",
+    "body": "data-scope=\"${1:expression}\"",
+    "description": "Sets a signal scope for the element and its descendants.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-scope"
       }
     ]
   },
@@ -270,7 +358,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-show"
+        "url": "https://data-star.dev/reference/attributes#data-show"
       }
     ]
   },
@@ -281,7 +369,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-signals"
+        "url": "https://data-star.dev/reference/attributes#data-signals"
       }
     ]
   },
@@ -292,18 +380,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-signals"
-      }
-    ]
-  },
-  "data-star-ignore": {
-    "prefix": "data-star-ignore",
-    "body": "data-star-ignore",
-    "description": "Ignores an element’s attributes when Datastar applies plugins.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-data-star-ignore"
+        "url": "https://data-star.dev/reference/attributes#data-signals"
       }
     ]
   },
@@ -314,7 +391,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-text"
+        "url": "https://data-star.dev/reference/attributes#data-text"
       }
     ]
   },
@@ -325,7 +402,7 @@
     "references": [
       {
         "name": "Documentation",
-        "url": "https://data-star.dev/reference/attribute_plugins#data-view-transition"
+        "url": "https://data-star.dev/reference/attributes#data-view-transition"
       }
     ]
   }
