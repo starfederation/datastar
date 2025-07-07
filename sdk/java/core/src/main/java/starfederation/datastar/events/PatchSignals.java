@@ -50,7 +50,7 @@ public final class PatchSignals extends AbstractDatastarEvent {
             }
 
             // Add signals data
-            dataLines.add(SIGNALS_DATALINE_LITERAL + data.trim());
+            dataLines.add(SIGNALS_DATALINE_LITERAL + data);
 
             return new PatchSignals(EventType.PatchSignals, dataLines);
         }

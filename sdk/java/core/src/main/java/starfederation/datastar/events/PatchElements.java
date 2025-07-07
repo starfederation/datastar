@@ -79,7 +79,6 @@ public final class PatchElements extends AbstractDatastarEvent {
             if (rawData!= null)
                 rawData.lines()
                         .filter(line -> !line.isBlank())
-                        .map(String::trim)
                         .forEach(line -> dataLines.add(ELEMENTS_DATALINE_LITERAL + line));
 
             return new PatchElements(EventType.PatchElements, dataLines);

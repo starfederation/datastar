@@ -78,7 +78,6 @@ public final class ExecuteScript extends AbstractDatastarEvent {
             // Add script
             wrappedScript.toString().lines()
                     .filter(line -> !line.isBlank())
-                    .map(String::trim)
                     .forEach(line -> dataLines.add(ELEMENTS_DATALINE_LITERAL + line));
 
             return new ExecuteScript(EventType.PatchElements, dataLines);
