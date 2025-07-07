@@ -66,7 +66,7 @@ handlerSignals = do
 
 handlerClear :: Snap ()
 handlerClear = send $ (mergeFragments "<div/>" (SEL "#signals") Inner def def)
-  
+
 handlerFeed :: Snap ()
 handlerFeed = do
   runSSE (SSEapp f)
@@ -95,7 +95,7 @@ handlerFeed = do
     feedDstar :: Text -> Text
     feedDstar x = mergeFragments ("<div id=\"feed\"><b>" <> x <> "</b></div>") def def def def
     removeDstar :: Text
-    removeDstar = removeFragments (SEL "#explain") (FO 5000 def) def
+    removeDstar = removeFragments (SEL "#explain") (FO def) def
 
 handlerKeats :: Snap ()
 handlerKeats = do
@@ -120,7 +120,7 @@ pause = threadDelay (10 * 100 * 100 `div` 2)
 sleep :: Int -> IO ()
 sleep n = threadDelay (n * 1000 * 1000)
 
-textToHtml :: Text -> Text 
+textToHtml :: Text -> Text
 textToHtml = T.concatMap escape
   where
     escape ' '  = T.pack "&nbsp;"

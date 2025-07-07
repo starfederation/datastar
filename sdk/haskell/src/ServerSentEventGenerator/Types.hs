@@ -44,7 +44,7 @@ instance Default Selector where
 
 instance Prompt Selector where
   prompt (SEL x) = withDefault cSelector cDefaultSelector x
-    
+
 -- | A sum of the possible Datastar specific events that can be sent
 
 data EventType =
@@ -101,7 +101,7 @@ instance Prompt MergeMode where
    prompt UpsertAttributes = cUpsertAttributes
 
 data FragmentOptions = FO {
-  , useViewTransition :: Bool
+    useViewTransition :: Bool
   } deriving (Show)
 
 -- | the MergeFragments and RemoveFragment data types share these options
@@ -112,8 +112,8 @@ instance Default FragmentOptions where
   }
 
 instance Prompt FragmentOptions where
-  prompt (FO a b) = mconcat . buildLines $ [
-    , withDefault cUseViewTransition (prompt cDefaultFragmentsUseViewTransitions)  (prompt b)
+  prompt (FO a) = mconcat . buildLines $ [
+      withDefault cUseViewTransition (prompt cDefaultFragmentsUseViewTransitions) (prompt a)
     ]
 
 newtype AutoRemove = Auto Bool
@@ -138,12 +138,11 @@ bug :: Exception e => e -> a
 bug = throw
 
 data ServerSentEventGeneratorExceptions =
-   BuildLineDataIMissing 
- | RemoveFragmentSelectorIsMissing 
- | SignalsSelectorIsMissing        
- | RemoveSignalsPathIsMissing      
- | RemoveSignalsPathIsEmpty        
- | ExecuteScriptIsMissing          
+   BuildLineDataIMissing
+ | RemoveFragmentSelectorIsMissing
+ | SignalsSelectorIsMissing
+ | RemoveSignalsPathIsMissing
+ | RemoveSignalsPathIsEmpty
+ | ExecuteScriptIsMissing
 
 instance Exception ServerSentEventGeneratorExceptions
-

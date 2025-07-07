@@ -31,12 +31,12 @@ main = do
     attributes1 = "type: text/javascript\nblocking: false"
     attributes2 = "type: module"
   test [
-      mergeFragments "<div>Merge</div>" (SEL "div") Append (FO 1000 True) yourOptions
-    , mergeFragments "<div>Merge</div>" def Morph (FO 1000 True) def
+      mergeFragments "<div>Merge</div>" (SEL "div") Append (FO True) yourOptions
+    , mergeFragments "<div>Merge</div>" def Morph (FO True) def
     , mergeFragments "<div>\n  <span>Merge</span>\n</div>" def def def def
     , mergeFragments "<div>Merge</div>" def def def def
-    , removeFragments (SEL  "#target") (FO 2000 True) yourOptions
-    , removeFragments (SEL  "#target") (FO 300  False) def
+    , removeFragments (SEL  "#target") (FO True) yourOptions
+    , removeFragments (SEL  "#target") (FO False) def
     , removeFragments (SEL  "#target") def def
     , mergeSignals oneTwo True yourOptions
     , mergeSignals firstSecond True def
@@ -47,4 +47,3 @@ main = do
     , executeScript script1 attributes2 (Auto True)  def
     , executeScript script2 def def def
     ]
-
