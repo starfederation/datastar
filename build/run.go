@@ -107,7 +107,6 @@ func writeOutConsts(version string) error {
 		"examples/ruby/hello-world/hello-world.html":                                       helloWorldExample,
 		"examples/rust/axum/hello-world/hello-world.html":                                  helloWorldExample,
 		"examples/rust/rocket/hello-world/hello-world.html":                                helloWorldExample,
-		"examples/rust/rama/hello-world/hello-world.html":                                  helloWorldExample,
 	}
 
 	for path, tmplFn := range templates {
