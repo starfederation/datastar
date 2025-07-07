@@ -1,4 +1,4 @@
-event: datastar-execute-script
-data: script console.log('hello');
+event: datastar-patch-elements
+data: elements <script data-effect="el.remove()">console.log('hello');</script>
 
 

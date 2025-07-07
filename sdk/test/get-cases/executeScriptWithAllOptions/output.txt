@@ -1,9 +1,6 @@
-event: datastar-execute-script
+event: datastar-patch-elements
 id: event1
 retry: 2000
-data: attributes type text/javascript
-data: attributes blocking false
-data: autoRemove false
-data: script console.log('hello');
+data: elements <script type="text/javascript" blocking="false">console.log('hello');</script>
 
 

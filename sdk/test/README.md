@@ -33,24 +33,21 @@ The `input.json` file must contain valid json of the following shape:
       "script": "console.log('hello');",
       "eventId": 1,
       "retryDuration": 2000,
-       "attributes": {
-         "type": "text/javascript",
-         "blocking": false
-       },
-       "autoRemove": false
+      "attributes": {
+        "type": "text/javascript",
+        "blocking": false
+      },
+      "autoRemove": false
      }
    ]
 }
 ```
 
-The `output.txt` file must contain valid a `txt/eventstream` like such:
+The `output.txt` file must contain valid a `text/eventstream` like such:
 
 ```
-event: datastar-execute-script
+event: datastar-patch-elements
 id: 1
 retry: 2000
-data: attributes type text/javascript
-data: attributes blocking false
-data: autoRemove false
-data: script console.log('hello');
+elements: <script type="text/javascript" blocking="false">console.log('hello')</script>;
 ```

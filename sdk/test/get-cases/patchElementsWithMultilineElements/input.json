@@ -2,7 +2,7 @@
   "events": [
     {
       "type": "patchElements",
-      "elements": "<div>Merge</div>"
+      "elements": "<div>\n  <span>Merge</span>\n</div>"
     }
   ]
 }

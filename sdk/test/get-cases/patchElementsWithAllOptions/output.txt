@@ -1,0 +1,9 @@
+event: datastar-patch-elements
+id: event1
+retry: 2000
+data: selector div
+data: mode append
+data: useViewTransition true
+data: elements <div>Merge</div>
+
+

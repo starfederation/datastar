@@ -15,7 +15,7 @@ awk '
     data = ""
 
     for (i = 1; i <= NF; i++) {
-      if ($i ~ /^data: (fragments|script|path)/) {
+      if ($i ~ /^data: (elements|signals)/) {
         data = flush_data(data)
         print $i
       } else if ($i ~ /^data:/) {
