@@ -222,9 +222,14 @@ class AttributeGenerator:
         """(PRO) Execute an expression on every requestAnimationFrame event."""
         return OnRafAttr(value=expression, alias=self._alias)
 
-    def on_signal_patch(self, expression: str) -> OnSignalPatchAttr:
+    def on_signal_patch(
+        self, expression: str, include: str | None = None, exclude: str | None = None
+    ) -> OnSignalPatchAttr:
         """(PRO) Execute an expression when a signal patch taxes plase."""
-        return OnSignalPatchAttr(value=expression, alias=self._alias)
+        attr = OnSignalPatchAttr(value=expression, alias=self._alias)
+        if include or exclude:
+            attr.filter(include, exclude)
+        return attr
 
     def on_resize(self, expression: str) -> OnResizeAttr:
         """(PRO) Execute an expression each time the element's dimensions change."""
@@ -288,11 +293,10 @@ class AttributeGenerator:
         value = attrs if isinstance(attrs, str) else " ".join(attrs)
         return BaseAttr("preserve-attrs", value=value, alias=self._alias)
 
-    # TODO: verify this when docs come out
-    def query_string(self, signals: str | Iterable[str]) -> BaseAttr:
+    @property
+    def query_string(self) -> QueryStringAttr:
         """(PRO) Sync the query string with signal values."""
-        value = signals if isinstance(signals, str) else " ".join(signals)
-        return BaseAttr("query-string", value=value, alias=self._alias)
+        return QueryStringAttr(alias=self._alias)
 
 
 class BaseAttr(Mapping):
@@ -542,7 +546,27 @@ class PersistAttr(BaseAttr):
         return self
 
 
-class ScopeAttr(BaseAttr, ScopedMod):
+class JsonSignalsAttr(BaseAttr):
+    _attr = "json-signals"
+
+    def __call__(self, include: str | None = None, exclude: str | None = None) -> Self:
+        if include or exclude:
+            filter_object = {}
+            if include:
+                filter_object["include"] = include
+            if exclude:
+                filter_object["exclude"] = exclude
+            self._value = json.dumps(filter_object)
+        return self
+
+    @property
+    def terse(self) -> Self:
+        """Output without extra whitespace."""
+        self._mods["terse"] = []
+        return self
+
+
+class ScopeAttr(BaseAttr):
     _attr = "scope"
 
     def __call__(self, scope_name: str | None = None) -> Self:
@@ -681,27 +705,44 @@ class OnLoadAttr(BaseAttr, ViewtransitionMod):
         return self
 
 
-class OnRafAttr(BaseAttr, TimingMod, ViewtransitionMod):
+class OnRafAttr(BaseAttr, TimingMod):
     _attr = "on-raf"
 
 
-class OnSignalPatchAttr(BaseAttr, TimingMod, ViewtransitionMod):
+class OnSignalPatchAttr(BaseAttr, TimingMod):
     _attr = "on-signal-patch"
 
-    def filter(self, filter_re: str) -> Self:
+    def filter(self, include: str | None = None, exclude: str | None = None) -> Self:
         """Filter the signal patch events."""
-        self._other_attrs = [BaseAttr("on-signal-patch-filter", value=filter_re)]
+        if include or exclude:
+            filter_object = {}
+            if include:
+                filter_object["include"] = include
+            if exclude:
+                filter_object["exclude"] = exclude
+            self._other_attrs = [
+                BaseAttr("on-signal-patch-filter", value=json.dumps(filter_object))
+            ]
         return self
 
 
-class OnResizeAttr(BaseAttr, TimingMod, ViewtransitionMod):
+class OnResizeAttr(BaseAttr, TimingMod):
     _attr = "on-resize"
 
 
 class QueryStringAttr(BaseAttr):
     _attr = "query-string"
 
-    # TODO: verify this when docs come out
+    def __call__(self, include: str | None = None, exclude: str | None = None) -> Self:
+        if include or exclude:
+            filter_object = {}
+            if include:
+                filter_object["include"] = include
+            if exclude:
+                filter_object["exclude"] = exclude
+            self._value = json.dumps(filter_object)
+        return self
+
     @property
     def history(self) -> Self:
         self._mods["history"] = []
