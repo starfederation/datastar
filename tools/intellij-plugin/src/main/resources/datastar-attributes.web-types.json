@@ -43,6 +43,12 @@
           "description": "Scopes the signal to the closest scope defined by `data-scope`"
         }
       ],
+      "datastar-json-signals-modifiers": [
+        {
+          "name": "terse",
+          "description": "Outputs a more compact JSON format"
+        }
+      ],
       "datastar-on-modifiers": [
         {
           "name": "capture",
@@ -523,7 +529,17 @@
           },
           "pattern": {
             "template": [
-              "data-json-signals"
+              "data-json-signals",
+              {
+                "items": "/js/datastar-json-signals-modifiers",
+                "template": [
+                  "__",
+                  "$...",
+                  "#item:modifier"
+                ],
+                "required": false,
+                "repeat": true
+              }
             ],
             "priority": "normal"
           }

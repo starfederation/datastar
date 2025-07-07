@@ -34,7 +34,6 @@ Install using Maven by adding the following to your `pom.xml`:
 ### Import Statements
 
 ```java
-
 import starfederation.datastar.utils.ServerSentEventGenerator;
 ```
 
