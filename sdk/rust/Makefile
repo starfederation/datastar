@@ -13,6 +13,7 @@ all:
 	@echo "qa                   - combine lint+check+clippy+doc+hack+test"
 	@echo "detect-unused-deps   - detect unused deps for removal"
 	@echo "hello-axum           - run hello-world example using the Axum framework"
+	@echo "test-suite-axum      - run test-suite example runner using the Axum framework"
 	@echo "hello-rocket         - run hello-world example using the Rocket framework"
 .PHONY:
 
@@ -41,6 +42,7 @@ test:
 
 qa: lint check clippy doc test
 	cd ../../examples/rust/axum/hello-world && make qa
+	cd ../../examples/rust/axum/test-suite && make qa
 	cd ../../examples/rust/rocket/hello-world && make qa
 
 detect-unused-deps:
@@ -49,6 +51,9 @@ detect-unused-deps:
 
 hello-axum:
 	cd ../../examples/rust/axum/hello-world && make run
+
+test-suite-axum:
+		cd ../../examples/rust/axum/test-suite && make run
 
 hello-rocket:
 	cd ../../examples/rust/rocket/hello-world && make run
