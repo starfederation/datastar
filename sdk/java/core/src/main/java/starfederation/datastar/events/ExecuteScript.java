@@ -15,7 +15,7 @@ public final class ExecuteScript extends AbstractDatastarEvent {
 
     @Override
     public EventType getEventType() {
-        return EventType.ExecuteScript;
+        return EventType.PatchElements;
     }
 
     public static Builder builder() {
@@ -24,14 +24,19 @@ public final class ExecuteScript extends AbstractDatastarEvent {
 
     public static final class Builder extends AbstractBuilder<ExecuteScript> {
         private String script;
-        private boolean autoRemove = DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE; // Default
-        private String attributes = DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES; // Default
+        private boolean autoRemove = true; // Default
+        private String attributes = ""; // Default
 
+        /**
+         * JavaScript to execute on the client. Do not wrap in HTML-script tags.
+         * @param script valid JavaScript
+         * @return a builder for fluent configuration
+         */
         public Builder script(String script) {
             if (script == null || script.isBlank()) {
                 throw new IllegalArgumentException("Script cannot be null or empty");
             }
-            this.script = script.trim();
+            this.script = script;
             return this;
         }
         private Builder() {
@@ -55,22 +60,27 @@ public final class ExecuteScript extends AbstractDatastarEvent {
                 throw new IllegalArgumentException("Script cannot be null or empty");
             }
 
+            var wrappedScript = new StringBuilder("<script");
             List<String> dataLines = new ArrayList<>();
-
-            // Add autoRemove if false (default is true)
-            if (autoRemove != DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE) {
-                dataLines.add(AUTO_REMOVE_DATALINE_LITERAL + autoRemove);
-            }
-
+            
             // Add attributes if not default
-            if (attributes != null && !attributes.equals(DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES)) {
-                dataLines.add(ATTRIBUTES_DATALINE_LITERAL + attributes);
+            if (attributes != null && !attributes.isBlank()) {
+                wrappedScript.append(' ').append(attributes);
             }
+
+            // Add autoRemove
+            if (autoRemove) {
+                wrappedScript.append(" data-effect=\"el.remove()\"");
+            }
+
+            wrappedScript.append(">").append(script).append("</script>");
 
             // Add script
-            dataLines.add(SCRIPT_DATALINE_LITERAL + script);
+            wrappedScript.toString().lines()
+                    .filter(line -> !line.isBlank())
+                    .forEach(line -> dataLines.add(ELEMENTS_DATALINE_LITERAL + line));
 
-            return new ExecuteScript(EventType.ExecuteScript, dataLines);
+            return new ExecuteScript(EventType.PatchElements, dataLines);
         }
     }
 }

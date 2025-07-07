@@ -51,7 +51,7 @@ ServerSentEventGenerator generator = new ServerSentEventGenerator(responseAdapte
 Once the generator is set up you can use it to send events. Let's utilize this event for the next few examples.
 
 ```java
-MergeFragments event = MergeFragments.builder()
+PatchElements event = PatchElements.builder()
         .selector("#test")
         .data("<div>test</div>")
         .build();
@@ -81,53 +81,54 @@ generator.send(event, "custom-id", 2000);
 
 ### Events, Event Options, Examples
 
-There are a few different event types in Datastar and each come with their own options. You can check out the [SDK Guide](https://github.com/rphumulock/datastar/blob/develop/sdk/README.md) for a review of all of them.
+There are a few different event types in Datastar and each come with their own options. You can check out the [SDK Guide](https://github.com/starfederation/datastar/blob/develop/sdk/README.md) for a review of all of them.
 
-#### Example: Merging Fragments into the DOM
+#### Example: Patch Elements into the DOM
 
-This event is used to merge fragments into the DOM. The data is a string that represents the HTML to be merged into the DOM.
+This event is used to patch elements into the DOM. The data is a string that represents the HTML to be patched into the DOM.
 
 ##### Options
 
-- `selector` (string) The CSS selector to use to insert the fragments. If not provided or empty, Datastar **will** default to using the `id` attribute of the fragment.
-- `mergeMode` (FragmentMergeMode) The mode to use when merging the fragment into the DOM. If not provided the Datastar client side **_will_** default to `morph`.
+- `selector` (string) The CSS selector to use to insert the element. If not provided or empty, Datastar **will** default to using the `id` attribute of the element.
+- `mode` (ElementPatchMode) The mode to use when patching the element into the DOM. If not provided the Datastar client side **_will_** default to `outer`.
 - `useViewTransition` Whether to use view transitions, if not provided the Datastar client side **_will_** default to `false`.
 
 ```java
-MergeFragments event = MergeFragments.builder()
+PatchElements event = PatchElements.builder()
         .selector("#feed")
-        .mergeMode(FragmentMergeMode.Append)
+        .mode(ElementPatchMode.Append)
         .useViewTransition(true)
         .data("<div id=\"feed\">\n<span>1</span>\n</div>")
         .build();
 ```
 
-#### Example: Removing HTML Fragments from the DOM
+#### Example: Removing HTML Elements from the DOM
 
-This event is used to remove fragments from the DOM.
+This event is used to remove elements from the DOM.
 
 ##### Options
 
-- `selector` (string) The CSS selector to use to insert the fragments. If not provided or empty, Datastar **will** default to using the `id` attribute of the fragment.
+- `selector` (string) The CSS selector to use to remove the elements. If not provided or empty, Datastar **will** default to using the `id` attribute of the element.
 - `useViewTransition` Whether to use view transitions, if not provided the Datastar client side **_will_** default to `false`.
 
 ```java
-RemoveFragments event = RemoveFragments.builder()
+PatchElements event = PatchElements.builder()
         .selector("#feed")
+        .mode(ElementPatchMode.Remove)
         .useViewTransition(true)
         .build();
 ```
 
-#### Example: Merging Signals
+#### Example: Patching/Updating Signals
 
-This event is used to merge data into the signals object on the client side. The data is a JSON object that represents the data to be merged into the signals object.
+This event is used to patch data into the signals object on the client side. The data is a JSON object that represents the data to be patched into the signals object.
 
 ###### Options
 
-- `onlyIfMissing` (boolean) Whether to merge the signal only if it does not already exist. If not provided, the Datastar client side will default to false, which will cause the data to be merged into the signals.
+- `onlyIfMissing` (boolean) Whether to patch the signals only if they do not already exist. If not provided, the Datastar client side will default to false, which will cause the data to be patched into the signals.
 
 ```java
-MergeSignals event = MergeSignals.builder()
+PatchSignals event = PatchSignals.builder()
         .data("{\"key\": \"value\"}")
         .onlyIfMissing(true)
         .build();
@@ -135,12 +136,11 @@ MergeSignals event = MergeSignals.builder()
 
 #### Example: Removing Signals
 
-For a signal to be removed, the path must be provided. The path is a string that represents the path to the signal in the signals object. The path should be in the format of a dot separated string. For example, if the signal is in the signals object `user` at `user.name`, the path would be `user.name`.
+For a signal to be removed, the signal values must be set to `null`. The signals can be nested, and therefore to remove a leaf value, you have to provide the path to the leaf.
 
 ```java
-RemoveSignals event = RemoveSignals.builder()
-        .addPath("user.name")
-        .addPath("user.email")
+PatchSignals event = PatchSignals.builder()
+        .data("{\"user\": {\"name\":null, \"email\": null}}")
         .build();
 ```
 

@@ -2,45 +2,45 @@ package starfederation.datastar.unit;
 
 import org.junit.jupiter.api.Test;
 import starfederation.datastar.enums.EventType;
-import starfederation.datastar.enums.FragmentMergeMode;
-import starfederation.datastar.events.MergeFragments;
+import starfederation.datastar.enums.ElementPatchMode;
+import starfederation.datastar.events.PatchElements;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MergeFragmentsTest {
+class PatchElementsTest {
 
     @Test
     void builderShouldGenerateCorrectEvent() {
-        MergeFragments event = MergeFragments.builder()
+        PatchElements event = PatchElements.builder()
                 .selector("#feed")
-                .mergeMode(FragmentMergeMode.Append)
+                .mode(ElementPatchMode.Append)
                 .useViewTransition(true)
                 .data("<div id=\"feed\">\n<span>1</span>\n</div>")
                 .build();
 
         String[] expectedDataLines = {
                 "selector #feed",
-                "mergeMode append",
+                "mode append",
                 "useViewTransition true",
-                "fragments <div id=\"feed\">",
-                "fragments <span>1</span>",
-                "fragments </div>"
+                "elements <div id=\"feed\">",
+                "elements <span>1</span>",
+                "elements </div>"
         };
 
         assertArrayEquals(expectedDataLines, event.getDataLines());
-        assertEquals(EventType.MergeFragments.toString(), event.getEventType().toString());
+        assertEquals(EventType.PatchElements, event.getEventType());
     }
 
     @Test
     void builderShouldExcludeDefaultValues() {
-        MergeFragments event = MergeFragments.builder()
+        PatchElements event = PatchElements.builder()
                 .data("<div id=\"feed\">\n<span>1</span>\n</div>")
                 .build();
 
         String[] expectedDataLines = {
-                "fragments <div id=\"feed\">",
-                "fragments <span>1</span>",
-                "fragments </div>"
+                "elements <div id=\"feed\">",
+                "elements <span>1</span>",
+                "elements </div>"
         };
 
         assertArrayEquals(expectedDataLines, event.getDataLines());
@@ -48,6 +48,6 @@ class MergeFragmentsTest {
 
     @Test
     void builderShouldThrowExceptionForNullData() {
-        assertThrows(IllegalArgumentException.class, () -> MergeFragments.builder().build());
+        assertThrows(IllegalArgumentException.class, () -> PatchElements.builder().build());
     }
 }

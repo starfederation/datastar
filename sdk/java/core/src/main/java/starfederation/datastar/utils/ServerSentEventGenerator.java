@@ -7,12 +7,10 @@ import java.io.Closeable;
 import java.io.PrintWriter;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static starfederation.datastar.Consts.DEFAULT_SSE_RETRY_DURATION;;
-
 public class ServerSentEventGenerator implements Closeable {
 
     private final PrintWriter writer;
-    private static final AtomicLong counter = new AtomicLong(-1);
+    private static final AtomicLong COUNTER = new AtomicLong(-1);
 
     /**
      * Initializes the Server-Sent Event generator.
@@ -77,7 +75,7 @@ public class ServerSentEventGenerator implements Closeable {
      * @param event the event to send
      */
     public synchronized void send(AbstractDatastarEvent event) {
-        send(event, String.valueOf(counter.incrementAndGet()), -1);
+        send(event, String.valueOf(COUNTER.incrementAndGet()), -1);
     }
 
     /**
@@ -99,7 +97,7 @@ public class ServerSentEventGenerator implements Closeable {
      * @param retry the retry duration
      */
     public synchronized void send(AbstractDatastarEvent event, int retry) {
-        send(event, String.valueOf(counter.incrementAndGet()), retry);
+        send(event, String.valueOf(COUNTER.incrementAndGet()), retry);
     }
 
     /**

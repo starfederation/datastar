@@ -1,7 +1,7 @@
 {%- func javaConsts(data *ConstTemplateData) -%}
 package starfederation.datastar;
 
-import starfederation.datastar.enums.FragmentMergeMode;
+import starfederation.datastar.enums.ElementPatchMode;
 
 /**
  * {%s data.DoNotEdit %}
@@ -24,7 +24,7 @@ public final class Consts {
     {%- for _, enum := range data.Enums -%}
         {%- if enum.Default != nil %}
     // {%s= enum.Description %}
-    public static final FragmentMergeMode DEFAULT_{%s enum.Name.ScreamingSnake %} = FragmentMergeMode.{%s enum.Default.Name.Pascal %};
+    public static final ElementPatchMode DEFAULT_{%s enum.Name.ScreamingSnake %} = ElementPatchMode.{%s enum.Default.Name.Pascal %};
         {%- endif -%}
     {%- endfor -%}
 
@@ -69,15 +69,15 @@ public enum EventType {
 }
 {%- endfunc -%}
 
-{%- func javaFragmentMergeMode(data *ConstTemplateData) -%}
+{%- func javaElementPatchMode(data *ConstTemplateData) -%}
 package starfederation.datastar.enums;
 
 /**
  * {%s data.DoNotEdit %}
  */
-public enum FragmentMergeMode {
+public enum ElementPatchMode {
 {%- for _, enum := range data.Enums -%}
-    {%- if enum.Name.Pascal == "FragmentMergeMode" -%}
+    {%- if enum.Name.Pascal == "ElementPatchMode" -%}
     {%- for i, entry := range enum.Values %}{% if i < len(enum.Values) - 1 %}
     // {%s entry.Description %}
     {%s entry.Name.Pascal %}("{%s entry.Value %}"),
@@ -90,7 +90,7 @@ public enum FragmentMergeMode {
 
     private final String value;
 
-    FragmentMergeMode(String value) {
+    ElementPatchMode(String value) {
         this.value = value;
     }
     
