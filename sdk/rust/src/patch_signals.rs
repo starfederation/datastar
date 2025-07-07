@@ -76,11 +76,9 @@ impl PatchSignals {
             ));
         }
 
-        data.push(format!(
-            "{} {}",
-            consts::SIGNALS_DATALINE_LITERAL,
-            self.signals
-        ));
+        for line in self.signals.lines() {
+            data.push(format!("{} {line}", consts::SIGNALS_DATALINE_LITERAL));
+        }
 
         DatastarEvent {
             event: consts::EventType::PatchSignals,

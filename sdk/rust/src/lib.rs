@@ -48,19 +48,19 @@ pub struct DatastarEvent {
 
 impl Display for DatastarEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "event: {}", self.event.as_str())?;
+        write!(f, "event: {}", self.event.as_str())?;
 
         if let Some(id) = &self.id {
-            writeln!(f, "id: {id}")?;
+            write!(f, "\nid: {id}")?;
         }
 
         let millis = self.retry.as_millis();
         if millis != consts::DEFAULT_SSE_RETRY_DURATION as u128 {
-            writeln!(f, "retry: {millis}")?;
+            write!(f, "\nretry: {millis}")?;
         }
 
         for line in &self.data {
-            writeln!(f, "data: {line}")?;
+            write!(f, "\ndata: {line}")?;
         }
 
         write!(f, "\n\n")?;

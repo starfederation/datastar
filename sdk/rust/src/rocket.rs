@@ -26,10 +26,15 @@ impl PatchSignals {
 impl DatastarEvent {
     /// Turn this [`DatastarEvent`] into a Rocket SSE [`Event`].
     pub fn write_as_rocket_sse_event(&self) -> Event {
-        let mut data = String::with_capacity(self.data.iter().map(|s| s.len()).sum());
+        let mut data = String::with_capacity(
+            self.data.iter().map(|s| s.len()).sum::<usize>() + self.data.len() - 1,
+        );
+
+        let mut sep = "";
         for line in self.data.iter() {
             // Assumption: std::fmt::write does not fail ever for [`String`].
-            let _ = writeln!(&mut data, "{line}");
+            let _ = write!(&mut data, "{sep}{line}");
+            sep = "\n";
         }
 
         let event = Event::data(data)

@@ -1,0 +1,15 @@
+[package]
+edition = "2024"
+name = "test_suite"
+version = "0.1.0"
+rust-version = "1.85.0"
+
+[dependencies]
+async-stream = "0.3.6"
+axum = "0.8.4"
+datastar = { path = "../../../../sdk/rust", features = ["axum"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = { version = "1" }
+tokio = { version = "1.46.1", features = ["full"] }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
