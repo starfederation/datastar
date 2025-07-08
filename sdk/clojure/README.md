@@ -8,6 +8,7 @@ We provide several libraries for working with [Datastar](https://data-star.dev/)
   several libraries implementing it to work with specific ring adapters.
 - A library containing [malli schemas](https://github.com/metosin/malli)
   covering the generic API and our adapter implementations.
+- A library providing the tools necessary to use Brotli compression in SSE Streams
 
 There currently are adapter implementations for:
 
@@ -19,51 +20,22 @@ If you want to roll your own adapter implementation, see
 
 ## Installation
 
-For now the libraries are distributed as git dependencies. You need to add a
-dependency for each library you use.
-
-> [!important]
-> This project is new and there isn't a release process yet other than using git shas.
-> Replace `LATEST_SHA` in the git coordinates below by the actual latest commit sha of this repository.
-
 To your `deps.edn` file you can add the following coordinates:
 
-- SDK
+| library       | deps coordinate                                                                                                              |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| SDK           | [![](https://clojars.org/dev.data-star.clojure/latest-version.svg)](https://clojars.org/dev.data-star.clojure/sdk)           |
+| http-kit      | [![](https://clojars.org/dev.data-star.clojure/latest-version.svg)](https://clojars.org/dev.data-star.clojure/http-kit)      |
+| ring          | [![](https://clojars.org/dev.data-star.clojure/latest-version.svg)](https://clojars.org/dev.data-star.clojure/ring)          |
+| brotli        | [![](https://clojars.org/dev.data-star.clojure/latest-version.svg)](https://clojars.org/dev.data-star.clojure/brotli)        |
+| malli-schemas | [![](https://clojars.org/dev.data-star.clojure/latest-version.svg)](https://clojars.org/dev.data-star.clojure/malli-schemas) |
 
-```clojure
-{datastar/sdk {:git/url "https://github.com/starfederation/datastar/"
-               :git/sha "LATEST_SHA"
-               :deps/root "sdk/clojure/sdk"}}
-```
+Notes:
 
-- ring implementation
-
-```clojure
-{datastar/ring {:git/url "https://github.com/starfederation/datastar/"
-                :git/sha "LATEST_SHA"
-                :deps/root "sdk/clojure/adapter-ring"}
-
- ring-compliant/adapter "Coordinate for the ring compliant adapter you want to use."}
-```
-
-By ring compliant adapter we mean adapters that are implementing the
-`ring.core.protocols/StreamableResponseBody` protocol to deal with response bodies.
-
-- http-kit implementation
-
-```clojure
-{datastar/http-kit {:git/url "https://github.com/starfederation/datastar/"
-                    :git/sha "LATEST_SHA"
-                    :deps/root "sdk/clojure/adapter-http-kit"}}
-```
-
-- Malli schemas:
-
-```clojure
-{datastar/malli-schemas {:git/url "https://github.com/starfederation/datastar/"
-                         :git/sha "LATEST_SHA"
-                         :deps/root "sdk/clojure/malli-schemas"}}
-```
+- You need the sdk and either the http-kit or the ring library to get started.
+- The ring library works with ring compliant adapters (adapter using the
+  `ring.core.protocols/StreamableResponseBody`)
+- Currently the brotli library works only with http-kit
 
 ## Usage
 
