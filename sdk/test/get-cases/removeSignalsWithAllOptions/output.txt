@@ -3,4 +3,3 @@ id: event1
 retry: 2000
 data: signals {"one":null,"two":{"alpha":null}}
 
-
