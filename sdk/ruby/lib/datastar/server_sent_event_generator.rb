@@ -84,9 +84,9 @@ module Datastar
     end
 
     def execute_script(script, options = BLANK_OPTIONS)
-      options = options.dup
-      auto_remove = options.key?(:auto_remove) ? options.delete(:auto_remove) : true
-      attributes = options.delete(:attributes) || BLANK_OPTIONS
+      options = camelize_keys(options)
+      auto_remove = options.key?('autoRemove') ? options.delete('autoRemove') : true
+      attributes = options.delete('attributes') || BLANK_OPTIONS
       script_tag = +"<script"
       attributes.each do |k, v|
         script_tag << %( #{camelize(k)}="#{v}")
@@ -145,6 +145,13 @@ module Datastar
           default_value = OPTION_DEFAULTS[k]
           buffer << "data: #{k} #{v}\n" unless v == default_value
         end
+      end
+    end
+
+    def camelize_keys(options)
+      options.each.with_object({}) do |(key, value), acc|
+        value = camelize_keys(value) if value.is_a?(Hash)
+        acc[camelize(key)] = value
       end
     end
 
