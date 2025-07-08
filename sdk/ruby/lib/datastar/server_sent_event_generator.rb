@@ -65,11 +65,15 @@ module Datastar
     end
 
     def patch_signals(signals, options = BLANK_OPTIONS)
-      signals = JSON.dump(signals) unless signals.is_a?(String)
-
       buffer = +"event: datastar-patch-signals\n"
       build_options(options, buffer)
-      buffer << "data: signals #{signals}\n"
+      case signals
+      when Hash
+        signals = JSON.dump(signals)
+        buffer << "data: signals #{signals}\n"
+      when String
+        multi_data_lines(signals, buffer, Consts::SIGNALS_DATALINE_LITERAL)
+      end
       write(buffer)
     end
 
@@ -157,6 +161,15 @@ module Datastar
 
     def camelize(str)
       str.to_s.split('_').map.with_index { |word, i| i == 0 ? word : word.capitalize }.join
+    end
+
+    # Take a string, split it by newlines,
+    # and write each line as a separate data line
+    def multi_data_lines(data, buffer, key)
+      lines = data.to_s.split("\n")
+      lines.each do |line|
+        buffer << "data: #{key} #{line}\n"
+      end
     end
 
     def set_nested_value(hash, path, value)

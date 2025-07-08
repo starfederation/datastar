@@ -196,6 +196,25 @@ RSpec.describe Datastar::Dispatcher do
       expect(socket.open).to be(false)
       expect(socket.lines).to eq([%(event: datastar-patch-signals\nid: 72\nretry: 2000\ndata: onlyIfMissing true\ndata: signals {"foo":"bar"}\n\n\n)])
     end
+
+    it 'takes a (JSON encoded) string as signals' do
+      signals = <<~JSON
+      {
+        "foo": "bar",
+        "age": 42
+      }
+      JSON
+      dispatcher.patch_signals(signals)
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.split_lines).to eq([
+        %(event: datastar-patch-signals),
+        %(data: signals {),
+        %(data: signals   "foo": "bar",),
+        %(data: signals   "age": 42),
+        %(data: signals }),
+      ])
+    end
   end
 
   describe '#remove_signals' do
