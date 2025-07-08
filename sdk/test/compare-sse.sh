@@ -52,35 +52,72 @@ BEGIN {
 NR == FNR {
     if (NF > 0) {
         event_count_1++
-        delete fields
-        delete field_order
-        field_count = 0
+        delete data_fields
+        delete other_fields
+        data_count = 0
         
-        # Parse fields and group by prefix
+        # Parse fields and separate data fields from others
         for (i = 1; i <= NF; i++) {
             if ($i != "") {
-                field_count++
                 # Extract prefix (everything before first colon)
                 prefix = $i
                 sub(/:.*/, "", prefix)
                 
-                # Store field content
-                if (!(prefix in fields)) {
-                    fields[prefix] = ""
-                    field_order[prefix] = 0
+                if (prefix == "data") {
+                    # Extract subgroup (first word after "data: ")
+                    subgroup = $i
+                    sub(/^data: /, "", subgroup)
+                    sub(/ .*$/, "", subgroup)
+                    
+                    # Store data fields with subgroup for sorting
+                    data_count++
+                    data_fields[data_count] = $i
+                    data_subgroups[data_count] = subgroup
+                } else {
+                    # Store non-data fields by prefix
+                    if (!(prefix in other_fields)) {
+                        other_fields[prefix] = ""
+                    }
+                    if (other_fields[prefix] != "") {
+                        other_fields[prefix] = other_fields[prefix] "\n"
+                    }
+                    other_fields[prefix] = other_fields[prefix] $i
                 }
-                if (fields[prefix] != "") {
-                    fields[prefix] = fields[prefix] "\n"
-                }
-                fields[prefix] = fields[prefix] $i
-                field_order[prefix]++
             }
         }
         
         # Store event data
-        for (prefix in fields) {
-            events_1[event_count_1, prefix] = fields[prefix]
-            event_field_count_1[event_count_1, prefix] = field_order[prefix]
+        for (prefix in other_fields) {
+            events_1[event_count_1, prefix] = other_fields[prefix]
+        }
+        
+        # Sort and store data fields
+        if (data_count > 0) {
+            # Create sorting indices based on subgroup, preserving order within subgroups
+            for (i = 1; i <= data_count; i++) {
+                sort_indices[i] = i
+            }
+            
+            # Sort indices by subgroup name
+            for (i = 1; i <= data_count; i++) {
+                for (j = i + 1; j <= data_count; j++) {
+                    if (data_subgroups[sort_indices[i]] > data_subgroups[sort_indices[j]]) {
+                        temp = sort_indices[i]
+                        sort_indices[i] = sort_indices[j]
+                        sort_indices[j] = temp
+                    }
+                }
+            }
+            
+            # Join data fields in sorted order
+            sorted_data = ""
+            for (i = 1; i <= data_count; i++) {
+                if (sorted_data != "") {
+                    sorted_data = sorted_data "\n"
+                }
+                sorted_data = sorted_data data_fields[sort_indices[i]]
+            }
+            events_1[event_count_1, "data"] = sorted_data
         }
     }
     next
@@ -90,35 +127,72 @@ NR == FNR {
 {
     if (NF > 0) {
         event_count_2++
-        delete fields
-        delete field_order
-        field_count = 0
+        delete data_fields
+        delete other_fields
+        data_count = 0
         
-        # Parse fields and group by prefix
+        # Parse fields and separate data fields from others
         for (i = 1; i <= NF; i++) {
             if ($i != "") {
-                field_count++
-                # Extract prefix
+                # Extract prefix (everything before first colon)
                 prefix = $i
                 sub(/:.*/, "", prefix)
                 
-                # Store field content
-                if (!(prefix in fields)) {
-                    fields[prefix] = ""
-                    field_order[prefix] = 0
+                if (prefix == "data") {
+                    # Extract subgroup (first word after "data: ")
+                    subgroup = $i
+                    sub(/^data: /, "", subgroup)
+                    sub(/ .*$/, "", subgroup)
+                    
+                    # Store data fields with subgroup for sorting
+                    data_count++
+                    data_fields[data_count] = $i
+                    data_subgroups[data_count] = subgroup
+                } else {
+                    # Store non-data fields by prefix
+                    if (!(prefix in other_fields)) {
+                        other_fields[prefix] = ""
+                    }
+                    if (other_fields[prefix] != "") {
+                        other_fields[prefix] = other_fields[prefix] "\n"
+                    }
+                    other_fields[prefix] = other_fields[prefix] $i
                 }
-                if (fields[prefix] != "") {
-                    fields[prefix] = fields[prefix] "\n"
-                }
-                fields[prefix] = fields[prefix] $i
-                field_order[prefix]++
             }
         }
         
         # Store event data
-        for (prefix in fields) {
-            events_2[event_count_2, prefix] = fields[prefix]
-            event_field_count_2[event_count_2, prefix] = field_order[prefix]
+        for (prefix in other_fields) {
+            events_2[event_count_2, prefix] = other_fields[prefix]
+        }
+        
+        # Sort and store data fields
+        if (data_count > 0) {
+            # Create sorting indices based on subgroup, preserving order within subgroups
+            for (i = 1; i <= data_count; i++) {
+                sort_indices[i] = i
+            }
+            
+            # Sort indices by subgroup name
+            for (i = 1; i <= data_count; i++) {
+                for (j = i + 1; j <= data_count; j++) {
+                    if (data_subgroups[sort_indices[i]] > data_subgroups[sort_indices[j]]) {
+                        temp = sort_indices[i]
+                        sort_indices[i] = sort_indices[j]
+                        sort_indices[j] = temp
+                    }
+                }
+            }
+            
+            # Join data fields in sorted order
+            sorted_data = ""
+            for (i = 1; i <= data_count; i++) {
+                if (sorted_data != "") {
+                    sorted_data = sorted_data "\n"
+                }
+                sorted_data = sorted_data data_fields[sort_indices[i]]
+            }
+            events_2[event_count_2, "data"] = sorted_data
         }
     }
 }
