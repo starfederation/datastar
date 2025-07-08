@@ -329,17 +329,6 @@
       }
     ]
   },
-  "data-scope": {
-    "prefix": "data-scope",
-    "body": "data-scope=\"${1:expression}\"",
-    "description": "Sets a signal scope for the element and its descendants.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-scope"
-      }
-    ]
-  },
   "data-scroll-into-view": {
     "prefix": "data-scroll-into-view",
     "body": "data-scroll-into-view",

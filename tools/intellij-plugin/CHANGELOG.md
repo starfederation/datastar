@@ -13,8 +13,6 @@
 - Added the `data-on-signal-patch-filter` attribute.
 - Added the `data-preserve-attr` attribute.
 - Added the `data-query-string` attribute.
-- Added the `data-scope` attribute.
-- Added the `scoped` modifier.
 - Added the `trusted` modifier.
 
 ## [1.0.2] - 2025.02.11

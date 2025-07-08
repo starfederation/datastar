@@ -11,10 +11,6 @@
         {
           "name": "case",
           "description": "Modify the casing of the signal name"
-        },
-        {
-          "name": "scoped",
-          "description": "Scopes the signal to the closest scope defined by `data-scope`"
         }
       ],
       "datastar-class-modifiers": [
@@ -27,20 +23,12 @@
         {
           "name": "case",
           "description": "Modify the casing of the signal name"
-        },
-        {
-          "name": "scoped",
-          "description": "Scopes the signal to the closest scope defined by `data-scope`"
         }
       ],
       "datastar-indicator-modifiers": [
         {
           "name": "case",
           "description": "Modify the casing of the signal name"
-        },
-        {
-          "name": "scoped",
-          "description": "Scopes the signal to the closest scope defined by `data-scope`"
         }
       ],
       "datastar-json-signals-modifiers": [
@@ -227,10 +215,6 @@
         {
           "name": "case",
           "description": "Modify the casing of the signal name"
-        },
-        {
-          "name": "scoped",
-          "description": "Scopes the signal to the closest scope defined by `data-scope`"
         }
       ],
       "datastar-scroll-into-view-modifiers": [
@@ -291,10 +275,6 @@
         {
           "name": "ifmissing",
           "description": "Only set the signals if the key does not exist. This is useful for setting defaults without overwriting existing values"
-        },
-        {
-          "name": "scoped",
-          "description": "Scopes the signal to the closest scope defined by `data-scope`"
         }
       ]
     },
@@ -881,23 +861,6 @@
           "pattern": {
             "template": [
               "data-replace-url"
-            ],
-            "priority": "normal"
-          }
-        },
-        {
-          "name": "data-scope",
-          "virtual": true,
-          "description": "Sets a signal scope for the element and its descendants.",
-          "doc-url": "https://data-star.dev/reference/attributes#data-scope",
-          "value": {
-            "kind": "expression",
-            "type": "string",
-            "required": false
-          },
-          "pattern": {
-            "template": [
-              "data-scope"
             ],
             "priority": "normal"
           }
