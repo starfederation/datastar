@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from collections.abc import AsyncIterable, Iterable
 from itertools import chain
-from typing import Protocol, TypeAlias, Union, runtime_checkable
+from typing import Literal, Protocol, TypeAlias, Union, overload, runtime_checkable
 
 import datastar_py.consts as consts
 
@@ -59,10 +59,32 @@ class ServerSentEventGenerator:
 
         return DatastarEvent("\n".join(chain(prefix, data_lines)) + "\n\n")
 
+    @overload
+    @classmethod
+    def patch_elements(
+        cls,
+        *,
+        selector: str,
+        mode: Literal[consts.ElementPatchMode.REMOVE],
+        use_view_transitions: bool | None = None,
+        event_id: str | None = None,
+        retry_duration: int | None = None,
+    ) -> DatastarEvent: ...
+    @overload
     @classmethod
     def patch_elements(
         cls,
         elements: str | _HtmlProvider,
+        selector: str | None = None,
+        mode: consts.ElementPatchMode | None = None,
+        use_view_transitions: bool | None = None,
+        event_id: str | None = None,
+        retry_duration: int | None = None,
+    ) -> DatastarEvent: ...
+    @classmethod
+    def patch_elements(
+        cls,
+        elements: str | _HtmlProvider | None = None,
         selector: str | None = None,
         mode: consts.ElementPatchMode | None = None,
         use_view_transition: bool | None = None,
@@ -84,13 +106,27 @@ class ServerSentEventGenerator:
                 f"{consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} {_js_bool(use_view_transition)}"
             )
 
-        data_lines.extend(f"{consts.ELEMENTS_DATALINE_LITERAL} {x}" for x in elements.splitlines())
+        if elements:
+            data_lines.extend(
+                f"{consts.ELEMENTS_DATALINE_LITERAL} {x}" for x in elements.splitlines()
+            )
 
         return ServerSentEventGenerator._send(
             consts.EventType.PATCH_ELEMENTS,
             data_lines,
             event_id,
             retry_duration,
+        )
+
+    @classmethod
+    def remove_elements(
+        cls, selector: str, event_id: str | None = None, retry_duration: int | None = None
+    ) -> DatastarEvent:
+        return ServerSentEventGenerator.patch_elements(
+            selector=selector,
+            mode=consts.ElementPatchMode.REMOVE,
+            event_id=event_id,
+            retry_duration=retry_duration,
         )
 
     @classmethod
