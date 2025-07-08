@@ -4,25 +4,44 @@
 # Compares two SSE files allowing fields to be in any order
 # but preserving order within same prefix types
 
-if [ $# -ne 2 ]; then
-    echo "Usage: $0 expected.txt actual.txt" >&2
-    exit 1
-fi
+# Function for comparing SSE outputs with error display
+compare_sse_with_output() {
+    expected="$1"
+    actual="$2"
+    
+    # Call the main comparison logic
+    compare_sse "$expected" "$actual" || { 
+        echo "Expected output ($expected):"
+        cat "$expected"
+        echo ""
+        echo "Actual output ($actual):"
+        cat "$actual"
+        return 1
+    }
+    return 0
+}
 
-expected="$1"
-actual="$2"
+# Main comparison function
+compare_sse() {
+    if [ $# -ne 2 ]; then
+        echo "Usage: $0 expected.txt actual.txt" >&2
+        exit 1
+    fi
 
-if [ ! -f "$expected" ]; then
-    echo "Expected file not found: $expected" >&2
-    exit 1
-fi
+    expected="$1"
+    actual="$2"
 
-if [ ! -f "$actual" ]; then
-    echo "Actual file not found: $actual" >&2
-    exit 1
-fi
+    if [ ! -f "$expected" ]; then
+        echo "Expected file not found: $expected" >&2
+        exit 1
+    fi
 
-# Use awk to parse and compare SSE events
+    if [ ! -f "$actual" ]; then
+        echo "Actual file not found: $actual" >&2
+        exit 1
+    fi
+
+    # Use awk to parse and compare SSE events
 awk '
 BEGIN {
     RS = "\n\n\n"  # Events separated by double newlines
@@ -166,3 +185,9 @@ END {
     exit 0
 }
 ' "$expected" "$actual"
+}
+
+# If script is called directly (not sourced), run the comparison
+if [ "${0##*/}" = "compare-sse.sh" ]; then
+    compare_sse "$@"
+fi
