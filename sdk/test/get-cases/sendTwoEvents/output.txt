@@ -1,8 +1,6 @@
 event: datastar-patch-elements
 data: elements <div>Merge</div>
 
-
 event: datastar-patch-elements
 data: elements <div>Merge 2</div>
-
 

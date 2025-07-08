@@ -6,4 +6,3 @@ data: mode append
 data: useViewTransition true
 data: elements <div>Merge</div>
 
-
