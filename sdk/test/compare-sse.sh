@@ -11,11 +11,9 @@ compare_sse_with_output() {
     
     # Call the main comparison logic
     compare_sse "$expected" "$actual" || { 
-        echo "Expected output ($expected):"
-        cat "$expected"
+        echo "Difference between expected and actual output:"
         echo ""
-        echo "Actual output ($actual):"
-        cat "$actual"
+        diff -u "$expected" "$actual" || true
         return 1
     }
     return 0
