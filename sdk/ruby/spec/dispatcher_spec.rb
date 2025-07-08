@@ -12,6 +12,10 @@ class TestSocket
   end
 
   def close = @open = false
+
+  def split_lines
+    @lines.join.split("\n")
+  end
 end
 
 RSpec.describe Datastar::Dispatcher do
@@ -192,6 +196,25 @@ RSpec.describe Datastar::Dispatcher do
       expect(socket.open).to be(false)
       expect(socket.lines).to eq([%(event: datastar-patch-signals\nid: 72\nretry: 2000\ndata: onlyIfMissing true\ndata: signals {"foo":"bar"}\n\n\n)])
     end
+
+    it 'takes a (JSON encoded) string as signals' do
+      signals = <<~JSON
+      {
+        "foo": "bar",
+        "age": 42
+      }
+      JSON
+      dispatcher.patch_signals(signals)
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.split_lines).to eq([
+        %(event: datastar-patch-signals),
+        %(data: signals {),
+        %(data: signals   "foo": "bar",),
+        %(data: signals   "age": 42),
+        %(data: signals }),
+      ])
+    end
   end
 
   describe '#remove_signals' do
@@ -235,6 +258,29 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
       expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script type="text/javascript" title="alert" data-effect="el.remove()">alert('hello')</script>\n\n\n)])
+    end
+
+    it 'accepts camelized string options' do
+      dispatcher.execute_script(
+        %(console.log('hello');),
+        'eventId' => 'event1',
+        'retryDuration' => 2000,
+        'attributes' => {
+          'type' => 'text/javascript',
+          'blocking' => false
+        },
+        'autoRemove' => false
+      )
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.split_lines).to eq([
+        %(event: datastar-patch-elements),
+        %(id: event1),
+        %(retry: 2000),
+        %(data: selector body),
+        %(data: mode append),
+        %(data: elements <script type="text/javascript" blocking="false">console.log('hello');</script>)
+      ])
     end
   end
 

@@ -65,11 +65,15 @@ module Datastar
     end
 
     def patch_signals(signals, options = BLANK_OPTIONS)
-      signals = JSON.dump(signals) unless signals.is_a?(String)
-
       buffer = +"event: datastar-patch-signals\n"
       build_options(options, buffer)
-      buffer << "data: signals #{signals}\n"
+      case signals
+      when Hash
+        signals = JSON.dump(signals)
+        buffer << "data: signals #{signals}\n"
+      when String
+        multi_data_lines(signals, buffer, Consts::SIGNALS_DATALINE_LITERAL)
+      end
       write(buffer)
     end
 
@@ -84,9 +88,9 @@ module Datastar
     end
 
     def execute_script(script, options = BLANK_OPTIONS)
-      options = options.dup
-      auto_remove = options.key?(:auto_remove) ? options.delete(:auto_remove) : true
-      attributes = options.delete(:attributes) || BLANK_OPTIONS
+      options = camelize_keys(options)
+      auto_remove = options.key?('autoRemove') ? options.delete('autoRemove') : true
+      attributes = options.delete('attributes') || BLANK_OPTIONS
       script_tag = +"<script"
       attributes.each do |k, v|
         script_tag << %( #{camelize(k)}="#{v}")
@@ -148,8 +152,24 @@ module Datastar
       end
     end
 
+    def camelize_keys(options)
+      options.each.with_object({}) do |(key, value), acc|
+        value = camelize_keys(value) if value.is_a?(Hash)
+        acc[camelize(key)] = value
+      end
+    end
+
     def camelize(str)
       str.to_s.split('_').map.with_index { |word, i| i == 0 ? word : word.capitalize }.join
+    end
+
+    # Take a string, split it by newlines,
+    # and write each line as a separate data line
+    def multi_data_lines(data, buffer, key)
+      lines = data.to_s.split("\n")
+      lines.each do |line|
+        buffer << "data: #{key} #{line}\n"
+      end
     end
 
     def set_nested_value(hash, path, value)

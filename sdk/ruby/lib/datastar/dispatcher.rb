@@ -157,7 +157,7 @@ module Datastar
     #
     #  datastar.patch_signals(count: 1, toggle: true)
     #
-    # @param signals [Hash] signals to merge
+    # @param signals [Hash, String] signals to merge
     # @param options [Hash] the options to send with the message
     def patch_signals(signals, options = BLANK_OPTIONS)
       stream_no_heartbeat do |sse|
