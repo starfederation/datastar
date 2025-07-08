@@ -1,6 +1,8 @@
 event: datastar-patch-elements
 id: event1
 retry: 2000
+data: mode append
+data: selector body
 data: elements <script type="text/javascript" blocking="false">console.log('hello');</script>
 
 
