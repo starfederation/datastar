@@ -8,7 +8,7 @@ import starfederation.datastar.adapters.request.AbstractRequestAdapter;
 import starfederation.datastar.adapters.request.HttpServletRequestAdapter;
 import starfederation.datastar.adapters.response.AbstractResponseAdapter;
 import starfederation.datastar.adapters.response.HttpServletResponseAdapter;
-import starfederation.datastar.events.MergeFragments;
+import starfederation.datastar.events.PatchElements;
 import starfederation.datastar.utils.DataStore;
 import starfederation.datastar.utils.ServerSentEventGenerator;
 import starfederation.datastar.utils.SignalReader;
@@ -66,7 +66,7 @@ public class HelloWorldServlet extends HttpServlet {
                 String htmlFragment = String.format("<div id=\"message\">%s</div>",
                         message.substring(0, currentIndex + 1));
 
-                MergeFragments event = MergeFragments.builder()
+                PatchElements event = PatchElements.builder()
                         .selector("#message")
                         .data(htmlFragment)
                         .build();
