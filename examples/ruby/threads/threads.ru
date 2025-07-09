@@ -26,7 +26,7 @@ INDEX = <<~HTML
           span { font-weight: bold; }
         }
       </style>
-      <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.2/bundles/datastar.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@release-candidate/bundles/datastar.js"></script>
     </head>
     <body>
       <button#{' '}
