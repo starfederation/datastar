@@ -4,7 +4,7 @@ require 'json'
 
 module Datastar
   class ServerSentEventGenerator
-    MSG_END = "\n\n"
+    MSG_END = "\n"
 
     SSE_OPTION_MAPPING = {
       'eventId' => 'id',

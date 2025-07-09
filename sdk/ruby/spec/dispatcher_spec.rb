@@ -76,12 +76,12 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq(["event: datastar-patch-elements\ndata: elements <div id=\"foo\">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n\n"])
+      expect(socket.lines).to eq(["event: datastar-patch-elements\ndata: elements <div id=\"foo\">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n"])
     end
 
     it 'takes D* options' do
       dispatcher.patch_elements(
-        %(<div id="foo">\n<span>hello</span>\n</div>\n),
+        %(<div id="foo">\n<span>hello</span>\n</div>),
         id: 72,
         retry_duration: 2000,
         use_view_transition: true,
@@ -89,7 +89,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: useViewTransition true\ndata: elements <div id="foo">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: useViewTransition true\ndata: elements <div id="foo">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n)])
     end
 
     it 'omits retry if using default value' do
@@ -101,7 +101,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: elements <div id="foo">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: elements <div id="foo">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n)])
     end
 
     it 'works with #call(view_context:) interfaces' do
@@ -116,7 +116,7 @@ RSpec.describe Datastar::Dispatcher do
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: elements <div id="foo">\ndata: elements <span>#{view_context}</span>\ndata: elements </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: elements <div id="foo">\ndata: elements <span>#{view_context}</span>\ndata: elements </div>\n\n)])
     end
 
     it 'works with #render_in(view_context, &) interfaces' do
@@ -131,7 +131,7 @@ RSpec.describe Datastar::Dispatcher do
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: elements <div id="foo">\ndata: elements <span>#{view_context}</span>\ndata: elements </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: elements <div id="foo">\ndata: elements <span>#{view_context}</span>\ndata: elements </div>\n\n)])
     end
 
     it 'accepts an array of elements' do
@@ -142,7 +142,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq(["event: datastar-patch-elements\ndata: elements <div id=\"foo\">Hello</div>\ndata: elements <div id=\"bar\">Bye</div>\n\n\n"])
+      expect(socket.lines).to eq(["event: datastar-patch-elements\ndata: elements <div id=\"foo\">Hello</div>\ndata: elements <div id=\"bar\">Bye</div>\n\n"])
     end
   end
 
@@ -152,7 +152,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: mode remove\ndata: selector #list-item-1\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: mode remove\ndata: selector #list-item-1\n\n)])
     end
 
     it 'takes D* options' do
@@ -160,7 +160,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: mode remove\ndata: selector #list-item-1\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: mode remove\ndata: selector #list-item-1\n\n)])
     end
 
     it 'takes an array of selectors' do
@@ -168,7 +168,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: mode remove\ndata: selector #item1, #item2\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: mode remove\ndata: selector #item1, #item2\n\n)])
     end
   end
 
@@ -178,7 +178,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals { "foo": "bar" }\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals { "foo": "bar" }\n\n)])
     end
 
     it 'takes a Hash of signals' do
@@ -186,7 +186,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals {"foo":"bar"}\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals {"foo":"bar"}\n\n)])
     end
 
     it 'takes D* options' do
@@ -194,7 +194,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-signals\nid: 72\nretry: 2000\ndata: onlyIfMissing true\ndata: signals {"foo":"bar"}\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\nid: 72\nretry: 2000\ndata: onlyIfMissing true\ndata: signals {"foo":"bar"}\n\n)])
     end
 
     it 'takes a (JSON encoded) string as signals' do
@@ -223,7 +223,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals {"user":{"name":null,"email":null}}\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals {"user":{"name":null,"email":null}}\n\n)])
     end
 
     it 'takes D* options' do
@@ -231,7 +231,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-signals\nid: 72\nretry: 2000\ndata: signals {"user":{"name":null}}\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\nid: 72\nretry: 2000\ndata: signals {"user":{"name":null}}\n\n)])
     end
   end
 
@@ -241,7 +241,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script data-effect="el.remove()">alert('hello')</script>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script data-effect="el.remove()">alert('hello')</script>\n\n)])
     end
 
     it 'takes D* options' do
@@ -249,7 +249,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: selector body\ndata: mode append\ndata: elements <script>alert('hello')</script>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: selector body\ndata: mode append\ndata: elements <script>alert('hello')</script>\n\n)])
     end
 
     it 'takes attributes Hash' do
@@ -257,7 +257,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script type="text/javascript" title="alert" data-effect="el.remove()">alert('hello')</script>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script type="text/javascript" title="alert" data-effect="el.remove()">alert('hello')</script>\n\n)])
     end
 
     it 'accepts camelized string options' do
@@ -290,7 +290,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script data-effect="el.remove()">setTimeout(() => { window.location = '/guide' })</script>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script data-effect="el.remove()">setTimeout(() => { window.location = '/guide' })</script>\n\n)])
     end
   end
 
@@ -378,15 +378,15 @@ RSpec.describe Datastar::Dispatcher do
         raise ex
       end
       dispatcher.stream do |sse|
-        sse.patch_elements %(<div id="foo">\n<span>hello</span>\n</div>\n)
+        sse.patch_elements %(<div id="foo">\n<span>hello</span>\n</div>)
         sse.patch_signals(foo: 'bar')
       end
 
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
       expect(socket.lines.size).to eq(2)
-      expect(socket.lines[0]).to eq("event: datastar-patch-elements\ndata: elements <div id=\"foo\">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n\n")
-      expect(socket.lines[1]).to eq("event: datastar-patch-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
+      expect(socket.lines[0]).to eq("event: datastar-patch-elements\ndata: elements <div id=\"foo\">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n")
+      expect(socket.lines[1]).to eq("event: datastar-patch-signals\ndata: signals {\"foo\":\"bar\"}\n\n")
     end
 
     it 'returns a Rack array response' do
@@ -425,7 +425,7 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.on_client_disconnect { |conn| connected = false }
 
       socket = TestSocket.new
-      allow(socket).to receive(:<<).with("\n\n").and_raise(Errno::EPIPE, 'Socket closed')
+      allow(socket).to receive(:<<).with("\n").and_raise(Errno::EPIPE, 'Socket closed')
 
       dispatcher.stream do |sse|
         sleep 10
@@ -444,7 +444,7 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.on_client_disconnect { |conn| connected = false }
 
       socket = TestSocket.new
-      allow(socket).to receive(:<<).with("\n\n").and_raise(Errno::EPIPE, 'Socket closed')
+      allow(socket).to receive(:<<).with("\n").and_raise(Errno::EPIPE, 'Socket closed')
 
       dispatcher.stream do |sse|
         sleep 0.001
@@ -513,7 +513,7 @@ RSpec.describe Datastar::Dispatcher do
         sse.check_connection!
       end
       socket = TestSocket.new
-      allow(socket).to receive(:<<).with("\n\n").and_raise(Errno::EPIPE, 'Socket closed')
+      allow(socket).to receive(:<<).with("\n").and_raise(Errno::EPIPE, 'Socket closed')
       
       dispatcher.response.body.call(socket)
       expect(events).to eq([true, false])
