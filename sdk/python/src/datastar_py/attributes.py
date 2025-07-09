@@ -134,11 +134,11 @@ class AttributeGenerator:
         val = _js_object(signals) if expressions_ else json.dumps(signals)
         return SignalsAttr(value=val, alias=self._alias)
 
-    def computed(self, computed_dict: Mapping | None = None, /, **computed: str) -> ComputedAttr:
+    def computed(self, computed_dict: Mapping | None = None, /, **computed: str) -> BaseAttr:
         """Create signals that are computed based on an expression."""
         computed = {**(computed_dict if computed_dict else {}), **computed}
         first, *rest = (
-            ComputedAttr(key=sig, value=expr, alias=self._alias) for sig, expr in computed.items()
+            BaseAttr("computed", key=sig, value=expr, alias=self._alias) for sig, expr in computed.items()
         )
         first._other_attrs = rest
         return first
@@ -159,7 +159,7 @@ class AttributeGenerator:
 
     def bind(self, signal_name: str) -> BaseAttr:
         """Set up two-way data binding between a signal and an element's value."""
-        return BindAttr(value=signal_name, alias=self._alias)
+        return BaseAttr("bind", value=signal_name, alias=self._alias)
 
     def class_(self, class_dict: Mapping | None = None, /, **classes: str) -> BaseAttr:
         """Add or removes classes to or from an element based on expressions."""
@@ -236,18 +236,13 @@ class AttributeGenerator:
         return OnResizeAttr(value=expression, alias=self._alias)
 
     @property
-    def scope(self) -> ScopeAttr:
-        """Set a scope for all scoped signals created under this element."""
-        return ScopeAttr(alias=self._alias)
-
-    @property
     def persist(self) -> PersistAttr:
         """(PRO) Persist signals in local storage."""
         return PersistAttr(alias=self._alias)
 
     def ref(self, signal_name: str) -> BaseAttr:
         """Create a signal which references the element on which the attribute is placed."""
-        return RefAttr(value=signal_name, alias=self._alias)
+        return BaseAttr("red", value=signal_name, alias=self._alias)
 
     def replace_url(self, url_expression: str) -> BaseAttr:
         """(PRO) Replace the URL in the browser without replacing the page."""
@@ -263,7 +258,7 @@ class AttributeGenerator:
 
     def indicator(self, signal_name: str) -> BaseAttr:
         """Create a signal whose value is true while an SSE request is in flight."""
-        return IndicatorAttr(value=signal_name, alias=self._alias)
+        return BaseAttr("indicator", value=signal_name, alias=self._alias)
 
     def custom_validity(self, expression: str) -> BaseAttr:
         """(PRO) Set the validity message for an element based on an expression."""
@@ -432,13 +427,6 @@ class TimingMod:
         return self
 
 
-class ScopedMod:
-    def scoped(self: TAttr) -> TAttr:
-        """Signals created by this attribute will be scoped to the closest defined data-scope."""
-        self._mods["scoped"] = []
-        return self
-
-
 class ViewtransitionMod:
     @property
     def viewtransition(self: TAttr) -> TAttr:
@@ -447,7 +435,7 @@ class ViewtransitionMod:
         return self
 
 
-class SignalsAttr(BaseAttr, ScopedMod):
+class SignalsAttr(BaseAttr):
     _attr = "signals"
 
     @property
@@ -455,10 +443,6 @@ class SignalsAttr(BaseAttr, ScopedMod):
         """Only set signals that do not already exist."""
         self._mods["ifmissing"] = []
         return self
-
-
-class ComputedAttr(BaseAttr, ScopedMod):
-    _attr = "computed"
 
 
 class IgnoreAttr(BaseAttr):
@@ -469,10 +453,6 @@ class IgnoreAttr(BaseAttr):
         """Only ignore the element itself, not its descendants."""
         self._mods["self"] = []
         return self
-
-
-class BindAttr(BaseAttr, ScopedMod):
-    _attr = "bind"
 
 
 class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
@@ -564,23 +544,6 @@ class JsonSignalsAttr(BaseAttr):
         """Output without extra whitespace."""
         self._mods["terse"] = []
         return self
-
-
-class ScopeAttr(BaseAttr):
-    _attr = "scope"
-
-    def __call__(self, scope_name: str | None = None) -> Self:
-        if scope_name:
-            self._value = scope_name
-        return self
-
-
-class IndicatorAttr(BaseAttr, ScopedMod):
-    _attr = "indicator"
-
-
-class RefAttr(BaseAttr, ScopedMod):
-    _attr = "ref"
 
 
 class ScrollIntoViewAttr(BaseAttr):
