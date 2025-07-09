@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from collections.abc import Awaitable, Collection, Mapping
 from functools import wraps
+from inspect import isasyncgen, isgenerator
 from typing import Any, Callable, ParamSpec
 
 from sanic import HTTPResponse, Request
 
 from . import _read_signals
-from .sse import SSE_HEADERS, DatastarEvent, ServerSentEventGenerator
+from .sse import SSE_HEADERS, DatastarEvent, DatastarEvents, ServerSentEventGenerator
 
 __all__ = [
     "SSE_HEADERS",
@@ -51,13 +52,7 @@ P = ParamSpec("P")
 
 
 def datastar_response(
-    func: Callable[
-        P,
-        Awaitable[DatastarEvent | Collection[DatastarEvent] | None]
-        | DatastarEvent
-        | Collection[DatastarEvent]
-        | None,
-    ],
+    func: Callable[P, Awaitable[DatastarEvents] | DatastarEvents],
 ) -> Callable[P, Awaitable[DatastarResponse]]:
     """A decorator which wraps a function result in DatastarResponse.
 
@@ -69,6 +64,18 @@ def datastar_response(
         r = func(*args, **kwargs)
         if isinstance(r, Awaitable):
             return DatastarResponse(await r)
+        if isasyncgen(r):
+            request = args[0]
+            response = await request.respond(response=DatastarResponse())
+            async for event in r:
+                await response.send(event)
+            return response
+        if isgenerator(r):
+            request = args[0]
+            response = await request.respond(response=DatastarResponse())
+            for event in r:
+                await response.send(event)
+            return response
         return DatastarResponse(r)
 
     wrapper.__annotations__["return"] = "DatastarResponse"
