@@ -35,21 +35,17 @@ run do |env|
     sse.signals['events'].each do |event|
       type = event.delete('type')
       case type
-      when 'mergeSignals'
-        arg = event.delete('signals')
-        sse.merge_signals(arg, event)
-      when 'removeSignals'
-        arg = event.delete('paths')
-        sse.remove_signals(arg, event)
+      when 'patchSignals'
+        arg = event.delete('signals') || event.delete('signals-raw')
+        sse.patch_signals(arg, event)
       when 'executeScript'
         arg = event.delete('script')
         sse.execute_script(arg, event)
-      when 'mergeFragments'
-        arg = event.delete('fragments')
+      when 'patchElements'
+        arg = event.delete('elements')
         sse.patch_elements(arg, event)
-      when 'removeFragments'
-        arg = event.delete('selector')
-        sse.remove_elements(arg, event)
+      else
+        raise "Unknown event type: #{type}"
       end
     end
   end
