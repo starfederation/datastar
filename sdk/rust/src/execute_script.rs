@@ -100,14 +100,17 @@ impl ExecuteScript {
             s.push_str(attribute.as_str());
         }
 
+        let mut scripts_lines = self.script.lines();
+
         s.push('>');
+        s.push_str(scripts_lines.next().unwrap_or_default());
         data.push(s);
 
         for line in self.script.lines() {
             data.push(format!("{} {}", consts::ELEMENTS_DATALINE_LITERAL, line));
         }
 
-        data.push(format!("{} </script>", consts::ELEMENTS_DATALINE_LITERAL));
+        data.last_mut().unwrap().push_str("</script>");
 
         DatastarEvent {
             event: consts::EventType::PatchElements,

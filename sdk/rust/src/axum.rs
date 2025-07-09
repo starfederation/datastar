@@ -2,7 +2,7 @@
 
 use {
     crate::{
-        consts::DATASTAR_REQ_HEADER_STR,
+        consts::{self, DATASTAR_REQ_HEADER_STR},
         prelude::{DatastarEvent, PatchElements, PatchSignals},
     },
     axum::{
@@ -33,9 +33,13 @@ impl PatchSignals {
 impl DatastarEvent {
     /// Turn this [`DatastarEvent`] into an Axum SSE [`Event`].
     pub fn write_as_axum_sse_event(&self) -> Event {
-        let event = Event::default()
-            .event(self.event.as_str())
-            .retry(self.retry);
+        let event = Event::default().event(self.event.as_str());
+
+        let event = if self.retry.as_millis() != (consts::DEFAULT_SSE_RETRY_DURATION as u128) {
+            event.retry(self.retry)
+        } else {
+            event
+        };
 
         let event = match self.id.as_deref() {
             Some(id) => event.id(id),
