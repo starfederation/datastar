@@ -1,5 +1,45 @@
 # Release notes for the Clojure SDK
 
+## 2025-06-22
+
+### Changed
+
+- The public API has seen it's main functions renamed following the new SDK ADR.
+  Several functions have been renamed or removed:
+
+  | Old                 | new                   |
+  | ------------------- | --------------------- |
+  | `merge-fragment!`   | `patch-elements!`     |
+  | `merge-fragments!`  | `patch-elements-seq!` |
+  | `remove-fragments!` | `remove-element!`     |
+  | `merge-signals!`    | `patch-signals!`      |
+  | `remove-signals`    | removed               |
+
+- All the examples and snippets have been updated following the ADR changes.
+
+### Fixed
+
+- A superflous newline character was send when marking the end of a SSE event
+- The clj-kondo config file for the SDK has been moved in a
+  `clj-kondo.exports/starfederation.datastar.clojure/sdk` directory. This change
+  allows for other projects to use
+  `starfederation.datastar.clojure/XXXX/config.edn` for their clj-kondo config.
+
+### Added
+
+- There is a new http-kit API that allows a more natural ring response model when
+  using SSE. With the current API the status and headers for a response are
+  sent directly while `->sse-response` is running, the `on-open` callback runs
+  just after. For instance that any middleware that would add headers after the
+  execution of the `->sse-response` function won't work, the initial response
+  being already sent.
+  The new `starfederation.datastar.clojure.adapter.http-kit2`
+  API changes this behavior. In this new api the initial response is not sent
+  during `->sse-response`. Instead a middleware takes care of sending it and
+  only then calls the `on-open` callback. If this middleware is the last to run
+  on the return any addition to the response map will be taken into account.
+- A new library providing Brotli write profile has been added.
+
 ## 2025-04-07
 
 ### Added

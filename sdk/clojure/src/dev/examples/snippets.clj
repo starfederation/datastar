@@ -10,10 +10,10 @@
 (def sse (at/->sse-gen))
 
 ;; multiple_events
-(d*/merge-fragment! sse "<div id=\"question\">...</div>")
-(d*/merge-fragment! sse "<div id=\"instructions\">...</div>")
-(d*/merge-signals! sse "{answer: '...'}")
-(d*/merge-signals! sse "{prize: '...'}")
+(d*/patch-elements! sse "<div id=\"question\">...</div>")
+(d*/patch-elements! sse "<div id=\"instructions\">...</div>")
+(d*/patch-signals! sse "{answer: '...'}")
+(d*/patch-signals! sse "{prize: '...'}")
 
 ;; setup
 #_{:clj-kondo/ignore true}
@@ -27,10 +27,10 @@
   (->sse-response request
     {on-open
      (fn [sse]
-       (d*/merge-fragment! sse
+       (d*/patch-elements! sse
          "<div id=\"question\">What do you put in a toaster?</div>")
 
-       (d*/merge-signals! sse "{response: '', answer: 'bread'}"))}))
+       (d*/patch-signals! sse "{response: '', answer: 'bread'}"))}))
 
 (comment
   (handler {}))
@@ -48,6 +48,6 @@
   (->sse-response request
     {on-open
       (fn [sse]
-        (d*/merge-fragment! sse "<div id=\"hello\">Hello, world!</div>")
-        (d*/merge-signals!  sse "{foo: {bar: 1}}")
+        (d*/patch-elements! sse "<div id=\"hello\">Hello, world!</div>")
+        (d*/patch-signals!  sse "{foo: {bar: 1}}")
         (d*/execute-script! sse "console.log('Success!')"))}))

@@ -1,92 +1,72 @@
 (ns starfederation.datastar.clojure.api.scripts
   (:require
-    [clojure.string :as string]
-    [starfederation.datastar.clojure.api.common :as common]
-    [starfederation.datastar.clojure.api.sse :as sse]
-    [starfederation.datastar.clojure.consts :as consts]
-    [starfederation.datastar.clojure.utils :as u]))
+    [starfederation.datastar.clojure.api.common   :as common]
+    [starfederation.datastar.clojure.api.elements :as elements]
+    [starfederation.datastar.clojure.consts       :as consts]))
 
 
-(defn add-auto-remove? [val]
-  (common/add-boolean-option? consts/default-execute-script-auto-remove
-                              val))
+(defn ->script-tag [script opts]
+  (let [auto-remove (common/auto-remove opts)
+        attrs       (common/attributes opts)
+        script-tag-builder (StringBuilder.)]
 
-(defn- add-auto-remove?! [data-lines! ar]
-  (common/add-opt-line!
-    data-lines!
-    add-auto-remove?
-    consts/auto-remove-dataline-literal
-    ar))
+    ;; Opening
+    (.append script-tag-builder "<script")
 
+    ;; Adding script tag attrs
+    (when attrs
+      (doseq [[k v] attrs]
+        (.append script-tag-builder " ")
+        (.append script-tag-builder (name k))
+        (.append script-tag-builder "=\"")
+        (.append script-tag-builder (str v))
+        (.append script-tag-builder "\"")))
 
-(defn- attributes->lines [m]
-  (persistent!
-    (reduce-kv
-      (fn [acc k v]
-        (conj! acc (str (name k) \space v)))
-      (transient [])
-      m)))
+    ;; Adding auto-remove logic
+    (when (or (nil? auto-remove) auto-remove)
+      (.append script-tag-builder " data-effect=\"el.remove()\""))
 
+    ;; Opening done
+    (.append script-tag-builder ">")
 
-(defn- add-attributes? [attributes]
-  (and attributes
-       (not= attributes consts/default-execute-script-attributes)))
+    ;; Content of the script
+    (.append script-tag-builder script)
 
-(defn- add-attributes! [data-lines! attributes]
-  (cond-> data-lines!
-    (add-attributes? attributes)
-    (common/add-data-lines! consts/attributes-dataline-literal
-                            (attributes->lines attributes))))
+    ;; Closing
+    (.append script-tag-builder "</script>")
 
-
-
-(defn- add-script! [data-lines! script-content]
-  (cond-> data-lines!
-    (u/not-empty-string? script-content)
-    (common/add-data-lines! consts/script-dataline-literal
-                            (string/split-lines script-content))))
+    ;; Returning the built tag
+    (str script-tag-builder)))
 
 
-(defn ->script [script-content opts]
-  (u/transient-> []
-    (add-attributes! (common/attributes opts))
-    (add-auto-remove?! (common/auto-remove opts))
-    (add-script! script-content)))
+(def patch-opts
+  {common/selector "body"
+   common/patch-mode consts/element-patch-mode-append})
 
+
+(defn execute-script! [sse-gen script-text opts]
+  (elements/patch-elements! sse-gen
+                            (->script-tag script-text opts)
+                            (merge opts patch-opts)))
 
 (comment
-  (->script "console.log('hello')" {})
-  := ["script console.log('hello')"]
+  (= (->script-tag "console.log('hello')" {})
+     "<script data-on-load=\"el.remove()\">console.log('hello')</script>")
 
-  (->script "console.log('hello')"
-              {common/auto-remove false})
-  := ["autoRemove false" "script console.log('hello')"]
-
-
- 
-  (->script "console.log('hello')"
-            {common/auto-remove false
-             common/attributes {:type "module"}})
-  := ["autoRemove false" "script console.log('hello')"]
+  (= (->script-tag "console.log('hello')"
+                    {common/auto-remove false})
+     "<script>console.log('hello')</script>")
 
 
-  (->script "console.log('hello')\nconsole.log('world!!!')"
-            {common/attributes {:type "module" :data-something 1}})
-  := ["attributes type module"
-      "attributes data-something 1"
-      "script console.log('hello')"
-      "script console.log('world!!!')"])
+  (= (->script-tag "console.log('hello')"
+                  {common/auto-remove false
+                   common/attributes {:type "module"}})
+     "<script type=\"module\">console.log('hello')</script>")
 
 
-(defn execute-script! [sse-gen script-content opts]
-  (try
-    (sse/send-event! sse-gen
-                     consts/event-type-execute-script
-                     (->script script-content opts)
-                     opts)
-    (catch Exception e
-      (throw (ex-info "Failed to send script"
-                      {:script script-content}
-                      e)))))
+  (= (->script-tag "console.log('hello');\nconsole.log('world!!!')"
+                  {common/auto-remove :true
+                   common/attributes {:type "module" :data-something 1}})
+     "<script type=\"module\" data-something=\"1\" data-on-load=\"el.remove()\">console.log('hello');\nconsole.log('world!!!')</script>"))
 
 

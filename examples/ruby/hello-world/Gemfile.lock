@@ -1,16 +1,20 @@
 PATH
   remote: ../../../sdk/ruby
   specs:
-    datastar (1.0.0.beta.1)
-      rack (~> 3.0)
+    datastar (1.0.0.beta.3)
+      json
+      logger
+      rack (>= 3.1.14)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    json (2.12.2)
+    logger (1.7.0)
     nio4r (2.7.4)
     puma (6.6.0)
       nio4r (~> 2.0)
-    rack (3.1.9)
+    rack (3.1.16)
 
 PLATFORMS
   arm64-darwin-24

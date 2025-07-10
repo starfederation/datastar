@@ -38,7 +38,7 @@ module Consts =
 
 {%- for _, enum := range data.Enums -%}
     module {%s enum.Name.Pascal %} =
-        let toString this =
+        let inline toString this =
             match this with
                 {%- for _, entry := range enum.Values -%}
                 | {%s enum.Name.Pascal %}.{%s entry.Name.Pascal %} -> "{%s entry.Value %}"

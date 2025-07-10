@@ -93,7 +93,7 @@ Using the adapter you create ring responses in your handlers:
   (hk-gen/->sse-response request
     {hk-gen/on-open
      (fn [sse-gen]
-       (d*/merge-fragment! sse-gen "<div>test</div>")
+       (d*/patch-elements! sse-gen "<div>test</div>")
        (d*/close-sse! sse-gen))}))
 
 ```
@@ -118,9 +118,9 @@ it somewhere and use it later:
        (swap! !connections disj sse-gen))}))
 
 
-(defn broadcast-fragment! [fragment]
+(defn broadcast-elements! [elements]
   (doseq [c @!connections]
-    (d*/merge-fragment! c fragment)))
+    (d*/patch-elements! c elements)))
 
 ```
 

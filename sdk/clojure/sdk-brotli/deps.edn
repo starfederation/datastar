@@ -1,0 +1,3 @@
+{:paths ["src/main"]
+ :deps {com.aayushatharva.brotli4j/brotli4j            {:mvn/version "1.18.0"}
+        io.netty/netty-buffer                          {:mvn/version "4.1.119.Final"}}}

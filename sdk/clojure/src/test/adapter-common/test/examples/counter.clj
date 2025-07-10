@@ -105,7 +105,7 @@
   (fn update-signal [req f & args]
     (->sse-response req
       {ac/on-open (fn [sse-gen]
-                    (d*/merge-signals! sse-gen (apply update-signal* req f args))
+                    (d*/patch-signals! sse-gen (apply update-signal* req f args))
                     (d*/close-sse! sse-gen))})))
 
 

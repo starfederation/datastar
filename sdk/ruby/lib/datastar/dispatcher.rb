@@ -10,20 +10,21 @@ module Datastar
   #  datastar = Datastar.new(request:, response:, view_context: self)
   #
   #  # One-off fragment response
-  #  datastar.merge_fragments(template)
+  #  datastar.patch_elements(template)
   #
   #  # Streaming response with multiple messages
   #  datastar.stream do |sse|
-  #    sse.merge_fragments(template)
+  #    sse.patch_elements(template)
   #    10.times do |i|
   #      sleep 0.1
-  #      sse.merge_signals(count: i)
+  #      sse.patch_signals(count: i)
   #    end
   #  end
   #
   class Dispatcher
     BLANK_BODY = [].freeze
     SSE_CONTENT_TYPE = 'text/event-stream'
+    SSE_ACCEPT_EXP = /text\/event-stream/
     HTTP_ACCEPT = 'HTTP_ACCEPT'
     HTTP1 = 'HTTP/1.1'
 
@@ -72,7 +73,7 @@ module Datastar
     # Check if the request accepts SSE responses
     # @return [Boolean]
     def sse?
-      @request.get_header(HTTP_ACCEPT) == SSE_CONTENT_TYPE
+      !!(@request.get_header(HTTP_ACCEPT).to_s =~ SSE_ACCEPT_EXP)
     end
 
     # Register an on-connect callback
@@ -119,47 +120,48 @@ module Datastar
       @signals ||= parse_signals(request).freeze
     end
 
-    # Send one-off fragments to the UI
-    # See https://data-star.dev/reference/sse_events#datastar-merge-fragments
+    # Send one-off elements to the UI
+    # See https://data-star.dev/reference/sse_events#datastar-patch-elements
     # @example
     #
-    #  datastar.merge_fragments(%(<div id="foo">\n<span>hello</span>\n</div>\n))
+    #  datastar.patch_elements(%(<div id="foo">\n<span>hello</span>\n</div>\n))
     #  # or a Phlex view object
-    #  datastar.merge_fragments(UserComponet.new)
+    #  datastar.patch_elements(UserComponet.new)
     #
-    # @param fragments [String, #call(view_context: Object) => Object] the HTML fragment or object
+    # @param elements [String, #call(view_context: Object) => Object] the HTML elements or object
     # @param options [Hash] the options to send with the message
-    def merge_fragments(fragments, options = BLANK_OPTIONS)
+    def patch_elements(elements, options = BLANK_OPTIONS)
       stream_no_heartbeat do |sse|
-        sse.merge_fragments(fragments, options)
+        sse.patch_elements(elements, options)
       end
     end
 
-    # One-off remove fragments from the UI
-    # See https://data-star.dev/reference/sse_events#datastar-remove-fragments
+    # One-off remove elements from the UI
+    # Sugar on top of patch-elements with mode: 'remove'
+    # See https://data-star.dev/reference/sse_events#datastar-patch-elements
     # @example
     #
-    #  datastar.remove_fragments('#users')
+    #  datastar.remove_elements('#users')
     #
     # @param selector [String] a CSS selector for the fragment to remove
     # @param options [Hash] the options to send with the message
-    def remove_fragments(selector, options = BLANK_OPTIONS)
+    def remove_elements(selector, options = BLANK_OPTIONS)
       stream_no_heartbeat do |sse|
-        sse.remove_fragments(selector, options)
+        sse.remove_elements(selector, options)
       end
     end
 
-    # One-off merge signals in the UI
-    # See https://data-star.dev/reference/sse_events#datastar-merge-signals
+    # One-off patch signals in the UI
+    # See https://data-star.dev/reference/sse_events#datastar-patch-signals
     # @example
     #
-    #  datastar.merge_signals(count: 1, toggle: true)
+    #  datastar.patch_signals(count: 1, toggle: true)
     #
-    # @param signals [Hash] signals to merge
+    # @param signals [Hash, String] signals to merge
     # @param options [Hash] the options to send with the message
-    def merge_signals(signals, options = BLANK_OPTIONS)
+    def patch_signals(signals, options = BLANK_OPTIONS)
       stream_no_heartbeat do |sse|
-        sse.merge_signals(signals, options)
+        sse.patch_signals(signals, options)
       end
     end
 
@@ -209,9 +211,9 @@ module Datastar
     #
     #  datastar.stream do |sse|
     #    total = 300
-    #    sse.merge_fragments(%(<progress data-signal-progress="0" id="progress" max="#{total}" data-attr-value="$progress">0</progress>))
+    #    sse.patch_elements(%(<progress data-signal-progress="0" id="progress" max="#{total}" data-attr-value="$progress">0</progress>))
     #    total.times do |i|
-    #      sse.merge_signals(progress: i)
+    #      sse.patch_signals(progress: i)
     #    end
     #  end
     #

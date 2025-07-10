@@ -40,7 +40,7 @@
 
 (defdescribe reading-bytes
   (specify "We can do str -> bytes -> str"
-    (let [original (str (d*/merge-fragment! (at/->sse-gen) "msg"))]
+    (let [original (str (d*/patch-elements! (at/->sse-gen) "msg"))]
       (expect
         (= original
            (-> original
@@ -52,7 +52,7 @@
 ;; -----------------------------------------------------------------------------
 (defn ->machinery [write-profile]
   (let [^ByteArrayOutputStream baos (ByteArrayOutputStream.)
-        {write! ac/write-to-buffered-writer!
+        {write! ac/write!
          wrap   ac/wrap-output-stream} write-profile
         writer (wrap baos)]
     {:write! write!

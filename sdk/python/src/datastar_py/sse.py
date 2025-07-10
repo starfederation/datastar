@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
-from collections.abc import AsyncIterable, Iterable
+from collections.abc import AsyncIterable, Iterable, Mapping
 from itertools import chain
-from typing import Protocol, TypeAlias, Union, runtime_checkable
+from typing import Literal, Protocol, TypeAlias, Union, overload, runtime_checkable
 
 import datastar_py.consts as consts
+from datastar_py.attributes import _escape
 
 SSE_HEADERS: dict[str, str] = {
     "Cache-Control": "no-cache",
@@ -46,11 +47,10 @@ class ServerSentEventGenerator:
         event_id: str | None = None,
         retry_duration: int | None = None,
     ) -> DatastarEvent:
-        prefix = []
+        prefix = [f"event: {event_type}"]
+
         if event_id:
             prefix.append(f"id: {event_id}")
-
-        prefix.append(f"event: {event_type}")
 
         if retry_duration and retry_duration != consts.DEFAULT_SSE_RETRY_DURATION:
             prefix.append(f"retry: {retry_duration}")
@@ -59,10 +59,32 @@ class ServerSentEventGenerator:
 
         return DatastarEvent("\n".join(chain(prefix, data_lines)) + "\n\n")
 
+    @overload
+    @classmethod
+    def patch_elements(
+        cls,
+        *,
+        selector: str,
+        mode: Literal[consts.ElementPatchMode.REMOVE],
+        use_view_transitions: bool | None = None,
+        event_id: str | None = None,
+        retry_duration: int | None = None,
+    ) -> DatastarEvent: ...
+    @overload
     @classmethod
     def patch_elements(
         cls,
         elements: str | _HtmlProvider,
+        selector: str | None = None,
+        mode: consts.ElementPatchMode | None = None,
+        use_view_transitions: bool | None = None,
+        event_id: str | None = None,
+        retry_duration: int | None = None,
+    ) -> DatastarEvent: ...
+    @classmethod
+    def patch_elements(
+        cls,
+        elements: str | _HtmlProvider | None = None,
         selector: str | None = None,
         mode: consts.ElementPatchMode | None = None,
         use_view_transition: bool | None = None,
@@ -72,7 +94,7 @@ class ServerSentEventGenerator:
         if isinstance(elements, _HtmlProvider):
             elements = elements.__html__()
         data_lines = []
-        if mode:
+        if mode and mode != "outer":  # TODO: Should there be a constant for this?
             data_lines.append(f"{consts.MODE_DATALINE_LITERAL} {mode}")
         if selector:
             data_lines.append(f"{consts.SELECTOR_DATALINE_LITERAL} {selector}")
@@ -84,7 +106,10 @@ class ServerSentEventGenerator:
                 f"{consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} {_js_bool(use_view_transition)}"
             )
 
-        data_lines.extend(f"{consts.ELEMENTS_DATALINE_LITERAL} {x}" for x in elements.splitlines())
+        if elements:
+            data_lines.extend(
+                f"{consts.ELEMENTS_DATALINE_LITERAL} {x}" for x in elements.splitlines()
+            )
 
         return ServerSentEventGenerator._send(
             consts.EventType.PATCH_ELEMENTS,
@@ -94,9 +119,20 @@ class ServerSentEventGenerator:
         )
 
     @classmethod
+    def remove_elements(
+        cls, selector: str, event_id: str | None = None, retry_duration: int | None = None
+    ) -> DatastarEvent:
+        return ServerSentEventGenerator.patch_elements(
+            selector=selector,
+            mode=consts.ElementPatchMode.REMOVE,
+            event_id=event_id,
+            retry_duration=retry_duration,
+        )
+
+    @classmethod
     def patch_signals(
         cls,
-        signals: dict,
+        signals: dict | str,
         event_id: str | None = None,
         only_if_missing: bool | None = None,
         retry_duration: int | None = None,
@@ -110,7 +146,12 @@ class ServerSentEventGenerator:
                 f"{consts.ONLY_IF_MISSING_DATALINE_LITERAL} {_js_bool(only_if_missing)}"
             )
 
-        data_lines.append(f"{consts.SIGNALS_DATALINE_LITERAL} {json.dumps(signals)}")
+        signals_str = (
+            signals if isinstance(signals, str) else json.dumps(signals, separators=(",", ":"))
+        )
+        data_lines.extend(
+            f"{consts.SIGNALS_DATALINE_LITERAL} {line}" for line in signals_str.splitlines()
+        )
 
         return ServerSentEventGenerator._send(
             consts.EventType.PATCH_SIGNALS, data_lines, event_id, retry_duration
@@ -120,16 +161,21 @@ class ServerSentEventGenerator:
     def execute_script(
         cls,
         script: str,
-        auto_remove: bool = False,
-        attributes: list[str] | None = None,
+        auto_remove: bool = True,
+        attributes: Mapping[str, str] | list[str] | None = None,
         event_id: str | None = None,
         retry_duration: int | None = None,
     ) -> DatastarEvent:
         attribute_string = ""
         if auto_remove:
-            attribute_string += " data-on-load='el.remove()'"
+            attribute_string += ' data-effect="el.remove()"'
         if attributes:
-            attribute_string += " " + " ".join(attributes)
+            if isinstance(attributes, Mapping):
+                attribute_string += " " + " ".join(
+                    f'{_escape(k)}="{_escape(v)}"' for k, v in attributes.items()
+                )
+            else:
+                attribute_string += " " + " ".join(attributes)
         script_tag = f"<script{attribute_string}>{script}</script>"
 
         return ServerSentEventGenerator.patch_elements(

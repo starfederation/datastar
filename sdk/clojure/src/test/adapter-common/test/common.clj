@@ -11,6 +11,7 @@
     [starfederation.datastar.clojure.adapter.common :as ac]
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.api.sse :as sse]
+    [test.examples.form :as ef]
     [test.utils :as u]))
 
 
@@ -125,15 +126,15 @@
 ;; -----------------------------------------------------------------------------
 (defn do-form! [driver msg button]
   (ea/go driver (u/url (:port *ctx*) "form"))
-  (ea/fill driver :input-1 msg)
+  (ea/fill driver ef/input-id msg)
   (ea/click driver button)
-  (ea/clear driver :input-1)
-  (ea/get-element-text driver :form-result))
+  (ea/clear driver ef/input-id)
+  (ea/get-element-text driver ef/form-result-id))
 
 
 (defn run-form-test! [driver]
-  {:get (do-form! driver "get" :get-form)
-   :post (do-form! driver "post" :post-form)})
+  {:get (do-form! driver "get" ef/get-button-id)
+   :post (do-form! driver "post" ef/post-button-id)})
 
 
 (def expected-form-vals
@@ -173,8 +174,9 @@
   needed to run the test (see [[setup-persistent-see-state]])."
   [->sse-response server-opts]
   (lt/around [f]
-    (let [{:keys [get-port]} server-opts
-          {:keys [!conn latch handler]} (setup-persistent-see-state ->sse-response)]
+    (let [{:keys [get-port wrap]} server-opts
+          {:keys [!conn latch handler]} (setup-persistent-see-state ->sse-response)
+          handler (cond-> handler wrap wrap)]
       (u/with-server server handler (dissoc server-opts :get-port)
         (binding [*ctx* {:port (get-port server)
                          :!conn !conn}]
@@ -182,8 +184,8 @@
 
 
 (defn persistent-see-send-events! [sse-gen]
-  (d*/merge-fragment! sse-gen "1")
-  (d*/merge-fragment! sse-gen "2"))
+  (d*/patch-elements! sse-gen "1")
+  (d*/patch-elements! sse-gen "2"))
 
 
 (defn run-persistent-sse-test! []
@@ -218,8 +220,8 @@
 
 (def expected-p-sse-res-body
   (let [sse-gen (test-gen/->sse-gen)]
-    (str (d*/merge-fragment! sse-gen "1")
-         (d*/merge-fragment! sse-gen "2"))))
+    (str (d*/patch-elements! sse-gen "1")
+         (d*/patch-elements! sse-gen "2"))))
 
 
 (defn p-sse-body-ok? [response]

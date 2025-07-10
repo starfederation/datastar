@@ -6,7 +6,7 @@
     java.net.ServerSocket))
 
 ;; -----------------------------------------------------------------------------
-;; Json helpers
+;; JSON helpers
 ;; -----------------------------------------------------------------------------
 (def ^:private bufSize 1024)
 (def read-json (charred/parse-json-fn {:async? false :bufsize bufSize}))

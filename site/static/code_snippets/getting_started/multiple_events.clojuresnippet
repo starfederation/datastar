@@ -1,4 +1,0 @@
-(d*/merge-fragment! sse "<div id=\"question\">...</div>")
-(d*/merge-fragment! sse "<div id=\"instructions\">...</div>")
-(d*/merge-signals! sse "{answer: '...'}")
-(d*/merge-signals! sse "{prize: '...'}")

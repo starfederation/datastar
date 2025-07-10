@@ -1,4 +1,0 @@
-event: datastar-remove-fragments
-data: selector #target
-
-

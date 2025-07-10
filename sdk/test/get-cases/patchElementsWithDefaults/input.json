@@ -1,0 +1,10 @@
+{
+  "events": [
+    {
+      "type": "patchElements",
+      "elements": "<div>Merge</div>",
+      "mode": "outer",
+      "useViewTransition": false
+    }
+  ]
+}

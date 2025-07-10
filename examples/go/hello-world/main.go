@@ -34,7 +34,7 @@ func main() {
 		sse := datastar.NewSSE(w, r)
 
 		for i := 0; i < len(message); i++ {
-			sse.MergeFragments(`<div id="message">` + message[:i+1] + `</div>`)
+			sse.PatchElements(`<div id="message">` + message[:i+1] + `</div>`)
 			time.Sleep(store.Delay * time.Millisecond)
 		}
 	})

@@ -4,7 +4,7 @@
     [examples.utils :as u]
     [reitit.ring :as rr]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response on-open on-close]]))
+    [starfederation.datastar.clojure.adapter.ring :refer [->sse-response on-open]]))
 
 ;; Testing several ways exception might be caught when using a ring adapter
 

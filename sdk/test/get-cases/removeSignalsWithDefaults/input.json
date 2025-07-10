@@ -1,10 +1,10 @@
 {
   "events": [
     {
-      "type": "removeSignals",
-      "paths": [
-        "one"
-      ]
+      "type": "patchSignals",
+      "signals": {
+        "one": null
+      }
     }
   ]
 }

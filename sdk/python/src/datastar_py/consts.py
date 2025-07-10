@@ -13,16 +13,19 @@ class StrEnum(str, Enum):
 
 # region The mode in which an element is patched into the DOM.
 class ElementPatchMode(StrEnum):
-    # Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    # Morphs the element into the existing element.
     OUTER = "outer"
 
-    # Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    # Replaces the inner HTML of the existing element.
     INNER = "inner"
 
-    # Removes the existing element from the DOM.
+    # Removes the existing element.
     REMOVE = "remove"
 
-    # Prepends the element inside the existing element.
+    # Replaces the existing element with the new element.
+    REPLACE = "replace"
+
+    # Prepends the element inside to the existing element.
     PREPEND = "prepend"
 
     # Appends the element inside the existing element.
@@ -33,9 +36,6 @@ class ElementPatchMode(StrEnum):
 
     # Inserts the element after the existing element.
     AFTER = "after"
-
-    # Do not morph, simply replace the whole element and reset any related state.
-    REPLACE = "replace"
 
 
 # endregion ElementPatchMode
@@ -56,7 +56,7 @@ class EventType(StrEnum):
 # endregion Enums
 
 DATASTAR_KEY = "datastar"
-VERSION = "1.0.0-beta.11"
+VERSION = "1.0.0-RC.1"
 
 # region Default durations
 

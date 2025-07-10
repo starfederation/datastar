@@ -1,4 +1,0 @@
-event: datastar-merge-signals
-data: signals {"one":1,"two":2}
-
-

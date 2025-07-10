@@ -4,6 +4,7 @@
     [ring.core.protocols :as p]
     [starfederation.datastar.clojure.adapter.common :as ac]
     [starfederation.datastar.clojure.adapter.ring.impl :as impl]
+    [starfederation.datastar.clojure.adapter.test :as at]
     [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.adapter.common-test :refer [read-bytes]])
   (:import
@@ -115,17 +116,19 @@
 ;; -----------------------------------------------------------------------------
 ;; Basic sending of a SSE event without any server
 ;; -----------------------------------------------------------------------------
+(def expected-event-result
+  (d*/patch-elements! (at/->sse-gen) "msg"))
+
 (defn send-SSE-event [response]
   (let [baos (ByteArrayOutputStream.)]
     (with-open [sse-gen (impl/->sse-gen)
                 baos baos]
       (p/write-body-to-stream sse-gen response baos)
-      (d*/merge-fragment! sse-gen "msg" {}))
+      (d*/patch-elements! sse-gen "msg" {}))
 
     (expect
       (= (read-bytes baos (::impl/opts response))
-         "event: datastar-merge-fragments\ndata: fragments msg\n\n\n"))))
-
+         expected-event-result))))
 
 (defdescribe simple-test
   (it "can send events with a using temp buffers"
@@ -133,7 +136,7 @@
  
   (it "can send events with a using a persistent buffered reader"
     (send-SSE-event {::impl/opts {ac/write-profile ac/buffered-writer-profile}}))
-  
+
   (it "can send gziped events with a using temp buffers"
     (send-SSE-event {::impl/opts {ac/write-profile ac/gzip-profile
                                   :gzip? true}}))

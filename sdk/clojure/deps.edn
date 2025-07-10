@@ -1,9 +1,10 @@
 {:paths []
  
- :deps {sdk/sdk                             {:local/root "./sdk"}
-        io.github.paintparty/fireworks      {:mvn/version "0.10.4"}
-        com.taoensso/telemere               {:mvn/version "1.0.0-RC3"}
-        com.aayushatharva.brotli4j/brotli4j {:mvn/version "1.18.0"}}
+ :deps {sdk/sdk                                        {:local/root "./sdk"}
+        io.github.tonsky/clojure-plus                  {:mvn/version "1.6.1"}
+        io.github.paintparty/fireworks                 {:mvn/version "0.10.4"}
+        mvxcvi/puget                                   {:mvn/version "1.3.4"}
+        com.taoensso/telemere                          {:mvn/version "1.0.0-RC3"}}
 
  :aliases
  {:repl {:extra-paths ["src/dev"]
@@ -26,6 +27,7 @@
   :test {:extra-paths ["test-resources/"
                        :test.paths/core-sdk
                        :test.paths/malli-schemas
+                       :test.paths/brotli
                        :test.paths/adapter-common
                        :test.paths/adapter-http-kit
                        :test.paths/adapter-ring
@@ -45,13 +47,17 @@
   :ring-jetty    {:extra-deps {sdk/adapter-ring           {:local/root "./adapter-ring"}
                                ring/ring-jetty-adapter    {:mvn/version "1.14.1"}}}
   
-  :ring-rj9a {:extra-deps {sdk/adapter-ring               {:local/root "./adapter-ring"}
-                           info.sunng/ring-jetty9-adapter {:mvn/version "0.36.1"}}}
+  :ring-rj9a     {:extra-deps {sdk/adapter-ring               {:local/root "./adapter-ring"}
+                               info.sunng/ring-jetty9-adapter {:mvn/version "0.36.1"}}}
 
   :malli-schemas {:extra-deps {sdk/malli {:local/root "./malli-schemas"}}}
+
+  :sdk-brotli    {:extra-deps {sdk/brotli                                     {:local/root "./sdk-brotli"}
+                               com.aayushatharva.brotli4j/native-linux-x86_64 {:mvn/version "1.18.0"}}}
   
   
   :test.paths/core-sdk           ["src/test/core-sdk"]
+  :test.paths/brotli             ["src/test/brotli"]
   :test.paths/malli-schemas      ["src/test/malli-schemas"]
   :test.paths/adapter-common     ["src/test/adapter-common"]
   :test.paths/adapter-ring       ["src/test/adapter-ring"]

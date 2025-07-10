@@ -10,90 +10,36 @@
 ;; -----------------------------------------------------------------------------
 ;; Merge signal
 ;; -----------------------------------------------------------------------------
-(defn add-only-if-missing? [val]
-  (common/add-boolean-option? consts/default-merge-signals-only-if-missing
-                              val))
+(defn add-only-if-missing? [v]
+  (common/add-boolean-option? consts/default-patch-signals-only-if-missing v))
 
-(defn- add-only-if-missing?! [data-lines! only-if-missing]
-  (common/add-opt-line!
-    data-lines!
-    add-only-if-missing?
-    consts/only-if-missing-dataline-literal
-    only-if-missing))
+(defn ->patch-signals [signals opts]
+  (let [oim (common/only-if-missing opts)]
+    (u/transient-> []
+      (cond->
+        (and oim (add-only-if-missing? oim))
+        (common/add-opt-line! consts/only-if-missing-dataline-literal oim)
 
+        (u/not-empty-string? signals)
+        (common/add-data-lines! consts/signals-dataline-literal
+                                (string/split-lines signals))))))
 
-(defn- add-merge-signals! [data-lines! signals]
-  (cond-> data-lines!
-    (u/not-empty-string? signals)
-    (common/add-data-lines! consts/signals-dataline-literal
-                            (string/split-lines signals))))
-
-
-(defn ->merge-signals [signals opts]
-  (u/transient-> []
-    (add-only-if-missing?! (common/only-if-missing opts))
-    (add-merge-signals! signals)))
 
 
 (comment
-  (->merge-signals "{some json}\n{some other json}" {})
-  := ["signals {some json}"
-      "signals {some other json}"]
-
-  (->merge-signals "{some json}\n{some other json}"
-                   {common/only-if-missing true})
-  := ["onlyIfMissing true"
-      "signals {some json}"
-      "signals {some other json}"])
-
-
+  (= (->patch-signals "{'some': \n 'json'}" {})
+     ["signals {'some': "
+      "signals  'json'}"]))
  
-(defn merge-signals! [sse-gen signals-content opts]
+(defn patch-signals! [sse-gen signals-content opts]
   (try
     (sse/send-event! sse-gen
-                     consts/event-type-merge-signals
-                     (->merge-signals signals-content opts)
+                     consts/event-type-patch-signals
+                     (->patch-signals signals-content opts)
                      opts)
     (catch Exception e
       (throw (ex-info "Failed to send merge signals"
                       {:signals signals-content}
-                      e)))))
-
-
-;; -----------------------------------------------------------------------------
-;; Remove signals
-;; -----------------------------------------------------------------------------
-(defn add-remove-signals-paths! [data-lines! paths]
-  (common/add-data-lines!
-    data-lines!
-    consts/paths-dataline-literal
-    paths))
-
-
-(defn ->remove-signals [paths]
-  (u/transient-> []
-    (add-remove-signals-paths! paths)))
-
-(comment
-  (->remove-signals ["foo.bar" "foo.baz" "bar"])
-  := ["paths foo.bar"
-      "paths foo.baz"
-      "paths bar"])
-
-
-(defn remove-signals! [sse-gen paths opts]
-  (when-not (seq paths)
-    (throw (ex-info "Invalid signal paths to remove."
-                    {:paths paths})))
-
-  (try
-    (sse/send-event! sse-gen
-                     consts/event-type-remove-signals
-                     (->remove-signals paths)
-                     opts)
-    (catch Exception e
-      (throw (ex-info "Failed to send remove signals"
-                      {:signals paths}
                       e)))))
 
 

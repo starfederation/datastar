@@ -7,8 +7,7 @@
     [reitit.ring.middleware.parameters :as reitit-params]
     [ring.util.response :as ruresp]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.http-kit :as hk-gen]
-    [starfederation.datastar.clojure.consts :as consts]))
+    [starfederation.datastar.clojure.adapter.http-kit :as hk-gen]))
 
 
 ;; Appending and removing fragments with the D* api
@@ -46,31 +45,33 @@
      [:button {:data-on-click (d*/sse-post (str "/remove-fragment/" id))} "remove me"]]))
 
 
-(defn add-fragment [req]
+(defn add-element [req]
   (let [signals (u/get-signals req)
         input-val (get signals "input")]
     (hk-gen/->sse-response req
       {hk-gen/on-open
        (fn [sse]
          (d*/with-open-sse sse
-          (d*/merge-fragment! sse (->fragment (id!) input-val)
+          (d*/patch-elements! sse
+                              (->fragment (id!) input-val)
                               {d*/selector "#list"
-                               d*/merge-mode consts/fragment-merge-mode-append})))})))
+                               d*/patch-mode d*/pm-append})))})))
 
 
-(defn remove-fragment [req]
+(defn remove-element [req]
   (let [id (-> req :path-params :id)]
     (hk-gen/->sse-response req
       {hk-gen/on-open
        (fn [sse-gen]
-         (d*/remove-fragment! sse-gen (str "#" id)))})))
-
+         (d*/with-open-sse sse-gen
+           (d*/remove-element! sse-gen (str "#" id))))})))
 
 
 (def router (rr/router
               [["/" {:handler #'home}]
-               ["/add-fragment" {:handler #'add-fragment}]
-               ["/remove-fragment/:id" {:handler #'remove-fragment}]]))
+               ["/add-fragment" {:handler #'add-element}]
+               ["/remove-fragment/:id" {:handler #'remove-element}]
+               c/datastar-route]))
 
 
 (def default-handler (rr/create-default-handler))

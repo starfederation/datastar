@@ -1,8 +1,6 @@
-event: datastar-merge-fragments
-data: fragments <div>Merge</div>
+event: datastar-patch-elements
+data: elements <div>Merge</div>
 
-
-event: datastar-merge-fragments
-data: fragments <div>Merge 2</div>
-
+event: datastar-patch-elements
+data: elements <div>Merge 2</div>
 

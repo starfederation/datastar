@@ -1,12 +1,12 @@
 {
   "events": [
     {
-      "type": "mergeFragments",
-      "fragments": "<div>Merge</div>"
+      "type": "patchElements",
+      "elements": "<div>Merge</div>"
     },
     {
-      "type": "mergeFragments",
-      "fragments": "<div>Merge 2</div>"
+      "type": "patchElements",
+      "elements": "<div>Merge 2</div>"
     }
   ]
 }

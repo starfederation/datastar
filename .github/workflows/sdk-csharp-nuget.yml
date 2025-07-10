@@ -1,4 +1,4 @@
-name: Build & Publish NuGet to GitHub Registry
+name: StarFederation.Datastar Nuget
 
 on:
   workflow_dispatch:

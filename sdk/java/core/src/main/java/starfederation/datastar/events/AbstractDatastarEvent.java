@@ -5,8 +5,8 @@ import starfederation.datastar.enums.EventType;
 import java.util.List;
 import java.util.Objects;
 
-sealed public abstract class AbstractDatastarEvent implements DatastarEvent permits MergeFragments, MergeSignals, RemoveFragments,
-        RemoveSignals, ExecuteScript, CustomEvent {
+sealed public abstract class AbstractDatastarEvent implements DatastarEvent permits PatchElements, PatchSignals,
+        ExecuteScript, CustomEvent {
 
     private final String[] dataLines;
 
@@ -24,10 +24,8 @@ sealed public abstract class AbstractDatastarEvent implements DatastarEvent perm
         return dataLines;
     }
 
-
     @Override
     public String toString() {
         return "event: %s\n%s".formatted(getEventType(), String.join("\n", dataLines));
     }
-
 }

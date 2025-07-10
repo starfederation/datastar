@@ -11,7 +11,7 @@ $message = 'Hello, world!';
 $sse = new ServerSentEventGenerator();
 
 for ($i = 0; $i < strlen($message); $i++) {
-    $sse->mergeFragments('<div id="message">'
+    $sse->patchElements('<div id="message">'
         . substr($message, 0, $i + 1)
         . '</div>'
     );

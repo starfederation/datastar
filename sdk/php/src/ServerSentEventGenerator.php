@@ -7,8 +7,11 @@ namespace starfederation\datastar;
 
 use starfederation\datastar\enums\ElementPatchMode;
 use starfederation\datastar\events\EventInterface;
+use starfederation\datastar\events\ExecuteScript;
+use starfederation\datastar\events\Location;
 use starfederation\datastar\events\PatchElements;
 use starfederation\datastar\events\PatchSignals;
+use starfederation\datastar\events\RemoveElements;
 
 class ServerSentEventGenerator
 {
@@ -40,8 +43,9 @@ class ServerSentEventGenerator
     public static function readSignals(): array
     {
         $input = $_GET[Consts::DATASTAR_KEY] ?? file_get_contents('php://input');
+        $signals = $input ? json_decode($input, true) : [];
 
-        return $input ? json_decode($input, true) : [];
+        return is_array($signals) ? $signals : [];
     }
 
     /**
@@ -92,28 +96,24 @@ class ServerSentEventGenerator
     }
 
     /**
+     * Removes elements from the DOM and returns the resulting output.
+     *
+     * @param array{
+     *      eventId?: string|null,
+     *      retryDuration?: int|null,
+     *  } $options
+     */
+    public function removeElements(string $selector, array $options = []): string
+    {
+        return $this->sendEvent(new RemoveElements($selector, $options));
+    }
+
+    /**
      * Executes JavaScript in the browser and returns the resulting output.
      */
     public function executeScript(string $script, array $options = []): string
     {
-        $elements = '<script ';
-
-        $attributes = $options['attributes'] ?? [];
-        foreach ($attributes as $name => $value) {
-             $elements .= ' ' . $name . '="' . htmlspecialchars($value, ENT_QUOTES) . '"';
-        }
-
-        $autoRemove = $options['autoRemove'] ?? false;
-        if ($autoRemove === true) {
-             $elements .= ' data-on-load="el.remove()"';
-        }
-
-        $elements .= '>' . $script . '</script>';
-
-        $options['selector'] = 'body';
-        $options['mode'] = ElementPatchMode::Append;
-
-        return $this->patchElements($elements, $options);
+        return $this->sendEvent(new ExecuteScript($script, $options));
     }
 
     /**
@@ -121,9 +121,7 @@ class ServerSentEventGenerator
      */
     public function location(string $uri, array $options = []): string
     {
-        $script = "setTimeout(() => window.location = '$uri')";
-
-        return $this->executeScript($script, $options);
+        return $this->sendEvent(new Location($uri, $options));
     }
 
     /**

@@ -1,0 +1,8 @@
+{
+  "events": [
+    {
+      "type": "patchSignals",
+      "signals-raw": "{\n\"one\": \"first signal\",\n\"two\":  \n\"second signal\"}"
+    }
+  ]
+}

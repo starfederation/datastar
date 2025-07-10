@@ -2,7 +2,7 @@ package starfederation.datastar.unit;
 
 import org.junit.jupiter.api.Test;
 import starfederation.datastar.enums.EventType;
-import starfederation.datastar.events.MergeSignals;
+import starfederation.datastar.events.PatchSignals;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,7 +10,7 @@ class MergeSignalsTest {
 
     @Test
     void builderShouldGenerateCorrectEvent() {
-        MergeSignals event = MergeSignals.builder()
+        PatchSignals event = PatchSignals.builder()
                 .data("{\"key\": \"value\"}")
                 .onlyIfMissing(true)
                 .build();
@@ -21,12 +21,12 @@ class MergeSignalsTest {
         };
 
         assertArrayEquals(expectedDataLines, event.getDataLines());
-        assertEquals(EventType.MergeSignals.toString(), event.getEventType().toString());
+        assertEquals(EventType.PatchSignals, event.getEventType());
     }
 
     @Test
     void builderShouldExcludeDefaultValues() {
-        MergeSignals event = MergeSignals.builder()
+        PatchSignals event = PatchSignals.builder()
                 .data("{\"key\": \"value\"}")
                 .build();
 
@@ -39,6 +39,6 @@ class MergeSignalsTest {
 
     @Test
     void builderShouldThrowExceptionForNullData() {
-        assertThrows(IllegalArgumentException.class, () -> MergeSignals.builder().build());
+        assertThrows(IllegalArgumentException.class, () -> PatchSignals.builder().build());
     }
 }

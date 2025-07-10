@@ -3,7 +3,7 @@
   (:require
     [dev.onionpancakes.chassis.core :refer [html]]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.adapter.test :refer [on-open]]
+    [starfederation.datastar.clojure.adapter.common :refer [on-open]]
     [starfederation.datastar.clojure.adapter.test :refer [->sse-response]]))
 
 
@@ -19,7 +19,7 @@
   (->sse-response ring-request
     {on-open
      (fn [sse]
-       (d*/merge-fragment! sse
+       (d*/patch-elements! sse
          (html [:div#indicator "Redirecting in 3 seconds..."]))
        (Thread/sleep 3000)
        (d*/execute-script! sse

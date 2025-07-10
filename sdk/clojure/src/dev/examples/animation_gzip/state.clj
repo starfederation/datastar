@@ -11,6 +11,8 @@
 (defn reset-state! []
   (reset! !state animation/starting-state))
 
+(defn resize! [x y]
+  (swap! !state animation/resize x y))
 
 (defn add-ping!
   ([pos]

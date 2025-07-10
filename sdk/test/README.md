@@ -18,9 +18,9 @@ If nothing else is output then all tests passed!
 
 Results of the test can be found in `./get_cases/$case_name/testOutput.txt` (or `post_cases` depending on the test).
 
- ## Adding new cases
+## Adding new cases
 
- To add a new test case, simply add a folder named after the test in either `./get-cases` or `./post-cases`.
+To add a new test case, simply add a folder named after the test in either `./get-cases` or `./post-cases`.
 
 That folder must contain an `input.json` file and an `output.txt` file.
 
@@ -33,24 +33,29 @@ The `input.json` file must contain valid json of the following shape:
       "script": "console.log('hello');",
       "eventId": 1,
       "retryDuration": 2000,
-       "attributes": {
-         "type": "text/javascript",
-         "blocking": false
-       },
-       "autoRemove": false
+      "attributes": {
+        "type": "text/javascript",
+        "blocking": false
+      },
+      "autoRemove": false
      }
    ]
 }
 ```
 
-The `output.txt` file must contain valid a `txt/eventstream` like such:
+The `output.txt` file must contain valid a `text/eventstream` like such:
 
 ```
-event: datastar-execute-script
+event: datastar-patch-elements
 id: 1
 retry: 2000
-data: attributes type text/javascript
-data: attributes blocking false
-data: autoRemove false
-data: script console.log('hello');
+elements: <script type="text/javascript" blocking="false">console.log('hello')</script>;
 ```
+
+### Special case for multiline signals
+
+For the event type `patchSignals` the `input.json` contains the `signals` as JSON-object which should be converted to a single signals line in the `output.txt`. 
+
+If you want to output multi-line signals, then the input must contain `signals-raw` as String with `\n` in them instead. This is due to the fact that Json parsers would otherwise interpret the input file without the line breaks.
+
+So the impementation of the server has to interpret `signals-raw` as String first, and if not present `signals` as JSON-object.

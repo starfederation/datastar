@@ -6,9 +6,9 @@ import "time"
 
 const (
     DatastarKey = "datastar"
-    Version                   = "1.0.0-beta.11"
-    VersionClientByteSize     = 40026
-    VersionClientByteSizeGzip = 14900
+    Version                     = "1.0.0-RC.1"
+    VersionClientByteSize       = 31267
+    VersionClientByteSizeBrotli = 10668
 
     //region Default durations
 
@@ -51,19 +51,22 @@ type ElementPatchMode string
 
 const (
     // Default value for ElementPatchMode
-    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the existing element.
     DefaultElementPatchMode = ElementPatchModeOuter
 
-    // Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    // Morphs the element into the existing element.
     ElementPatchModeOuter ElementPatchMode = "outer"
 
-    // Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    // Replaces the inner HTML of the existing element.
     ElementPatchModeInner ElementPatchMode = "inner"
 
-    // Removes the existing element from the DOM.
+    // Removes the existing element.
     ElementPatchModeRemove ElementPatchMode = "remove"
 
-    // Prepends the element inside the existing element.
+    // Replaces the existing element with the new element.
+    ElementPatchModeReplace ElementPatchMode = "replace"
+
+    // Prepends the element inside to the existing element.
     ElementPatchModePrepend ElementPatchMode = "prepend"
 
     // Appends the element inside the existing element.
@@ -74,9 +77,6 @@ const (
 
     // Inserts the element after the existing element.
     ElementPatchModeAfter ElementPatchMode = "after"
-
-    // Do not morph, simply replace the whole element and reset any related state.
-    ElementPatchModeReplace ElementPatchMode = "replace"
 
 )
 //endregion ElementPatchMode

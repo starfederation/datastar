@@ -105,24 +105,34 @@
   (hc/compile
     [:div
      [:h3 "Controls"]
-     [:ul#controls
+     [:ul.h-list
       [:li [:button {:data-on-click (d*/sse-get "/refresh")} "refresh"]]
       [:li [:button {:data-on-click (d*/sse-get "/reset")} "reset"]]
       [:li [:button {:data-on-click (d*/sse-get "/random-10")} "add 10"]]
+      [:li [:button {:data-on-click (d*/sse-get "/step1")} "step1"]]
       (if (:animator state)
         (hc/compile
           [:li [:button {:data-on-click (d*/sse-get "/pause")} "pause"]])
         (hc/compile
-          [:li [:button {:data-on-click (d*/sse-get "/play")} "play"]]))]]))
+          [:li [:button {:data-on-click (d*/sse-get "/play")} "play"]]))]
+
+     [:ul.h-list {:data-signals-rows    (-> state :size :x)
+                  :data-signals-columns (-> state :size :y)}
+      [:li "rows: "    [:input {:type "number"
+                                :data-bind "rows"
+                                :data-on-change (d*/sse-post "/resize")}]]
+      [:li "columns: " [:input {:type "number"
+                                :data-bind "columns"
+                                :data-on-change (d*/sse-post "/resize")}]]]]))
 
 
 (defn log-pane [state]
   (hc/compile
     [:div#log-pane.stack
      [:h3 "State"]
-
      [:div.stack
       [:h4 "General state"]
+      [:pre (pr-str (:size state))]
       [:span "clock: " (:clock state)]
       [:span "animator:" (:animator state)]]
 
@@ -164,7 +174,7 @@
   (h/html
     (c/page-scaffold
       [:div {:data-on-load (d*/sse-get "/updates")}
-       [:style css]
+       [:style (h/raw css)]
        [:h2.center "lets get something fun going"]
        (content state)])))
 

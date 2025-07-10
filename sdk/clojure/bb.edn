@@ -14,18 +14,22 @@
 
   test:all (t/lazytest [:http-kit
                         :ring-jetty
-                        :malli-schemas]
+                        :malli-schemas
+                        :sdk-brotli]
                        [:test.paths/core-sdk
                         :test.paths/malli-schemas
+                        :test.paths/brotli
                         :test.paths/adapter-ring
                         :test.paths/adapter-http-kit
                         :test.paths/adapter-ring-jetty])
 
   test:all-w (t/lazytest [:http-kit
                           :ring-jetty
-                          :malli-schemas]
+                          :malli-schemas
+                          :sdk-brotli]
                          [:test.paths/core-sdk
                           :test.paths/malli-schemas
+                          :test.paths/brotli
                           :test.paths/adapter-ring
                           :test.paths/adapter-ring-jetty
                           :test.paths/adapter-http-kit]

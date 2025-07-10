@@ -4,21 +4,19 @@ Thanks for thinking about contributing to Datastar 🚀
 
 ## Before You Contribute
 
-Before you contribute, please consider that Datastar is a lightweight JavaScript framework that aims to simplify reactive web apps by using a minimalist, attribute-based approach for state management and event handling directly in HTML.
+Before you contribute, please consider that Datastar is developed and maintained by a a small team of core contributors in a private repo. The source code for each version is made available in the public repo.
 
-Anything outside of this scope may not be accepted. If you have a need for a feature that is not within the scope of Datastar, consider using a Web Component or writing your own Datastar plugin.
+## Bug Reports
 
-## Bug Reports & Feature Requests
+Before submitting bug reports, please search the [open issues](https://github.com/starfederation/datastar/issues) and the _#help_ channel in the [Discord server](https://discord.gg/bnRNgZjgPh) to see if it has already been addressed. When submitting a [new issue](https://github.com/starfederation/datastar/issues/new), please use a descriptive title and include a clear description and as much relevant information as possible.
 
-Before submitting bug reports and feature requests, please search the [open issues](https://github.com/starfederation/datastar/issues) and the _#help_ channel in the [Discord server](https://discord.gg/bnRNgZjgPh) to see if it has already been addressed. When submitting a [new issue](https://github.com/starfederation/datastar/issues/new), please use a descriptive title and include a clear description and as much relevant information as possible.
+## Feature Requests
+
+Before requesting a new feature, please consider that Datastar is a lightweight JavaScript framework that aims to simplify reactive web apps by using a minimalist, attribute-based approach for state management and event handling directly in HTML. If you have a need for a feature that is outside of this scope, consider using a Web Component or writing your own Datastar plugin.
 
 ## Pull Requests
 
 Always open an issue to discuss your idea _before_ submitting a pull request. Pull requests must be made to the `develop` branch, have a descriptive title and clearly describe the problem and solution. If the pull request adds or changes behavior, documentation and examples should be updated accordingly.
-
-## Documentation
-
-Datastar’s documentation is written in markdown files that live in [this folder](https://github.com/starfederation/datastar/tree/develop/site/static/md). Improvements to them can be submitted via pull requests.
 
 ## SDKs
 
@@ -33,7 +31,3 @@ SDKs must follow the [Architecture Decision Record](https://github.com/starfeder
 - Sample [code snippets](https://github.com/starfederation/datastar/tree/develop/site/static/code_snippets) in the language of your SDK.
 - An implementation of each of the [examples](https://github.com/starfederation/datastar/tree/develop/examples).
 - Template values for consts and examples in [`run.go`](https://github.com/starfederation/datastar/blob/develop/build/run.go).
-
-## Building
-
-Datastar comes with instructions for building, either manually or via Docker. Read the [Building Guidelines »](BUILDING.md)

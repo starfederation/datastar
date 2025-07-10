@@ -59,7 +59,7 @@
 
 
 (defn send-big-event! []
-  (d*/merge-fragment! @!conn big-message))
+  (d*/patch-elements! @!conn big-message))
 
 ;; curl -vv http://localhost:8081/persistent
 (comment

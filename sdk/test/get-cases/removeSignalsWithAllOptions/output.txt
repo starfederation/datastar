@@ -1,7 +1,5 @@
-event: datastar-remove-signals
+event: datastar-patch-signals
 id: event1
 retry: 2000
-data: paths one
-data: paths two.alpha
-
+data: signals {"one":null,"two":{"alpha":null}}
 

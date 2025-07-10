@@ -1,28 +1,17 @@
 //! [`ExecuteScript`] executes JavaScript in the browser.
+//!
+//! This is sugar for `PatchElements` specifically for executing scripts.
 
 use {
-    crate::{DatastarEvent, consts},
+    crate::{
+        DatastarEvent,
+        consts::{self, ElementPatchMode},
+    },
     core::time::Duration,
 };
 
 /// [`ExecuteScript`] executes JavaScript in the browser
-///
-/// See the [Datastar documentation](https://data-star.dev/reference/sse_events#datastar-execute-script).
-///
-/// # Examples
-///
-/// ```
-/// use datastar::prelude::{Sse, ExecuteScript};
-/// use async_stream::stream;
-///
-/// Sse(stream! {
-///     yield ExecuteScript::new("console.log('Hello, world!')")
-///         .auto_remove(false)
-///         .attributes(["type text/javascript"]);
-/// });
-/// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-
 pub struct ExecuteScript {
     /// `id` can be used by the backend to replay events.
     /// This is part of the SSE spec and is used to tell the browser how to handle the event.
@@ -34,9 +23,9 @@ pub struct ExecuteScript {
     /// `script` is a string that represents the JavaScript to be executed by the browser.
     pub script: String,
     /// Whether to remove the script after execution, if not provided the Datastar client side will default to `true`.
-    pub auto_remove: bool,
-    /// A list of attributes to add to the script element, if not provided the Datastar client side will default to `type module`.
-    /// Each item in the array ***must*** be a string in the format `key value`.
+    pub auto_remove: Option<bool>,
+    /// A list of attributes to add to the script element, if not provided the Datastar client side will default to `type="module"`.
+    /// Each item in the array ***must*** be properly formatted.
     pub attributes: Vec<String>,
 }
 
@@ -47,8 +36,8 @@ impl ExecuteScript {
             id: None,
             retry: Duration::from_millis(consts::DEFAULT_SSE_RETRY_DURATION),
             script: script.into(),
-            auto_remove: consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE,
-            attributes: vec![consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES.to_owned()],
+            auto_remove: Default::default(),
+            attributes: Default::default(),
         }
     }
 
@@ -66,7 +55,7 @@ impl ExecuteScript {
 
     /// Sets the `script` of the [`ExecuteScript`] event.
     pub fn auto_remove(mut self, auto_remove: bool) -> Self {
-        self.auto_remove = auto_remove;
+        self.auto_remove = Some(auto_remove);
         self
     }
 
@@ -78,44 +67,70 @@ impl ExecuteScript {
 
     /// Converts this [`ExecuteScript`] into a [`DatastarEvent`].
     #[inline]
-    pub fn into_event(self) -> DatastarEvent {
-        self.into()
+    pub fn into_datastar_event(mut self) -> DatastarEvent {
+        let id = self.id.take();
+        self.convert_to_datastar_event_inner(id)
+    }
+
+    /// Copy this [`ExecuteScript`] as a [`DatastarEvent`].
+    #[inline]
+    pub fn as_datastar_event(&self) -> DatastarEvent {
+        self.convert_to_datastar_event_inner(self.id.clone())
+    }
+
+    fn convert_to_datastar_event_inner(&self, id: Option<String>) -> DatastarEvent {
+        let mut data: Vec<String> = Vec::new();
+
+        data.push(format!("{} body", consts::SELECTOR_DATALINE_LITERAL));
+
+        data.push(format!(
+            "{} {}",
+            consts::MODE_DATALINE_LITERAL,
+            ElementPatchMode::Append.as_str(),
+        ));
+
+        let mut s = format!("{} <script", consts::ELEMENTS_DATALINE_LITERAL);
+
+        if self.auto_remove.unwrap_or(true) {
+            s.push_str(r##" data-effect="el.remove()""##);
+        }
+
+        for attribute in &self.attributes {
+            s.push(' ');
+            s.push_str(attribute.as_str());
+        }
+
+        let mut scripts_lines = self.script.lines();
+
+        s.push('>');
+        s.push_str(scripts_lines.next().unwrap_or_default());
+        data.push(s);
+
+        for line in scripts_lines {
+            data.push(format!("{} {}", consts::ELEMENTS_DATALINE_LITERAL, line));
+        }
+
+        data.last_mut().unwrap().push_str("</script>");
+
+        DatastarEvent {
+            event: consts::EventType::PatchElements,
+            id,
+            retry: self.retry,
+            data,
+        }
+    }
+}
+
+impl From<&ExecuteScript> for DatastarEvent {
+    #[inline]
+    fn from(val: &ExecuteScript) -> Self {
+        val.as_datastar_event()
     }
 }
 
 impl From<ExecuteScript> for DatastarEvent {
+    #[inline]
     fn from(val: ExecuteScript) -> Self {
-        let mut data: Vec<String> = Vec::new();
-
-        if val.auto_remove != consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE {
-            data.push(format!(
-                "{} {}",
-                consts::AUTO_REMOVE_DATALINE_LITERAL,
-                val.auto_remove
-            ));
-        }
-
-        if val.attributes.len() != 1
-            || val.attributes[0] != consts::DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES
-        {
-            for attribute in &val.attributes {
-                data.push(format!(
-                    "{} {}",
-                    consts::ATTRIBUTES_DATALINE_LITERAL,
-                    attribute
-                ));
-            }
-        }
-
-        for line in val.script.lines() {
-            data.push(format!("{} {}", consts::SCRIPT_DATALINE_LITERAL, line));
-        }
-
-        Self {
-            event: consts::EventType::ExecuteScript,
-            id: val.id,
-            retry: val.retry,
-            data,
-        }
+        val.into_datastar_event()
     }
 }

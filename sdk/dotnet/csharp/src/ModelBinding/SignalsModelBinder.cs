@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace StarFederation.Datastar.ModelBinding;
 
-public class SignalsModelBinder(ILogger<SignalsModelBinder> logger, IDatastarSignalsReaderService signalsReader) : IModelBinder
+public class SignalsModelBinder(ILogger<SignalsModelBinder> logger, IDatastarService signalsReader) : IModelBinder
 {
     public async Task BindModelAsync(ModelBindingContext bindingContext)
     {

@@ -8,7 +8,7 @@ public static class ServiceCollectionExtensionMethods
     public static IServiceCollection AddDatastarMvc(this IServiceCollection serviceCollection)
     {
         // ReSharper disable once SuspiciousTypeConversion.Global
-        if (!serviceCollection.Any(_ => _.ServiceType == typeof(IDatastarSignalsReaderService)))
+        if (!serviceCollection.Any(_ => _.ServiceType == typeof(IDatastarService)))
         {
             throw new Exception($"{nameof(AddDatastarMvc)} requires that {nameof(StarFederation.Datastar.DependencyInjection.ServiceCollectionExtensionMethods.AddDatastar)} is added first");
         }

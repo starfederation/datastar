@@ -4,6 +4,6 @@
     [starfederation.datastar.clojure.api.common-schemas :as cs]
     [starfederation.datastar.clojure.api.scripts]))
 
-(m/=> starfederation.datastar.clojure.api.scripts/->script
-      [:-> cs/script-content-schema cs/execute-script-options-schemas cs/data-lines-schema])
+(m/=> starfederation.datastar.clojure.api.scripts/->script-tag
+      [:-> cs/script-content-schema cs/execute-script-options-schemas :string])
 

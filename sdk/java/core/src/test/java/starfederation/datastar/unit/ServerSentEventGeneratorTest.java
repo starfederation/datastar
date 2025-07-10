@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentest4j.AssertionFailedError;
 import starfederation.datastar.adapters.response.AbstractResponseAdapter;
-import starfederation.datastar.events.MergeFragments;
+import starfederation.datastar.events.PatchElements;
 import starfederation.datastar.utils.ServerSentEventGenerator;
 
 import java.io.PrintWriter;
@@ -47,7 +47,7 @@ class ServerSentEventGeneratorTest {
 
     }
     private void resetCounter() throws Exception {
-        Field counterField = ServerSentEventGenerator.class.getDeclaredField("counter");
+        Field counterField = ServerSentEventGenerator.class.getDeclaredField("COUNTER");
         counterField.setAccessible(true);
         AtomicLong counter = (AtomicLong) counterField.get(null);
         counter.set(-1);
@@ -56,7 +56,7 @@ class ServerSentEventGeneratorTest {
 
     @Test
     void sendShouldWriteValidEvent() {
-        MergeFragments event = MergeFragments.builder()
+        PatchElements event = PatchElements.builder()
                 .selector("#test")
                 .data("<div>test</div>")
                 .build();
@@ -64,10 +64,10 @@ class ServerSentEventGeneratorTest {
         generator.send(event);
 
         String expectedOutput = """
-                event: datastar-merge-fragments
+                event: datastar-patch-elements
                 id: 0
                 data: selector #test
-                data: fragments <div>test</div>
+                data: elements <div>test</div>
                 
                 """;
 
@@ -76,7 +76,7 @@ class ServerSentEventGeneratorTest {
 
     @Test
     void sendWithIdShouldWriteValidEvent() {
-        MergeFragments event = MergeFragments.builder()
+        PatchElements event = PatchElements.builder()
                 .selector("#test")
                 .data("<div>test</div>")
                 .build();
@@ -84,10 +84,10 @@ class ServerSentEventGeneratorTest {
         generator.send(event, "custom-id");
 
         String expectedOutput = """
-                event: datastar-merge-fragments
+                event: datastar-patch-elements
                 id: custom-id
                 data: selector #test
-                data: fragments <div>test</div>
+                data: elements <div>test</div>
                 
                 """;
 
@@ -96,12 +96,12 @@ class ServerSentEventGeneratorTest {
 
     @Test
     void sendShouldGenerateIncrementingIds() {
-        MergeFragments event1 = MergeFragments.builder()
+        PatchElements event1 = PatchElements.builder()
                 .selector("#test1")
                 .data("<div>test1</div>")
                 .build();
 
-        MergeFragments event2 = MergeFragments.builder()
+        PatchElements event2 = PatchElements.builder()
                 .selector("#test2")
                 .data("<div>test2</div>")
                 .build();
@@ -110,15 +110,15 @@ class ServerSentEventGeneratorTest {
         generator.send(event2);
 
         String expectedOutput = """
-                event: datastar-merge-fragments
+                event: datastar-patch-elements
                 id: 0
                 data: selector #test1
-                data: fragments <div>test1</div>
+                data: elements <div>test1</div>
                 
-                event: datastar-merge-fragments
+                event: datastar-patch-elements
                 id: 1
                 data: selector #test2
-                data: fragments <div>test2</div>
+                data: elements <div>test2</div>
                 
                 """;
 

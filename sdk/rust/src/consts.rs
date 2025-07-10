@@ -8,7 +8,7 @@ pub(crate) const DATASTAR_KEY: &str = "datastar";
 #[allow(unused)]
 pub(crate) const DATASTAR_REQ_HEADER_STR: &str = "datastar-request";
 #[expect(unused)]
-pub(crate) const VERSION: &str = "1.0.0-beta.11";
+pub(crate) const VERSION: &str = "1.0.0-RC.1";
 
 // #region Defaults
 
@@ -20,7 +20,6 @@ pub const DEFAULT_SSE_RETRY_DURATION: u64 = 1000;
 // #endregion
 
 // #region Default strings
-
 
 // #endregion
 
@@ -47,16 +46,18 @@ pub(crate) const DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING: bool = false;
 // #region Enums
 
 /// The mode in which an element is patched into the DOM.
-#[derive(Default,Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ElementPatchMode {
-    /// Morphs the element into the existing element using Datastar's morphing, preserving focus and minimizing element changes.
+    /// Morphs the element into the existing element.
     #[default]
     Outer,
-    /// Morphs the element into the innerHTML using Datastar's morphing, preserving focus and minimizing element changes.
+    /// Replaces the inner HTML of the existing element.
     Inner,
-    /// Removes the existing element from the DOM.
+    /// Removes the existing element.
     Remove,
-    /// Prepends the element inside the existing element.
+    /// Replaces the existing element with the new element.
+    Replace,
+    /// Prepends the element inside to the existing element.
     Prepend,
     /// Appends the element inside the existing element.
     Append,
@@ -64,8 +65,6 @@ pub enum ElementPatchMode {
     Before,
     /// Inserts the element after the existing element.
     After,
-    /// Do not morph, simply replace the whole element and reset any related state.
-    Replace,
 }
 
 impl ElementPatchMode {
@@ -75,11 +74,11 @@ impl ElementPatchMode {
             Self::Outer => "outer",
             Self::Inner => "inner",
             Self::Remove => "remove",
+            Self::Replace => "replace",
             Self::Prepend => "prepend",
             Self::Append => "append",
             Self::Before => "before",
             Self::After => "after",
-            Self::Replace => "replace",
         }
     }
 }

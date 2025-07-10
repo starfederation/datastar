@@ -1,12 +1,15 @@
 (ns user
   (:require
     [clojure.repl.deps :as crdeps]
-    [clj-reload.core :as reload]
-    [malli.dev :as mdev]))
+    [clojure+.hashp    :as hashp]
+    [clj-reload.core   :as reload]
+    [malli.dev         :as mdev]))
 
 
 (alter-var-root #'*warn-on-reflection* (constantly true))
 
+
+(hashp/install!)
 
 (reload/init
   {:no-reload ['user]})

@@ -1,0 +1,13 @@
+{
+  "events": [
+    {
+      "type": "patchElements",
+      "elements": "<div>Merge</div>",
+      "eventId": "event1",
+      "retryDuration": 2000,
+      "selector": "div",
+      "mode": "append",
+      "useViewTransition": true
+    }
+  ]
+}

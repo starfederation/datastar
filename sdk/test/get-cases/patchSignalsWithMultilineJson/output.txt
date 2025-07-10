@@ -1,0 +1,6 @@
+event: datastar-patch-signals
+data: signals {
+data: signals "one": "first signal",
+data: signals "two":  
+data: signals "second signal"}
+

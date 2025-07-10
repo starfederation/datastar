@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Iterable, Iterator, Mapping
+from itertools import chain
 from typing import Literal, Self, TypeAlias, TypeVar, Union, overload
 
 __all__ = ["attribute_generator"]
@@ -123,208 +124,257 @@ class AttributeGenerator:
         expressions_: bool = False,
         **signals: SignalValue,
     ) -> SignalsAttr:
-        """Merge one or more signals into the existing signals.
+        """Patch one or more signals into the existing signals.
 
-        :param signals_dict: A dictionary of signals to merge.
+        :param signals_dict: A dictionary of signals to patch.
         :param expressions_: If True, the values of the signals will be evaluated as expressions
             rather than literals.
         """
         signals = {**(signals_dict if signals_dict else {}), **signals}
-        return SignalsAttr(signals, expressions=expressions_, alias=self._alias)
+        val = _js_object(signals) if expressions_ else json.dumps(signals)
+        return SignalsAttr(value=val, alias=self._alias)
 
-    def computed(self, computed_dict: Mapping | None = None, /, **computed: str) -> AttrGroup:
+    def computed(self, computed_dict: Mapping | None = None, /, **computed: str) -> BaseAttr:
         """Create signals that are computed based on an expression."""
         computed = {**(computed_dict if computed_dict else {}), **computed}
-        return AttrGroup(
-            BaseAttr("computed", expr, sig, alias=self._alias) for sig, expr in computed.items()
+        first, *rest = (
+            BaseAttr("computed", key=sig, value=expr, alias=self._alias)
+            for sig, expr in computed.items()
         )
+        first._other_attrs = rest
+        return first
+
+    def effect(self, expression: str) -> BaseAttr:
+        """Execute an expression when any referenced signals change."""
+        return BaseAttr("effect", value=expression, alias=self._alias)
 
     @property
-    def star_ignore(self) -> StarIgnoreAttr:
+    def ignore(self) -> IgnoreAttr:
         """Tell Datastar to ignore data-* attributes on the element."""
-        return StarIgnoreAttr(alias=self._alias)
+        return IgnoreAttr(alias=self._alias)
 
     def attr(self, attr_dict: Mapping | None = None, /, **attrs: str) -> BaseAttr:
         """Set the value of any HTML attributes to expressions, and keep them in sync."""
         attrs = {**(attr_dict if attr_dict else {}), **attrs}
-        return BaseAttr("attr", _js_object(attrs), alias=self._alias)
+        return BaseAttr("attr", value=_js_object(attrs), alias=self._alias)
 
     def bind(self, signal_name: str) -> BaseAttr:
         """Set up two-way data binding between a signal and an element's value."""
-        return BaseAttr("bind", signal_name, alias=self._alias)
+        return BaseAttr("bind", value=signal_name, alias=self._alias)
 
     def class_(self, class_dict: Mapping | None = None, /, **classes: str) -> BaseAttr:
         """Add or removes classes to or from an element based on expressions."""
         classes = {**(class_dict if class_dict else {}), **classes}
-        return BaseAttr("class", _js_object(classes), alias=self._alias)
+        return BaseAttr("class", value=_js_object(classes), alias=self._alias)
 
     @overload
     def on(self, event: Literal["interval"], expression: str) -> OnIntervalAttr: ...
     @overload
     def on(self, event: Literal["load"], expression: str) -> OnLoadAttr: ...
     @overload
+    def on(self, event: Literal["intersect"], expression: str) -> OnIntersectAttr: ...
+    @overload
     def on(self, event: Literal["raf"], expression: str) -> OnRafAttr: ...
     @overload
-    def on(self, event: Literal["signal-change"], expression: str) -> OnSignalChangeAttr: ...
+    def on(self, event: Literal["resize"], expression: str) -> OnResizeAttr: ...
+    @overload
+    def on(self, event: Literal["signal-patch"], expression: str) -> OnSignalPatchAttr: ...
     @overload
     def on(self, event: JSEvent | str, expression: str) -> OnAttr: ...
     def on(
         self, event: str, expression: str
-    ) -> OnAttr | OnIntervalAttr | OnLoadAttr | OnRafAttr | OnSignalChangeAttr:
+    ) -> (
+        OnAttr
+        | OnIntervalAttr
+        | OnLoadAttr
+        | OnIntersectAttr
+        | OnRafAttr
+        | OnResizeAttr
+        | OnSignalPatchAttr
+    ):
         """Execute an expression when an event occurs."""
         if event == "interval":
-            return OnIntervalAttr(expression, alias=self._alias)
+            return OnIntervalAttr(value=expression, alias=self._alias)
         if event == "load":
-            return OnLoadAttr(expression, alias=self._alias)
+            return OnLoadAttr(value=expression, alias=self._alias)
         if event == "raf":
-            return OnRafAttr(expression, alias=self._alias)
-        if event == "signal-change":
-            return OnSignalChangeAttr(expression, alias=self._alias)
-        return OnAttr(event, expression, alias=self._alias)
+            return OnRafAttr(value=expression, alias=self._alias)
+        if event == "resize":
+            return OnResizeAttr(value=expression, alias=self._alias)
+        if event == "intersect":
+            return OnIntersectAttr(value=expression, alias=self._alias)
+        if event == "signal-patch":
+            return OnSignalPatchAttr(value=expression, alias=self._alias)
+        return OnAttr(key=event, value=expression, alias=self._alias)
+
+    def on_interval(self, expression: str) -> OnIntervalAttr:
+        """Execute an expression at a regular interval."""
+        return OnIntervalAttr(value=expression, alias=self._alias)
+
+    def on_load(self, expression: str) -> OnLoadAttr:
+        """Execute an expression when the element is loaded into the DOM."""
+        return OnLoadAttr(value=expression, alias=self._alias)
+
+    def on_intersect(self, expression: str) -> OnIntersectAttr:
+        """Execute an expression when the element intersects with the viewport."""
+        return OnIntersectAttr(value=expression, alias=self._alias)
+
+    def on_raf(self, expression: str) -> OnRafAttr:
+        """(PRO) Execute an expression on every requestAnimationFrame event."""
+        return OnRafAttr(value=expression, alias=self._alias)
+
+    def on_signal_patch(
+        self, expression: str, include: str | None = None, exclude: str | None = None
+    ) -> OnSignalPatchAttr:
+        """(PRO) Execute an expression when a signal patch taxes plase."""
+        attr = OnSignalPatchAttr(value=expression, alias=self._alias)
+        if include or exclude:
+            attr.filter(include, exclude)
+        return attr
+
+    def on_resize(self, expression: str) -> OnResizeAttr:
+        """(PRO) Execute an expression each time the element's dimensions change."""
+        return OnResizeAttr(value=expression, alias=self._alias)
 
     @property
     def persist(self) -> PersistAttr:
-        """Persist signals in local storage."""
+        """(PRO) Persist signals in local storage."""
         return PersistAttr(alias=self._alias)
 
     def ref(self, signal_name: str) -> BaseAttr:
         """Create a signal which references the element on which the attribute is placed."""
-        return BaseAttr("ref", signal_name, alias=self._alias)
+        return BaseAttr("red", value=signal_name, alias=self._alias)
 
     def replace_url(self, url_expression: str) -> BaseAttr:
-        return BaseAttr("replace-url", url_expression, alias=self._alias)
+        """(PRO) Replace the URL in the browser without replacing the page."""
+        return BaseAttr("replace-url", value=url_expression, alias=self._alias)
 
     def show(self, expression: str) -> BaseAttr:
         """Show or hides an element based on whether an expression evaluates to true or false."""
-        return BaseAttr("show", expression, alias=self._alias)
+        return BaseAttr("show", value=expression, alias=self._alias)
 
     def text(self, expression: str) -> BaseAttr:
         """Bind the text content of an element to an expression."""
-        return BaseAttr("text", expression, alias=self._alias)
+        return BaseAttr("text", value=expression, alias=self._alias)
 
     def indicator(self, signal_name: str) -> BaseAttr:
         """Create a signal whose value is true while an SSE request is in flight."""
-        return BaseAttr("indicator", signal_name, alias=self._alias)
+        return BaseAttr("indicator", value=signal_name, alias=self._alias)
 
     def custom_validity(self, expression: str) -> BaseAttr:
-        """Set the validity message for an element based on an expression."""
-        return BaseAttr("custom-validity", expression, alias=self._alias)
+        """(PRO) Set the validity message for an element based on an expression."""
+        return BaseAttr("custom-validity", value=expression, alias=self._alias)
 
     @property
     def scroll_into_view(self) -> ScrollIntoViewAttr:
-        """Scrolls the element into view."""
+        """(PRO) Scrolls the element into view."""
         return ScrollIntoViewAttr(alias=self._alias)
 
     def view_transition(self, expression: str) -> BaseAttr:
-        """Set the view-transition-name style attribute explicitly."""
-        return BaseAttr("view-transition", expression, alias=self._alias)
+        """(PRO) Set the view-transition-name style attribute explicitly."""
+        return BaseAttr("view-transition", value=expression, alias=self._alias)
 
     @property
     def json_signals(self) -> BaseAttr:
         """Create a signal that contains the JSON representation of the signals."""
-        return BaseAttr("json-signals", True, alias=self._alias)
+        return BaseAttr("json-signals", alias=self._alias)
 
     @property
     def ignore_morph(self) -> BaseAttr:
         """Do not overwrite this element or its children when morphing."""
-        return BaseAttr("ignore-morph", True, alias=self._alias)
+        return BaseAttr("ignore-morph", alias=self._alias)
 
     def preserve_attr(self, attrs: str | Iterable[str]) -> BaseAttr:
         """Preserve the client side state for specified attribute(s) when morphing."""
         value = attrs if isinstance(attrs, str) else " ".join(attrs)
-        return BaseAttr("preserve-attrs", value, alias=self._alias)
+        return BaseAttr("preserve-attrs", value=value, alias=self._alias)
+
+    @property
+    def query_string(self) -> QueryStringAttr:
+        """(PRO) Sync the query string with signal values."""
+        return QueryStringAttr(alias=self._alias)
 
 
 class BaseAttr(Mapping):
+    _attr: str
+
     def __init__(
         self,
-        attr: str,
-        value: str | Literal[True] = True,
-        suffix: str | None = None,
+        attr: str | None = None,
+        /,
         *,
+        key: str | None = None,
+        value: str | Literal[True] = True,
         alias: str = "data-",
     ) -> None:
-        self._attr: str = attr
-        self._suffix: str | None = suffix
+        if attr:
+            self._attr: str = attr
+        self._key: str | None = None
         self._mods: dict[str, list[str]] = {}
+        self._other_attrs: list[BaseAttr] = []
         self._value: str | Literal[True] = value
         self._alias: str = alias
-        if suffix:
-            self._to_kebab_suffix(suffix)
+        if key:
+            self._to_kebab_key(key)
 
     def __call__(self) -> Self:
-        # Because some attributes and modifiers do not need to be called
-        # allow calling them anyway so that everything _could_ be used consistently
+        # Because some attributes and modifiers do not need to be called,
+        # allow calling them anyway so that all attributes allow parens.
         return self
 
-    def _key(self) -> str:
+    def _full_key(self) -> str:
         key = f"{self._alias}{self._attr}"
-        if self._suffix:
-            key += f"-{self._suffix}"
+        if self._key:
+            key += f"-{self._key}"
         for mod, values in self._mods.items():
             key += f"__{mod}"
             if values:
                 key += f".{'.'.join(values)}"
         return key
 
-    def _to_kebab_suffix(self, signal_name: str) -> None:
-        if "-" in signal_name:
-            kebab_name, from_case = signal_name.lower(), "kebab"
-        elif "_" in signal_name:
-            kebab_name, from_case = signal_name.lower().replace("_", "-"), "snake"
-        elif signal_name[0].isupper():
+    def _to_kebab_key(self, key_name: str) -> None:
+        if "-" in key_name:
+            kebab_name, from_case = key_name.lower(), "kebab"
+        elif "_" in key_name:
+            kebab_name, from_case = key_name.lower().replace("_", "-"), "snake"
+        elif key_name[0].isupper():
             kebab_name, from_case = (
-                re.sub(r"((?<!\.)[A-Z])", r"-\1", signal_name).lstrip("-").lower(),
+                re.sub(r"((?<!\.)[A-Z])", r"-\1", key_name).lstrip("-").lower(),
                 "pascal",
             )
-        elif signal_name.lower() != signal_name:
+        elif key_name.lower() != key_name:
             kebab_name, from_case = (
-                re.sub(r"([A-Z])", r"-\1", signal_name).lower(),
+                re.sub(r"([A-Z])", r"-\1", key_name).lower(),
                 "camel",
             )
         else:
-            kebab_name, from_case = signal_name, None
-        self._suffix = kebab_name
+            kebab_name, from_case = key_name, None
+        self._key = kebab_name
         if from_case:
             self._mods["case"] = [from_case]
 
     def __getitem__(self, key: str, /) -> str | Literal[True]:
-        return self._value
-
-    def __len__(self) -> Literal[1]:
-        return 1
-
-    def __iter__(self) -> Iterator[str]:
-        return iter([self._key()])
-
-    def __str__(self) -> str:
-        r = _escape(self._key())
-        if isinstance(self._value, str):
-            r += f'="{_escape(self._value)}"'
-        return r
-
-    __html__ = __str__
-
-
-class AttrGroup(Mapping):
-    def __init__(self, attrs: Iterable[BaseAttr]) -> None:
-        self._attrs: list[BaseAttr] = list(attrs)
-        self._attr_dict: dict[str, str] = {}
-        for attr in self._attrs:
-            self._attr_dict.update(attr)
-        self._attr_string: str = " ".join(str(attr) for attr in self._attrs)
-
-    def __iter__(self) -> Iterator[str]:
-        return iter(self._attr_dict)
+        if key == self._full_key():
+            return self._value
+        for attr in self._other_attrs:
+            if key == attr._full_key():
+                return attr._value
+        raise KeyError(key)
 
     def __len__(self) -> int:
-        return len(self._attr_dict)
+        return len(self._other_attrs) + 1
 
-    def __getitem__(self, key: str, /) -> str:
-        return self._attr_dict[key]
+    def __iter__(self) -> Iterator[str]:
+        return chain((self._full_key(),), *self._other_attrs)
 
     def __str__(self) -> str:
-        return self._attr_string
+        r = _escape(self._full_key())
+        if isinstance(self._value, str):
+            r += f'="{_escape(self._value)}"'
+        if self._other_attrs:
+            other = " ".join(str(o) for o in self._other_attrs)
+            r += f" {other}"
+        return r
 
     __html__ = __str__
 
@@ -387,22 +437,17 @@ class ViewtransitionMod:
 
 
 class SignalsAttr(BaseAttr):
-    def __init__(
-        self, signals_object: dict, *, expressions: bool = False, alias: str = "data-"
-    ) -> None:
-        val = _js_object(signals_object) if expressions else json.dumps(signals_object)
-        super().__init__("signals", val, alias=alias)
+    _attr = "signals"
 
     @property
     def ifmissing(self) -> Self:
-        """Only merge signals if their keys do not already exist."""
+        """Only set signals that do not already exist."""
         self._mods["ifmissing"] = []
         return self
 
 
-class StarIgnoreAttr(BaseAttr):
-    def __init__(self, *, alias: str = "data-") -> None:
-        super().__init__("star-ignore", True, alias=alias)
+class IgnoreAttr(BaseAttr):
+    _attr = "ignore"
 
     @property
     def self(self) -> Self:
@@ -412,9 +457,7 @@ class StarIgnoreAttr(BaseAttr):
 
 
 class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, event: str, expression: str, *, alias: str = "data-") -> None:
-        super().__init__("on", expression, alias=alias)
-        self._to_kebab_suffix(event)
+    _attr = "on"
 
     @property
     def once(self) -> Self:
@@ -466,8 +509,7 @@ class OnAttr(BaseAttr, TimingMod, ViewtransitionMod):
 
 
 class PersistAttr(BaseAttr):
-    def __init__(self, *, alias: str = "data-") -> None:
-        super().__init__("persist", True, alias=alias)
+    _attr = "persist"
 
     def __call__(self, signal_names: str | Iterable[str] | None = None) -> Self:
         if not signal_names:
@@ -485,9 +527,28 @@ class PersistAttr(BaseAttr):
         return self
 
 
+class JsonSignalsAttr(BaseAttr):
+    _attr = "json-signals"
+
+    def __call__(self, include: str | None = None, exclude: str | None = None) -> Self:
+        if include or exclude:
+            filter_object = {}
+            if include:
+                filter_object["include"] = include
+            if exclude:
+                filter_object["exclude"] = exclude
+            self._value = json.dumps(filter_object)
+        return self
+
+    @property
+    def terse(self) -> Self:
+        """Output without extra whitespace."""
+        self._mods["terse"] = []
+        return self
+
+
 class ScrollIntoViewAttr(BaseAttr):
-    def __init__(self, *, alias: str = "data-") -> None:
-        super().__init__("scroll-into-view", True, alias=alias)
+    _attr = "scroll-into-view"
 
     @property
     def smooth(self) -> Self:
@@ -562,9 +623,28 @@ class ScrollIntoViewAttr(BaseAttr):
         return self
 
 
+class OnIntersectAttr(BaseAttr, TimingMod, ViewtransitionMod):
+    @property
+    def once(self) -> Self:
+        """Only trigger the event listener once."""
+        self._mods["once"] = []
+        return self
+
+    @property
+    def half(self) -> Self:
+        """Trigger the event listener when half the element enters the viewport."""
+        self._mods["half"] = []
+        return self
+
+    @property
+    def full(self) -> Self:
+        """Trigger the event listener when the full element is visible."""
+        self._mods["full"] = []
+        return self
+
+
 class OnIntervalAttr(BaseAttr, ViewtransitionMod):
-    def __init__(self, expression: str, *, alias: str = "data-") -> None:
-        super().__init__("on-interval", expression, alias=alias)
+    _attr = "on-interval"
 
     def duration(self, duration: int | float | str, *, leading: bool = False) -> Self:
         """Set the interval duration."""
@@ -575,8 +655,7 @@ class OnIntervalAttr(BaseAttr, ViewtransitionMod):
 
 
 class OnLoadAttr(BaseAttr, ViewtransitionMod):
-    def __init__(self, expression: str, *, alias: str = "data-") -> None:
-        super().__init__("on-load", expression, alias=alias)
+    _attr = "on-load"
 
     def delay(self, delay: int | float | str) -> Self:
         """Delay the event listener."""
@@ -590,14 +669,48 @@ class OnLoadAttr(BaseAttr, ViewtransitionMod):
         return self
 
 
-class OnRafAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, expression: str, *, alias: str = "data-") -> None:
-        super().__init__("on-raf", expression, alias=alias)
+class OnRafAttr(BaseAttr, TimingMod):
+    _attr = "on-raf"
 
 
-class OnSignalChangeAttr(BaseAttr, TimingMod, ViewtransitionMod):
-    def __init__(self, expression: str, *, alias: str = "data-") -> None:
-        super().__init__("on-signal-change", expression, alias=alias)
+class OnSignalPatchAttr(BaseAttr, TimingMod):
+    _attr = "on-signal-patch"
+
+    def filter(self, include: str | None = None, exclude: str | None = None) -> Self:
+        """Filter the signal patch events."""
+        if include or exclude:
+            filter_object = {}
+            if include:
+                filter_object["include"] = include
+            if exclude:
+                filter_object["exclude"] = exclude
+            self._other_attrs = [
+                BaseAttr("on-signal-patch-filter", value=json.dumps(filter_object))
+            ]
+        return self
+
+
+class OnResizeAttr(BaseAttr, TimingMod):
+    _attr = "on-resize"
+
+
+class QueryStringAttr(BaseAttr):
+    _attr = "query-string"
+
+    def __call__(self, include: str | None = None, exclude: str | None = None) -> Self:
+        if include or exclude:
+            filter_object = {}
+            if include:
+                filter_object["include"] = include
+            if exclude:
+                filter_object["exclude"] = exclude
+            self._value = json.dumps(filter_object)
+        return self
+
+    @property
+    def history(self) -> Self:
+        self._mods["history"] = []
+        return self
 
 
 def _escape(s: str) -> str:

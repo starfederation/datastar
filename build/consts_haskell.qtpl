@@ -22,10 +22,6 @@ cDatastarKey                             :: StringLike a => a
 cDatastarKey                             = "{%s data.DatastarKey %}"
 cVersion                                 :: StringLike a => a
 cVersion                                 = "{%s data.Version %}"
-cVersionClientByteSize                   :: Int
-cVersionClientByteSize                   = {%d data.VersionClientByteSize %}
-cVersionClientByteSizeGzip               :: Int
-cVersionClientByteSizeGzip               = {%d data.VersionClientByteSizeGzip %}
 {%- for _, d := range data.DefaultDurations -%}
 {%s PadRight(fmt.Sprintf("cDefault%s", d.Name.Pascal), 40) %} :: Int
 {%s PadRight(fmt.Sprintf("cDefault%s", d.Name.Pascal), 40) %} = {%d durationToMs(d.Duration) %} -- milliseconds

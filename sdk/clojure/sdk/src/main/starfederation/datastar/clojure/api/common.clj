@@ -9,12 +9,13 @@
 (def retry-duration      :d*.sse/retry-duration)
 
 ;; Merge fragment opts
-(def selector            :d*.fragments/selector)
-(def merge-mode          :d*.fragments/merge-mode)
-(def use-view-transition :d*.fragments/use-view-transition)
+(def selector            :d*.elements/selector)
+(def patch-mode          :d*.elements/patch-mode)
+(def use-view-transition :d*.elements/use-view-transition)
 
 ;;Signals opts
 (def only-if-missing     :d*.signals/only-if-missing)
+
 
 ;; Script opts
 (def auto-remove         :d*.scripts/auto-remove)
@@ -32,26 +33,20 @@
   - `data-lines`: a transient vector of data-lines that will be written in a sse
     event
   - `prefix`: The Datastar specific preffix for that line
-  - `test`: function applied to `v` if the result is true the data-line is
-    added, it is elided otherwise. If not test is provided, the data-line will
-    be added.
   - `v`: the value for that line
   "
-  ([data-lines! prefix v]
-   (conj! data-lines! (str prefix v)))
-  ([data-lines! test prefix v]
-   (cond-> data-lines!
-     (test v) (conj! (str prefix v)))))
+  [data-lines! prefix v]
+  (conj! data-lines! (str prefix v)))
 
 
 (defn add-data-lines!
   "Add several data-lines to the `data-lines!` transient vector."
-  [data-lines! prefix lines]
+  [data-lines! prefix lines-seq]
   (reduce
     (fn [acc part]
       (conj! acc (str prefix part)))
     data-lines!
-    lines))
+    lines-seq))
 
 
 (defn add-boolean-option?

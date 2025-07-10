@@ -25,21 +25,21 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 // add as an ASP Service
-//  allows injection of IServerSentEventService, to respond to a request with a Datastar friendly ServerSentEvent
-//  and ISignals, to read the signals sent by the client
+//  allows injection of IDatastarService, to respond to a request with a Datastar friendly ServerSentEvent
+//  and to read the signals sent by the client
 builder.Services.AddDatastar();
 
-// displayDate - merging a fragment
-app.MapGet("/displayDate", async (IDatastarServerSentEventService sse) =>
+// displayDate - patching an element
+app.MapGet("/displayDate", async (IDatastarService datastarService) =>
 {
     string today = DateTime.Now.ToString("%y-%M-%d %h:%m:%s");
-    await sse.MergeFragmentsAsync($"""<div id='target'><span id='date'><b>{today}</b><button data-on-click="@get('/removeDate')">Remove</button></span></div>""");
+    await datastarService.PatchElementsAsync($"""<div id='target'><span id='date'><b>{today}</b><button data-on-click="@get('/removeDate')">Remove</button></span></div>""");
 });
 
-// removeDate - removing a fragment
-app.MapGet("/removeDate", async (IDatastarServerSentEventService sse) => { await sse.RemoveFragmentsAsync("#date"); });
+// removeDate - removing an element
+app.MapGet("/removeDate", async (IDatastarService datastarService) => { await datastarService.RemoveElementAsync("#date"); });
 
-public record Signals {
+public record MySignals {
     [JsonPropertyName("input")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Input { get; init; } = null;
@@ -52,11 +52,11 @@ public record Signals {
 }
 
 // changeOutput - reads the signals, update the Output, and merge back
-app.MapPost("/changeOutput", async (IDatastarServerSentEventService sse, IDatastarSignalsReaderService dsSignals) => ...
+app.MapPost("/changeOutput", async (IDatastarService datastarService) => ...
 {
-    Signals signals = await dsSignals.ReadSignalsAsync<Signals>();
-    Signals newSignals = new() { Output = $"Your Input: {signals.Input}" };
-    await sse.MergeSignalsAsync(newSignals.Serialize());
+    MySignals signals = await datastarService.ReadSignalsAsync<MySignals>();
+    MySignals newSignals = new() { Output = $"Your Input: {signals.Input}" };
+    await datastarService.PatchSignalsAsync(newSignals.Serialize());
 });
 ```
 
@@ -77,8 +77,6 @@ public class MySignals {
 public IActionResult Test_GetSignals([FromSignals] MySignals signals) => ...
 
 public IActionResult Test_GetValues([FromSignals] string myString, [FromSignals] int myInt) => ...
-
-public IActionResult Test_GetInner([FromSignals] MySignals.InnerSignals myInner) => ...
 
 public IActionResult Test_GetInnerPathed([FromSignals(Path = "myInner")] MySignals.InnerSignals myInnerOther) => ...
 

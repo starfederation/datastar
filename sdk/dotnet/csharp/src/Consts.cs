@@ -6,13 +6,15 @@ using System;
 
 public enum ElementPatchMode
 {
-    /// Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+    /// Morphs the element into the existing element.
     Outer,
-    /// Morphs the element into the innerHTML using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+    /// Replaces the inner HTML of the existing element.
     Inner,
-    /// Removes the existing element from the DOM.
+    /// Removes the existing element.
     Remove,
-    /// Prepends the element inside the existing element.
+    /// Replaces the existing element with the new element.
+    Replace,
+    /// Prepends the element inside to the existing element.
     Prepend,
     /// Appends the element inside the existing element.
     Append,
@@ -20,8 +22,6 @@ public enum ElementPatchMode
     Before,
     /// Inserts the element after the existing element.
     After,
-    /// Do not morph, simply replace the whole element and reset any related state.
-    Replace,
 
 }
 public enum EventType
@@ -36,13 +36,13 @@ public enum EventType
 public static class Consts
 {
     public const string DatastarKey = "datastar";
-    public const string Version     = "1.0.0-beta.11";
+    public const string Version     = "1.0.0-RC.1";
 
     /// Default: TimeSpan.FromMilliseconds 1000
     public static readonly TimeSpan DefaultSseRetryDuration = TimeSpan.FromMilliseconds(1000);
 
 
-    /// Default: outer - Morphs the element into the existing element using Datastar&#39;s morphing, preserving focus and minimizing element changes.
+    /// Default: outer - Morphs the element into the existing element.
     public const ElementPatchMode DefaultElementPatchMode = ElementPatchMode.Outer;
 
     public const bool DefaultElementsUseViewTransitions = false;
@@ -60,11 +60,11 @@ public static class Consts
         ElementPatchMode.Outer => "outer",
         ElementPatchMode.Inner => "inner",
         ElementPatchMode.Remove => "remove",
+        ElementPatchMode.Replace => "replace",
         ElementPatchMode.Prepend => "prepend",
         ElementPatchMode.Append => "append",
         ElementPatchMode.Before => "before",
         ElementPatchMode.After => "after",
-        ElementPatchMode.Replace => "replace",
         _ => throw new NotImplementedException($"ElementPatchMode.{enumValue}")
     };
     public static string EnumToString( EventType enumValue ) => enumValue switch {

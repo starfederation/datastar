@@ -7,8 +7,8 @@ namespace starfederation\datastar\events;
 
 use Exception;
 use starfederation\datastar\Consts;
-use starfederation\datastar\enums\EventType;
 use starfederation\datastar\enums\ElementPatchMode;
+use starfederation\datastar\enums\EventType;
 
 class PatchElements implements EventInterface
 {

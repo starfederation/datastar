@@ -21,7 +21,8 @@
 (def dev-aliases
   [:test
    :repl
-   :malli-schemas])
+   :malli-schemas
+   :sdk-brotli])
 
 (defn arg->kw [s]
   (if (string/starts-with? s ":")

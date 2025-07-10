@@ -1,0 +1,5 @@
+event: datastar-patch-elements
+data: elements <div>
+data: elements   <span>Merge</span>
+data: elements </div>
+
