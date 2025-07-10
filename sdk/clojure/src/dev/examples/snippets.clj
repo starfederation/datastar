@@ -12,8 +12,8 @@
 ;; multiple_events
 (d*/patch-elements! sse "<div id=\"question\">...</div>")
 (d*/patch-elements! sse "<div id=\"instructions\">...</div>")
-(d*/patch-elements! sse "{answer: '...'}")
-(d*/patch-elements! sse "{prize: '...'}")
+(d*/patch-signals! sse "{answer: '...'}")
+(d*/patch-signals! sse "{prize: '...'}")
 
 ;; setup
 #_{:clj-kondo/ignore true}
@@ -30,7 +30,7 @@
        (d*/patch-elements! sse
          "<div id=\"question\">What do you put in a toaster?</div>")
 
-       (d*/patch-elements! sse "{response: '', answer: 'bread'}"))}))
+       (d*/patch-signals! sse "{response: '', answer: 'bread'}"))}))
 
 (comment
   (handler {}))
