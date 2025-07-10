@@ -11,8 +11,9 @@ use {
         consts,
         prelude::{ExecuteScript, PatchElements, PatchSignals},
     },
+    indexmap::IndexMap,
     serde::Deserialize,
-    serde_json::{Map, Value},
+    serde_json::Value,
     tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
 };
 
@@ -55,8 +56,8 @@ pub enum TestCaseEvent {
         event_id: Option<String>,
         #[serde(alias = "retryDuration")]
         retry_duration: Option<u64>,
-        attributes: Option<Map<String, Value>>,
-        #[serde(alias = "auto_remove")]
+        attributes: Option<IndexMap<String, Value>>,
+        #[serde(alias = "autoRemove")]
         auto_remove: Option<bool>,
     },
     #[serde(rename = "patchElements")]
@@ -73,7 +74,9 @@ pub enum TestCaseEvent {
     },
     #[serde(rename = "patchSignals")]
     PatchSignals {
-        signals: Option<Map<String, Value>>,
+        signals: Option<IndexMap<String, Value>>,
+        #[serde(alias = "signals-raw")]
+        signals_raw: Option<String>,
         #[serde(alias = "eventId")]
         event_id: Option<String>,
         #[serde(alias = "retryDuration")]
@@ -94,7 +97,7 @@ async fn test(ReadSignals(test_case): ReadSignals<TestCase>) -> impl IntoRespons
                         retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
                         auto_remove,
                         attributes: attributes.map(|attributes| {
-                            attributes.into_iter().map(|(key, value)| format!("{key}=\"{value}\"")).collect()
+                            attributes.into_iter().map(|(key, value)| format!("{key}=\"{}\"", value.to_string().trim_matches('"'))).collect()
                         }).unwrap_or_default(),
                     }.into_datastar_event().write_as_axum_sse_event()
                 }
@@ -111,10 +114,13 @@ async fn test(ReadSignals(test_case): ReadSignals<TestCase>) -> impl IntoRespons
                         _ => consts::ElementPatchMode::Outer,
                     }, use_view_transition: use_view_transition.unwrap_or_default() }.into_datastar_event().write_as_axum_sse_event()
                 },
-                TestCaseEvent::PatchSignals { signals, event_id, retry_duration, only_if_missing } => {
+                TestCaseEvent::PatchSignals { signals, signals_raw, event_id, retry_duration, only_if_missing } => {
                     PatchSignals {
                         id: event_id,
-                        retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)), signals: signals.map(|s| serde_json::to_string(&s).unwrap_or_default()).unwrap_or_default(), only_if_missing: only_if_missing.unwrap_or_default() }.into_datastar_event().write_as_axum_sse_event()
+                        retry: Duration::from_millis(retry_duration.unwrap_or(consts::DEFAULT_SSE_RETRY_DURATION)),
+                        signals: signals_raw.unwrap_or_else(|| signals.map(|s| serde_json::to_string(&s).unwrap_or_default()).unwrap_or_default()),
+                        only_if_missing: only_if_missing.unwrap_or_default(),
+                    }.into_datastar_event().write_as_axum_sse_event()
                 },
             };
 

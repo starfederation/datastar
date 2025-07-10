@@ -21,7 +21,6 @@ pub const DEFAULT_SSE_RETRY_DURATION: u64 = 1000;
 
 // #region Default strings
 
-
 // #endregion
 
 // #region Datalines
@@ -47,7 +46,7 @@ pub(crate) const DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING: bool = false;
 // #region Enums
 
 /// The mode in which an element is patched into the DOM.
-#[derive(Default,Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ElementPatchMode {
     /// Morphs the element into the existing element.
     #[default]

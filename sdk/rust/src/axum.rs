@@ -47,7 +47,7 @@ impl DatastarEvent {
         };
 
         let mut data = String::with_capacity(
-            self.data.iter().map(|s| s.len()).sum::<usize>() + self.data.len() - 1,
+            (self.data.iter().map(|s| s.len()).sum::<usize>() + self.data.len()).saturating_sub(1),
         );
 
         let mut sep = "";
