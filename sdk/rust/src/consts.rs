@@ -8,7 +8,7 @@ pub(crate) const DATASTAR_KEY: &str = "datastar";
 #[allow(unused)]
 pub(crate) const DATASTAR_REQ_HEADER_STR: &str = "datastar-request";
 #[expect(unused)]
-pub(crate) const VERSION: &str = "1.0.0-RC.13";
+pub(crate) const VERSION: &str = "1.0.0-RC.1";
 
 // #region Defaults
 
@@ -20,6 +20,7 @@ pub const DEFAULT_SSE_RETRY_DURATION: u64 = 1000;
 // #endregion
 
 // #region Default strings
+
 
 // #endregion
 
@@ -46,7 +47,7 @@ pub(crate) const DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING: bool = false;
 // #region Enums
 
 /// The mode in which an element is patched into the DOM.
-#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Default,Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ElementPatchMode {
     /// Morphs the element into the existing element.
     #[default]
