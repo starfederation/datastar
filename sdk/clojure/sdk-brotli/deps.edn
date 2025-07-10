@@ -6,4 +6,4 @@
                           slipset/deps-deploy {:mvn/version "0.2.2"}}
                    :ns-default build}
            :neil  {:project {:name    dev.data-star.clojure/brotli
-                             :version "1.0.0-RC13"}}}}
+                             :version "1.0.0-RC1"}}}}
