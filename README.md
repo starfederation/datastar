@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/github/license/starfederation/datastar)](https://github.com/starfederation/datastar/blob/main/LICENSE)
 [![Stars](https://img.shields.io/github/stars/starfederation/datastar?style=flat)](https://github.com/starfederation/datastar/stargazers)
 
-<p align="center"><img width="200" height="200" src="https://github.com/user-attachments/assets/f6b7df66-f763-456a-8fbe-2de0f05a6fab"></p>
+<p align="center"><img width="200" height="200" src="https://data-star.dev/static/images/rocket-512x512.png"></p>
 
 # Datastar
 
