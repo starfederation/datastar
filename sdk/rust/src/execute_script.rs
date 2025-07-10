@@ -91,7 +91,7 @@ impl ExecuteScript {
 
         let mut s = format!("{} <script", consts::ELEMENTS_DATALINE_LITERAL);
 
-        if !self.auto_remove.unwrap_or(true) {
+        if self.auto_remove.unwrap_or(true) {
             s.push_str(r##" data-effect="el.remove()""##);
         }
 
@@ -106,7 +106,7 @@ impl ExecuteScript {
         s.push_str(scripts_lines.next().unwrap_or_default());
         data.push(s);
 
-        for line in self.script.lines() {
+        for line in scripts_lines {
             data.push(format!("{} {}", consts::ELEMENTS_DATALINE_LITERAL, line));
         }
 
