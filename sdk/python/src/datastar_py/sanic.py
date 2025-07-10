@@ -73,12 +73,14 @@ def datastar_response(
             response = await request.respond(response=DatastarResponse())
             async for event in r:
                 await response.send(event)
+            await response.eof()
             return response
         if isgenerator(r):
             request = args[0]
             response = await request.respond(response=DatastarResponse())
             for event in r:
                 await response.send(event)
+            await response.eof()
             return response
         return DatastarResponse(r)
 
