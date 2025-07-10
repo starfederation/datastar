@@ -77,5 +77,6 @@
          doc (-> src-var meta :doc)]
     `(do
        (def ~dest ~(symbol src-var))
-       (alter-meta! (resolve '~dest) assoc :doc ~doc)))))
+       (alter-meta! (resolve '~dest) assoc :doc ~doc)
+       (var ~dest)))))
 

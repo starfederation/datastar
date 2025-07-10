@@ -5,6 +5,9 @@
 In the whole Datastar project:
 
 - `examples/clojure`
+- `site/static/code_snippets/*.clojuresnippet`
+- `site/static/going_deeper/*.clojuresnippet`
+- `site/static/how_tos/*.clojuresnippet`
 
 In the SDK code proper `sdk/clojure`:
 
@@ -50,9 +53,9 @@ In the SDK code proper `sdk/clojure`:
 - The Clojars account is managed by Ben Croker, the DNS verification is managed by Delaney.
 - The Clojars deploy token is also managed by Ben and added to this repo as a GH Actions Secret
   - Secret name: `CLOJARS_USERNAME`
-    Value: *the clojars account username*
+    Value: _the clojars account username_
   - Secret name: `CLOJARS_PASSWORD`
-    Value: *the clojars deploy token*
+    Value: _the clojars deploy token_
 - The libraries' versions are bumped in lockstep so that there is no confusion over which version of the common lib should be used with an adapter lib.
 
 The Github Actions [CI workflow for clojure](../../.github/workflows/clojure-sdk.yml) will always run the tests and produce jar artifacts.

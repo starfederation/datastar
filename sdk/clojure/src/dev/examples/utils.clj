@@ -1,7 +1,8 @@
 (ns examples.utils
   (:require
-    [charred.api :as charred]
-    [fireworks.core :refer [?]]
+    [charred.api                         :as charred]
+    [fireworks.core                      :refer [?]]
+    [puget.printer                       :as pp]
     [starfederation.datastar.clojure.api :as d*]))
 
 
@@ -17,7 +18,18 @@
 (defmacro force-out [& body]
   `(binding [*out* (java.io.OutputStreamWriter. System/out)]
      ~@body))
+
  
+(defn pp-request [req]
+ (-> req
+     (dissoc :reitit.core/match :reitit.core/router)
+     pp/pprint
+     pp/with-color))
+
+
+(defn ?req [req]
+  (? (dissoc req :reitit.core/match :reitit.core/router)))
+
 
 (def ^:private bufSize 1024)
 (def read-json (charred/parse-json-fn {:async? false :bufsize bufSize}))
@@ -25,7 +37,7 @@
 
 
 (defn get-signals [req]
-  (-> req d*/get-signals read-json))
+  (some-> req d*/get-signals read-json))
 
 
 (defn rr [sym]
@@ -95,7 +107,4 @@
                            :join? false}
                           opts))))))
 
-
-(defn ?req [req]
-  (? (dissoc req :reitit.core/match :reitit.core/router)))
 

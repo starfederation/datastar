@@ -19,7 +19,7 @@
   (->sse-response ring-request
     {on-open
      (fn [sse]
-       (d*/merge-fragment! sse
+       (d*/patch-elements! sse
          (html [:div#indicator "Redirecting in 3 seconds..."]))
        (Thread/sleep 3000)
        (d*/execute-script! sse "window.location = \"/guide\"")

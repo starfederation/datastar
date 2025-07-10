@@ -36,47 +36,52 @@
 
 
 (def str->datastar-opt
-  {"eventId" d*/id
+  ;; SSE
+  {"eventId"       d*/id
    "retryDuration" d*/retry-duration
 
-   "selector" d*/selector
-   "mergeMode" d*/merge-mode
+   ;; patch elements
+   "selector"          d*/selector
+   "patchMode"         d*/patch-mode
    "useViewTransition" d*/use-view-transition
 
+   ;; patch signals
    "onlyIfMissing" d*/only-if-missing
-   "autoRemove" d*/auto-remove
 
+   ;; execute script
+   "autoRemove" d*/auto-remove
    "attributes" d*/attributes})
 
 (def options (set (keys str->datastar-opt)))
 
 ;; -----------------------------------------------------------------------------
-;; Testing code: We want to send back event received as datastar signal values
+;; Testing code: We want to send back the event that we received as datastar
+;; signal values in the HTTP request
 ;; -----------------------------------------------------------------------------
-(defn merge-fragments! [sse event]
-  (let [frags (get event "fragments")
+(defn patch-elements! [sse event]
+  (let [elements (get event "elements")
         opts (-> event
                  (select-keys options)
                  (set/rename-keys str->datastar-opt))]
-    (d*/merge-fragment! sse frags opts)))
+    (d*/patch-elements! sse elements opts)))
 
 
-(defn remove-fragments! [sse event]
+(defn remove-element! [sse event]
   (let [selector (get event "selector")
         opts (-> event
                  (select-keys options)
                  (set/rename-keys str->datastar-opt))]
-    (d*/remove-fragment! sse selector opts)))
+    (d*/remove-element! sse selector opts)))
 
 
-(defn merge-signals! [sse event]
+(defn patch-signals! [sse event]
   (let [signals (-> (get event "signals")
                     (->> (into (sorted-map))) ;; for the purpose of the test, keys need to be ordered
                     (charred/write-json-str))
         opts (-> event
                  (select-keys options)
                  (set/rename-keys str->datastar-opt))]
-    (d*/merge-signals! sse signals opts)))
+    (d*/patch-signals! sse signals opts)))
 
 
 (defn remove-signals! [sse event]
@@ -84,7 +89,7 @@
         opts (-> event
                  (select-keys options)
                  (set/rename-keys str->datastar-opt))]
-    (d*/remove-signals! sse paths opts)))
+    (d*/patch-signals! sse paths opts)))
 
 
 (defn execute-script! [sse event]
@@ -98,11 +103,11 @@
 
 
 (def dispatch
-  {"mergeFragments"  merge-fragments!
-   "removeFragments" remove-fragments!
-   "mergeSignals"    merge-signals!
-   "removeSignals"   remove-signals!
-   "executeScript"   execute-script!})
+  {"patchElements"  patch-elements!
+   "removeElements" remove-element!
+   "patchSignals"   patch-signals!
+   "removeSignals"  remove-signals!
+   "executeScript"  execute-script!})
 
 
 (defn send-event-back! [sse event]

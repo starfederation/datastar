@@ -63,7 +63,7 @@
 (def ^:private data-line-prefix  "data: ")
 
 (def ^:private new-line     "\n")
-(def ^:private end-event    (str new-line new-line))
+(def ^:private end-event    new-line)
 
 
 ;; -----------------------------------------------------------------------------

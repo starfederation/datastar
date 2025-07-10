@@ -2,8 +2,8 @@
   (:require
     [examples.animation-gzip.rendering :as rendering]
     [examples.animation-gzip.state :as state]
+    [examples.utils :as u]
     [ring.util.response :as ruresp]
-    [starfederation.datastar.clojure.api :as d*]
     [starfederation.datastar.clojure.adapter.common :as ac]))
 
 
@@ -47,90 +47,79 @@
      :y (Integer/parseInt y)}))
 
 
-(defn ->ping-handler [->sse-response]
-  (fn ping-handler
-    ([req]
-     (->sse-response req
-       {:status 204
-        ac/on-open
-        (fn [sse]
-          (d*/with-open-sse sse
-            (when-let [coords (recover-coords req)]
-              (state/add-ping! coords))))}))
-    ([req respond _raise]
-     (respond
-       (ping-handler req)))))
+(defn ping-handler
+  ([req]
+   (when-let [coords (recover-coords req)]
+     (println "-- ping " coords)
+     (state/add-ping! coords))
+   {:status 204})
+  ([req respond _raise]
+   (respond (ping-handler req))))
 
 
-(defn ->random-pings-handler [->sse-response]
-  (fn random-pings-handler
-    ([req]
-     (->sse-response req
-       {:status 204
-        ac/on-open
-        (fn [sse]
-          (d*/with-open-sse sse
-            (state/add-random-pings!)))}))
-    ([req respond _raise]
-     (respond
-       (random-pings-handler req)))))
+(defn random-pings-handler
+  ([_req]
+   (println "-- add pixels")
+   (state/add-random-pings!)
+   {:status 204})
+  ([req respond _raise]
+   (respond
+     (random-pings-handler req))))
 
 
-(defn ->reset-handler [->sse-response]
-  (fn reset-handler
-    ([req]
-     (->sse-response req
-       {:status 204
-        ac/on-open
-        (fn [sse]
-          (d*/with-open-sse sse
-            (state/reset-state!)))}))
-    ([req respond _raise]
-     (respond
-       (reset-handler req)))))
+(defn reset-handler
+  ([_req]
+   (println "-- reseting state")
+   (state/reset-state!)
+   {:status 204})
+  ([req respond _raise]
+   (respond (reset-handler req))))
+
+(defn step-handler
+  ([_req]
+   (println "-- Step 1")
+   (state/step-state!)
+   {:status 204})
+  ([req respond _raise]
+   (respond
+     (step-handler req))))
 
 
-(defn ->play-handler [->sse-response]
-  (fn play-handler
-    ([req]
-     (->sse-response req
-       {:status 204
-        ac/on-open
-        (fn [sse]
-          (d*/with-open-sse sse
-            (state/start-animating!)))}))
-    ([req respond _raise]
-     (respond
-       (play-handler req)))))
+
+(defn play-handler
+  ([_req]
+   (println "-- play animation")
+   (state/start-animating!)
+   {:status 204})
+  ([req respond _raise]
+   (respond (play-handler req))))
 
 
-(defn ->pause-handler [->sse-response]
-  (fn pause-handler
-    ([req]
-     (->sse-response req
-       {:status 204
-        ac/on-open
-        (fn [sse]
-          (d*/with-open-sse sse
-            (state/stop-animating!)))}))
-    ([req respond _raise]
-     (respond
-       (pause-handler req)))))
+(defn pause-handler
+  ([_req]
+   (println "-- pause animation")
+   (state/stop-animating!)
+   {:status 204})
+  ([req respond _raise]
+   (respond (pause-handler req))))
+
+(defn resize-handler
+  ([req]
+   (let [{x "rows" y "columns"} (u/get-signals req)]
+     (println "-- resize" x y)
+     (state/resize! x y)
+     {:status 204}))
+  ([req respond _raise]
+   (respond
+     (resize-handler req))))
 
 
-(defn ->refresh-handler [->sse-response & {:as opts}]
-  (fn refresh-handler
-    ([req]
-     (->sse-response req
-       (merge opts
-         {ac/on-open
-          (fn [sse]
-            (d*/with-open-sse sse
-              (d*/merge-fragment! sse
-                (rendering/render-content @state/!state))))})))
-    ([req respond _raise]
-     (respond
-       (refresh-handler req)))))
-
+(defn refresh-handler
+  ([_req]
+   {:status 200
+    :headers {"Content-Type" "text/html"}
+    :body (rendering/render-content @state/!state)})
+  ([req respond _raise]
+   (respond (refresh-handler req))))
 
 

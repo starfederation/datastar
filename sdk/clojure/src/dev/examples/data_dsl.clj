@@ -7,10 +7,10 @@
 ;; on top of the SDK
 
 (def example
-  {:event ::merge-fragments
-   :fragments ["<div>hello</div>"]
+  {:event ::patch-elements
+   :elements "<div>hello</div>"
    d*/selector "foo"
-   d*/merge-mode d*/mm-append
+   d*/patch-mode d*/pm-append
    d*/use-view-transition true})
 
 
@@ -18,13 +18,13 @@
 ;; -----------------------------------------------------------------------------
 ;; Pure version just for data-lines
 ;; -----------------------------------------------------------------------------
-(require '[starfederation.datastar.clojure.api.fragments :as frags])
+(require '[starfederation.datastar.clojure.api.elements :as elements])
 
 
 (defn sse-event [e]
   (case (:event e)
-    ::merge-fragments
-    (frags/->merge-fragments (:fragments e) e)))
+    ::patch-elements
+    (elements/->patch-elements (:elements e) e)))
 
 
 (sse-event example)
@@ -39,19 +39,19 @@
 ;; -----------------------------------------------------------------------------
 (require '[starfederation.datastar.clojure.api.sse :as sse])
 
-(defn fragment->str [e]
+(defn elements->str [e]
   (let [buffer (StringBuilder.)]
     (sse/write-event! buffer
-                      consts/event-type-merge-fragments
-                      (frags/->merge-fragments (:fragments e) e)
+                      consts/event-type-patch-elements
+                      (elements/->patch-elements (:fragments e) e)
                       e)
     (str buffer)))
 
 
 (defn event->str [e]
   (case (:event e)
-      ::merge-fragments
-      (fragment->str e)))
+      ::patch-elements
+      (elements->str e)))
 
 (event->str example)
 ; "event: datastar-merge-fragments\n
@@ -64,7 +64,7 @@
 ;; -----------------------------------------------------------------------------
 ;; Side effecting version
 ;; -----------------------------------------------------------------------------
-(require '[starfederation.datastar.clojure.adapters.test :as at])
+(require '[starfederation.datastar.clojure.adapter.test :as at])
 
 ;; SSE generator that returns the sse event string instead of sending it
 (def sse-gen (at/->sse-gen))
@@ -73,7 +73,7 @@
 
 (defn sse-event! [sse-gen e]
   (case (:event e)
-    ::merge-fragments (d*/merge-fragments! sse-gen (:fragments e) e)))
+    ::patch-elements (d*/patch-elements! sse-gen (:fragments e) e)))
 
 
 (sse-event! sse-gen example)

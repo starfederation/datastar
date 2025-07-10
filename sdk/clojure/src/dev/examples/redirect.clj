@@ -38,7 +38,7 @@
   (->sse-response ring-request
     {on-open
       (fn [sse]
-        (d*/merge-fragment! sse
+        (d*/patch-elements! sse
           (html [:div#indicator "Redirecting in 3 seconds..."]))
         (Thread/sleep 3000)
         (d*/redirect! sse "/guide")
@@ -50,7 +50,8 @@
 (def router (rr/router
               [["/" {:handler home}]
                ["/guide" {:handler guide}]
-               ["/redirect-me" {:handler redirect-handler}]]))
+               ["/redirect-me" {:handler redirect-handler}]
+               c/datastar-route]))
 
 
 (def default-handler (rr/create-default-handler))

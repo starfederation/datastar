@@ -30,7 +30,7 @@
              duration (if (neg? (compare seconds "50"))
                         "5"
                         "1")]
-         (d*/merge-fragment! sse
+         (d*/patch-elements! sse
            (html [:div#time {(str "data-on-interval__duration." duration "s")
                              (d*/sse-get "/endpoint")}
                    current-time]))

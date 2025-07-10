@@ -9,34 +9,28 @@
       [:-> cs/sse-gen-schema :any])
 
 
-(m/=> starfederation.datastar.clojure.api/merge-fragment!
+(m/=> starfederation.datastar.clojure.api/patch-elements!
       [:function
-       [:-> cs/sse-gen-schema cs/fragment-schema :any]
-       [:-> cs/sse-gen-schema cs/fragment-schema cs/merge-fragment-options-schemas :any]])
+       [:-> cs/sse-gen-schema cs/elements-schema :any]
+       [:-> cs/sse-gen-schema cs/elements-schema cs/patch-element-options-schemas :any]])
 
 
-(m/=> starfederation.datastar.clojure.api/merge-fragments!
+(m/=> starfederation.datastar.clojure.api/patch-elements-seq!
       [:function
-       [:-> cs/sse-gen-schema cs/fragments-schema :any]
-       [:-> cs/sse-gen-schema cs/fragments-schema cs/merge-fragment-options-schemas :any]])
+       [:-> cs/sse-gen-schema cs/elements-seq-schema :any]
+       [:-> cs/sse-gen-schema cs/elements-seq-schema cs/patch-element-options-schemas :any]])
 
 
-(m/=> starfederation.datastar.clojure.api/remove-fragment!
+(m/=> starfederation.datastar.clojure.api/remove-element!
       [:function
        [:-> cs/sse-gen-schema cs/selector-schema :any]
-       [:-> cs/sse-gen-schema cs/selector-schema cs/remove-fragments-options-schemas :any]])
+       [:-> cs/sse-gen-schema cs/selector-schema cs/remove-element-options-schemas :any]])
 
 
-(m/=> starfederation.datastar.clojure.api/merge-signals!
+(m/=> starfederation.datastar.clojure.api/patch-signals!
       [:function
        [:-> cs/sse-gen-schema cs/signals-schema :any]
-       [:-> cs/sse-gen-schema cs/signals-schema cs/merge-signals-options-schemas :any]])
-
-
-(m/=> starfederation.datastar.clojure.api/remove-signals!
-      [:function
-       [:-> cs/sse-gen-schema cs/signal-paths-schema :any]
-       [:-> cs/sse-gen-schema cs/signal-paths-schema cs/remove-signals-options-schemas :any]])
+       [:-> cs/sse-gen-schema cs/signals-schema cs/patch-signals-options-schemas :any]])
 
 
 (m/=> starfederation.datastar.clojure.api/execute-script!

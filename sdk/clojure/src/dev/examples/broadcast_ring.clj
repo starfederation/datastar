@@ -56,7 +56,7 @@
 (defn broadcast-lines! [n]
   (doseq [conn @!conns]
     (try
-      (d*/merge-fragment! conn (->> (range 0 n)
+      (d*/patch-elements! conn (->> (range 0 n)
                                     (map (fn [x]
                                            (str "-----------------" x "-------------")))
                                     (string/join "\n")))

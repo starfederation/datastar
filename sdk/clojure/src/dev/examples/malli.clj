@@ -5,8 +5,8 @@
     [malli.dev :as mdev]
     [starfederation.datastar.clojure.adapter.test :as at]
     [starfederation.datastar.clojure.api :as d*]
-    [starfederation.datastar.clojure.api.fragments :as f]
-    [starfederation.datastar.clojure.api.fragments-schemas]
+    [starfederation.datastar.clojure.api.elements :as e]
+    [starfederation.datastar.clojure.api.elements-schemas]
     [starfederation.datastar.clojure.api.common :as c]))
 
 ;; Testing how instrumentation works and how it's activated
@@ -19,10 +19,10 @@
   (mdev/stop!))
 
 (comment
-  (d*/merge-fragment! {} "frag")
-  (d*/merge-fragment! (at/->sse-gen) "frag")
-  (f/->merge-fragment "f" {c/retry-duration :a})
-  (f/->merge-fragment "f" {c/retry-duration 1022}))
+  (d*/patch-elements! {} "frag")
+  (d*/patch-elements! (at/->sse-gen) "frag")
+  (e/->patch-elements "f" {c/retry-duration :a})
+  (e/->patch-elements "f" {c/retry-duration 1022}))
 
 
 (comment

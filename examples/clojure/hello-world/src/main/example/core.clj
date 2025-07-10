@@ -46,7 +46,7 @@
        (fn [sse]
          (d*/with-open-sse sse
            (dotimes [i msg-count]
-             (d*/merge-fragment! sse (->frag i))
+             (d*/patch-elements! sse (->frag i))
              (Thread/sleep d))))})))
 
 

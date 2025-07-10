@@ -2,11 +2,12 @@
   width: 70%;
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   flex-direction: row;
 }
 
 #right-pane {
-  width: 40%;
+  width: auto;
 }
 
 #controls {
@@ -15,13 +16,20 @@
   flex-direction: row;
 }
 
+.h-list {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+
 h2 {
   width: 50%;
 }
 
 .pseudo-canvas {
   display: grid;
-  gap: 0px;
+  gap: 0;
   border: 1px dotted black;
 }
 
