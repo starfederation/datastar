@@ -10,6 +10,7 @@
 import asyncio
 from datetime import datetime
 
+from datastar_py.consts import VERSION
 from datastar_py.quart import (
     DatastarResponse,
     ServerSentEventGenerator,
@@ -26,7 +27,7 @@ HTML = """\
 		<head>
 			<title>DATASTAR on Quart</title>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-beta.11/bundles/datastar.js"></script>
+            <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@VERSION/bundles/datastar.js"></script>
 			<style>
             html, body { height: 100%; width: 100%; }
             body { background-image: linear-gradient(to right bottom, oklch(0.424958 0.052808 253.972015), oklch(0.189627 0.038744 264.832977)); }
@@ -52,7 +53,7 @@ HTML = """\
         </div>
 		</body>
 	</html>
-"""
+""".replace("VERSION", VERSION)
 
 
 @app.route("/updates")
