@@ -40,7 +40,8 @@ export type AttributePlugin = {
   onLoad: (ctx: RuntimeContext) => OnRemovalFn | void // Return a function to be called on removal
   keyReq?: Requirement // The rules for the key requirements
   valReq?: Requirement // The rules for the value requirements
-  isExpr?: boolean // If the value is an expression
+  returnsValue?: boolean // If the expression returns a value
+  shouldEvaluate?: boolean // If the value should be evaluated
   argNames?: string[] // argument names for the reactive expression
 }
 

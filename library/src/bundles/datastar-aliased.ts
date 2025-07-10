@@ -1,27 +1,30 @@
 import { apply, load, setAlias } from '../engine'
-import { Peek } from '../plugins/framework/actions/peek'
-import { SetAll } from '../plugins/framework/actions/setAll'
-import { ToggleAll } from '../plugins/framework/actions/toggleAll'
-import { Attr } from '../plugins/framework/attributes/attr'
-import { Bind } from '../plugins/framework/attributes/bind'
-import { Class } from '../plugins/framework/attributes/class'
-import { Indicator } from '../plugins/framework/attributes/indicator'
-import { JsonSignals } from '../plugins/framework/attributes/jsonSignals'
-import { On } from '../plugins/framework/attributes/on'
-import { OnIntersect } from '../plugins/framework/attributes/onIntersect'
-import { OnInterval } from '../plugins/framework/attributes/onInterval'
-import { OnLoad } from '../plugins/framework/attributes/onLoad'
-import { Ref } from '../plugins/framework/attributes/ref'
-import { Scope } from '../plugins/framework/attributes/scope'
-import { Show } from '../plugins/framework/attributes/show'
-import { Text } from '../plugins/framework/attributes/text'
-import { DELETE } from '../plugins/framework/backend/actions/delete'
-import { GET } from '../plugins/framework/backend/actions/get'
-import { PATCH } from '../plugins/framework/backend/actions/patch'
-import { POST } from '../plugins/framework/backend/actions/post'
-import { PUT } from '../plugins/framework/backend/actions/put'
-import { PatchElements } from '../plugins/framework/backend/watchers/patchElements'
-import { PatchSignals } from '../plugins/framework/backend/watchers/patchSignals'
+import { Peek } from '../plugins/actions/peek'
+import { SetAll } from '../plugins/actions/setAll'
+import { ToggleAll } from '../plugins/actions/toggleAll'
+import { Attr } from '../plugins/attributes/attr'
+import { Bind } from '../plugins/attributes/bind'
+import { Class } from '../plugins/attributes/class'
+import { Computed } from '../plugins/attributes/computed'
+import { Effect } from '../plugins/attributes/effect'
+import { Indicator } from '../plugins/attributes/indicator'
+import { JsonSignals } from '../plugins/attributes/jsonSignals'
+import { On } from '../plugins/attributes/on'
+import { OnIntersect } from '../plugins/attributes/onIntersect'
+import { OnInterval } from '../plugins/attributes/onInterval'
+import { OnLoad } from '../plugins/attributes/onLoad'
+import { OnSignalPatch } from "../plugins/attributes/onSignalPatch";
+import { Ref } from '../plugins/attributes/ref'
+import { Show } from '../plugins/attributes/show'
+import { Signals } from '../plugins/attributes/signals'
+import { Text } from '../plugins/attributes/text'
+import { DELETE } from '../plugins/backend/actions/delete'
+import { GET } from '../plugins/backend/actions/get'
+import { PATCH } from '../plugins/backend/actions/patch'
+import { POST } from '../plugins/backend/actions/post'
+import { PUT } from '../plugins/backend/actions/put'
+import { PatchElements } from '../plugins/backend/watchers/patchElements'
+import { PatchSignals } from '../plugins/backend/watchers/patchSignals'
 
 setAlias('star')
 
@@ -38,15 +41,18 @@ load(
   Attr,
   Bind,
   Class,
+  Computed,
+  Effect,
   Indicator,
   JsonSignals,
   On,
   OnIntersect,
   OnInterval,
   OnLoad,
+	OnSignalPatch,
   Ref,
-  Scope,
   Show,
+  Signals,
   Text,
   // Actions
   Peek,

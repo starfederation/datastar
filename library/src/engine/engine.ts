@@ -1,4 +1,4 @@
-import { findClosestScoped, isHTMLOrSVG } from '../utils/dom'
+import { isHTMLOrSVG } from '../utils/dom'
 import { isEmpty, isPojo, pathToObj } from '../utils/paths'
 import { camel, snake } from '../utils/text'
 import { DATASTAR, DSP, DSS } from './consts'
@@ -590,6 +590,7 @@ const hasPath = (path: string): boolean =>
         ) !== undefined,
   )
 
+export const DELETE = Symbol('delete')
 const deep = (value: any, prefix = ''): any => {
   const isArr = Array.isArray(value)
   if (isArr || isPojo(value)) {
@@ -602,60 +603,65 @@ const deep = (value: any, prefix = ''): any => {
     const keys = signal(0)
     return new Proxy(deepObj, {
       get: (_, prop: string) => {
-        if (prop === 'toJSON' && !Object.hasOwn(deepObj, prop)) {
-          return
+        if (!(prop === 'toJSON' && !Object.hasOwn(deepObj, prop))) {
+          if (isArr && prop in Array.prototype) {
+            keys()
+            return deepObj[prop]
+          } else {
+            if (!Object.hasOwn(deepObj, prop) || deepObj[prop]() == null) {
+              deepObj[prop] = signal('')
+              dispatch({ [prefix + prop]: '' })
+              keys(keys() + 1)
+            }
+            return deepObj[prop]()
+          }
         }
-        if (isArr && prop in Array.prototype) {
-          keys()
-          return deepObj[prop]
-        }
-        if (!Object.hasOwn(deepObj, prop)) {
-          deepObj[prop] = signal('')
-          dispatch({ [prefix + prop]: '' })
-          keys(keys() + 1)
-        }
-        return deepObj[prop]()
       },
       set: (_, prop: string, newValue) => {
-        if (isArr && prop === 'length') {
-          deepObj[prop] = newValue
-          dispatch({ [prefix.slice(0, -1)]: deepObj })
-          keys(keys() + 1)
-          return true
-        }
-
-        if (Object.hasOwn(deepObj, prop)) {
-          if (newValue === null || newValue === undefined) {
+        if (newValue === DELETE) {
+          if (Object.hasOwn(deepObj, prop)) {
             delete deepObj[prop]
-            dispatch({ [prefix + prop]: null })
+            dispatch({ [prefix + prop]: DELETE })
             keys(keys() + 1)
-            return true
-          }
-          if (deepObj[prop](deep(newValue, `${prefix + prop}.`))) {
-            dispatch({ [prefix + prop]: newValue })
           }
         } else {
-          if (newValue === null || newValue === undefined) {
-            return true
-          }
-          if (Object.hasOwn(newValue, computedSymbol)) {
+          if (isArr && prop === 'length') {
             deepObj[prop] = newValue
-            dispatch({ [prefix + prop]: '' })
+            dispatch({ [prefix.slice(0, -1)]: deepObj })
+            keys(keys() + 1)
           } else {
-            deepObj[prop] = signal(deep(newValue, `${prefix + prop}.`))
-            dispatch({ [prefix + prop]: newValue })
+            if (Object.hasOwn(deepObj, prop)) {
+              if (newValue == null) {
+                if (deepObj[prop](null)) {
+                  dispatch({ [prefix + prop]: null })
+                }
+              } else {
+                if (deepObj[prop](deep(newValue, `${prefix + prop}.`))) {
+                  dispatch({ [prefix + prop]: newValue })
+                }
+              }
+            } else {
+              if (newValue != null) {
+                if (Object.hasOwn(newValue, computedSymbol)) {
+                  deepObj[prop] = newValue
+                  dispatch({ [prefix + prop]: '' })
+                } else {
+                  deepObj[prop] = signal(deep(newValue, `${prefix + prop}.`))
+                  dispatch({ [prefix + prop]: newValue })
+                }
+                keys(keys() + 1)
+              }
+            }
           }
-
-          keys(keys() + 1)
         }
 
         return true
       },
       deleteProperty: (_, prop: string) => {
         if (Object.hasOwn(deepObj, prop)) {
-          delete deepObj[prop]
-          dispatch({ [prefix + prop]: null })
-          keys(keys() + 1)
+          if (deepObj[prop](null)) {
+            dispatch({ [prefix + prop]: null })
+          }
         }
 
         return true
@@ -694,7 +700,7 @@ const mergePatch = (
 ): void => {
   startBatch()
   for (const key in patch) {
-    if (patch[key] === null || patch[key] === undefined) {
+    if (patch[key] == null) {
       if (!ifMissing) {
         delete root[key]
       }
@@ -723,7 +729,7 @@ const mergeInner = (
     }
 
     for (const key in patch) {
-      if (patch[key] === null || patch[key] === undefined) {
+      if (patch[key] == null) {
         if (!ifMissing) {
           delete targetParent[target][key]
         }
@@ -900,7 +906,9 @@ function applyAttributePlugin(
       rx: 0 as any,
     }
     ctx.runtimeErr = runtimeErr.bind(0, ctx)
-    ctx.rx = generateReactiveExpression(ctx)
+    if (plugin.shouldEvaluate === undefined || plugin.shouldEvaluate === true) {
+      ctx.rx = generateReactiveExpression(ctx)
+    }
 
     // Check the requirements
     const keyReq = plugin.keyReq || 'allowed'
@@ -1008,7 +1016,7 @@ function generateReactiveExpression(
   const attrPlugin = (ctx.plugin as AttributePlugin) || undefined
 
   // plugin is guaranteed to be an attribute plugin
-  if (attrPlugin?.isExpr) {
+  if (attrPlugin?.returnsValue) {
     // This regex allows Datastar expressions to support nested
     // regex and strings that contain ; without breaking.
     //
@@ -1044,19 +1052,8 @@ function generateReactiveExpression(
     expr = ctx.value.trim()
   }
 
-  // Handle $$ syntax - converts $$signal to $context.signal for context signals
   expr = expr.replace(
-    // Regex: matches $$ followed by valid signal names (including nested like $$foo.bar)
-    /\$\$([a-zA-Z_][\w.-]*(?:\.[a-zA-Z_][\w.-]*)*?)(?=\s|$|[^\w.-])/g,
-    // s = captured signal name after $$
-    (_, s) => {
-      const scope = findClosestScoped(ctx.el)
-      return scope ? `$${scope}.${s}` : `$${s}` // if no scope: $signal for global scope
-    },
-  )
-
-  expr = expr.replace(
-    /\$([a-zA-Z_][\w.-]*(?:\.[a-zA-Z_][\w.-]*)*?)(?=\s|$|[^\w.-])/g,
+    /\$([\w.-]+(?:\.[\w.-]+)*?)(?=\s|$|[^\w.-])/g,
     (match, signalName) => {
       // If the signal name ends with a hyphen followed by a $, it's likely two separate signals
       // So we should not include the trailing hyphen in this signal name

@@ -1,5 +1,4 @@
-import type { HTMLOrSVG, Modifiers } from '../engine/types'
-import { findClosestScoped } from './dom'
+import type { Modifiers } from '../engine/types'
 
 export const isBoolString = (str: string) => str.trim() === 'true'
 
@@ -36,18 +35,4 @@ export function modifyCasing(str: string, mods: Modifiers) {
     if (fn) str = fn(str)
   }
   return str
-}
-
-export function modifyScope(
-  signalName: string,
-  el: HTMLOrSVG,
-  mods: Modifiers,
-) {
-  if (mods.has('scoped')) {
-    const scope = findClosestScoped(el)
-    if (scope) {
-      signalName = `${scope}.${signalName}`
-    }
-  }
-  return signalName
 }

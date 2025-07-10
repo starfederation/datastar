@@ -35,36 +35,32 @@ export const DefaultPatchSignalsOnlyIfMissing = false;
 
 // #region Enums
 
-// The mode in which an element is patched into the DOM.
-export const ElementPatchModes = {
-    // Morphs the element into the existing element.
-    Outer: "outer",
-    // Replaces the inner HTML of the existing element.
-    Inner: "inner",
-    // Removes the existing element.
-    Remove: "remove",
-    // Replaces the existing element with the new element.
-    Replace: "replace",
-    // Prepends the element inside to the existing element.
-    Prepend: "prepend",
-    // Appends the element inside the existing element.
-    Append: "append",
-    // Inserts the element before the existing element.
-    Before: "before",
-    // Inserts the element after the existing element.
-    After: "after",
-} as const;
+// The mode in which a element is patched into the DOM.
+// Morphs the element into the existing element.
+export const ElementPatchModeOuter = "outer"
+// Replaces the inner HTML of the existing element.
+export const ElementPatchModeInner = "inner"
+// Removes the existing element.
+export const ElementPatchModeRemove = "remove"
+// Replaces the existing element with the new element.
+export const ElementPatchModeReplace = "replace"
+// Prepends the element inside to the existing element.
+export const ElementPatchModePrepend = "prepend"
+// Appends the element inside the existing element.
+export const ElementPatchModeAppend = "append"
+// Inserts the element before the existing element.
+export const ElementPatchModeBefore = "before"
+// Inserts the element after the existing element.
+export const ElementPatchModeAfter = "after"
 
 // Default value for ElementPatchMode
-export const DefaultElementPatchMode = ElementPatchModes.Outer;
+export const DefaultElementPatchMode = ElementPatchModeOuter;
 
 // The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
-export const EventTypes = {
-    // An event for patching HTML elements into the DOM.
-    PatchElements: "datastar-patch-elements",
-    // An event for patching signals.
-    PatchSignals: "datastar-patch-signals",
-} as const;
+// An event for patching HTML elements into the DOM.
+export const EventTypePatchElements = "datastar-patch-elements"
+// An event for patching signals.
+export const EventTypePatchSignals = "datastar-patch-signals"
 // #endregion
 
 // #endregion
