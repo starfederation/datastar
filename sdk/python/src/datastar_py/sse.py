@@ -150,8 +150,7 @@ class ServerSentEventGenerator:
             signals if isinstance(signals, str) else json.dumps(signals, separators=(",", ":"))
         )
         data_lines.extend(
-            f"{consts.SIGNALS_DATALINE_LITERAL} {line}"
-            for line in signals_str.splitlines()
+            f"{consts.SIGNALS_DATALINE_LITERAL} {line}" for line in signals_str.splitlines()
         )
 
         return ServerSentEventGenerator._send(

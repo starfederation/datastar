@@ -1,16 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from collections.abc import Awaitable, Mapping
+from functools import wraps
+from typing import Any, Callable, ParamSpec
 
 from django.http import HttpRequest
 from django.http import StreamingHttpResponse as _StreamingHttpResponse
 
 from . import _read_signals
 from .sse import SSE_HEADERS, DatastarEvent, DatastarEvents, ServerSentEventGenerator
-
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-
 
 __all__ = [
     "SSE_HEADERS",
@@ -40,6 +38,27 @@ class DatastarResponse(_StreamingHttpResponse):
         if isinstance(content, DatastarEvent):
             content = (content,)
         super().__init__(content, status=status, headers=headers)
+
+
+P = ParamSpec("P")
+
+
+def datastar_response(
+    func: Callable[P, Awaitable[DatastarEvents] | DatastarEvents],
+) -> Callable[P, Awaitable[DatastarResponse]]:
+    """A decorator which wraps a function result in DatastarResponse.
+
+    Can be used on a sync or async function or generator function.
+    """
+
+    @wraps(func)
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> DatastarResponse:
+        r = func(*args, **kwargs)
+        if isinstance(r, Awaitable):
+            return DatastarResponse(await r)
+        return DatastarResponse(r)
+
+    return wrapper
 
 
 def read_signals(request: HttpRequest) -> dict[str, Any] | None:

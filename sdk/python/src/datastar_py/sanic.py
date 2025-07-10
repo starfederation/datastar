@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from collections.abc import Awaitable, Collection, Mapping
+from functools import wraps
+from inspect import isasyncgen, isgenerator
+from typing import Any, Callable, ParamSpec
 
 from sanic import HTTPResponse, Request
 
 from . import _read_signals
-from .sse import SSE_HEADERS, DatastarEvent, ServerSentEventGenerator
-
-if TYPE_CHECKING:
-    from collections.abc import Collection, Mapping
+from .sse import SSE_HEADERS, DatastarEvent, DatastarEvents, ServerSentEventGenerator
 
 __all__ = [
     "SSE_HEADERS",
@@ -50,6 +50,42 @@ async def datastar_respond(
     request: Request, *, status: int = 200, headers: Mapping[str, str] | None = None
 ) -> DatastarResponse:
     return await request.respond(DatastarResponse(status=status, headers=headers))
+
+
+P = ParamSpec("P")
+
+
+def datastar_response(
+    func: Callable[P, Awaitable[DatastarEvents] | DatastarEvents],
+) -> Callable[P, Awaitable[DatastarResponse]]:
+    """A decorator which wraps a function result in DatastarResponse.
+
+    Can be used on a sync or async function or generator function.
+    """
+
+    @wraps(func)
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> DatastarResponse:
+        r = func(*args, **kwargs)
+        if isinstance(r, Awaitable):
+            return DatastarResponse(await r)
+        if isasyncgen(r):
+            request = args[0]
+            response = await request.respond(response=DatastarResponse())
+            async for event in r:
+                await response.send(event)
+            await response.eof()
+            return response
+        if isgenerator(r):
+            request = args[0]
+            response = await request.respond(response=DatastarResponse())
+            for event in r:
+                await response.send(event)
+            await response.eof()
+            return response
+        return DatastarResponse(r)
+
+    wrapper.__annotations__["return"] = "DatastarResponse"
+    return wrapper
 
 
 async def read_signals(request: Request) -> dict[str, Any] | None:
