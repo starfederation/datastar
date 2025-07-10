@@ -39,25 +39,4 @@ Read the [Getting Started Guide »](https://data-star.dev/guide/getting_started)
 
 Read the [Contribution Guidelines »](https://github.com/starfederation/datastar/blob/develop/CONTRIBUTING.md)
 
-## Custom Plugins
-
-You can manually add your own plugins to the core:
-
-```html
-<script type="importmap">
-{
-    "imports": {
-      "datastar": "https://cdn.jsdelivr.net/gh/starfederation/datastar/bundles/datastar.js"
-    }
-}
-</script>
-<script type="module">
-    import { load } from 'datastar'
-
-    load(
-        // Look ma’, I made a plugin!
-    )
-</script>
-```
-
 [![Star History Chart](https://api.star-history.com/svg?repos=starfederation/datastar&type=Date)](https://www.star-history.com/#starfederation/datastar&Date)
