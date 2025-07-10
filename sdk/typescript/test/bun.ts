@@ -73,31 +73,109 @@ function isEventArray(events) {
 function testEvents(stream, events) {
   events.forEach((event) => {
     const { type, ...e } = event;
+    
+    // Convert camelCase to method calls like Python SDK does
     switch (type) {
-      case "mergeFragments":
-        if (e !== null && typeof e === "object" && "fragments" in e) {
-          const { fragments, ...options } = e;
-          stream.PatchElements(fragments, options || undefined);
-        }
+      case "patchElements":
+        handlePatchElements(stream, e);
         break;
-      case "removeFragments":
-        if (e !== null && typeof e === "object" && "selector" in e) {
-          const { selector, ...options } = e;
-          stream.PatchElements(selector, options || undefined);
-        }
+      case "removeElements":
+        handleRemoveElements(stream, e);
         break;
-      case "mergeSignals":
-        if (e !== null && typeof e === "object" && "signals" in e) {
-          const { signals, ...options } = e;
-          stream.PatchSignals(JSON.stringify(signals), options || undefined);
-        }
+      case "patchSignals":
+        handlePatchSignals(stream, e);
         break;
       case "removeSignals":
-        if (e !== null && typeof e === "object" && "paths" in e) {
-          const { paths, ...options } = e;
-          stream.PatchSignals(JSON.stringify(paths), options || undefined);
-        }
+        handleRemoveSignals(stream, e);
+        break;
+      case "executeScript":
+        handleExecuteScript(stream, e);
+        break;
+      // Legacy support for old event types
+      case "mergeFragments":
+        handlePatchElements(stream, { ...e, mode: e.mode || "outer" });
+        break;
+      case "removeFragments":
+        handleRemoveElements(stream, e);
+        break;
+      case "mergeSignals":
+        handlePatchSignals(stream, e);
         break;
     }
   });
+}
+
+function handlePatchElements(stream, e) {
+  if (e !== null && typeof e === "object") {
+    const { elements, mode, selector, useViewTransition, ...options } = e;
+    
+    // Build patch options
+    const patchOptions = { ...options };
+    if (mode && mode !== "outer") patchOptions.mode = mode;
+    if (selector) patchOptions.selector = selector;
+    if (useViewTransition !== undefined) patchOptions.useViewTransition = useViewTransition;
+    
+    // For remove mode, elements might be empty which is fine
+    const elementsToUse = elements || "";
+    stream.PatchElements(elementsToUse, patchOptions);
+  }
+}
+
+function handleRemoveElements(stream, e) {
+  if (e !== null && typeof e === "object" && "selector" in e) {
+    const { selector, ...options } = e;
+    stream.PatchElements("", { ...options, mode: "remove", selector: selector });
+  }
+}
+
+function handlePatchSignals(stream, e) {
+  if (e !== null && typeof e === "object") {
+    const { signals, "signals-raw": signalsRaw, ...options } = e;
+    
+    if (signalsRaw) {
+      stream.PatchSignals(signalsRaw, options || undefined);
+    } else if (signals) {
+      stream.PatchSignals(JSON.stringify(signals), options || undefined);
+    }
+  }
+}
+
+function handleRemoveSignals(stream, e) {
+  if (e !== null && typeof e === "object" && "paths" in e) {
+    const { paths, ...options } = e;
+    const pathArray = paths;
+    const removeSignals = {};
+    pathArray.forEach(path => {
+      removeSignals[path] = null;
+    });
+    stream.PatchSignals(JSON.stringify(removeSignals), options || undefined);
+  }
+}
+
+function handleExecuteScript(stream, e) {
+  if (e !== null && typeof e === "object" && "script" in e) {
+    const { script, autoRemove = true, attributes, ...options } = e;
+    let scriptElement = `<script`;
+    
+    // Add auto-remove behavior first (Python SDK pattern)
+    if (autoRemove) {
+      scriptElement += ` data-effect="el.remove()"`;
+    }
+    
+    // Add attributes if provided
+    if (attributes && typeof attributes === "object") {
+      for (const [key, value] of Object.entries(attributes)) {
+        scriptElement += ` ${key}="${value}"`;
+      }
+    }
+    
+    scriptElement += `>${script}</script>`;
+    
+    // Use append mode with body selector (Python SDK pattern)
+    stream.PatchElements(scriptElement, { 
+      mode: "append", 
+      selector: "body",
+      ...options 
+    });
+  }
 } 

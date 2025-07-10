@@ -93,7 +93,7 @@ export abstract class ServerSentEventGenerator {
       dataLines.map((data) => {
         return `data: ${data}\n`;
       }),
-      ["\n\n"],
+      ["\n"],
     );
   }
 
@@ -135,9 +135,6 @@ export abstract class ServerSentEventGenerator {
     elements: string,
     options?: PatchElementsOptions,
   ): ReturnType<typeof this.send> {
-    // Validate required parameters
-    this.validateRequired(elements, 'elements');
-
     const { eventId, retryDuration, ...renderOptions } = options ||
       {} as Partial<PatchElementsOptions>;
 
@@ -147,9 +144,17 @@ export abstract class ServerSentEventGenerator {
       this.validateElementPatchMode(patchMode);
     }
 
+    // Check if we're in remove mode with a selector
+    const selector = (renderOptions as Record<string, unknown>)[DatastarDatalineSelector] as string;
+    const isRemoveWithSelector = patchMode === 'remove' && selector;
+
+    // Validate required parameters - elements only required when not removing with selector
+    if (!isRemoveWithSelector) {
+      this.validateRequired(elements, 'elements');
+    }
+
     // Per spec: If no selector specified, elements must have IDs (this validation would be complex
     // and is better handled client-side, but we ensure elements is not empty)
-    const selector = (renderOptions as Record<string, unknown>)[DatastarDatalineSelector] as string;
     if (!selector && patchMode === 'remove') {
       // For remove mode, elements parameter may be omitted when selector is supplied
       // but since we have no selector, we need elements with IDs
@@ -158,8 +163,11 @@ export abstract class ServerSentEventGenerator {
       }
     }
 
-    const dataLines = this.eachOptionIsADataLine(renderOptions)
-      .concat(this.eachNewlineIsADataLine(DatastarDatalineElements, elements));
+    // Build data lines - skip elements data line if empty in remove mode with selector
+    const dataLines = this.eachOptionIsADataLine(renderOptions);
+    if (!isRemoveWithSelector || elements.trim() !== '') {
+      dataLines.push(...this.eachNewlineIsADataLine(DatastarDatalineElements, elements));
+    }
 
     return this.send("datastar-patch-elements", dataLines, {
       eventId,

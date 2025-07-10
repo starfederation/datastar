@@ -94,9 +94,9 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
   ): string[] {
     const eventLines = super.send(event, dataLines, options);
 
-    eventLines.forEach((line) => {
-      this.controller?.enqueue(new TextEncoder().encode(line));
-    });
+    // Join all lines and encode as a single chunk to avoid extra newlines
+    const eventText = eventLines.join('');
+    this.controller?.enqueue(new TextEncoder().encode(eventText));
 
     return eventLines;
   }

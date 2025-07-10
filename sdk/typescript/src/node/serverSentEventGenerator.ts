@@ -87,9 +87,9 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
   ): string[] {
     const eventLines = super.send(event, dataLines, options);
 
-    eventLines.forEach((line) => {
-      this.res.write(line);
-    });
+    // Join all lines and write as a single chunk to avoid extra newlines
+    const eventText = eventLines.join('');
+    this.res.write(eventText);
 
     return eventLines;
   }
