@@ -14,7 +14,7 @@ Datastar helps you build reactive web applications with the simplicity of server
 Getting started is as easy as adding a single 10.41 KiB script tag to your HTML.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-RC.1/bundles/datastar.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>
 ```
 
 Then start adding frontend reactivity using declarative <code>data-*</code> attributes.
