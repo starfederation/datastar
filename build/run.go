@@ -78,10 +78,6 @@ func writeOutConsts(version string) error {
 	})
 
 	templates := map[string]func(data *ConstTemplateData) string{
-		"README.md":                    datastarREADME,
-		"library/README.md":            datastarREADME,
-		"library/src/engine/consts.ts": datastarClientConsts,
-		"library/package.json":         datastarClientPackageJSON,
 		"sdk/clojure/sdk/src/main/starfederation/datastar/clojure/consts.clj": clojureConsts,
 		"sdk/go/datastar/consts.go":                                                        goConsts,
 		"sdk/dotnet/fsharp/src/Consts.fs":                                                  fsharpConsts,
