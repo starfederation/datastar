@@ -1,6 +1,5 @@
-using System.Text.Json;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
-using StarFederation.Datastar;
 using StarFederation.Datastar.DependencyInjection;
 
 namespace HelloWorld;
@@ -14,7 +13,7 @@ public class Program
         public float? Delay { get; set; } = null;
     }
 
-    public const string Message = "Hello, World!";
+    public const string Message = "Hello, world!";
 
     public static void Main(string[] args)
     {
@@ -24,18 +23,20 @@ public class Program
         WebApplication app = builder.Build();
         app.UseStaticFiles();
 
-        app.MapGet("/hello-world", async (IDatastarServerSentEventService sse, IDatastarSignalsReaderService signals) =>
+        app.MapGet("/hello-world", async (IDatastarService datastarService) =>
         {
-            Signals mySignals = await signals.ReadSignalsAsync<Signals>();
+            Signals? mySignals = await datastarService.ReadSignalsAsync<Signals>();
+            Debug.Assert(mySignals != null, nameof(mySignals) + " != null");
+
             for (int index = 0; index < Message.Length; ++index)
             {
-                await sse.MergeFragmentsAsync($"""<div id="message">{Message[..index]}</div>""");
+                await datastarService.PatchElementsAsync($"""<div id="message">{Message[..index]}</div>""");
                 if (!char.IsWhiteSpace(Message[index]))
                 {
                     await Task.Delay(TimeSpan.FromMilliseconds(mySignals.Delay.GetValueOrDefault(0)));
                 }
             }
-            await sse.MergeFragmentsAsync($"""<div id="message">{Message}</div>""");
+            await datastarService.PatchElementsAsync($"""<div id="message">{Message}</div>""");
         });
 
         app.Run();

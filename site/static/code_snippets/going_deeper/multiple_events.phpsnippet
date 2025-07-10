@@ -1,8 +1,0 @@
-use starfederation\datastar\ServerSentEventGenerator;
-
-// Creates a new `ServerSentEventGenerator` instance.
-$sse = new ServerSentEventGenerator();
-
-$sse->mergeFragments('<div id="hello">Hello, world!</div>');
-$sse->mergeSignals(['foo' => ['bar' => 1]]);
-$sse->executeScript('console.log("Success!")');

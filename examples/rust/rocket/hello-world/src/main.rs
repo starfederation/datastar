@@ -1,10 +1,9 @@
 use {
     core::time::Duration,
-    datastar::{Sse, prelude::MergeFragments},
+    datastar::prelude::PatchElements,
     rocket::{
-        futures::Stream,
         get, launch,
-        response::{content::RawHtml, stream::stream},
+        response::{content::RawHtml, stream::EventStream},
         routes,
         serde::{Deserialize, json::Json},
     },
@@ -29,11 +28,16 @@ struct Signals {
 }
 
 #[get("/hello-world?<datastar>")]
-fn hello_world(datastar: Json<Signals>) -> Sse<impl Stream<Item = MergeFragments>> {
-    Sse(stream! {
+fn hello_world(datastar: Json<Signals>) -> EventStream![] {
+    EventStream! {
         for i in 0..MESSAGE.len() {
-            yield MergeFragments::new(format!("<div id='message'>{}</div>", &MESSAGE[0..i+1]));
+            let elements = format!("<div id='message'>{}</div>", &MESSAGE[0..i + 1]);
+            let patch = PatchElements::new(elements);
+            let sse_event = patch.write_as_rocket_sse_event();
+
+            yield sse_event;
+
             rocket::tokio::time::sleep(Duration::from_millis(datastar.delay)).await;
         }
-    })
+    }
 }

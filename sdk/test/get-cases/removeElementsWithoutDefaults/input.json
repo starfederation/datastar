@@ -1,0 +1,9 @@
+{
+  "events": [
+    {
+      "type": "patchElements",
+      "selector": "#target",
+      "mode": "remove"
+    }
+  ]
+}

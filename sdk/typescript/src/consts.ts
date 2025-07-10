@@ -2,7 +2,7 @@
 
 export const DATASTAR = "datastar" as const;
 export const DATASTAR_REQUEST = "Datastar-Request";
-export const VERSION = "1.0.0-beta.11";
+export const VERSION = "1.0.0-RC.13";
 
 // #region Defaults
 
@@ -16,77 +16,62 @@ export const DefaultSseRetryDurationMs = 1000;
 
 // #region Default strings
 
-// The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
-export const DefaultExecuteScriptAttributes = "type module";
 
 // #endregion
 
 
 // #region Default booleans
 
-// Should fragments be merged using the ViewTransition API?
-export const DefaultFragmentsUseViewTransitions = false;
+// Should elements be patched using the ViewTransition API?
+export const DefaultElementsUseViewTransitions = false;
 
-// Should a given set of signals merge if they are missing?
-export const DefaultMergeSignalsOnlyIfMissing = false;
-
-// Should script element remove itself after execution?
-export const DefaultExecuteScriptAutoRemove = true;
+// Should a given set of signals patch if they are missing?
+export const DefaultPatchSignalsOnlyIfMissing = false;
 
 // #endregion
 
 // #region Datalines
 
 export const DatastarDatalineSelector = "selector"
-export const DatastarDatalineMergeMode = "mergeMode"
-export const DatastarDatalineFragments = "fragments"
+export const DatastarDatalineMode = "mode"
+export const DatastarDatalineElements = "elements"
 export const DatastarDatalineUseViewTransition = "useViewTransition"
 export const DatastarDatalineSignals = "signals"
 export const DatastarDatalineOnlyIfMissing = "onlyIfMissing"
-export const DatastarDatalinePaths = "paths"
-export const DatastarDatalineScript = "script"
-export const DatastarDatalineAttributes = "attributes"
-export const DatastarDatalineAutoRemove = "autoRemove"
 // #endregion
 
 
 // #region Enums
 
-// The mode in which a fragment is merged into the DOM.
-export const FragmentMergeModes = [
-// Morphs the fragment into the existing element using idiomorph.
-    "morph",
+// The mode in which an element is patched into the DOM.
+export const ElementPatchModes = [
+// Morphs the element into the existing element.
+    "outer",
 // Replaces the inner HTML of the existing element.
     "inner",
-// Replaces the outer HTML of the existing element.
-    "outer",
-// Prepends the fragment to the existing element.
+// Removes the existing element.
+    "remove",
+// Replaces the existing element with the new element.
+    "replace",
+// Prepends the element inside to the existing element.
     "prepend",
-// Appends the fragment to the existing element.
+// Appends the element inside the existing element.
     "append",
-// Inserts the fragment before the existing element.
+// Inserts the element before the existing element.
     "before",
-// Inserts the fragment after the existing element.
+// Inserts the element after the existing element.
     "after",
-// Upserts the attributes of the existing element.
-    "upsertAttributes",
 ] as const;
 
-// Default value for FragmentMergeMode
-export const DefaultFragmentMergeMode = "morph";
+// Default value for ElementPatchMode
+export const DefaultElementPatchMode = "outer";
 
 // The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 export const EventTypes = [
-// An event for merging HTML fragments into the DOM.
-    "datastar-merge-fragments",
-// An event for merging signals.
-    "datastar-merge-signals",
-// An event for removing HTML fragments from the DOM.
-    "datastar-remove-fragments",
-// An event for removing signals.
-    "datastar-remove-signals",
-// An event for executing <script/> elements in the browser.
-    "datastar-execute-script",
+// An event for patching HTML elements into the DOM.
+    "datastar-patch-elements",
+// An event for patching signals.
+    "datastar-patch-signals",
 ] as const;
 // #endregion
 

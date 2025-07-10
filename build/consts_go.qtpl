@@ -7,9 +7,9 @@ import "time"
 
 const (
     DatastarKey = "{%s data.DatastarKey %}"
-    Version                   = "{%s data.Version %}"
-    VersionClientByteSize     = {%d data.VersionClientByteSize %}
-    VersionClientByteSizeGzip = {%d data.VersionClientByteSizeGzip %}
+    Version                     = "{%s data.Version %}"
+    VersionClientByteSize       = {%d data.VersionClientByteSize %}
+    VersionClientByteSizeBrotli = {%d data.VersionClientByteSizeBrotli %}
 
     //region Default durations
 

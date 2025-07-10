@@ -1,0 +1,4 @@
+event: datastar-patch-elements
+data: mode remove
+data: selector #target
+

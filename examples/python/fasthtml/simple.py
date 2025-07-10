@@ -41,7 +41,7 @@ async def index():
         Body(data_signals=json.dumps({"currentTime": now}))(
             Div(cls="container")(
                 Div(data_on_load="@get('/updates')", cls="time")(
-                    "Current time from fragment: ",
+                    "Current time from element: ",
                     Span(id="currentTime")(now),
                 ),
                 Div(cls="time")(
@@ -56,9 +56,9 @@ async def index():
 async def clock():
     while True:
         now = datetime.isoformat(datetime.now())
-        yield ServerSentEventGenerator.merge_fragments(Span(id="currentTime")(now))
+        yield ServerSentEventGenerator.patch_elements(Span(id="currentTime")(now))
         await asyncio.sleep(1)
-        yield ServerSentEventGenerator.merge_signals({"currentTime": f"{now}"})
+        yield ServerSentEventGenerator.patch_signals({"currentTime": f"{now}"})
         await asyncio.sleep(1)
 
 

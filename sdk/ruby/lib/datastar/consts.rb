@@ -4,63 +4,54 @@
 module Datastar
   module Consts
     DATASTAR_KEY = 'datastar'
-    VERSION = '1.0.0-beta.11'
+    VERSION = '1.0.0-RC.13'
 
     # The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
     DEFAULT_SSE_RETRY_DURATION = 1000
 
-    # Should fragments be merged using the ViewTransition API?
-    DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS = false
+    # Should elements be patched using the ViewTransition API?
+    DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS = false
 
-    # Should a given set of signals merge if they are missing?
-    DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING = false
+    # Should a given set of signals patch if they are missing?
+    DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING = false
 
-    # Should script element remove itself after execution?
-    DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE = true
+    module ElementPatchMode
 
-    # The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.}
-    DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES = 'type module'
-
-    module FragmentMergeMode
-
-      # Morphs the fragment into the existing element using idiomorph.
-      MORPH = 'morph'
+      # Morphs the element into the existing element.
+      OUTER = 'outer';
 
       # Replaces the inner HTML of the existing element.
-      INNER = 'inner'
+      INNER = 'inner';
 
-      # Replaces the outer HTML of the existing element.
-      OUTER = 'outer'
+      # Removes the existing element.
+      REMOVE = 'remove';
 
-      # Prepends the fragment to the existing element.
-      PREPEND = 'prepend'
+      # Replaces the existing element with the new element.
+      REPLACE = 'replace';
 
-      # Appends the fragment to the existing element.
-      APPEND = 'append'
+      # Prepends the element inside to the existing element.
+      PREPEND = 'prepend';
 
-      # Inserts the fragment before the existing element.
-      BEFORE = 'before'
+      # Appends the element inside the existing element.
+      APPEND = 'append';
 
-      # Inserts the fragment after the existing element.
-      AFTER = 'after'
+      # Inserts the element before the existing element.
+      BEFORE = 'before';
 
-      # Upserts the attributes of the existing element.
-      UPSERT_ATTRIBUTES = 'upsertAttributes'
+      # Inserts the element after the existing element.
+      AFTER = 'after';
     end
 
-    # The mode in which a fragment is merged into the DOM.
-    DEFAULT_FRAGMENT_MERGE_MODE = FragmentMergeMode::MORPH
+
+    # The mode in which an element is patched into the DOM.
+    DEFAULT_ELEMENT_PATCH_MODE = ElementPatchMode::OUTER
 
     # Dataline literals.
     SELECTOR_DATALINE_LITERAL = 'selector'
-    MERGE_MODE_DATALINE_LITERAL = 'mergeMode'
-    FRAGMENTS_DATALINE_LITERAL = 'fragments'
+    MODE_DATALINE_LITERAL = 'mode'
+    ELEMENTS_DATALINE_LITERAL = 'elements'
     USE_VIEW_TRANSITION_DATALINE_LITERAL = 'useViewTransition'
     SIGNALS_DATALINE_LITERAL = 'signals'
     ONLY_IF_MISSING_DATALINE_LITERAL = 'onlyIfMissing'
-    PATHS_DATALINE_LITERAL = 'paths'
-    SCRIPT_DATALINE_LITERAL = 'script'
-    ATTRIBUTES_DATALINE_LITERAL = 'attributes'
-    AUTO_REMOVE_DATALINE_LITERAL = 'autoRemove'
   end
 end

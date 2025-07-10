@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
-from collections.abc import AsyncIterable, Iterable
+from collections.abc import AsyncIterable, Iterable, Mapping
 from itertools import chain
-from typing import Protocol, TypeAlias, Union, runtime_checkable
+from typing import Literal, Protocol, TypeAlias, Union, overload, runtime_checkable
 
 import datastar_py.consts as consts
+from datastar_py.attributes import _escape
 
 SSE_HEADERS: dict[str, str] = {
     "Cache-Control": "no-cache",
@@ -46,142 +47,144 @@ class ServerSentEventGenerator:
         event_id: str | None = None,
         retry_duration: int | None = None,
     ) -> DatastarEvent:
-        prefix = []
+        prefix = [f"event: {event_type}"]
+
         if event_id:
             prefix.append(f"id: {event_id}")
 
-        prefix.append(f"event: {event_type}")
-
-        if retry_duration:
+        if retry_duration and retry_duration != consts.DEFAULT_SSE_RETRY_DURATION:
             prefix.append(f"retry: {retry_duration}")
 
         data_lines = [f"data: {line}" for line in data_lines]
 
         return DatastarEvent("\n".join(chain(prefix, data_lines)) + "\n\n")
 
+    @overload
     @classmethod
-    def merge_fragments(
+    def patch_elements(
         cls,
-        fragments: str | _HtmlProvider,
+        *,
+        selector: str,
+        mode: Literal[consts.ElementPatchMode.REMOVE],
+        use_view_transitions: bool | None = None,
+        event_id: str | None = None,
+        retry_duration: int | None = None,
+    ) -> DatastarEvent: ...
+    @overload
+    @classmethod
+    def patch_elements(
+        cls,
+        elements: str | _HtmlProvider,
         selector: str | None = None,
-        merge_mode: consts.FragmentMergeMode | None = None,
+        mode: consts.ElementPatchMode | None = None,
+        use_view_transitions: bool | None = None,
+        event_id: str | None = None,
+        retry_duration: int | None = None,
+    ) -> DatastarEvent: ...
+    @classmethod
+    def patch_elements(
+        cls,
+        elements: str | _HtmlProvider | None = None,
+        selector: str | None = None,
+        mode: consts.ElementPatchMode | None = None,
         use_view_transition: bool | None = None,
         event_id: str | None = None,
         retry_duration: int | None = None,
     ) -> DatastarEvent:
-        if isinstance(fragments, _HtmlProvider):
-            fragments = fragments.__html__()
+        if isinstance(elements, _HtmlProvider):
+            elements = elements.__html__()
         data_lines = []
-        if merge_mode:
-            data_lines.append(f"{consts.MERGE_MODE_DATALINE_LITERAL} {merge_mode}")
+        if mode and mode != "outer":  # TODO: Should there be a constant for this?
+            data_lines.append(f"{consts.MODE_DATALINE_LITERAL} {mode}")
         if selector:
             data_lines.append(f"{consts.SELECTOR_DATALINE_LITERAL} {selector}")
-        if use_view_transition is not None:
+        if (
+            use_view_transition is not None
+            and use_view_transition != consts.DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS
+        ):
             data_lines.append(
                 f"{consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} {_js_bool(use_view_transition)}"
             )
 
-        data_lines.extend(
-            f"{consts.FRAGMENTS_DATALINE_LITERAL} {x}" for x in fragments.splitlines()
-        )
+        if elements:
+            data_lines.extend(
+                f"{consts.ELEMENTS_DATALINE_LITERAL} {x}" for x in elements.splitlines()
+            )
 
         return ServerSentEventGenerator._send(
-            consts.EventType.MERGE_FRAGMENTS,
+            consts.EventType.PATCH_ELEMENTS,
             data_lines,
             event_id,
             retry_duration,
         )
 
     @classmethod
-    def remove_fragments(
-        cls,
-        selector: str | None = None,
-        use_view_transition: bool | None = None,
-        event_id: str | None = None,
-        retry_duration: int | None = None,
+    def remove_elements(
+        cls, selector: str, event_id: str | None = None, retry_duration: int | None = None
     ) -> DatastarEvent:
-        data_lines = []
-        if selector:
-            data_lines.append(f"{consts.SELECTOR_DATALINE_LITERAL} {selector}")
-        if use_view_transition is not None:
-            data_lines.append(
-                f"{consts.USE_VIEW_TRANSITION_DATALINE_LITERAL} {_js_bool(use_view_transition)}"
-            )
-
-        return ServerSentEventGenerator._send(
-            consts.EventType.REMOVE_FRAGMENTS,
-            data_lines,
-            event_id,
-            retry_duration,
+        return ServerSentEventGenerator.patch_elements(
+            selector=selector,
+            mode=consts.ElementPatchMode.REMOVE,
+            event_id=event_id,
+            retry_duration=retry_duration,
         )
 
     @classmethod
-    def merge_signals(
+    def patch_signals(
         cls,
-        signals: dict,
+        signals: dict | str,
         event_id: str | None = None,
         only_if_missing: bool | None = None,
         retry_duration: int | None = None,
     ) -> DatastarEvent:
         data_lines = []
-        if only_if_missing is not None:
+        if (
+            only_if_missing is not None
+            and only_if_missing != consts.DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING
+        ):
             data_lines.append(
                 f"{consts.ONLY_IF_MISSING_DATALINE_LITERAL} {_js_bool(only_if_missing)}"
             )
 
-        data_lines.append(f"{consts.SIGNALS_DATALINE_LITERAL} {json.dumps(signals)}")
-
-        return ServerSentEventGenerator._send(
-            consts.EventType.MERGE_SIGNALS, data_lines, event_id, retry_duration
+        signals_str = (
+            signals if isinstance(signals, str) else json.dumps(signals, separators=(",", ":"))
+        )
+        data_lines.extend(
+            f"{consts.SIGNALS_DATALINE_LITERAL} {line}"
+            for line in signals_str.splitlines()
         )
 
-    @classmethod
-    def remove_signals(
-        cls,
-        paths: list[str],
-        event_id: str | None = None,
-        retry_duration: int | None = None,
-    ) -> DatastarEvent:
-        data_lines = [f"{consts.PATHS_DATALINE_LITERAL} {path}" for path in paths]
-
         return ServerSentEventGenerator._send(
-            consts.EventType.REMOVE_SIGNALS,
-            data_lines,
-            event_id,
-            retry_duration,
+            consts.EventType.PATCH_SIGNALS, data_lines, event_id, retry_duration
         )
 
     @classmethod
     def execute_script(
         cls,
         script: str,
-        auto_remove: bool | None = None,
-        attributes: list[str] | None = None,
+        auto_remove: bool = True,
+        attributes: Mapping[str, str] | list[str] | None = None,
         event_id: str | None = None,
         retry_duration: int | None = None,
     ) -> DatastarEvent:
-        data_lines = []
-
-        if auto_remove is not None:
-            data_lines.append(f"{consts.AUTO_REMOVE_DATALINE_LITERAL} {_js_bool(auto_remove)}")
-
+        attribute_string = ""
+        if auto_remove:
+            attribute_string += ' data-effect="el.remove()"'
         if attributes:
-            data_lines.extend(
-                f"{consts.ATTRIBUTES_DATALINE_LITERAL} {attribute}"
-                for attribute in attributes
-                if attribute.strip() != consts.DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES
-            )
+            if isinstance(attributes, Mapping):
+                attribute_string += " " + " ".join(
+                    f'{_escape(k)}="{_escape(v)}"' for k, v in attributes.items()
+                )
+            else:
+                attribute_string += " " + " ".join(attributes)
+        script_tag = f"<script{attribute_string}>{script}</script>"
 
-        data_lines.extend(
-            f"{consts.SCRIPT_DATALINE_LITERAL} {script_line}"
-            for script_line in script.splitlines()
-        )
-
-        return ServerSentEventGenerator._send(
-            consts.EventType.EXECUTE_SCRIPT,
-            data_lines,
-            event_id,
-            retry_duration,
+        return ServerSentEventGenerator.patch_elements(
+            script_tag,
+            mode=consts.ElementPatchMode.APPEND,
+            selector="body",
+            event_id=event_id,
+            retry_duration=retry_duration,
         )
 
     @classmethod

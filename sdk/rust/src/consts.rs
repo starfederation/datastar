@@ -8,7 +8,7 @@ pub(crate) const DATASTAR_KEY: &str = "datastar";
 #[allow(unused)]
 pub(crate) const DATASTAR_REQ_HEADER_STR: &str = "datastar-request";
 #[expect(unused)]
-pub(crate) const VERSION: &str = "1.0.0-beta.11";
+pub(crate) const VERSION: &str = "1.0.0-RC.13";
 
 // #region Defaults
 
@@ -21,100 +21,82 @@ pub const DEFAULT_SSE_RETRY_DURATION: u64 = 1000;
 
 // #region Default strings
 
-/// The default attributes for <script/> element use when executing scripts. It is a set of key-value pairs delimited by a newline \\n character.
-pub(crate) const DEFAULT_EXECUTE_SCRIPT_ATTRIBUTES: &str = "type module";
-
 // #endregion
 
 // #region Datalines
 
 pub(crate) const SELECTOR_DATALINE_LITERAL: &str = "selector";
-pub(crate) const MERGE_MODE_DATALINE_LITERAL: &str = "mergeMode";
-pub(crate) const FRAGMENTS_DATALINE_LITERAL: &str = "fragments";
+pub(crate) const MODE_DATALINE_LITERAL: &str = "mode";
+pub(crate) const ELEMENTS_DATALINE_LITERAL: &str = "elements";
 pub(crate) const USE_VIEW_TRANSITION_DATALINE_LITERAL: &str = "useViewTransition";
 pub(crate) const SIGNALS_DATALINE_LITERAL: &str = "signals";
 pub(crate) const ONLY_IF_MISSING_DATALINE_LITERAL: &str = "onlyIfMissing";
-pub(crate) const PATHS_DATALINE_LITERAL: &str = "paths";
-pub(crate) const SCRIPT_DATALINE_LITERAL: &str = "script";
-pub(crate) const ATTRIBUTES_DATALINE_LITERAL: &str = "attributes";
-pub(crate) const AUTO_REMOVE_DATALINE_LITERAL: &str = "autoRemove";
 
 // #endregion
 
 // #region Default booleans
 
-/// Should fragments be merged using the ViewTransition API?
-pub(crate) const DEFAULT_FRAGMENTS_USE_VIEW_TRANSITIONS: bool = false;
-/// Should a given set of signals merge if they are missing?
-pub(crate) const DEFAULT_MERGE_SIGNALS_ONLY_IF_MISSING: bool = false;
-/// Should script element remove itself after execution?
-pub(crate) const DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE: bool = true;
+/// Should elements be patched using the ViewTransition API?
+pub(crate) const DEFAULT_ELEMENTS_USE_VIEW_TRANSITIONS: bool = false;
+/// Should a given set of signals patch if they are missing?
+pub(crate) const DEFAULT_PATCH_SIGNALS_ONLY_IF_MISSING: bool = false;
 
 // #endregion
 
 // #region Enums
 
-/// The mode in which a fragment is merged into the DOM.
+/// The mode in which an element is patched into the DOM.
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum FragmentMergeMode {
-    /// Morphs the fragment into the existing element using idiomorph.
+pub enum ElementPatchMode {
+    /// Morphs the element into the existing element.
     #[default]
-    Morph,
+    Outer,
     /// Replaces the inner HTML of the existing element.
     Inner,
-    /// Replaces the outer HTML of the existing element.
-    Outer,
-    /// Prepends the fragment to the existing element.
+    /// Removes the existing element.
+    Remove,
+    /// Replaces the existing element with the new element.
+    Replace,
+    /// Prepends the element inside to the existing element.
     Prepend,
-    /// Appends the fragment to the existing element.
+    /// Appends the element inside the existing element.
     Append,
-    /// Inserts the fragment before the existing element.
+    /// Inserts the element before the existing element.
     Before,
-    /// Inserts the fragment after the existing element.
+    /// Inserts the element after the existing element.
     After,
-    /// Upserts the attributes of the existing element.
-    UpsertAttributes,
 }
 
-impl FragmentMergeMode {
-    /// Returns the [`FragmentMergeMode`] as a string.
+impl ElementPatchMode {
+    /// Returns the [`ElementPatchMode`] as a string.
     pub(crate) const fn as_str(&self) -> &str {
         match self {
-            Self::Morph => "morph",
-            Self::Inner => "inner",
             Self::Outer => "outer",
+            Self::Inner => "inner",
+            Self::Remove => "remove",
+            Self::Replace => "replace",
             Self::Prepend => "prepend",
             Self::Append => "append",
             Self::Before => "before",
             Self::After => "after",
-            Self::UpsertAttributes => "upsertAttributes",
         }
     }
 }
 /// The type protocol on top of SSE which allows for core pushed based communication between the server and the client.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum EventType {
-    /// An event for merging HTML fragments into the DOM.
-    MergeFragments,
-    /// An event for merging signals.
-    MergeSignals,
-    /// An event for removing HTML fragments from the DOM.
-    RemoveFragments,
-    /// An event for removing signals.
-    RemoveSignals,
-    /// An event for executing <script/> elements in the browser.
-    ExecuteScript,
+    /// An event for patching HTML elements into the DOM.
+    PatchElements,
+    /// An event for patching signals.
+    PatchSignals,
 }
 
 impl EventType {
     /// Returns the [`EventType`] as a string.
     pub(crate) const fn as_str(&self) -> &str {
         match self {
-            Self::MergeFragments => "datastar-merge-fragments",
-            Self::MergeSignals => "datastar-merge-signals",
-            Self::RemoveFragments => "datastar-remove-fragments",
-            Self::RemoveSignals => "datastar-remove-signals",
-            Self::ExecuteScript => "datastar-execute-script",
+            Self::PatchElements => "datastar-patch-elements",
+            Self::PatchSignals => "datastar-patch-signals",
         }
     }
 }

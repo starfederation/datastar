@@ -5,19 +5,12 @@
 
 #[cfg(feature = "axum")]
 pub mod axum;
-#[cfg(feature = "rama")]
-pub mod rama;
 #[cfg(feature = "rocket")]
 pub mod rocket;
 
 pub mod execute_script;
-pub mod merge_fragments;
-pub mod merge_signals;
-pub mod remove_fragments;
-pub mod remove_signals;
-
-#[cfg(test)]
-mod testing;
+pub mod patch_elements;
+pub mod patch_signals;
 
 #[doc = include_str!("../README.md")]
 #[cfg(doctest)]
@@ -28,14 +21,9 @@ pub mod consts;
 
 /// The prelude for the `datastar` crate
 pub mod prelude {
-    #[cfg(feature = "axum")]
-    pub use crate::axum::ReadSignals;
-    #[cfg(all(feature = "rama", not(feature = "axum")))]
-    pub use crate::rama::ReadSignals;
     pub use crate::{
-        DatastarEvent, Sse, TrySse, consts::FragmentMergeMode, execute_script::ExecuteScript,
-        merge_fragments::MergeFragments, merge_signals::MergeSignals,
-        remove_fragments::RemoveFragments, remove_signals::RemoveSignals,
+        DatastarEvent, consts::ElementPatchMode, execute_script::ExecuteScript,
+        patch_elements::PatchElements, patch_signals::PatchSignals,
     };
 }
 
@@ -60,19 +48,19 @@ pub struct DatastarEvent {
 
 impl Display for DatastarEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "event: {}", self.event.as_str())?;
+        write!(f, "event: {}", self.event.as_str())?;
 
         if let Some(id) = &self.id {
-            writeln!(f, "id: {}", id)?;
+            write!(f, "\nid: {id}")?;
         }
 
         let millis = self.retry.as_millis();
         if millis != consts::DEFAULT_SSE_RETRY_DURATION as u128 {
-            writeln!(f, "retry: {}", millis)?;
+            write!(f, "\nretry: {millis}")?;
         }
 
         for line in &self.data {
-            writeln!(f, "data: {}", line)?;
+            write!(f, "\ndata: {line}")?;
         }
 
         write!(f, "\n\n")?;
@@ -80,11 +68,3 @@ impl Display for DatastarEvent {
         Ok(())
     }
 }
-
-/// [`Sse`] is a wrapper around a stream of [`DatastarEvent`]s.
-#[derive(Debug)]
-pub struct Sse<S>(pub S);
-
-/// [`TrySse`] is a wrapper around a stream of [`DatastarEvent`]s that can fail.
-#[derive(Debug)]
-pub struct TrySse<S>(pub S);

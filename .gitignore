@@ -1,3 +1,6 @@
+bundles/datastar-pro*
+library/src/bundles/datastar-pro*
+library/src/plugins/pro
 tailwindcli
 datastar_site
 data
@@ -15,3 +18,4 @@ __debug_bin*
 
 # search index
 /data-star.bleve
+/dev*.md

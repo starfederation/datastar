@@ -1,6 +1,6 @@
 import { snake } from '../utils/text'
 import { DATASTAR } from './consts'
-import { type InitContext, PluginType, type RuntimeContext } from './types'
+import type { InitContext, RuntimeContext } from './types'
 
 const url = 'https://data-star.dev/errors'
 
@@ -29,17 +29,17 @@ export function initErr(reason: string, ctx: InitContext, metadata = {}) {
   const errCtx = {
     plugin: {
       name: ctx.plugin.name,
-      type: PluginType[ctx.plugin.type],
+      type: ctx.plugin.type,
     },
   }
   return dserr('init', reason, Object.assign(errCtx, metadata))
 }
 
-export function runtimeErr(reason: string, ctx: RuntimeContext, metadata = {}) {
+export function runtimeErr(ctx: RuntimeContext, reason: string, metadata = {}) {
   const errCtx = {
     plugin: {
       name: ctx.plugin.name,
-      type: PluginType[ctx.plugin.type],
+      type: ctx.plugin.type,
     },
     element: {
       id: ctx.el.id,
@@ -49,7 +49,7 @@ export function runtimeErr(reason: string, ctx: RuntimeContext, metadata = {}) {
       rawKey: ctx.rawKey,
       key: ctx.key,
       value: ctx.value,
-      validSignals: ctx.signals.paths(),
+      // validSignals:
       fnContent: ctx.fnContent,
     },
   }

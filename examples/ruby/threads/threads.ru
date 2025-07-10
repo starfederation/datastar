@@ -26,7 +26,7 @@ INDEX = <<~HTML
           span { font-weight: bold; }
         }
       </style>
-      <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.2/bundles/datastar.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@release-candidate/bundles/datastar.js"></script>
     </head>
     <body>
       <button#{' '}
@@ -47,10 +47,10 @@ run do |env|
   datastar = Datastar
              .from_rack_env(env)
              .on_connect do |sse|
-    sse.merge_fragments(%(<p id="connection">Connected...</p>))
+    sse.patch_elements(%(<p id="connection">Connected...</p>))
     p ['connect', sse]
   end.on_server_disconnect do |sse|
-    sse.merge_fragments(%(<p id="connection">Done...</p>))
+    sse.patch_elements(%(<p id="connection">Done...</p>))
     p ['server disconnect', sse]
   end.on_client_disconnect do |socket|
     p ['client disconnect', socket]
@@ -67,7 +67,7 @@ run do |env|
         # Raising an error to demonstrate error handling
         # raise ArgumentError, 'This is an error' if i > 5
 
-        sse.merge_fragments(%(<span id="slow">#{i}</span>))
+        sse.patch_elements(%(<span id="slow">#{i}</span>))
       end
     end
 
@@ -75,7 +75,7 @@ run do |env|
     datastar.stream do |sse|
       1000.times do |i|
         sleep 0.01
-        sse.merge_fragments(%(<span id="fast">#{i}</span>))
+        sse.patch_elements(%(<span id="fast">#{i}</span>))
       end
     end
   else

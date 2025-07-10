@@ -17,13 +17,11 @@ class ExecuteScriptTest {
                 .build();
 
         String[] expectedDataLines = {
-                "autoRemove false",
-                "attributes type='module'",
-                "script console.log('Hello World');"
+                "elements <script type='module'>console.log('Hello World');</script>"
         };
 
         assertArrayEquals(expectedDataLines, event.getDataLines());
-        assertEquals(EventType.ExecuteScript.toString(), event.getEventType().toString());
+        assertEquals(EventType.PatchElements, event.getEventType());
     }
 
     @Test
@@ -33,7 +31,7 @@ class ExecuteScriptTest {
                 .build();
 
         String[] expectedDataLines = {
-                "script console.log('Hello World');"
+                "elements <script data-effect=\"el.remove()\">console.log('Hello World');</script>"
         };
 
         assertArrayEquals(expectedDataLines, event.getDataLines());

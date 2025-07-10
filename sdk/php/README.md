@@ -27,7 +27,7 @@ composer require starfederation/datastar-php
 
 ```php
 use starfederation\datastar\enums\EventType;
-use starfederation\datastar\enums\FragmentMergeMode;
+use starfederation\datastar\enums\ElementPatchMode;
 use starfederation\datastar\ServerSentEventGenerator;
 
 // Creates a new `ServerSentEventGenerator` instance.
@@ -37,26 +37,30 @@ $sse = new ServerSentEventGenerator();
 // If your framework has its own way of sending response headers, manually send the headers returned by `ServerSentEventGenerator::headers()` instead.
 $sse->sendHeaders();
 
-// Merges HTML fragments into the DOM.
-$sse->mergeFragments('<div></div>', [
+// Patches elements into the DOM.
+$sse->patchElements('<div></div>', [
     'selector' => '#my-div',
-    'mergeMode' => FragmentMergeMode::Append,
+    'mode' => ElementPatchMode::Append,
     'useViewTransition' => true,
 ]);
 
-// Removes HTML fragments from the DOM.
-$sse->removeFragments('#my-div');
+// Patches elements into the DOM.
+$sse->removeElements('#my-div', [
+    'useViewTransition' => true,
+]);
 
-// Merges signals.
-$sse->mergeSignals('{foo: 123}', [
+// Patches signals.
+$sse->patchSignals('{foo: 123}', [
     'onlyIfMissing' => true,
 ]);
 
-// Removes signals.
-$sse->removeSignals(['foo', 'bar']);
-
 // Executes JavaScript in the browser.
-$sse->executeScript('console.log("Hello, world!")');
+$sse->executeScript('console.log("Hello, world!")', [
+    'autoRemove' => true,
+    'attributes' => [
+        'type' => 'application/javascript',
+    ],
+]);
 
 // Redirects the browser by setting the location to the provided URI.
 $sse->location('/guide');

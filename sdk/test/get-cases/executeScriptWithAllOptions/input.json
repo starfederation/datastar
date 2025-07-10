@@ -7,7 +7,7 @@
       "retryDuration": 2000,
       "attributes": {
         "type": "text/javascript",
-        "blocking": false
+        "blocking": "false"
       },
       "autoRemove": false
     }

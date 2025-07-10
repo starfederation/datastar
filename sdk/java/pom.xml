@@ -1,187 +1,188 @@
-    <project xmlns="http://maven.apache.org/POM/4.0.0"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://www.apache.org/xsd/maven-4.0.0.xsd">
-        <modelVersion>4.0.0</modelVersion>
-        <groupId>dev.data-star</groupId>
-        <artifactId>datastar-java-sdk-suite</artifactId>
-        <version>1.0.0</version>
-        <packaging>pom</packaging>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>dev.data-star</groupId>
+    <artifactId>datastar-java-sdk-suite</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
 
-        <name>Datastar Java SDK Suite</name>
-        <description>The suite of libraries for the Datastar Java SDK</description>
+    <name>Datastar Java SDK Suite</name>
+    <description>The suite of libraries for the Datastar Java SDK</description>
 
-        <modules>
-            <module>core</module>
-            <module>datastar-java-sdk-jaxrs</module>
-        </modules>
+    <modules>
+        <module>core</module>
+        <module>datastar-java-sdk-jaxrs</module>
+    </modules>
 
-        <developers>
-            <developer>
-                <id>starfederation</id>
-                <name>StarFederation Dev Team</name>
-                <email>no-reply@data-star.dev</email>
-                <organization>StarFederation</organization>
-                <organizationUrl>https://data-star.dev/</organizationUrl>
-            </developer>
-        </developers>
+    <developers>
+        <developer>
+            <id>starfederation</id>
+            <name>StarFederation Dev Team</name>
+            <email>no-reply@data-star.dev</email>
+            <organization>StarFederation</organization>
+            <organizationUrl>https://data-star.dev/</organizationUrl>
+        </developer>
+    </developers>
 
-        <licenses>
-            <license>
-                <name>MIT</name>
-                <distribution>repo</distribution>
-                <url>https://mit-license.org/</url>
-            </license>
-        </licenses>
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <distribution>repo</distribution>
+            <url>https://mit-license.org/</url>
+        </license>
+    </licenses>
 
-        <distributionManagement>
-            <repository>
-                <id>github</id>
-                <url>https://maven.pkg.github.com/starfederation/datastar</url>
-            </repository>
-        </distributionManagement>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/starfederation/datastar</url>
+        </repository>
+    </distributionManagement>
 
-        <scm>
-          <connection>scm:git:git@github.com:starfederation/datastar.git</connection>
-          <developerConnection>scm:git:git@github.com:starfederation/datastar.git</developerConnection>
-          <url>https://github.com/starfederation/datastar</url>
-        </scm>
- 
-        <properties>
-            <maven.compiler.release>17</maven.compiler.release>
-            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-            <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-            <generateBackupPoms>false</generateBackupPoms>
+    <scm>
+        <connection>scm:git:git@github.com:starfederation/datastar.git</connection>
+        <developerConnection>scm:git:git@github.com:starfederation/datastar.git</developerConnection>
+        <url>https://github.com/starfederation/datastar</url>
+    </scm>
 
-            <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
-            <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
-            <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
-            <maven.dependency.plugin.version>3.7.1</maven.dependency.plugin.version>
-            <maven.javadoc.plugin.version>3.10.1</maven.javadoc.plugin.version>
-            <maven.gpg.plugin.version>3.2.7</maven.gpg.plugin.version>
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <generateBackupPoms>false</generateBackupPoms>
 
-            <junit.jupiter.version>5.11.4</junit.jupiter.version>
-            <mockito.version>5.14.2</mockito.version>
-            <jackson.databind.version>2.18.2</jackson.databind.version>
-        </properties>
+        <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
+        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
+        <maven.dependency.plugin.version>3.7.1</maven.dependency.plugin.version>
+        <maven.javadoc.plugin.version>3.10.1</maven.javadoc.plugin.version>
+        <maven.gpg.plugin.version>3.2.7</maven.gpg.plugin.version>
+
+        <junit.jupiter.version>5.11.4</junit.jupiter.version>
+        <mockito.version>5.14.2</mockito.version>
+        <jackson.databind.version>2.18.2</jackson.databind.version>
+    </properties>
 
 
-        <profiles>
-            <profile>
-                <id>release-deploy</id>
-                <activation>
-                    <property>
-                        <name>performRelease</name>
-                        <value>true</value>
-                    </property>
-                </activation>
-                <build>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-gpg-plugin</artifactId>
-                            <version>${maven.gpg.plugin.version}</version>
-                            <executions>
-                                <execution>
-                                    <id>sign-artifacts</id>
-                                    <phase>verify</phase>
-                                    <goals>
-                                        <goal>sign</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-                        </plugin>
-                        <!-- Generate Javadoc JAR -->
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-javadoc-plugin</artifactId>
-                            <version>${maven.javadoc.plugin.version}</version>
-                            <executions>
-                                <execution>
-                                    <id>attach-javadocs</id>
-                                    <phase>verify</phase>
-                                    <goals>
-                                        <goal>jar</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-source-plugin</artifactId>
-                            <version>${maven.source.plugin.version}</version>
-                            <executions>
-                                <execution>
-                                    <phase>package</phase>
-                                    <goals>
-                                        <goal>jar</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-                        </plugin>
-                    </plugins>
-                </build>
-            </profile>
-        </profiles>
-        <dependencies>
-    <!-- JUnit Jupiter for Testing -->
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <version>${junit.jupiter.version}</version>
-                <scope>test</scope>
-            </dependency>
-    
-    <!-- Mockito Core (Mocking library) -->
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockito.version}</version>
-                <scope>test</scope>
-            </dependency>
+    <profiles>
+        <profile>
+            <id>release-deploy</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven.gpg.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Generate Javadoc JAR -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven.javadoc.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${maven.source.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <dependencies>
+        <!-- JUnit Jupiter for Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-            <!-- Mockito JUnit 5 Integration -->
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-junit-jupiter</artifactId>
-                <version>${mockito.version}</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-  
-        <build>
-            <plugins>
-                <!-- Maven Compiler Plugin for Java 17 -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.plugin.version}</version>
-                    <configuration>
-                        <release>${maven.compiler.release}</release>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>${maven.dependency.plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>properties</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven.surefire.plugin.version}</version>
-                    <configuration>
-                        <argLine>
-                            -javaagent:@{org.mockito:mockito-core:jar}
-                            -Xshare:off
-                        </argLine>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </build>
-    </project>
+        <!-- Mockito Core (Mocking library) -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito JUnit 5 Integration -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Maven Compiler Plugin for Java 17 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven.dependency.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <argLine>
+                        -javaagent:@{org.mockito:mockito-core:jar}
+                        -Xshare:off
+                    </argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

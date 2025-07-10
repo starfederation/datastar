@@ -5,13 +5,13 @@
 
 namespace starfederation\datastar;
 
-use starfederation\datastar\enums\FragmentMergeMode;
+use starfederation\datastar\enums\ElementPatchMode;
 use starfederation\datastar\events\EventInterface;
 use starfederation\datastar\events\ExecuteScript;
-use starfederation\datastar\events\MergeFragments;
-use starfederation\datastar\events\MergeSignals;
-use starfederation\datastar\events\RemoveFragments;
-use starfederation\datastar\events\RemoveSignals;
+use starfederation\datastar\events\Location;
+use starfederation\datastar\events\PatchElements;
+use starfederation\datastar\events\PatchSignals;
+use starfederation\datastar\events\RemoveElements;
 
 class ServerSentEventGenerator
 {
@@ -43,8 +43,9 @@ class ServerSentEventGenerator
     public static function readSignals(): array
     {
         $input = $_GET[Consts::DATASTAR_KEY] ?? file_get_contents('php://input');
+        $signals = $input ? json_decode($input, true) : [];
 
-        return $input ? json_decode($input, true) : [];
+        return is_array($signals) ? $signals : [];
     }
 
     /**
@@ -71,48 +72,40 @@ class ServerSentEventGenerator
     }
 
     /**
-     * Merges HTML fragments into the DOM and returns the resulting output.
+     * Patches HTML elements into the DOM and returns the resulting output.
      *
      * @param array{
      *     selector?: string|null,
-     *     mergeMode?: FragmentMergeMode|string|null,
+     *     mode?: ElementPatchMode|string|null,
      *     useViewTransition?: bool|null,
      *     eventId?: string|null,
      *     retryDuration?: int|null,
      * } $options
      */
-    public function mergeFragments(string $fragments, array $options = []): string
+    public function patchElements(string $elements, array $options = []): string
     {
-        return $this->sendEvent(new MergeFragments($fragments, $options));
+        return $this->sendEvent(new PatchElements($elements, $options));
     }
 
     /**
-     * Removes HTML fragments from the DOM and returns the resulting output.
+     * Patches signals and returns the resulting output.
+     */
+    public function patchSignals(array|string $signals, array $options = []): string
+    {
+        return $this->sendEvent(new PatchSignals($signals, $options));
+    }
+
+    /**
+     * Removes elements from the DOM and returns the resulting output.
      *
      * @param array{
      *      eventId?: string|null,
      *      retryDuration?: int|null,
      *  } $options
      */
-    public function removeFragments(string $selector, array $options = []): string
+    public function removeElements(string $selector, array $options = []): string
     {
-        return $this->sendEvent(new RemoveFragments($selector, $options));
-    }
-
-    /**
-     * Merges signals and returns the resulting output.
-     */
-    public function mergeSignals(array|string $signals, array $options = []): string
-    {
-        return $this->sendEvent(new MergeSignals($signals, $options));
-    }
-
-    /**
-     * Removes signal paths and returns the resulting output.
-     */
-    public function removeSignals(array $paths, array $options = []): string
-    {
-        return $this->sendEvent(new RemoveSignals($paths, $options));
+        return $this->sendEvent(new RemoveElements($selector, $options));
     }
 
     /**
@@ -128,9 +121,7 @@ class ServerSentEventGenerator
      */
     public function location(string $uri, array $options = []): string
     {
-        $script = "setTimeout(() => window.location = '$uri')";
-        
-        return $this->executeScript($script, $options);
+        return $this->sendEvent(new Location($uri, $options));
     }
 
     /**

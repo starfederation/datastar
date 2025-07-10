@@ -2,40 +2,55 @@
 
 ## Summary
 
-Datastar has had a few helper tools in the past for different languages.  The SDK effort is to unify around the tooling needed for Hypermedia On Whatever your Like (HOWL) based UIs.  Although Datastar the library can use any plugins, the default bundle includes robust Server Sent Event (SSE) base approach.  Most current languages and backend don't have great tooling around the style of delivering content to the frontend.
+Datastar SDK provides unified tooling for building Hypermedia On Whatever you Like (HOWL) based UIs across multiple languages. While Datastar supports various plugins, the default bundle focuses on a robust Server-Sent Event (SSE) approach, addressing the lack of good SSE tooling in most languages and backends.
 
-### Decision
+## Decision
 
-Provide an SDK in a language agnostic way, to that end
+Provide a language-agnostic SDK with these principles:
 
-1. Keep SDK as minimal as possible
-2. Allow per language/framework extended features to live in an SDK ***sugar*** version
+1. **Minimal Core**: Keep the SDK as minimal as possible
+2. **Sugar Extensions**: Allow per-language/framework extended features in SDK "sugar" versions
+
+### Naming Rationale
+
+**Why "Patch" instead of "Merge":**
+The prefix "Patch" was chosen to better reflect the non-idempotent nature of these operations. Unlike PUT requests that replace entire resources, PATCH requests apply partial modifications. This aligns with our SDKs behavior where operations modify specific parts of the DOM or signal state rather than replacing them entirely.
+
+**Why "Elements" instead of "Fragments":**
+We use "Elements" because it accurately describes what the SDK handles - complete HTML elements, not arbitrary DOM nodes like text nodes or document fragments. This naming matches the actual intent and constraints of the system, making the API clearer and more predictable for developers.
 
 ## Details
 
-### Assumptions
+### Core Mechanics
 
 The core mechanics of Datastar’s SSE support is
 
-1. Data gets sent to browser as SSE events.
-2. Data comes in via JSON from browser under a `datastar` namespace.
+1. **Server → Browser**: Data is sent as SSE events
+2. **Browser → Server**: Data arrives as JSON under the `datastar` namespace
 
-# Library
+# SDK Specification
 
-> [!WARNING] All naming conventions are shown using `Go` as the standard. Things may vary per language norms but please keep as close as possible.
+> [!WARNING] 
+> All naming conventions use Go as the reference implementation. Adapt to language-specific conventions while maintaining consistency.
 
 ## ServerSentEventGenerator
 
-***There must*** be a `ServerSentEventGenerator` namespace.  In Go this is implemented as a struct, but could be a class or even namespace in languages such as C.
+**Required**: A `ServerSentEventGenerator` namespace/class/struct (implementation may vary by language).
+
+---
 
 ### Construction / Initialization
-   1. ***There must*** be a way to create a new instance of this object based on the incoming `HTTP` Request and Response objects.
-   2. The `ServerSentEventGenerator` ***must*** use a response controller that has the following response headers set by default
-      1. `Cache-Control = nocache`
-      2. `Content-Type = text/event-stream`
-      3. `Connection = keep-alive` ***only*** if a HTTP/1.1 connection is used (see [spec](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Connection))
-   3. Then the created response ***should*** `flush` immediately to avoid timeouts while 0-♾️ events are created
-   4. Multiple calls using `ServerSentEventGenerator` should be single threaded to guarantee order.  The Go implementation uses a mutex to facilitate this behavior but might not be needed in a some environments
+
+**Requirements:**
+
+| Requirement | Description |
+|-------------|-------------|
+| **Constructor** | ***Must*** accept HTTP Request and Response objects |
+| **Response Headers** | ***Must*** set:<br>• `Cache-Control: no-cache`<br>• `Content-Type: text/event-stream`<br>• `Connection: keep-alive` (HTTP/1.1 only - [see spec](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Connection)) |
+| **Immediate Flush** | ***Should*** flush response immediately to prevent timeouts |
+| **Thread Safety** | ***Should*** ensure ordered delivery (e.g., mutex in Go) |
+
+---
 
 ### `ServerSentEventGenerator.send`
 
@@ -50,307 +65,363 @@ ServerSentEventGenerator.send(
 )
 ```
 
-All top level `ServerSentEventGenerator` ***should*** use a unified sending function.  This method ***should be private/protected***
+A unified sending function ***should*** be used internally (private/protected).
 
-####  Args
+#### Parameters
 
 ##### EventType
-An enum of Datastar supported events.  Will be a string over the wire.
-Currently valid values are
 
-| Event                     | Description                         |
-|---------------------------|-------------------------------------|
-| datastar-merge-fragments  | Merges HTML fragments into the DOM  |
-| datastar-merge-signals    | Merges signals into the signals       |
-| datastar-remove-fragments | Removes HTML fragments from the DOM |
-| datastar-remove-signals   | Removes signals from the signals      |
-| datastar-execute-script   | Executes JavaScript in the browser  |
+String enum of supported events:
+
+| Event | Description |
+|-------|-------------|
+| `datastar-patch-elements` | Patches HTML elements into the DOM |
+| `datastar-patch-signals` | Patches signals into the signal store |
 
 ##### Options
-* `eventId` (string) Each event ***may*** include an `eventId`.  This can be used by the backend to replay events.  This is part of the SSE spec and is used to tell the browser how to handle the event.  For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id
-* `retryDuration` (duration) Each event ***may*** include a `retryDuration` value.  If one is not provided the SDK ***must*** default to `1000` milliseconds.  This is part of the SSE spec and is used to tell the browser how long to wait before reconnecting if the connection is lost. For more details see https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry
 
-#### Logic
-When called the function ***must*** write to the response buffer the following in specified order.  If any part of this process fails you ***must*** return/throw an error depending on language norms.
-1. ***Must*** write `event: EVENT_TYPE\n` where `EVENT_TYPE` is [EventType](#EventType).
-2. If a user defined event ID is provided, the function ***must*** write `id: EVENT_ID\n` where `EVENT_ID` is the event ID.
-3. ***Must*** write `retry: RETRY_DURATION\n` where `RETRY_DURATION` is the provided retry duration, ***unless*** the value is the default of `1000` milliseconds.
-4. For each string in the provided `dataLines`, you ***must*** write `data: DATA\n` where `DATA` is the provided string.
-5. ***Must*** write a `\n\n` to complete the event per the SSE spec.
-6. Afterward the writer ***should*** immediately flush.  This can be confounded by other middlewares such as compression layers.
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `eventId` | string | - | Unique event identifier for replay functionality ([SSE spec](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#id)) |
+| `retryDuration` | ms | `1000` | Reconnection delay after connection loss ([SSE spec](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#retry)) |
 
-### `ServerSentEventGenerator.MergeFragments`
+#### Implementation Requirements
 
-```
-ServerSentEventGenerator.MergeFragments(
-    fragments: string,
-    options?: {
-        selector?: string,
-        mergeMode?: FragmentMergeMode,
-        useViewTransition?: boolean,
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-     }
- )
-```
+***Must*** write to response buffer in this exact order:
 
-#### Example Output
+1. `event: EVENT_TYPE\n`
+2. `id: EVENT_ID\n` (if `eventId` provided)
+3. `retry: RETRY_DURATION\n` (***unless*** default of `1000`)
+4. `data: DATA\n` (for each of the `dataLines`)
+5. `\n` (end of event)
+6. ***Should*** flush immediately (note: compression middleware may interfere)
 
-Minimal:
+**Error Handling**: ***Must*** return/throw errors per language conventions.
 
-```
-event: datastar-merge-fragments
-data: fragments <div id="feed">
-data: fragments     <span>1</span>
-data: fragments </div>
-```
+---
 
-Maximal:
+### `ServerSentEventGenerator.PatchElements`
 
-```
-event: datastar-merge-fragments
-id: 123
-retry: 2000
-data: selector #feed
-data: useViewTransition true
-data: fragments <div id="feed">
-data: fragments     <span>1</span>
-data: fragments </div>
-```
-
-`MergeFragments` is a helper function to send HTML fragments to the browser to be merged into the DOM.
-
-#### Args
-
-##### FragmentMergeMode
-
-An enum of Datastar supported fragment merge modes.  Will be a string over the wire
-Valid values should match the [FragmentMergeMode](#FragmentMergeMode) and currently include
-
-| Mode             | Description                                             |
-|------------------|---------------------------------------------------------|
-| morph            | Use Idiomorph to merge the fragment into the DOM        |
-| inner            | Replace the innerHTML of the selector with the fragment |
-| outer            | Replace the outerHTML of the selector with the fragment |
-| prepend          | Prepend the fragment to the selector                    |
-| append           | Append the fragment to the selector                     |
-| before           | Insert the fragment before the selector                 |
-| after            | Insert the fragment after the selector                  |
-| upsertAttributes | Update the attributes of the selector with the fragment |
-
-##### Options
-* `selector` (string) The CSS selector to use to insert the fragments.  If not provided or empty, Datastar **will** default to using the `id` attribute of the fragment.
-* `mergeMode` (FragmentMergeMode) The mode to use when merging the fragment into the DOM.  If not provided the Datastar client side ***will*** default to `morph`.
-* `useViewTransition` Whether to use view transitions, if not provided the Datastar client side ***will*** default to `false`.
-
-#### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-merge-fragments` event type.
-1. If `selector` is provided, the function ***must*** include the selector in the event data in the format `selector SELECTOR\n`, ***unless*** the selector is empty.
-2. If `mergeMode` is provided, the function ***must*** include the merge mode in the event data in the format `merge MERGE_MODE\n`, ***unless*** the value is the default of `morph`.
-3. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
-4. The function ***must*** include the fragments in the event data, with each line prefixed with `fragments `. This ***should*** be output after all other event data.
-
-### `ServerSentEventGenerator.RemoveFragments`
-
-```
-ServerSentEventGenerator.RemoveFragments(
-    selector: string,
-    options?: {
-        useViewTransition?: boolean,
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-    }
+```go
+ServerSentEventGenerator.PatchElements(
+  elements: string,
+  options?: {
+    selector?: string,
+    mode?: ElementPatchMode,
+    useViewTransition?: boolean,
+    eventId?: string,
+    retryDuration?: durationInMilliseconds
+  }
 )
 ```
 
 #### Example Output
 
-Minimal:
+<details>
+  <summary>Minimal Example</summary>
 
-```
-event: datastar-remove-fragments
-data: selector #target
-```
+  ```
+  event: datastar-patch-elements
+  data: elements <div id="feed"><span>1</span></div>
 
-Maximal:
+  ```
+</details>
 
-```
-event: datastar-remove-fragments
-id: 123
-retry: 2000
-data: selector #target
-data: useViewTransition true
-```
+<details>
+  <summary>Full Example (all options)</summary>
 
-`RemoveFragments` is a helper function to send a selector to the browser to remove HTML fragments from the DOM.
+  ```
+  event: datastar-patch-elements
+  id: 123
+  retry: 2000
+  data: mode inner
+  data: selector #feed
+  data: useViewTransition true
+  data: elements <div id="feed">
+  data: elements     <span>1</span>
+  data: elements </div>
 
-#### Args
+  ```
+</details>
 
-`selector` is a CSS selector that represents the fragments to be removed from the DOM.  The selector ***must*** be a valid CSS selector.  The Datastar client side will use this selector to remove the fragment from the DOM.
+<details>
+  <summary>Patch elements based on their ID</summary>
 
-##### Options
+  ```
+  event: datastar-patch-elements
+  data: elements <div id="id1">New content.</div>
+  data: elements <div id="id2">Other new content.</div>
+  ```
+</details>
 
-* `useViewTransition` Whether to use view transitions, if not provided the Datastar client side ***will*** default to `false`.
+<details>
+  <summary>Insert a new element based on a selector</summary>
 
-#### Logic
-1. When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-remove-fragments` event type.
-2. The function ***must*** include the selector in the event data in the format `selector SELECTOR\n`.
-3. If `useViewTransition` is provided, the function ***must*** include the view transition in the event data in the format `useViewTransition USE_VIEW_TRANSITION\n`, ***unless*** the value is the default of `false`.  `USE_VIEW_TRANSITION` should be `true` or `false` (string), depending on the value of the `useViewTransition` option.
+  ```
+  event: datastar-patch-elements
+  data: mode append
+  data: selector #mycontainer
+  data: elements <div>New content</div>
+  ```
+</details>
 
+<details>
+  <summary>Remove elements based on a selector</summary>
 
-### `ServerSentEventGenerator.MergeSignals`
+  ```
+  event: datastar-patch-elements
+  data: mode remove
+  data: selector #feed, #otherid
+  ```
+</details>
 
-```
-ServerSentEventGenerator.MergeSignals(
-    signals: string,
-    options ?: {
-        onlyIfMissing?: boolean,
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-     }
- )
-```
+<details>
+  <summary>Remove elements without a selector</summary>
 
-#### Example Output
+  ```
+  event: datastar-patch-elements
+  data: mode remove
+  data: elements <div id="first"></div><div id="second"></div>
+  ```
+</details>
 
-Minimal:
+`PatchElements` sends HTML elements to the browser for DOM manipulation.
 
-```
-event: datastar-merge-signals
-data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
-```
+> [!TIP]
+> - To remove elements, use the `remove` patch mode
+> - To execute JavaScript, send a `<script>` element – it will auto-execute when added to the DOM
 
-Maximal:
+### Elements vs Fragments: Key Distinction
 
-```
-event: datastar-merge-signals
-id: 123
-retry: 2000
-data: onlyIfMissing true
-data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
-```
+> [!IMPORTANT]
+> Datastar requires **complete HTML elements**, not fragments.
 
-`MergeSignals` is a helper function to send one or more signals to the browser to be merged into the signals.
+| Approach | Example | Characteristics |
+|----------|---------|-----------------|
+| **Datastar (Elements)** | `<div id="content">Hello</div>` | • Complete, well-formed HTML<br>• Valid opening/closing tags<br>• Standard DOM API compatible<br>• Predictable browser behavior |
+| **HTMX (Fragments)** | `Hello <strong>World</strong>` | • Partial HTML allowed<br>• May lack proper structure<br>• Requires special handling<br>• More flexible but less predictable |
 
-#### Args
+### Parameters
 
-Data is a JavaScript object or JSON string that will be sent to the browser to update signals in the signals.  The data ***must*** evaluate to a valid JavaScript.  It will be converted to signals by the Datastar client side.
+- **elements**: One or more complete HTML elements. If a selector has not been specified, each top-level element must contain an ID. With ElementPatchMode `remove`, this parameter may be omitted when a selector is supplied.
 
-##### Options
+#### ElementPatchMode
 
-* `onlyIfMissing` (boolean) Whether to merge the signal only if it does not already exist.  If not provided, the Datastar client side ***will*** default to `false`, which will cause the data to be merged into the signals.
+String enum defining how elements are patched into the DOM.
 
-#### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-merge-signals` event type.
+##### Available Modes
 
-1. If `onlyIfMissing` is provided, the function ***must*** include it in the event data in the format `onlyIfMissing ONLY_IF_MISSING\n`, ***unless*** the value is the default of `false`.  `ONLY_IF_MISSING` should be `true` or `false` (string), depending on the value of the `onlyIfMissing` option.
-2. The function ***must*** include the signals in the event data, with each line prefixed with `signals `.  This ***should*** be output after all other event data.
+| Mode | Morphed? | Description |
+|------|------|-------------|
+| `outer` | ✅ | Morph entire element, preserving state |
+| `inner` | ✅ | Morph inner HTML only, preserving state |
+| `replace` | 🚫 | Replace entire element, reset state |
+| `prepend` | 🚫 | Insert at beginning inside target |
+| `append` | 🚫 | Insert at end inside target |
+| `before` | 🚫 | Insert before target element |
+| `after` | 🚫 | Insert after target element |
+| `remove` | 🚫 | Remove target element from DOM |
 
-### `ServerSentEventGenerator.RemoveSignals`
+#### Options
 
-```html
-ServerSentEventGenerator.RemoveSignals(
-    paths: string[],
-    options?: {
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-    }
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `selector` | string | Element ID | CSS selector for target element. If a selector is not specified, each element must have an ID specified. |
+| `mode` | ElementPatchMode | `outer` | How to patch the element |
+| `useViewTransition` | boolean | `false` | Enable view transitions API |
+
+### Implementation
+
+***Must*** call `ServerSentEventGenerator.send` with event type `datastar-patch-elements`.
+
+**Data format** (only include non-defaults):
+- `selector SELECTOR\n` (if provided)
+- `mode PATCH_MODE\n` (if not `outer`)
+- `useViewTransition true\n` (if `true`)
+- `elements HTML_LINE\n` (for each line of HTML)
+
+---
+
+### `ServerSentEventGenerator.PatchSignals`
+
+```go
+ServerSentEventGenerator.PatchSignals(
+  signals: string,
+  options ?: {
+    onlyIfMissing?: boolean,
+    eventId?: string,
+    retryDuration?: durationInMilliseconds
+  }
 )
 ```
 
 #### Example Output
 
-Minimal:
+<details>
+  <summary>Minimal Example</summary>
 
-```
-event: datastar-remove-signals
-data: paths user.name
-data: paths user.email
-```
+  ```
+  event: datastar-patch-signals
+  data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 
-Maximal:
+  ```
+</details>
 
-```
-event: datastar-remove-signals
-id: 123
-retry: 2000
-data: paths user.name
-data: paths user.email
-```
+<details>
+  <summary>Full Example (all options)</summary>
 
-`RemoveSignals` is a helper function to send signals to the browser to be removed from the signals.
+  ```
+  event: datastar-patch-signals
+  id: 123
+  retry: 2000
+  data: onlyIfMissing true
+  data: signals {"output":"Patched Output Test","show":true,"input":"Test","user":{"name":"","email":""}}
 
-#### Args
+  ```
+</details>
 
-`paths` is a list of strings that represent the signal paths to be removed from the signals.  The paths ***must*** be valid `.` delimited paths to signals within the signals.  The Datastar client side will use these paths to remove the data from the signals.
+`PatchSignals` sends signals to the browser using [RFC 7386 JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386) semantics.
 
-#### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-remove-signals` event type.
+### Parameters
 
-1. The function ***must*** include the paths in the event data, with each line prefixed with `paths `.  Space-separated paths such as `paths foo.bar baz.qux.hello world` ***should*** be allowed.
+- **signals**: A valid JSON string containing the patch data
+
+### RFC 7386 JSON Merge Patch Behavior
+
+| Operation | Behavior | Example |
+|-----------|----------|---------|
+| **Add/Update** | Set property value | `{"key": "value"}` |
+| **Remove** | Set to `null` | `{"key": null}` |
+| **Nested** | Recursive patch | `{"user": {"name": "Johnny"}}` |
+
+### Examples
+
+<details>
+  <summary>Signal Operations Examples</summary>
+
+  ```
+  // Add signal
+  {"newSignal": "value"}
+
+  // Update signal
+  {"existingSignal": "newValue"}
+
+  // Remove signal
+  {"signalToRemove": null}
+
+  // Complex nested patch
+  {
+    "user": {
+      "name": "Johnny",
+      "email": null,
+      "preferences": {
+        "theme": "dark"
+      }
+    }
+  }
+  ```
+</details>
+
+### Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `onlyIfMissing` | boolean | `false` | Patches only signals that don’t already exist |
+
+### Implementation
+
+***Must*** call `ServerSentEventGenerator.send` with event type `datastar-patch-signals`.
+
+**Data format**:
+- `onlyIfMissing true\n` (only if `true`)
+- `signals JSON_LINE\n` (for each line of JSON)
+
+---
 
 ### `ServerSentEventGenerator.ExecuteScript`
 
-```
+```go
 ServerSentEventGenerator.ExecuteScript(
-    script: string,
-    options?: {
-        autoRemove?: boolean,
-        attributes?: string,
-        eventId?: string,
-        retryDuration?: durationInMilliseconds
-    }
+  script: string,
+  options?: {
+    autoRemove?: boolean,
+    attributes?: []string,
+    eventId?: string,
+    retryDuration?: durationInMilliseconds
+  }
 )
 ```
 
 #### Example Output
 
-Minimal:
+<details>
+  <summary>Minimal Example</summary>
 
+  ```
+  event: datastar-patch-elements
+  data: mode append
+  data: selector body
+  data: elements <script>console.log('Here')</script>
+  ```
+</details>
+
+<details>
+  <summary>Full Example (all options)</summary>
+
+  ```
+  event: datastar-patch-elements
+  id: 123
+  retry: 2000
+  data: mode append
+  data: selector body
+  data: elements <script type="application/javascript" data-effect="el.remove()">console.log('Here')</script>
+  ```
+</details>
+
+### Parameters
+
+- **script**: One or more lines of JavaScript.
+
+### Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `autoRemove` | boolean | `true` | Removes the script tag after executing |
+| `attributes` | []string | - | Attributes to add to the script tag |
+
+### Implementation
+
+***Must*** call `ServerSentEventGenerator.send` with event type `datastar-patch-elements`, sending a `script` tag containing the JavaScript to execute. If `autoRemove` is `true`, `data-effect="el.remove()"` must be added to the `script` tag. If `attributes` exist, they must be added to the `script` tag. 
+
+**Data format** (only include non-defaults):
+- `selector body\n`
+- `mode append\n`
+- `elements SCRIPT_TAG\n`
+
+---
+
+## `ReadSignals`
+
+`ReadSignals` parses incoming signal data from the browser into backend objects.
+
+```go
+ReadSignals(request *http.Request, signals any) error
 ```
-event: datastar-execute-script
-data: script window.location = "https://data-star.dev"
-```
 
-Maximal:
+### Parameters
 
-```
-event: datastar-execute-script
-id: 123
-retry: 2000
-data: autoRemove false
-data: attributes type text/javascript
-data: script window.location = "https://data-star.dev"
-```
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `request` | HTTP Request | Language-specific request object |
+| `signals` | any | Target object/struct for unmarshaling |
 
-#### Args
+### Implementation
 
-`script` is a string that represents the JavaScript to be executed by the browser.
+The function ***must*** parse the incoming HTTP request based on the method:
 
-##### Options
+| Method | Data Location | Format | Description |
+|--------|---------------|--------|-------------|
+| `GET` | Query parameter `datastar` | URL-encoded JSON | Extract from query string |
+| Others | Request body | JSON | Parse request body directly |
 
-* `autoRemove` Whether to remove the script after execution, if not provided the Datastar client side ***will*** default to `true`.
-* `attributes` A line separated list of attributes to add to the `script` element, if not provided the Datastar client side ***will*** default to `type module`. Each item in the array should be a string in the format `key value`.
-
-#### Logic
-When called the function ***must*** call `ServerSentEventGenerator.send` with the `datastar-execute-script` event type.
-
-1. If `autoRemove` is provided, the function ***must*** include the auto remove script value in the event data in the format `autoRemove AUTO_REMOVE\n`, ***unless*** the value is the default of `true`.
-2. If `attributes` is provided, the function ***must*** include the attributes in the event data, with each line prefixed with `attributes `, ***unless*** the attributes value is the default of `type module`.
-3. The function ***must*** include the script in the event data, with each line prefixed with `script `.  This ***should*** be output after all other event data.
-
-## `ReadSignals(r *http.Request, signals any) error`
-
-`ReadSignals` is a helper function to parse incoming data from the browser.  It should take the incoming request and convert into an object that can be used by the backend.
-
-#### Args
-
-* `r` (http.Request) The incoming request object from the browser.  This object ***must*** be a valid Request object per the language specifics.
-* `signals` (any) The signals object that the incoming data will be extracted into.  The exact function signature will depend on the language specifics.
-
-#### Logic
-
-1. The function ***must*** parse the incoming HTTP request
-   1. If the incoming method is `GET`, the function ***must*** parse the query string's `datastar` key and treat it as a URL encoded JSON string.
-   2. Otherwise, the function ***must*** parse the body of the request as a JSON encoded string.
-   3. If the incoming data is not valid JSON, the function ***must*** return an error.
+**Error Handling**: ***Must*** return error for invalid JSON.

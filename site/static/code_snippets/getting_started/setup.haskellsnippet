@@ -1,8 +1,0 @@
-import ServerSentEventGenerator
-import ServerSentEventGenerator.Server.Snap -- or whatever is appropriate
-
--- Merges HTML fragments into the DOM.
-send (withDefaults mergeFragments "<div id=\"question\">What do you put in a toaster?</div>")
-
--- Merges signals into the signals.
-send (withDefaults mergeSignals "{response: '', answer: 'bread'}")

@@ -6,11 +6,9 @@ rust-version = "1.85.0"
 
 [dependencies]
 async-stream = "0.3.6"
-axum = "0.8.3"
+axum = "0.8.4"
 datastar = { path = "../../../../sdk/rust", features = ["axum"] }
-futures = "0.3.31"
 serde = { version = "1.0.219", features = ["derive"] }
-tokio = { version = "1.44.2", features = ["full"] }
-tokio-stream = "0.1.17"
+tokio = { version = "1.46.1", features = ["full"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }

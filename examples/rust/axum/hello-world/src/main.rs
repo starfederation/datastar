@@ -2,14 +2,11 @@ use {
     async_stream::stream,
     axum::{
         Router,
-        response::{Html, IntoResponse},
+        response::{Html, IntoResponse, Sse},
         routing::get,
     },
-    core::{error::Error, time::Duration},
-    datastar::{
-        Sse,
-        prelude::{MergeFragments, ReadSignals},
-    },
+    core::{convert::Infallible, error::Error, time::Duration},
+    datastar::{axum::ReadSignals, prelude::PatchElements},
     serde::Deserialize,
     tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt},
 };
@@ -52,9 +49,14 @@ pub struct Signals {
 }
 
 async fn hello_world(ReadSignals(signals): ReadSignals<Signals>) -> impl IntoResponse {
-    Sse(stream! {
+    Sse::new(stream! {
         for i in 0..MESSAGE.len() {
-            yield MergeFragments::new(format!("<div id='message'>{}</div>", &MESSAGE[0..i + 1]));
+            let elements = format!("<div id='message'>{}</div>", &MESSAGE[0..i + 1]);
+            let patch = PatchElements::new(elements);
+            let sse_event = patch.write_as_axum_sse_event();
+
+            yield Ok::<_, Infallible>(sse_event);
+
             tokio::time::sleep(Duration::from_millis(signals.delay)).await;
         }
     })

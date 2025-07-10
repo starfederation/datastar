@@ -21,6 +21,8 @@ __all__ = [
 class DatastarResponse(Response):
     """Respond with 0..N `DatastarEvent`s"""
 
+    default_headers: dict[str, str] = SSE_HEADERS.copy()
+
     def __init__(
         self,
         content: DatastarEvents = None,
@@ -30,7 +32,7 @@ class DatastarResponse(Response):
         if not content:
             status = status or 204
         else:
-            headers = {**SSE_HEADERS, **(headers or {})}
+            headers = {**self.default_headers, **(headers or {})}
         super().__init__(content, status=status, headers=headers)
         if isgenerator(content) or isasyncgen(content):
             self.timeout = None

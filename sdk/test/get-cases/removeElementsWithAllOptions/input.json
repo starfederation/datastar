@@ -1,0 +1,12 @@
+{
+  "events": [
+    {
+      "type": "patchElements",
+      "selector": "#target",
+      "eventId": "event1",
+      "mode": "remove",
+      "retryDuration": 2000,
+      "useViewTransition": true
+    }
+  ]
+}

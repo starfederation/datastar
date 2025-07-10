@@ -44,7 +44,7 @@ HTML = """\
             class="time"
             data-on-load="@get('/updates')"
             >
-            Current time from fragment: <span id="currentTime">CURRENT_TIME</span>
+            Current time from element: <span id="currentTime">CURRENT_TIME</span>
             </div>
             <div
             class="time"
@@ -64,11 +64,11 @@ async def read_root() -> str:
 
 async def time_updates() -> AsyncGenerator[DatastarEvent, None]:
     while True:
-        yield ServerSentEventGenerator.merge_fragments(
+        yield ServerSentEventGenerator.patch_elements(
             f"""<span id="currentTime">{datetime.now().isoformat()}"""
         )
         await asyncio.sleep(1)
-        yield ServerSentEventGenerator.merge_signals(
+        yield ServerSentEventGenerator.patch_signals(
             {"currentTime": f"{datetime.now().isoformat()}"}
         )
         await asyncio.sleep(1)

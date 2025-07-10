@@ -1,6 +1,0 @@
-datastar.stream do |sse|
-  sse.merge_fragments('<div id="question">...</div>')
-  sse.merge_fragments('<div id="instructions">...</div>')
-  sse.merge_signals(answer: '...')
-  sse.merge_signals(prize: '...')
-end

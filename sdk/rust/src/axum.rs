@@ -1,87 +1,63 @@
 //! Axum integration for Datastar.
 
 use {
-    crate::{Sse, TrySse, consts::DATASTAR_REQ_HEADER_STR, prelude::DatastarEvent},
+    crate::{
+        consts::{self, DATASTAR_REQ_HEADER_STR},
+        prelude::{DatastarEvent, PatchElements, PatchSignals},
+    },
     axum::{
         Json,
-        body::{Body, Bytes, HttpBody},
+        body::Bytes,
         extract::{FromRequest, OptionalFromRequest, Query, Request},
         http::{self},
-        response::{IntoResponse, Response},
+        response::{IntoResponse, Response, sse::Event},
     },
-    core::{
-        convert::Infallible,
-        pin::Pin,
-        task::{Context, Poll},
-    },
-    futures_util::{Stream, StreamExt},
-    http_body::Frame,
-    pin_project_lite::pin_project,
     serde::{Deserialize, de::DeserializeOwned},
-    sync_wrapper::SyncWrapper,
+    std::fmt::Write,
 };
 
-pin_project! {
-    struct SseBody<S> {
-        #[pin]
-        stream: SyncWrapper<S>,
+impl PatchElements {
+    /// Write this [`PatchElements`] into an Axum SSE [`Event`].
+    pub fn write_as_axum_sse_event(&self) -> Event {
+        self.as_datastar_event().write_as_axum_sse_event()
     }
 }
 
-impl<S, I> IntoResponse for Sse<S>
-where
-    S: Stream<Item = I> + Send + 'static,
-    I: Into<DatastarEvent> + Send + 'static,
-{
-    #[inline]
-    fn into_response(self) -> Response {
-        TrySse(self.0.map(Ok::<_, Infallible>)).into_response()
+impl PatchSignals {
+    /// Write this [`PatchSignals`] into an Axum SSE [`Event`].
+    pub fn write_as_axum_sse_event(&self) -> Event {
+        self.as_datastar_event().write_as_axum_sse_event()
     }
 }
 
-impl<S, I, E> IntoResponse for TrySse<S>
-where
-    S: Stream<Item = Result<I, E>> + Send + 'static,
-    I: Into<DatastarEvent> + Send + 'static,
-    E: Into<Box<dyn std::error::Error + Send + Sync>>,
-{
-    fn into_response(self) -> Response {
-        (
-            [
-                (http::header::CONTENT_TYPE, "text/event-stream"),
-                (http::header::CACHE_CONTROL, "no-cache"),
-                #[cfg(not(feature = "http2"))]
-                (http::header::CONNECTION, "keep-alive"),
-            ],
-            Body::new(SseBody {
-                stream: SyncWrapper::new(self.0.map(|r| r.map(Into::into))),
-            }),
-        )
-            .into_response()
-    }
-}
+impl DatastarEvent {
+    /// Turn this [`DatastarEvent`] into an Axum SSE [`Event`].
+    pub fn write_as_axum_sse_event(&self) -> Event {
+        let event = Event::default().event(self.event.as_str());
 
-impl<S, E> HttpBody for SseBody<S>
-where
-    S: Stream<Item = Result<DatastarEvent, E>>,
-{
-    type Data = Bytes;
-    type Error = E;
+        let event = if self.retry.as_millis() != (consts::DEFAULT_SSE_RETRY_DURATION as u128) {
+            event.retry(self.retry)
+        } else {
+            event
+        };
 
-    fn poll_frame(
-        self: Pin<&mut Self>,
-        cx: &mut Context<'_>,
-    ) -> Poll<Option<Result<Frame<Self::Data>, Self::Error>>> {
-        let this = self.project();
+        let event = match self.id.as_deref() {
+            Some(id) => event.id(id),
+            None => event,
+        };
 
-        match this.stream.get_pin_mut().poll_next(cx) {
-            Poll::Pending => Poll::Pending,
-            Poll::Ready(Some(Err(error))) => Poll::Ready(Some(Err(error))),
-            Poll::Ready(None) => Poll::Ready(None),
-            Poll::Ready(Some(Ok(event))) => {
-                Poll::Ready(Some(Ok(Frame::data(event.to_string().into()))))
-            }
+        let mut data = String::with_capacity(
+            self.data.iter().map(|s| s.len()).sum::<usize>() + self.data.len() - 1,
+        );
+
+        let mut sep = "";
+        for line in self.data.iter() {
+            // Assumption: std::fmt::write does not fail ever for [`String`].
+            let _ = write!(&mut data, "{sep}{line}");
+            sep = "\n";
         }
+
+        event.data(data)
     }
 }
 
@@ -95,7 +71,7 @@ struct DatastarParam {
 /// # Examples
 ///
 /// ```
-/// use datastar::prelude::ReadSignals;
+/// use datastar::axum::ReadSignals;
 /// use serde::Deserialize;
 ///
 /// #[derive(Deserialize)]
@@ -180,78 +156,5 @@ where
             }
         }?;
         Ok(Self(json))
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use {
-        super::Sse,
-        crate::{
-            prelude::ReadSignals,
-            testing::{self, Signals, base_test_server},
-        },
-        axum::{
-            Router,
-            response::{Html, IntoResponse},
-            routing::{get, post},
-        },
-        tokio::net::TcpListener,
-        tracing_test::traced_test,
-    };
-
-    async fn base_test_endpoint_required(
-        ReadSignals(signals): ReadSignals<Signals>,
-    ) -> impl IntoResponse {
-        Sse(testing::test(signals.events))
-    }
-
-    async fn base_test_endpoint_optional(
-        signals: Option<ReadSignals<Signals>>,
-    ) -> impl IntoResponse {
-        match signals {
-            Some(ReadSignals(signals)) => Sse(testing::test(signals.events)).into_response(),
-            None => Html("<p>Hello</p>").into_response(),
-        }
-    }
-
-    #[tokio::test]
-    #[traced_test]
-    async fn sdk_base_test() -> Result<(), Box<dyn core::error::Error>> {
-        let listener = TcpListener::bind("127.0.0.1:0").await?;
-        let local_addr = listener.local_addr()?;
-
-        let base_url = format!("http://{local_addr}");
-
-        let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
-        let shutdown_signal = async move {
-            shutdown_rx
-                .await
-                .expect("to have no shutdown signal error on receival");
-        };
-
-        let app = Router::new()
-            .route("/base/test", get(base_test_endpoint_required))
-            .route("/base/test", post(base_test_endpoint_required))
-            .route("/base/test-opt", get(base_test_endpoint_optional))
-            .route("/base/test-opt", post(base_test_endpoint_optional));
-
-        let (server_result_tx, server_result_rx) = tokio::sync::oneshot::channel();
-        tokio::spawn(async move {
-            server_result_tx
-                .send(
-                    axum::serve(listener, app)
-                        .with_graceful_shutdown(shutdown_signal)
-                        .await,
-                )
-                .expect("send axum serve result upstream over oneshot ch");
-        });
-
-        base_test_server(&base_url).await;
-
-        shutdown_tx.send(()).expect("trigger shutdown signal");
-        server_result_rx.await??;
-
-        Ok(())
     }
 }

@@ -12,6 +12,10 @@ class TestSocket
   end
 
   def close = @open = false
+
+  def split_lines
+    @lines.join.split("\n")
+  end
 end
 
 RSpec.describe Datastar::Dispatcher do
@@ -56,35 +60,40 @@ RSpec.describe Datastar::Dispatcher do
 
   specify '#sse?' do
     expect(dispatcher.sse?).to be(true)
-    request = build_request('/events', headers: { 'HTTP_ACCEPT' => 'application/json' })
 
+    request = build_request('/events', headers: { 'HTTP_ACCEPT' => 'application/json' })
     dispatcher = Datastar.new(request:, response:, view_context:)
     expect(dispatcher.sse?).to be(false)
+
+    request = build_request('/events', headers: { 'HTTP_ACCEPT' => 'text/event-stream,application/json' })
+    dispatcher = Datastar.new(request:, response:, view_context:)
+    expect(dispatcher.sse?).to be(true)
   end
 
-  describe '#merge_fragments' do
-    it 'produces a streameable response body with D* fragments' do
-      dispatcher.merge_fragments %(<div id="foo">\n<span>hello</span>\n</div>\n)
+  describe '#patch_elements' do
+    it 'produces a streameable response body with D* elements' do
+      dispatcher.patch_elements %(<div id="foo">\n<span>hello</span>\n</div>\n)
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq(["event: datastar-merge-fragments\ndata: fragments <div id=\"foo\">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n"])
+      expect(socket.lines).to eq(["event: datastar-patch-elements\ndata: elements <div id=\"foo\">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n"])
     end
 
     it 'takes D* options' do
-      dispatcher.merge_fragments(
-        %(<div id="foo">\n<span>hello</span>\n</div>\n),
+      dispatcher.patch_elements(
+        %(<div id="foo">\n<span>hello</span>\n</div>),
         id: 72,
-        retry_duration: 2000
+        retry_duration: 2000,
+        use_view_transition: true,
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: useViewTransition true\ndata: elements <div id="foo">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n)])
     end
 
     it 'omits retry if using default value' do
-      dispatcher.merge_fragments(
+      dispatcher.patch_elements(
         %(<div id="foo">\n<span>hello</span>\n</div>\n),
         id: 72,
         retry_duration: 1000
@@ -92,7 +101,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\ndata: fragments <div id="foo">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: elements <div id="foo">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n)])
     end
 
     it 'works with #call(view_context:) interfaces' do
@@ -100,14 +109,14 @@ RSpec.describe Datastar::Dispatcher do
         def self.call(view_context:) = %(<div id="foo">\n<span>#{view_context}</span>\n</div>\n)
       end
 
-      dispatcher.merge_fragments(
+      dispatcher.patch_elements(
         template_class,
         id: 72,
         retry_duration: 2000
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: fragments <div id="foo">\ndata: fragments <span>#{view_context}</span>\ndata: fragments </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: elements <div id="foo">\ndata: elements <span>#{view_context}</span>\ndata: elements </div>\n\n)])
     end
 
     it 'works with #render_in(view_context, &) interfaces' do
@@ -115,68 +124,106 @@ RSpec.describe Datastar::Dispatcher do
         def self.render_in(view_context) = %(<div id="foo">\n<span>#{view_context}</span>\n</div>\n)
       end
 
-      dispatcher.merge_fragments(
+      dispatcher.patch_elements(
         template_class,
         id: 72,
         retry_duration: 2000
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
-      expect(socket.lines).to eq([%(event: datastar-merge-fragments\nid: 72\nretry: 2000\ndata: fragments <div id="foo">\ndata: fragments <span>#{view_context}</span>\ndata: fragments </div>\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: elements <div id="foo">\ndata: elements <span>#{view_context}</span>\ndata: elements </div>\n\n)])
     end
-  end
 
-  describe '#remove_fragments' do
-    it 'produces D* remove fragments' do
-      dispatcher.remove_fragments('#list-item-1')
+    it 'accepts an array of elements' do
+      dispatcher.patch_elements([
+        %(<div id="foo">Hello</div>),
+        %(<div id="bar">Bye</div>)
+      ])
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-remove-fragments\ndata: selector #list-item-1\n\n\n)])
+      expect(socket.lines).to eq(["event: datastar-patch-elements\ndata: elements <div id=\"foo\">Hello</div>\ndata: elements <div id=\"bar\">Bye</div>\n\n"])
+    end
+  end
+
+  describe '#remove_elements' do
+    it 'produces D* patch elements with "remove" mode' do
+      dispatcher.remove_elements('#list-item-1')
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: mode remove\ndata: selector #list-item-1\n\n)])
     end
 
     it 'takes D* options' do
-      dispatcher.remove_fragments('#list-item-1', id: 72)
+      dispatcher.remove_elements('#list-item-1', id: 72)
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-remove-fragments\nid: 72\ndata: selector #list-item-1\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: mode remove\ndata: selector #list-item-1\n\n)])
+    end
+
+    it 'takes an array of selectors' do
+      dispatcher.remove_elements(%w[#item1 #item2])
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.open).to be(false)
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: mode remove\ndata: selector #item1, #item2\n\n)])
     end
   end
 
-  describe '#merge_signals' do
+  describe '#patch_signals' do
     it 'produces a streameable response body with D* signals' do
-      dispatcher.merge_signals %({ "foo": "bar" })
+      dispatcher.patch_signals %({ "foo": "bar" })
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-signals\ndata: signals { "foo": "bar" }\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals { "foo": "bar" }\n\n)])
     end
 
     it 'takes a Hash of signals' do
-      dispatcher.merge_signals(foo: 'bar')
+      dispatcher.patch_signals(foo: 'bar')
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-signals\ndata: signals {"foo":"bar"}\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals {"foo":"bar"}\n\n)])
     end
 
     it 'takes D* options' do
-      dispatcher.merge_signals({foo: 'bar'}, event_id: 72, retry_duration: 2000, only_if_missing: true)
+      dispatcher.patch_signals({foo: 'bar'}, event_id: 72, retry_duration: 2000, only_if_missing: true)
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-merge-signals\nid: 72\nretry: 2000\ndata: onlyIfMissing true\ndata: signals {"foo":"bar"}\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\nid: 72\nretry: 2000\ndata: onlyIfMissing true\ndata: signals {"foo":"bar"}\n\n)])
+    end
+
+    it 'takes a (JSON encoded) string as signals' do
+      signals = <<~JSON
+      {
+        "foo": "bar",
+        "age": 42
+      }
+      JSON
+      dispatcher.patch_signals(signals)
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.split_lines).to eq([
+        %(event: datastar-patch-signals),
+        %(data: signals {),
+        %(data: signals   "foo": "bar",),
+        %(data: signals   "age": 42),
+        %(data: signals }),
+      ])
     end
   end
 
   describe '#remove_signals' do
-    it 'produces a streameable response body with D* remove-signals' do
+    it 'sets signal values to null via #patch_signals' do
       dispatcher.remove_signals ['user.name', 'user.email']
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-remove-signals\ndata: paths user.name\ndata: paths user.email\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\ndata: signals {"user":{"name":null,"email":null}}\n\n)])
     end
 
     it 'takes D* options' do
@@ -184,41 +231,25 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-remove-signals\nid: 72\nretry: 2000\ndata: paths user.name\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-signals\nid: 72\nretry: 2000\ndata: signals {"user":{"name":null}}\n\n)])
     end
   end
 
   describe '#execute_script' do
-    it 'produces a streameable response body with D* execute-script' do
+    it 'appends a <script> tag via patch-elements' do
       dispatcher.execute_script %(alert('hello'))
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: script alert('hello')\n\n\n)])
-    end
-
-    it 'splits multi-line script into multiple data lines' do
-      dispatcher.execute_script %(alert('hello');\nalert('world'))
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: script alert('hello');\ndata: script alert('world')\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script data-effect="el.remove()">alert('hello')</script>\n\n)])
     end
 
     it 'takes D* options' do
-      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: !Datastar::Consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE
+      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: false
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\nid: 72\ndata: autoRemove false\ndata: script alert('hello')\n\n\n)])
-    end
-
-    it 'omits autoRemove true' do
-      dispatcher.execute_script %(alert('hello')), event_id: 72, auto_remove: Datastar::Consts::DEFAULT_EXECUTE_SCRIPT_AUTO_REMOVE
-      socket = TestSocket.new
-      dispatcher.response.body.call(socket)
-      expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\nid: 72\ndata: script alert('hello')\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\ndata: selector body\ndata: mode append\ndata: elements <script>alert('hello')</script>\n\n)])
     end
 
     it 'takes attributes Hash' do
@@ -226,15 +257,30 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: attributes type text/javascript\ndata: attributes title alert\ndata: script alert('hello')\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script type="text/javascript" title="alert" data-effect="el.remove()">alert('hello')</script>\n\n)])
     end
 
-    it 'takes attributes Hash' do
-      dispatcher.execute_script %(alert('hello')), attributes: { type: 'module', title: 'alert' }
+    it 'accepts camelized string options' do
+      dispatcher.execute_script(
+        %(console.log('hello');),
+        'eventId' => 'event1',
+        'retryDuration' => 2000,
+        'attributes' => {
+          'type' => 'text/javascript',
+          'blocking' => false
+        },
+        'autoRemove' => false
+      )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
-      expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: attributes title alert\ndata: script alert('hello')\n\n\n)])
+      expect(socket.split_lines).to eq([
+        %(event: datastar-patch-elements),
+        %(id: event1),
+        %(retry: 2000),
+        %(data: selector body),
+        %(data: mode append),
+        %(data: elements <script type="text/javascript" blocking="false">console.log('hello');</script>)
+      ])
     end
   end
 
@@ -244,7 +290,7 @@ RSpec.describe Datastar::Dispatcher do
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
-      expect(socket.lines).to eq([%(event: datastar-execute-script\ndata: script setTimeout(() => { window.location = '/guide' })\n\n\n)])
+      expect(socket.lines).to eq([%(event: datastar-patch-elements\ndata: selector body\ndata: mode append\ndata: elements <script data-effect="el.remove()">setTimeout(() => { window.location = '/guide' })</script>\n\n)])
     end
   end
 
@@ -328,21 +374,24 @@ RSpec.describe Datastar::Dispatcher do
   describe '#stream' do
     it 'writes multiple events to socket' do
       socket = TestSocket.new
+      dispatcher.on_error do |ex|
+        raise ex
+      end
       dispatcher.stream do |sse|
-        sse.merge_fragments %(<div id="foo">\n<span>hello</span>\n</div>\n)
-        sse.merge_signals(foo: 'bar')
+        sse.patch_elements %(<div id="foo">\n<span>hello</span>\n</div>)
+        sse.patch_signals(foo: 'bar')
       end
 
       dispatcher.response.body.call(socket)
       expect(socket.open).to be(false)
       expect(socket.lines.size).to eq(2)
-      expect(socket.lines[0]).to eq("event: datastar-merge-fragments\ndata: fragments <div id=\"foo\">\ndata: fragments <span>hello</span>\ndata: fragments </div>\n\n\n")
-      expect(socket.lines[1]).to eq("event: datastar-merge-signals\ndata: signals {\"foo\":\"bar\"}\n\n\n")
+      expect(socket.lines[0]).to eq("event: datastar-patch-elements\ndata: elements <div id=\"foo\">\ndata: elements <span>hello</span>\ndata: elements </div>\n\n")
+      expect(socket.lines[1]).to eq("event: datastar-patch-signals\ndata: signals {\"foo\":\"bar\"}\n\n")
     end
 
     it 'returns a Rack array response' do
-      status, headers, body = dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+      status, headers, _body = dispatcher.stream do |sse|
+        sse.patch_signals(foo: 'bar')
       end
       expect(status).to eq(200)
       expect(headers['content-type']).to eq('text/event-stream')
@@ -376,7 +425,7 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.on_client_disconnect { |conn| connected = false }
 
       socket = TestSocket.new
-      allow(socket).to receive(:<<).with("\n\n").and_raise(Errno::EPIPE, 'Socket closed')
+      allow(socket).to receive(:<<).with("\n").and_raise(Errno::EPIPE, 'Socket closed')
 
       dispatcher.stream do |sse|
         sleep 10
@@ -395,7 +444,7 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.on_client_disconnect { |conn| connected = false }
 
       socket = TestSocket.new
-      allow(socket).to receive(:<<).with("\n\n").and_raise(Errno::EPIPE, 'Socket closed')
+      allow(socket).to receive(:<<).with("\n").and_raise(Errno::EPIPE, 'Socket closed')
 
       dispatcher.stream do |sse|
         sleep 0.001
@@ -431,7 +480,7 @@ RSpec.describe Datastar::Dispatcher do
       connected = false
       dispatcher.on_connect { |conn| connected = true }
       dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
@@ -445,7 +494,7 @@ RSpec.describe Datastar::Dispatcher do
         .on_client_disconnect { |conn| events << false }
 
       dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
       socket = TestSocket.new
       allow(socket).to receive(:<<).and_raise(Errno::EPIPE, 'Socket closed')
@@ -464,7 +513,7 @@ RSpec.describe Datastar::Dispatcher do
         sse.check_connection!
       end
       socket = TestSocket.new
-      allow(socket).to receive(:<<).with("\n\n").and_raise(Errno::EPIPE, 'Socket closed')
+      allow(socket).to receive(:<<).with("\n").and_raise(Errno::EPIPE, 'Socket closed')
       
       dispatcher.response.body.call(socket)
       expect(events).to eq([true, false])
@@ -477,7 +526,7 @@ RSpec.describe Datastar::Dispatcher do
         .on_server_disconnect { |conn| events << false }
 
       dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
       socket = TestSocket.new
       
@@ -491,7 +540,7 @@ RSpec.describe Datastar::Dispatcher do
       dispatcher.on_error { |ex| errors << ex }
 
       dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
       socket = TestSocket.new
       allow(socket).to receive(:<<).and_raise(ArgumentError, 'Invalid argument')
@@ -508,7 +557,7 @@ RSpec.describe Datastar::Dispatcher do
       allow(socket).to receive(:<<).and_raise(ArgumentError, 'Invalid argument')
       
       dispatcher.stream do |sse|
-        sse.merge_signals(foo: 'bar')
+        sse.patch_signals(foo: 'bar')
       end
       dispatcher.response.body.call(socket)
       expect(errs.first).to be_a(ArgumentError)
