@@ -138,7 +138,8 @@ class AttributeGenerator:
         """Create signals that are computed based on an expression."""
         computed = {**(computed_dict if computed_dict else {}), **computed}
         first, *rest = (
-            BaseAttr("computed", key=sig, value=expr, alias=self._alias) for sig, expr in computed.items()
+            BaseAttr("computed", key=sig, value=expr, alias=self._alias)
+            for sig, expr in computed.items()
         )
         first._other_attrs = rest
         return first
