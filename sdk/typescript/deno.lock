@@ -171,7 +171,6 @@
     "packageJson": {
       "dependencies": [
         "npm:@types/node@^22.10.2",
-        "npm:deepmerge-ts@^7.1.4",
         "npm:typescript@~5.6.2"
       ]
     }

@@ -32,9 +32,7 @@
     "npm/README.md",
     "README.md"
   ],
-  "dependencies": {
-    "deepmerge-ts": "^7.1.4"
-  },
+  "dependencies": {},
   "devDependencies": {
     "typescript": "~5.6.2",
     "@types/node": "^22.10.2"
