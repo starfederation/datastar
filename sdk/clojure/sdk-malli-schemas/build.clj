@@ -4,12 +4,11 @@
 
 (def project (-> (edn/read-string (slurp "deps.edn"))
                  :aliases :neil :project))
-(def lib (or (:name project) 'my/lib1))
+(def lib (:name project))
+(def version (:version project))
+(assert lib ":name must be set in deps.edn under the :neil alias")
+(assert version ":version must be set in deps.edn under the :neil alias")
 
-;; use neil project set version 1.2.0 to update the version in deps.edn
-
-(def version (or (:version project)
-                 "1.2.0"))
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
 (def uber-file (format "target/%s-%s-standalone.jar" (name lib) version))
