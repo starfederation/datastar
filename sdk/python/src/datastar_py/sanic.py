@@ -57,14 +57,14 @@ P = ParamSpec("P")
 
 def datastar_response(
     func: Callable[P, Awaitable[DatastarEvents] | DatastarEvents],
-) -> Callable[P, Awaitable[DatastarResponse]]:
+) -> Callable[P, Awaitable[DatastarResponse | None]]:
     """A decorator which wraps a function result in DatastarResponse.
 
     Can be used on a sync or async function or generator function.
     """
 
     @wraps(func)
-    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> DatastarResponse:
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> DatastarResponse | None:
         r = func(*args, **kwargs)
         if isinstance(r, Awaitable):
             return DatastarResponse(await r)
@@ -74,14 +74,14 @@ def datastar_response(
             async for event in r:
                 await response.send(event)
             await response.eof()
-            return response
+            return None
         if isgenerator(r):
             request = args[0]
             response = await request.respond(response=DatastarResponse())
             for event in r:
                 await response.send(event)
             await response.eof()
-            return response
+            return None
         return DatastarResponse(r)
 
     wrapper.__annotations__["return"] = "DatastarResponse"

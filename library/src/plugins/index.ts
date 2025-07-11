@@ -1,24 +1,29 @@
-import { SetAll } from './framework/actions/setAll'
-import { ToggleAll } from './framework/actions/toggleAll'
-import { Attr } from './framework/attributes/attr'
-import { Bind } from './framework/attributes/bind'
-import { Class } from './framework/attributes/class'
-import { Indicator } from './framework/attributes/indicator'
-import { JsonSignals } from './framework/attributes/jsonSignals'
-import { On } from './framework/attributes/on'
-import { OnIntersect } from './framework/attributes/onIntersect'
-import { OnInterval } from './framework/attributes/onInterval'
-import { OnLoad } from './framework/attributes/onLoad'
-import { Ref } from './framework/attributes/ref'
-import { Show } from './framework/attributes/show'
-import { Text } from './framework/attributes/text'
-import { DELETE } from './framework/backend/actions/delete'
-import { GET } from './framework/backend/actions/get'
-import { PATCH } from './framework/backend/actions/patch'
-import { POST } from './framework/backend/actions/post'
-import { PUT } from './framework/backend/actions/put'
-import { PatchElements } from './framework/backend/watchers/patchElements'
-import { PatchSignals } from './framework/backend/watchers/patchSignals'
+import { Peek } from '../plugins/actions/peek'
+import { SetAll } from '../plugins/actions/setAll'
+import { ToggleAll } from '../plugins/actions/toggleAll'
+import { Attr } from '../plugins/attributes/attr'
+import { Bind } from '../plugins/attributes/bind'
+import { Class } from '../plugins/attributes/class'
+import { Computed } from '../plugins/attributes/computed'
+import { Effect } from '../plugins/attributes/effect'
+import { Indicator } from '../plugins/attributes/indicator'
+import { JsonSignals } from '../plugins/attributes/jsonSignals'
+import { On } from '../plugins/attributes/on'
+import { OnIntersect } from '../plugins/attributes/onIntersect'
+import { OnInterval } from '../plugins/attributes/onInterval'
+import { OnLoad } from '../plugins/attributes/onLoad'
+import { OnSignalPatch } from "../plugins/attributes/onSignalPatch";
+import { Ref } from '../plugins/attributes/ref'
+import { Show } from '../plugins/attributes/show'
+import { Signals } from '../plugins/attributes/signals'
+import { Text } from '../plugins/attributes/text'
+import { DELETE } from '../plugins/backend/actions/delete'
+import { GET } from '../plugins/backend/actions/get'
+import { PATCH } from '../plugins/backend/actions/patch'
+import { POST } from '../plugins/backend/actions/post'
+import { PUT } from '../plugins/backend/actions/put'
+import { PatchElements } from '../plugins/backend/watchers/patchElements'
+import { PatchSignals } from '../plugins/backend/watchers/patchSignals'
 
 export {
   // Backend
@@ -33,16 +38,21 @@ export {
   Attr,
   Bind,
   Class,
+  Computed,
+  Effect,
   Indicator,
   JsonSignals,
   On,
   OnIntersect,
   OnInterval,
   OnLoad,
+	OnSignalPatch,
   Ref,
   Show,
+  Signals,
   Text,
   // Actions
+  Peek,
   SetAll,
   ToggleAll,
 }

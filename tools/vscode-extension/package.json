@@ -7,7 +7,7 @@
   "publisher": "starfederation",
   "license": "MIT",
   "repository": "https://github.com/starfederation/datastar",
-  "icon": "./src/icon.png",
+  "icon": "src/icon.png",
   "galleryBanner": {
     "color": "#bee3f8",
     "theme": "light"
@@ -22,7 +22,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./src/extension.js",
+  "main": "src/extension.js",
   "contributes": {
     "configuration": {
       "title": "Datastar",
