@@ -38,18 +38,6 @@ export abstract class ServerSentEventGenerator {
     }
   }
 
-  /**
-   * Validates that the provided string is valid JSON.
-   * @param jsonString - The JSON string to validate
-   * @throws {Error} If the JSON is invalid
-   */
-  private validateJSON(jsonString: string): void {
-    try {
-      JSON.parse(jsonString);
-    } catch (error) {
-      throw new Error(`Invalid JSON provided: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  }
 
   /**
    * Validates required parameters are not empty or undefined.
@@ -189,8 +177,6 @@ export abstract class ServerSentEventGenerator {
     // Validate required parameters
     this.validateRequired(signals, 'signals');
     
-    // Validate JSON format
-    this.validateJSON(signals);
 
     const { eventId, retryDuration, ...eventOptions } = options ||
       {} as Partial<PatchSignalsOptions>;
