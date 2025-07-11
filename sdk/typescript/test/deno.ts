@@ -27,7 +27,7 @@ serve(async (req: Request) => {
     }
 
     return ServerSentEventGenerator.stream((stream) => {
-      stream.PatchElements(
+      stream.patchElements(
         `<div id="toMerge">Hello ${reader.signals.foo}</div>`,
       );
     });
@@ -43,9 +43,9 @@ serve(async (req: Request) => {
     }
   } else if (url.pathname.includes("await")) {
     return ServerSentEventGenerator.stream(async (stream) => {
-      stream.PatchElements('<div id="toMerge">Merged</div>');
+      stream.patchElements('<div id="toMerge">Merged</div>');
       await delay(5000);
-      stream.PatchElements('<div id="toMerge">After 5 seconds</div>');
+      stream.patchElements('<div id="toMerge">After 5 seconds</div>');
     });
   }
 
@@ -79,13 +79,13 @@ function testEvents(
     // Convert camelCase to method calls like Python SDK does
     switch (type) {
       case "patchElements":
-        handlePatchElements(stream, e);
+        handlepatchElements(stream, e);
         break;
       case "removeElements":
         handleRemoveElements(stream, e);
         break;
       case "patchSignals":
-        handlePatchSignals(stream, e);
+        handlepatchSignals(stream, e);
         break;
       case "removeSignals":
         handleRemoveSignals(stream, e);
@@ -95,19 +95,19 @@ function testEvents(
         break;
       // Legacy support for old event types
       case "mergeFragments":
-        handlePatchElements(stream, { ...e, mode: e.mode || "outer" });
+        handlepatchElements(stream, { ...e, mode: e.mode || "outer" });
         break;
       case "removeFragments":
         handleRemoveElements(stream, e);
         break;
       case "mergeSignals":
-        handlePatchSignals(stream, e);
+        handlepatchSignals(stream, e);
         break;
     }
   });
 }
 
-function handlePatchElements(stream: ServerSentEventGenerator, e: Record<string, Jsonifiable>) {
+function handlepatchElements(stream: ServerSentEventGenerator, e: Record<string, Jsonifiable>) {
   if (e !== null && typeof e === "object") {
     const { elements, mode, selector, useViewTransition, ...options } = e;
     
@@ -119,25 +119,25 @@ function handlePatchElements(stream: ServerSentEventGenerator, e: Record<string,
     
     // For remove mode, elements might be empty which is fine
     const elementsToUse = (elements as string) || "";
-    stream.PatchElements(elementsToUse, patchOptions);
+    stream.patchElements(elementsToUse, patchOptions);
   }
 }
 
 function handleRemoveElements(stream: ServerSentEventGenerator, e: Record<string, Jsonifiable>) {
   if (e !== null && typeof e === "object" && "selector" in e) {
     const { selector, ...options } = e;
-    stream.PatchElements("", { ...options, mode: "remove", selector: selector as string });
+    stream.patchElements("", { ...options, mode: "remove", selector: selector as string });
   }
 }
 
-function handlePatchSignals(stream: ServerSentEventGenerator, e: Record<string, Jsonifiable>) {
+function handlepatchSignals(stream: ServerSentEventGenerator, e: Record<string, Jsonifiable>) {
   if (e !== null && typeof e === "object") {
     const { signals, "signals-raw": signalsRaw, ...options } = e;
     
     if (signalsRaw) {
-      stream.PatchSignals(signalsRaw as string, options || undefined);
+      stream.patchSignals(signalsRaw as string, options || undefined);
     } else if (signals) {
-      stream.PatchSignals(JSON.stringify(signals), options || undefined);
+      stream.patchSignals(JSON.stringify(signals), options || undefined);
     }
   }
 }
@@ -150,7 +150,7 @@ function handleRemoveSignals(stream: ServerSentEventGenerator, e: Record<string,
     pathArray.forEach(path => {
       removeSignals[path] = null;
     });
-    stream.PatchSignals(JSON.stringify(removeSignals), options || undefined);
+    stream.patchSignals(JSON.stringify(removeSignals), options || undefined);
   }
 }
 
@@ -174,7 +174,7 @@ function handleExecuteScript(stream: ServerSentEventGenerator, e: Record<string,
     scriptElement += `>${script}</script>`;
     
     // Use append mode with body selector (Python SDK pattern)
-    stream.PatchElements(scriptElement, { 
+    stream.patchElements(scriptElement, { 
       mode: "append", 
       selector: "body",
       ...options 

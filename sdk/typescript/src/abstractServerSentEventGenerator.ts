@@ -131,7 +131,7 @@ export abstract class ServerSentEventGenerator {
    * @param [options] - Additional options for patching.
    * @throws {Error} If validation fails
    */
-  public PatchElements(
+  public patchElements(
     elements: string,
     options?: PatchElementsOptions,
   ): ReturnType<typeof this.send> {
@@ -182,7 +182,7 @@ export abstract class ServerSentEventGenerator {
    * @param [options] - Additional options for patching.
    * @throws {Error} If validation fails
    */
-  public PatchSignals(
+  public patchSignals(
     signals: string,
     options?: PatchSignalsOptions,
   ): ReturnType<typeof this.send> {

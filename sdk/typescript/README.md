@@ -1,8 +1,9 @@
-<p align="center"><img width="150" src="https://putyourlightson.com/assets/logos/datastar.svg"></p>
 
-# Datastar TypeScript SDK
+<p align="center"><img width="200" height="200" src="https://data-star.dev/static/images/rocket-512x512.png"></p>
 
-![Static Badge](https://img.shields.io/badge/run_time-node_js-2a682d?logo=nodedotjs&labelColor=black) ![Static Badge](https://img.shields.io/badge/run_time-deno-6affaf?logo=deno&labelColor=black) ![Static Badge](https://img.shields.io/badge/run_time-bun-f672b6?logo=bun&labelColor=black)
+# Datastar TypeScript SDK 
+
+[![Version](https://img.shields.io/badge/version-1.0.0–RC.1-orange)](https://github.com/starfederation/datastar/releases) ![Static Badge](https://img.shields.io/badge/run_time-node_js-2a682d?logo=nodedotjs&labelColor=black) ![Static Badge](https://img.shields.io/badge/run_time-deno-6affaf?logo=deno&labelColor=black) ![Static Badge](https://img.shields.io/badge/run_time-bun-f672b6?logo=bun&labelColor=black)
 
 A TypeScript SDK for building reactive web applications with [Datastar](https://github.com/starfederation/datastar).
 
@@ -59,10 +60,10 @@ if (!reader.success) {
 // Stream updates back to the client
 ServerSentEventGenerator.stream(req, res, (stream) => {
     // Patch signals
-    stream.PatchSignals(JSON.stringify({ foo: reader.signals.foo }));
+    stream.patchSignals(JSON.stringify({ foo: reader.signals.foo }));
     
     // Patch DOM elements
-    stream.PatchElements(`<div id="toMerge">Hello <span data-text="$foo">${reader.signals.foo}</span></div>`);
+    stream.patchElements(`<div id="toMerge">Hello <span data-text="$foo">${reader.signals.foo}</span></div>`);
 });
 ```
 
@@ -139,7 +140,7 @@ Creates a Server-Sent Event stream for real-time communication.
 
 #### Stream Instance Methods
 
-##### `PatchSignals(signals, options?)`
+##### `patchSignals(signals, options?)`
 Patches signals into the client signal store.
 
 **Parameters:**
@@ -148,10 +149,10 @@ Patches signals into the client signal store.
 
 **Example:**
 ```javascript
-stream.PatchSignals(JSON.stringify({ foo: "bar", count: 42 }));
+stream.patchSignals(JSON.stringify({ foo: "bar", count: 42 }));
 ```
 
-##### `PatchElements(elements, options?)`
+##### `patchElements(elements, options?)`
 Patches HTML elements into the client DOM.
 
 **Parameters:**
@@ -165,7 +166,7 @@ Patches HTML elements into the client DOM.
 
 **Example:**
 ```javascript
-stream.PatchElements('<div id="myDiv">Updated content</div>');
+stream.patchElements('<div id="myDiv">Updated content</div>');
 ```
 
 ## Development
@@ -271,5 +272,5 @@ You'll need to implement:
 - `send`: Send data to clients
 
 The abstract class provides these public methods:
-- `PatchElements(elements, options?)`: Patch HTML elements
-- `PatchSignals(signals, options?)`: Patch signal data
+- `patchElements(elements, options?)`: Patch HTML elements
+- `patchSignals(signals, options?)`: Patch signal data

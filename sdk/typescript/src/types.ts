@@ -7,7 +7,7 @@ import {
   DatastarDatalineUseViewTransition,
   DefaultElementPatchMode,
   DefaultElementsUseViewTransitions,
-  DefaultPatchSignalsOnlyIfMissing,
+  DefaultpatchSignalsOnlyIfMissing,
   EventTypes,
   ElementPatchModes,
 } from "./consts.ts";
@@ -46,7 +46,7 @@ export interface PatchElementsOptions extends ElementOptions {
   [DatastarDatalineSelector]?: string;
 }
 
-export interface PatchElementsEvent {
+export interface patchElementsEvent {
   event: "datastar-patch-elements";
   options: PatchElementsOptions;
   [DatastarDatalineElements]: string;
@@ -56,7 +56,7 @@ export interface PatchSignalsOptions extends DatastarEventOptions {
   [DatastarDatalineOnlyIfMissing]?: boolean;
 }
 
-export interface PatchSignalsEvent {
+export interface patchSignalsEvent {
   event: "datastar-patch-signals";
   options: PatchSignalsOptions;
   [DatastarDatalineSignals]: Record<string, Jsonifiable>;
@@ -79,11 +79,11 @@ export type DatastarEventOptionsUnion =
   | DatastarEventOptions;
 
 export type DatastarEvent =
-  | PatchElementsEvent
-  | PatchSignalsEvent;
+  | patchElementsEvent
+  | patchSignalsEvent;
 
 export const DefaultMapping = {
   [DatastarDatalinePatchMode]: DefaultElementPatchMode,
   [DatastarDatalineUseViewTransition]: DefaultElementsUseViewTransitions,
-  [DatastarDatalineOnlyIfMissing]: DefaultPatchSignalsOnlyIfMissing,
+  [DatastarDatalineOnlyIfMissing]: DefaultpatchSignalsOnlyIfMissing,
 } as const;
