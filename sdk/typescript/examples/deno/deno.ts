@@ -12,7 +12,7 @@ serve(async (req: Request) => {
       },
     );
   } else if (url.pathname.includes("/merge")) {
-    const reader = await ServerSentEventGenerator.ReadSignals(req);
+    const reader = await ServerSentEventGenerator.readSignals(req);
 
     if (!reader.success) {
       console.error("Error while reading signals", reader.error);

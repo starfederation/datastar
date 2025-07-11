@@ -14,7 +14,7 @@ serve(async (req: Request) => {
       },
     );
   } else if (url.pathname.includes("/merge")) {
-    const reader = await ServerSentEventGenerator.ReadSignals(req);
+    const reader = await ServerSentEventGenerator.readSignals(req);
 
     if (!reader.success) {
       console.error("Error while reading signals", reader.error);
@@ -32,7 +32,7 @@ serve(async (req: Request) => {
       );
     });
   } else if (url.pathname.includes("/test")) {
-    const reader = await ServerSentEventGenerator.ReadSignals(req);
+    const reader = await ServerSentEventGenerator.readSignals(req);
     if (reader.success === true) {
       const events = reader.signals.events;
       if (isEventArray(events)) {

@@ -50,7 +50,7 @@ Here's a simple example in Node showing how to read client signals and send back
 import { ServerSentEventGenerator } from "datastar-sdk/node";
 
 // Read signals from the client request
-const reader = await ServerSentEventGenerator.ReadSignals(req);
+const reader = await ServerSentEventGenerator.readSignals(req);
 
 if (!reader.success) {
     console.error('Error reading signals:', reader.error);
@@ -102,7 +102,7 @@ The main class for handling Datastar communication.
 
 #### Static Methods
 
-##### `ReadSignals(request)`
+##### `readSignals(request)`
 Reads signals from a client request.
 
 **Parameters:**
@@ -267,7 +267,7 @@ To support additional runtimes or frameworks, extend the abstract `ServerSentEve
 
 You'll need to implement:
 - `constructor`: Initialize runtime-specific components
-- `ReadSignals`: Parse signals from requests  
+- `readSignals`: Parse signals from requests  
 - `stream`: Create SSE streams
 - `send`: Send data to clients
 
