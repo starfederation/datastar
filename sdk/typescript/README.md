@@ -62,11 +62,7 @@ ServerSentEventGenerator.stream(req, res, (stream) => {
     stream.PatchSignals(JSON.stringify({ foo: reader.signals.foo }));
     
     // Patch DOM elements
-    stream.PatchElements(`
-        <div id="toMerge">
-            Hello <span data-text="$foo">${reader.signals.foo}</span>
-        </div>
-    `, { mode: "outer" });
+    stream.PatchElements(`<div id="toMerge">Hello <span data-text="$foo">${reader.signals.foo}</span></div>`);
 });
 ```
 
@@ -169,7 +165,7 @@ Patches HTML elements into the client DOM.
 
 **Example:**
 ```javascript
-stream.PatchElements('<div id="myDiv">Updated content</div>', { mode: "outer" });
+stream.PatchElements('<div id="myDiv">Updated content</div>');
 ```
 
 ## Development
