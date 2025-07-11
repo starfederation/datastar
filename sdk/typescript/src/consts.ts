@@ -20,7 +20,7 @@ export const DefaultSseRetryDurationMs = 1000;
 export const DefaultElementsUseViewTransitions = false;
 
 // Should a given set of signals patch if they are missing?
-export const DefaultpatchSignalsOnlyIfMissing = false;
+export const DefaultPatchSignalsOnlyIfMissing = false;
 
 // #endregion
 

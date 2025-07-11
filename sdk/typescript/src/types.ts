@@ -7,7 +7,7 @@ import {
   DatastarDatalineUseViewTransition,
   DefaultElementPatchMode,
   DefaultElementsUseViewTransitions,
-  DefaultpatchSignalsOnlyIfMissing,
+  DefaultPatchSignalsOnlyIfMissing,
   EventTypes,
   ElementPatchModes,
 } from "./consts.ts";
@@ -85,5 +85,5 @@ export type DatastarEvent =
 export const DefaultMapping = {
   [DatastarDatalinePatchMode]: DefaultElementPatchMode,
   [DatastarDatalineUseViewTransition]: DefaultElementsUseViewTransitions,
-  [DatastarDatalineOnlyIfMissing]: DefaultpatchSignalsOnlyIfMissing,
+  [DatastarDatalineOnlyIfMissing]: DefaultPatchSignalsOnlyIfMissing,
 } as const;
