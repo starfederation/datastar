@@ -10,7 +10,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "datastar-sdk": "^1.0.0-beta.11"
+    "datastar-sdk": "^1.0.0-RC.1"
   },
   "scripts": {
     "start": "bun bun.ts"
