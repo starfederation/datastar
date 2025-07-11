@@ -45,16 +45,14 @@ export const Default{%s b.Name.Pascal %} = {%v b.Value %};
 
 {%- for _, enum := range data.Enums -%}
 // {%s= enum.Description %}
-export const {%s enum.Name.Pascal %}s = {
 {%- for _, entry := range enum.Values -%}
-    // {%s= entry.Description %}
-    {%s entry.Name.Pascal %}: "{%s entry.Value %}",
+// {%s= entry.Description %}
+export const {%s enum.Name.Pascal %}{%s entry.Name.Pascal %} = "{%s entry.Value %}"
 {%- endfor -%}
-} as const;
 {%- if enum.Default != nil -%}
 
 // Default value for {%s enum.Name.Pascal %}
-export const Default{%s enum.Name.Pascal %} = {%s enum.Name.Pascal %}s.{%s enum.Default.Name.Pascal %};
+export const Default{%s enum.Name.Pascal %} = {%s enum.Name.Pascal %}{%s enum.Default.Name.Pascal %};
 
 {%- endif -%}
 {%- endfor -%}
