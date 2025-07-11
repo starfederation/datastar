@@ -177,8 +177,6 @@ export abstract class ServerSentEventGenerator {
     // Validate required parameters
     this.validateRequired(signals, 'signals');
     
-    // Validate JSON format
-    this.validateJSON(signals);
 
     const { eventId, retryDuration, ...eventOptions } = options ||
       {} as Partial<PatchSignalsOptions>;
