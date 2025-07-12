@@ -226,7 +226,7 @@ class AttributeGenerator:
     def on_signal_patch(
         self, expression: str, include: str | None = None, exclude: str | None = None
     ) -> OnSignalPatchAttr:
-        """(PRO) Execute an expression when a signal patch taxes plase."""
+        """Execute an expression when a signal patch taxes plase."""
         attr = OnSignalPatchAttr(value=expression, alias=self._alias)
         if include or exclude:
             attr.filter(include, exclude)
@@ -243,7 +243,7 @@ class AttributeGenerator:
 
     def ref(self, signal_name: str) -> BaseAttr:
         """Create a signal which references the element on which the attribute is placed."""
-        return BaseAttr("red", value=signal_name, alias=self._alias)
+        return BaseAttr("ref", value=signal_name, alias=self._alias)
 
     def replace_url(self, url_expression: str) -> BaseAttr:
         """(PRO) Replace the URL in the browser without replacing the page."""
