@@ -2,7 +2,7 @@
 
 export const DATASTAR = "datastar" as const;
 export const DATASTAR_REQUEST = "Datastar-Request";
-export const VERSION = "1.0.0-RC.1";
+export const VERSION = "1.0.0-RC.12";
 
 // #region Defaults
 
@@ -10,12 +10,6 @@ export const VERSION = "1.0.0-RC.1";
 
 // The default duration for retrying SSE on connection reset. This is part of the underlying retry mechanism of SSE.
 export const DefaultSseRetryDurationMs = 1000;
-
-// #endregion
-
-
-// #region Default strings
-
 
 // #endregion
 
@@ -33,11 +27,12 @@ export const DefaultPatchSignalsOnlyIfMissing = false;
 // #region Datalines
 
 export const DatastarDatalineSelector = "selector"
-export const DatastarDatalineMode = "mode"
+export const DatastarDatalinePatchMode = "mode"
 export const DatastarDatalineElements = "elements"
 export const DatastarDatalineUseViewTransition = "useViewTransition"
 export const DatastarDatalineSignals = "signals"
 export const DatastarDatalineOnlyIfMissing = "onlyIfMissing"
+export const DatastarDatalinePaths = "paths"
 // #endregion
 
 
@@ -45,22 +40,22 @@ export const DatastarDatalineOnlyIfMissing = "onlyIfMissing"
 
 // The mode in which an element is patched into the DOM.
 export const ElementPatchModes = [
-// Morphs the element into the existing element.
+// Morph entire element, preserving state
     "outer",
-// Replaces the inner HTML of the existing element.
+// Morph inner HTML only, preserving state
     "inner",
-// Removes the existing element.
-    "remove",
-// Replaces the existing element with the new element.
+// Replace entire element, reset state
     "replace",
-// Prepends the element inside to the existing element.
+// Insert at beginning inside target
     "prepend",
-// Appends the element inside the existing element.
+// Insert at end inside target
     "append",
-// Inserts the element before the existing element.
+// Insert before target element
     "before",
-// Inserts the element after the existing element.
+// Insert after target element
     "after",
+// Remove target element from DOM
+    "remove",
 ] as const;
 
 // Default value for ElementPatchMode

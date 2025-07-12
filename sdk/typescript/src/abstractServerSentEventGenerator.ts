@@ -2,18 +2,20 @@ import {
   DatastarEventOptions,
   DefaultMapping,
   EventType,
-  ExecuteScriptOptions,
-  FragmentOptions,
-  MergeFragmentsOptions,
-  MergeSignalsOptions,
+  PatchElementsOptions,
+  PatchSignalsOptions,
+  Jsonifiable,
+  ElementPatchMode,
 } from "./types.ts";
 
 import {
-  DefaultExecuteScriptAttributes,
+  DatastarDatalineElements,
+  DatastarDatalinePatchMode,
+  DatastarDatalineSelector,
+  DatastarDatalineSignals,
   DefaultSseRetryDurationMs,
+  ElementPatchModes,
 } from "./consts.ts";
-
-import type { Jsonifiable } from "npm:type-fest";
 
 /**
  * Abstract ServerSentEventGenerator class, responsible for initializing and handling
@@ -24,6 +26,30 @@ import type { Jsonifiable } from "npm:type-fest";
  */
 export abstract class ServerSentEventGenerator {
   protected constructor() {}
+
+  /**
+   * Validates that the provided mode is a valid ElementPatchMode.
+   * @param mode - The mode to validate
+   * @throws {Error} If the mode is invalid
+   */
+  private validateElementPatchMode(mode: string): asserts mode is ElementPatchMode {
+    if (!ElementPatchModes.includes(mode as ElementPatchMode)) {
+      throw new Error(`Invalid ElementPatchMode: "${mode}". Valid modes are: ${ElementPatchModes.join(', ')}`);
+    }
+  }
+
+
+  /**
+   * Validates required parameters are not empty or undefined.
+   * @param value - The value to validate
+   * @param paramName - The parameter name for error messages
+   * @throws {Error} If the value is empty or undefined
+   */
+  private validateRequired(value: string | undefined, paramName: string): asserts value is string {
+    if (!value || value.trim() === '') {
+      throw new Error(`${paramName} is required and cannot be empty`);
+    }
+  }
 
   /**
    * Sends a server-sent event (SSE) to the client.
@@ -55,7 +81,7 @@ export abstract class ServerSentEventGenerator {
       dataLines.map((data) => {
         return `data: ${data}\n`;
       }),
-      ["\n\n"],
+      ["\n"],
     );
   }
 
@@ -80,130 +106,85 @@ export abstract class ServerSentEventGenerator {
 
   private hasDefaultValue(key: string, val: unknown): boolean {
     if (key in DefaultMapping) {
-      return val === DefaultMapping[key as keyof typeof DefaultMapping];
+      return val === (DefaultMapping as Record<string, unknown>)[key];
     }
 
     return false;
   }
 
   /**
-   * Sends a merge fragments event.
+   * Patches HTML elements into the DOM.
    *
-   * @param fragments - HTML fragments that will be merged.
-   * @param [options] - Additional options for merging.
+   * @param elements - HTML elements that will be patched.
+   * @param [options] - Additional options for patching.
+   * @throws {Error} If validation fails
    */
-  public mergeFragments(
-    data: string,
-    options?: MergeFragmentsOptions,
+  public patchElements(
+    elements: string,
+    options?: PatchElementsOptions,
   ): ReturnType<typeof this.send> {
     const { eventId, retryDuration, ...renderOptions } = options ||
-      {} as Partial<MergeFragmentsOptions>;
+      {} as Partial<PatchElementsOptions>;
 
-    const dataLines = this.eachOptionIsADataLine(renderOptions)
-      .concat(this.eachNewlineIsADataLine("fragments", data));
+    // Validate patch mode if provided
+    const patchMode = (renderOptions as Record<string, unknown>)[DatastarDatalinePatchMode] as string;
+    if (patchMode) {
+      this.validateElementPatchMode(patchMode);
+    }
 
-    return this.send("datastar-merge-fragments", dataLines, {
-      eventId,
-      retryDuration,
-    });
-  }
+    // Check if we're in remove mode with a selector
+    const selector = (renderOptions as Record<string, unknown>)[DatastarDatalineSelector] as string;
+    const isRemoveWithSelector = patchMode === 'remove' && selector;
 
-  /**
-   * Sends a remove fragments event.
-   *
-   * @param selector - CSS selector of fragments to remove.
-   * @param [options] - Additional options for removing.
-   */
-  public removeFragments(selector: string, options?: FragmentOptions) {
-    const { eventId, retryDuration, ...eventOptions } = options ||
-      {} as Partial<FragmentOptions>;
-    const dataLines = this.eachOptionIsADataLine(eventOptions)
-      .concat(this.eachNewlineIsADataLine("selector", selector));
+    // Validate required parameters - elements only required when not removing with selector
+    if (!isRemoveWithSelector) {
+      this.validateRequired(elements, 'elements');
+    }
 
-    return this.send("datastar-remove-fragments", dataLines, {
-      eventId,
-      retryDuration,
-    });
-  }
-
-  /**
-   * Sends a merge signals event.
-   *
-   * @param data - Data object or json string that will be merged into the client's signals.
-   * @param [options] - Additional options for merging.
-   */
-  public mergeSignals(
-    data: Record<string, Jsonifiable> | string,
-    options?: MergeSignalsOptions,
-  ): ReturnType<typeof this.send> {
-    const { eventId, retryDuration, ...eventOptions } = options ||
-      {} as Partial<MergeSignalsOptions>;
-
-    const signals = typeof data === "string" ? data : JSON.stringify(data);
-    const dataLines = this.eachOptionIsADataLine(eventOptions)
-      .concat(this.eachNewlineIsADataLine("signals", signals));
-
-    return this.send("datastar-merge-signals", dataLines, {
-      eventId,
-      retryDuration,
-    });
-  }
-
-  /**
-   * Sends a remove signals event.
-   *
-   * @param paths - An array of paths or a string containing space separated paths.
-   * @param [options] - Additional options for removing signals.
-   */
-  public removeSignals(
-    paths: string[] | string,
-    options?: DatastarEventOptions,
-  ): ReturnType<typeof this.send> {
-    const eventOptions = options || {} as DatastarEventOptions;
-    const pathsArray = typeof paths === "string"
-      ? paths.split(" ")
-      : paths.flatMap((path) => path.split(" "));
-
-    const dataLines = pathsArray.map((path) => `paths ${path}`);
-
-    return this.send("datastar-remove-signals", dataLines, eventOptions);
-  }
-
-  /**
-   * Executes a script on the client-side.
-   *
-   * @param script - Script code to execute.
-   * @param [options] - Additional options for execution.
-   */
-  public executeScript(
-    script: string,
-    options?: ExecuteScriptOptions,
-  ): ReturnType<typeof this.send> {
-    const {
-      eventId,
-      retryDuration,
-      attributes,
-      ...eventOptions
-    } = options || {} as Partial<ExecuteScriptOptions>;
-    const attributesArray = attributes instanceof Array
-      ? attributes
-      : this.eachOptionIsADataLine(attributes ?? {});
-
-    const attributesDataLines = attributesArray.filter((line) => {
-      const parts = line.split(" ");
-      const defaultParts = DefaultExecuteScriptAttributes.split(" ");
-      if (parts[0] === defaultParts[0] && parts[1]) {
-        return parts[1] !== defaultParts[1];
+    // Per spec: If no selector specified, elements must have IDs (this validation would be complex
+    // and is better handled client-side, but we ensure elements is not empty)
+    if (!selector && patchMode === 'remove') {
+      // For remove mode, elements parameter may be omitted when selector is supplied
+      // but since we have no selector, we need elements with IDs
+      if (!elements || elements.trim() === '') {
+        throw new Error('For remove mode without selector, elements parameter with IDs is required');
       }
-      return true;
-    }).map((line) => `attributes ${line}`);
+    }
 
-    const dataLines = attributesDataLines.concat(
-      this.eachOptionIsADataLine(eventOptions),
-      this.eachNewlineIsADataLine("script", script),
-    );
+    // Build data lines - skip elements data line if empty in remove mode with selector
+    const dataLines = this.eachOptionIsADataLine(renderOptions);
+    if (!isRemoveWithSelector || elements.trim() !== '') {
+      dataLines.push(...this.eachNewlineIsADataLine(DatastarDatalineElements, elements));
+    }
 
-    return this.send("datastar-execute-script", dataLines, {
+    return this.send("datastar-patch-elements", dataLines, {
+      eventId,
+      retryDuration,
+    });
+  }
+
+  /**
+   * Patches signals into the signal store.
+   *
+   * @param signals - JSON string containing signal data to patch.
+   * @param [options] - Additional options for patching.
+   * @throws {Error} If validation fails
+   */
+  public patchSignals(
+    signals: string,
+    options?: PatchSignalsOptions,
+  ): ReturnType<typeof this.send> {
+    // Validate required parameters
+    this.validateRequired(signals, 'signals');
+    
+
+    const { eventId, retryDuration, ...eventOptions } = options ||
+      {} as Partial<PatchSignalsOptions>;
+
+    const dataLines = this.eachOptionIsADataLine(eventOptions)
+      .concat(this.eachNewlineIsADataLine(DatastarDatalineSignals, signals));
+
+    return this.send("datastar-patch-signals", dataLines, {
       eventId,
       retryDuration,
     });

@@ -1,12 +1,12 @@
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
-import { ServerSentEventGenerator } from "../src/web/serverSentEventGenerator.ts";
+import { ServerSentEventGenerator } from "npm:datastar-sdk/web";
 
 serve(async (req: Request) => {
   const url = new URL(req.url);
 
   if (url.pathname === "/") {
     return new Response(
-      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
+      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
       {
         headers: { "Content-Type": "text/html" },
       },
@@ -31,7 +31,7 @@ serve(async (req: Request) => {
     }
 
     return ServerSentEventGenerator.stream((stream) => {
-      stream.mergeFragments(
+      stream.patchElements(
         `<div id="toMerge">Hello ${reader.signals.foo}</div>`,
       );
     });

@@ -9,14 +9,15 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
-
     "module": "commonjs",
     "outDir": "dist",
     "sourceMap": true,
-
     "declaration": true,
-    "lib": ["es2022"]
+    "lib": [
+      "es2022"
+    ]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["src/web/deno.ts"]
+  "include": [
+    "src/**/*.ts"
+  ],
 }

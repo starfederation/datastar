@@ -1,8 +1,5 @@
-import { DatastarEventOptions, EventType, sseHeaders, StreamOptions } from "../types.ts";
+import { DatastarEventOptions, EventType, sseHeaders, StreamOptions, Jsonifiable } from "../types.ts";
 import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator.ts";
-
-import type { Jsonifiable } from "npm:type-fest";
-import { deepmerge } from "npm:deepmerge-ts";
 
 function isRecord(obj: unknown): obj is Record<string, Jsonifiable> {
   return typeof obj === "object" && obj !== null;
@@ -82,9 +79,13 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
 
     return new Response(
       readableStream,
-      deepmerge({
-        headers: sseHeaders,
-      }, options?.responseInit ?? {}),
+      {
+        ...options?.responseInit,
+        headers: {
+          ...sseHeaders,
+          ...(options?.responseInit?.headers as Record<string, string> || {}),
+        },
+      },
     );
   }
 
@@ -95,9 +96,9 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
   ): string[] {
     const eventLines = super.send(event, dataLines, options);
 
-    eventLines.forEach((line) => {
-      this.controller?.enqueue(new TextEncoder().encode(line));
-    });
+    // Join all lines and encode as a single chunk to avoid extra newlines
+    const eventText = eventLines.join('');
+    this.controller?.enqueue(new TextEncoder().encode(eventText));
 
     return eventLines;
   }

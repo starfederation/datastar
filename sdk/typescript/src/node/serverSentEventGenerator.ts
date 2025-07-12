@@ -1,10 +1,9 @@
-import { DatastarEventOptions, EventType, sseHeaders, StreamOptions } from "../types.ts";
+import { DatastarEventOptions, EventType, sseHeaders, StreamOptions, Jsonifiable } from "../types.ts";
 
 import { ServerSentEventGenerator as AbstractSSEGenerator } from "../abstractServerSentEventGenerator.ts";
 
 import { IncomingMessage, ServerResponse } from "node:http";
 import process from "node:process";
-import type { Jsonifiable } from "npm:type-fest";
 
 function isRecord(obj: unknown): obj is Record<string, Jsonifiable> {
   return typeof obj === "object" && obj !== null;
@@ -25,6 +24,8 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
     this.res = res;
 
     this.res.writeHead(200, sseHeaders);
+    // Per spec: "Should flush response immediately to prevent timeouts"
+    this.res.flushHeaders();
   }
 
   /**
@@ -86,9 +87,9 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
   ): string[] {
     const eventLines = super.send(event, dataLines, options);
 
-    eventLines.forEach((line) => {
-      this.res.write(line);
-    });
+    // Join all lines and write as a single chunk to avoid extra newlines
+    const eventText = eventLines.join('');
+    this.res.write(eventText);
 
     return eventLines;
   }
@@ -135,19 +136,25 @@ export class ServerSentEventGenerator extends AbstractSSEGenerator {
         resolve(chunks);
       });
     });
-    let parsedBody = {};
+    
     try {
       if (typeof body !== "string") throw Error("body was not a string");
-      parsedBody = JSON.parse(body);
+      const parsedBody = JSON.parse(body);
+      
+      if (isRecord(parsedBody)) {
+        return { success: true, signals: parsedBody };
+      } else {
+        throw new Error("Parsed JSON body is not of type record");
+      }
     } catch (e: unknown) {
       if (isRecord(e) && "message" in e && typeof e.message === "string") {
         return { success: false, error: e.message };
-      } else {return {
+      } else {
+        return {
           success: false,
           error: "unknown error when parsing request",
-        };}
+        };
+      }
     }
-
-    return { success: true, signals: parsedBody };
   }
 }

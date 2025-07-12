@@ -1,6 +1,5 @@
 import { createServer } from "node:http";
-// for this to work the esm build needs to be generated, see ../README.md
-import { ServerSentEventGenerator } from "../npm/esm/node/serverSentEventGenerator.js";
+import { ServerSentEventGenerator } from "datastar-sdk/node";
 
 const hostname = "127.0.0.1";
 const port = 3000;
@@ -10,7 +9,7 @@ const server = createServer(async (req, res) => {
     const headers = new Headers({ "Content-Type": "text/html" });
     res.setHeaders(headers);
     res.end(
-      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.1/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
+      `<html><head><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script></head><body><div id="toMerge" data-signals-foo="'World'" data-on-load="@get('/merge')">Hello</div></body></html>`,
     );
   } else if (req.url?.includes("/merge")) {
     const reader = await ServerSentEventGenerator.readSignals(req);
@@ -29,7 +28,7 @@ const server = createServer(async (req, res) => {
     }
 
     ServerSentEventGenerator.stream(req, res, (stream) => {
-      stream.mergeFragments(
+      stream.patchElements(
         `<div id="toMerge">Hello ${reader.signals.foo}</div>`,
       );
     });
