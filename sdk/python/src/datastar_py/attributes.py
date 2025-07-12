@@ -243,7 +243,7 @@ class AttributeGenerator:
 
     def ref(self, signal_name: str) -> BaseAttr:
         """Create a signal which references the element on which the attribute is placed."""
-        return BaseAttr("red", value=signal_name, alias=self._alias)
+        return BaseAttr("ref", value=signal_name, alias=self._alias)
 
     def replace_url(self, url_expression: str) -> BaseAttr:
         """(PRO) Replace the URL in the browser without replacing the page."""
