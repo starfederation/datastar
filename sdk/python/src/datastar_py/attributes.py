@@ -226,7 +226,7 @@ class AttributeGenerator:
     def on_signal_patch(
         self, expression: str, include: str | None = None, exclude: str | None = None
     ) -> OnSignalPatchAttr:
-        """(PRO) Execute an expression when a signal patch taxes plase."""
+        """Execute an expression when a signal patch taxes plase."""
         attr = OnSignalPatchAttr(value=expression, alias=self._alias)
         if include or exclude:
             attr.filter(include, exclude)
