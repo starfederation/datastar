@@ -5,3 +5,4 @@ data: elements <script data-effect="el.remove()">if (true) {
 data: elements   console.log('hello');
 data: elements }</script>
 
+

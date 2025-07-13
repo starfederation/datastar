@@ -3,3 +3,4 @@ data: mode append
 data: selector body
 data: elements <script data-effect="el.remove()">console.log('hello');</script>
 
+
