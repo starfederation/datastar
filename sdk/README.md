@@ -15,8 +15,8 @@ The Datastar SDKs have moved to their own repositories for better maintainabilit
 
 The SDK configuration has moved from a Go-based build system to a JSON-based configuration:
 
-- **Configuration**: [`datastar-sdk-config.json`](./datastar-sdk-config.json) - Contains all constants and defaults
-- **Schema**: [`datastar-sdk-config.schema.json-v1.json`](./datastar-sdk-config.schema.json-v1.json) - JSON schema for validation
+- **Configuration**: [`datastar-sdk-config-v1.json`](./datastar-sdk-config.json) - Contains all constants and defaults
+- **Schema**: [`datastar-sdk-config-v1.schema.json`](./datastar-sdk-config.schema.json-v1.json) - JSON schema for validation
 - **Migration Guide**: [`SDK_MIGRATION_GUIDE.md`](./SDK_MIGRATION_GUIDE.md) - Guide for migrating from the old build system
 - **Architecture Decision Record**: [`ADR.md`](./ADR.md) - SDK architecture and specification
 
