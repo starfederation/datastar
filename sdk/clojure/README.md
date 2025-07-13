@@ -81,7 +81,7 @@ You then use the Datastar SDK functions with the SSE generator.
 Start by requiring the main API and an adapter. With Http-kit for instance:
 
 ```clojure
-(require '[starfederation.datastar.clojure.api :as d*])
+(require '[starfederation.datastar.clojure.api :as d*]
          '[starfederation.datastar.clojure.adapter.http-kit :as hk-gen])
 
 ```
