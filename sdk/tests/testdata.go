@@ -31,10 +31,12 @@ func init() {
 	}
 }
 
+// TestSSEGetEndpoints is an exported version of the GET endpoint tests
 func TestSSEGetEndpoints(t *testing.T) {
 	runTestCases(t, testData, "golden/get", runGetTest)
 }
 
+// TestSSEPostEndpoints is an exported version of the POST endpoint tests
 func TestSSEPostEndpoints(t *testing.T) {
 	runTestCases(t, testData, "golden/post", runPostTest)
 }
@@ -337,4 +339,3 @@ func normalizeHTML(htmlStr string) string {
 	
 	return strings.TrimSpace(result)
 }
-
