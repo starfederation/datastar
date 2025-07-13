@@ -42,7 +42,7 @@ compare_sse() {
     # Use awk to parse and compare SSE events
 awk '
 BEGIN {
-    RS = "\n\n\n"  # Events separated by double newlines
+    RS = "\n\n"  # Events separated by double newlines
     FS = "\n"      # Fields separated by single newlines
     event_count_1 = 0
     event_count_2 = 0
