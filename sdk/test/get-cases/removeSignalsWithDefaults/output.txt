@@ -1,4 +1,0 @@
-event: datastar-patch-signals
-data: signals {"one":null}
-
-

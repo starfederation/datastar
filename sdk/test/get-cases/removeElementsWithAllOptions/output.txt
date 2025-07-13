@@ -1,8 +1,0 @@
-event: datastar-patch-elements
-id: event1
-retry: 2000
-data: selector #target
-data: mode remove
-data: useViewTransition true
-
-

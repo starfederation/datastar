@@ -27,6 +27,28 @@ tasks:
       - pnpm i
       - pnpm build
 
+  test-sdk:
+    desc: Run SDK tests
+    dir: sdk/tests
+    env:
+      TEST_SERVER_URL: '{{.SERVER | default "http://localhost:7331"}}'
+    cmds:
+      - go mod tidy
+      - go test -v ./...
+
+  test-sdk-docker:
+    desc: Run SDK tests in Docker
+    dir: sdk/tests
+    cmds:
+      - docker-compose build
+      - docker-compose run --rm test-runner
+
+  install-sdk-tests:
+    desc: Install the datastar-sdk-tests command
+    dir: sdk/tests
+    cmds:
+      - go install ./cmd/datastar-sdk-tests
+
   default:
     cmds:
       - task: site

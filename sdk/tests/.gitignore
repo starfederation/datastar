@@ -1,0 +1,13 @@
+# Test output files
+**/**/norm*.txt
+**/**/testOutput.txt
+
+# Test output directory created on failures
+testdata/
+
+# Go test binary
+*.test
+
+# Go build output
+test-runner
+compare-sse
