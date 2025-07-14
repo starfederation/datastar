@@ -148,7 +148,7 @@ You can find more information in several places:
 
 ## Adapter behaviors:
 
-Ring adapters are not made equals. This leads to our SSE generators not having
+Ring adapters are not made equal. This leads to our SSE generators not having
 the exact same behaviors in some cases.
 
 ### SSE connection lifetime in ring when trying to store the sse-gen somewhere
@@ -167,7 +167,7 @@ handling the request. This is a valid strategy when using java's virtual threads
 
 | Adapter      |                                                                        |
 | ------------ | ---------------------------------------------------------------------- |
-| all adapters | alive until the client or the server explicitely closes the connection |
+| all adapters | alive until the client or the server explicitly closes the connection |
 
 ### Detecting a closed connection
 
