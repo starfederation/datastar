@@ -106,7 +106,7 @@ RSpec.describe Datastar::Dispatcher do
 
     it 'works with #call(view_context:) interfaces' do
       template_class = Class.new do
-        def self.call(view_context:) = %(<div id="foo">\n<span>#{view_context}</span>\n</div>\n)
+        def self.call(context:) = %(<div id="foo">\n<span>#{context}</span>\n</div>\n)
       end
 
       dispatcher.patch_elements(
@@ -116,7 +116,31 @@ RSpec.describe Datastar::Dispatcher do
       )
       socket = TestSocket.new
       dispatcher.response.body.call(socket)
-      expect(socket.lines).to eq([%(event: datastar-patch-elements\nid: 72\nretry: 2000\ndata: elements <div id="foo">\ndata: elements <span>#{view_context}</span>\ndata: elements </div>\n\n)])
+      expect(socket.split_lines).to eq([
+        %(event: datastar-patch-elements),
+        %(id: 72),
+        %(retry: 2000),
+        %(data: elements <div id="foo">),
+        %(data: elements <span>#[Double "View context"]</span>),
+        %(data: elements </div>)
+      ])
+    end
+
+    require 'phlex'
+    it 'works with Phlex components' do
+      component_class = Class.new(Phlex::HTML) do
+        def view_template
+          h1(id: 'foo') { 'Hello, ' + context.to_s }
+        end
+      end
+
+      dispatcher.patch_elements(component_class.new)
+      socket = TestSocket.new
+      dispatcher.response.body.call(socket)
+      expect(socket.split_lines).to eq([
+        %(event: datastar-patch-elements),
+        %(data: elements <h1 id="foo">Hello, #[Double &quot;View context&quot;]</h1>)
+      ])
     end
 
     it 'works with #render_in(view_context, &) interfaces' do
