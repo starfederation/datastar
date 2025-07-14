@@ -123,7 +123,7 @@ module Datastar
       if element.respond_to?(:render_in)
         element.render_in(view_context)
       elsif element.respond_to?(:call)
-        element.call(view_context:)
+        element.call(context: view_context)
       else
         element
       end
