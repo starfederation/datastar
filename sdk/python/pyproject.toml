@@ -1,7 +1,7 @@
 [project]
 name = "datastar-py"
 description = "Helper functions and classes for the Datastar library (https://data-star.dev/)"
-version = "0.5.0"
+version = "0.6.0"
 readme = "README.md"
 authors = [
     { name = "Felix Ingram", email = "f.ingram@gmail.com" },
