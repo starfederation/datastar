@@ -41,3 +41,23 @@ tasks:
     dir: sdk/tests
     cmds:
       - go install ./cmd/datastar-sdk-tests
+
+  build-sdk-tests-docker:
+    desc: Build Docker image for datastar-sdk-tests
+    dir: sdk/tests
+    sources:
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
+      - "Dockerfile"
+    generates:
+      - ".docker-build-timestamp"
+    cmds:
+      - docker build -t datastar-sdk-tests:latest .
+      - touch .docker-build-timestamp
+
+  run-sdk-tests-docker:
+    desc: Run datastar-sdk-tests in Docker container
+    deps: [build-sdk-tests-docker]
+    cmds:
+      - docker run --rm --network host datastar-sdk-tests:latest {{.CLI_ARGS}}

@@ -11,3 +11,6 @@ testdata/
 # Go build output
 test-runner
 compare-sse
+
+# sdk tests
+.docker-build-timestamp
