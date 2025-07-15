@@ -31,13 +31,6 @@ go run github.com/starfederation/datastar/sdk/tests/cmd/datastar-sdk-tests@lates
 go run github.com/starfederation/datastar/sdk/tests/cmd/datastar-sdk-tests@latest -v
 ```
 
-### Using Docker
-
-```bash
-# Run tests using Docker container
-docker run --rm --network host datastar-sdk-tests:latest -server http://localhost:7331 -v
-```
-
 ### Using go test directly
 
 ```bash
