@@ -3,12 +3,14 @@ package sdktests
 import (
 	"bytes"
 	"embed"
+  "flag"
 	"fmt"
 	"io"
 	"io/fs"
 	"net/http"
 	"net/url"
 	"os"
+  "path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -23,12 +25,10 @@ import (
 //go:embed golden
 var testData embed.FS
 
-var serverURL = os.Getenv("TEST_SERVER_URL")
+var serverURL string
 
 func init() {
-	if serverURL == "" {
-		serverURL = "http://localhost:7331"
-	}
+  flag.StringVar(&serverURL, "server", "http://localhost:7331", "Server URL to test against")
 }
 
 // TestSSEGetEndpoints is an exported version of the GET endpoint tests
@@ -64,8 +64,8 @@ func runTestCases(t *testing.T, embedFS embed.FS, casesDir string, runTest func(
 	for testName := range testCases {
 		testName := testName // capture for closure
 		t.Run(testName, func(t *testing.T) {
-			inputPath := filepath.Join(casesDir, testName, "input.json")
-			outputPath := filepath.Join(casesDir, testName, "output.txt")
+      inputPath := path.Join(casesDir, testName, "input.json")
+			outputPath := path.Join(casesDir, testName, "output.txt")
 
 			// Read input from embedded FS
 			inputData, err := embedFS.ReadFile(inputPath)
