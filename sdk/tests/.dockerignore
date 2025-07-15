@@ -1,0 +1,23 @@
+# Git files
+.git
+.gitignore
+
+# Test output
+testdata/
+**/**/testOutput.txt
+**/**/norm*.txt
+
+# Go test cache
+*.test
+
+# IDE files
+.vscode/
+.idea/
+
+# Documentation
+*.md
+
+# Docker files (don't copy into context)
+Dockerfile
+docker-compose.yml
+.dockerignore
