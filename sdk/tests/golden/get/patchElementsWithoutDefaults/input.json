@@ -1,0 +1,8 @@
+{
+  "events": [
+    {
+      "type": "patchElements",
+      "elements": "<div>Merge</div>"
+    }
+  ]
+}

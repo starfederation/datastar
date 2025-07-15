@@ -1,0 +1,10 @@
+{
+  "events": [
+    {
+      "type": "patchSignals",
+      "signals": {
+        "one": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "events": [
+    {
+      "type": "patchSignals",
+      "signals": {
+        "one": "first\n signal",
+        "two": "second signal"
+      }
+    }
+  ]
+}

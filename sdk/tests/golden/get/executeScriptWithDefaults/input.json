@@ -1,0 +1,9 @@
+{
+  "events": [
+    {
+      "type": "executeScript",
+      "script": "console.log('hello');",
+      "autoRemove": true
+    }
+  ]
+}
