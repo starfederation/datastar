@@ -11,7 +11,6 @@ import (
 
 func main() {
 	var (
-		serverURL = flag.String("server", "http://localhost:7331", "Test server URL")
 		verbose   = flag.Bool("v", false, "Verbose output")
 		testType  = flag.String("type", "all", "Test type: get, post, or all")
 		help      = flag.Bool("h", false, "Show help")
@@ -30,9 +29,6 @@ func main() {
 		fmt.Println("  datastar-sdk-tests -server http://localhost:8080")
 		os.Exit(0)
 	}
-
-	// Set environment variable for tests
-	os.Setenv("TEST_SERVER_URL", *serverURL)
 
 	// Create a testing.M to run tests
 	var tests []testing.InternalTest

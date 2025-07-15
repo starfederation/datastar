@@ -3,6 +3,7 @@ package sdktests
 import (
 	"bytes"
 	"embed"
+	"flag"
 	"fmt"
 	"io"
 	"io/fs"
@@ -23,12 +24,10 @@ import (
 //go:embed golden
 var testData embed.FS
 
-var serverURL = os.Getenv("TEST_SERVER_URL")
+var serverURL string
 
 func init() {
-	if serverURL == "" {
-		serverURL = "http://localhost:7331"
-	}
+    flag.StringVar(&serverURL, "server", "http://localhost:7331", "Test server URL")
 }
 
 // TestSSEGetEndpoints is an exported version of the GET endpoint tests
