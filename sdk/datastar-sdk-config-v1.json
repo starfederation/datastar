@@ -1,0 +1,76 @@
+{
+	"$schema": "./datastar-sdk-config.schema.json-v1.json",
+	"datastarKey": "datastar",
+	"defaults": {
+		"booleans": {
+			"elementsUseViewTransitions": false,
+			"patchSignalsOnlyIfMissing": false
+		},
+		"durations": {
+			"sseRetryDuration": 1000
+		}
+	},
+	"datalineLiterals": [
+		"selector",
+		"mode",
+		"elements",
+		"useViewTransition",
+		"signals",
+		"onlyIfMissing"
+	],
+	"enums": {
+		"ElementPatchMode": {
+			"description": "The mode in which an element is patched into the DOM.",
+			"default": "outer",
+			"values": [
+				{
+					"value": "outer",
+					"description": "Morphs the element into the existing element."
+				},
+				{
+					"value": "inner",
+					"description": "Replaces the inner HTML of the existing element."
+				},
+				{
+					"value": "remove",
+					"description": "Removes the existing element."
+				},
+				{
+					"value": "replace",
+					"description": "Replaces the existing element with the new element."
+				},
+				{
+					"value": "prepend",
+					"description": "Prepends the element inside to the existing element."
+				},
+				{
+					"value": "append",
+					"description": "Appends the element inside the existing element."
+				},
+				{
+					"value": "before",
+					"description": "Inserts the element before the existing element."
+				},
+				{
+					"value": "after",
+					"description": "Inserts the element after the existing element."
+				}
+			]
+		},
+		"EventType": {
+			"description": "The type protocol on top of SSE which allows for core pushed based communication between the server and the client.",
+			"values": [
+				{
+					"name": "PatchElements",
+					"value": "datastar-patch-elements",
+					"description": "An event for patching HTML elements into the DOM."
+				},
+				{
+					"name": "PatchSignals",
+					"value": "datastar-patch-signals",
+					"description": "An event for patching signals."
+				}
+			]
+		}
+	}
+}

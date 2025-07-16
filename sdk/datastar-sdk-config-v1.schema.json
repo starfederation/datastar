@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://datastar.dev/schemas/sdk-config.schema.json",
+  "title": "Datastar SDK Configuration",
+  "description": "Configuration schema for Datastar SDK authors",
+  "type": "object",
+  "required": ["version", "datastarKey", "defaults", "enums", "datalineLiterals"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "The version of Datastar",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9]+)?$"
+    },
+    "datastarKey": {
+      "type": "string",
+      "description": "The key used for datastar attributes",
+      "default": "datastar"
+    },
+    "defaults": {
+      "type": "object",
+      "description": "Default values for various SDK settings",
+      "properties": {
+        "booleans": {
+          "type": "object",
+          "description": "Boolean default values",
+          "properties": {
+            "elementsUseViewTransitions": {
+              "type": "boolean",
+              "description": "Should elements be patched using the ViewTransition API?",
+              "default": false
+            },
+            "patchSignalsOnlyIfMissing": {
+              "type": "boolean",
+              "description": "Should a given set of signals patch if they are missing?",
+              "default": false
+            }
+          }
+        },
+        "durations": {
+          "type": "object",
+          "description": "Duration default values (in milliseconds)",
+          "properties": {
+            "sseRetryDuration": {
+              "type": "integer",
+              "description": "The default duration for retrying SSE on connection reset (in milliseconds)",
+              "default": 1000
+            }
+          }
+        }
+      }
+    },
+    "datalineLiterals": {
+      "type": "array",
+      "description": "Literal strings used in dataline attributes",
+      "items": {
+        "type": "string"
+      },
+      "default": ["selector", "mode", "elements", "useViewTransition", "signals", "onlyIfMissing"]
+    },
+    "enums": {
+      "type": "object",
+      "description": "Enum definitions used in the SDK",
+      "properties": {
+        "ElementPatchMode": {
+          "type": "object",
+          "description": "The mode in which an element is patched into the DOM",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "default": {
+              "type": "string"
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["value", "description"],
+                "properties": {
+                  "value": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "EventType": {
+          "type": "object",
+          "description": "The type protocol on top of SSE which allows for core pushed based communication between the server and the client",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["value", "description"],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
