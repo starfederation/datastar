@@ -6,8 +6,8 @@ import type { AttributePlugin } from '../../engine/types'
 import { pathToObj } from '../../utils/paths'
 import { modifyCasing } from '../../utils/text'
 import {
-  DATASTAR_SSE_EVENT,
-  type DatastarSSEEvent,
+  DATASTAR_FETCH_EVENT,
+  type DatastarFetchEvent,
   FINISHED,
   STARTED,
 } from '../backend/shared'
@@ -23,7 +23,7 @@ export const Indicator: AttributePlugin = {
 
     mergePatch(pathToObj({}, { [signalName]: false }), { ifMissing: true })
 
-    const watcher = ((event: CustomEvent<DatastarSSEEvent>) => {
+    const watcher = ((event: CustomEvent<DatastarFetchEvent>) => {
       const { type, el: elt } = event.detail
       if (elt !== el) {
         return
@@ -37,10 +37,10 @@ export const Indicator: AttributePlugin = {
           break
       }
     }) as EventListener
-    document.addEventListener(DATASTAR_SSE_EVENT, watcher)
+    document.addEventListener(DATASTAR_FETCH_EVENT, watcher)
     return () => {
       mergePatch(pathToObj({}, { [signalName]: false }))
-      document.removeEventListener(DATASTAR_SSE_EVENT, watcher)
+      document.removeEventListener(DATASTAR_FETCH_EVENT, watcher)
     }
   },
 }

@@ -9,7 +9,7 @@ import {
 import { kebab, modifyCasing } from '../../utils/text'
 import { modifyTiming } from '../../utils/timing'
 import { modifyViewTransition } from '../../utils/view-transitions'
-import { DATASTAR_SSE_EVENT } from '../backend/shared'
+import { DATASTAR_FETCH_EVENT } from '../backend/shared'
 
 export const On: AttributePlugin = {
   type: 'attribute',
@@ -62,7 +62,7 @@ export const On: AttributePlugin = {
     eventName = modifyCasing(eventName, mods)
     // Listen for Datastar events on the document
     if (
-      eventName === DATASTAR_SSE_EVENT ||
+      eventName === DATASTAR_FETCH_EVENT ||
       eventName === DATASTAR_SIGNAL_PATCH_EVENT
     ) {
       target = document

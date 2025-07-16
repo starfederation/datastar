@@ -636,8 +636,13 @@ const deep = (value: any, prefix = ''): any => {
                   dispatch({ [prefix + prop]: null })
                 }
               } else {
-                if (deepObj[prop](deep(newValue, `${prefix + prop}.`))) {
-                  dispatch({ [prefix + prop]: newValue })
+                if (Object.hasOwn(newValue, computedSymbol)) {
+                  deepObj[prop] = newValue
+                  dispatch({ [prefix + prop]: '' })
+                } else {
+                  if (deepObj[prop](deep(newValue, `${prefix + prop}.`))) {
+                    dispatch({ [prefix + prop]: newValue })
+                  }
                 }
               }
             } else {
@@ -1052,35 +1057,47 @@ function generateReactiveExpression(
     expr = ctx.value.trim()
   }
 
-  expr = expr.replace(
-    /\$([\w.-]+(?:\.[\w.-]+)*?)(?=\s|$|[^\w.-])/g,
-    (match, signalName) => {
-      // If the signal name ends with a hyphen followed by a $, it's likely two separate signals
-      // So we should not include the trailing hyphen in this signal name
-      if (
-        signalName.endsWith('-') &&
-        match.length < expr.length &&
-        expr[expr.indexOf(match) + match.length] === '$'
-      ) {
-        signalName = signalName.slice(0, -1)
-        const parts = signalName.split('.')
-        return `${parts.reduce((acc: string, part: string) => `${acc}['${part}']`, '$')}-`
-      }
+  // Replace signal references with bracket notation
+  // Examples:
+  //   $count          → $['count']
+  //   $count--        → $['count']--
+  //   $count++        → $['count']++
+  //   $count += 5     → $['count'] += 5
+  //   $foo = 5        → $['foo'] = 5
+  //   $foo.bar        → $['foo']['bar']
+  //   $foo-bar        → $['foo-bar']
+  //   $foo.bar-baz    → $['foo']['bar-baz']
+  //   $foo-$bar       → $['foo']-$['bar']
+  //   $arr[$index]    → $['arr'][$['index']]
+  //   $['foo']        → $['foo']
+  //   $foo[obj.bar]   → $['foo'][obj.bar]
+  //   $foo['bar.baz'] → $['foo']['bar.baz']
 
+  // Transform all signal patterns
+  expr = expr
+    // $['x'] → $x (normalize existing bracket notation)
+    .replace(/\$\['([a-zA-Z_$][\w$]*)'\]/g, '$$$1')
+    // $x → $['x'] (including dots and hyphens)
+    .replace(/\$([a-zA-Z_]\w*(?:[.-]\w+)*)/g, (_, signalName) => {
       const parts = signalName.split('.')
       return parts.reduce(
         (acc: string, part: string) => `${acc}['${part}']`,
         '$',
       )
-    },
-  )
+    })
+    // $ inside brackets: [$x] → [$['x']]
+    .replace(
+      /\[(\$[a-zA-Z_]\w*)\]/g,
+      (_, varName) => `[$['${varName.slice(1)}']]`,
+    )
 
   // Ignore any escaped values
   const escaped = new Map<string, string>()
   const escapeRe = RegExp(`(?:${DSP})(.*?)(?:${DSS})`, 'gm')
+  let counter = 0
   for (const match of expr.matchAll(escapeRe)) {
     const k = match[1]
-    const v = `dsEscaped${djb2(k)}`
+    const v = `dsEscaped${counter++}`
     escaped.set(v, k)
     expr = expr.replace(DSP + k + DSS, v)
   }
@@ -1143,13 +1160,4 @@ function generateReactiveExpression(
       error: error.message,
     })
   }
-}
-
-function djb2(str: string) {
-  let hash = 5831
-  let i = str.length
-  while (i--) {
-    hash += (hash << 5) + str.charCodeAt(i)
-  }
-  return (hash >>> 0).toString(36)
 }

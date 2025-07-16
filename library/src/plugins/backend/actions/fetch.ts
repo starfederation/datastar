@@ -14,8 +14,8 @@ import type {
 } from '../../../engine/types'
 import { kebab } from '../../../utils/text'
 import {
-  DATASTAR_SSE_EVENT,
-  type DatastarSSEEvent,
+  DATASTAR_FETCH_EVENT,
+  type DatastarFetchEvent,
   ERROR,
   FINISHED,
   RETRIES_FAILED,
@@ -24,7 +24,7 @@ import {
 } from '../shared'
 
 // Global store for active SSE controllers per element
-const activeSSEControllers = new WeakMap<HTMLOrSVG, AbortController>()
+const fetchAbortControllers = new WeakMap<HTMLOrSVG, AbortController>()
 
 // Helper to create HTTP method plugins with consistent structure
 export const createHttpMethod = (
@@ -36,32 +36,35 @@ export const createHttpMethod = (
   fn: async (ctx, url: string, args: FetchArgs) => {
     const { el } = ctx
 
-    // Abort any existing controller for this element
-    activeSSEControllers.get(el)?.abort()
+    const requestCancellation = args?.requestCancellation ?? 'auto'
+    const controller =
+      requestCancellation instanceof AbortController ? requestCancellation : new AbortController()
+    const isDisabled = requestCancellation === 'disabled'
+    if (!isDisabled) {
+      fetchAbortControllers.get(el)?.abort()
+    }
 
-    // Create new controller
-    const controller = new AbortController()
-    activeSSEControllers.set(el, controller)
+    if (!isDisabled && !(requestCancellation instanceof AbortController)) {
+      fetchAbortControllers.set(el, controller)
+    }
 
     try {
-      // Pass the abort signal to sse
-      await sse(ctx, method, url, args, controller.signal)
+      await fetcher(ctx, method, url, args, controller.signal)
     } finally {
-      // Clean up: remove this controller if it's still the active one
-      if (activeSSEControllers.get(el) === controller) {
-        activeSSEControllers.delete(el)
+      if (fetchAbortControllers.get(el) === controller) {
+        fetchAbortControllers.delete(el)
       }
     }
   },
 })
 
-const dispatchSSE = (
+const dispatchFetch = (
   type: string,
   el: HTMLOrSVG,
   argsRaw: Record<string, string>,
 ) =>
   document.dispatchEvent(
-    new CustomEvent<DatastarSSEEvent>(DATASTAR_SSE_EVENT, {
+    new CustomEvent<DatastarFetchEvent>(DATASTAR_FETCH_EVENT, {
       detail: { type, el, argsRaw },
     }),
   )
@@ -89,9 +92,10 @@ export type FetchArgs = {
   contentType?: 'json' | 'form'
   filterSignals?: SignalFilterOptions
   selector?: string
+  requestCancellation?: 'auto' | 'disabled' | AbortController
 }
 
-export const sse = async (
+const fetcher = async (
   { el, evt, filtered, runtimeErr }: RuntimeContext,
   method: string,
   url: string,
@@ -138,7 +142,7 @@ export const sse = async (
       signal: abort,
       onopen: async (response: Response) => {
         if (response.status >= 400)
-          dispatchSSE(ERROR, el, { status: response.status.toString() })
+          dispatchFetch(ERROR, el, { status: response.status.toString() })
       },
       onmessage: (evt) => {
         if (!evt.event.startsWith(DATASTAR)) return
@@ -156,7 +160,7 @@ export const sse = async (
           Object.entries(argsRawLines).map(([k, v]) => [k, v.join('\n')]),
         )
 
-        dispatchSSE(type, el, argsRaw)
+        dispatchFetch(type, el, argsRaw)
       },
       onerror: (error) => {
         if (isWrongContent(error)) {
@@ -166,7 +170,7 @@ export const sse = async (
         // do nothing and it will retry
         if (error) {
           console.error(error.message)
-          dispatchSSE(RETRYING, el, { message: error.message })
+          dispatchFetch(RETRYING, el, { message: error.message })
         }
       },
     }
@@ -268,14 +272,14 @@ export const sse = async (
                 loaded += data.byteLength
 
                 const progress = Math.round((loaded / total) * 100)
-                dispatchSSE('upload-progress', el, {
+                dispatchFetch('upload-progress', el, {
                   progress: progress.toString(),
                   loaded: loaded.toString(),
                   total: total.toString(),
                 })
               }
 
-              dispatchSSE('upload-progress', el, {
+              dispatchFetch('upload-progress', el, {
                 progress: '0',
                 loaded: '0',
                 total: total.toString(),
@@ -316,7 +320,7 @@ export const sse = async (
                 write(encoder.encode(`--${boundary}--\r\n`))
 
                 if (loaded < total) {
-                  dispatchSSE('upload-progress', el, {
+                  dispatchFetch('upload-progress', el, {
                     progress: '100',
                     loaded: total.toString(),
                     total: total.toString(),
@@ -344,7 +348,7 @@ export const sse = async (
       throw runtimeErr('SseInvalidContentType', { action, contentType })
     }
 
-    dispatchSSE(STARTED, el, {})
+    dispatchFetch(STARTED, el, {})
     urlInstance.search = queryParams.toString()
 
     try {
@@ -359,7 +363,7 @@ export const sse = async (
       // set the content-type to text/event-stream
     }
   } finally {
-    dispatchSSE(FINISHED, el, {})
+    dispatchFetch(FINISHED, el, {})
     cleanupFn()
   }
 }
@@ -561,7 +565,6 @@ function fetchEventSource(
   return new Promise<void>((resolve, reject) => {
     // make a copy of the input headers since we may modify it below:
     const headers: Record<string, string> = {
-      accept: 'text/event-stream',
       ...inputHeaders,
     }
 
@@ -627,8 +630,9 @@ function fetchEventSource(
             if (v) argsRaw[n] = v
           }
 
-          dispatchSSE(dispatchType, el, argsRaw)
+          dispatchFetch(dispatchType, el, argsRaw)
           dispose()
+          resolve()
         }
 
         const ct = response.headers.get('Content-Type')
@@ -710,7 +714,7 @@ function fetchEventSource(
               retryMaxWaitMs,
             ) // exponential backoff
             if (++retries >= retryMaxCount) {
-              dispatchSSE(RETRIES_FAILED, el, {})
+              dispatchFetch(RETRIES_FAILED, el, {})
               // we should not retry anymore:
               dispose()
               reject('Max retries reached.') // Max retries reached, check your server or network connection

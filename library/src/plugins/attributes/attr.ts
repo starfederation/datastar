@@ -14,57 +14,37 @@ export const Attr: AttributePlugin = {
     const syncAttr = (key: string, val: any) => {
       if (val === '' || val === true) {
         el.setAttribute(key, '')
-      } else if (val === false || val === null || val === undefined) {
+      } else if (val === false || val == null) {
         el.removeAttribute(key)
       } else {
         el.setAttribute(key, val)
       }
     }
-    if (key === '') {
-      const observer = new MutationObserver(() => {
-        observer.disconnect()
-        const obj = rx() as Record<string, any>
-        for (const [key, val] of Object.entries(obj)) {
-          syncAttr(key, val)
-        }
-        observer.observe(el, {
-          attributeFilter: Object.keys(obj),
-        })
-      })
-      const cleanup = effect(() => {
-        observer.disconnect()
-        const obj = rx() as Record<string, any>
-        for (const key in obj) {
-          syncAttr(key, obj[key])
-        }
-        observer.observe(el, {
-          attributeFilter: Object.keys(obj),
-        })
-      })
 
-      return () => {
-        observer.disconnect()
-        cleanup()
-      }
-    }
-    // Attributes are always kebab-case
-    const k = kebab(key)
-    const observer = new MutationObserver(() => {
-      observer.disconnect()
-      const value = rx<string>()
-      syncAttr(k, value)
-      observer.observe(el, {
-        attributeFilter: [value],
-      })
-    })
-    const cleanup = effect(() => {
-      observer.disconnect()
-      const value = rx<string>()
-      syncAttr(k, value)
-      observer.observe(el, {
-        attributeFilter: [value],
-      })
-    })
+    key = kebab(key)
+    const update = key
+      ? () => {
+          observer.disconnect()
+          const val = rx<string>()
+          syncAttr(key, val)
+          observer.observe(el, {
+            attributeFilter: [key],
+          })
+        }
+      : () => {
+          observer.disconnect()
+          const obj = rx<Record<string, any>>()
+          const attributeFilter = Object.keys(obj)
+          for (const key of attributeFilter) {
+            syncAttr(key, obj[key])
+          }
+          observer.observe(el, {
+            attributeFilter,
+          })
+        }
+
+    const observer = new MutationObserver(update)
+    const cleanup = effect(update)
 
     return () => {
       observer.disconnect()

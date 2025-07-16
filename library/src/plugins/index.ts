@@ -16,6 +16,7 @@ import { OnSignalPatch } from "../plugins/attributes/onSignalPatch";
 import { Ref } from '../plugins/attributes/ref'
 import { Show } from '../plugins/attributes/show'
 import { Signals } from '../plugins/attributes/signals'
+import { Style } from '../plugins/attributes/style'
 import { Text } from '../plugins/attributes/text'
 import { DELETE } from '../plugins/backend/actions/delete'
 import { GET } from '../plugins/backend/actions/get'
@@ -50,6 +51,7 @@ export {
   Ref,
   Show,
   Signals,
+  Style,
   Text,
   // Actions
   Peek,

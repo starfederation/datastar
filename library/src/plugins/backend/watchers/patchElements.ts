@@ -491,9 +491,9 @@ function morphNode(
       }
     }
 
-    //  many bothans died to bring us information:
+    //  many bothans died to bring us this information:
     //  https://github.com/patrick-steele-idem/morphdom/blob/master/src/specialElHandlers.js
-    //  https://github.com/choojs/nanomorph/blob/master/lib/morph.jsL113
+    //  https://github.com/choojs/nanomorph/blob/master/lib/morph.js#L113
     if (
       oldNode instanceof HTMLInputElement &&
       newNode instanceof HTMLInputElement &&
