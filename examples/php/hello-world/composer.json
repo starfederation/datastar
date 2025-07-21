@@ -1,7 +1,0 @@
-{
-  "require": {
-    "starfederation/datastar-php": "1.0.0-beta.7"
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
-}

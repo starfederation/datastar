@@ -1,9 +1,0 @@
-[package]
-edition = "2024"
-name = "hello_world"
-version = "0.1.0"
-rust-version = "1.85.0"
-
-[dependencies]
-datastar = { path = "../../../../sdk/rust", features = ["rocket"] }
-rocket = { version = "0.5.1", default-features = false, features = ["json"] }
