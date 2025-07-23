@@ -13,7 +13,7 @@ body:
         If you still believe you’ve found a bug, please provide a clear and concise description, including:
         - What is happening and what you expected to happen.
         - Steps to reproduce the issue.
-        - Screenshots, if applicable.
+        - A [Codepen](https://codepen.io/zangster300/pen/xbGmPyL) with a minimal reproduction of the behavior, if possible.
   - type: textarea
     id: body
     attributes:
