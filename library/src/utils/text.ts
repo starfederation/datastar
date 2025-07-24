@@ -4,18 +4,19 @@ export const isBoolString = (str: string) => str.trim() === 'true'
 
 export const kebab = (str: string) =>
   str
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/([a-z])([0-9]+)/gi, '$1-$2')
-    .replace(/([0-9]+)([a-z])/gi, '$1-$2')
+    .replace(/([A-Z])/g, '-$1')
     .toLowerCase()
 
 export const camel = (str: string) =>
-  kebab(str).replace(/-./g, (x) => x[1].toUpperCase())
+  kebab(str).replace(/-[a-z]/g, (x) => x[1].toUpperCase())
 
 export const snake = (str: string) => kebab(str).replace(/-/g, '_')
 
 export const pascal = (str: string) =>
   camel(str).replace(/(^.|(?<=\.).)/g, (x) => x[0].toUpperCase())
+
+export const lowerFirst = (str: string) =>
+    (str[0] === "-" ? "" : str[0].toLowerCase()) + str.slice(1)
 
 export const jsStrToObject = (raw: string) => {
   try {
