@@ -4,18 +4,23 @@ export const isBoolString = (str: string) => str.trim() === 'true'
 
 export const kebab = (str: string) =>
   str
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/([a-z])([0-9]+)/gi, '$1-$2')
-    .replace(/([0-9]+)([a-z])/gi, '$1-$2')
+    .replace(/([A-Z])/g, '-$1')
     .toLowerCase()
 
-export const camel = (str: string) =>
-  kebab(str).replace(/-./g, (x) => x[1].toUpperCase())
+export const camel = (str: string) => str
 
 export const snake = (str: string) => kebab(str).replace(/-/g, '_')
 
 export const pascal = (str: string) =>
-  camel(str).replace(/(^.|(?<=\.).)/g, (x) => x[0].toUpperCase())
+  str[0].toUpperCase() + str.slice(1)
+
+export const removePrefix = (prefix: string, str: string) => {
+  // removes a prefix from a string in dataset case
+  // e.g. removePrefix("signals", "signalsKeyname") -> "keyname"
+  const suffix = str.slice(prefix.replace(/-[a-z]/g, "-").length)
+  if (!suffix) return suffix
+  return (suffix[0] === "-" ? "" : suffix[0].toLowerCase()) + suffix.slice(1)
+}
 
 export const jsStrToObject = (raw: string) => {
   try {
