@@ -13,7 +13,7 @@ export const camel = (str: string) =>
 export const snake = (str: string) => kebab(str).replace(/-/g, '_')
 
 export const pascal = (str: string) =>
-  camel(str).replace(/(^.|(?<=\.).)/g, (x) => x[0].toUpperCase())
+  str[0].toUpperCase() + camel(str).slice(1)
 
 export const lowerFirst = (str: string) =>
     (str[0] === "-" ? "" : str[0].toLowerCase()) + str.slice(1)
