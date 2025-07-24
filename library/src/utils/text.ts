@@ -7,16 +7,20 @@ export const kebab = (str: string) =>
     .replace(/([A-Z])/g, '-$1')
     .toLowerCase()
 
-export const camel = (str: string) =>
-  kebab(str).replace(/-[a-z]/g, (x) => x[1].toUpperCase())
+export const camel = (str: string) => str
 
 export const snake = (str: string) => kebab(str).replace(/-/g, '_')
 
 export const pascal = (str: string) =>
-  str[0].toUpperCase() + camel(str).slice(1)
+  str[0].toUpperCase() + str.slice(1)
 
-export const lowerFirst = (str: string) =>
-    (str[0] === "-" ? "" : str[0].toLowerCase()) + str.slice(1)
+export const removePrefix = (prefix: string, str: string) => {
+  // removes a prefix from a string in dataset case
+  // e.g. removePrefix("signals", "signalsKeyname") -> "keyname"
+  const suffix = str.slice(prefix.replace(/-[a-z]/g, "-").length)
+  if (!suffix) return suffix
+  return (suffix[0] === "-" ? "" : suffix[0].toLowerCase()) + suffix.slice(1)
+}
 
 export const jsStrToObject = (raw: string) => {
   try {

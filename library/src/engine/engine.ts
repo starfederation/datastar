@@ -1,6 +1,6 @@
 import { isHTMLOrSVG } from '../utils/dom'
 import { isEmpty, isPojo, pathToObj } from '../utils/paths'
-import { camel, lowerFirst, snake } from '../utils/text'
+import { camel, removePrefix, snake } from '../utils/text'
 import { DATASTAR, DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
 import type {
@@ -875,16 +875,13 @@ function applyAttributePlugin(
   attrKey: string,
   value: string,
 ): void {
-  const rawKey = alias ? lowerFirst(attrKey.slice(camel(alias).length)) : attrKey
+  const rawKey = alias ? removePrefix(alias, attrKey) : attrKey
   const plugin = plugins.find((_, i) => pluginRegexs[i].test(rawKey))
   if (plugin) {
     // Extract the key and modifiers
-    let [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/__+/)
+    let [key, ...rawModifiers] = removePrefix(plugin.name, rawKey).split(/__+/)
 
     const hasKey = !!key
-    if (hasKey) {
-      key = lowerFirst(key)
-    }
     const hasValue = !!value
 
     // Create the runtime context
