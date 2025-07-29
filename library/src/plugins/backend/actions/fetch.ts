@@ -116,7 +116,7 @@ const fetcher = async (
   let cleanupFn = () => {}
   try {
     if (!url?.length) {
-      throw runtimeErr('SseNoUrlProvided', { action })
+      throw runtimeErr('FetchNoUrlProvided', { action })
     }
 
     const initialHeaders: Record<string, any> = {
@@ -191,7 +191,7 @@ const fetcher = async (
       ) as HTMLFormElement
       if (!formEl) {
         throw runtimeErr(
-          selector ? 'SseFormNotFound' : 'SseClosestFormNotFound',
+          selector ? 'FetchFormNotFound' : 'FetchClosestFormNotFound',
           { action, selector },
         )
       }
@@ -345,7 +345,7 @@ const fetcher = async (
         req.body = formParams
       }
     } else {
-      throw runtimeErr('SseInvalidContentType', { action, contentType })
+      throw runtimeErr('FetchInvalidContentType', { action, contentType })
     }
 
     dispatchFetch(STARTED, el, {})
@@ -355,7 +355,7 @@ const fetcher = async (
       await fetchEventSource(urlInstance.toString(), el, req)
     } catch (error) {
       if (!isWrongContent(error)) {
-        throw runtimeErr('SseFetchFailed', { method, url, error })
+        throw runtimeErr('FetchFailed', { method, url, error })
       }
       // exit gracefully and do nothing if the content-type is wrong
       // this can happen if the client is sending a request

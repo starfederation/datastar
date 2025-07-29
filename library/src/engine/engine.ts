@@ -84,6 +84,7 @@ let activeSub: ReactiveNode | undefined
 const startBatch = (): void => {
   batchDepth++
 }
+
 const endBatch = (): void => {
   if (!--batchDepth) {
     flush()
@@ -576,19 +577,17 @@ const isValidLink = (checkLink: Link, sub: ReactiveNode): boolean => {
   return false
 }
 
-const getPath = <T = any>(path: string): T =>
-  path.split('.').reduce((acc, key) => acc[key], root) as T
-
-const hasPath = (path: string): boolean =>
-  peek(
-    () =>
-      path
-        .split('.')
-        .reduce(
-          (obj, key) => (obj && Object.hasOwn(obj, key) ? obj[key] : undefined),
-          root,
-        ) !== undefined,
-  )
+const getPath = <T = any>(path: string): T | undefined => {
+  let result = root
+  const split = path.split('.')
+  for (const path of split) {
+    if (result == null || !Object.hasOwn(result, path)) {
+      return
+    }
+    result = result[path]
+  }
+  return result as T
+}
 
 export const DELETE = Symbol('delete')
 const deep = (value: any, prefix = ''): any => {
@@ -608,6 +607,9 @@ const deep = (value: any, prefix = ''): any => {
             keys()
             return deepObj[prop]
           } else {
+            if (typeof prop === 'symbol') {
+              return deepObj[prop]
+            }
             if (!Object.hasOwn(deepObj, prop) || deepObj[prop]() == null) {
               deepObj[prop] = signal('')
               dispatch({ [prefix + prop]: '' })
@@ -767,13 +769,24 @@ function filtered(
     for (const key in node) {
       if (isPojo(node[key])) {
         stack.push([node[key], `${prefix + key}.`])
-      } else if (include.test(prefix + key) && !exclude.test(prefix + key)) {
+      } else if (
+        toRegExp(include).test(prefix + key) &&
+        !toRegExp(exclude).test(prefix + key)
+      ) {
         pathObj[prefix + key] = getPath(prefix + key)
       }
     }
   }
 
   return pathToObj({}, pathObj)
+}
+
+function toRegExp(val: string | RegExp): RegExp {
+  if (typeof val === 'string') {
+    return RegExp(val.replace(/^\/|\/$/g, ''))
+  }
+
+  return val
 }
 
 const root: Record<string, any> = deep({})
@@ -813,10 +826,12 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
       mergePatch,
       peek,
       getPath,
-      hasPath,
       startBatch,
       endBatch,
+      initErr: 0 as any,
     }
+    ctx.initErr = initErr.bind(0, ctx)
+
     if (plugin.type === 'action') {
       actions[plugin.name] = plugin
     } else if (plugin.type === 'attribute') {
@@ -825,7 +840,7 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
     } else if (plugin.type === 'watcher') {
       plugin.onGlobalInit?.(ctx)
     } else {
-      throw initErr('InvalidPluginType', ctx)
+      throw ctx.initErr('InvalidPluginType')
     }
   }
 
@@ -846,6 +861,19 @@ function applyEls(els: Iterable<HTMLOrSVG>): void {
       for (const key in el.dataset) {
         applyAttributePlugin(el, key, el.dataset[key]!)
       }
+    }
+  }
+}
+
+function cleanupEls(els: Iterable<HTMLOrSVG>): void {
+  for (const el of els) {
+    const cleanups = removals.get(el)
+    // If removals has el, delete it and run all cleanup functions
+    if (removals.delete(el)) {
+      for (const cleanup of cleanups!.values()) {
+        cleanup()
+      }
+      cleanups!.clear()
     }
   }
 }
@@ -875,90 +903,96 @@ function applyAttributePlugin(
   attrKey: string,
   value: string,
 ): void {
-  const rawKey = camel(alias ? attrKey.slice(alias.length) : attrKey)
-  const plugin = plugins.find((_, i) => pluginRegexs[i].test(rawKey))
-  if (plugin) {
-    // Extract the key and modifiers
-    let [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/__+/)
+  if (attrKey.startsWith(alias)) {
+    const rawKey = camel(alias ? attrKey.slice(alias.length) : attrKey)
+    const plugin = plugins.find((_, i) => pluginRegexs[i].test(rawKey))
+    if (plugin) {
+      // Extract the key and modifiers
+      let [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/__+/)
 
-    const hasKey = !!key
-    if (hasKey) {
-      key = camel(key)
-    }
-    const hasValue = !!value
-
-    // Create the runtime context
-    const ctx: RuntimeContext = {
-      plugin,
-      actions,
-      root,
-      filtered,
-      signal,
-      computed,
-      effect,
-      mergePatch,
-      peek,
-      getPath,
-      hasPath,
-      startBatch,
-      endBatch,
-      el,
-      rawKey,
-      key,
-      value,
-      mods: new Map(),
-      runtimeErr: 0 as any,
-      rx: 0 as any,
-    }
-    ctx.runtimeErr = runtimeErr.bind(0, ctx)
-    if (plugin.shouldEvaluate === undefined || plugin.shouldEvaluate === true) {
-      ctx.rx = generateReactiveExpression(ctx)
-    }
-
-    // Check the requirements
-    const keyReq = plugin.keyReq || 'allowed'
-    if (hasKey) {
-      if (keyReq === 'denied') {
-        throw ctx.runtimeErr(`${plugin.name}KeyNotAllowed`)
+      const hasKey = !!key
+      if (hasKey) {
+        key = camel(key)
       }
-    } else if (keyReq === 'must') {
-      throw ctx.runtimeErr(`${plugin.name}KeyRequired`)
-    }
+      const hasValue = !!value
 
-    const valReq = plugin.valReq || 'allowed'
-    if (hasValue) {
-      if (valReq === 'denied') {
-        throw ctx.runtimeErr(`${plugin.name}ValueNotAllowed`)
+      // Create the runtime context
+      const ctx: RuntimeContext = {
+        plugin,
+        actions,
+        root,
+        filtered,
+        signal,
+        computed,
+        effect,
+        mergePatch,
+        peek,
+        getPath,
+        startBatch,
+        endBatch,
+        initErr: 0 as any,
+        el,
+        rawKey,
+        key,
+        value,
+        mods: new Map(),
+        runtimeErr: 0 as any,
+        rx: 0 as any,
       }
-    } else if (valReq === 'must') {
-      throw ctx.runtimeErr(`${plugin.name}ValueRequired`)
-    }
+      ctx.initErr = initErr.bind(0, ctx)
+      ctx.runtimeErr = runtimeErr.bind(0, ctx)
+      if (
+        plugin.shouldEvaluate === undefined ||
+        plugin.shouldEvaluate === true
+      ) {
+        ctx.rx = generateReactiveExpression(ctx)
+      }
 
-    // Check for exclusive requirements
-    if (keyReq === 'exclusive' || valReq === 'exclusive') {
-      if (hasKey && hasValue) {
-        throw ctx.runtimeErr(`${plugin.name}KeyAndValueProvided`)
+      // Check the requirements
+      const keyReq = plugin.keyReq || 'allowed'
+      if (hasKey) {
+        if (keyReq === 'denied') {
+          throw ctx.runtimeErr(`${plugin.name}KeyNotAllowed`)
+        }
+      } else if (keyReq === 'must') {
+        throw ctx.runtimeErr(`${plugin.name}KeyRequired`)
       }
-      if (!hasKey && !hasValue) {
-        throw ctx.runtimeErr(`${plugin.name}KeyOrValueRequired`)
-      }
-    }
 
-    for (const rawMod of rawModifiers) {
-      const [label, ...mod] = rawMod.split('.')
-      ctx.mods.set(camel(label), new Set(mod.map((t) => t.toLowerCase())))
-    }
-
-    const cleanup = plugin.onLoad(ctx)
-    if (cleanup) {
-      let cleanups = removals.get(el)
-      if (cleanups) {
-        cleanups.get(rawKey)?.()
-      } else {
-        cleanups = new Map()
-        removals.set(el, cleanups)
+      const valReq = plugin.valReq || 'allowed'
+      if (hasValue) {
+        if (valReq === 'denied') {
+          throw ctx.runtimeErr(`${plugin.name}ValueNotAllowed`)
+        }
+      } else if (valReq === 'must') {
+        throw ctx.runtimeErr(`${plugin.name}ValueRequired`)
       }
-      cleanups.set(rawKey, cleanup)
+
+      // Check for exclusive requirements
+      if (keyReq === 'exclusive' || valReq === 'exclusive') {
+        if (hasKey && hasValue) {
+          throw ctx.runtimeErr(`${plugin.name}KeyAndValueProvided`)
+        }
+        if (!hasKey && !hasValue) {
+          throw ctx.runtimeErr(`${plugin.name}KeyOrValueRequired`)
+        }
+      }
+
+      for (const rawMod of rawModifiers) {
+        const [label, ...mod] = rawMod.split('.')
+        ctx.mods.set(camel(label), new Set(mod.map((t) => t.toLowerCase())))
+      }
+
+      const cleanup = plugin.onLoad(ctx)
+      if (cleanup) {
+        let cleanups = removals.get(el)
+        if (cleanups) {
+          cleanups.get(rawKey)?.()
+        } else {
+          cleanups = new Map()
+          removals.set(el, cleanups)
+        }
+        cleanups.set(rawKey, cleanup)
+      }
     }
   }
 }
@@ -977,14 +1011,8 @@ function observe(mutations: MutationRecord[]) {
     if (type === 'childList') {
       for (const node of removedNodes) {
         if (isHTMLOrSVG(node)) {
-          const cleanups = removals.get(node)
-          // If removals has el, delete it and run all cleanup functions
-          if (removals.delete(node)) {
-            for (const cleanup of cleanups!.values()) {
-              cleanup()
-            }
-            cleanups!.clear()
-          }
+          cleanupEls([node])
+          cleanupEls(node.querySelectorAll<HTMLOrSVG>('*'))
         }
       }
 
@@ -1072,13 +1100,17 @@ function generateReactiveExpression(
   //   $['foo']        → $['foo']
   //   $foo[obj.bar]   → $['foo'][obj.bar]
   //   $foo['bar.baz'] → $['foo']['bar.baz']
+  //   $1              → $['1']
+  //   $123            → $['123']
+  //   $foo.0.name     → $['foo']['0']['name']
+  //   $foo.0.1.2.bar.0 → $['foo']['0']['1']['2']['bar']['0']
 
   // Transform all signal patterns
   expr = expr
     // $['x'] → $x (normalize existing bracket notation)
-    .replace(/\$\['([a-zA-Z_$][\w$]*)'\]/g, '$$$1')
+    .replace(/\$\['([a-zA-Z_$\d][\w$]*)'\]/g, '$$$1')
     // $x → $['x'] (including dots and hyphens)
-    .replace(/\$([a-zA-Z_]\w*(?:[.-]\w+)*)/g, (_, signalName) => {
+    .replace(/\$([a-zA-Z_\d]\w*(?:[.-]\w+)*)/g, (_, signalName) => {
       const parts = signalName.split('.')
       return parts.reduce(
         (acc: string, part: string) => `${acc}['${part}']`,
@@ -1087,7 +1119,7 @@ function generateReactiveExpression(
     })
     // $ inside brackets: [$x] → [$['x']]
     .replace(
-      /\[(\$[a-zA-Z_]\w*)\]/g,
+      /\[(\$[a-zA-Z_\d]\w*)\]/g,
       (_, varName) => `[$['${varName.slice(1)}']]`,
     )
 

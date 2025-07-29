@@ -25,7 +25,7 @@ export function internalErr(from: string, reason: string, args = {}) {
   return dserr('internal', reason, Object.assign({ from }, args))
 }
 
-export function initErr(reason: string, ctx: InitContext, metadata = {}) {
+export function initErr(ctx: InitContext, reason: string, metadata = {}) {
   const errCtx = {
     plugin: {
       name: ctx.plugin.name,

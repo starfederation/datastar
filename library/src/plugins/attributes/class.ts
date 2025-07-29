@@ -26,11 +26,15 @@ export const Class: AttributePlugin = {
         const classNames = k.split(/\s+/).filter((cn) => cn.length > 0)
         if (classes[k]) {
           for (const name of classNames) {
-            el.classList.add(name)
+            if (!el.classList.contains(name)) {
+              el.classList.add(name)
+            }
           }
         } else {
           for (const name of classNames) {
-            el.classList.remove(name)
+            if (el.classList.contains(name)) {
+              el.classList.remove(name)
+            }
           }
         }
       }

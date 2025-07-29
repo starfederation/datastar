@@ -73,10 +73,10 @@ export type InitContext = {
   effect(fn: (...args: any[]) => void): OnRemovalFn // creates an effect
   mergePatch: (patch: any, args?: { ifMissing?: boolean }) => any
   peek: <T>(fn: () => T) => T // returns the current state of the signal without subscribing
-  getPath: <T = any>(path: string) => T // get a value from the root
-  hasPath: (path: string) => boolean // check if a path exists from the root
+  getPath: <T = any>(path: string) => T | undefined // get a value from the root
   startBatch: () => void // starts a signal batch
   endBatch: () => void // ends a signal batch
+  initErr: (reason: string, metadata?: object) => Error
 }
 
 export type HTMLOrSVG = Element & (HTMLElement | SVGElement)
@@ -104,8 +104,8 @@ export type EventCallbackHandler = (...args: any[]) => void
 
 export type SignalFilter = RegExp
 export type SignalFilterOptions = {
-  include?: RegExp
-  exclude?: RegExp
+  include?: RegExp | string
+  exclude?: RegExp | string
 }
 
 export type Signal<T = any> = {

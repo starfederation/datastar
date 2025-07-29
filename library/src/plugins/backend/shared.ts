@@ -6,7 +6,7 @@ export const STARTED = 'started'
 export const FINISHED = 'finished'
 export const ERROR = 'error'
 export const RETRYING = 'retrying'
-export const RETRIES_FAILED = 'retrying'
+export const RETRIES_FAILED = 'retries-failed'
 
 export interface DatastarFetchEvent {
   type: string

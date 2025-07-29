@@ -21,6 +21,8 @@ export const JsonSignals: AttributePlugin = {
       el.textContent = JSON.stringify(filtered(filters), null, spaces)
       observer.observe(el, {
         childList: true,
+        characterData: true,
+        subtree: true,
       })
     }
     const observer = new MutationObserver(callback)

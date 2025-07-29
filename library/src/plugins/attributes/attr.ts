@@ -16,8 +16,10 @@ export const Attr: AttributePlugin = {
         el.setAttribute(key, '')
       } else if (val === false || val == null) {
         el.removeAttribute(key)
-      } else {
+      } else if (typeof val === 'string') {
         el.setAttribute(key, val)
+      } else {
+        el.setAttribute(key, JSON.stringify(val))
       }
     }
 

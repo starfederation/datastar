@@ -15,12 +15,7 @@ import {
   EventTypePatchElements,
 } from '../../../engine/consts'
 import { aliasify } from '../../../engine/engine'
-import { initErr } from '../../../engine/errors'
-import type {
-  HTMLOrSVG,
-  InitContext,
-  WatcherPlugin,
-} from '../../../engine/types'
+import type { InitContext, WatcherPlugin } from '../../../engine/types'
 import { kebab } from '../../../utils/text'
 import { supportsViewTransitions } from '../../../utils/view-transitions'
 import { datastarSSEEventWatcher } from '../shared'
@@ -29,73 +24,103 @@ export const PatchElements: WatcherPlugin = {
   type: 'watcher',
   name: EventTypePatchElements,
   async onGlobalInit(ctx) {
-    datastarSSEEventWatcher(EventTypePatchElements, (args) =>
-      onPatchElements(ctx, args),
-    )
+    datastarSSEEventWatcher(EventTypePatchElements, (args) => {
+      if (
+        supportsViewTransitions &&
+        args.useViewTransition?.trim() === 'true'
+      ) {
+        document.startViewTransition(() => onPatchElements(ctx, args))
+      } else {
+        onPatchElements(ctx, args)
+      }
+    })
   },
 }
 
 function onPatchElements(
   ctx: InitContext,
   {
-    elements,
+    elements = '',
     selector,
     mode = DefaultElementPatchMode,
-    useViewTransition,
   }: Record<string, string>,
 ) {
-  if (mode === ElementPatchModeRemove && selector) {
-    const targets = document.querySelectorAll(selector)
-    if (!targets.length) {
-      throw initErr('NoTargetsFound', ctx, {
-        selectorOrId: selector,
-      })
-    }
+  const { initErr } = ctx
+  const elementsWithSvgsRemoved = elements.replace(
+    /<svg(\s[^>]*>|>)([\s\S]*?)<\/svg>/gim,
+    '',
+  )
+  const hasHtml = /<\/html>/.test(elementsWithSvgsRemoved)
+  const hasHead = /<\/head>/.test(elementsWithSvgsRemoved)
+  const hasBody = /<\/body>/.test(elementsWithSvgsRemoved)
 
-    if (useViewTransition && supportsViewTransitions) {
-      document.startViewTransition(() => {
-        for (const target of targets) {
-          target.remove()
-        }
-      })
-    } else {
-      for (const target of targets) {
-        target.remove()
-      }
-    }
+  const newDocument = new DOMParser().parseFromString(
+    hasHtml || hasHead || hasBody
+      ? elements
+      : `<body><template>${elements}</template></body>`,
+    'text/html',
+  )
+
+  let newContent = document.createDocumentFragment()
+  if (hasHtml) {
+    newContent.appendChild(newDocument.documentElement)
+  } else if (hasHead && hasBody) {
+    newContent.appendChild(newDocument.head)
+    newContent.appendChild(newDocument.body)
+  } else if (hasHead) {
+    newContent.appendChild(newDocument.head)
+  } else if (hasBody) {
+    newContent.appendChild(newDocument.body)
   } else {
-    const template = document.createElement('template')
-    template.innerHTML = elements
+    newContent = newDocument.querySelector('template')!.content
+  }
 
-    for (const node of [...template.content.childNodes]) {
-      const type = node.nodeType
-      if (type !== 1) {
-        if (type === 3 && !node.nodeValue!.trim()) {
+  if (
+    !selector &&
+    (mode === ElementPatchModeOuter || mode === ElementPatchModeReplace)
+  ) {
+    for (const child of newContent.children) {
+      let target: Element
+      if (child instanceof HTMLHtmlElement) {
+        target = document.documentElement
+      } else if (child instanceof HTMLBodyElement) {
+        target = document.body
+      } else if (child instanceof HTMLHeadElement) {
+        target = document.head
+      } else {
+        target = document.getElementById(child.id)!
+        if (!target) {
+          console.error(
+            initErr('NoTargetsFound', {
+              id: child.id,
+            }),
+          )
           continue
         }
-        throw initErr('NoElementsFound', ctx)
       }
 
-      const selectorOrId = selector || `#${(node as Element).id}`
-      const targets = document.querySelectorAll(selectorOrId)
-      if (!targets.length) {
-        throw initErr('NoTargetsFound', ctx, {
-          selectorOrId,
-        })
-      }
-
-      if (useViewTransition && supportsViewTransitions) {
-        document.startViewTransition(() =>
-          applyToTargets(ctx, mode, node as HTMLOrSVG, targets),
-        )
-      } else {
-        applyToTargets(ctx, mode, node as HTMLOrSVG, targets)
-      }
+      applyToTargets(ctx, mode, child, [target])
     }
+  } else {
+    const targets = document.querySelectorAll(selector)
+    if (!targets.length) {
+      console.error(
+        initErr('NoTargetsFound', {
+          selector: selector,
+        }),
+      )
+      return
+    }
+
+    applyToTargets(ctx, mode, newContent, targets)
   }
 }
 
 const scripts = new WeakSet<HTMLScriptElement>()
+for (const script of document.querySelectorAll('script')) {
+  scripts.add(script)
+}
+
 function execute(target: Element): void {
   const elScripts =
     target instanceof HTMLScriptElement
@@ -115,22 +140,23 @@ function execute(target: Element): void {
 }
 
 function applyToTargets(
-  ctx: InitContext,
+  { initErr }: InitContext,
   mode: string,
-  element: HTMLOrSVG,
-  capturedTargets: NodeListOf<Element>,
+  element: DocumentFragment | Element,
+  capturedTargets: Iterable<Element>,
 ) {
   for (const target of capturedTargets) {
+    const cloned = element.cloneNode(true) as Element
     if (mode === ElementPatchModeRemove) {
       target.remove()
     } else if (
       mode === ElementPatchModeOuter ||
       mode === ElementPatchModeInner
     ) {
-      morph(target, element, mode)
+      morph(target, cloned, mode)
       execute(target)
     } else {
-      const cloned = element.cloneNode(true) as Element
+      execute(cloned)
       if (mode === ElementPatchModeReplace) {
         target.replaceWith(cloned)
       } else if (mode === ElementPatchModePrepend) {
@@ -142,9 +168,8 @@ function applyToTargets(
       } else if (mode === ElementPatchModeAfter) {
         target.after(cloned)
       } else {
-        throw initErr('InvalidPatchMode', ctx, { mode })
+        throw initErr('InvalidPatchMode', { mode })
       }
-      execute(cloned)
     }
   }
 }
@@ -158,19 +183,21 @@ ctxPantry.hidden = true
 
 function morph(
   oldElt: Element,
-  newElt: Element,
+  newContent: DocumentFragment | Element,
   mode: typeof ElementPatchModeInner | typeof ElementPatchModeOuter,
 ): void {
   const ignore = aliasify('ignore-morph')
   if (
-    (oldElt.hasAttribute(ignore) && newElt.hasAttribute(ignore)) ||
+    (oldElt.hasAttribute(ignore) &&
+      newContent instanceof HTMLElement &&
+      newContent.hasAttribute(ignore)) ||
     oldElt.parentElement?.closest(`[${ignore}]`)
   ) {
     return
   }
 
   const normalizedElt = document.createElement('div')
-  normalizedElt.append(newElt as Element)
+  normalizedElt.append(newContent)
   document.body.insertAdjacentElement('afterend', ctxPantry)
 
   // Computes the set of IDs that persist between the two contents excluding duplicates
@@ -499,23 +526,16 @@ function morphNode(
       newNode instanceof HTMLInputElement &&
       newNode.type !== 'file'
     ) {
-      const bind = aliasify('bind').slice(5)
-      let noBind = true
-      for (const key in newNode.dataset) {
-        if (key.startsWith(bind)) {
-          noBind = false
-          break
-        }
-      }
-      if (noBind) {
-        const newValue = newNode.value
-        if (!newNode.hasAttribute('value')) {
-          oldNode.value = ''
-          oldNode.removeAttribute('value')
-        } else if (oldNode.value !== newValue) {
-          oldNode.setAttribute('value', newValue)
-          oldNode.value = newValue
-        }
+      // https://github.com/bigskysoftware/idiomorph/issues/27
+      // | old input value | new input value  | behaviour                              |
+      // | --------------- | ---------------- | -------------------------------------- |
+      // | `null`          | `null`           | preserve old input value               |
+      // | some value      | the same value   | preserve old input value               |
+      // | some value      | `null`           | set old input value to `""`            |
+      // | `null`          | some value       | set old input value to new input value |
+      // | some value      | some other value | set old input value to new input value |
+      if (newNode.getAttribute('value') !== oldNode.getAttribute('value')) {
+        oldNode.value = newNode.getAttribute('value') ?? ''
       }
     } else if (
       oldNode instanceof HTMLTextAreaElement &&
