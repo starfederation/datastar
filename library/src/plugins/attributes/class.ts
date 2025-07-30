@@ -3,7 +3,7 @@
 // Description: Adds or removes a class to or from an element based on an expression.
 
 import type { AttributePlugin } from '../../engine/types'
-import { kebab, modifyCasing } from '../../utils/text'
+import { modifyCasing } from '../../utils/text'
 
 export const Class: AttributePlugin = {
   type: 'attribute',
@@ -12,7 +12,7 @@ export const Class: AttributePlugin = {
   returnsValue: true,
   onLoad: ({ key, el, effect, mods, rx }) => {
     if (key) {
-      key = modifyCasing(kebab(key), mods)
+      key = modifyCasing(key, mods, 'kebab')
     }
 
     const callback = () => {

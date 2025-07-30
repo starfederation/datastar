@@ -7,7 +7,7 @@ import { jsStrToObject } from '../../utils/text'
 
 export const JsonSignals: AttributePlugin = {
   type: 'attribute',
-  name: 'jsonSignals',
+  name: 'json-signals',
   keyReq: 'denied',
   onLoad: ({ el, effect, value, filtered, mods }) => {
     const spaces = mods.has('terse') ? 0 : 2
