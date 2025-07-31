@@ -8,12 +8,14 @@ body:
       value: |
         So you think you’ve discovered a bug in Datastar? To ensure this hasn’t already been reported, please first search [existing issues](https://github.com/starfederation/datastar/issues?q=is%3Aissue) and ensure you’re running the [latest release](https://github.com/starfederation/datastar/releases). The `#bug-report` channel in the [Discord server](https://discord.gg/bnRNgZjgPh) is also a great place to report bugs.
 
-        To rule out that this isn’t a setup or configuration issue, please read the [guide](https://data-star.dev/guide) and the [reference](https://data-star.dev/reference/attribute_plugins) docs.
+        To rule out that this isn’t a setup or configuration issue, please read the [guide](https://data-star.dev/guide) and the [reference](https://data-star.dev/reference) docs.
         
         If you still believe you’ve found a bug, please provide a clear and concise description, including:
         - What is happening and what you expected to happen.
         - Steps to reproduce the issue.
         - A [Codepen](https://codepen.io/zangster300/pen/xbGmPyL) with a minimal reproduction of the behavior, if possible.
+
+        If this is an SDK specific bug, please create an issue in the relevant SDK repository.
   - type: textarea
     id: body
     attributes:

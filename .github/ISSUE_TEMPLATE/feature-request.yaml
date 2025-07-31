@@ -11,6 +11,8 @@ body:
         If you still believe you have a new suggestion, please provide a clear and concise description, including:
         - What problem you believe your feature request can solve.
         - Any alternative solutions or features you have already considered.
+        
+        If this is an SDK specific feature request, please create an issue in the relevant SDK repository.
   - type: textarea
     id: body
     attributes:

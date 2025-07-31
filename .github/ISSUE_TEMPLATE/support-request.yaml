@@ -9,6 +9,8 @@ body:
         So you have a question about Datastar? To ensure your question hasn’t already been answered, please first search [existing issues](https://github.com/starfederation/datastar/issues?q=is%3Aissue). The `#help` channel in the [Discord server](https://discord.gg/bnRNgZjgPh) is also a great place to ask questions.
         
         If your question is still unanswered, please provide a clear and concise description. Note that we are diligent about documentation, so please check whether your question is answered in the [guide](https://data-star.dev/guide) or the [reference](https://data-star.dev/reference) docs before submitting.
+
+        If this is an SDK specific support request, please create an issue in the relevant SDK repository.
   - type: textarea
     id: body
     attributes:
