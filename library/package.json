@@ -1,8 +1,8 @@
 {
   "name": "@starfederation/datastar",
-  "author": "Star Federation",
+  "author": "Delaney Gillilan",
   "description": "The hypermedia framework.",
-  "version": "1.0.0-RC.3",
+  "version": "1.0.0-RC.4",
   "license": "MIT",
   "private": false,
   "homepage": "https://data-star.dev",

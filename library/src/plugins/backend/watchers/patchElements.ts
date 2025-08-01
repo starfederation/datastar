@@ -494,30 +494,6 @@ function morphNode(
       return oldNode
     }
 
-    const preserveAttrs = (
-      (newNode as HTMLElement).getAttribute(aliasify('preserve-attr')) ?? ''
-    ).split(' ')
-
-    for (const { name, value } of (newNode as Element).attributes) {
-      if (
-        (oldNode as Element).getAttribute(name) !== value &&
-        !preserveAttrs.includes(kebab(name))
-      ) {
-        ;(oldNode as Element).setAttribute(name, value)
-      }
-    }
-
-    const oldAttrs = (oldNode as Element).attributes
-    for (let i = oldAttrs.length - 1; i >= 0; i--) {
-      const { name } = oldAttrs[i]
-      if (
-        !(newNode as Element).hasAttribute(name) &&
-        !preserveAttrs.includes(kebab(name))
-      ) {
-        ;(oldNode as Element).removeAttribute(name)
-      }
-    }
-
     //  many bothans died to bring us this information:
     //  https://github.com/patrick-steele-idem/morphdom/blob/master/src/specialElHandlers.js
     //  https://github.com/choojs/nanomorph/blob/master/lib/morph.js#L113
@@ -547,6 +523,30 @@ function morphNode(
       }
       if (oldNode.firstChild && oldNode.firstChild.nodeValue !== newValue) {
         oldNode.firstChild.nodeValue = newValue
+      }
+    }
+
+    const preserveAttrs = (
+      (newNode as HTMLElement).getAttribute(aliasify('preserve-attr')) ?? ''
+    ).split(' ')
+
+    for (const { name, value } of (newNode as Element).attributes) {
+      if (
+        (oldNode as Element).getAttribute(name) !== value &&
+        !preserveAttrs.includes(kebab(name))
+      ) {
+        ;(oldNode as Element).setAttribute(name, value)
+      }
+    }
+
+    const oldAttrs = (oldNode as Element).attributes
+    for (let i = oldAttrs.length - 1; i >= 0; i--) {
+      const { name } = oldAttrs[i]
+      if (
+        !(newNode as Element).hasAttribute(name) &&
+        !preserveAttrs.includes(kebab(name))
+      ) {
+        ;(oldNode as Element).removeAttribute(name)
       }
     }
   }
