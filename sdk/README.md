@@ -25,7 +25,7 @@ The SDK configuration system provides:
 1. Read the [Architecture Decision Record](./ADR.md) for SDK specifications
 2. Use [`datastar-sdk-config.json`](./datastar-sdk-config.json) as your source of constants
 3. Implement the required `ServerSentEventGenerator` interface
-4. Validate your implementation using the [test suite](./tests/README.mdl)
+4. Validate your implementation using the [test suite](./tests/README.md)
 
 ## Official SDKs
 
