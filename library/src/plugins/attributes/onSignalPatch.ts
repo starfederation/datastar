@@ -14,7 +14,7 @@ import { modifyTiming } from '../../utils/timing'
 
 export const OnSignalPatch: AttributePlugin = {
   type: 'attribute',
-  name: 'onSignalPatch',
+  name: 'on-signal-patch',
   valReq: 'must',
   argNames: ['patch'],
   returnsValue: true,

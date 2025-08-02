@@ -9,13 +9,7 @@ export const kebab = (str: string) =>
     .replace(/([0-9]+)([a-z])/gi, '$1-$2')
     .toLowerCase()
 
-export const camel = (str: string) =>
-  kebab(str).replace(/-./g, (x) => x[1].toUpperCase())
-
 export const snake = (str: string) => kebab(str).replace(/-/g, '_')
-
-export const pascal = (str: string) =>
-  camel(str).replace(/(^.|(?<=\.).)/g, (x) => x[0].toUpperCase())
 
 export const jsStrToObject = (raw: string) => {
   try {
@@ -27,10 +21,19 @@ export const jsStrToObject = (raw: string) => {
   }
 }
 
-const caseFns: Record<string, (s: string) => string> = { kebab, snake, pascal }
+// The case mods expect the input to be raw attribute names (kebab-case)
+export const modCamel = (str: string) =>
+    str.replace(/-[a-z]/g, (x) => x[1].toUpperCase())
 
-export function modifyCasing(str: string, mods: Modifiers) {
-  for (const c of mods.get('case') || []) {
+export const modSnake = (str: string) => str.replace(/-/g, '_')
+
+export const modPascal = (str: string) =>
+    str[0].toUpperCase() + modCamel(str.slice(1))
+
+const caseFns: Record<string, (s: string) => string> = { camel: modCamel, snake: modSnake, pascal: modPascal }
+
+export function modifyCasing(str: string, mods: Modifiers, defaultCase: string = 'camel') {
+  for (const c of mods.get('case') || [defaultCase]) {
     const fn = caseFns[c]
     if (fn) str = fn(str)
   }

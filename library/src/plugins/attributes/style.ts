@@ -14,8 +14,6 @@ export const Style: AttributePlugin = {
     const { style } = el
     const initialStyles = new Map<string, string>()
 
-    key &&= kebab(key)
-
     const apply = (prop: string, value: any) => {
       const initial = initialStyles.get(prop)
       if (!value && value !== 0) {

@@ -8,7 +8,7 @@ import { modifyViewTransition } from '../../utils/view-transitions'
 
 export const OnInterval: AttributePlugin = {
   type: 'attribute',
-  name: 'onInterval',
+  name: 'on-interval',
   keyReq: 'denied',
   valReq: 'must',
   onLoad: ({ mods, rx, startBatch, endBatch }) => {

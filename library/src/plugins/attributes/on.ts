@@ -6,7 +6,7 @@ import {
   type AttributePlugin,
   DATASTAR_SIGNAL_PATCH_EVENT,
 } from '../../engine/types'
-import { kebab, modifyCasing } from '../../utils/text'
+import { modifyCasing } from '../../utils/text'
 import { modifyTiming } from '../../utils/timing'
 import { modifyViewTransition } from '../../utils/view-transitions'
 import { DATASTAR_FETCH_EVENT } from '../backend/shared'
@@ -58,8 +58,7 @@ export const On: AttributePlugin = {
       }
     }
     // Default to kebab-case and allow modifying
-    let eventName = kebab(key)
-    eventName = modifyCasing(eventName, mods)
+    let eventName = modifyCasing(key, mods, 'kebab')
     // Listen for Datastar events on the document
     if (
       eventName === DATASTAR_FETCH_EVENT ||

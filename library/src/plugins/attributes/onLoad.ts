@@ -9,7 +9,7 @@ import { modifyViewTransition } from '../../utils/view-transitions'
 
 export const OnLoad: AttributePlugin = {
   type: 'attribute',
-  name: 'onLoad',
+  name: 'on-load',
   keyReq: 'denied',
   valReq: 'must',
   onLoad: ({ rx, mods, startBatch, endBatch }) => {

@@ -10,7 +10,7 @@ const once = new WeakSet<HTMLOrSVG>()
 
 export const OnIntersect: AttributePlugin = {
   type: 'attribute',
-  name: 'onIntersect',
+  name: 'on-intersect',
   keyReq: 'denied',
   onLoad: ({ el, mods, rx, startBatch, endBatch }) => {
     let callback = () => {
