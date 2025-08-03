@@ -9,7 +9,7 @@
 
 ### The hypermedia framework.
 
-Datastar helps you build reactive web applications with the simplicity of server-side rendering and the power of a full-stack SPA framework.
+Datastar is a lightweight framework for building everything from simple sites to real-time collaborative web applications.
 
 Getting started is as easy as adding a single 10.68 KiB script tag to your HTML.
 
