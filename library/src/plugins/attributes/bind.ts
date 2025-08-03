@@ -78,7 +78,10 @@ export const Bind: AttributePlugin = {
           }
           break
         case 'file': {
-          const syncSignal = () => {
+          const syncSignal = (evt: Event) => {
+            const target = evt.target
+            if ('detail' in evt || target === null) return
+            evt.stopImmediatePropagation()
             const files = [...(el.files || [])]
             const contents: string[] = []
             const mimes: string[] = []
@@ -119,6 +122,7 @@ export const Bind: AttributePlugin = {
                   },
                 ),
               )
+              target.dispatchEvent(new CustomEvent(evt.type, {detail: true}))
             })
           }
 
