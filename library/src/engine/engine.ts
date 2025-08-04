@@ -1,6 +1,6 @@
 import { isHTMLOrSVG } from '../utils/dom'
 import { isEmpty, isPojo, pathToObj } from '../utils/paths'
-import { camel, snake } from '../utils/text'
+import { snake } from '../utils/text'
 import { DATASTAR, DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
 import type {
@@ -851,7 +851,7 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
     return a.name.localeCompare(b.name)
   })
 
-  pluginRegexs = plugins.map((plugin) => RegExp(`^${plugin.name}([A-Z]|_|$)`))
+  pluginRegexs = plugins.map((plugin) => RegExp(`^${plugin.name}(-|$)`))
 }
 
 function applyEls(els: Iterable<HTMLOrSVG>): void {
@@ -859,7 +859,7 @@ function applyEls(els: Iterable<HTMLOrSVG>): void {
   for (const el of els) {
     if (!el.closest(ignore)) {
       for (const key in el.dataset) {
-        applyAttributePlugin(el, key, el.dataset[key]!)
+        applyAttributePlugin(el, key.replace(/[A-Z]/g, '-$&').toLowerCase(), el.dataset[key]!)
       }
     }
   }
@@ -903,17 +903,14 @@ function applyAttributePlugin(
   attrKey: string,
   value: string,
 ): void {
-  if (attrKey.startsWith(alias)) {
-    const rawKey = camel(alias ? attrKey.slice(alias.length) : attrKey)
+  if (!alias || attrKey.startsWith(alias + '-')) {
+    const rawKey = alias ? attrKey.slice(alias.length + 1) : attrKey
     const plugin = plugins.find((_, i) => pluginRegexs[i].test(rawKey))
     if (plugin) {
       // Extract the key and modifiers
-      let [key, ...rawModifiers] = rawKey.slice(plugin.name.length).split(/__+/)
+      let [key, ...rawModifiers] = rawKey.slice(plugin.name.length + 1).split(/__+/)
 
       const hasKey = !!key
-      if (hasKey) {
-        key = camel(key)
-      }
       const hasValue = !!value
 
       // Create the runtime context
@@ -979,7 +976,7 @@ function applyAttributePlugin(
 
       for (const rawMod of rawModifiers) {
         const [label, ...mod] = rawMod.split('.')
-        ctx.mods.set(camel(label), new Set(mod.map((t) => t.toLowerCase())))
+        ctx.mods.set(label, new Set(mod))
       }
 
       const cleanup = plugin.onLoad(ctx)
@@ -1025,7 +1022,7 @@ function observe(mutations: MutationRecord[]) {
     } else if (type === 'attributes') {
       // If el has a parent with data-ignore, skip it
       if (isHTMLOrSVG(target) && !target.closest(ignore)) {
-        const key = camel(attributeName!.slice(5))
+        const key = attributeName!.slice(5)
         const value = target.getAttribute(attributeName!)
         if (value === null) {
           const cleanups = removals.get(target)

@@ -3,7 +3,6 @@
 // Description: Sets the value of any HTML attribute to an expression, and keeps it in sync.
 
 import type { AttributePlugin } from '../../engine/types'
-import { kebab } from '../../utils/text'
 
 export const Attr: AttributePlugin = {
   type: 'attribute',
@@ -23,7 +22,6 @@ export const Attr: AttributePlugin = {
       }
     }
 
-    key = kebab(key)
     const update = key
       ? () => {
           observer.disconnect()
