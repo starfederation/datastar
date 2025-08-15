@@ -9,7 +9,8 @@ export type OnRemovalFn = () => void
 export type DatastarPlugin = AttributePlugin | WatcherPlugin | ActionPlugin
 
 export const DATASTAR_SIGNAL_PATCH_EVENT = `${DATASTAR}-signal-patch`
-export type JSONPatch = Record<string, any>
+export type JSONPatch = Record<string, any> & { length?: never }
+export type Paths = [string, any][]
 
 export interface CustomEventMap {
   [DATASTAR_SIGNAL_PATCH_EVENT]: CustomEvent<JSONPatch>
@@ -63,6 +64,10 @@ export type ActionPlugin = {
 
 export type GlobalInitializer = (ctx: InitContext) => void
 
+export type MergePatchArgs = {
+  ifMissing?: boolean
+}
+
 export type InitContext = {
   plugin: DatastarPlugin // The plugin instance
   actions: Readonly<ActionPlugins> // All registered actions
@@ -71,7 +76,8 @@ export type InitContext = {
   signal<T>(initialValue?: T | undefined): Signal<T> // creates a signal
   computed<T>(getter: (previousValue?: T) => T): Computed<T> // creates a computed signal
   effect(fn: (...args: any[]) => void): OnRemovalFn // creates an effect
-  mergePatch: (patch: any, args?: { ifMissing?: boolean }) => any
+  mergePatch: (patch: JSONPatch, args?: MergePatchArgs) => void
+  mergePaths: (paths: Paths, args?: MergePatchArgs) => void
   peek: <T>(fn: () => T) => T // returns the current state of the signal without subscribing
   getPath: <T = any>(path: string) => T | undefined // get a value from the root
   startBatch: () => void // starts a signal batch

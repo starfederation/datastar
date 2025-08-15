@@ -1,5 +1,5 @@
 import { isHTMLOrSVG } from '../utils/dom'
-import { isEmpty, isPojo, pathToObj } from '../utils/paths'
+import { isPojo, pathToObj } from '../utils/paths'
 import { camel, snake } from '../utils/text'
 import { DATASTAR, DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
@@ -12,7 +12,9 @@ import type {
   HTMLOrSVG,
   InitContext,
   JSONPatch,
+  MergePatchArgs,
   OnRemovalFn,
+  Paths,
   RuntimeContext,
   RuntimeExpressionFunction,
   Signal,
@@ -74,7 +76,7 @@ interface AlienSignal<T = any> extends ReactiveNode {
   value_: T
 }
 
-let currentPatch: Record<string, any> = {}
+const currentPatch: Paths = []
 const queuedEffects: (AlienEffect | undefined)[] = []
 let batchDepth = 0
 let notifyIndex = 0
@@ -601,7 +603,7 @@ const deep = (value: any, prefix = ''): any => {
     }
     const keys = signal(0)
     return new Proxy(deepObj, {
-      get: (_, prop: string) => {
+      get(_, prop: string) {
         if (!(prop === 'toJSON' && !Object.hasOwn(deepObj, prop))) {
           if (isArr && prop in Array.prototype) {
             keys()
@@ -612,38 +614,46 @@ const deep = (value: any, prefix = ''): any => {
             }
             if (!Object.hasOwn(deepObj, prop) || deepObj[prop]() == null) {
               deepObj[prop] = signal('')
-              dispatch({ [prefix + prop]: '' })
+              dispatch(prefix + prop, '')
               keys(keys() + 1)
             }
             return deepObj[prop]()
           }
         }
       },
-      set: (_, prop: string, newValue) => {
+      set(_, prop: string, newValue) {
+        const path = prefix + prop
         if (newValue === DELETE) {
           if (Object.hasOwn(deepObj, prop)) {
             delete deepObj[prop]
-            dispatch({ [prefix + prop]: DELETE })
+            dispatch(path, DELETE)
             keys(keys() + 1)
           }
         } else {
           if (isArr && prop === 'length') {
+            const diff = (deepObj[prop] as unknown as number) - newValue
             deepObj[prop] = newValue
-            dispatch({ [prefix.slice(0, -1)]: deepObj })
-            keys(keys() + 1)
+            if (diff > 0) {
+              const patch: Record<string, any> = {}
+              for (let i = newValue; i < deepObj[prop]; i++) {
+                patch[i] = null
+              }
+              dispatch(prefix.slice(0, -1), patch)
+              keys(keys() + 1)
+            }
           } else {
             if (Object.hasOwn(deepObj, prop)) {
               if (newValue == null) {
                 if (deepObj[prop](null)) {
-                  dispatch({ [prefix + prop]: null })
+                  dispatch(path, null)
                 }
               } else {
                 if (Object.hasOwn(newValue, computedSymbol)) {
                   deepObj[prop] = newValue
-                  dispatch({ [prefix + prop]: '' })
+                  dispatch(path, '')
                 } else {
-                  if (deepObj[prop](deep(newValue, `${prefix + prop}.`))) {
-                    dispatch({ [prefix + prop]: newValue })
+                  if (deepObj[prop](deep(newValue, `${path}.`))) {
+                    dispatch(path, newValue)
                   }
                 }
               }
@@ -651,10 +661,10 @@ const deep = (value: any, prefix = ''): any => {
               if (newValue != null) {
                 if (Object.hasOwn(newValue, computedSymbol)) {
                   deepObj[prop] = newValue
-                  dispatch({ [prefix + prop]: '' })
+                  dispatch(path, '')
                 } else {
-                  deepObj[prop] = signal(deep(newValue, `${prefix + prop}.`))
-                  dispatch({ [prefix + prop]: newValue })
+                  deepObj[prop] = signal(deep(newValue, `${path}.`))
+                  dispatch(path, newValue)
                 }
                 keys(keys() + 1)
               }
@@ -664,16 +674,16 @@ const deep = (value: any, prefix = ''): any => {
 
         return true
       },
-      deleteProperty: (_, prop: string) => {
+      deleteProperty(_, prop: string) {
         if (Object.hasOwn(deepObj, prop)) {
           if (deepObj[prop](null)) {
-            dispatch({ [prefix + prop]: null })
+            dispatch(prefix + prop, null)
           }
         }
 
         return true
       },
-      ownKeys: () => {
+      ownKeys() {
         keys()
         return Reflect.ownKeys(deepObj)
       },
@@ -686,24 +696,24 @@ const deep = (value: any, prefix = ''): any => {
   return value
 }
 
-const dispatch = (obj?: Record<string, any>) => {
-  if (obj) {
-    pathToObj(currentPatch, obj)
+const dispatch = (path?: string, value?: any) => {
+  if (path !== undefined && value !== undefined) {
+    currentPatch.push([path, value])
   }
-  if (!batchDepth && !isEmpty(currentPatch)) {
-    const oldPatch = currentPatch
-    currentPatch = {}
+  if (!batchDepth && currentPatch.length) {
+    const detail = pathToObj(currentPatch)
+    currentPatch.length = 0
     document.dispatchEvent(
       new CustomEvent<JSONPatch>(DATASTAR_SIGNAL_PATCH_EVENT, {
-        detail: oldPatch,
+        detail,
       }),
     )
   }
 }
 
 const mergePatch = (
-  patch: Record<string, any>,
-  { ifMissing }: { ifMissing?: boolean } = {},
+  patch: JSONPatch,
+  { ifMissing }: MergePatchArgs = {},
 ): void => {
   startBatch()
   for (const key in patch) {
@@ -717,6 +727,9 @@ const mergePatch = (
   }
   endBatch()
 }
+
+const mergePaths = (paths: Paths, options: MergePatchArgs = {}): void =>
+  mergePatch(pathToObj(paths), options)
 
 const mergeInner = (
   patch: any,
@@ -758,27 +771,28 @@ const mergeInner = (
 function filtered(
   { include = /.*/, exclude = /(?!)/ }: SignalFilterOptions = {},
   obj: JSONPatch = root,
-) {
+): Record<string, any> {
   // We need to find all valid signal paths in the object
-  const pathObj: Record<string, any> = {}
-  const stack: Array<[any, string]> = [[obj, '']]
+  const paths: Paths = []
+  const stack: [any, string][] = [[obj, '']]
 
   while (stack.length) {
     const [node, prefix] = stack.pop()!
 
     for (const key in node) {
+      const path = prefix + key
       if (isPojo(node[key])) {
-        stack.push([node[key], `${prefix + key}.`])
+        stack.push([node[key], `${path}.`])
       } else if (
-        toRegExp(include).test(prefix + key) &&
-        !toRegExp(exclude).test(prefix + key)
+        toRegExp(include).test(path) &&
+        !toRegExp(exclude).test(path)
       ) {
-        pathObj[prefix + key] = getPath(prefix + key)
+        paths.push([path, getPath(path)])
       }
     }
   }
 
-  return pathToObj({}, pathObj)
+  return pathToObj(paths)
 }
 
 function toRegExp(val: string | RegExp): RegExp {
@@ -824,6 +838,7 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
       computed,
       effect,
       mergePatch,
+      mergePaths,
       peek,
       getPath,
       startBatch,
@@ -926,6 +941,7 @@ function applyAttributePlugin(
         computed,
         effect,
         mergePatch,
+        mergePaths,
         peek,
         getPath,
         startBatch,

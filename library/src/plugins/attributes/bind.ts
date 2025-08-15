@@ -3,8 +3,7 @@
 // Description: Creates a signal (if one doesn’t already exist) and sets up two-way data binding between it and an element’s value.
 
 import { aliasify } from '../../engine/engine'
-import type { AttributePlugin } from '../../engine/types'
-import { pathToObj } from '../../utils/paths'
+import type { AttributePlugin, Paths } from '../../engine/types'
 import { modifyCasing } from '../../utils/text'
 
 const dataURIRegex = /^data:(?<mime>[^;]+);base64,(?<contents>.*)$/
@@ -22,7 +21,7 @@ export const Bind: AttributePlugin = {
     mods,
     value,
     effect,
-    mergePatch,
+    mergePaths,
     runtimeErr,
     getPath,
   }) => {
@@ -109,16 +108,11 @@ export const Bind: AttributePlugin = {
                   }),
               ),
             ).then(() => {
-              mergePatch(
-                pathToObj(
-                  {},
-                  {
-                    [signalName]: contents,
-                    [`${signalName}Mimes`]: mimes,
-                    [`${signalName}Names`]: names,
-                  },
-                ),
-              )
+              mergePaths([
+                [signalName, contents],
+                [`${signalName}Mimes`, mimes],
+                [`${signalName}Names`, names],
+              ])
             })
           }
 
@@ -183,20 +177,20 @@ export const Bind: AttributePlugin = {
         `[${aliasify('bind')}-${key}],[${aliasify('bind')}="${value}"]`,
       ) as NodeListOf<HTMLInputElement>
 
-      const pathObj: Record<string, string> = {}
+      const paths: Paths = []
       let i = 0
       for (const input of inputs) {
-        pathObj[`${path}.${i}`] = get(input, 'none')
+        paths.push([`${path}.${i}`, get(input, 'none')])
 
         if (el === input) {
           break
         }
         i++
       }
-      mergePatch(pathToObj({}, pathObj), { ifMissing: true })
+      mergePaths(paths, { ifMissing: true })
       path = `${path}.${i}`
     } else {
-      mergePatch(pathToObj({}, { [path]: get(el, type) }), {
+      mergePaths([[path, get(el, type)]], {
         ifMissing: true,
       })
     }
@@ -206,7 +200,7 @@ export const Bind: AttributePlugin = {
       if (signalValue != null) {
         const value = get(el, typeof signalValue)
         if (value !== empty) {
-          mergePatch(pathToObj({}, { [path]: value }))
+          mergePaths([[path, value]])
         }
       }
     }

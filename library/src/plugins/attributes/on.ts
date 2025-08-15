@@ -29,12 +29,6 @@ export const On: AttributePlugin = {
         if (mods.has('stop')) {
           evt.stopPropagation()
         }
-        // Return if not a trusted event, not a custom event and no `trusted` modifier exists
-        if (
-          !(evt.isTrusted || evt instanceof CustomEvent || mods.has('trusted'))
-        ) {
-          return
-        }
         ctx.evt = evt
       }
       startBatch()

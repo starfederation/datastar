@@ -3,7 +3,6 @@
 // Description: Creates a signal that is computed based on an expression.
 
 import type { AttributePlugin } from '../../engine/types'
-import { pathToObj } from '../../utils/paths'
 import { modifyCasing } from '../../utils/text'
 
 export const Computed: AttributePlugin = {
@@ -12,7 +11,7 @@ export const Computed: AttributePlugin = {
   keyReq: 'must',
   valReq: 'must',
   returnsValue: true,
-  onLoad: ({ key, mods, rx, computed, mergePatch }) => {
-    mergePatch(pathToObj({}, { [modifyCasing(key, mods)]: computed(rx) }))
+  onLoad: ({ key, mods, rx, computed, mergePaths }) => {
+    mergePaths([[modifyCasing(key, mods), computed(rx)]])
   },
 }
