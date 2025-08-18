@@ -79,7 +79,12 @@ export const Bind: AttributePlugin = {
         case 'file': {
           const syncSignal = () => {
             const files = [...(el.files || [])]
-            const signalFiles: object[] = []
+type File = {
+  name: string
+  type: string
+  contents: string
+}
+const signalFiles: File[] = []
             Promise.all(
               files.map(
                 (f) =>
