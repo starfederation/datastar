@@ -54,7 +54,7 @@ export type WatcherPlugin = {
 }
 
 export type ActionPlugins = Record<string, ActionPlugin>
-export type ActionMethod = (ctx: RuntimeContext, ...args: any[]) => any
+export type ActionMethod = (ctx: ActionContext, ...args: any[]) => any
 
 export type ActionPlugin = {
   type: 'action'
@@ -99,6 +99,10 @@ export type RuntimeContext = InitContext & {
   fnContent?: string // the content of the function
   evt?: Event // the event that triggered the plugin
   runtimeErr: (reason: string, metadata?: object) => Error
+}
+
+export type ActionContext = RuntimeContext & {
+  setCleanup: (fn: OnRemovalFn, key: string) => void // sets a cleanup function for this element and key
 }
 
 export type RuntimeExpressionFunction = (
