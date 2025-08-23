@@ -48,6 +48,7 @@ export const createHttpMethod = (
 
     if (!isDisabled && !(requestCancellation instanceof AbortController)) {
       fetchAbortControllers.set(el, controller)
+      ctx.setCleanup(() => controller.abort(), `fetch`)
     }
 
     try {

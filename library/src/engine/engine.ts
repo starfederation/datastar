@@ -4,6 +4,7 @@ import { camel, snake } from '../utils/text'
 import { DATASTAR, DSP, DSS } from './consts'
 import { initErr, runtimeErr } from './errors'
 import type {
+  ActionContext,
   ActionPlugins,
   AttributePlugin,
   Computed,
@@ -1000,17 +1001,21 @@ function applyAttributePlugin(
 
       const cleanup = plugin.onLoad(ctx)
       if (cleanup) {
-        let cleanups = removals.get(el)
-        if (cleanups) {
-          cleanups.get(rawKey)?.()
-        } else {
-          cleanups = new Map()
-          removals.set(el, cleanups)
-        }
-        cleanups.set(rawKey, cleanup)
+        setCleanup(cleanup, el, rawKey);
       }
     }
   }
+}
+
+function setCleanup(cleanup: OnRemovalFn, el: HTMLOrSVG, key: string): void {
+  let cleanups = removals.get(el)
+  if (cleanups) {
+    cleanups.get(key)?.()
+  } else {
+    cleanups = new Map()
+    removals.set(el, cleanups)
+  }
+  cleanups.set(key, cleanup)
 }
 
 // Set up a mutation observer to run plugin removal and apply functions
@@ -1160,6 +1165,7 @@ function generateReactiveExpression(
   const actionMatches = [...expr.matchAll(actionsRe)]
   const actionNames = new Set<string>()
   const actionFns = new Set<(...args: any[]) => any>()
+  const actionCtx: ActionContext = { ...ctx, setCleanup: (cleanup: OnRemovalFn, key: string) => setCleanup(cleanup, ctx.el, key) }
   if (actionMatches.length) {
     const actionPrefix = `${DATASTAR}Act_`
     for (const match of actionMatches) {
@@ -1175,7 +1181,7 @@ function generateReactiveExpression(
       // Add ctx to action calls
       expr = expr.replace(`@${actionName}(`, `${name}(`)
       actionNames.add(name)
-      actionFns.add((...args: any[]) => action.fn(ctx, ...args))
+      actionFns.add((...args: any[]) => action.fn(actionCtx, ...args))
     }
   }
 
