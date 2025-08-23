@@ -274,6 +274,17 @@
       }
     ]
   },
+  "data-persist-*": {
+    "prefix": "data-persist-*",
+    "body": "data-persist-${1:name}=\"${2:expression}\"",
+    "description": "Persists signals in local storage with a custom key.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-persist"
+      }
+    ]
+  },
   "data-preserve-attr": {
     "prefix": "data-preserve-attr",
     "body": "data-preserve-attr=\"\"",
@@ -370,6 +381,28 @@
       {
         "name": "Documentation",
         "url": "https://data-star.dev/reference/attributes#data-signals"
+      }
+    ]
+  },
+  "data-style": {
+    "prefix": "data-style",
+    "body": "data-style=\"{${1:styleName}: ${2:expression}}\"",
+    "description": "Adds or removes one or more inline CSS styles from an element using a set of key-value pairs that map to the style name and expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-style"
+      }
+    ]
+  },
+  "data-style-*": {
+    "prefix": "data-style-*",
+    "body": "data-style-${1:name}=\"${2:expression}\"",
+    "description": "Adds or removes an inline CSS style from an element based on an expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-style"
       }
     ]
   },

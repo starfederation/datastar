@@ -99,10 +99,6 @@
           "description": "Throttle without trailing edge"
         },
         {
-          "name": "trusted",
-          "description": "Runs the expression even if the `isTrusted` property on the event is `false`"
-        },
-        {
           "name": "viewtransition",
           "description": "Wraps the expression in `document.startViewTransition()` when the View Transition API is available"
         },
@@ -206,6 +202,10 @@
         }
       ],
       "datastar-query-string-modifiers": [
+        {
+          "name": "filter",
+          "description": "Filters out empty values"
+        },
         {
           "name": "history",
           "description": "Enables history support"
@@ -321,12 +321,12 @@
         {
           "name": "data-class-*",
           "virtual": true,
-          "description": "Adds or removes a class from an element based on an expression.",
+          "description": "Adds or removes classes from an element based on an expression.",
           "doc-url": "https://data-star.dev/reference/attributes#data-class",
           "value": {
             "kind": "expression",
             "type": [
-              "boolean",
+              "string",
               "object"
             ],
             "required": true
@@ -738,7 +738,7 @@
           }
         },
         {
-          "name": "data-persist",
+          "name": "data-persist-*",
           "virtual": true,
           "description": "Persists all signals in local storage.",
           "doc-url": "https://data-star.dev/reference/attributes#data-persist",
@@ -748,20 +748,33 @@
             "required": false
           },
           "pattern": {
-            "template": [
-              "data-persist",
+            "or": [
               {
-                "items": "/js/datastar-persist-modifiers",
                 "template": [
-                  "__",
-                  "$...",
-                  "#item:modifier"
+                  "data-persist-",
+                  {
+                    "regex": "[-a-z0-9]+"
+                  }
                 ],
-                "required": false,
-                "repeat": true
+                "priority": "normal"
+              },
+              {
+                "template": [
+                  "data-persist",
+                  {
+                    "items": "/js/datastar-persist-modifiers",
+                    "template": [
+                      "__",
+                      "$...",
+                      "#item:modifier"
+                    ],
+                    "required": false,
+                    "repeat": true
+                  }
+                ],
+                "priority": "normal"
               }
-            ],
-            "priority": "normal"
+            ]
           }
         },
         {
@@ -956,6 +969,39 @@
                     "required": false,
                     "repeat": true
                   }
+                ],
+                "priority": "normal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "data-style-*",
+          "virtual": true,
+          "description": "Adds or removes inline CSS styles from an element based on an expression.",
+          "doc-url": "https://data-star.dev/reference/attributes#data-style",
+          "value": {
+            "kind": "expression",
+            "type": [
+              "string",
+              "object"
+            ],
+            "required": true
+          },
+          "pattern": {
+            "or": [
+              {
+                "template": [
+                  "data-style-",
+                  {
+                    "regex": "[-a-z0-9]+"
+                  }
+                ],
+                "priority": "normal"
+              },
+              {
+                "template": [
+                  "data-style"
                 ],
                 "priority": "normal"
               }

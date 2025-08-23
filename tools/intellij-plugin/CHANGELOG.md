@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.1.1] - 2025-08-23
+
+- Added the `data-style` attribute.
+- Added the ability to use a key with the `data-persist` attribute.
+- Added the `filter` modifier to the `data-query-string` attribute.
+- Removed the `trusted` modifier.
+
 ## [1.1.0] - 2025-07-16
 
 ### Added
@@ -50,7 +57,8 @@
 
 - Initial public release
 
-[Unreleased]: https://github.com/starfederation/datastar/tools/intellij-plugin/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/starfederation/datastar/tools/intellij-plugin/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/starfederation/datastar/tools/intellij-plugin/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/starfederation/datastar/tools/intellij-plugin/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/starfederation/datastar/tools/intellij-plugin/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/starfederation/datastar/tools/intellij-plugin/compare/v1.0.0...v1.0.1
