@@ -79,9 +79,12 @@ export const Bind: AttributePlugin = {
         case 'file': {
           const syncSignal = () => {
             const files = [...(el.files || [])]
-            const contents: string[] = []
-            const mimes: string[] = []
-            const names: string[] = []
+type File = {
+  name: string
+  type: string
+  contents: string
+}
+const signalFiles: File[] = []
             Promise.all(
               files.map(
                 (f) =>
@@ -99,20 +102,18 @@ export const Bind: AttributePlugin = {
                           result: reader.result,
                         })
                       }
-                      contents.push(match.groups.contents)
-                      mimes.push(match.groups.mime)
-                      names.push(f.name)
+                      signalFiles.push({
+                        name: f.name,
+                        type: f.type,
+                        contents: match.groups.contents,
+                      })
                     }
                     reader.onloadend = () => resolve()
                     reader.readAsDataURL(f)
                   }),
               ),
             ).then(() => {
-              mergePaths([
-                [signalName, contents],
-                [`${signalName}Mimes`, mimes],
-                [`${signalName}Names`, names],
-              ])
+              mergePaths([[signalName, signalFiles]])
             })
           }
 
