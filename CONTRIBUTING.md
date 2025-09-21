@@ -22,4 +22,4 @@ Always open an issue to discuss your idea _before_ submitting a pull request. Pu
 
 We only accept SDKs from people willing to contribute _and_ maintain them.
 
-SDKs must follow the [guidelines](https://github.com/starfederation/datastar/blob/main/sdk/README.md)and implement the [Architecture Decision Record](https://github.com/starfederation/datastar/blob/develop/sdk/ADR.md).
+SDKs must follow the [guidelines](https://github.com/starfederation/datastar/blob/main/sdk/README.md) and implement the [Architecture Decision Record](https://github.com/starfederation/datastar/blob/develop/sdk/ADR.md).
