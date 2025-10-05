@@ -23,9 +23,10 @@ export const OnLoad: AttributePlugin = {
     const delayArgs = mods.get('delay')
     if (delayArgs) {
       wait = tagToMs(delayArgs)
+      if (wait > 0) {
+        callback = delay(callback, wait)
+      }
     }
-    // Delay the callback regardless of whether the modifier is set so that other plugins are processed first.
-    callback = delay(callback, wait)
     callback()
   },
 }

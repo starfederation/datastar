@@ -3,7 +3,6 @@
 // Description: Creates a new signal that is a reference to the element on which the data attribute is placed.
 
 import type { AttributePlugin } from '../../engine/types'
-import { pathToObj } from '../../utils/paths'
 import { modifyCasing } from '../../utils/text'
 
 // Sets the value of the element
@@ -13,9 +12,8 @@ export const Ref: AttributePlugin = {
   keyReq: 'exclusive',
   valReq: 'exclusive',
   shouldEvaluate: false,
-  onLoad: ({ el, key, mods, value, mergePatch }) => {
+  onLoad: ({ el, key, mods, value, mergePaths }) => {
     const signalName = key ? modifyCasing(key, mods) : value
-
-    mergePatch(pathToObj({}, { [signalName]: el }))
+    mergePaths([[signalName, el]])
   },
 }

@@ -189,7 +189,6 @@ ServerSentEventGenerator.PatchElements(
 
 > [!TIP]
 > - To remove elements, use the `remove` patch mode
-> - To execute JavaScript, send a `<script>` element – it will auto-execute when added to the DOM
 
 ### Elements vs Fragments: Key Distinction
 

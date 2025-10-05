@@ -38,7 +38,9 @@ export const createHttpMethod = (
 
     const requestCancellation = args?.requestCancellation ?? 'auto'
     const controller =
-      requestCancellation instanceof AbortController ? requestCancellation : new AbortController()
+      requestCancellation instanceof AbortController
+        ? requestCancellation
+        : new AbortController()
     const isDisabled = requestCancellation === 'disabled'
     if (!isDisabled) {
       fetchAbortControllers.get(el)?.abort()
@@ -103,7 +105,7 @@ const fetcher = async (
     selector,
     headers: userHeaders,
     contentType = 'json',
-    filterSignals = { include: /.*/, exclude: /(^|\.)_/ },
+    filterSignals: { include = /.*/, exclude = /(^|\.)_/ } = {},
     openWhenHidden = false,
     retryInterval = DefaultSseRetryDurationMs,
     retryScaler = 2,
@@ -179,7 +181,7 @@ const fetcher = async (
     const queryParams = new URLSearchParams(urlInstance.search)
 
     if (contentType === 'json') {
-      const res = JSON.stringify(filtered(filterSignals))
+      const res = JSON.stringify(filtered({ include, exclude }))
       if (method === 'GET') {
         queryParams.set(DATASTAR, res)
       } else {

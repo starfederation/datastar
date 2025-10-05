@@ -1,3 +1,5 @@
+import type { Paths } from '../engine/types'
+
 export const isPojo = (obj: any): obj is Record<string, any> =>
   obj !== null &&
   typeof obj === 'object' &&
@@ -27,15 +29,13 @@ export function updateLeaves(
   }
 }
 
-export const pathToObj = (
-  target: Record<string, any>,
-  paths: Record<string, any>,
-): Record<string, any> => {
-  for (const path in paths) {
+export const pathToObj = (paths: Paths): Record<string, any> => {
+  const result: Record<string, any> = {}
+  for (const [path, value] of paths) {
     const keys = path.split('.')
     const lastKey = keys.pop()!
-    const obj = keys.reduce((acc, key) => (acc[key] ??= {}), target)
-    obj[lastKey] = paths[path]
+    const obj = keys.reduce((acc, key) => (acc[key] ??= {}), result)
+    obj[lastKey] = value
   }
-  return target
+  return result
 }
