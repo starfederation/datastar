@@ -851,7 +851,7 @@ export function load(...pluginsToLoad: DatastarPlugin[]) {
     return a.name.localeCompare(b.name)
   })
 
-  pluginRegexs = plugins.map((plugin) => RegExp(`^${plugin.name}(-|$)`))
+  pluginRegexs = plugins.map((plugin) => RegExp(`^${plugin.name}(:|$)`))
 }
 
 function applyEls(els: Iterable<HTMLOrSVG>): void {

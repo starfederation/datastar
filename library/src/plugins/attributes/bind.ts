@@ -180,7 +180,7 @@ export const Bind: AttributePlugin = {
       !(el instanceof HTMLSelectElement && el.multiple)
     ) {
       const inputs = document.querySelectorAll(
-        `[${aliasify('bind')}-${key}],[${aliasify('bind')}="${value}"]`,
+        `[${aliasify('bind')}\\:${key}],[${aliasify('bind')}="${value}"]`,
       ) as NodeListOf<HTMLInputElement>
 
       const pathObj: Record<string, string> = {}
