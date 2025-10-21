@@ -4,7 +4,7 @@ Thanks for thinking about contributing to Datastar 🚀
 
 ## Before You Contribute
 
-Before you contribute, please consider that Datastar is developed and maintained by a a small team of core contributors in a private repo. The source code for each version is made available in the public repo.
+Before you contribute, please consider that Datastar is developed and maintained by a a small team of core contributors in a _private_ repo. The source code for each version is made available in the public repo.
 
 ## Bug Reports
 
@@ -16,7 +16,7 @@ Before requesting a new feature, please consider that Datastar is a lightweight 
 
 ## Pull Requests
 
-Always open an issue to discuss your idea _before_ submitting a pull request. Pull requests must be made to the `develop` branch, have a descriptive title and clearly describe the problem and solution. If the pull request adds or changes behavior, documentation and examples should be updated accordingly.
+Always open an issue to discuss your idea _before_ submitting a pull request. Pull requests must be made to the `develop` branch, have a descriptive title and clearly describe the problem and solution. If the pull request adds or changes behavior, appropriate justification _must_ be provided, and documentation and examples should be updated accordingly.
 
 ## SDKs
 
