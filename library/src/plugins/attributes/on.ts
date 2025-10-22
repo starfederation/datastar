@@ -51,7 +51,6 @@ attribute({
     const eventName = modifyCasing(key, mods, 'kebab')
     // Listen for Datastar events on the document
     if (
-      eventName === DATASTAR_FETCH_EVENT ||
       eventName === DATASTAR_SIGNAL_PATCH_EVENT
     ) {
       target = document

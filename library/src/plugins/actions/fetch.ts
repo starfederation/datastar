@@ -243,12 +243,15 @@ const dispatchFetch = (
   type: string,
   el: HTMLOrSVG,
   argsRaw: Record<string, string>,
-) =>
-  document.dispatchEvent(
+) => {
+  const dispatchEl = el.isConnected ? el : document
+  dispatchEl.dispatchEvent(
     new CustomEvent<DatastarFetchEvent>(DATASTAR_FETCH_EVENT, {
       detail: { type, el, argsRaw },
+      bubbles: true,
     }),
   )
+}
 
 const isWrongContent = (err: any) => `${err}`.includes('text/event-stream')
 
