@@ -12,7 +12,15 @@ import type {
 } from '@engine/types'
 import { kebab } from '@utils/text'
 
-const fetchAbortControllers = new WeakMap<HTMLOrSVG, AbortController>()
+const fetchAbortControllers = new Map<HTMLOrSVG, AbortController>()
+const fetchAbortObserver = new MutationObserver(() => {
+  for (const [el, controller] of fetchAbortControllers) {
+    if (!el.isConnected) {
+      controller.abort()
+      fetchAbortControllers.delete(el)
+    }
+  }
+})
 
 const createHttpMethod = (name: string, method: string): void =>
   action({
@@ -37,38 +45,25 @@ const createHttpMethod = (name: string, method: string): void =>
         requestCancellation instanceof AbortController
           ? requestCancellation
           : new AbortController()
-      const isDisabled = requestCancellation === 'disabled'
-      if (!isDisabled) {
-        const oldController = fetchAbortControllers.get(el)
-        if (oldController) {
-          oldController.abort()
-          // wait one tick for FINISHED to fire
-          await Promise.resolve()
-        }
+      const oldController = fetchAbortControllers.get(el)
+      if (oldController) {
+        oldController.abort()
+        // wait one tick for FINISHED to fire
+        await Promise.resolve()
       }
 
-      if (!isDisabled && !(requestCancellation instanceof AbortController)) {
+      if (requestCancellation === 'auto') {
+        if (!fetchAbortControllers.size) {
+          fetchAbortObserver.observe(document.body, {
+            childList: true,
+            subtree: true,
+          })
+        }
         fetchAbortControllers.set(el, controller)
       }
 
       try {
-        const observer = new MutationObserver((mutations) => {
-          for (const mutation of mutations) {
-            for (const removed of mutation.removedNodes) {
-              if (removed === el) {
-                controller.abort()
-                cleanupFn()
-              }
-            }
-          }
-        })
-        if (el.parentNode) {
-          observer.observe(el.parentNode, { childList: true })
-        }
-
-        let cleanupFn = () => {
-          observer.disconnect()
-        }
+        let cleanupFn = () => {}
 
         try {
           if (!url?.length) {
@@ -170,7 +165,6 @@ const createHttpMethod = (name: string, method: string): void =>
               formEl.addEventListener('submit', preventDefault)
               cleanupFn = () => {
                 formEl.removeEventListener('submit', preventDefault)
-                observer.disconnect()
               }
             }
 
@@ -222,6 +216,9 @@ const createHttpMethod = (name: string, method: string): void =>
       } finally {
         if (fetchAbortControllers.get(el) === controller) {
           fetchAbortControllers.delete(el)
+        }
+        if (!fetchAbortControllers.size) {
+          fetchAbortObserver.disconnect()
         }
       }
     },
