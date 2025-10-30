@@ -149,8 +149,10 @@ const createHttpMethod = (name: string, method: string): void =>
               throw error('FetchFormNotFound', { action, selector })
             }
 
+            const skipValidation = formEl instanceof HTMLFormElement && formEl.noValidate === true
+
             // Validate the form
-            if (!formEl.checkValidity()) {
+            if (!skipValidation && !formEl.checkValidity()) {
               formEl.reportValidity()
               cleanupFn()
               return
