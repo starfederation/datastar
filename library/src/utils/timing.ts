@@ -12,60 +12,44 @@ export const delay = (
   }
 }
 
+export const throttle = (
+  callback: EventCallbackHandler,
+  wait: number,
+  leading = true,
+  trailing = false,
+  debounce = false,
+): EventCallbackHandler => {
+  let lastArgs: Parameters<EventCallbackHandler> | null = null
+  let timer = 0
+
+  return (...args: any[]) => {
+    if (timer) {
+      lastArgs = args
+    }
+    if (leading && !timer) {
+      callback(...args)
+      lastArgs = null
+    }
+    if (!timer || debounce) {
+      timer && clearTimeout(timer)
+      timer = setTimeout(() => {
+        if (trailing && lastArgs !== null) {
+          callback(...lastArgs)
+        }
+        lastArgs = null
+        timer = 0
+      }, wait)
+    }
+  }
+}
+
 export const debounce = (
   callback: EventCallbackHandler,
   wait: number,
   leading = false,
   trailing = true,
 ): EventCallbackHandler => {
-  let timer = 0
-  return (...args: any[]) => {
-    timer && clearTimeout(timer)
-
-    if (leading && !timer) {
-      callback(...args)
-    }
-
-    timer = setTimeout(() => {
-      if (trailing) {
-        callback(...args)
-      }
-      timer && clearTimeout(timer)
-      timer = 0
-    }, wait)
-  }
-}
-
-export const throttle = (
-  callback: EventCallbackHandler,
-  wait: number,
-  leading = true,
-  trailing = false,
-): EventCallbackHandler => {
-  let waiting = false
-  let lastArgs: Parameters<EventCallbackHandler> | null = null
-
-  return (...args: any[]) => {
-    if (waiting) {
-      lastArgs = args
-      return
-    }
-
-    if (leading) {
-      callback(...args)
-    } else {
-      lastArgs = args
-    }
-
-    waiting = true
-    setTimeout(() => {
-      if (trailing && lastArgs !== null) {
-        callback(...lastArgs)
-        lastArgs = null
-      }
-      waiting = false
-    }, wait)
-  }
+  return throttle(callback, wait, leading, trailing, true)
 }
 
 export const modifyTiming = (
