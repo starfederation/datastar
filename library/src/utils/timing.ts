@@ -43,18 +43,25 @@ export const throttle = (
   trailing = false,
 ): EventCallbackHandler => {
   let waiting = false
+  let lastArgs: Parameters<EventCallbackHandler> | null = null
 
   return (...args: any[]) => {
-    if (waiting) return
+    if (waiting) {
+      lastArgs = args
+      return
+    }
 
     if (leading) {
       callback(...args)
+    } else {
+      lastArgs = args
     }
 
     waiting = true
     setTimeout(() => {
-      if (trailing) {
-        callback(...args)
+      if (trailing && lastArgs !== null) {
+        callback(...lastArgs)
+        lastArgs = null
       }
       waiting = false
     }, wait)
