@@ -43,15 +43,6 @@ export const throttle = (
   }
 }
 
-export const debounce = (
-  callback: EventCallbackHandler,
-  wait: number,
-  leading = false,
-  trailing = true,
-): EventCallbackHandler => {
-  return throttle(callback, wait, leading, trailing, true)
-}
-
 export const modifyTiming = (
   callback: EventCallbackHandler,
   mods: Modifiers,
@@ -67,7 +58,7 @@ export const modifyTiming = (
     const wait = tagToMs(debounceArgs)
     const leading = tagHas(debounceArgs, 'leading', false)
     const trailing = !tagHas(debounceArgs, 'notrailing', false)
-    callback = debounce(callback, wait, leading, trailing)
+    callback = throttle(callback, wait, leading, trailing, true)
   }
 
   const throttleArgs = mods.get('throttle')
