@@ -20,7 +20,7 @@ export const throttle = (
   debounce = false,
 ): EventCallbackHandler => {
   let lastArgs: Parameters<EventCallbackHandler> | null = null
-  let timer: number | null = null
+  let timer = 0
 
   return (...args: any[]) => {
     if (leading && !timer) {
@@ -29,8 +29,8 @@ export const throttle = (
     } else {
       lastArgs = args
     }
-    if (timer === null || debounce) {
-      if (timer !== null) {
+    if (!timer || debounce) {
+      if (timer) { 
         clearTimeout(timer)
       }
       timer = setTimeout(() => {
@@ -38,7 +38,7 @@ export const throttle = (
           callback(...lastArgs)
         }
         lastArgs = null
-        timer = null
+        timer = 0
       }, wait)
     }
   }
