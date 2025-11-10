@@ -23,12 +23,11 @@ export const throttle = (
   let timer = 0
 
   return (...args: any[]) => {
-    if (timer) {
-      lastArgs = args
-    }
     if (leading && !timer) {
       callback(...args)
       lastArgs = null
+    } else {
+      lastArgs = args
     }
     if (!timer || debounce) {
       timer && clearTimeout(timer)
