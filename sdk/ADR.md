@@ -104,7 +104,7 @@ String enum of supported events:
 
 ```go
 ServerSentEventGenerator.PatchElements(
-  elements: string,
+  elements?: string,
   options?: {
     selector?: string,
     mode?: ElementPatchMode,
@@ -175,16 +175,6 @@ ServerSentEventGenerator.PatchElements(
   ```
 </details>
 
-<details>
-  <summary>Remove elements without a selector</summary>
-
-  ```
-  event: datastar-patch-elements
-  data: mode remove
-  data: elements <div id="first"></div><div id="second"></div>
-  ```
-</details>
-
 `PatchElements` sends HTML elements to the browser for DOM manipulation.
 
 > [!TIP]
@@ -202,7 +192,7 @@ ServerSentEventGenerator.PatchElements(
 
 ### Parameters
 
-- **elements**: One or more complete HTML elements. If a selector has not been specified, each top-level element must contain an ID. With ElementPatchMode `remove`, this parameter may be omitted when a selector is supplied.
+- **elements**: One or more complete HTML elements. If a selector has not been specified, each top-level element must contain an ID. With ElementPatchMode `remove`, this parameter may be omitted.
 
 #### ElementPatchMode
 
@@ -424,3 +414,4 @@ The function ***must*** parse the incoming HTTP request based on the method:
 | Others | Request body | JSON | Parse request body directly |
 
 **Error Handling**: ***Must*** return error for invalid JSON.
+
