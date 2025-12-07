@@ -24,9 +24,50 @@
   ],
   "main": "src/extension.js",
   "contributes": {
+    "grammars": [
+      {
+        "scopeName": "datastar.injection",
+        "path": "./src/datastar.injection.tmLanguage.json",
+        "injectTo": [
+          "text.html.basic",
+          "text.html.derivative",
+          "text.html.php",
+          "text.html.twig",
+          "text.html.php.blade",
+          "text.html.edge",
+          "text.html.nunjucks",
+          "text.html.njk",
+          "source.templ",
+          "source.astro",
+          "source.gohtml",
+          "text.html.vue",
+          "source.vue",
+          "source.svelte",
+          "text.html.svelte",
+          "text.html.handlebars",
+          "source.mustache",
+          "source.liquid",
+          "text.html.erb",
+          "text.html.ejs",
+          "text.pug",
+          "text.aspnetcorerazor",
+          "text.html.django",
+          "text.html.jinja",
+          "text.html.jsp"
+        ]
+      }
+    ],
     "configuration": {
       "title": "Datastar",
       "properties": {
+        "datastar.customAttributes": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Custom Datastar plugin names (without 'data-' prefix). Example: ['my-plugin', 'custom-action']"
+        },
         "datastar.enabledLanguages": {
           "type": "array",
           "default": [

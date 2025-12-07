@@ -1,0 +1,373 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "scopeName": "datastar.injection",
+  "injectionSelector": "L:text.html, L:meta.tag -string -comment -expression.html-template -meta.function.echo.blade",
+  "patterns": [
+    {
+      "include": "#datastar-attribute"
+    }
+  ],
+  "repository": {
+    "datastar-attribute": {
+      "comment": "Match Datastar attributes: data-[plugin]:[key]:[nested-key]__[modifier(s)]",
+      "begin": "\\b(data-)(attr|bind|class|computed|effect|ignore|ignore-morph|indicator|init|json-signals|on|on-intersect|on-interval|on-signal-patch|on-signal-patch-filter|preserve-attr|ref|show|signals|style|text|animate|custom-validity|on-raf|on-resize|persist|query-string|replace-url|rocket|scroll-into-view|view-transition|my-foo)(?=__|:|[\\s>=])",
+      "end": "(?<=[\"'])|(?=[\\s>])",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.operator.datastar.prefix"
+        },
+        "2": {
+          "name": "support.function.datastar.plugin"
+        }
+      },
+      "patterns": [
+        {
+          "comment": "Match plugin-like keys: :data-[plugin]",
+          "match": "(:)(data-(?:attr|bind|class|computed|effect|ignore|ignore-morph|indicator|init|json-signals|on|on-intersect|on-interval|on-signal-patch|on-signal-patch-filter|preserve-attr|ref|show|signals|style|text|animate|custom-validity|on-raf|on-resize|persist|query-string|replace-url|rocket|scroll-into-view|view-transition|my-foo))(?=__|:|[\\s>=])",
+          "captures": {
+            "1": {
+              "name": "punctuation.separator.key.datastar"
+            },
+            "2": {
+              "name": "support.function.datastar.plugin"
+            }
+          }
+        },
+        {
+          "comment": "Match regular keys: :key",
+          "match": "(:)([a-z][a-z0-9-]*)(?=__|:|[\\s>=])",
+          "captures": {
+            "1": {
+              "name": "punctuation.separator.key.datastar"
+            },
+            "2": {
+              "name": "variable.parameter.datastar.key"
+            }
+          }
+        },
+        {
+          "comment": "Match modifiers with arguments: __modifier.arg",
+          "match": "(__)([a-z][a-z0-9-]*)(\\.)([a-z0-9]+)",
+          "captures": {
+            "1": {
+              "name": "punctuation.separator.modifier.datastar"
+            },
+            "2": {
+              "name": "storage.modifier.datastar"
+            },
+            "3": {
+              "name": "punctuation.separator.modifier-arg.datastar"
+            },
+            "4": {
+              "name": "constant.numeric.modifier-arg.datastar"
+            }
+          }
+        },
+        {
+          "comment": "Match modifiers without arguments: __modifier",
+          "match": "(__)([a-z][a-z0-9-]*)",
+          "captures": {
+            "1": {
+              "name": "punctuation.separator.modifier.datastar"
+            },
+            "2": {
+              "name": "storage.modifier.datastar"
+            }
+          }
+        },
+        {
+          "comment": "Match attribute value with expressions",
+          "begin": "(=)([\"'])",
+          "end": "\\2",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.separator.key-value.html"
+            },
+            "2": {
+              "name": "punctuation.definition.string.begin.html"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.html"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#datastar-expressions"
+            }
+          ]
+        }
+      ]
+    },
+    "datastar-expressions": {
+      "patterns": [
+        {
+          "include": "#signal-reference"
+        },
+        {
+          "include": "#action-call"
+        },
+        {
+          "include": "#method-call"
+        },
+        {
+          "include": "#function-call"
+        },
+        {
+          "include": "#javascript-syntax"
+        }
+      ]
+    },
+    "signal-reference": {
+      "match": "(\\$[a-zA-Z_][a-zA-Z0-9_]*)((\\?)?\\.[a-zA-Z_][a-zA-Z0-9_]*(?!\\())*(\\[[^\\]]+\\])?",
+      "captures": {
+        "1": {
+          "name": "variable.other.datastar.signal"
+        }
+      }
+    },
+    "action-call": {
+      "begin": "(@[a-z]+)(\\()",
+      "end": "\\)",
+      "beginCaptures": {
+        "1": {
+          "name": "support.function.datastar.action"
+        },
+        "2": {
+          "name": "punctuation.section.arguments.begin.datastar"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.arguments.end.datastar"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#datastar-expressions"
+        }
+      ]
+    },
+    "method-call": {
+      "begin": "(\\.)([a-zA-Z_][a-zA-Z0-9_]*)(\\()",
+      "end": "\\)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.accessor.datastar"
+        },
+        "2": {
+          "name": "entity.name.function.datastar"
+        },
+        "3": {
+          "name": "punctuation.section.arguments.begin.datastar"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.arguments.end.datastar"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#datastar-expressions"
+        }
+      ]
+    },
+    "function-call": {
+      "begin": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(\\()",
+      "end": "\\)",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.name.function.datastar"
+        },
+        "2": {
+          "name": "punctuation.section.arguments.begin.datastar"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.arguments.end.datastar"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#datastar-expressions"
+        }
+      ]
+    },
+    "javascript-syntax": {
+      "patterns": [
+        {
+          "include": "#arrow-function"
+        },
+        {
+          "include": "#object-literal"
+        },
+        {
+          "include": "#array-literal"
+        },
+        {
+          "include": "#spread-operator"
+        },
+        {
+          "include": "#js-strings"
+        },
+        {
+          "include": "#js-numbers"
+        },
+        {
+          "include": "#js-keywords"
+        },
+        {
+          "include": "#js-operators"
+        }
+      ]
+    },
+    "js-strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.datastar",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.datastar",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.datastar",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.datastar",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.template.datastar",
+          "begin": "`",
+          "end": "`",
+          "patterns": [
+            {
+              "name": "meta.template.expression.datastar",
+              "begin": "\\$\\{",
+              "end": "\\}",
+              "beginCaptures": {
+                "0": {
+                  "name": "punctuation.definition.template-expression.begin.datastar"
+                }
+              },
+              "endCaptures": {
+                "0": {
+                  "name": "punctuation.definition.template-expression.end.datastar"
+                }
+              },
+              "patterns": [
+                {
+                  "include": "#datastar-expressions"
+                }
+              ]
+            },
+            {
+              "name": "constant.character.escape.datastar",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "js-numbers": {
+      "match": "\\b\\d+(\\.\\d+)?\\b",
+      "name": "constant.numeric.datastar"
+    },
+    "js-keywords": {
+      "patterns": [
+        {
+          "match": "\\b(const|let|var|async|await|function|return|throw|new|if|else|for|while|do|switch|case|break|continue|try|catch|finally)\\b",
+          "name": "keyword.control.datastar"
+        },
+        {
+          "match": "\\b(true|false|null|undefined)\\b",
+          "name": "constant.language.datastar"
+        },
+        {
+          "match": "\\b(this|event|el|Promise|Error|Array|Object|String|Number|Boolean|Date|Math|console)\\b",
+          "name": "support.class.datastar"
+        }
+      ]
+    },
+    "js-operators": {
+      "match": "(\\+\\+|--|\\+=|-=|\\*=|/=|%=|\\+|-|\\*|/|%|===|!==|==|!=|>=|<=|>|<|&&|\\|\\||\\?\\?|!|=|\\?|:)",
+      "name": "keyword.operator.datastar"
+    },
+    "spread-operator": {
+      "match": "\\.\\.\\.",
+      "name": "keyword.operator.spread.datastar"
+    },
+    "arrow-function": {
+      "match": "(\\([^)]*\\)|[a-zA-Z_][a-zA-Z0-9_]*)\\s*(=>)",
+      "captures": {
+        "1": {
+          "name": "variable.parameter.function.datastar"
+        },
+        "2": {
+          "name": "storage.type.function.arrow.datastar"
+        }
+      }
+    },
+    "object-literal": {
+      "begin": "\\{",
+      "end": "\\}",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.object.begin.datastar"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.object.end.datastar"
+        }
+      },
+      "patterns": [
+        {
+          "match": "([a-zA-Z_][a-zA-Z0-9_]*)\\s*(:)",
+          "captures": {
+            "1": {
+              "name": "variable.other.property.datastar"
+            },
+            "2": {
+              "name": "punctuation.separator.key-value.datastar"
+            }
+          }
+        },
+        {
+          "include": "#datastar-expressions"
+        }
+      ]
+    },
+    "array-literal": {
+      "begin": "\\[",
+      "end": "\\]",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.array.begin.datastar"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.array.end.datastar"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#datastar-expressions"
+        }
+      ]
+    }
+  }
+}
