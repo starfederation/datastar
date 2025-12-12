@@ -376,11 +376,6 @@ const genRx = (
         .split('.')
         .reduce((acc: string, part: string) => `${acc}['${part}']`, '$'),
     )
-    // [$x] -> [$['x']] ($ inside brackets)
-    .replace(
-      /\[(\$[a-zA-Z_\d]\w*)\]/g,
-      (_, varName) => `[$['${varName.slice(1)}']]`,
-    )
 
   expr = expr.replaceAll(/@(\w+)\(/g, '__action("$1",evt,')
 
