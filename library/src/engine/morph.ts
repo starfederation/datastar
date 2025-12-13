@@ -152,9 +152,11 @@ const morphChildren = (
     // elements with persistent IDs and possible state info we can still preserve by moving in and then morphing
     if (ctxIdMap.has(newChild)) {
       // node has children with IDs with possible state so create a dummy elt of same type and apply full morph algorithm
-      const newEmptyChild = document.createElement(
-        (newChild as Element).tagName,
-      )
+      const ns = (newChild as Element).namespaceURI
+      const newEmptyChild =
+        ns && ns !== 'http://www.w3.org/1999/xhtml'
+          ? document.createElementNS(ns, (newChild as Element).tagName)
+          : document.createElement((newChild as Element).tagName)
       oldParent.insertBefore(newEmptyChild, insertionPoint)
       morphNode(newEmptyChild, newChild)
       insertionPoint = newEmptyChild.nextSibling

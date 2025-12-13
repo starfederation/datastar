@@ -3,8 +3,8 @@
 // Description: Patches elements into the DOM.
 
 import { watcher } from '@engine'
-import type { WatcherContext } from '@engine/types'
 import { morph } from '@engine/morph'
+import type { WatcherContext } from '@engine/types'
 import { supportsViewTransitions } from '@utils/view-transitions'
 
 type PatchElementsMode =
@@ -22,13 +22,20 @@ type PatchElementsArgs = {
   mode: PatchElementsMode
   selector: string
   useViewTransition: boolean
+  namespace?: string
+}
+
+const NAMESPACE_WRAPPER: Record<string, string | null> = {
+  'http://www.w3.org/1999/xhtml': null,
+  'http://www.w3.org/2000/svg': 'svg',
+  'http://www.w3.org/1998/Math/MathML': 'math',
 }
 
 watcher({
   name: 'datastar-patch-elements',
   apply(
     ctx,
-    { elements = '', selector = '', mode = 'outer', useViewTransition },
+    { elements = '', selector = '', mode = 'outer', useViewTransition, namespace },
   ) {
     switch (mode) {
       case 'remove':
@@ -48,11 +55,16 @@ watcher({
       throw ctx.error('PatchElementsExpectedSelector')
     }
 
+    if (namespace && !(namespace in NAMESPACE_WRAPPER)) {
+      throw ctx.error('PatchElementsUnsupportedNamespace', { namespace })
+    }
+
     const args2: PatchElementsArgs = {
       mode,
       selector,
       elements,
       useViewTransition: useViewTransition?.trim() === 'true',
+      namespace,
     }
 
     if (supportsViewTransitions && useViewTransition) {
@@ -65,7 +77,7 @@ watcher({
 
 const onPatchElements = (
   { error }: WatcherContext,
-  { elements, selector, mode }: PatchElementsArgs,
+  { elements, selector, mode, namespace }: PatchElementsArgs,
 ) => {
   const elementsWithSvgsRemoved = elements.replace(
     /<svg(\s[^>]*>|>)([\s\S]*?)<\/svg>/gim,
@@ -75,10 +87,14 @@ const onPatchElements = (
   const hasHead = /<\/head>/.test(elementsWithSvgsRemoved)
   const hasBody = /<\/body>/.test(elementsWithSvgsRemoved)
 
+  const wrapper = namespace ? NAMESPACE_WRAPPER[namespace] : null
+
   const newDocument = new DOMParser().parseFromString(
     hasHtml || hasHead || hasBody
       ? elements
-      : `<body><template>${elements}</template></body>`,
+      : wrapper
+        ? `<body><template><${wrapper} xmlns="${namespace}">${elements}</${wrapper}></template></body>`
+        : `<body><template>${elements}</template></body>`,
     'text/html',
   )
 
@@ -92,6 +108,13 @@ const onPatchElements = (
     newContent.appendChild(newDocument.head)
   } else if (hasBody) {
     newContent.appendChild(newDocument.body)
+  } else if (wrapper) {
+    const wrapperEl = newDocument
+      .querySelector('template')!
+      .content.querySelector(wrapper)!
+    for (const child of wrapperEl.childNodes) {
+      newContent.appendChild(child)
+    }
   } else {
     newContent = newDocument.querySelector('template')!.content
   }
