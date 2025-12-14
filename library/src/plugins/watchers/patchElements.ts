@@ -23,13 +23,14 @@ type PatchElementsArgs = {
   mode: PatchElementsMode
   selector: string
   useViewTransition: boolean
+  wrap?: string
 }
 
 watcher({
   name: 'datastar-patch-elements',
   apply(
     ctx,
-    { elements = '', selector = '', mode = 'outer', useViewTransition },
+    { elements = '', selector = '', mode = 'outer', useViewTransition, wrap },
   ) {
     switch (mode) {
       case 'remove':
@@ -54,6 +55,7 @@ watcher({
       selector,
       elements,
       useViewTransition: useViewTransition?.trim() === 'true',
+      wrap,
     }
 
     if (supportsViewTransitions && useViewTransition) {
@@ -66,7 +68,7 @@ watcher({
 
 const onPatchElements = (
   { error }: WatcherContext,
-  { elements, selector, mode }: PatchElementsArgs,
+  { elements, selector, mode, wrap }: PatchElementsArgs,
 ) => {
   const elementsWithSvgsRemoved = elements.replace(
     /<svg(\s[^>]*>|>)([\s\S]*?)<\/svg>/gim,
@@ -79,7 +81,9 @@ const onPatchElements = (
   const newDocument = new DOMParser().parseFromString(
     hasHtml || hasHead || hasBody
       ? elements
-      : `<body><template>${elements}</template></body>`,
+      : wrap
+        ? `<body><template><${wrap}>${elements}</${wrap}></template></body>`
+        : `<body><template>${elements}</template></body>`,
     'text/html',
   )
 
@@ -93,6 +97,11 @@ const onPatchElements = (
     newContent.appendChild(newDocument.head)
   } else if (hasBody) {
     newContent.appendChild(newDocument.body)
+  } else if (wrap) {
+    const wrapEl = newDocument.querySelector('template')!.content.querySelector(wrap)!
+    for (const child of wrapEl.childNodes) {
+      newContent.appendChild(child)
+    }
   } else {
     newContent = newDocument.querySelector('template')!.content
   }
@@ -345,9 +354,12 @@ const morphChildren = (
     // elements with persistent IDs and possible state info we can still preserve by moving in and then morphing
     if (ctxIdMap.has(newChild)) {
       // node has children with IDs with possible state so create a dummy elt of same type and apply full morph algorithm
-      const newEmptyChild = document.createElement(
-        (newChild as Element).tagName,
-      )
+      const ns = (newChild as Element).namespaceURI
+      const tagName = (newChild as Element).tagName
+      const newEmptyChild =
+        ns && ns !== 'http://www.w3.org/1999/xhtml'
+          ? document.createElementNS(ns, tagName)
+          : document.createElement(tagName)
       oldParent.insertBefore(newEmptyChild, insertionPoint)
       morphNode(newEmptyChild, newChild)
       insertionPoint = newEmptyChild.nextSibling

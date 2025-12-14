@@ -109,6 +109,7 @@ ServerSentEventGenerator.PatchElements(
     selector?: string,
     mode?: ElementPatchMode,
     useViewTransition?: boolean,
+    wrap: string,
     eventId?: string,
     retryDuration?: durationInMilliseconds
   }
@@ -137,6 +138,7 @@ ServerSentEventGenerator.PatchElements(
   data: mode inner
   data: selector #feed
   data: useViewTransition true
+  data: wrap div
   data: elements <div id="feed">
   data: elements     <span>1</span>
   data: elements </div>
@@ -172,6 +174,20 @@ ServerSentEventGenerator.PatchElements(
   event: datastar-patch-elements
   data: mode remove
   data: selector #feed, #otherid
+  ```
+</details>
+
+<details>
+  <summary>Patch SVG elements</summary>
+
+  ```
+  event: datastar-patch-elements
+  data: mode append
+  data: selector #vis
+  data: wrap svg
+  data: elements <circle id="c1" cx="10" r="5" fill="red"/>
+  data: elements <circle id="c2" cx="20" r="5" fill="green"/>
+  data: elements <circle id="c3" cx="30" r="5" fill="blue"/>
   ```
 </details>
 
@@ -218,6 +234,7 @@ String enum defining how elements are patched into the DOM.
 | `selector` | string | Element ID | CSS selector for target element. If a selector is not specified, each element must have an ID specified. |
 | `mode` | ElementPatchMode | `outer` | How to patch the element |
 | `useViewTransition` | boolean | `false` | Enable view transitions API |
+| `wrap` | string | Tag name | Tag name used to control the [namespace](https://developer.mozilla.org/en-US/docs/Web/API/Element/namespaceURI) of any new elements. If a tag name is not specified, elements will be created in the HTML namespace. |
 
 ### Implementation
 
@@ -227,6 +244,7 @@ String enum defining how elements are patched into the DOM.
 - `selector SELECTOR\n` (if provided)
 - `mode PATCH_MODE\n` (if not `outer`)
 - `useViewTransition true\n` (if `true`)
+- `wrap TAG_NAME\n` (if provided)
 - `elements HTML_LINE\n` (for each line of HTML)
 
 ---
@@ -414,4 +432,3 @@ The function ***must*** parse the incoming HTTP request based on the method:
 | Others | Request body | JSON | Parse request body directly |
 
 **Error Handling**: ***Must*** return error for invalid JSON.
-
