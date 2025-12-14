@@ -109,7 +109,7 @@ ServerSentEventGenerator.PatchElements(
     selector?: string,
     mode?: ElementPatchMode,
     useViewTransition?: boolean,
-    wrap: string,
+    wrap?: string,
     eventId?: string,
     retryDuration?: durationInMilliseconds
   }
