@@ -23,14 +23,14 @@ type PatchElementsArgs = {
   mode: PatchElementsMode
   selector: string
   useViewTransition: boolean
-  wrap?: string
+  wrap: string
 }
 
 watcher({
   name: 'datastar-patch-elements',
   apply(
     ctx,
-    { elements = '', selector = '', mode = 'outer', useViewTransition, wrap },
+    { elements = '', selector = '', mode = 'outer', useViewTransition = '', wrap = '' },
   ) {
     switch (mode) {
       case 'remove':
@@ -54,7 +54,7 @@ watcher({
       mode,
       selector,
       elements,
-      useViewTransition: useViewTransition?.trim() === 'true',
+      useViewTransition: useViewTransition.trim() === 'true',
       wrap,
     }
 
