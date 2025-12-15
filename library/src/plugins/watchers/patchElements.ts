@@ -18,19 +18,27 @@ type PatchElementsMode =
   | 'before'
   | 'after'
 
+const namespaceToTag = {
+  'html': '',
+  'svg': 'svg',
+  'mathml': 'math'
+}
+
+type Namespace = keyof typeof namespaceToTag
+
 type PatchElementsArgs = {
   elements: string
   mode: PatchElementsMode
   selector: string
   useViewTransition: boolean
-  wrap: string
+  namespace: Namespace
 }
 
 watcher({
   name: 'datastar-patch-elements',
   apply(
     ctx,
-    { elements = '', selector = '', mode = 'outer', useViewTransition = '', wrap = '' },
+    { elements = '', selector = '', mode = 'outer', useViewTransition = '', namespace = 'html' },
   ) {
     switch (mode) {
       case 'remove':
@@ -50,12 +58,16 @@ watcher({
       throw ctx.error('PatchElementsExpectedSelector')
     }
 
+    if (!(namespace === 'html' || namespace === 'svg' || namespace === 'mathml')) {
+      throw ctx.error('PatchElementsInvalidNamespace', { namespace })
+    }
+
     const args2: PatchElementsArgs = {
       mode,
       selector,
       elements,
       useViewTransition: useViewTransition.trim() === 'true',
-      wrap,
+      namespace
     }
 
     if (supportsViewTransitions && useViewTransition) {
@@ -68,8 +80,10 @@ watcher({
 
 const onPatchElements = (
   { error }: WatcherContext,
-  { elements, selector, mode, wrap }: PatchElementsArgs,
+  { elements, selector, mode, namespace }: PatchElementsArgs,
 ) => {
+  const wrap = namespaceToTag[namespace]
+
   const elementsWithSvgsRemoved = elements.replace(
     /<svg(\s[^>]*>|>)([\s\S]*?)<\/svg>/gim,
     '',
