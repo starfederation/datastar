@@ -560,6 +560,7 @@ const fetchEventSource = (
             'selector',
             'mode',
             'useViewTransition',
+            'namespace'
           )
         }
 
