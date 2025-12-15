@@ -8,23 +8,25 @@ import { isHTMLOrSVG } from '@utils/dom'
 import { aliasify } from '@utils/text'
 import { supportsViewTransitions } from '@utils/view-transitions'
 
-type PatchElementsMode =
-  | 'remove'
-  | 'outer'
-  | 'inner'
-  | 'replace'
-  | 'prepend'
-  | 'append'
-  | 'before'
-  | 'after'
+const isValidType = <T extends readonly string[]>(
+  arr: T,
+  value: string,
+): value is T[number] => (arr as readonly string[]).includes(value)
 
-const namespaceToTag = {
-  'html': '',
-  'svg': 'svg',
-  'mathml': 'math'
-}
+const PATCH_MODES = [
+  'remove',
+  'outer',
+  'inner',
+  'replace',
+  'prepend',
+  'append',
+  'before',
+  'after',
+] as const
+type PatchElementsMode = (typeof PATCH_MODES)[number]
 
-type Namespace = keyof typeof namespaceToTag
+const NAMESPACES = ['html', 'svg', 'mathml'] as const
+type Namespace = (typeof NAMESPACES)[number]
 
 type PatchElementsArgs = {
   elements: string
@@ -38,27 +40,23 @@ watcher({
   name: 'datastar-patch-elements',
   apply(
     ctx,
-    { elements = '', selector = '', mode = 'outer', useViewTransition = '', namespace = 'html' },
+    {
+      elements = '',
+      selector = '',
+      mode = 'outer',
+      useViewTransition = '',
+      namespace = 'html',
+    },
   ) {
-    switch (mode) {
-      case 'remove':
-      case 'outer':
-      case 'inner':
-      case 'replace':
-      case 'prepend':
-      case 'append':
-      case 'before':
-      case 'after':
-        break
-      default:
-        throw ctx.error('PatchElementsInvalidMode', { mode })
+    if (!isValidType(PATCH_MODES, mode)) {
+      throw ctx.error('PatchElementsInvalidMode', { mode })
     }
 
     if (!selector && mode !== 'outer' && mode !== 'replace') {
       throw ctx.error('PatchElementsExpectedSelector')
     }
 
-    if (!(namespace === 'html' || namespace === 'svg' || namespace === 'mathml')) {
+    if (!isValidType(NAMESPACES, namespace)) {
       throw ctx.error('PatchElementsInvalidNamespace', { namespace })
     }
 
@@ -67,7 +65,7 @@ watcher({
       selector,
       elements,
       useViewTransition: useViewTransition.trim() === 'true',
-      namespace
+      namespace,
     }
 
     if (supportsViewTransitions && useViewTransition) {
@@ -82,8 +80,6 @@ const onPatchElements = (
   { error }: WatcherContext,
   { elements, selector, mode, namespace }: PatchElementsArgs,
 ) => {
-  const wrap = namespaceToTag[namespace]
-
   const elementsWithSvgsRemoved = elements.replace(
     /<svg(\s[^>]*>|>)([\s\S]*?)<\/svg>/gim,
     '',
@@ -92,12 +88,16 @@ const onPatchElements = (
   const hasHead = /<\/head>/.test(elementsWithSvgsRemoved)
   const hasBody = /<\/body>/.test(elementsWithSvgsRemoved)
 
+  const wrapperTag =
+    namespace === 'svg' ? 'svg' : namespace === 'mathml' ? 'math' : ''
+  const wrappedEls = wrapperTag
+    ? `<${wrapperTag}>${elements}</${wrapperTag}>`
+    : elements
+
   const newDocument = new DOMParser().parseFromString(
     hasHtml || hasHead || hasBody
       ? elements
-      : wrap
-        ? `<body><template><${wrap}>${elements}</${wrap}></template></body>`
-        : `<body><template>${elements}</template></body>`,
+      : `<body><template>${wrappedEls}</template></body>`,
     'text/html',
   )
 
@@ -111,9 +111,11 @@ const onPatchElements = (
     newContent.appendChild(newDocument.head)
   } else if (hasBody) {
     newContent.appendChild(newDocument.body)
-  } else if (wrap) {
-    const wrapEl = newDocument.querySelector('template')!.content.querySelector(wrap)!
-    for (const child of wrapEl.childNodes) {
+  } else if (wrapperTag) {
+    const wrapperEl = newDocument
+      .querySelector('template')!
+      .content.querySelector(wrapperTag)!
+    for (const child of wrapperEl.childNodes) {
       newContent.appendChild(child)
     }
   } else {
@@ -368,11 +370,11 @@ const morphChildren = (
     // elements with persistent IDs and possible state info we can still preserve by moving in and then morphing
     if (ctxIdMap.has(newChild)) {
       // node has children with IDs with possible state so create a dummy elt of same type and apply full morph algorithm
-      const ns = (newChild as Element).namespaceURI
+      const namespaceURI = (newChild as Element).namespaceURI
       const tagName = (newChild as Element).tagName
       const newEmptyChild =
-        ns && ns !== 'http://www.w3.org/1999/xhtml'
-          ? document.createElementNS(ns, tagName)
+        namespaceURI && namespaceURI !== 'http://www.w3.org/1999/xhtml'
+          ? document.createElementNS(namespaceURI, tagName)
           : document.createElement(tagName)
       oldParent.insertBefore(newEmptyChild, insertionPoint)
       morphNode(newEmptyChild, newChild)
