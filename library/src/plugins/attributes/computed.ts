@@ -2,16 +2,30 @@
 // Slug: Creates a computed signal.
 // Description: Creates a signal that is computed based on an expression.
 
-import type { AttributePlugin } from '../../engine/types'
-import { modifyCasing } from '../../utils/text'
+import { attribute } from '@engine'
+import { computed, mergePaths, mergePatch } from '@engine/signals'
+import { modifyCasing } from '@utils/text'
+import { updateLeaves } from '@utils/paths'
 
-export const Computed: AttributePlugin = {
-  type: 'attribute',
+attribute({
   name: 'computed',
-  keyReq: 'must',
-  valReq: 'must',
-  returnsValue: true,
-  onLoad: ({ key, mods, rx, computed, mergePaths }) => {
-    mergePaths([[modifyCasing(key, mods), computed(rx)]])
+  requirement: {
+    value: 'must',
   },
-}
+  returnsValue: true,
+  apply({ key, mods, rx, error }) {
+    if (key) {
+      mergePaths([[modifyCasing(key, mods), computed(rx)]])
+    } else {
+      const patch = Object.assign({}, rx() as Record<string, () => any>)
+      updateLeaves(patch, (old) => {
+        if (typeof old === 'function') {
+          return computed(old)
+        } else {
+          throw error('ComputedExpectedFunction')
+        }
+      })
+      mergePatch(patch)
+    }
+  },
+})

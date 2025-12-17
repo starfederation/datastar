@@ -2,12 +2,14 @@
 // Slug: Executes an expression when signals change.
 // Description: Executes an expression on page load and whenever any signals in the expression change.
 
-import type { AttributePlugin } from '../../engine/types'
+import { attribute } from '@engine'
+import { effect } from '@engine/signals'
 
-export const Effect: AttributePlugin = {
-  type: 'attribute',
+attribute({
   name: 'effect',
-  keyReq: 'denied',
-  valReq: 'must',
-  onLoad: ({ effect, rx }) => effect(rx),
-}
+  requirement: {
+    key: 'denied',
+    value: 'must',
+  },
+  apply: ({ rx }) => effect(rx),
+})

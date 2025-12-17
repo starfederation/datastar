@@ -55,7 +55,7 @@
       "items": {
         "type": "string"
       },
-      "default": ["selector", "mode", "elements", "useViewTransition", "signals", "onlyIfMissing"]
+      "default": ["selector", "mode", "elements", "useViewTransition", "namespace", "signals", "onlyIfMissing"]
     },
     "enums": {
       "type": "object",
@@ -104,6 +104,33 @@
                   "name": {
                     "type": "string"
                   },
+                  "value": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Namespace": {
+          "type": "object",
+          "description": "The namespace in which elements are created",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "default": {
+              "type": "string"
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["value", "description"],
+                "properties": {
                   "value": {
                     "type": "string"
                   },

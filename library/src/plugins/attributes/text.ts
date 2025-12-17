@@ -2,15 +2,17 @@
 // Slug: Binds the text content of an element.
 // Description: Binds the text content of an element to an expression.
 
-import type { AttributePlugin } from '../../engine/types'
+import { attribute } from '@engine'
+import { effect } from '@engine/signals'
 
-export const Text: AttributePlugin = {
-  type: 'attribute',
+attribute({
   name: 'text',
-  keyReq: 'denied',
-  valReq: 'must',
+  requirement: {
+    key: 'denied',
+    value: 'must',
+  },
   returnsValue: true,
-  onLoad: ({ el, effect, rx }) => {
+  apply({ el, rx }) {
     const update = () => {
       observer.disconnect()
       el.textContent = `${rx()}`
@@ -20,6 +22,7 @@ export const Text: AttributePlugin = {
         subtree: true,
       })
     }
+
     const observer = new MutationObserver(update)
     const cleanup = effect(update)
 
@@ -28,4 +31,4 @@ export const Text: AttributePlugin = {
       cleanup()
     }
   },
-}
+})

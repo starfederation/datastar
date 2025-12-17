@@ -2,15 +2,14 @@
 // Slug: Syncs the value of an attribute with an expression.
 // Description: Sets the value of any HTML attribute to an expression, and keeps it in sync.
 
-import type { AttributePlugin } from '../../engine/types'
-import { kebab } from '../../utils/text'
+import { attribute } from '@engine'
+import { effect } from '@engine/signals'
 
-export const Attr: AttributePlugin = {
-  type: 'attribute',
+attribute({
   name: 'attr',
-  valReq: 'must',
+  requirement: { value: 'must' },
   returnsValue: true,
-  onLoad: ({ el, effect, key, rx }) => {
+  apply({ el, key, rx }) {
     const syncAttr = (key: string, val: any) => {
       if (val === '' || val === true) {
         el.setAttribute(key, '')
@@ -23,11 +22,10 @@ export const Attr: AttributePlugin = {
       }
     }
 
-    key = kebab(key)
     const update = key
       ? () => {
           observer.disconnect()
-          const val = rx<string>()
+          const val = rx() as string
           syncAttr(key, val)
           observer.observe(el, {
             attributeFilter: [key],
@@ -35,7 +33,7 @@ export const Attr: AttributePlugin = {
         }
       : () => {
           observer.disconnect()
-          const obj = rx<Record<string, any>>()
+          const obj = rx() as Record<string, any>
           const attributeFilter = Object.keys(obj)
           for (const key of attributeFilter) {
             syncAttr(key, obj[key])
@@ -53,4 +51,4 @@ export const Attr: AttributePlugin = {
       cleanup()
     }
   },
-}
+})

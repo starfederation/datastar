@@ -1,1 +1,1 @@
-declare const __USE_UPLOAD_PROGRESS__: boolean
+declare const ALIAS: string | null

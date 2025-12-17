@@ -2,25 +2,20 @@
 // Slug: Creates an indicator for whether an SSE request is in flight.
 // Description: Creates a signal and sets its value to `true` while an SSE request request is in flight, otherwise `false`.
 
-import type { AttributePlugin } from '../../engine/types'
-import { modifyCasing } from '../../utils/text'
-import {
-  DATASTAR_FETCH_EVENT,
-  type DatastarFetchEvent,
-  FINISHED,
-  STARTED,
-} from '../backend/shared'
+import { attribute } from '@engine'
+import { DATASTAR_FETCH_EVENT } from '@engine/consts'
+import { mergePaths } from '@engine/signals'
+import type { DatastarFetchEvent } from '@engine/types'
+import { FINISHED, STARTED } from '@plugins/actions/fetch'
+import { modifyCasing } from '@utils/text'
 
-export const Indicator: AttributePlugin = {
-  type: 'attribute',
+attribute({
   name: 'indicator',
-  keyReq: 'exclusive',
-  valReq: 'exclusive',
-  shouldEvaluate: false,
-  onLoad: ({ el, key, mods, mergePaths, value }) => {
-    const signalName = key ? modifyCasing(key, mods) : value
+  requirement: 'exclusive',
+  apply({ el, key, mods, value }) {
+    const signalName = key != null ? modifyCasing(key, mods) : value
 
-    mergePaths([[signalName, false]], { ifMissing: true })
+    mergePaths([[signalName, false]])
 
     const watcher = ((event: CustomEvent<DatastarFetchEvent>) => {
       const { type, el: elt } = event.detail
@@ -42,4 +37,4 @@ export const Indicator: AttributePlugin = {
       document.removeEventListener(DATASTAR_FETCH_EVENT, watcher)
     }
   },
-}
+})

@@ -2,18 +2,20 @@
 // Slug: Shows or hides an element.
 // Description: Shows or hides an element based on whether an expression evaluates to `true` or `false`.
 
-import type { AttributePlugin } from '../../engine/types'
+import { attribute } from '@engine'
+import { effect } from '@engine/signals'
 
 const NONE = 'none'
 const DISPLAY = 'display'
 
-export const Show: AttributePlugin = {
-  type: 'attribute',
+attribute({
   name: 'show',
-  keyReq: 'denied',
-  valReq: 'must',
+  requirement: {
+    key: 'denied',
+    value: 'must',
+  },
   returnsValue: true,
-  onLoad: ({ el, effect, rx }) => {
+  apply({ el, rx }) {
     const update = () => {
       observer.disconnect()
       const shouldShow = rx()
@@ -32,4 +34,4 @@ export const Show: AttributePlugin = {
       cleanup()
     }
   },
-}
+})

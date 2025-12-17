@@ -10,9 +10,9 @@
       }
     ]
   },
-  "data-attr-*": {
-    "prefix": "data-attr-*",
-    "body": "data-attr-${1:name}=\"${2:expression}\"",
+  "data-attr:*": {
+    "prefix": "data-attr:*",
+    "body": "data-attr:${1:name}=\"${2:expression}\"",
     "description": "Sets an element’s attribute value based on an expression.",
     "references": [
       {
@@ -32,9 +32,9 @@
       }
     ]
   },
-  "data-bind-*": {
-    "prefix": "data-bind-*",
-    "body": "data-bind-${1:name}",
+  "data-bind:*": {
+    "prefix": "data-bind:*",
+    "body": "data-bind:${1:name}",
     "description": "Creates a new signal and enables two-way binding between it and the element.",
     "references": [
       {
@@ -54,9 +54,9 @@
       }
     ]
   },
-  "data-class-*": {
-    "prefix": "data-class-*",
-    "body": "data-class-${1:name}=\"${2:expression}\"",
+  "data-class:*": {
+    "prefix": "data-class:*",
+    "body": "data-class:${1:name}=\"${2:expression}\"",
     "description": "Adds or removes a class from an element based on an expression.",
     "references": [
       {
@@ -66,8 +66,19 @@
     ]
   },
   "data-computed": {
-    "prefix": "data-computed-*",
-    "body": "data-computed-${1:name}=\"${2:expression}\"",
+    "prefix": "data-computed",
+    "body": "data-computed=\"{${1:signalName}: ${2:expression}}\"",
+    "description": "Creates one or more signals that are computed based on a set of key-value pairs that map to the signal name and expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-computed"
+      }
+    ]
+  },
+  "data-computed:*": {
+    "prefix": "data-computed:*",
+    "body": "data-computed:${1:name}=\"${2:expression}\"",
     "description": "Creates a signal that is computed based on an expression.",
     "references": [
       {
@@ -131,14 +142,25 @@
       }
     ]
   },
-  "data-indicator-*": {
-    "prefix": "data-indicator-*",
-    "body": "data-indicator-${1:name}",
+  "data-indicator:*": {
+    "prefix": "data-indicator:*",
+    "body": "data-indicator:${1:name}",
     "description": "Creates a signal to track in-flight backend requests.",
     "references": [
       {
         "name": "Documentation",
         "url": "https://data-star.dev/reference/attributes#data-indicator"
+      }
+    ]
+  },
+  "data-init": {
+    "prefix": "data-init",
+    "body": "data-init=\"${1:expression}\"",
+    "description": "Runs an expression whenever the attribute is initialised.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-init"
       }
     ]
   },
@@ -154,8 +176,8 @@
     ]
   },
   "data-on": {
-    "prefix": "data-on-*",
-    "body": "data-on-${1:name}=\"${2:expression}\"",
+    "prefix": "data-on:*",
+    "body": "data-on:${1:name}=\"${2:expression}\"",
     "description": "Runs an expression whenever an event is triggered on an element.",
     "references": [
       {
@@ -164,9 +186,9 @@
       }
     ]
   },
-  "data-on-click": {
-    "prefix": "data-on-click",
-    "body": "data-on-click=\"${1:expression}\"",
+  "data-on:click": {
+    "prefix": "data-on:click",
+    "body": "data-on:click=\"${1:expression}\"",
     "description": "Runs an expression whenever the element is clicked.",
     "references": [
       {
@@ -175,9 +197,9 @@
       }
     ]
   },
-  "data-on-keydown": {
-    "prefix": "data-on-keydown",
-    "body": "data-on-keydown=\"${1:expression}\"",
+  "data-on:keydown": {
+    "prefix": "data-on:keydown",
+    "body": "data-on:keydown=\"${1:expression}\"",
     "description": "Runs an expression whenever a key is pressed.",
     "references": [
       {
@@ -205,17 +227,6 @@
       {
         "name": "Documentation",
         "url": "https://data-star.dev/reference/attributes#data-on-interval"
-      }
-    ]
-  },
-  "data-on-load": {
-    "prefix": "data-on-load",
-    "body": "data-on-load=\"${1:expression}\"",
-    "description": "Runs an expression whenever the element is initialised.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-on-load"
       }
     ]
   },
@@ -274,6 +285,17 @@
       }
     ]
   },
+  "data-persist:*": {
+    "prefix": "data-persist:*",
+    "body": "data-persist:${1:name}=\"${2:expression}\"",
+    "description": "Persists signals in local storage with a custom key.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-persist"
+      }
+    ]
+  },
   "data-preserve-attr": {
     "prefix": "data-preserve-attr",
     "body": "data-preserve-attr=\"\"",
@@ -307,9 +329,9 @@
       }
     ]
   },
-  "data-ref-*": {
-    "prefix": "data-ref-*",
-    "body": "data-ref-${1:name}",
+  "data-ref:*": {
+    "prefix": "data-ref:*",
+    "body": "data-ref:${1:name}",
     "description": "Creates a signal whose value references an element.",
     "references": [
       {
@@ -362,14 +384,36 @@
       }
     ]
   },
-  "data-signals-*": {
-    "prefix": "data-signals-*",
-    "body": "data-signals-${1:name}=\"${2:expression}\"",
+  "data-signals:*": {
+    "prefix": "data-signals:*",
+    "body": "data-signals:${1:name}=\"${2:expression}\"",
     "description": "Merges a signal into the existing signals.",
     "references": [
       {
         "name": "Documentation",
         "url": "https://data-star.dev/reference/attributes#data-signals"
+      }
+    ]
+  },
+  "data-style": {
+    "prefix": "data-style",
+    "body": "data-style=\"{${1:styleName}: ${2:expression}}\"",
+    "description": "Adds or removes one or more inline CSS styles from an element using a set of key-value pairs that map to the style name and expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-style"
+      }
+    ]
+  },
+  "data-style:*": {
+    "prefix": "data-style:*",
+    "body": "data-style:${1:name}=\"${2:expression}\"",
+    "description": "Adds or removes an inline CSS style from an element based on an expression.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/attributes#data-style"
       }
     ]
   },

@@ -2,25 +2,25 @@
 // Slug: Sets the value of all matching signals.
 // Description: Sets the value of all matching signals (or all signals if no filter is used) to the expression provided in the first argument.
 
-import type {
-  ActionPlugin,
-  RuntimeContext,
-  SignalFilterOptions,
-} from '../../engine/types'
-import { updateLeaves } from '../../utils/paths'
+import { action } from '@engine'
+import {
+  filtered,
+  mergePatch,
+  startPeeking,
+  stopPeeking,
+} from '@engine/signals'
+import type { SignalFilterOptions } from '@engine/types'
+import { updateLeaves } from '@utils/paths'
 
-export const SetAll: ActionPlugin = {
-  type: 'action',
+action({
   name: 'setAll',
-  fn: (
-    { filtered, mergePatch, peek }: RuntimeContext,
-    value: any,
-    filter: SignalFilterOptions,
-  ) => {
-    peek(() => {
-      const masked = filtered(filter)
-      updateLeaves(masked, () => value)
-      mergePatch(masked)
-    })
+  apply(_, value: any, filter: SignalFilterOptions) {
+    // peek because in an effect you would be subscribing to signals and then setting them which
+    // would cause an infinite loop and why would you want to infinite loop on purpose
+    startPeeking()
+    const masked = filtered(filter)
+    updateLeaves(masked, () => value)
+    mergePatch(masked)
+    stopPeeking()
   },
-}
+})

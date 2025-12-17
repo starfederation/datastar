@@ -2,18 +2,20 @@
 // Slug: Runs an expression at a regular interval.
 // Description: Runs an expression at a regular interval.
 
-import type { AttributePlugin } from '../../engine/types'
-import { tagHas, tagToMs } from '../../utils/tags'
-import { modifyViewTransition } from '../../utils/view-transitions'
+import { attribute } from '@engine'
+import { beginBatch, endBatch } from '@engine/signals'
+import { tagHas, tagToMs } from '@utils/tags'
+import { modifyViewTransition } from '@utils/view-transitions'
 
-export const OnInterval: AttributePlugin = {
-  type: 'attribute',
-  name: 'onInterval',
-  keyReq: 'denied',
-  valReq: 'must',
-  onLoad: ({ mods, rx, startBatch, endBatch }) => {
+attribute({
+  name: 'on-interval',
+  requirement: {
+    key: 'denied',
+    value: 'must',
+  },
+  apply({ mods, rx }) {
     let callback = () => {
-      startBatch()
+      beginBatch()
       rx()
       endBatch()
     }
@@ -32,4 +34,4 @@ export const OnInterval: AttributePlugin = {
       clearInterval(intervalId)
     }
   },
-}
+})

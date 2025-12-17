@@ -1,8 +1,8 @@
 {
   "name": "datastar-vscode",
-  "version": "1.1.0",
+  "version": "1.3.0",
   "displayName": "Datastar",
-  "description": "Adds autocomplete for Datastar to Visual Studio Code.",
+  "description": "Adds autocomplete and syntax highlighting for Datastar to Visual Studio Code.",
   "author": "Ben Croker",
   "publisher": "starfederation",
   "license": "MIT",
@@ -24,9 +24,50 @@
   ],
   "main": "src/extension.js",
   "contributes": {
+    "grammars": [
+      {
+        "scopeName": "datastar.injection",
+        "path": "./src/datastar.injection.tmLanguage.json",
+        "injectTo": [
+          "text.html.basic",
+          "text.html.derivative",
+          "text.html.php",
+          "text.html.twig",
+          "text.html.php.blade",
+          "text.html.edge",
+          "text.html.nunjucks",
+          "text.html.njk",
+          "source.templ",
+          "source.astro",
+          "source.gohtml",
+          "text.html.vue",
+          "source.vue",
+          "source.svelte",
+          "text.html.svelte",
+          "text.html.handlebars",
+          "source.mustache",
+          "source.liquid",
+          "text.html.erb",
+          "text.html.ejs",
+          "text.pug",
+          "text.aspnetcorerazor",
+          "text.html.django",
+          "text.html.jinja",
+          "text.html.jsp"
+        ]
+      }
+    ],
     "configuration": {
       "title": "Datastar",
       "properties": {
+        "datastar.customAttributes": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Custom Datastar plugin names (without 'data-' prefix). Example: ['my-plugin', 'custom-action']"
+        },
         "datastar.enabledLanguages": {
           "type": "array",
           "default": [
@@ -153,7 +194,7 @@
     ]
   },
   "devDependencies": {
-    "@vscode/vsce": "^2.19.0"
+    "@vscode/vsce": "^3.7.1"
   },
   "scripts": {
     "build": "npm exec vsce package",

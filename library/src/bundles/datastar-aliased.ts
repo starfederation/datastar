@@ -1,67 +1,39 @@
-import { apply, load, setAlias } from '../engine'
-import { Peek } from '../plugins/actions/peek'
-import { SetAll } from '../plugins/actions/setAll'
-import { ToggleAll } from '../plugins/actions/toggleAll'
-import { Attr } from '../plugins/attributes/attr'
-import { Bind } from '../plugins/attributes/bind'
-import { Class } from '../plugins/attributes/class'
-import { Computed } from '../plugins/attributes/computed'
-import { Effect } from '../plugins/attributes/effect'
-import { Indicator } from '../plugins/attributes/indicator'
-import { JsonSignals } from '../plugins/attributes/jsonSignals'
-import { On } from '../plugins/attributes/on'
-import { OnIntersect } from '../plugins/attributes/onIntersect'
-import { OnInterval } from '../plugins/attributes/onInterval'
-import { OnLoad } from '../plugins/attributes/onLoad'
-import { OnSignalPatch } from "../plugins/attributes/onSignalPatch";
-import { Ref } from '../plugins/attributes/ref'
-import { Show } from '../plugins/attributes/show'
-import { Signals } from '../plugins/attributes/signals'
-import { Style } from '../plugins/attributes/style'
-import { Text } from '../plugins/attributes/text'
-import { DELETE } from '../plugins/backend/actions/delete'
-import { GET } from '../plugins/backend/actions/get'
-import { PATCH } from '../plugins/backend/actions/patch'
-import { POST } from '../plugins/backend/actions/post'
-import { PUT } from '../plugins/backend/actions/put'
-import { PatchElements } from '../plugins/backend/watchers/patchElements'
-import { PatchSignals } from '../plugins/backend/watchers/patchSignals'
+export { action, actions, attribute, watcher } from '@engine'
+export {
+  beginBatch,
+  computed,
+  effect,
+  endBatch,
+  filtered,
+  getPath,
+  mergePatch,
+  mergePaths,
+  root,
+  signal,
+  startPeeking,
+  stopPeeking,
+} from '@engine/signals'
 
-setAlias('star')
-
-load(
-  // Backend
-  GET,
-  POST,
-  PUT,
-  PATCH,
-  DELETE,
-  PatchElements,
-  PatchSignals,
-  // Attributes
-  Attr,
-  Bind,
-  Class,
-  Computed,
-  Effect,
-  Indicator,
-  JsonSignals,
-  On,
-  OnIntersect,
-  OnInterval,
-  OnLoad,
-	OnSignalPatch,
-  Ref,
-  Show,
-  Signals,
-  Style,
-  Text,
-  // Actions
-  Peek,
-  SetAll,
-  ToggleAll,
-)
-
-apply()
-
-export { apply, load, setAlias }
+import '@plugins/actions/peek'
+import '@plugins/actions/setAll'
+import '@plugins/actions/toggleAll'
+import '@plugins/actions/fetch'
+import '@plugins/attributes/attr'
+import '@plugins/attributes/bind'
+import '@plugins/attributes/class'
+import '@plugins/attributes/computed'
+import '@plugins/attributes/effect'
+import '@plugins/attributes/indicator'
+import '@plugins/attributes/init'
+import '@plugins/attributes/jsonSignals'
+import '@plugins/attributes/on'
+import '@plugins/attributes/onIntersect'
+import '@plugins/attributes/onInterval'
+import '@plugins/attributes/onSignalPatch'
+import '@plugins/attributes/ref'
+import '@plugins/attributes/show'
+import '@plugins/attributes/signals'
+import '@plugins/attributes/style'
+import '@plugins/attributes/text'
+import '@plugins/watchers/patchElements'
+import '@plugins/watchers/patchSignals'

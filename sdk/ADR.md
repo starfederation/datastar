@@ -104,11 +104,12 @@ String enum of supported events:
 
 ```go
 ServerSentEventGenerator.PatchElements(
-  elements: string,
+  elements?: string,
   options?: {
     selector?: string,
     mode?: ElementPatchMode,
     useViewTransition?: boolean,
+    namespace?: 'html' | 'svg' | 'mathml',
     eventId?: string,
     retryDuration?: durationInMilliseconds
   }
@@ -137,6 +138,7 @@ ServerSentEventGenerator.PatchElements(
   data: mode inner
   data: selector #feed
   data: useViewTransition true
+  data: namespace html
   data: elements <div id="feed">
   data: elements     <span>1</span>
   data: elements </div>
@@ -176,12 +178,16 @@ ServerSentEventGenerator.PatchElements(
 </details>
 
 <details>
-  <summary>Remove elements without a selector</summary>
+  <summary>Patch SVG elements</summary>
 
   ```
   event: datastar-patch-elements
-  data: mode remove
-  data: elements <div id="first"></div><div id="second"></div>
+  data: mode append
+  data: selector #vis
+  data: namespace svg
+  data: elements <circle id="c1" cx="10" r="5" fill="red"/>
+  data: elements <circle id="c2" cx="20" r="5" fill="green"/>
+  data: elements <circle id="c3" cx="30" r="5" fill="blue"/>
   ```
 </details>
 
@@ -202,7 +208,7 @@ ServerSentEventGenerator.PatchElements(
 
 ### Parameters
 
-- **elements**: One or more complete HTML elements. If a selector has not been specified, each top-level element must contain an ID. With ElementPatchMode `remove`, this parameter may be omitted when a selector is supplied.
+- **elements**: One or more complete HTML elements. If a selector has not been specified, each top-level element must contain an ID. With ElementPatchMode `remove`, this parameter may be omitted.
 
 #### ElementPatchMode
 
@@ -228,6 +234,7 @@ String enum defining how elements are patched into the DOM.
 | `selector` | string | Element ID | CSS selector for target element. If a selector is not specified, each element must have an ID specified. |
 | `mode` | ElementPatchMode | `outer` | How to patch the element |
 | `useViewTransition` | boolean | `false` | Enable view transitions API |
+| `namespace` | `html` \| `svg` \| `mathml` | `html` | Namespace in which to create new elements |
 
 ### Implementation
 
@@ -237,6 +244,7 @@ String enum defining how elements are patched into the DOM.
 - `selector SELECTOR\n` (if provided)
 - `mode PATCH_MODE\n` (if not `outer`)
 - `useViewTransition true\n` (if `true`)
+- `namespace NAMESPACE\n` (if not `html`)
 - `elements HTML_LINE\n` (for each line of HTML)
 
 ---

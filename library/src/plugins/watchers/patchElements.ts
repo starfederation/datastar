@@ -2,50 +2,84 @@
 // Slug: Patches elements into the DOM.
 // Description: Patches elements into the DOM.
 
-import {
-  DefaultElementPatchMode,
-  ElementPatchModeAfter,
-  ElementPatchModeAppend,
-  ElementPatchModeBefore,
-  ElementPatchModeInner,
-  ElementPatchModeOuter,
-  ElementPatchModePrepend,
-  ElementPatchModeRemove,
-  ElementPatchModeReplace,
-  EventTypePatchElements,
-} from '../../../engine/consts'
-import { aliasify } from '../../../engine/engine'
-import type { InitContext, WatcherPlugin } from '../../../engine/types'
-import { kebab } from '../../../utils/text'
-import { supportsViewTransitions } from '../../../utils/view-transitions'
-import { datastarSSEEventWatcher } from '../shared'
+import { watcher } from '@engine'
+import type { WatcherContext } from '@engine/types'
+import { isHTMLOrSVG } from '@utils/dom'
+import { aliasify } from '@utils/text'
+import { supportsViewTransitions } from '@utils/view-transitions'
 
-export const PatchElements: WatcherPlugin = {
-  type: 'watcher',
-  name: EventTypePatchElements,
-  async onGlobalInit(ctx) {
-    datastarSSEEventWatcher(EventTypePatchElements, (args) => {
-      if (
-        supportsViewTransitions &&
-        args.useViewTransition?.trim() === 'true'
-      ) {
-        document.startViewTransition(() => onPatchElements(ctx, args))
-      } else {
-        onPatchElements(ctx, args)
-      }
-    })
-  },
+const isValidType = <T extends readonly string[]>(
+  arr: T,
+  value: string,
+): value is T[number] => (arr as readonly string[]).includes(value)
+
+const PATCH_MODES = [
+  'remove',
+  'outer',
+  'inner',
+  'replace',
+  'prepend',
+  'append',
+  'before',
+  'after',
+] as const
+type PatchElementsMode = (typeof PATCH_MODES)[number]
+
+const NAMESPACES = ['html', 'svg', 'mathml'] as const
+type Namespace = (typeof NAMESPACES)[number]
+
+type PatchElementsArgs = {
+  selector: string
+  mode: PatchElementsMode
+  namespace: Namespace
+  useViewTransition: boolean
+  elements: string
 }
 
-function onPatchElements(
-  ctx: InitContext,
-  {
-    elements = '',
-    selector,
-    mode = DefaultElementPatchMode,
-  }: Record<string, string>,
-) {
-  const { initErr } = ctx
+watcher({
+  name: 'datastar-patch-elements',
+  apply(
+    ctx,
+    {
+      selector = '',
+      mode = 'outer',
+      namespace = 'html',
+      useViewTransition = '',
+      elements = '',
+    },
+  ) {
+    if (!isValidType(PATCH_MODES, mode)) {
+      throw ctx.error('PatchElementsInvalidMode', { mode })
+    }
+
+    if (!selector && mode !== 'outer' && mode !== 'replace') {
+      throw ctx.error('PatchElementsExpectedSelector')
+    }
+
+    if (!isValidType(NAMESPACES, namespace)) {
+      throw ctx.error('PatchElementsInvalidNamespace', { namespace })
+    }
+
+    const args2: PatchElementsArgs = {
+      selector,
+      mode,
+      namespace,
+      useViewTransition: useViewTransition.trim() === 'true',
+      elements,
+    }
+
+    if (supportsViewTransitions && useViewTransition) {
+      document.startViewTransition(() => onPatchElements(ctx, args2))
+    } else {
+      onPatchElements(ctx, args2)
+    }
+  },
+})
+
+const onPatchElements = (
+  { error }: WatcherContext,
+  { selector, mode, namespace, elements }: PatchElementsArgs,
+) => {
   const elementsWithSvgsRemoved = elements.replace(
     /<svg(\s[^>]*>|>)([\s\S]*?)<\/svg>/gim,
     '',
@@ -54,10 +88,16 @@ function onPatchElements(
   const hasHead = /<\/head>/.test(elementsWithSvgsRemoved)
   const hasBody = /<\/body>/.test(elementsWithSvgsRemoved)
 
+  const wrapperTag =
+    namespace === 'svg' ? 'svg' : namespace === 'mathml' ? 'math' : ''
+  const wrappedEls = wrapperTag
+    ? `<${wrapperTag}>${elements}</${wrapperTag}>`
+    : elements
+
   const newDocument = new DOMParser().parseFromString(
     hasHtml || hasHead || hasBody
       ? elements
-      : `<body><template>${elements}</template></body>`,
+      : `<body><template>${wrappedEls}</template></body>`,
     'text/html',
   )
 
@@ -71,14 +111,18 @@ function onPatchElements(
     newContent.appendChild(newDocument.head)
   } else if (hasBody) {
     newContent.appendChild(newDocument.body)
+  } else if (wrapperTag) {
+    const wrapperEl = newDocument
+      .querySelector('template')!
+      .content.querySelector(wrapperTag)!
+    for (const child of wrapperEl.childNodes) {
+      newContent.appendChild(child)
+    }
   } else {
     newContent = newDocument.querySelector('template')!.content
   }
 
-  if (
-    !selector &&
-    (mode === ElementPatchModeOuter || mode === ElementPatchModeReplace)
-  ) {
+  if (!selector && (mode === 'outer' || mode === 'replace')) {
     for (const child of newContent.children) {
       let target: Element
       if (child instanceof HTMLHtmlElement) {
@@ -90,29 +134,23 @@ function onPatchElements(
       } else {
         target = document.getElementById(child.id)!
         if (!target) {
-          console.error(
-            initErr('NoTargetsFound', {
-              id: child.id,
-            }),
-          )
+          console.warn(error('PatchElementsNoTargetsFound'), {
+            element: { id: child.id },
+          })
           continue
         }
       }
 
-      applyToTargets(ctx, mode, child, [target])
+      applyToTargets(mode as PatchElementsMode, child, [target])
     }
   } else {
     const targets = document.querySelectorAll(selector)
     if (!targets.length) {
-      console.error(
-        initErr('NoTargetsFound', {
-          selector: selector,
-        }),
-      )
+      console.warn(error('PatchElementsNoTargetsFound'), { selector })
       return
     }
 
-    applyToTargets(ctx, mode, newContent, targets)
+    applyToTargets(mode as PatchElementsMode, newContent, targets)
   }
 }
 
@@ -121,7 +159,7 @@ for (const script of document.querySelectorAll('script')) {
   scripts.add(script)
 }
 
-function execute(target: Element): void {
+const execute = (target: Element): void => {
   const elScripts =
     target instanceof HTMLScriptElement
       ? [target]
@@ -139,59 +177,68 @@ function execute(target: Element): void {
   }
 }
 
-function applyToTargets(
-  { initErr }: InitContext,
-  mode: string,
+const applyPatchMode = (
+  targets: Iterable<Element>,
   element: DocumentFragment | Element,
-  capturedTargets: Iterable<Element>,
-) {
-  for (const target of capturedTargets) {
+  action: string,
+) => {
+  for (const target of targets) {
     const cloned = element.cloneNode(true) as Element
-    if (mode === ElementPatchModeRemove) {
-      target.remove()
-    } else if (
-      mode === ElementPatchModeOuter ||
-      mode === ElementPatchModeInner
-    ) {
-      morph(target, cloned, mode)
-      execute(target)
-    } else {
-      execute(cloned)
-      if (mode === ElementPatchModeReplace) {
-        target.replaceWith(cloned)
-      } else if (mode === ElementPatchModePrepend) {
-        target.prepend(cloned)
-      } else if (mode === ElementPatchModeAppend) {
-        target.append(cloned)
-      } else if (mode === ElementPatchModeBefore) {
-        target.before(cloned)
-      } else if (mode === ElementPatchModeAfter) {
-        target.after(cloned)
-      } else {
-        throw initErr('InvalidPatchMode', { mode })
-      }
-    }
+    execute(cloned)
+    // @ts-expect-error
+    target[action](cloned)
   }
 }
 
-const oldIdTagNameMap = new Map<string, string>()
+const applyToTargets = (
+  mode: PatchElementsMode,
+  element: DocumentFragment | Element,
+  targets: Iterable<Element>,
+) => {
+  switch (mode) {
+    case 'remove':
+      for (const target of targets) {
+        target.remove()
+      }
+      break
+    case 'outer':
+    case 'inner':
+      for (const target of targets) {
+        morph(target, element.cloneNode(true) as Element, mode)
+        execute(target)
+      }
+      break
+    case 'replace':
+      applyPatchMode(targets, element, 'replaceWith')
+      break
+    case 'prepend':
+    case 'append':
+    case 'before':
+    case 'after':
+      applyPatchMode(targets, element, mode)
+  }
+}
+
 const ctxIdMap = new Map<Node, Set<string>>()
 const ctxPersistentIds = new Set<string>()
+const oldIdTagNameMap = new Map<string, string>()
 const duplicateIds = new Set<string>()
 const ctxPantry = document.createElement('div')
 ctxPantry.hidden = true
 
-function morph(
-  oldElt: Element,
+const aliasedIgnoreMorph = aliasify('ignore-morph')
+const aliasedIgnoreMorphAttr = `[${aliasedIgnoreMorph}]`
+const morph = (
+  oldElt: Element | ShadowRoot,
   newContent: DocumentFragment | Element,
-  mode: typeof ElementPatchModeInner | typeof ElementPatchModeOuter,
-): void {
-  const ignore = aliasify('ignore-morph')
+  mode: 'outer' | 'inner' = 'outer',
+): void => {
   if (
-    (oldElt.hasAttribute(ignore) &&
-      newContent instanceof HTMLElement &&
-      newContent.hasAttribute(ignore)) ||
-    oldElt.parentElement?.closest(`[${ignore}]`)
+    (isHTMLOrSVG(oldElt) &&
+      isHTMLOrSVG(newContent) &&
+      oldElt.hasAttribute(aliasedIgnoreMorph) &&
+      newContent.hasAttribute(aliasedIgnoreMorph)) ||
+    oldElt.parentElement?.closest(aliasedIgnoreMorphAttr)
   ) {
     return
   }
@@ -209,7 +256,7 @@ function morph(
       oldIdTagNameMap.set(id, tagName)
     }
   }
-  if (oldElt.id) {
+  if (oldElt instanceof Element && oldElt.id) {
     if (oldIdTagNameMap.has(oldElt.id)) {
       duplicateIds.add(oldElt.id)
     } else {
@@ -227,31 +274,22 @@ function morph(
     }
   }
 
-  oldIdTagNameMap.clear()
-
   for (const id of duplicateIds) {
     ctxPersistentIds.delete(id)
   }
 
+  oldIdTagNameMap.clear()
   duplicateIds.clear()
-
-  // Computes a map of nodes to all IDs contained within that node (inclusive of the node).
-  // This map can be used to ask if two nodes have intersecting sets of IDs,
-  // which allows for a looser definition of "matching" than traditional ID matching,
-  // and allows child nodes to contribute to a parent nodes matching.
-  // const idMap = new Map<Node, Set<string>>()
   ctxIdMap.clear()
 
-  populateIdMapWithTree(
-    mode === 'outer' ? oldElt.parentElement! : oldElt,
-    oldIdElements,
-  )
+  const parent = mode === 'outer' ? oldElt.parentElement! : oldElt
+  populateIdMapWithTree(parent, oldIdElements)
   populateIdMapWithTree(normalizedElt, newIdElements)
 
   morphChildren(
-    mode === 'outer' ? oldElt.parentElement! : oldElt,
+    parent,
     normalizedElt,
-    mode === 'outer' ? (oldElt as Node) : null,
+    mode === 'outer' ? oldElt : null,
     oldElt.nextSibling,
   )
 
@@ -262,12 +300,12 @@ function morph(
 // The idea is to use ID sets to try to match up nodes as faithfully as possible.
 // We greedily match, which allows us to keep the algorithm fast,
 // but by using ID sets, we are able to better match up with content deeper in the DOM.
-function morphChildren(
-  oldParent: Element, // the old content that we are merging the new content into
+const morphChildren = (
+  oldParent: Element | ShadowRoot, // the old content that we are merging the new content into
   newParent: Element, // the parent element of the new content
-  insertionPoint: Node | null = null, // // the point in the DOM we start morphing at (defaults to first child)
+  insertionPoint: Node | null = null, // the point in the DOM we start morphing at (defaults to first child)
   endPoint: Node | null = null, // the point in the DOM we stop morphing at (defaults to after last child)
-): void {
+): void => {
   // normalize
   if (
     oldParent instanceof HTMLTemplateElement &&
@@ -301,14 +339,11 @@ function morphChildren(
       }
     }
 
-    // @ts-ignore
-    const ncId = newChild.id
     // if the matching node is elsewhere in the original content
-    if (newChild instanceof Element && ctxPersistentIds.has(ncId)) {
+    if (newChild instanceof Element && ctxPersistentIds.has(newChild.id)) {
       // move it and all its children here and morph, will always be found
       // Search for an element by ID within the document and pantry, and move it using moveBefore.
-
-      const movedChild = window[ncId] as unknown as Element
+      const movedChild = document.getElementById(newChild.id) as Element
 
       // Removes an element from its ancestors' ID maps.
       // This is needed when an element is moved from the "future" via `moveBeforeId`.
@@ -318,7 +353,7 @@ function morphChildren(
       while ((current = current.parentNode as Element)) {
         const idSet = ctxIdMap.get(current)
         if (idSet) {
-          idSet.delete(ncId)
+          idSet.delete(newChild.id)
           if (!idSet.size) {
             ctxIdMap.delete(current)
           }
@@ -335,9 +370,12 @@ function morphChildren(
     // elements with persistent IDs and possible state info we can still preserve by moving in and then morphing
     if (ctxIdMap.has(newChild)) {
       // node has children with IDs with possible state so create a dummy elt of same type and apply full morph algorithm
-      const newEmptyChild = document.createElement(
-        (newChild as Element).tagName,
-      )
+      const namespaceURI = (newChild as Element).namespaceURI
+      const tagName = (newChild as Element).tagName
+      const newEmptyChild =
+        namespaceURI && namespaceURI !== 'http://www.w3.org/1999/xhtml'
+          ? document.createElementNS(namespaceURI, tagName)
+          : document.createElement(tagName)
       oldParent.insertBefore(newEmptyChild, insertionPoint)
       morphNode(newEmptyChild, newChild)
       insertionPoint = newEmptyChild.nextSibling
@@ -360,12 +398,12 @@ function morphChildren(
 // Scans forward from the startPoint to the endPoint looking for a match for the node.
 // It looks for an id set match first, then a soft match.
 // We abort soft matching if we find two future soft matches, to reduce churn.
-function findBestMatch(
+const findBestMatch = (
   node: Node,
   startPoint: Node | null,
   endPoint: Node | null,
-): Node | null {
-  let bestMatch = null
+): Node | null => {
+  let bestMatch: Node | null | undefined = null
   let nextSibling = node.nextSibling
   let siblingSoftMatchCount = 0
   let displaceMatchCount = 0
@@ -409,6 +447,7 @@ function findBestMatch(
         bestMatch = cursor
       }
     }
+
     // check for IDs we may be displaced when matching
     displaceMatchCount += ctxIdMap.get(cursor)?.size || 0
     if (displaceMatchCount > nodeMatchCount) {
@@ -431,65 +470,60 @@ function findBestMatch(
       }
     }
 
-    // if the current node contains active element, stop looking for better future matches,
-    // because if one is found, this node will be moved to the pantry, re-parenting it and thus losing focus
-    if (cursor.contains(document.activeElement)) break
-
     cursor = cursor.nextSibling
   }
 
   return bestMatch || null
 }
 
-function isSoftMatch(oldNode: Node, newNode: Node): boolean {
-  // ok to cast: if one is not element, `id` and `tagName` will be null and we'll just compare that.
-  const oldId = (oldNode as Element).id
-  return (
-    oldNode.nodeType === newNode.nodeType &&
-    (oldNode as Element).tagName === (newNode as Element).tagName &&
-    // If oldElt has an `id` with possible state and it doesn’t match newElt.id then avoid morphing.
-    // We'll still match an anonymous node with an IDed newElt, though, because if it got this far,
-    // its not persistent, and new nodes can't have any hidden state.
-    (!oldId || oldId === (newNode as Element).id)
-  )
-}
+// ok to cast: if one is not element, `id` and `tagName` will be null and we'll just compare that.
+const isSoftMatch = (oldNode: Node, newNode: Node): boolean =>
+  oldNode.nodeType === newNode.nodeType &&
+  (oldNode as Element).tagName === (newNode as Element).tagName &&
+  // If oldElt has an `id` with possible state and it doesn’t match newElt.id then avoid morphing.
+  // We'll still match an anonymous node with an IDed newElt, though, because if it got this far,
+  // its not persistent, and new nodes can't have any hidden state.
+  (!(oldNode as Element).id ||
+    (oldNode as Element).id === (newNode as Element).id)
 
 // Gets rid of an unwanted DOM node; strategy depends on nature of its reuse:
 // - Persistent nodes will be moved to the pantry for later reuse
 // - Other nodes will have their hooks called, and then are removed
-function removeNode(node: Node) {
+const removeNode = (node: Node): void => {
   // are we going to id set match this later?
-  if (ctxIdMap.has(node)) {
-    // skip callbacks and move to pantry
-    moveBefore(ctxPantry, node, null)
-  } else {
-    // remove for realsies
-    node.parentNode?.removeChild(node)
-  }
+  ctxIdMap.has(node)
+    ? // skip callbacks and move to pantry
+      moveBefore(ctxPantry, node, null)
+    : // remove for realsies
+      node.parentNode?.removeChild(node)
 }
 
 // Moves an element before another element within the same parent.
 // Uses the proposed `moveBefore` API if available (and working), otherwise falls back to `insertBefore`.
 // This is essentially a forward-compat wrapper.
 const moveBefore: (parentNode: Node, node: Node, after: Node | null) => void =
-  // @ts-ignore
+  // @ts-expect-error
   removeNode.call.bind(ctxPantry.moveBefore ?? ctxPantry.insertBefore)
 
-function morphNode(
+const aliasedPreserveAttr = aliasify('preserve-attr')
+
+// syncs the oldNode to the newNode, copying over all attributes and
+// inner element state from the newNode to the oldNode
+const morphNode = (
   oldNode: Node, // root node to merge content into
   newNode: Node, // new content to merge
-): Node {
-  // syncs the oldNode to the newNode, copying over all attributes and
-  // inner element state from the newNode to the oldNode
+): Node => {
   const type = newNode.nodeType
 
   // if is an element type, sync the attributes from the
   // new node into the new node
   if (type === 1 /* element type */) {
-    const ignore = aliasify('ignore-morph')
+    const oldElt = oldNode as Element
+    const newElt = newNode as Element
+    const shouldScopeChildren = oldElt.hasAttribute('data-scope-children')
     if (
-      (oldNode as Element).hasAttribute(ignore) &&
-      (newNode as Element).hasAttribute(ignore)
+      oldElt.hasAttribute(aliasedIgnoreMorph) &&
+      newElt.hasAttribute(aliasedIgnoreMorph)
     ) {
       return oldNode
     }
@@ -498,9 +532,9 @@ function morphNode(
     //  https://github.com/patrick-steele-idem/morphdom/blob/master/src/specialElHandlers.js
     //  https://github.com/choojs/nanomorph/blob/master/lib/morph.js#L113
     if (
-      oldNode instanceof HTMLInputElement &&
-      newNode instanceof HTMLInputElement &&
-      newNode.type !== 'file'
+      oldElt instanceof HTMLInputElement &&
+      newElt instanceof HTMLInputElement &&
+      newElt.type !== 'file'
     ) {
       // https://github.com/bigskysoftware/idiomorph/issues/27
       // | old input value | new input value  | behaviour                              |
@@ -510,44 +544,54 @@ function morphNode(
       // | some value      | `null`           | set old input value to `""`            |
       // | `null`          | some value       | set old input value to new input value |
       // | some value      | some other value | set old input value to new input value |
-      if (newNode.getAttribute('value') !== oldNode.getAttribute('value')) {
-        oldNode.value = newNode.getAttribute('value') ?? ''
+      if (newElt.getAttribute('value') !== oldElt.getAttribute('value')) {
+        oldElt.value = newElt.getAttribute('value') ?? ''
       }
     } else if (
-      oldNode instanceof HTMLTextAreaElement &&
-      newNode instanceof HTMLTextAreaElement
+      oldElt instanceof HTMLTextAreaElement &&
+      newElt instanceof HTMLTextAreaElement
     ) {
-      const newValue = newNode.value
-      if (newValue !== oldNode.value) {
-        oldNode.value = newValue
+      if (newElt.value !== oldElt.value) {
+        oldElt.value = newElt.value
       }
-      if (oldNode.firstChild && oldNode.firstChild.nodeValue !== newValue) {
-        oldNode.firstChild.nodeValue = newValue
+      if (oldElt.firstChild && oldElt.firstChild.nodeValue !== newElt.value) {
+        oldElt.firstChild.nodeValue = newElt.value
       }
     }
 
     const preserveAttrs = (
-      (newNode as HTMLElement).getAttribute(aliasify('preserve-attr')) ?? ''
+      (newNode as HTMLElement).getAttribute(aliasedPreserveAttr) ?? ''
     ).split(' ')
 
-    for (const { name, value } of (newNode as Element).attributes) {
+    for (const { name, value } of newElt.attributes) {
       if (
-        (oldNode as Element).getAttribute(name) !== value &&
-        !preserveAttrs.includes(kebab(name))
+        oldElt.getAttribute(name) !== value &&
+        !preserveAttrs.includes(name)
       ) {
-        ;(oldNode as Element).setAttribute(name, value)
+        oldElt.setAttribute(name, value)
       }
     }
 
-    const oldAttrs = (oldNode as Element).attributes
-    for (let i = oldAttrs.length - 1; i >= 0; i--) {
-      const { name } = oldAttrs[i]
-      if (
-        !(newNode as Element).hasAttribute(name) &&
-        !preserveAttrs.includes(kebab(name))
-      ) {
-        ;(oldNode as Element).removeAttribute(name)
+    for (let i = oldElt.attributes.length - 1; i >= 0; i--) {
+      const { name } = oldElt.attributes[i]!
+      if (!newElt.hasAttribute(name) && !preserveAttrs.includes(name)) {
+        oldElt.removeAttribute(name)
       }
+    }
+
+    // Preserve the scope marker even if the incoming markup doesn't carry it.
+    if (shouldScopeChildren && !oldElt.hasAttribute('data-scope-children')) {
+      oldElt.setAttribute('data-scope-children', '')
+    }
+
+    if (!oldElt.isEqualNode(newElt)) {
+      morphChildren(oldElt, newElt)
+    }
+
+    if (shouldScopeChildren) {
+      oldElt.dispatchEvent(
+        new CustomEvent('datastar:scope-children', { bubbles: false }),
+      )
     }
   }
 
@@ -557,9 +601,6 @@ function morphNode(
     }
   }
 
-  if (!oldNode.isEqualNode(newNode)) {
-    morphChildren(oldNode as Element, newNode as Element)
-  }
   return oldNode
 }
 
@@ -567,10 +608,10 @@ function morphNode(
 // The ID set for a given element is the set of all IDs contained within its subtree.
 // As an optimization, we filter these IDs through the given list of persistent IDs,
 // because we don't need to bother considering IDed elements that won't be in the new content.
-function populateIdMapWithTree(
-  root: Element | null,
-  elements: Element[] | NodeListOf<Element>,
-) {
+const populateIdMapWithTree = (
+  root: Element | ShadowRoot | null,
+  elements: Iterable<Element>,
+): void => {
   for (const elt of elements) {
     if (ctxPersistentIds.has(elt.id)) {
       let current: Element | null = elt

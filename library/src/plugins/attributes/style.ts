@@ -2,19 +2,19 @@
 // Slug: Sets inline styles on an element based on an expression.
 // Description: Sets CSS styles on an element using either key-based or object syntax, and keeps them in sync with reactive signals.
 
-import type { AttributePlugin } from '../../engine/types'
-import { kebab } from '../../utils/text'
+import { attribute } from '@engine'
+import { effect } from '@engine/signals'
+import { kebab } from '@utils/text'
 
-export const Style: AttributePlugin = {
-  type: 'attribute',
+attribute({
   name: 'style',
-  valReq: 'must',
+  requirement: {
+    value: 'must',
+  },
   returnsValue: true,
-  onLoad: ({ key, el, effect, rx }) => {
+  apply({ key, el, rx }) {
     const { style } = el
     const initialStyles = new Map<string, string>()
-
-    key &&= kebab(key)
 
     const apply = (prop: string, value: any) => {
       const initial = initialStyles.get(prop)
@@ -36,7 +36,7 @@ export const Style: AttributePlugin = {
       if (key) {
         apply(key, rx())
       } else {
-        const styles = rx<Record<string, any>>()
+        const styles = rx() as Record<string, any>
 
         for (const [prop, initial] of initialStyles) {
           prop in styles ||
@@ -64,4 +64,4 @@ export const Style: AttributePlugin = {
       }
     }
   },
-}
+})

@@ -15,6 +15,7 @@
 		"mode",
 		"elements",
 		"useViewTransition",
+		"namespace",
 		"signals",
 		"onlyIfMissing"
 	],
@@ -69,6 +70,24 @@
 					"name": "PatchSignals",
 					"value": "datastar-patch-signals",
 					"description": "An event for patching signals."
+				}
+			]
+		},
+		"Namespace": {
+			"description": "The namespace in which elements are created.",
+			"default": "html",
+			"values": [
+				{
+					"value": "html",
+					"description": "HTML namespace for standard HTML elements."
+				},
+				{
+					"value": "svg",
+					"description": "SVG namespace for SVG elements."
+				},
+				{
+					"value": "mathml",
+					"description": "MathML namespace for mathematical notation."
 				}
 			]
 		}

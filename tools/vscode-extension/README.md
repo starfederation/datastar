@@ -1,8 +1,8 @@
 # Datastar Extension for Visual Studio Code
 
-Adds autocomplete for [Datastar](https://data-star.dev/) to Visual Studio Code.
+Adds autocomplete and syntax highlighting for [Datastar](https://data-star.dev/) to Visual Studio Code.
 
-![screenshot-Zi09CjE7@2x](https://github.com/user-attachments/assets/5082d177-46d2-4683-b7ed-f68749c12c7b)
+![VSCode extension](https://data-star.dev/static/images/vscode-extension-120.png)
 
 ## Configuration
 
@@ -18,13 +18,33 @@ By default, Datastar snippets work in HTML and most common template languages. Y
 {
   "datastar.enabledLanguages": [
     "html",
-    "php", 
+    "php",
     "twig",
     ".edge",
     ".custom"
   ]
 }
 ```
+
+### Custom Attributes
+
+You can add syntax highlighting support for custom Datastar plugins using the `datastar.customAttributes` setting.
+
+**To configure:**
+1. Open VS Code Settings (Cmd/Ctrl + ,)
+2. Search for "datastar custom attributes"
+3. Add your custom plugin names (without the `data-` prefix)
+
+**Example:**
+```json
+{
+  "datastar.customAttributes": [
+    "my-plugin"
+  ]
+}
+```
+
+After adding custom attributes, reload VS Code to apply the changes.
 
 ## License
 

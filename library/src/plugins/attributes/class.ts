@@ -2,25 +2,26 @@
 // Slug: Adds or removes a class based on an expression.
 // Description: Adds or removes a class to or from an element based on an expression.
 
-import type { AttributePlugin } from '../../engine/types'
-import { kebab, modifyCasing } from '../../utils/text'
+import { attribute } from '@engine'
+import { effect } from '@engine/signals'
+import { modifyCasing } from '@utils/text'
 
-export const Class: AttributePlugin = {
-  type: 'attribute',
+attribute({
   name: 'class',
-  valReq: 'must',
+  requirement: {
+    value: 'must',
+  },
   returnsValue: true,
-  onLoad: ({ key, el, effect, mods, rx }) => {
-    if (key) {
-      key = modifyCasing(kebab(key), mods)
-    }
+  apply({ key, el, mods, rx }) {
+    key &&= modifyCasing(key, mods, 'kebab')
 
+    let classes: Record<string, boolean>
     const callback = () => {
       observer.disconnect()
 
-      const classes = key
-        ? { [key]: rx<boolean>() }
-        : rx<Record<string, boolean>>()
+      classes = key
+        ? { [key]: rx() as boolean }
+        : (rx() as Record<string, boolean>)
 
       for (const k in classes) {
         const classNames = k.split(/\s+/).filter((cn) => cn.length > 0)
@@ -49,10 +50,6 @@ export const Class: AttributePlugin = {
       observer.disconnect()
       cleanup()
 
-      const classes = key
-        ? { [key]: rx<boolean>() }
-        : rx<Record<string, boolean>>()
-
       for (const k in classes) {
         const classNames = k.split(/\s+/).filter((cn) => cn.length > 0)
         for (const name of classNames) {
@@ -61,4 +58,4 @@ export const Class: AttributePlugin = {
       }
     }
   },
-}
+})
