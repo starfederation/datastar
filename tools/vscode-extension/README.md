@@ -39,8 +39,7 @@ You can add syntax highlighting support for custom Datastar plugins using the `d
 ```json
 {
   "datastar.customAttributes": [
-    "my-plugin",
-    "custom-action"
+    "my-plugin"
   ]
 }
 ```
