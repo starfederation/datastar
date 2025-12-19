@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "scopeName": "datastar.injection",
-  "injectionSelector": "L:text.html, L:meta.tag -string -comment -expression.html-template -meta.function.echo.blade",
+  "injectionSelector": "L:meta.tag -string -comment -expression.html-template -meta.function.echo.blade",
   "patterns": [
     {
       "include": "#datastar-attribute"
