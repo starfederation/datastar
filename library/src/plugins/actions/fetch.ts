@@ -238,7 +238,6 @@ type ResponseOverrides =
       mode?: string
       namespace?: string
       useViewTransition?: boolean
-      namespace?: string
     }
   | {
       onlyIfMissing?: boolean
