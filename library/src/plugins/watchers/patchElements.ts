@@ -225,6 +225,8 @@ const oldIdTagNameMap = new Map<string, string>()
 const duplicateIds = new Set<string>()
 const ctxPantry = document.createElement('div')
 ctxPantry.hidden = true
+let ctxFutureMatches = new WeakSet<Node>()
+let ctxActiveElementAndParents: Element[] = []
 
 const aliasedIgnoreMorph = aliasify('ignore-morph')
 const aliasedIgnoreMorphAttr = `[${aliasedIgnoreMorph}]`
@@ -286,6 +288,15 @@ const morph = (
   populateIdMapWithTree(parent, oldIdElements)
   populateIdMapWithTree(normalizedElt, newIdElements)
 
+  ctxFutureMatches = new WeakSet<Node>()
+  ctxActiveElementAndParents = []
+  let elt = document.activeElement
+  while (elt !== oldElt) {
+    if (!elt) break
+    ctxActiveElementAndParents.push(elt)
+    elt = elt.parentElement
+  }
+
   morphChildren(
     parent,
     normalizedElt,
@@ -323,15 +334,15 @@ const morphChildren = (
     if (insertionPoint && insertionPoint !== endPoint) {
       const bestMatch = findBestMatch(newChild, insertionPoint, endPoint)
       if (bestMatch) {
-        // if the node to morph is not at the insertion point then remove/move up to it
+        // if the node to morph is not at the insertion point then move nodes before it to the end
         if (bestMatch !== insertionPoint) {
-          let cursor: Node | null = insertionPoint
-          // Remove nodes between the start and end nodes
-          while (cursor && cursor !== bestMatch) {
-            const tempNode = cursor
-            cursor = cursor.nextSibling
-            removeNode(tempNode)
-          }
+          moveNodesBetweenToEnd(
+            oldParent,
+            insertionPoint,
+            bestMatch,
+            endPoint,
+            newChild,
+          )
         }
         morphNode(bestMatch, newChild)
         insertionPoint = bestMatch.nextSibling
@@ -395,27 +406,61 @@ const morphChildren = (
   }
 }
 
-// Scans forward from the startPoint to the endPoint looking for a match for the node.
-// It looks for an id set match first, then a soft match.
-// We abort soft matching if we find two future soft matches, to reduce churn.
+const isMatch = (oldNode: Node, newNode: Node): boolean => {
+  if (oldNode.isEqualNode(newNode)) return true
+  if (oldNode instanceof Element && newNode instanceof Element) {
+    const attrs = ['name', 'href', 'src']
+    for (const attr of attrs) {
+      const v1 = oldNode.getAttribute(attr)
+      const v2 = newNode.getAttribute(attr)
+      if (v1 && v1 === v2) return true
+    }
+  }
+  return false
+}
+
+const matchesUpcomingSibling = (
+  oldNode: Node,
+  startNode: Node,
+  limit = 5,
+): boolean => {
+  if (ctxFutureMatches.has(oldNode)) return true
+  for (
+    let sibling = startNode.nextSibling, i = 0;
+    sibling && i < limit;
+    sibling = sibling.nextSibling, i++
+  ) {
+    if (isMatch(oldNode, sibling)) {
+      ctxFutureMatches.add(oldNode)
+      return true
+    }
+  }
+  return false
+}
+
+// Scans forward from startPoint to endPoint looking for the best match for node.
+// Priority: id set match > exact/attribute match > tag match
 const findBestMatch = (
   node: Node,
   startPoint: Node | null,
   endPoint: Node | null,
 ): Node | null => {
-  let bestMatch: Node | null | undefined = null
-  let nextSibling = node.nextSibling
-  let siblingSoftMatchCount = 0
+  // non-element nodes: only check first position, don't scan siblings
+  if (node.nodeType !== 1) {
+    return startPoint?.nodeType === node.nodeType ? startPoint : null
+  }
+
+  let softMatch: Node | null = null
   let displaceMatchCount = 0
 
   // Max ID matches we are willing to displace in our search
   const nodeMatchCount = ctxIdMap.get(node)?.size || 0
+  let scanLimit = 10
 
   let cursor = startPoint
   while (cursor && cursor !== endPoint) {
     // soft matching is a prerequisite for id set matching
     if (isSoftMatch(cursor, node)) {
-      let isIdSetMatch = false
       const oldSet = ctxIdMap.get(cursor)
       const newSet = ctxIdMap.get(node)
 
@@ -426,54 +471,45 @@ const findBestMatch = (
           // But the newNode content we call this on has not been
           // merged yet and we don't allow duplicate IDs so it is simple
           if (newSet.has(id)) {
-            isIdSetMatch = true
-            break
+            return cursor // found an id set match, we're done!
           }
         }
       }
 
-      if (isIdSetMatch) {
-        return cursor // found an id set match, we're done!
-      }
-
       // we haven’t yet saved a soft match fallback
       // the current soft match will hard match something else in the future, leave it
-      if (!bestMatch && !ctxIdMap.has(cursor)) {
-        // optimization: if node can't id set match, we can just return the soft match immediately
-        if (!nodeMatchCount) {
+      // only consider nodes without id children (avoid moving nodes with state)
+      if (!ctxIdMap.has(cursor)) {
+        // exact or attribute match within scan window
+        if (scanLimit > 0 && isMatch(cursor, node)) {
           return cursor
         }
-        // save this as the fallback if we get through the loop without finding a hard match
-        bestMatch = cursor
+        // save first tag-only match as fallback
+        if (!softMatch) {
+          softMatch = cursor
+        }
       }
     }
 
-    // check for IDs we may be displaced when matching
+    // stop if we've displaced more IDs than the node contains
     displaceMatchCount += ctxIdMap.get(cursor)?.size || 0
-    if (displaceMatchCount > nodeMatchCount) {
-      // if we are going to displace more IDs than the node contains then
-      // we do not have a good candidate for an ID match, so return
-      break
-    }
+    if (displaceMatchCount > nodeMatchCount) break
 
-    if (bestMatch === null && nextSibling && isSoftMatch(cursor, nextSibling)) {
-      // The next new node has a soft match with this node, so
-      // increment the count of future soft matches
-      siblingSoftMatchCount++
-      nextSibling = nextSibling.nextSibling
+    // stop if cursor contains active element to avoid losing focus
+    if (ctxActiveElementAndParents.includes(cursor as Element)) break
 
-      // If there are two future soft matches, block soft matching for this node to allow
-      // future siblings to soft match. This is to reduce churn in the DOM when an element
-      // is prepended.
-      if (siblingSoftMatchCount >= 2) {
-        bestMatch = undefined
-      }
-    }
+    // stop scanning after limit if node has no ID children to match
+    if (--scanLimit < 1 && !nodeMatchCount) break
 
     cursor = cursor.nextSibling
   }
 
-  return bestMatch || null
+  // if softMatch will be used by an upcoming sibling, insert current node instead
+  if (softMatch && matchesUpcomingSibling(softMatch, node)) {
+    return null
+  }
+
+  return softMatch
 }
 
 // ok to cast: if one is not element, `id` and `tagName` will be null and we'll just compare that.
@@ -492,10 +528,31 @@ const isSoftMatch = (oldNode: Node, newNode: Node): boolean =>
 const removeNode = (node: Node): void => {
   // are we going to id set match this later?
   ctxIdMap.has(node)
-    ? // skip callbacks and move to pantry
-      moveBefore(ctxPantry, node, null)
-    : // remove for realsies
-      node.parentNode?.removeChild(node)
+    ? moveBefore(ctxPantry, node, null)
+    : node.parentNode?.removeChild(node)
+}
+
+const moveNodesBetweenToEnd = (
+  oldParent: Element | ShadowRoot,
+  startInclusive: Node,
+  endExclusive: Node,
+  originalEndPoint: Node | null,
+  currentNewChild: Node,
+): void => {
+  let cursor: Node | null = startInclusive
+  while (cursor && cursor !== endExclusive) {
+    const tempNode = cursor
+    cursor = cursor.nextSibling
+    if (
+      tempNode instanceof Element &&
+      (ctxIdMap.has(tempNode) ||
+        matchesUpcomingSibling(tempNode, currentNewChild, 5))
+    ) {
+      moveBefore(oldParent, tempNode, originalEndPoint)
+    } else {
+      removeNode(tempNode)
+    }
+  }
 }
 
 // Moves an element before another element within the same parent.
