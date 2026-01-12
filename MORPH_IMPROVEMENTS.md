@@ -8,13 +8,14 @@ This document describes the improvements ported from my test version of Idiomorp
 
 ### 1. Enhanced Node Matching
 
-**New Functions:**
-- `isMatch()` - Uses `isEqualNode()` for deep equality check, falls back to matching on identifying attributes (name, href, src)
-- `matchesUpcomingSibling()` - Checks if a node matches any upcoming siblings within a limit
+**New Function:**
+- `matchesUpcomingSibling()` - Checks if a node matches any upcoming siblings within a limit using `isEqualNode()`
+
+**Changes:**
+- Direct use of `isEqualNode()` for exact node matching in `findBestMatch()` and `matchesUpcomingSibling()`
 
 **Benefits:**
 - Deep equality checking via `isEqualNode()` catches identical nodes
-- Attribute-based matching (name, href, src) identifies semantically equivalent elements
 - Prevents premature matching when better matches exist later in the DOM
 - Reduces unnecessary DOM operations
 
@@ -23,13 +24,13 @@ This document describes the improvements ported from my test version of Idiomorp
 **Changes:**
 - Added non-element node early exit (text/comment nodes only check first position)
 - Replaced sibling soft match counting with scan limit (10 nodes)
-- Added exact/attribute matching within scan window before falling back to tag-only matches
+- Added exact matching within scan window before falling back to tag-only matches
 - Optimized active element check (moved earlier in loop for better performance)
 - Added final check to defer soft match if upcoming siblings will use it better
 
 **Matching Priority:**
 1. ID set match (highest priority)
-2. Exact or attribute match (within scan window)
+2. Exact match via `isEqualNode()` (within scan window)
 3. Tag-only match (fallback)
 
 **Benefits:**
@@ -83,7 +84,7 @@ The algorithm now scans up to 10 nodes ahead when looking for matches. This bala
 If a soft match would be better used by an upcoming sibling, the algorithm returns null to insert the current node instead, allowing the soft match to be used later.
 
 ### Deep Equality Checking
-The `isMatch()` function first uses `isEqualNode()` which performs a deep comparison of nodes including their attributes, children, and content. This catches exact duplicates before falling back to attribute-based heuristics.
+The algorithm uses `isEqualNode()` which performs a deep comparison of nodes including their attributes, children, and content. This catches exact duplicates efficiently.
 
 ## Source
 

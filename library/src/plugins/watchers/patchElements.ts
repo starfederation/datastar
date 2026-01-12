@@ -406,19 +406,6 @@ const morphChildren = (
   }
 }
 
-const isMatch = (oldNode: Node, newNode: Node): boolean => {
-  if (oldNode.isEqualNode(newNode)) return true
-  if (oldNode instanceof Element && newNode instanceof Element) {
-    const attrs = ['name', 'href', 'src']
-    for (const attr of attrs) {
-      const v1 = oldNode.getAttribute(attr)
-      const v2 = newNode.getAttribute(attr)
-      if (v1 && v1 === v2) return true
-    }
-  }
-  return false
-}
-
 const matchesUpcomingSibling = (
   oldNode: Node,
   startNode: Node,
@@ -430,7 +417,7 @@ const matchesUpcomingSibling = (
     sibling && i < limit;
     sibling = sibling.nextSibling, i++
   ) {
-    if (isMatch(oldNode, sibling)) {
+    if (oldNode.isEqualNode(sibling)) {
       ctxFutureMatches.add(oldNode)
       return true
     }
@@ -480,8 +467,8 @@ const findBestMatch = (
       // the current soft match will hard match something else in the future, leave it
       // only consider nodes without id children (avoid moving nodes with state)
       if (!ctxIdMap.has(cursor)) {
-        // exact or attribute match within scan window
-        if (scanLimit > 0 && isMatch(cursor, node)) {
+        // exact match within scan window
+        if (scanLimit > 0 && cursor.isEqualNode(node)) {
           return cursor
         }
         // save first tag-only match as fallback
