@@ -44,8 +44,7 @@ attribute({
     const callback: EventListener = (evt: Event | CustomEvent<JSONPatch>) => {
       // we know that evt is CustomEvent<JSONPatch>, but typescript doesn't
       const watched = filtered(filters, (evt as CustomEvent<JSONPatch>).detail)
-      if (!isEmpty(watched))
-      {
+      if (!isEmpty(watched)) {
         timedCallback({...evt, detail: watched})
       }
     }
