@@ -254,7 +254,7 @@ const morph = (
   for (const { id, tagName } of oldIdElements) {
     if (oldIdTagNameMap.has(id)) {
       duplicateIds.add(id)
-    } else {
+    } else if (id) {
       oldIdTagNameMap.set(id, tagName)
     }
   }
