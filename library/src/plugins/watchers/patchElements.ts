@@ -437,19 +437,25 @@ const findBestMatch = (
     return startPoint?.nodeType === node.nodeType ? startPoint : null
   }
 
+  const newSet = ctxIdMap.get(node)
+  // Max ID matches we are willing to displace in our search
+  const nodeMatchCount = newSet?.size || 0
+
+  // If node has a non-persistent ID, it can't match any old ID'd nodes,
+  // and matching an anonymous old node is unlikely, so skip the scan
+  if ((node as Element).id && !newSet) {
+    return null
+  }
+
   let softMatch: Node | null = null
   let displaceMatchCount = 0
-
-  // Max ID matches we are willing to displace in our search
-  const nodeMatchCount = ctxIdMap.get(node)?.size || 0
   let scanLimit = 10
 
   let cursor = startPoint
   while (cursor && cursor !== endPoint) {
+    const oldSet = ctxIdMap.get(cursor)
     // soft matching is a prerequisite for id set matching
     if (isSoftMatch(cursor, node)) {
-      const oldSet = ctxIdMap.get(cursor)
-      const newSet = ctxIdMap.get(node)
 
       if (newSet && oldSet) {
         for (const id of oldSet) {
@@ -466,7 +472,7 @@ const findBestMatch = (
       // we haven’t yet saved a soft match fallback
       // the current soft match will hard match something else in the future, leave it
       // only consider nodes without id children (avoid moving nodes with state)
-      if (!ctxIdMap.has(cursor)) {
+      if (!oldSet) {
         // exact match within scan window
         if (scanLimit > 0 && cursor.isEqualNode(node)) {
           return cursor
@@ -479,7 +485,7 @@ const findBestMatch = (
     }
 
     // stop if we've displaced more IDs than the node contains
-    displaceMatchCount += ctxIdMap.get(cursor)?.size || 0
+    displaceMatchCount += oldSet?.size || 0
     if (displaceMatchCount > nodeMatchCount) break
 
     // stop if cursor contains active element to avoid losing focus
