@@ -634,7 +634,7 @@ const morphNode = (
       oldElt.setAttribute('data-scope-children', '')
     }
 
-    if (!oldElt.isEqualNode(newElt)) {
+    if (!oldElt.isEqualNode(newElt) || newElt.tagName === 'TEMPLATE' || newElt.querySelector?.('template')) {
       morphChildren(oldElt, newElt)
     }
 
