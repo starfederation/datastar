@@ -58,4 +58,4 @@ For the event type `patchSignals` the `input.json` contains the `signals` as JSO
 
 If you want to output multi-line signals, then the input must contain `signals-raw` as String with `\n` in them instead. This is due to the fact that Json parsers would otherwise interpret the input file without the line breaks.
 
-So the impementation of the server has to interpret `signals-raw` as String first, and if not present `signals` as JSON-object.
+So the implementation of the server has to interpret `signals-raw` as String first, and if not present `signals` as JSON-object.
