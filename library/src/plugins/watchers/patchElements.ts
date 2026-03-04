@@ -562,6 +562,15 @@ const morphNode = (
       return oldNode
     }
 
+    // If the new element has the ignore-morph attribute, preserve the old element as is
+    // and set the attribute on it to avoid future morphing
+    // This is done first to allow a patch to set the attribute on an element without clearing
+    // any client state or state from previous requests.
+    if (newElt.hasAttribute(aliasedIgnoreMorph)) {
+      oldElt.setAttribute(aliasedIgnoreMorph, '')
+      return oldNode
+    }
+
     //  many bothans died to bring us this information:
     //  https://github.com/patrick-steele-idem/morphdom/blob/master/src/specialElHandlers.js
     //  https://github.com/choojs/nanomorph/blob/master/lib/morph.js#L113
