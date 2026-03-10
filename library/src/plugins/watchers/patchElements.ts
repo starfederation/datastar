@@ -28,6 +28,14 @@ type PatchElementsMode = (typeof PATCH_MODES)[number]
 const NAMESPACES = ['html', 'svg', 'mathml'] as const
 type Namespace = (typeof NAMESPACES)[number]
 
+const BOOLEAN_ATTRIBUTES = [
+  'checked',
+  'disabled',
+  'readonly',
+  'required',
+  'multiple',
+]
+
 type PatchElementsArgs = {
   selector: string
   mode: PatchElementsMode
@@ -570,26 +578,29 @@ const morphNode = (
       newElt instanceof HTMLInputElement &&
       newElt.type !== 'file'
     ) {
-      // https://github.com/bigskysoftware/idiomorph/issues/27
-      // | old input value | new input value  | behaviour                              |
-      // | --------------- | ---------------- | -------------------------------------- |
-      // | `null`          | `null`           | preserve old input value               |
-      // | some value      | the same value   | preserve old input value               |
-      // | some value      | `null`           | set old input value to `""`            |
-      // | `null`          | some value       | set old input value to new input value |
-      // | some value      | some other value | set old input value to new input value |
+      // Modify only if the new element’s value is different from the old element’s initial value.
       if (newElt.getAttribute('value') !== oldElt.getAttribute('value')) {
         oldElt.value = newElt.getAttribute('value') ?? ''
+      }
+    } else if (
+      oldElt instanceof HTMLSelectElement &&
+      newElt instanceof HTMLSelectElement
+    ) {
+      // Modify the `selected` attribute on options
+      const oldOptions = oldElt.options
+      const newOptions = newElt.options
+      for (let i = 0; i < newOptions.length; i++) {
+        if (newOptions[i]!.selected !== oldOptions[i]!.selected) {
+          oldOptions[i]!.selected = newOptions[i]!.selected
+        }
       }
     } else if (
       oldElt instanceof HTMLTextAreaElement &&
       newElt instanceof HTMLTextAreaElement
     ) {
-      if (newElt.value !== oldElt.value) {
-        oldElt.value = newElt.value
-      }
+      // Modify only if the new element’s value is different from the old element’s initial value.
       if (oldElt.firstChild && oldElt.firstChild.nodeValue !== newElt.value) {
-        oldElt.firstChild.nodeValue = newElt.value
+        oldElt.value = newElt.value
       }
     }
 
@@ -598,11 +609,19 @@ const morphNode = (
     ).split(' ')
 
     for (const { name, value } of newElt.attributes) {
-      if (
-        oldElt.getAttribute(name) !== value &&
-        !preserveAttrs.includes(name)
-      ) {
-        oldElt.setAttribute(name, value)
+      if (!preserveAttrs.includes(name)) {
+        if (
+          BOOLEAN_ATTRIBUTES.includes(name) &&
+          oldElt.hasAttribute(name) !== newElt.hasAttribute(name)
+        ) {
+          // Handle boolean attributes by presence
+          newElt.hasAttribute(name)
+            ? oldElt.setAttribute(name, '')
+            : oldElt.removeAttribute(name)
+        } else if (oldElt.getAttribute(name) !== value) {
+          // Handle regular attributes by value
+          oldElt.setAttribute(name, value)
+        }
       }
     }
 
