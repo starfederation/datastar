@@ -573,6 +573,7 @@ const morphNode = (
     //  many bothans died to bring us this information:
     //  https://github.com/patrick-steele-idem/morphdom/blob/master/src/specialElHandlers.js
     //  https://github.com/choojs/nanomorph/blob/master/lib/morph.js#L113
+    let shouldDispatchChangeEvent = false
     if (
       oldElt instanceof HTMLInputElement &&
       newElt instanceof HTMLInputElement &&
@@ -581,18 +582,7 @@ const morphNode = (
       // Modify only if the new element’s value is different from the old element’s initial value.
       if (newElt.getAttribute('value') !== oldElt.getAttribute('value')) {
         oldElt.value = newElt.getAttribute('value') ?? ''
-      }
-    } else if (
-      oldElt instanceof HTMLSelectElement &&
-      newElt instanceof HTMLSelectElement
-    ) {
-      // Modify the `selected` attribute on options
-      const oldOptions = oldElt.options
-      const newOptions = newElt.options
-      for (let i = 0; i < newOptions.length; i++) {
-        if (newOptions[i]!.selected !== oldOptions[i]!.selected) {
-          oldOptions[i]!.selected = newOptions[i]!.selected
-        }
+        shouldDispatchChangeEvent = true
       }
     } else if (
       oldElt instanceof HTMLTextAreaElement &&
@@ -601,6 +591,28 @@ const morphNode = (
       // Modify only if the new element’s value is different from the old element’s initial value.
       if (oldElt.firstChild && oldElt.firstChild.nodeValue !== newElt.value) {
         oldElt.value = newElt.value
+        shouldDispatchChangeEvent = true
+      }
+    } else if (
+      oldElt instanceof HTMLSelectElement &&
+      newElt instanceof HTMLSelectElement
+    ) {
+      // Modify the `selected` attribute and property on options
+      const oldOptions = oldElt.options
+      const newOptions = newElt.options
+      for (let i = 0; i < newOptions.length; i++) {
+        if (
+          newOptions[i]!.getAttribute('selected') !==
+          oldOptions[i]!.getAttribute('selected')
+        ) {
+          oldOptions[i]!.setAttribute(
+            'selected',
+            newOptions[i]!.getAttribute('selected') ?? '',
+          )
+          ;(oldOptions[i] as any).selected =
+            newOptions[i]!.hasAttribute('selected')
+          shouldDispatchChangeEvent = true
+        }
       }
     }
 
@@ -615,9 +627,13 @@ const morphNode = (
           oldElt.hasAttribute(name) !== newElt.hasAttribute(name)
         ) {
           // Handle boolean attributes by presence
-          newElt.hasAttribute(name)
+          const shouldSet = newElt.hasAttribute(name)
+          shouldSet
             ? oldElt.setAttribute(name, '')
             : oldElt.removeAttribute(name)
+          ;(oldElt as any)[name] = shouldSet
+          shouldDispatchChangeEvent =
+            name === 'checked' ? true : shouldDispatchChangeEvent
         } else if (oldElt.getAttribute(name) !== value) {
           // Handle regular attributes by value
           oldElt.setAttribute(name, value)
@@ -630,6 +646,10 @@ const morphNode = (
       if (!newElt.hasAttribute(name) && !preserveAttrs.includes(name)) {
         oldElt.removeAttribute(name)
       }
+    }
+
+    if (shouldDispatchChangeEvent) {
+      oldElt.dispatchEvent(new Event('change', { bubbles: true }))
     }
 
     // Preserve the scope marker even if the incoming markup doesn't carry it.
