@@ -28,14 +28,6 @@ type PatchElementsMode = (typeof PATCH_MODES)[number]
 const NAMESPACES = ['html', 'svg', 'mathml'] as const
 type Namespace = (typeof NAMESPACES)[number]
 
-const BOOLEAN_ATTRIBUTES = [
-  'checked',
-  'disabled',
-  'readonly',
-  'required',
-  'multiple',
-]
-
 type PatchElementsArgs = {
   selector: string
   mode: PatchElementsMode
@@ -209,7 +201,7 @@ const applyPatchMode = (
     }
     const nextNode = consume ? element : (element.cloneNode(true) as Element)
     execute(nextNode as Element)
-    // @ts-expect-error
+    // @ts-expect-error - calling dynamic method path on DOM element
     target[action](nextNode)
     used = true
   }
@@ -570,48 +562,59 @@ const morphNode = (
       return oldNode
     }
 
+    // The following logic for handling inputs, textareas, and options is finnicky.
+    // Only change with extreme caution and lots of testing!
+    // --
     //  many bothans died to bring us this information:
     //  https://github.com/patrick-steele-idem/morphdom/blob/master/src/specialElHandlers.js
     //  https://github.com/choojs/nanomorph/blob/master/lib/morph.js#L113
+    // --
+
+    // Updates an element property, and returns whether it changed
+    const updateElementProp = (
+      oldElt: Element,
+      newElt: Element,
+      name: string,
+    ): boolean => {
+      const newEltHasAttr = newElt.hasAttribute(name)
+      if (oldElt.hasAttribute(name) !== newEltHasAttr) {
+        // @ts-expect-error - setting dynamic property for native DOM properties
+        oldElt[name] = newEltHasAttr
+        return true
+      }
+      return false
+    }
+
     let shouldDispatchChangeEvent = false
     if (
       oldElt instanceof HTMLInputElement &&
       newElt instanceof HTMLInputElement &&
       newElt.type !== 'file'
     ) {
-      // Modify only if the new element’s value attribute is different from the old element’s value attribute.
+      // Modify the value only if the new element’s value attribute is different from the old element’s value attribute
       const newValue = newElt.getAttribute('value')
       if (oldElt.getAttribute('value') !== newValue) {
-        oldElt.setAttribute('value', newValue ?? '')
         oldElt.value = newValue ?? ''
         shouldDispatchChangeEvent = true
       }
+      // Update checked and disabled properties
+      shouldDispatchChangeEvent = updateElementProp(oldElt, newElt, 'checked') || shouldDispatchChangeEvent
+      updateElementProp(oldElt, newElt, 'disabled')
     } else if (
       oldElt instanceof HTMLTextAreaElement &&
       newElt instanceof HTMLTextAreaElement
     ) {
-      // Modify only if the new element’s node value is different from the old element’s node value.
-      if (oldElt.firstChild?.nodeValue !== newElt.firstChild?.nodeValue) {
-        oldElt.value = newElt.value
+      // Modify the value only if the new element’s value is different from the old element’s default value.
+      const newValue = newElt.value
+      if (oldElt.defaultValue !== newValue) {
+        oldElt.value = newValue
         shouldDispatchChangeEvent = true
       }
     } else if (
-      oldElt instanceof HTMLSelectElement &&
-      newElt instanceof HTMLSelectElement
+      oldElt instanceof HTMLOptionElement &&
+      newElt instanceof HTMLOptionElement
     ) {
-      // Modify the `selected` attribute and property on options
-      const oldOptions = oldElt.options
-      const newOptions = newElt.options
-      for (let i = 0; i < newOptions.length; i++) {
-        const newOptionSelected = newOptions[i]!.hasAttribute('selected')
-        if (oldOptions[i]!.hasAttribute('selected') !== newOptionSelected) {
-          newOptionSelected
-            ? oldOptions[i]!.setAttribute('selected', '')
-            : oldOptions[i]!.removeAttribute('selected')
-          ;(oldOptions[i] as any).selected = newOptionSelected
-          shouldDispatchChangeEvent = true
-        }
-      }
+      shouldDispatchChangeEvent = updateElementProp(oldElt, newElt, 'selected') || shouldDispatchChangeEvent
     }
 
     const preserveAttrs = (
@@ -619,28 +622,16 @@ const morphNode = (
     ).split(' ')
 
     for (const { name, value } of newElt.attributes) {
-      if (!preserveAttrs.includes(name)) {
-        if (
-          BOOLEAN_ATTRIBUTES.includes(name) &&
-          oldElt.hasAttribute(name) !== newElt.hasAttribute(name)
-        ) {
-          // Handle boolean attributes by presence
-          const shouldSet = newElt.hasAttribute(name)
-          shouldSet
-            ? oldElt.setAttribute(name, '')
-            : oldElt.removeAttribute(name)
-          ;(oldElt as any)[name] = shouldSet
-          shouldDispatchChangeEvent =
-            name === 'checked' ? true : shouldDispatchChangeEvent
-        } else if (oldElt.getAttribute(name) !== value) {
-          // Handle regular attributes by value
-          oldElt.setAttribute(name, value)
-        }
+      if (
+        oldElt.getAttribute(name) !== value &&
+        !preserveAttrs.includes(name)
+      ) {
+        oldElt.setAttribute(name, value)
       }
     }
 
-    for (let i = oldElt.attributes.length - 1; i >= 0; i--) {
-      const { name } = oldElt.attributes[i]!
+    // Create a static copy, so we can iterate forward safely as we remove attributes
+    for (const { name } of Array.from(oldElt.attributes)) {
       if (!newElt.hasAttribute(name) && !preserveAttrs.includes(name)) {
         oldElt.removeAttribute(name)
       }
@@ -673,7 +664,7 @@ const morphNode = (
 
   if (type === 8 /* comment */ || type === 3 /* text */) {
     if (oldNode.nodeValue !== newNode.nodeValue) {
-      //oldNode.nodeValue = newNode.nodeValue
+      oldNode.nodeValue = newNode.nodeValue
     }
   }
 
