@@ -579,17 +579,19 @@ const morphNode = (
       newElt instanceof HTMLInputElement &&
       newElt.type !== 'file'
     ) {
-      // Modify only if the new element’s value is different from the old element’s initial value.
-      if (newElt.getAttribute('value') !== oldElt.getAttribute('value')) {
-        oldElt.value = newElt.getAttribute('value') ?? ''
+      // Modify only if the new element’s value attribute is different from the old element’s value attribute.
+      const newValue = newElt.getAttribute('value')
+      if (oldElt.getAttribute('value') !== newValue) {
+        oldElt.setAttribute('value', newValue ?? '')
+        oldElt.value = newValue ?? ''
         shouldDispatchChangeEvent = true
       }
     } else if (
       oldElt instanceof HTMLTextAreaElement &&
       newElt instanceof HTMLTextAreaElement
     ) {
-      // Modify only if the new element’s value is different from the old element’s initial value.
-      if (oldElt.firstChild && oldElt.firstChild.nodeValue !== newElt.value) {
+      // Modify only if the new element’s node value is different from the old element’s node value.
+      if (oldElt.firstChild?.nodeValue !== newElt.firstChild?.nodeValue) {
         oldElt.value = newElt.value
         shouldDispatchChangeEvent = true
       }
@@ -601,16 +603,12 @@ const morphNode = (
       const oldOptions = oldElt.options
       const newOptions = newElt.options
       for (let i = 0; i < newOptions.length; i++) {
-        if (
-          newOptions[i]!.getAttribute('selected') !==
-          oldOptions[i]!.getAttribute('selected')
-        ) {
-          oldOptions[i]!.setAttribute(
-            'selected',
-            newOptions[i]!.getAttribute('selected') ?? '',
-          )
-          ;(oldOptions[i] as any).selected =
-            newOptions[i]!.hasAttribute('selected')
+        const newOptionSelected = newOptions[i]!.hasAttribute('selected')
+        if (oldOptions[i]!.hasAttribute('selected') !== newOptionSelected) {
+          newOptionSelected
+            ? oldOptions[i]!.setAttribute('selected', '')
+            : oldOptions[i]!.removeAttribute('selected')
+          ;(oldOptions[i] as any).selected = newOptionSelected
           shouldDispatchChangeEvent = true
         }
       }
@@ -675,7 +673,7 @@ const morphNode = (
 
   if (type === 8 /* comment */ || type === 3 /* text */) {
     if (oldNode.nodeValue !== newNode.nodeValue) {
-      oldNode.nodeValue = newNode.nodeValue
+      //oldNode.nodeValue = newNode.nodeValue
     }
   }
 
