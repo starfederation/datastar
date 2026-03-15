@@ -122,15 +122,15 @@ const createHttpMethod = (
           },
         }
 
-        const delayedFetchEventSourceInit = () => {
+        const buildFetchEventSourceInit = () => {
           const urlInstance = new URL(url, document.baseURI)
           const queryParams = new URLSearchParams(urlInstance.search)
           if (contentType === 'json') {
             startPeeking()
-            payload =
+            const requestPayload =
               payload !== undefined ? payload : filtered({ include, exclude })
             stopPeeking()
-            const body = JSON.stringify(payload)
+            const body = JSON.stringify(requestPayload)
             if (method === 'GET') {
               queryParams.set('datastar', body)
             } else {
@@ -200,7 +200,7 @@ const createHttpMethod = (
         dispatchFetch(STARTED, el, {})
 
         try {
-          await fetchEventSource(el, delayedFetchEventSourceInit)
+          await fetchEventSource(el, buildFetchEventSourceInit)
         } catch (e: any) {
           if (!isWrongContent(e)) {
             throw error('FetchFailed', { method, url, error: e.message })
@@ -446,10 +446,10 @@ type FetchEventSourceInit =
 
 const fetchEventSource = (
   el: HTMLOrSVG,
-  delayedFetchEventSourceInit: () => FetchEventSourceInit,
+  buildFetchEventSourceInit: () => FetchEventSourceInit,
 ): Promise<void> => {
   return new Promise<void>((resolve, reject) => {
-    const fetchInit = delayedFetchEventSourceInit()
+    const fetchInit = buildFetchEventSourceInit()
     if (!fetchInit) {
       return
     }
@@ -480,7 +480,14 @@ const fetchEventSource = (
     let curRequestController: AbortController
     const onVisibilityChange = () => {
       curRequestController.abort() // close existing request on every visibility change
-      if (!document.hidden) create() // page is now visible again, recreate request.
+      if (!document.hidden) {
+        const currentFetchInit = buildFetchEventSourceInit()
+        if (!currentFetchInit) return
+
+        input = currentFetchInit.input
+        rest.body = currentFetchInit.body
+        create()
+      }
     }
 
     if (!openWhenHidden) {
