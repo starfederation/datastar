@@ -14,6 +14,9 @@ import type {
 import { kebab } from '@utils/text'
 
 const abortControllers = new WeakMap<HTMLOrSVG, AbortController>()
+const methodSupportsRequestBody = (method: string): boolean =>
+  !['GET', 'DELETE'].includes(method)
+
 
 const createHttpMethod = (
   name: string,
@@ -68,7 +71,7 @@ const createHttpMethod = (
           Accept: 'text/event-stream, text/html, application/json',
           'Datastar-Request': true,
         }
-        if (contentType === 'json') {
+        if (contentType === 'json' && methodSupportsRequestBody(method)) {
           initialHeaders['Content-Type'] = 'application/json'
         }
         const headers = Object.assign({}, initialHeaders, userHeaders)
@@ -131,10 +134,10 @@ const createHttpMethod = (
               payload !== undefined ? payload : filtered({ include, exclude })
             stopPeeking()
             const body = JSON.stringify(requestPayload)
-            if (method === 'GET') {
-              queryParams.set('datastar', body)
-            } else {
+            if (methodSupportsRequestBody(method)) {
               req.body = body
+            } else {
+              queryParams.set('datastar', body)
             }
           } else if (contentType === 'form') {
             const formEl = (
@@ -180,14 +183,16 @@ const createHttpMethod = (
             }
 
             const formParams = new URLSearchParams(formData as any)
-            if (method === 'GET') {
+            if (methodSupportsRequestBody(method)) {
+              if (multipart) {
+              req.body = formData
+              } else {
+                req.body = formParams
+              }
+            } else {
               for (const [key, value] of formParams) {
                 queryParams.append(key, value)
               }
-            } else if (multipart) {
-              req.body = formData
-            } else {
-              req.body = formParams
             }
           } else {
             throw error('FetchInvalidContentType', { action, contentType })
