@@ -429,6 +429,9 @@ The function ***must*** parse the incoming HTTP request based on the method:
 | Method | Data Location | Format | Description |
 |--------|---------------|--------|-------------|
 | `GET` | Query parameter `datastar` | URL-encoded JSON | Extract from query string |
-| Others | Request body | JSON | Parse request body directly |
+| `PATCH` | Request body | JSON | Parse request body directly |
+| `POST` | Request body | JSON | Parse request body directly |
+| `PUT` | Request body | JSON | Parse request body directly |
+| `DELETE` | Query parameter `datastar` | URL-encoded JSON | Extract from query string |
 
 **Error Handling**: ***Must*** return error for invalid JSON.
