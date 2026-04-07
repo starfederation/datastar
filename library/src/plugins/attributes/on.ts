@@ -19,6 +19,7 @@ attribute({
   apply({ el, key, mods, rx }) {
     let target: Element | Window | Document = el
     if (mods.has('window')) target = window
+    if (mods.has('document')) target = document
     let callback = (evt?: Event) => {
       if (evt) {
         if (mods.has('prevent')) {
