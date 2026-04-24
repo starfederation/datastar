@@ -48,8 +48,8 @@ watcher({
     const mode = typeof args.mode === 'string' ? args.mode : 'outer'
     const namespace =
       typeof args.namespace === 'string' ? args.namespace : 'html'
-    const useViewTransitionRaw =
-      typeof args.useViewTransition === 'string' ? args.useViewTransition : ''
+    const useViewTransition =
+      typeof args.useViewTransition === 'string' && args.useViewTransition.trim() === 'true'
     const viewTransitionSelector =
       typeof args.viewTransitionSelector === 'string' ? args.viewTransitionSelector : ''
     const elements = args.elements
@@ -70,7 +70,7 @@ watcher({
       selector,
       mode,
       namespace,
-      useViewTransition: useViewTransitionRaw.trim() === 'true',
+      useViewTransition,
       viewTransitionSelector,
       elements,
     }
