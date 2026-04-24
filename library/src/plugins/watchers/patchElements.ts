@@ -37,6 +37,7 @@ type PatchElementsArgs = {
   mode: PatchElementsMode
   namespace: Namespace
   useViewTransition: boolean
+  viewTransitionSelector: string
   elements: WatcherArgsValue
 }
 
@@ -49,6 +50,8 @@ watcher({
       typeof args.namespace === 'string' ? args.namespace : 'html'
     const useViewTransitionRaw =
       typeof args.useViewTransition === 'string' ? args.useViewTransition : ''
+    const viewTransitionSelector =
+      typeof args.viewTransitionSelector === 'string' ? args.viewTransitionSelector : ''
     const elements = args.elements
 
     if (!isValidType(PATCH_MODES, mode)) {
@@ -63,18 +66,26 @@ watcher({
       throw ctx.error('PatchElementsInvalidNamespace', { namespace })
     }
 
-    const args2: PatchElementsArgs = {
+    const patchElementsArgs: PatchElementsArgs = {
       selector,
       mode,
       namespace,
       useViewTransition: useViewTransitionRaw.trim() === 'true',
+      viewTransitionSelector,
       elements,
     }
 
-    if (supportsViewTransitions && args2.useViewTransition) {
-      document.startViewTransition(() => onPatchElements(ctx, args2))
+    if (patchElementsArgs.useViewTransition && supportsViewTransitions()) {
+      let element: any = document.documentElement
+      if (viewTransitionSelector) {
+        const el = document.querySelector(viewTransitionSelector)
+        if (el && supportsViewTransitions(el)) {
+          element = el
+        }
+      }
+      element.startViewTransition(() => onPatchElements(ctx, patchElementsArgs))
     } else {
-      onPatchElements(ctx, args2)
+      onPatchElements(ctx, patchElementsArgs)
     }
   },
 })
@@ -203,7 +214,7 @@ const applyPatchMode = (
     if (consume && used) {
       break
     }
-    const nextNode = consume ? element : (element.cloneNode(true) as Element)
+    const nextNode = getNextNode(element, consume, used)
     execute(nextNode as Element)
     // @ts-expect-error - calling dynamic method path on DOM element
     target[action](nextNode)
@@ -231,9 +242,7 @@ const applyToTargets = (
           if (consume && used) {
             break
           }
-          const nextNode = consume
-            ? element
-            : (element.cloneNode(true) as Element)
+          const nextNode = getNextNode(element, consume, used)
           morph(target, nextNode, mode)
           execute(target)
           const scopeHost = target.closest('[data-scope-children]')
@@ -257,6 +266,15 @@ const applyToTargets = (
     case 'after':
       applyPatchMode(targets, element, mode, consume)
   }
+}
+
+// Returns a clone of the element if it should be consumed or has not yet been used, otherwise returns the element itself for reuse. See https://github.com/starfederation/datastar/issues/1155
+const getNextNode = (
+  element: DocumentFragment | Element,
+  consume: boolean,
+  used: boolean,
+): DocumentFragment | Element => {
+  return consume || !used ? element : (element.cloneNode(true) as Element)
 }
 
 const ctxIdMap = new Map<Node, Set<string>>()
