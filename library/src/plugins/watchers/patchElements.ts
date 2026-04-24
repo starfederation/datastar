@@ -36,8 +36,6 @@ type PatchElementsArgs = {
   selector: string
   mode: PatchElementsMode
   namespace: Namespace
-  useViewTransition: boolean
-  viewTransitionSelector: string
   elements: WatcherArgsValue
 }
 
@@ -70,12 +68,10 @@ watcher({
       selector,
       mode,
       namespace,
-      useViewTransition,
-      viewTransitionSelector,
       elements,
     }
 
-    if (patchElementsArgs.useViewTransition && supportsViewTransitions()) {
+    if (useViewTransition && supportsViewTransitions()) {
       let element: any = document.documentElement
       if (viewTransitionSelector) {
         const el = document.querySelector(viewTransitionSelector)
