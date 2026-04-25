@@ -84,7 +84,7 @@ const onPatchElements = (
   { selector, mode, namespace, elements }: PatchElementsArgs,
 ) => {
   let newContent = document.createDocumentFragment()
-  const consume = typeof elements !== 'string' && !!elements
+  let consume = typeof elements !== 'string' && !!elements
 
   if (typeof elements === 'string') {
     const elementsWithSvgsRemoved = elements.replace(
@@ -165,6 +165,10 @@ const onPatchElements = (
     }
 
     const targetList = consume && mode !== 'remove' ? [targets[0]!] : targets
+
+    // If only one target exists, we can safely consume the new content which prevents deep cloning (https://github.com/starfederation/datastar/issues/1155).
+    consume = targetList.length == 1 ? true : consume
+
     applyToTargets(mode as PatchElementsMode, newContent, targetList, consume)
   }
 }
@@ -203,7 +207,7 @@ const applyPatchMode = (
     if (consume && used) {
       break
     }
-    const nextNode = getNextNode(element, consume, used)
+    const nextNode = consume ? element : (element.cloneNode(true) as Element)
     execute(nextNode as Element)
     // @ts-expect-error - calling dynamic method path on DOM element
     target[action](nextNode)
@@ -231,7 +235,7 @@ const applyToTargets = (
           if (consume && used) {
             break
           }
-          const nextNode = getNextNode(element, consume, used)
+          const nextNode = consume ? element : (element.cloneNode(true) as Element)
           morph(target, nextNode, mode)
           execute(target)
           const scopeHost = target.closest('[data-scope-children]')
@@ -255,15 +259,6 @@ const applyToTargets = (
     case 'after':
       applyPatchMode(targets, element, mode, consume)
   }
-}
-
-// Returns the element if it should be consumed or has not been used, otherwise returns a clone of the element for reuse. See https://github.com/starfederation/datastar/issues/1155
-const getNextNode = (
-  element: DocumentFragment | Element,
-  consume: boolean,
-  used: boolean,
-): DocumentFragment | Element => {
-  return consume || !used ? element : (element.cloneNode(true) as Element)
 }
 
 const ctxIdMap = new Map<Node, Set<string>>()
