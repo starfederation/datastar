@@ -155,7 +155,8 @@ const onPatchElements = (
         }
       }
 
-      applyToTargets(mode as PatchElementsMode, child, [target], consume)
+      // Consume the new content so we don’t deep clone.
+      applyToTargets(mode as PatchElementsMode, child, [target], true)
     }
   } else {
     const targets = document.querySelectorAll(selector)
@@ -167,7 +168,7 @@ const onPatchElements = (
     const targetList = consume && mode !== 'remove' ? [targets[0]!] : targets
 
     // If only one target exists, we can safely consume the new content which prevents deep cloning (https://github.com/starfederation/datastar/issues/1155).
-    if (targetList.length == 1) {
+    if (targetList.length === 1) {
       consume = true
     }
 
