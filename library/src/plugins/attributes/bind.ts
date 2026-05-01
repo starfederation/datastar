@@ -57,16 +57,15 @@ const empty = Symbol('empty')
 const boundPath = (
   el: Element,
   key: string | null | undefined,
-  value: string | null | undefined,
   rawKey: string,
   signalName: string,
   adapter: BindAdapter,
   initialValue: any,
 ) => {
-  const aliasedEscapedRawKey = aliasify(CSS.escape(rawKey))
+  const rawAttribute = aliasify(CSS.escape(rawKey))
   const selector = key
-    ? `[${aliasedEscapedRawKey}]`
-    : `[${aliasedEscapedRawKey}="${CSS.escape(value!)}"]`
+    ? `[${rawAttribute}]`
+    : `[${rawAttribute}="${CSS.escape(signalName)}"]`
   if (
     initialValue === undefined &&
     el instanceof HTMLInputElement &&
@@ -150,7 +149,7 @@ attribute({
               el.checked =
                 typeof value === 'string' ? value === el.value : value
             },
-            events: ['change'],
+            events: ['input'],
           }
           break
         case 'radio':
@@ -164,7 +163,7 @@ attribute({
               el.checked =
                 value === (typeof value === 'number' ? +el.value : el.value)
             },
-            events: ['change'],
+            events: ['input'],
           }
           break
         case 'file': {
@@ -267,7 +266,6 @@ attribute({
     const path = boundPath(
       el,
       key,
-      value,
       rawKey,
       signalName,
       adapter,
