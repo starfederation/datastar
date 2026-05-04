@@ -520,6 +520,18 @@ const fetchEventSource = (
 
     let retries = 0
     let baseRetryInterval = retryInterval
+    const scheduleRetry = (interval: number = retryInterval): boolean => {
+      clearTimeout(retryTimer)
+      retryTimer = setTimeout(create, interval)
+      retryInterval = Math.min(retryInterval * retryScaler, retryMaxWait)
+      if (++retries >= retryMaxCount) {
+        dispatchFetch(RETRIES_FAILED, el, {})
+        dispose()
+        reject('Max retries reached.')
+        return false
+      }
+      return true
+    }
     const create = async () => {
       curRequestController = new AbortController()
       const curRequestSignal = curRequestController.signal
@@ -569,8 +581,8 @@ const fetchEventSource = (
             !isRedirectStatus &&
             (retry === 'always' || (retry === 'error' && isErrorStatus))
           ) {
-            clearTimeout(retryTimer)
-            retryTimer = setTimeout(create, retryInterval)
+            dispatchFetch(RETRYING, el, { status: status.toString() })
+            scheduleRetry()
             return
           }
           dispose()
@@ -662,18 +674,7 @@ const fetchEventSource = (
           try {
             // check if we need to retry:
             const interval: any = onerror?.(err) || retryInterval
-            clearTimeout(retryTimer)
-            retryTimer = setTimeout(create, interval)
-            retryInterval = Math.min(
-              retryInterval * retryScaler,
-              retryMaxWait,
-            ) // exponential backoff
-            if (++retries >= retryMaxCount) {
-              dispatchFetch(RETRIES_FAILED, el, {})
-              // we should not retry anymore:
-              dispose()
-              reject('Max retries reached.') // Max retries reached, check your server or network connection
-            } else {
+            if (scheduleRetry(interval)) {
               console.error(
                 `Datastar failed to reach ${input.toString()} retrying in ${interval}ms.`,
               )
