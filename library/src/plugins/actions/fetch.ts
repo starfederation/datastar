@@ -90,8 +90,9 @@ const createHttpMethod = (
           retryMaxCount,
           signal: controller.signal,
           onopen: async (response: Response) => {
-            if (response.status >= 400)
+            if (response.status >= 400) {
               dispatchFetch(ERROR, el, { status: response.status.toString() })
+            }
           },
           onmessage: (evt) => {
             if (!evt.event.startsWith('datastar')) return
@@ -115,11 +116,6 @@ const createHttpMethod = (
             if (isWrongContent(error)) {
               // don't retry if the content-type is wrong
               throw error('FetchExpectedTextEventStream', { url })
-            }
-            // do nothing and it will retry
-            if (error) {
-              console.error(error.message)
-              dispatchFetch(RETRYING, el, { message: error.message })
             }
           },
         }
@@ -440,7 +436,7 @@ type FetchEventSourceInit =
       onopen?: (response: Response) => Promise<void>
       onmessage?: (ev: EventSourceMessage) => void
       onclose?: () => void
-      onerror?: (err: any) => void
+      onerror?: (error: any) => void
       openWhenHidden?: boolean
       fetch?: typeof fetch
       retry?: 'auto' | 'error' | 'always' | 'never'
@@ -468,7 +464,6 @@ const fetchEventSource = (
       onopen: inputOnOpen,
       onmessage,
       onclose,
-      onerror,
       openWhenHidden,
       fetch: inputFetch,
       retry = 'auto',
@@ -522,14 +517,11 @@ const fetchEventSource = (
     let baseRetryInterval = retryInterval
 
     const retryRequest = () => {
-      retries++
-      if (retries <= retryMaxCount) {
+      if (retries < retryMaxCount) {
+        dispatchFetch(RETRYING, el, {})
         clearTimeout(retryTimer)
-        console.error(
-          `Datastar failed to reach ${input.toString()} retrying in ${retryInterval}ms.`,
-        )
         retryTimer = setTimeout(create, retryInterval)
-
+        retries++
         // Prepare the interval for the next retry (exponential backoff)
         retryInterval = Math.min(retryInterval * retryScaler, retryMaxWait)
       } else {
