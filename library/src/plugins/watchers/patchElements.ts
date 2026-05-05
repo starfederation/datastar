@@ -91,7 +91,7 @@ const onPatchElements = (
   { selector, mode, namespace, elements }: PatchElementsArgs,
 ) => {
   let newContent = document.createDocumentFragment()
-  const consume = typeof elements !== 'string' && !!elements
+  let consume = typeof elements !== 'string' && !!elements
 
   if (typeof elements === 'string') {
     const elementsWithSvgsRemoved = elements.replace(
@@ -162,7 +162,8 @@ const onPatchElements = (
         }
       }
 
-      applyToTargets(mode as PatchElementsMode, child, [target], consume)
+      // Consume the new content so we don’t deep clone.
+      applyToTargets(mode as PatchElementsMode, child, [target], true)
     }
   } else {
     const targets = document.querySelectorAll(selector)
@@ -172,6 +173,12 @@ const onPatchElements = (
     }
 
     const targetList = consume && mode !== 'remove' ? [targets[0]!] : targets
+
+    // If only one target exists, we can safely consume the new content which prevents deep cloning (https://github.com/starfederation/datastar/issues/1155).
+    if (targetList.length === 1) {
+      consume = true
+    }
+
     applyToTargets(mode as PatchElementsMode, newContent, targetList, consume)
   }
 }
@@ -238,7 +245,7 @@ const applyToTargets = (
           if (consume && used) {
             break
           }
-          const nextNode = getNextNode(element, consume, used)
+          const nextNode = consume ? element : (element.cloneNode(true) as Element)
           morph(target, nextNode, mode)
           execute(target)
           const scopeHost = target.closest('[data-scope-children]')

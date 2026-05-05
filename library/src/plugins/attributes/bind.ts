@@ -54,27 +54,24 @@ const valueAdapter = (
 const dataURIRegex = /^data:(?<mime>[^;]+);base64,(?<contents>.*)$/
 const empty = Symbol('empty')
 
-const aliasedBind = aliasify('bind')
-
 const boundPath = (
   el: Element,
   key: string | null | undefined,
-  value: string | null | undefined,
+  rawKey: string,
   signalName: string,
   adapter: BindAdapter,
   initialValue: any,
 ) => {
+  const rawAttribute = aliasify(CSS.escape(rawKey))
+  const selector = key
+    ? `[${rawAttribute}]`
+    : `[${rawAttribute}="${CSS.escape(signalName)}"]`
   if (
     initialValue === undefined &&
     el instanceof HTMLInputElement &&
     el.type === 'radio'
   ) {
-    const signalNameKebab = key ? key : value!
-    const checked = [
-      ...document.querySelectorAll(
-        `[${aliasedBind}\\:${CSS.escape(signalNameKebab)}],[${aliasedBind}="${CSS.escape(signalNameKebab)}"]`,
-      ),
-    ].find(
+    const checked = [...document.querySelectorAll(selector)].find(
       (input): input is HTMLInputElement =>
         input instanceof HTMLInputElement && input.checked,
     )
@@ -94,10 +91,7 @@ const boundPath = (
     return signalName
   }
 
-  const signalNameKebab = key ? key : value!
-  const inputs = document.querySelectorAll(
-    `[${aliasedBind}\\:${CSS.escape(signalNameKebab)}],[${aliasedBind}="${CSS.escape(signalNameKebab)}"]`,
-  ) as NodeListOf<Element>
+  const inputs = document.querySelectorAll(selector) as NodeListOf<Element>
 
   const paths: Paths = []
   let i = 0
@@ -122,7 +116,7 @@ const boundPath = (
 attribute({
   name: 'bind',
   requirement: 'exclusive',
-  apply({ el, key, mods, value, error }) {
+  apply({ el, key, rawKey, mods, value, error }) {
     const signalName = key != null ? modifyCasing(key, mods) : value
 
     const props = mods.get('prop')
@@ -155,7 +149,7 @@ attribute({
               el.checked =
                 typeof value === 'string' ? value === el.value : value
             },
-            events: ['change'],
+            events: ['input'],
           }
           break
         case 'radio':
@@ -169,7 +163,7 @@ attribute({
               el.checked =
                 value === (typeof value === 'number' ? +el.value : el.value)
             },
-            events: ['change'],
+            events: ['input'],
           }
           break
         case 'file': {
@@ -269,7 +263,14 @@ attribute({
     }
 
     const initialValue = getPath(signalName)
-    const path = boundPath(el, key, value, signalName, adapter, initialValue)
+    const path = boundPath(
+      el,
+      key,
+      rawKey,
+      signalName,
+      adapter,
+      initialValue,
+    )
 
     const syncSignal = () => {
       const signalValue = getPath(path)
