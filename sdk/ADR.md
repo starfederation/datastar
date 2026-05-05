@@ -109,6 +109,7 @@ ServerSentEventGenerator.PatchElements(
     selector?: string,
     mode?: ElementPatchMode,
     useViewTransition?: boolean,
+    viewTransitionSelector?: string,
     namespace?: 'html' | 'svg' | 'mathml',
     eventId?: string,
     retryDuration?: durationInMilliseconds
@@ -138,6 +139,7 @@ ServerSentEventGenerator.PatchElements(
   data: mode inner
   data: selector #feed
   data: useViewTransition true
+  data: viewTransitionSelector #main
   data: namespace html
   data: elements <div id="feed">
   data: elements     <span>1</span>
@@ -234,6 +236,7 @@ String enum defining how elements are patched into the DOM.
 | `selector` | string | Element ID | CSS selector for target element. If a selector is not specified, each element must have an ID specified. |
 | `mode` | ElementPatchMode | `outer` | How to patch the element |
 | `useViewTransition` | boolean | `false` | Enable view transitions API |
+| `viewTransitionSelector` | string | `#main` | CSS selector for view transitions API |
 | `namespace` | `html` \| `svg` \| `mathml` | `html` | Namespace in which to create new elements |
 
 ### Implementation
@@ -244,6 +247,7 @@ String enum defining how elements are patched into the DOM.
 - `selector SELECTOR\n` (if provided)
 - `mode PATCH_MODE\n` (if not `outer`)
 - `useViewTransition true\n` (if `true`)
+- `viewTransitionSelector SELECTOR\n` (if provided and `useViewTransition` is `true`)
 - `namespace NAMESPACE\n` (if not `html`)
 - `elements HTML_LINE\n` (for each line of HTML)
 
