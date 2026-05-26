@@ -13,7 +13,8 @@ import type {
 } from '@engine/types'
 import { kebab } from '@utils/text'
 
-const abortControllers = new WeakMap<HTMLOrSVG, AbortController>()
+// Map of abort controllers keyed by method and path
+const abortControllers = new Map<string, Map<string, AbortController>>()
 const methodSupportsRequestBody = (method: string): boolean =>
   !['GET', 'DELETE'].includes(method)
 
@@ -47,8 +48,11 @@ const createHttpMethod = (
           ? requestCancellation
           : new AbortController()
       if (requestCancellation === 'auto' || requestCancellation === 'cleanup') {
-        abortControllers.get(el)?.abort()
-        abortControllers.set(el, controller)
+        abortControllers.get(method)?.get(url)?.abort()
+        if (!abortControllers.has(method)) {
+          abortControllers.set(method, new Map())
+        }
+        abortControllers.get(method)!.set(url, controller)
       }
       if (requestCancellation === 'cleanup') {
         cleanups.get(`@${name}`)?.()
