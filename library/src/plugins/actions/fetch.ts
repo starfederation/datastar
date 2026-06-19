@@ -485,15 +485,20 @@ const fetchEventSource = (
     }
 
     let curRequestController: AbortController
-    const onVisibilityChange = () => {
-      curRequestController.abort() // close existing request on every visibility change
-      if (!document.hidden) {
-        const currentFetchInit = buildFetchEventSourceInit()
-        if (!currentFetchInit) return
 
-        input = currentFetchInit.input
-        rest.body = currentFetchInit.body
-        create()
+    const rebuildAndRetry = () => {
+      const currentFetchInit = buildFetchEventSourceInit()
+      if (!currentFetchInit) return
+
+      input = currentFetchInit.input
+      rest.body = currentFetchInit.body
+      create()
+    }
+
+    const onVisibilityChange = () => {
+      curRequestController.abort()
+      if (!document.hidden) {
+        rebuildAndRetry()
       }
     }
 
@@ -524,7 +529,7 @@ const fetchEventSource = (
       if (retries < retryMaxCount) {
         dispatchFetch(RETRYING, el, {})
         clearTimeout(retryTimer)
-        retryTimer = setTimeout(create, retryInterval)
+        retryTimer = setTimeout(rebuildAndRetry, retryInterval)
         retries++
         // Prepare the interval for the next retry (exponential backoff)
         retryInterval = Math.min(retryInterval * retryScaler, retryMaxWait)
