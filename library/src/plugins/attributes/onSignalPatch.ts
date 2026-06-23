@@ -29,25 +29,25 @@ attribute({
       filters = jsStrToObject(filtersRaw)
     }
 
-    let running = false
-
-    const callback: EventListener = modifyTiming(
+    const timedCallback = modifyTiming(
       (evt: CustomEvent<JSONPatch>) => {
-        if (running) return
-        const watched = filtered(filters, evt.detail)
-        if (!isEmpty(watched)) {
-          running = true
-          beginBatch()
-          try {
-            rx(watched)
-          } finally {
-            endBatch()
-            running = false
-          }
+        beginBatch()
+        try {
+          rx(evt.detail)
+        } finally {
+          endBatch()
         }
       },
       mods,
     )
+
+    const callback: EventListener = (evt: Event | CustomEvent<JSONPatch>) => {
+      // we know that evt is CustomEvent<JSONPatch>, but typescript doesn't
+      const watched = filtered(filters, (evt as CustomEvent<JSONPatch>).detail)
+      if (!isEmpty(watched)) {
+        timedCallback({...evt, detail: watched})
+      }
+    }
 
     document.addEventListener(DATASTAR_SIGNAL_PATCH_EVENT, callback)
     return () => {
