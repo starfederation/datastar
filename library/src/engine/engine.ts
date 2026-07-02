@@ -409,22 +409,22 @@ export const genRx = (
     // Each of these regex defines a block type we want to match
     // (importantly we ignore the content within these blocks):
     //
-    // regex            \/(\\\/|[^\/])*\/
-    // double quotes      "(\\"|[^\"])*"
-    // single quotes      '(\\'|[^'])*'
-    // ticks              `(\\`|[^`])*`
-    // iife               \(\s*((function)\s*\(\s*\)|(\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;)\{]*)\s*\)\s*\(\s*\)
+    // regex              \/(?:\\\/|[^\/])*\/
+    // double quotes      "(?:\\"|[^\"])*"
+    // single quotes      '(?:\\'|[^'])*'
+    // ticks              `(?:\\`|[^`])*`
+    // iife               \(\s*(?:(?:function)\s*\(\s*\)|(?:\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;)\{]*)\s*\)\s*\(\s*\)
     //
     // The iife support is (intentionally) limited. It only supports
     // function and arrow syntax with no arguments, and no nested IIFEs.
     //
     // We also want to match the non delimiter part of statements
     // note we only support ; statement delimiters:
-    //
     // [^;]
     //
+    // Optimized using non-capturing groups (?:...) to prevent unnecessary backtracking.
     const statementRe =
-      /(\/(\\\/|[^/])*\/|"(\\"|[^"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|\(\s*((function)\s*\(\s*\)|(\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm
+      /(?:\/(?:\\\/|[^/])*\/|"(?:\\"|[^"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|\(\s*(?:(?:function)\s*\(\s*\)|(?:\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm
     const statements = value.trim().match(statementRe)
     if (statements) {
       const lastIdx = statements.length - 1
