@@ -467,21 +467,24 @@ export const genRx = (
   // Skip replacements inside string/template literals.
   // Template interpolation support rewrites `${...}` only when braces are non-nested.
   expr = expr.replace(
-    /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\$]|\$(?!\{))*`)|\$\{([^{}]*)\}|\$([a-zA-Z_\d]\w*(?:[.-]\w+)*)/g,
-    (match, quoted, interpolationExpr, signalName) => {
-      if (quoted) return match
+    /(?:"[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*'|`[^`\\$]*(?:(?:\\.|\$(?!\{))[^`\\$]*)*`)|\$\{([^{}]*)\}|\$(\w+(?:[.-]\w+)*)/g,
+    (match, interpolationExpr, signalName) => {
+      // If `interpolationExpr` and `signalName` are both undefined, it means we matched a quoted string literal.
+      if (interpolationExpr === undefined && signalName === undefined) {
+        return match
+      }
+
+      const formatSignal = (name: string) =>
+        name.split('.').reduce((acc, part) => `${acc}['${part}']`, '$')
+
       if (interpolationExpr !== undefined) {
         return `\${${interpolationExpr.replace(
-          /\$([a-zA-Z_\d]\w*(?:[.-]\w+)*)/g,
-          (_: string, innerSignalName: string) =>
-            innerSignalName
-              .split('.')
-              .reduce((acc: string, part: string) => `${acc}['${part}']`, '$'),
+          /\$(\w+(?:[.-]\w+)*)/g,
+          (_: string, innerSignalName: string) => formatSignal(innerSignalName),
         )}}`
       }
-      return signalName
-        .split('.')
-        .reduce((acc: string, part: string) => `${acc}['${part}']`, '$')
+
+      return formatSignal(signalName!)
     },
   )
 
