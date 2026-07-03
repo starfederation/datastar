@@ -4,7 +4,13 @@
 
 import { attribute } from '@engine'
 import { DATASTAR_SIGNAL_PATCH_EVENT } from '@engine/consts'
-import { beginBatch, endBatch, filtered } from '@engine/signals'
+import {
+  beginBatch,
+  endBatch,
+  filtered,
+  startPeeking,
+  stopPeeking,
+} from '@engine/signals'
 import type { JSONPatch, SignalFilterOptions } from '@engine/types'
 import { isEmpty } from '@utils/paths'
 import { aliasify, jsStrToObject } from '@utils/text'
@@ -34,7 +40,10 @@ attribute({
     const callback: EventListener = modifyTiming(
       (evt: CustomEvent<JSONPatch>) => {
         if (running) return
+        // peek when getting the filtered signals because we don't want to subscribe to them, we just want to know which ones are being patched
+        startPeeking()
         const watched = filtered(filters, evt.detail)
+        stopPeeking()
         if (!isEmpty(watched)) {
           running = true
           beginBatch()
