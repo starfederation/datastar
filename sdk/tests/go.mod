@@ -1,12 +1,10 @@
 module github.com/starfederation/datastar/sdk/tests
 
-go 1.23.0
-
-toolchain go1.24.4
+go 1.25.0
 
 require (
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/net v0.38.0
+	golang.org/x/net v0.56.0
 )
 
 require (
