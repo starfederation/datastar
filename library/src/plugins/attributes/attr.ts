@@ -29,6 +29,8 @@ attribute({
       }
     }
 
+    let attributeFilter: string[] = [];
+
     const update = key
       ? () => {
           observer.disconnect()
@@ -41,7 +43,10 @@ attribute({
       : () => {
           observer.disconnect()
           const obj = rx() as Record<string, any>
-          const attributeFilter = Object.keys(obj)
+          for (const key of attributeFilter.filter(key => !obj.hasOwnProperty(key))) {
+            el.removeAttribute(key)
+          }
+          attributeFilter = Object.keys(obj);
           for (const key of attributeFilter) {
             syncAttr(key, obj[key])
           }
