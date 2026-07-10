@@ -67,7 +67,7 @@ const queuedEffects: (AlienEffect | undefined)[] = []
 let batchDepth = 0
 let notifyIndex = 0
 let queuedEffectsLength = 0
-let prevSub: ReactiveNode | undefined
+let subStack: Stack<ReactiveNode | undefined> | undefined
 let activeSub: ReactiveNode | undefined
 let version = 0
 
@@ -83,13 +83,16 @@ export const endBatch = (): void => {
 }
 
 export const startPeeking = (sub?: ReactiveNode): void => {
-  prevSub = activeSub
+  subStack = {
+    value_: activeSub,
+    prev_: subStack,
+  }
   activeSub = sub
 }
 
 export const stopPeeking = (): void => {
-  activeSub = prevSub
-  prevSub = undefined
+  activeSub = subStack?.value_
+  subStack = subStack?.prev_
 }
 
 export const signal = <T>(initialValue?: T): Signal<T> => {
