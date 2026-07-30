@@ -25,8 +25,11 @@ attribute({
     }
     let callback = (evt?: Event) => {
       beginBatch()
-      rx(evt)
-      endBatch()
+      try {
+        rx(evt)
+      } finally {
+        endBatch()
+      }
     }
     callback = modifyViewTransition(callback, mods)
     callback = modifyTiming(callback, mods)
