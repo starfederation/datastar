@@ -71,15 +71,19 @@ watcher({
       elements,
     }
 
-    if (useViewTransition && supportsViewTransitions()) {
-      let element: any = document.documentElement
+    if (useViewTransition) {
+      let target: Document | Element = document
       if (viewTransitionSelector) {
         const el = document.querySelector(viewTransitionSelector)
-        if (el && supportsViewTransitions(el)) {
-          element = el
+        if (el) {
+          target = el
         }
       }
-      element.startViewTransition(() => onPatchElements(ctx, patchElementsArgs))
+      if (supportsViewTransitions(target)) {
+        target.startViewTransition(() => onPatchElements(ctx, patchElementsArgs))
+      } else {
+        onPatchElements(ctx, patchElementsArgs)
+      }
     } else {
       onPatchElements(ctx, patchElementsArgs)
     }
