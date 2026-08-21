@@ -1,9 +1,4 @@
-import {
-  DATASTAR_FETCH_EVENT,
-  DATASTAR_READY_EVENT,
-  DSP,
-  DSS,
-} from '@engine/consts'
+import { DATASTAR_FETCH_EVENT, DATASTAR_READY_EVENT } from '@engine/consts'
 import { root } from '@engine/signals'
 import type {
   ActionContext,
@@ -438,17 +433,6 @@ export const genRx = (
     expr = value.trim()
   }
 
-  // Ignore any escaped values
-  const escaped = new Map<string, string>()
-  const escapeRe = RegExp(`(?:${DSP})(.*?)(?:${DSS})`, 'gm')
-  let counter = 0
-  for (const match of expr.matchAll(escapeRe)) {
-    const k = match[1]
-    const v = `__escaped${counter++}`
-    escaped.set(v, k)
-    expr = expr.replace(DSP + k + DSS, v)
-  }
-
   // Replace signal references with bracket notation
   // Examples:
   //   $count          -> $['count']
@@ -489,11 +473,6 @@ export const genRx = (
   )
 
   expr = expr.replaceAll(/@([A-Za-z_$][\w$]*)\(/g, '__action("$1",evt,')
-
-  // Replace any escaped values
-  for (const [k, v] of escaped) {
-    expr = expr.replace(k, v)
-  }
 
   try {
     const fn = Function('el', '$', '__action', 'evt', ...argNames, expr)

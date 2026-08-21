@@ -39,4 +39,4 @@ Read the [Getting Started Guide »](https://data-star.dev/guide/getting_started)
 
 Read the [Contribution Guidelines »](https://github.com/starfederation/datastar/blob/develop/CONTRIBUTING.md)
 
-[![Star History Chart](https://api.star-history.com/svg?repos=starfederation/datastar&type=Date)](https://www.star-history.com/#starfederation/datastar&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=starfederation/datastar&type=Date)](https://star-history.dera.page/#starfederation/datastar&Date)

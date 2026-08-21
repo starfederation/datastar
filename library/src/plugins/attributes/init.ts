@@ -17,8 +17,11 @@ attribute({
   apply({ rx, mods }) {
     let callback = () => {
       beginBatch()
-      rx()
-      endBatch()
+      try {
+        rx()
+      } finally {
+        endBatch()
+      }
     }
     callback = modifyViewTransition(callback, mods)
     let wait = 0
