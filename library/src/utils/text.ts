@@ -1,3 +1,4 @@
+import { compileExpression } from '@engine/csp'
 import type { Modifiers } from '@engine/types'
 
 export const kebab = (str: string): string =>
@@ -20,12 +21,18 @@ export const pascal = (str: string): string =>
 export const title = (str: string): string =>
   str.replace(/\b\w/g, (char) => char.toUpperCase())
 
+export const isStringTrue = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim() === 'true'
+
 const RE_FUNCTION_LITERAL =
   /^(?:(?:async\s+)?function\b|(?:async\s*)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>)/
 
 type JsStrToObjectOptions = {
   reviveFunctionStrings?: boolean
 }
+
+const evaluate = (source: string): any =>
+  compileExpression([], `return (${source})`)()
 
 export const jsStrToObject = (
   raw: string,
@@ -39,7 +46,7 @@ export const jsStrToObject = (
       const trimmed = value.trim()
       if (!RE_FUNCTION_LITERAL.test(trimmed)) return value
       try {
-        const revived = Function(`return (${trimmed})`)()
+        const revived = evaluate(trimmed)
         return typeof revived === 'function' ? revived : value
       } catch {
         return value
@@ -48,7 +55,7 @@ export const jsStrToObject = (
   } catch {
     // If JSON parsing fails, try to evaluate as a JavaScript object
     // This is less safe and should be used with caution
-    return Function(`return (${raw})`)()
+    return evaluate(raw)
   }
 }
 

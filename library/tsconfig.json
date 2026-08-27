@@ -15,6 +15,7 @@
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
         "declaration": true,
+        "rootDir": ".",
         "outDir": "dist",
         "paths": {
             "@engine": ["./src/engine/engine.ts"],
@@ -24,5 +25,5 @@
             "@utils/*": ["./src/utils/*"]
         }
     },
-    "include": ["src/**/*.ts", "src/**/*.js"]
+    "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.d.ts"]
 }

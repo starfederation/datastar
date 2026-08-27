@@ -3,6 +3,7 @@
 // Description: Binds the text content of an element to an expression.
 
 import { attribute } from '@engine'
+import { MutationObserverClass } from '@engine/consts'
 import { effect } from '@engine/signals'
 
 attribute({
@@ -23,7 +24,7 @@ attribute({
       })
     }
 
-    const observer = new MutationObserver(update)
+    const observer = new MutationObserverClass(update)
     const cleanup = effect(update)
 
     return () => {

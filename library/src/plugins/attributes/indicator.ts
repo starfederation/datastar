@@ -3,7 +3,7 @@
 // Description: Creates a signal and sets its value to `true` while an SSE request request is in flight, otherwise `false`.
 
 import { attribute } from '@engine'
-import { DATASTAR_FETCH_EVENT } from '@engine/consts'
+import { DATASTAR_FETCH_EVENT, DOCUMENT } from '@engine/consts'
 import { mergePaths } from '@engine/signals'
 import type { DatastarFetchEvent } from '@engine/types'
 import { FINISHED, STARTED } from '@plugins/actions/fetch'
@@ -34,11 +34,11 @@ attribute({
           break
       }
     }) as EventListener
-    document.addEventListener(DATASTAR_FETCH_EVENT, watcher)
+    DOCUMENT.addEventListener(DATASTAR_FETCH_EVENT, watcher)
     return () => {
       activeFetches = 0
       mergePaths([[signalName, false]])
-      document.removeEventListener(DATASTAR_FETCH_EVENT, watcher)
+      DOCUMENT.removeEventListener(DATASTAR_FETCH_EVENT, watcher)
     }
   },
 })

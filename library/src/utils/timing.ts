@@ -6,9 +6,7 @@ export const delay = (
   wait: number,
 ): EventCallbackHandler => {
   return (...args: any[]) => {
-    setTimeout(() => {
-      callback(...args)
-    }, wait)
+    setTimeout(callback, wait, ...args)
   }
 }
 
@@ -57,16 +55,16 @@ export const modifyTiming = (
   const debounceArgs = mods.get('debounce')
   if (debounceArgs) {
     const wait = tagToMs(debounceArgs)
-    const leading = tagHas(debounceArgs, 'leading', false)
-    const trailing = !tagHas(debounceArgs, 'notrailing', false)
+    const leading = tagHas(debounceArgs, 'leading')
+    const trailing = !tagHas(debounceArgs, 'notrailing')
     callback = throttle(callback, wait, leading, trailing, true)
   }
 
   const throttleArgs = mods.get('throttle')
   if (throttleArgs) {
     const wait = tagToMs(throttleArgs)
-    const leading = !tagHas(throttleArgs, 'noleading', false)
-    const trailing = tagHas(throttleArgs, 'trailing', false)
+    const leading = !tagHas(throttleArgs, 'noleading')
+    const trailing = tagHas(throttleArgs, 'trailing')
     callback = throttle(callback, wait, leading, trailing)
   }
 

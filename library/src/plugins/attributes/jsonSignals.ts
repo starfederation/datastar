@@ -3,6 +3,7 @@
 // Description: Sets the text content of an element to a reactive JSON stringified version of signals.
 
 import { attribute } from '@engine'
+import { MutationObserverClass } from '@engine/consts'
 import { effect, filtered } from '@engine/signals'
 import type { SignalFilterOptions } from '@engine/types'
 import { jsStrToObject } from '@utils/text'
@@ -28,7 +29,7 @@ attribute({
         subtree: true,
       })
     }
-    const observer = new MutationObserver(callback)
+    const observer = new MutationObserverClass(callback)
     const cleanup = effect(callback)
 
     return () => {

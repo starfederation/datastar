@@ -3,7 +3,12 @@
 // Description: Creates a signal (if one doesn’t already exist) and sets up two-way data binding between it and an element’s value.
 
 import { attribute } from '@engine'
-import { DATASTAR_PROP_CHANGE_EVENT } from '@engine/consts'
+import {
+  DATASTAR_PROP_CHANGE_EVENT,
+  DOCUMENT,
+  HTMLInput,
+  MutationObserverClass,
+} from '@engine/consts'
 import { effect, getPath, mergePaths } from '@engine/signals'
 import type { Paths } from '@engine/types'
 import { hasOwn } from '@utils/polyfills'
@@ -16,40 +21,72 @@ type SignalFile = {
 }
 
 type BindAdapter = {
-  get: (el: any, type: string) => any
-  set: (el: any, value: any) => void
-  events: string[]
+  get_: (el: any, type: string) => any
+  set_: (el: any, value: any) => void
+  events_: string[]
 }
 
 const propAdapter = (prop: string, ...events: string[]): BindAdapter => ({
-  get: (el: any) => el[prop],
-  set: (el: any, value: any) => {
+  get_: (el: any) => el[prop],
+  set_: (el: any, value: any) => {
     el[prop] = value
   },
-  events,
+  events_: events,
 })
 
 const attrAdapter = (attr: string, ...events: string[]): BindAdapter => ({
-  get: (el: Element) => el.getAttribute(attr),
-  set: (el: Element, value: any) => {
+  get_: (el: Element) => el.getAttribute(attr),
+  set_: (el: Element, value: any) => {
     el.setAttribute(attr, `${value}`)
   },
-  events,
+  events_: events,
 })
 
 const valueAdapter = (
   treatUndefinedAsString = false,
   ...events: string[]
 ): BindAdapter => ({
-  get: (el: HTMLInputElement | HTMLSelectElement, type: string) =>
+  get_: (el: HTMLInputElement | HTMLSelectElement, type: string) =>
     type === 'string' || (treatUndefinedAsString && type === 'undefined')
       ? el.value
       : +el.value,
-  set: (el: HTMLInputElement | HTMLSelectElement, value: string | number) => {
+  set_: (el: HTMLInputElement | HTMLSelectElement, value: string | number) => {
     el.value = `${value}`
   },
-  events,
+  events_: events,
 })
+
+const selectAdapter = (): BindAdapter => {
+  const numbers = new Set<string>()
+  return {
+    get_: (el: HTMLSelectElement, type: string) =>
+      el.multiple
+        ? [...el.selectedOptions].map((option) =>
+            numbers.has(option.value) ? +option.value : option.value,
+          )
+        : type === 'string' || type === 'undefined'
+          ? el.value
+          : +el.value,
+    set_: (el: HTMLSelectElement, value: any) => {
+      if (!el.multiple) {
+        el.value = `${value}`
+        return
+      }
+      for (const option of el.options) {
+        if (value.includes(option.value)) {
+          numbers.delete(option.value)
+          option.selected = true
+        } else if (value.includes(+option.value)) {
+          numbers.add(option.value)
+          option.selected = true
+        } else {
+          option.selected = false
+        }
+      }
+    },
+    events_: ['change'],
+  }
+}
 
 const dataURIRegex = /^data:(?<mime>[^;]+);base64,(?<contents>.*)$/
 const empty = Symbol('empty')
@@ -68,12 +105,12 @@ const boundPath = (
     : `[${rawAttribute}="${CSS.escape(signalName)}"]`
   if (
     initialValue === undefined &&
-    el instanceof HTMLInputElement &&
+    el instanceof HTMLInput &&
     el.type === 'radio'
   ) {
-    const checked = [...document.querySelectorAll(selector)].find(
+    const checked = [...DOCUMENT.querySelectorAll(selector)].find(
       (input): input is HTMLInputElement =>
-        input instanceof HTMLInputElement && input.checked,
+        input instanceof HTMLInput && input.checked,
     )
     // Missing radio binds adopt the checked option.
     if (checked) {
@@ -85,13 +122,13 @@ const boundPath = (
     !Array.isArray(initialValue) ||
     (el instanceof HTMLSelectElement && el.multiple)
   ) {
-    mergePaths([[signalName, adapter.get(el, typeof initialValue)]], {
+    mergePaths([[signalName, adapter.get_(el, typeof initialValue)]], {
       ifMissing: true,
     })
     return signalName
   }
 
-  const inputs = document.querySelectorAll(selector) as NodeListOf<Element>
+  const inputs = DOCUMENT.querySelectorAll(selector) as NodeListOf<Element>
 
   const paths: Paths = []
   let i = 0
@@ -99,7 +136,7 @@ const boundPath = (
     // Missing proxy slots materialize as '', which breaks `ifMissing`.
     paths.push([
       `${signalName}.${i}`,
-      adapter.get(
+      adapter.get_(
         input,
         typeof (hasOwn(initialValue, i) ? initialValue[i] : undefined),
       ),
@@ -123,7 +160,7 @@ attribute({
     const events = mods.get('event')
     let adapter: BindAdapter | null = null
 
-    if (el instanceof HTMLInputElement) {
+    if (el instanceof HTMLInput) {
       switch (el.type) {
         case 'range':
         case 'number':
@@ -131,7 +168,7 @@ attribute({
           break
         case 'checkbox':
           adapter = {
-            get: (el: HTMLInputElement, type: string) => {
+            get_: (el: HTMLInputElement, type: string) => {
               if (el.value !== 'on') {
                 return type === 'boolean'
                   ? el.checked
@@ -145,11 +182,11 @@ attribute({
                   : ''
                 : el.checked
             },
-            set: (el: HTMLInputElement, value: string | boolean) => {
+            set_: (el: HTMLInputElement, value: string | boolean) => {
               el.checked =
                 typeof value === 'string' ? value === el.value : value
             },
-            events: ['input'],
+            events_: ['input'],
           }
           break
         case 'radio':
@@ -157,13 +194,13 @@ attribute({
             el.setAttribute('name', signalName)
           }
           adapter = {
-            get: (el: HTMLInputElement, type: string) =>
+            get_: (el: HTMLInputElement, type: string) =>
               el.checked ? (type === 'number' ? +el.value : el.value) : empty,
-            set: (el: HTMLInputElement, value: string | number) => {
+            set_: (el: HTMLInputElement, value: string | number) => {
               el.checked =
                 value === (typeof value === 'number' ? +el.value : el.value)
             },
-            events: ['input'],
+            events_: ['input'],
           }
           break
         case 'file': {
@@ -210,33 +247,8 @@ attribute({
         default:
           adapter = valueAdapter(true, 'input')
       }
-    } else if (el instanceof HTMLSelectElement && el.multiple) {
-      const typeMap = new Map<string, string>()
-      adapter = {
-        get: (el: HTMLSelectElement) =>
-          [...el.selectedOptions].map((option) => {
-            const type = typeMap.get(option.value)
-            return type === 'string' || type == null
-              ? option.value
-              : +option.value
-          }),
-        set: (el: HTMLSelectElement, value: (string | number)[]) => {
-          for (const option of el.options) {
-            if (value.includes(option.value)) {
-              typeMap.set(option.value, 'string')
-              option.selected = true
-            } else if (value.includes(+option.value)) {
-              typeMap.set(option.value, 'number')
-              option.selected = true
-            } else {
-              option.selected = false
-            }
-          }
-        },
-        events: ['change'],
-      }
     } else if (el instanceof HTMLSelectElement) {
-      adapter = valueAdapter(true, 'change')
+      adapter = selectAdapter()
     } else if (el instanceof HTMLTextAreaElement) {
       adapter = propAdapter('value', 'input')
     } else if (el instanceof HTMLElement && el.tagName.includes('-')) {
@@ -257,42 +269,58 @@ attribute({
     if (props && !firstProp) throw error('BindPropNameMissing')
     if (firstProp) {
       const prop = camel(firstProp)
-      adapter = propAdapter(prop, ...(events ? [...events] : adapter.events))
+      adapter = propAdapter(prop, ...(events ? [...events] : adapter.events_))
     } else if (events) {
-      adapter.events = [...events]
+      adapter.events_ = [...events]
     }
 
-    const initialValue = getPath(signalName)
-    const path = boundPath(
+    let path = boundPath(
       el,
       key,
       rawKey,
       signalName,
       adapter,
-      initialValue,
+      getPath(signalName),
     )
-
     const syncSignal = () => {
       const signalValue = getPath(path)
       if (signalValue != null) {
-        const value = adapter.get(el, typeof signalValue)
+        const value = adapter.get_(el, typeof signalValue)
         if (value !== empty) {
           mergePaths([[path, value]])
         }
       }
     }
+    const syncElement = () => {
+      adapter.set_(el, getPath(path))
+    }
 
-    for (const eventName of adapter.events) {
+    for (const eventName of adapter.events_) {
       el.addEventListener(eventName, syncSignal)
     }
     el.addEventListener(DATASTAR_PROP_CHANGE_EVENT, syncSignal)
-    const cleanup = effect(() => {
-      adapter.set(el, getPath(path))
-    })
+    let cleanup = effect(syncElement)
+    const multipleObserver =
+      el instanceof HTMLSelectElement
+        ? new MutationObserverClass(() => {
+            cleanup()
+            path = boundPath(
+              el,
+              key,
+              rawKey,
+              signalName,
+              adapter,
+              getPath(signalName),
+            )
+            cleanup = effect(syncElement)
+          })
+        : null
+    multipleObserver?.observe(el, { attributeFilter: ['multiple'] })
 
     return () => {
+      multipleObserver?.disconnect()
       cleanup()
-      for (const eventName of adapter.events) {
+      for (const eventName of adapter.events_) {
         el.removeEventListener(eventName, syncSignal)
       }
       el.removeEventListener(DATASTAR_PROP_CHANGE_EVENT, syncSignal)

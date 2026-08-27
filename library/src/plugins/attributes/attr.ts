@@ -3,6 +3,7 @@
 // Description: Sets the value of any HTML attribute to an expression, and keeps it in sync.
 
 import { attribute } from '@engine'
+import { MutationObserverClass } from '@engine/consts'
 import { effect } from '@engine/signals'
 
 attribute({
@@ -50,7 +51,7 @@ attribute({
           })
         }
 
-    const observer = new MutationObserver(update)
+    const observer = new MutationObserverClass(update)
     const cleanup = effect(update)
 
     return () => {

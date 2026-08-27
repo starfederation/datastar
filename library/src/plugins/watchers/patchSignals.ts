@@ -4,7 +4,7 @@
 
 import { watcher } from '@engine'
 import { mergePatch } from '@engine/signals'
-import { jsStrToObject } from '@utils/text'
+import { isStringTrue, jsStrToObject } from '@utils/text'
 
 watcher({
   name: 'datastar-patch-signals',
@@ -13,8 +13,7 @@ watcher({
       throw error('PatchSignalsExpectedSignals')
     }
 
-    const ifMissing =
-      typeof onlyIfMissing === 'string' && onlyIfMissing.trim() === 'true'
+    const ifMissing = isStringTrue(onlyIfMissing)
     mergePatch(jsStrToObject(signals), { ifMissing })
   },
 })

@@ -6,16 +6,14 @@ import { watcher } from '@engine'
 import {
   DATASTAR_PROP_CHANGE_EVENT,
   DATASTAR_SCOPE_CHILDREN_EVENT,
+  DOCUMENT,
+  HTMLInput,
 } from '@engine/consts'
+import { createHTML, prepareScript } from '@engine/csp'
 import type { WatcherArgsValue, WatcherContext } from '@engine/types'
 import { isHTMLOrSVG } from '@utils/dom'
-import { aliasify } from '@utils/text'
+import { aliasify, isStringTrue } from '@utils/text'
 import { supportsViewTransitions } from '@utils/view-transitions'
-
-const isValidType = <T extends readonly string[]>(
-  arr: T,
-  value: string,
-): value is T[number] => (arr as readonly string[]).includes(value)
 
 const PATCH_MODES = [
   'remove',
@@ -33,10 +31,10 @@ const NAMESPACES = ['html', 'svg', 'mathml'] as const
 type Namespace = (typeof NAMESPACES)[number]
 
 type PatchElementsArgs = {
-  selector: string
-  mode: PatchElementsMode
-  namespace: Namespace
-  elements: WatcherArgsValue
+  selector_: string
+  mode_: PatchElementsMode
+  namespace_: Namespace
+  elements_: WatcherArgsValue
 }
 
 watcher({
@@ -46,13 +44,12 @@ watcher({
     const mode = typeof args.mode === 'string' ? args.mode : 'outer'
     const namespace =
       typeof args.namespace === 'string' ? args.namespace : 'html'
-    const useViewTransition =
-      typeof args.useViewTransition === 'string' && args.useViewTransition.trim() === 'true'
+    const useViewTransition = isStringTrue(args.useViewTransition)
     const viewTransitionSelector =
       typeof args.viewTransitionSelector === 'string' ? args.viewTransitionSelector : ''
     const elements = args.elements
 
-    if (!isValidType(PATCH_MODES, mode)) {
+    if (!PATCH_MODES.includes(mode as PatchElementsMode)) {
       throw ctx.error('PatchElementsInvalidMode', { mode })
     }
 
@@ -60,21 +57,27 @@ watcher({
       throw ctx.error('PatchElementsExpectedSelector')
     }
 
-    if (!isValidType(NAMESPACES, namespace)) {
+    if (!NAMESPACES.includes(namespace as Namespace)) {
       throw ctx.error('PatchElementsInvalidNamespace', { namespace })
     }
 
     const patchElementsArgs: PatchElementsArgs = {
-      selector,
-      mode,
-      namespace,
-      elements,
+      selector_: selector,
+      mode_: mode,
+      namespace_: namespace,
+      elements_: elements,
     }
 
     if (useViewTransition) {
+<<<<<<< Updated upstream
       let target: Document | Element = document
       if (viewTransitionSelector) {
         const el = document.querySelector(viewTransitionSelector)
+=======
+      let target: Document | Element = DOCUMENT
+      if (viewTransitionSelector) {
+        const el = DOCUMENT.querySelector(viewTransitionSelector)
+>>>>>>> Stashed changes
         if (el) {
           target = el
         }
@@ -92,9 +95,14 @@ watcher({
 
 const onPatchElements = (
   { error }: WatcherContext,
-  { selector, mode, namespace, elements }: PatchElementsArgs,
+  {
+    selector_: selector,
+    mode_: mode,
+    namespace_: namespace,
+    elements_: elements,
+  }: PatchElementsArgs,
 ) => {
-  let newContent = document.createDocumentFragment()
+  let newContent = DOCUMENT.createDocumentFragment()
   let consume = typeof elements !== 'string' && !!elements
 
   if (typeof elements === 'string') {
@@ -112,10 +120,12 @@ const onPatchElements = (
       ? `<${wrapperTag}>${elements}</${wrapperTag}>`
       : elements
 
-    const newDocument = new DOMParser().parseFromString(
+    const html =
       hasHtml || hasHead || hasBody
         ? elements
-        : `<body><template>${wrappedEls}</template></body>`,
+        : `<body><template>${wrappedEls}</template></body>`
+    const newDocument = new DOMParser().parseFromString(
+      createHTML(html),
       'text/html',
     )
 
@@ -151,13 +161,13 @@ const onPatchElements = (
     for (const child of children) {
       let target: Element
       if (child instanceof HTMLHtmlElement) {
-        target = document.documentElement
+        target = DOCUMENT.documentElement
       } else if (child instanceof HTMLBodyElement) {
-        target = document.body
+        target = DOCUMENT.body
       } else if (child instanceof HTMLHeadElement) {
-        target = document.head
+        target = DOCUMENT.head
       } else {
-        target = document.getElementById(child.id)!
+        target = DOCUMENT.getElementById(child.id)!
         if (!target) {
           console.warn(error('PatchElementsNoTargetsFound'), {
             element: { id: child.id },
@@ -170,7 +180,7 @@ const onPatchElements = (
       applyToTargets(mode as PatchElementsMode, child, [target], true)
     }
   } else {
-    const targets = document.querySelectorAll(selector)
+    const targets = DOCUMENT.querySelectorAll(selector)
     if (!targets.length) {
       console.warn(error('PatchElementsNoTargetsFound'), { selector })
       return
@@ -188,7 +198,7 @@ const onPatchElements = (
 }
 
 const scripts = new WeakSet<HTMLScriptElement>()
-for (const script of document.querySelectorAll('script')) {
+for (const script of DOCUMENT.querySelectorAll('script')) {
   scripts.add(script)
 }
 
@@ -199,11 +209,11 @@ const execute = (target: Element): void => {
       : target.querySelectorAll('script')
   for (const old of elScripts) {
     if (!scripts.has(old)) {
-      const script = document.createElement('script')
+      const script = DOCUMENT.createElement('script')
       for (const { name, value } of old.attributes) {
         script.setAttribute(name, value)
       }
-      script.text = old.text
+      prepareScript(script, old.text)
       old.replaceWith(script)
       scripts.add(script)
     }
@@ -279,7 +289,7 @@ const ctxIdMap = new Map<Node, Set<string>>()
 const ctxPersistentIds = new Set<string>()
 const oldIdTagNameMap = new Map<string, string>()
 const duplicateIds = new Set<string>()
-const ctxPantry = document.createElement('div')
+const ctxPantry = DOCUMENT.createElement('div')
 ctxPantry.hidden = true
 
 const aliasedIgnoreMorph = aliasify('ignore-morph')
@@ -299,9 +309,9 @@ export const morph = (
     return
   }
 
-  const normalizedElt = document.createElement('div')
+  const normalizedElt = DOCUMENT.createElement('div')
   normalizedElt.append(newContent)
-  document.body.insertAdjacentElement('afterend', ctxPantry)
+  DOCUMENT.body.insertAdjacentElement('afterend', ctxPantry)
 
   // Computes the set of IDs that persist between the two contents excluding duplicates
   const oldIdElements = oldElt.querySelectorAll('[id]')
@@ -399,7 +409,7 @@ const morphChildren = (
     if (newChild instanceof Element && ctxPersistentIds.has(newChild.id)) {
       // move it and all its children here and morph, will always be found
       // Search for an element by ID within the document and pantry, and move it using moveBefore.
-      const movedChild = document.getElementById(newChild.id) as Element
+      const movedChild = DOCUMENT.getElementById(newChild.id) as Element
 
       // Removes an element from its ancestors' ID maps.
       // This is needed when an element is moved from the "future" via `moveBeforeId`.
@@ -430,14 +440,14 @@ const morphChildren = (
       const tagName = (newChild as Element).tagName
       const newEmptyChild =
         namespaceURI && namespaceURI !== 'http://www.w3.org/1999/xhtml'
-          ? document.createElementNS(namespaceURI, tagName)
-          : document.createElement(tagName)
+          ? DOCUMENT.createElementNS(namespaceURI, tagName)
+          : DOCUMENT.createElement(tagName)
       oldParent.insertBefore(newEmptyChild, insertionPoint)
       morphNode(newEmptyChild, newChild)
       insertionPoint = newEmptyChild.nextSibling
     } else {
       // optimization: no id state to preserve so we can just insert a clone of the newChild and its descendants
-      const newClonedChild = document.importNode(newChild, true) // importNode to not mutate newParent
+      const newClonedChild = DOCUMENT.importNode(newChild, true) // importNode to not mutate newParent
       oldParent.insertBefore(newClonedChild, insertionPoint)
       insertionPoint = newClonedChild.nextSibling
     }
@@ -622,8 +632,8 @@ const morphNode = (
 
     let shouldDispatchPropChangeEvent = false
     if (
-      oldElt instanceof HTMLInputElement &&
-      newElt instanceof HTMLInputElement &&
+      oldElt instanceof HTMLInput &&
+      newElt instanceof HTMLInput &&
       newElt.type !== 'file'
     ) {
       // Modify the value only if the new element’s value attribute is different from the old element’s value attribute
@@ -692,7 +702,7 @@ const morphNode = (
       oldElt instanceof HTMLTemplateElement &&
       newElt instanceof HTMLTemplateElement
     ) {
-      oldElt.innerHTML = newElt.innerHTML
+      oldElt.innerHTML = createHTML(newElt.innerHTML)
     } else if (!oldElt.isEqualNode(newElt)) {
       morphChildren(oldElt, newElt)
     }

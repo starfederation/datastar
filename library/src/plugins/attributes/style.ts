@@ -3,6 +3,7 @@
 // Description: Sets CSS styles on an element using either key-based or object syntax, and keeps them in sync with reactive signals.
 
 import { attribute } from '@engine'
+import { MutationObserverClass } from '@engine/consts'
 import { effect } from '@engine/signals'
 import { kebab } from '@utils/text'
 
@@ -53,7 +54,7 @@ attribute({
       observer.observe(el, { attributeFilter: ['style'] })
     }
 
-    const observer = new MutationObserver(update)
+    const observer = new MutationObserverClass(update)
     const cleanup = effect(update)
 
     return () => {

@@ -3,6 +3,7 @@
 // Description: Adds or removes a class to or from an element based on an expression.
 
 import { attribute } from '@engine'
+import { MutationObserverClass } from '@engine/consts'
 import { effect } from '@engine/signals'
 import { modifyCasing } from '@utils/text'
 
@@ -43,7 +44,7 @@ attribute({
       observer.observe(el, { attributeFilter: ['class'] })
     }
 
-    const observer = new MutationObserver(callback)
+    const observer = new MutationObserverClass(callback)
     const cleanup = effect(callback)
 
     return () => {

@@ -1,4 +1,10 @@
-import { DATASTAR_FETCH_EVENT, DATASTAR_READY_EVENT } from '@engine/consts'
+import {
+  DATASTAR_FETCH_EVENT,
+  DATASTAR_READY_EVENT,
+  DOCUMENT,
+  MutationObserverClass,
+} from '@engine/consts'
+import { compileExpression } from '@engine/csp'
 import { root } from '@engine/signals'
 import type {
   ActionContext,
@@ -72,7 +78,7 @@ export const attribute = <R extends Requirement, B extends boolean>(
       queuedAttributes.length = 0
       const roots = observedRoots.size
         ? [...observedRoots]
-        : [document.documentElement]
+        : [DOCUMENT.documentElement]
       for (const root of roots) {
         applyQueued(root, !observedRoots.has(root))
       }
@@ -85,7 +91,7 @@ export const action = <T>(plugin: ActionPlugin<T>): void => {
   actionPlugins.set(plugin.name, plugin)
 }
 
-document.addEventListener(DATASTAR_FETCH_EVENT, ((
+DOCUMENT.addEventListener(DATASTAR_FETCH_EVENT, ((
   evt: CustomEvent<DatastarFetchEvent>,
 ) => {
   const plugin = watcherPlugins.get(evt.detail.type)
@@ -198,7 +204,7 @@ const observe = (mutations: MutationRecord[]) => {
 }
 
 // TODO: mutation observer per root so applying to web component doesnt overwrite main observer
-const mutationObserver = new MutationObserver(observe)
+const mutationObserver = new MutationObserverClass(observe)
 
 export const parseAttributeKey = (
   rawKey: string,
@@ -220,16 +226,16 @@ export const parseAttributeKey = (
 }
 
 export const isDocumentObserverActive = () =>
-  observedRoots.has(document.documentElement)
+  observedRoots.has(DOCUMENT.documentElement)
 
 const dispatchDatastarReady = () => {
   if (datastarReadyDispatched || !isDocumentObserverActive()) return
   datastarReadyDispatched = true
-  document.dispatchEvent(new Event(DATASTAR_READY_EVENT))
+  DOCUMENT.dispatchEvent(new Event(DATASTAR_READY_EVENT))
 }
 
 const applyQueued = (
-  root: HTMLOrSVG | ShadowRoot = document.documentElement,
+  root: HTMLOrSVG | ShadowRoot = DOCUMENT.documentElement,
   observeRoot = true,
 ): void => {
   if (isHTMLOrSVG(root)) {
@@ -249,7 +255,7 @@ const applyQueued = (
 }
 
 export const apply = (
-  root: HTMLOrSVG | ShadowRoot = document.documentElement,
+  root: HTMLOrSVG | ShadowRoot = DOCUMENT.documentElement,
   observeRoot = true,
 ): void => {
   if (isHTMLOrSVG(root)) {
@@ -350,9 +356,9 @@ const applyAttributePlugin = (
       ctx.rx = (...args: any[]) => {
         if (!cachedRx) {
           cachedRx = genRx(value, {
-            returnsValue: plugin.returnsValue,
-            argNames: plugin.argNames,
-            cleanups,
+            returnsValue_: plugin.returnsValue,
+            argNames_: plugin.argNames,
+            cleanups_: cleanups,
           })
         }
         return cachedRx(el, ...args)
@@ -381,19 +387,24 @@ const applyAttributePlugin = (
 }
 
 type GenRxOptions = {
-  returnsValue?: boolean
-  argNames?: string[]
-  cleanups?: Map<string, () => void>
+  returnsValue_?: boolean
+  argNames_?: string[]
+  cleanups_?: Map<string, () => void>
 }
 
 type GenRxFn = <T>(el: HTMLOrSVG, ...args: any[]) => T
 
+const signalPath = (name: string): string =>
+  name
+    .split('.')
+    .reduce((path, part) => `${path}['${part}']`, '$')
+
 export const genRx = (
   value: string,
   {
-    returnsValue = false,
-    argNames = [],
-    cleanups = new Map(),
+    returnsValue_: returnsValue = false,
+    argNames_: argNames = [],
+    cleanups_: cleanups = new Map(),
   }: GenRxOptions = {},
 ): GenRxFn => {
   let expr = ''
@@ -458,24 +469,24 @@ export const genRx = (
         return match
       }
 
-      const formatSignal = (name: string) =>
-        name.split('.').reduce((acc, part) => `${acc}['${part}']`, '$')
-
       if (interpolationExpr !== undefined) {
         return `\${${interpolationExpr.replace(
           /\$(\w+(?:[.-]\w+)*)/g,
-          (_: string, innerSignalName: string) => formatSignal(innerSignalName),
+          (_: string, innerSignalName: string) => signalPath(innerSignalName),
         )}}`
       }
 
-      return formatSignal(signalName!)
+      return signalPath(signalName!)
     },
   )
 
   expr = expr.replaceAll(/@([A-Za-z_$][\w$]*)\(/g, '__action("$1",evt,')
 
   try {
-    const fn = Function('el', '$', '__action', 'evt', ...argNames, expr)
+    const fn = compileExpression(
+      ['el', '$', '__action', 'evt', ...argNames],
+      expr,
+    )
     return (el: HTMLOrSVG, ...args: any[]) => {
       const action = (name: string, evt: Event | undefined, ...args: any[]) => {
         const err = error.bind(0, {

@@ -6,6 +6,7 @@ import { attribute } from '@engine'
 import {
   DATASTAR_FETCH_EVENT,
   DATASTAR_SIGNAL_PATCH_EVENT,
+  DOCUMENT,
 } from '@engine/consts'
 import { beginBatch, endBatch } from '@engine/signals'
 import { modifyCasing } from '@utils/text'
@@ -21,7 +22,7 @@ attribute({
     if (mods.has('window')) {
       target = window
     } else if (mods.has('document')) {
-      target = document
+      target = DOCUMENT
     }
     let callback = (evt?: Event) => {
       beginBatch()
@@ -40,7 +41,7 @@ attribute({
       once: mods.has('once'),
     }
     if (mods.has('outside')) {
-      target = document
+      target = DOCUMENT
       const cb = callback
       callback = (evt?: Event) => {
         if (!el.contains(evt?.target as HTMLElement)) {
@@ -53,7 +54,7 @@ attribute({
       eventName === DATASTAR_FETCH_EVENT ||
       eventName === DATASTAR_SIGNAL_PATCH_EVENT
     ) {
-      target = document
+      target = DOCUMENT
     }
     // Apply event-side effects before timing/view-transition wrappers run.
     const listener = (evt?: Event) => {

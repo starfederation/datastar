@@ -1,4 +1,4 @@
-import { DATASTAR_SIGNAL_PATCH_EVENT } from '@engine/consts'
+import { DATASTAR_SIGNAL_PATCH_EVENT, DOCUMENT } from '@engine/consts'
 import type {
   Computed,
   Effect,
@@ -54,11 +54,11 @@ interface AlienEffect extends ReactiveNode {
 
 interface AlienComputed<T = unknown> extends ReactiveNode {
   value_?: T
-  getter(previousValue?: T): T
+  getter_(previousValue?: T): T
 }
 
 interface AlienSignal<T = unknown> extends ReactiveNode {
-  previousValue: T
+  previousValue_: T
   value_: T
 }
 
@@ -97,7 +97,7 @@ export const stopPeeking = (): void => {
 
 export const signal = <T>(initialValue?: T): Signal<T> => {
   return signalOper.bind(0, {
-    previousValue: initialValue,
+    previousValue_: initialValue,
     value_: initialValue,
     flags_: 1 satisfies ReactiveFlags.Mutable,
   }) as Signal<T>
@@ -107,7 +107,7 @@ const computedSymbol = Symbol('computed')
 export const computed = <T>(getter: (previousValue?: T) => T): Computed<T> => {
   const c = computedOper.bind(0, {
     flags_: 17 as ReactiveFlags.Mutable | ReactiveFlags.Dirty,
-    getter,
+    getter_: getter,
   }) as Computed<T>
   // @ts-expect-error
   c[computedSymbol] = 1
@@ -144,7 +144,7 @@ const flush = () => {
 }
 
 const update = (signal: AlienSignal | AlienComputed): boolean => {
-  if ('getter' in signal) {
+  if ('getter_' in signal) {
     return updateComputed(signal)
   }
   return updateSignal(signal, signal.value_)
@@ -155,7 +155,7 @@ const updateComputed = (c: AlienComputed): boolean => {
   startTracking(c)
   try {
     const oldValue = c.value_
-    return oldValue !== (c.value_ = c.getter(oldValue))
+    return oldValue !== (c.value_ = c.getter_(oldValue))
   } finally {
     stopPeeking()
     endTracking(c)
@@ -164,7 +164,7 @@ const updateComputed = (c: AlienComputed): boolean => {
 
 const updateSignal = <T>(s: AlienSignal<T>, value: T): boolean => {
   s.flags_ = 1 satisfies ReactiveFlags.Mutable
-  return s.previousValue !== (s.previousValue = value)
+  return s.previousValue_ !== (s.previousValue_ = value)
 }
 
 const notify = (e: AlienEffect): void => {
@@ -339,7 +339,7 @@ const unlink = (link: Link, sub = link.sub_): Link | undefined => {
   if (prevSub_) {
     prevSub_.nextSub_ = nextSub_
   } else if (!(dep_.subs_ = nextSub_)) {
-    if ('getter' in dep_) {
+    if ('getter_' in dep_) {
       let toRemove = dep_.deps_
       if (toRemove) {
         dep_.flags_ = 17 as ReactiveFlags.Mutable | ReactiveFlags.Dirty
@@ -347,7 +347,7 @@ const unlink = (link: Link, sub = link.sub_): Link | undefined => {
           toRemove = unlink(toRemove, dep_)
         } while (toRemove)
       }
-    } else if (!('previousValue' in dep_)) {
+    } else if (!('previousValue_' in dep_)) {
       effectOper(dep_ as AlienEffect)
     }
   }
@@ -683,7 +683,7 @@ const dispatch = (path?: string, value?: any) => {
   if (!batchDepth && currentPatch.length) {
     const detail = pathToObj(currentPatch)
     currentPatch.length = 0
-    document.dispatchEvent(
+    DOCUMENT.dispatchEvent(
       new CustomEvent<JSONPatch>(DATASTAR_SIGNAL_PATCH_EVENT, {
         detail,
       }),

@@ -1,9 +1,14 @@
-// Icon: ion:eye
-// Slug: Access signals without subscribing to changes.
-// Description: Allows accessing signals without subscribing to their changes in expressions.
+// Icon: mdi:arrow
+// Slug: Sends fetch requests to the backend.
+// Description: Sends fetch requests to the backend and handles responses.
 
 import { action } from '@engine'
-import { DATASTAR_FETCH_EVENT } from '@engine/consts'
+import {
+  DATASTAR_FETCH_EVENT,
+  DOCUMENT,
+  HTMLInput,
+} from '@engine/consts'
+import { prepareScript } from '@engine/csp'
 import { filtered, startPeeking, stopPeeking } from '@engine/signals'
 import type {
   DatastarFetchEvent,
@@ -47,16 +52,16 @@ const createHttpMethod = (
         requestCancellation instanceof AbortController
           ? requestCancellation
           : new AbortController()
+      const cleanupName = `@${name}`
       if (requestCancellation === 'auto' || requestCancellation === 'cleanup') {
-        abortControllers.get(method)?.get(url)?.abort()
-        if (!abortControllers.has(method)) {
-          abortControllers.set(method, new Map())
-        }
-        abortControllers.get(method)!.set(url, controller)
+        const controllers = abortControllers.get(method) ?? new Map()
+        controllers.get(url)?.abort()
+        controllers.set(url, controller)
+        abortControllers.set(method, controllers)
       }
       if (requestCancellation === 'cleanup') {
-        cleanups.get(`@${name}`)?.()
-        cleanups.set(`@${name}`, async () => {
+        cleanups.get(cleanupName)?.()
+        cleanups.set(cleanupName, async () => {
           controller.abort()
           // wait one tick for FINISHED to fire
           await Promise.resolve()
@@ -70,40 +75,40 @@ const createHttpMethod = (
           throw error('FetchNoUrlProvided', { action })
         }
 
-        const initialHeaders: Record<string, any> = {
+        const headers: Record<string, any> = {
           Accept: 'text/event-stream, text/html, application/json',
           'Datastar-Request': true,
         }
         if (contentType === 'json' && methodSupportsRequestBody(method)) {
-          initialHeaders['Content-Type'] = 'application/json'
+          headers['Content-Type'] = 'application/json'
         }
-        const headers = Object.assign({}, initialHeaders, userHeaders)
+        Object.assign(headers, userHeaders)
 
         // We ignore the content-type header if using form data
         // if missing the boundary will be set automatically
 
         const req: FetchEventSourceInit = {
-          input: '',
+          input_: '',
           method,
           headers,
-          openWhenHidden,
-          retry,
-          retryInterval,
-          retryScaler,
-          retryMaxWait,
-          retryMaxCount,
+          openWhenHidden_: openWhenHidden,
+          retry_: retry,
+          retryInterval_: retryInterval,
+          retryScaler_: retryScaler,
+          retryMaxWait_: retryMaxWait,
+          retryMaxCount_: retryMaxCount,
           signal: controller.signal,
-          onopen: async (response: Response) => {
+          onopen_: async (response: Response) => {
             if (response.status >= 400) {
               dispatchFetch(ERROR, el, { status: response.status.toString() })
             }
           },
-          onmessage: (evt) => {
-            if (!evt.event.startsWith('datastar')) return
-            const type = evt.event
+          onmessage_: (evt) => {
+            if (!evt.event_.startsWith('datastar')) return
+            const type = evt.event_
             const argsRawLines: Record<string, string[]> = {}
 
-            for (const line of evt.data.split('\n')) {
+            for (const line of evt.data_.split('\n')) {
               const i = line.indexOf(' ')
               const k = line.slice(0, i)
               const v = line.slice(i + 1)
@@ -125,7 +130,7 @@ const createHttpMethod = (
         }
 
         const buildFetchEventSourceInit = () => {
-          const urlInstance = new URL(url, document.baseURI)
+          const urlInstance = new URL(url, DOCUMENT.baseURI)
           const queryParams = new URLSearchParams(urlInstance.search)
           if (contentType === 'json') {
             startPeeking()
@@ -140,7 +145,7 @@ const createHttpMethod = (
             }
           } else if (contentType === 'form') {
             const formEl = (
-              selector ? document.querySelector(selector) : el.closest('form')
+              selector ? DOCUMENT.querySelector(selector) : el.closest('form')
             ) as HTMLFormElement
             if (!formEl) {
               throw error('FetchFormNotFound', { action, selector })
@@ -171,7 +176,7 @@ const createHttpMethod = (
             // Append the value of the form submitter if it is a valid submitter and has a name
             if (
               submitter instanceof HTMLButtonElement ||
-              (submitter instanceof HTMLInputElement &&
+              (submitter instanceof HTMLInput &&
                 submitter.type === 'submit')
             ) {
               const name = submitter.getAttribute('name')
@@ -187,11 +192,7 @@ const createHttpMethod = (
 
             const formParams = new URLSearchParams(formData as any)
             if (methodSupportsRequestBody(method)) {
-              if (multipart) {
-                req.body = formData
-              } else {
-                req.body = formParams
-              }
+              req.body = multipart ? formData : formParams
             } else {
               for (const [key, value] of formParams) {
                 queryParams.append(key, value)
@@ -201,7 +202,7 @@ const createHttpMethod = (
             throw error('FetchInvalidContentType', { action, contentType })
           }
           urlInstance.search = queryParams.toString()
-          req.input = urlInstance.toString()
+          req.input_ = urlInstance.toString()
           return req
         }
 
@@ -221,7 +222,7 @@ const createHttpMethod = (
       } finally {
         dispatchFetch(FINISHED, el, {})
         cleanupFn()
-        cleanups.delete(`@${name}`)
+        cleanups.delete(cleanupName)
       }
     },
   })
@@ -239,7 +240,7 @@ export const RETRYING = 'retrying'
 export const RETRIES_FAILED = 'retries-failed'
 
 const dispatchFetch = (type: string, el: HTMLOrSVG, argsRaw: WatcherArgs) =>
-  document.dispatchEvent(
+  DOCUMENT.dispatchEvent(
     new CustomEvent<DatastarFetchEvent>(DATASTAR_FETCH_EVENT, {
       detail: { type, el, argsRaw },
     }),
@@ -282,10 +283,10 @@ export type FetchArgs = {
  */
 
 interface EventSourceMessage {
-  id: string
-  event: string
-  data: string
-  retry?: number
+  id_: string
+  event_: string
+  data_: string
+  retry_?: number
 }
 
 /**
@@ -320,7 +321,10 @@ const getLines = (onLine: (line: Uint8Array, fieldLength: number) => void) => {
       fieldLength = -1
     } else {
       // we're still parsing the old line. Append the new bytes into buffer:
-      buffer = concat(buffer, arr)
+      const next = new Uint8Array(buffer.length + arr.length)
+      next.set(buffer)
+      next.set(arr, buffer.length)
+      buffer = next
     }
 
     const bufLength = buffer.length
@@ -394,19 +398,21 @@ const getMessages = (
 
       switch (field) {
         case 'data':
-          message.data = message.data ? `${message.data}\n${value}` : value
+          message.data_ = message.data_
+            ? `${message.data_}\n${value}`
+            : value
           break
         case 'event':
-          message.event = value
+          message.event_ = value
           break
         case 'id':
-          onId((message.id = value))
+          onId((message.id_ = value))
           break
         case 'retry': {
           const retry = +value
           if (!Number.isNaN(retry)) {
             // per spec, ignore non-integers
-            onRetry((message.retry = retry))
+            onRetry((message.retry_ = retry))
           }
           break
         }
@@ -415,40 +421,31 @@ const getMessages = (
   }
 }
 
-const concat = (a: Uint8Array, b: Uint8Array) => {
-  const res = new Uint8Array(a.length + b.length)
-  res.set(a)
-  res.set(b, a.length)
-  return res
-}
-
 const newMessage = (): EventSourceMessage => ({
   // data, event, and id must be initialized to empty strings:
   // https://html.spec.whatwg.org/multipage/server-sent-events.html#event-stream-interpretation
   // retry should be initialized to undefined so we return a consistent shape
   // to the js engine all the time: https://mathiasbynens.be/notes/shapes-ics#takeaways
-  data: '',
-  event: '',
-  id: '',
-  retry: undefined,
+  data_: '',
+  event_: '',
+  id_: '',
+  retry_: undefined,
 })
 
 type FetchEventSourceInit =
   | (RequestInit & {
-      input: RequestInfo
+      input_: RequestInfo
       headers?: Record<string, string>
-      onopen?: (response: Response) => Promise<void>
-      onmessage?: (ev: EventSourceMessage) => void
-      onclose?: () => void
+      onopen_: (response: Response) => Promise<void>
+      onmessage_: (ev: EventSourceMessage) => void
       onerror?: (err: any) => void
-      openWhenHidden?: boolean
-      fetch?: typeof fetch
-      retry?: 'auto' | 'error' | 'always' | 'never'
-      retryInterval?: number
-      retryScaler?: number
-      retryMaxWait?: number
-      retryMaxCount?: number
-      responseOverrides?: ResponseOverrides
+      openWhenHidden_: boolean
+      retry_: 'auto' | 'error' | 'always' | 'never'
+      retryInterval_: number
+      retryScaler_: number
+      retryMaxWait_: number
+      retryMaxCount_: number
+      responseOverrides_?: ResponseOverrides
     })
   | undefined
 
@@ -462,20 +459,18 @@ const fetchEventSource = (
       return
     }
     let {
-      input,
+      input_: input,
       signal: inputSignal,
       headers: inputHeaders,
-      onopen: inputOnOpen,
-      onmessage,
-      onclose,
-      openWhenHidden,
-      fetch: inputFetch,
-      retry = 'auto',
-      retryInterval = 1_000,
-      retryScaler = 2,
-      retryMaxWait = 30_000,
-      retryMaxCount = 10,
-      responseOverrides,
+      onopen_: inputOnOpen,
+      onmessage_: onmessage,
+      openWhenHidden_: openWhenHidden,
+      retry_: retry,
+      retryInterval_: retryInterval,
+      retryScaler_: retryScaler,
+      retryMaxWait_: retryMaxWait,
+      retryMaxCount_: retryMaxCount,
+      responseOverrides_: responseOverrides,
       ...rest
     }: FetchEventSourceInit = fetchInit
 
@@ -490,37 +485,36 @@ const fetchEventSource = (
       const currentFetchInit = buildFetchEventSourceInit()
       if (!currentFetchInit) return
 
-      input = currentFetchInit.input
+      input = currentFetchInit.input_
       rest.body = currentFetchInit.body
       create()
     }
 
     const onVisibilityChange = () => {
       curRequestController.abort()
-      if (!document.hidden) {
+      if (!DOCUMENT.hidden) {
         rebuildAndRetry()
       }
     }
 
     if (!openWhenHidden) {
-      document.addEventListener('visibilitychange', onVisibilityChange)
+      DOCUMENT.addEventListener('visibilitychange', onVisibilityChange)
     }
 
     let retryTimer: ReturnType<typeof setTimeout> | undefined
     const dispose = () => {
-      document.removeEventListener('visibilitychange', onVisibilityChange)
+      DOCUMENT.removeEventListener('visibilitychange', onVisibilityChange)
       clearTimeout(retryTimer)
       curRequestController.abort()
     }
 
     // if the incoming signal aborts, dispose resources and resolve:
-    inputSignal?.addEventListener('abort', () => {
+    inputSignal!.addEventListener('abort', () => {
       dispose()
       resolve() // don't waste time constructing/logging errors
     })
 
-    const fetch = inputFetch || window.fetch
-    const onopen = inputOnOpen || (() => {})
+    const onopen = inputOnOpen
 
     let retries = 0
     let baseRetryInterval = retryInterval
@@ -582,7 +576,6 @@ const fetchEventSource = (
         const isErrorStatus = status >= 400 && status < 600
 
         if (status !== 200) {
-          onclose?.()
           if (
             retry !== 'never' &&
             !isNoContentStatus &&
@@ -626,7 +619,7 @@ const fetchEventSource = (
         }
 
         if (ct?.includes('text/javascript')) {
-          const script = document.createElement('script')
+          const script = DOCUMENT.createElement('script')
           const scriptAttributesHeader = response.headers.get(
             'datastar-script-attributes',
           )
@@ -638,8 +631,9 @@ const fetchEventSource = (
               script.setAttribute(name, value as string)
             }
           }
-          script.textContent = await response.text()
-          document.head.appendChild(script)
+          const content = await response.text()
+          prepareScript(script, content)
+          DOCUMENT.head.appendChild(script)
           dispose()
           return
         }
@@ -664,8 +658,6 @@ const fetchEventSource = (
             ),
           ),
         )
-
-        onclose?.()
 
         if (retry === 'always' && !isRedirectStatus) {
           retryRequest()

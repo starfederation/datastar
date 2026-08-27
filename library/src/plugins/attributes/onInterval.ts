@@ -27,7 +27,7 @@ attribute({
     const durationArgs = mods.get('duration')
     if (durationArgs) {
       duration = tagToMs(durationArgs)
-      const leading = tagHas(durationArgs, 'leading', false)
+      const leading = tagHas(durationArgs, 'leading')
       if (leading) {
         callback()
       }

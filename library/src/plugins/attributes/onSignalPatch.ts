@@ -3,7 +3,7 @@
 // Description: Runs an expression whenever one or more signals are patched.
 
 import { attribute } from '@engine'
-import { DATASTAR_SIGNAL_PATCH_EVENT } from '@engine/consts'
+import { DATASTAR_SIGNAL_PATCH_EVENT, DOCUMENT } from '@engine/consts'
 import {
   beginBatch,
   endBatch,
@@ -40,7 +40,7 @@ attribute({
     const callback: EventListener = modifyTiming(
       (evt: CustomEvent<JSONPatch>) => {
         if (running) return
-        // peek when getting the filtered signals because we don't want to subscribe to them, we just want to know which ones are being patched
+        // Peek when getting the filtered signals because we don’t want to subscribe to them, we just want to know which ones are being patched.
         startPeeking()
         const watched = filtered(filters, evt.detail)
         stopPeeking()
@@ -58,9 +58,9 @@ attribute({
       mods,
     )
 
-    document.addEventListener(DATASTAR_SIGNAL_PATCH_EVENT, callback)
+    DOCUMENT.addEventListener(DATASTAR_SIGNAL_PATCH_EVENT, callback)
     return () => {
-      document.removeEventListener(DATASTAR_SIGNAL_PATCH_EVENT, callback)
+      DOCUMENT.removeEventListener(DATASTAR_SIGNAL_PATCH_EVENT, callback)
     }
   },
 })

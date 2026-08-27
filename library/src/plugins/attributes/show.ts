@@ -3,6 +3,7 @@
 // Description: Shows or hides an element based on whether an expression evaluates to `true` or `false`.
 
 import { attribute } from '@engine'
+import { MutationObserverClass } from '@engine/consts'
 import { effect } from '@engine/signals'
 
 const NONE = 'none'
@@ -26,7 +27,7 @@ attribute({
       }
       observer.observe(el, { attributeFilter: ['style'] })
     }
-    const observer = new MutationObserver(update)
+    const observer = new MutationObserverClass(update)
     const cleanup = effect(update)
 
     return () => {
