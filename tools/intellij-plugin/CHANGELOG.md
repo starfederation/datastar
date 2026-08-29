@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-08-29
+
+- Added the `data-nonce` attribute to the `html` element.
+
 ## [1.3.1] - 2026-07-02
 
 - Broadened support for Datastar attributes in any HTML context.

@@ -309,6 +309,23 @@
       ]
     },
     "html": {
+      "elements": [
+        {
+          "name": "html",
+          "attributes": [
+            {
+              "name": "data-nonce",
+              "description": "Enables Content Security Policy mode using a nonempty nonce.",
+              "doc-url": "https://data-star.dev/reference/security#content-security-policy",
+              "value": {
+                "kind": "plain",
+                "type": "string",
+                "required": true
+              }
+            }
+          ]
+        }
+      ],
       "attributes": [
         {
           "name": "data-animate:*",
