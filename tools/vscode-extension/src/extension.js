@@ -9,8 +9,9 @@ const BUILTIN_ATTRIBUTES = [
     'on-signal-patch', 'on-signal-patch-filter', 'preserve-attr', 'ref', 'show',
     'signals', 'style', 'text',
     // PRO
-    'animate', 'custom-validity', 'on-raf', 'on-resize', 'persist',
-    'query-string', 'replace-url', 'rocket', 'scroll-into-view', 'view-transition'
+    'animate', 'custom-validity', 'match-media', 'on-raf', 'on-resize',
+    'persist', 'query-string', 'replace-url', 'scroll-into-view',
+    'view-transition'
 ];
 
 let grammarPath;
@@ -178,4 +179,4 @@ function deactivate() { }
 module.exports = {
     activate,
     deactivate
-}; 
+};

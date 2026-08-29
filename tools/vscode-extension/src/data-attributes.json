@@ -197,6 +197,17 @@
       }
     ]
   },
+  "data-nonce": {
+    "prefix": "data-nonce",
+    "body": "data-nonce=\"${1}\"",
+    "description": "Enables Content Security Policy mode using a nonempty nonce. This attribute is only allowed on the `html` element.",
+    "references": [
+      {
+        "name": "Documentation",
+        "url": "https://data-star.dev/reference/security#content-security-policy"
+      }
+    ]
+  },
   "data-on": {
     "prefix": "data-on:*",
     "body": "data-on:${1:name}=\"${2:expression}\"",

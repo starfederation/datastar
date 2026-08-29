@@ -1,6 +1,6 @@
 {
   "name": "datastar-vscode",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "displayName": "Datastar",
   "description": "Adds autocomplete and syntax highlighting for Datastar to Visual Studio Code.",
   "author": "Ben Croker",
