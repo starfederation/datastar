@@ -39,4 +39,8 @@ Read the [Getting Started Guide »](https://data-star.dev/guide/getting_started)
 
 Read the [Contribution Guidelines »](https://github.com/starfederation/datastar/blob/develop/CONTRIBUTING.md)
 
-[![Star History Chart](https://api.star-history.com/svg?repos=starfederation/datastar&type=Date)](https://www.star-history.com/#starfederation/datastar&Date)
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=starfederation/datastar&type=date&theme=dark&legend=top-left&sealed_token=gQqeZvmc9YZnA9wdrVw03ob9L0mM-xug325W8NCT2xNO1o0ZfXq2RP9rmL4-2mEnurJO0nGWqihA0UVXxyixIR-08b7q52722UqU3E_P0NzqaoTlam5_3xfKPsZ2ESwFlPYjLW3ybmynyY3Lo_Z1pv0dDvuXfQBNRBd3-u505jglrkEu4OGwgez3u-3P" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=starfederation/datastar&type=date&legend=top-left&sealed_token=gQqeZvmc9YZnA9wdrVw03ob9L0mM-xug325W8NCT2xNO1o0ZfXq2RP9rmL4-2mEnurJO0nGWqihA0UVXxyixIR-08b7q52722UqU3E_P0NzqaoTlam5_3xfKPsZ2ESwFlPYjLW3ybmynyY3Lo_Z1pv0dDvuXfQBNRBd3-u505jglrkEu4OGwgez3u-3P" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=starfederation/datastar&type=date&legend=top-left&sealed_token=gQqeZvmc9YZnA9wdrVw03ob9L0mM-xug325W8NCT2xNO1o0ZfXq2RP9rmL4-2mEnurJO0nGWqihA0UVXxyixIR-08b7q52722UqU3E_P0NzqaoTlam5_3xfKPsZ2ESwFlPYjLW3ybmynyY3Lo_Z1pv0dDvuXfQBNRBd3-u505jglrkEu4OGwgez3u-3P" />
+ </picture>
