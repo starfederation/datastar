@@ -71,9 +71,25 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
             ? clickCompletion.textEdit.newText
             : undefined, 'data-on:click="${1:expression}"');
 
-        const signalText = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$us">';
+        const modifierText = '<button data-on:click__';
         connection.sendNotification('textDocument/didChange', {
             textDocument: { uri, version: 3 },
+            contentChanges: [{ text: modifierText }],
+        });
+        const modifierCompletions = await connection.sendRequest<CompletionItem[]>('textDocument/completion', {
+            textDocument: { uri },
+            position: { line: 0, character: modifierText.length },
+        });
+        const debounceCompletion = modifierCompletions.find(completion => completion.label === 'debounce');
+        assert.ok(debounceCompletion);
+        assert.equal(debounceCompletion.kind, 14);
+        assert.equal(debounceCompletion.textEdit && 'newText' in debounceCompletion.textEdit
+            ? debounceCompletion.textEdit.newText
+            : undefined, 'debounce');
+
+        const signalText = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$us">';
+        connection.sendNotification('textDocument/didChange', {
+            textDocument: { uri, version: 4 },
             contentChanges: [{ text: signalText }],
         });
         const signalCompletions = await connection.sendRequest<CompletionItem[]>('textDocument/completion', {
@@ -94,7 +110,7 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
         });
         const changedText = '<main data-nonce="abc">';
         connection.sendNotification('textDocument/didChange', {
-            textDocument: { uri, version: 4 },
+            textDocument: { uri, version: 5 },
             contentChanges: [{ text: changedText }],
         });
 

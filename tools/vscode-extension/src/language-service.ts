@@ -2,7 +2,7 @@ import languageDataJson from './language-data.json'
 
 type Requirement = 'allowed' | 'must' | 'denied' | 'exclusive'
 type SignalKind = 'signal' | 'property' | 'computed' | 'reference'
-type CompletionKind = 'signal' | 'property'
+type CompletionKind = 'signal' | 'property' | 'modifier'
 
 type Reference = {
     name: string
@@ -13,6 +13,7 @@ type AttributeMetadata = {
     name: string
     description: string
     requirement: { key: Requirement; value: Requirement }
+    modifiers: Array<{ name: string; description?: string }>
     signals?: 'key' | 'key-or-value' | 'key-or-object'
     valueKind: 'expression' | 'signal-name' | 'string'
     keys?: string[]
@@ -531,6 +532,49 @@ function getSignalCompletions(text: string, offset: number): LanguageCompletion[
     }));
 }
 
+function getModifierCompletions(prefix: string, offset: number): LanguageCompletion[] | undefined {
+    const separator = prefix.lastIndexOf('__');
+    if (separator === -1) return undefined;
+
+    const attributeName = prefix.slice(0, separator);
+    const current = prefix.slice(separator + 2);
+    if (!/^[a-zA-Z0-9.-]*$/.test(current)) return [];
+
+    const parsed = parseAttributeName(attributeName);
+    const metadata = attributeMetadata.get(parsed.pluginName);
+    if (!metadata) return [];
+
+    const appliedModifiers = new Set(parsed.modifiers.map(modifier => modifier.split('.')[0]));
+    const completion = snippetEntries.find(entry => entry.pluginName === parsed.pluginName);
+    const parts = current.split('.');
+    const modifierName = parts[0];
+    const completingTag = parts.length > 1;
+    const typedPart = completingTag ? parts.at(-1)! : current;
+    const appliedTags = new Set(parts.slice(1, -1));
+
+    return metadata.modifiers
+        .filter(modifier => {
+            const [name, tag] = modifier.name.split('.', 2);
+            if (appliedModifiers.has(name)) return false;
+            if (!completingTag) return tag === undefined;
+            return name === modifierName && tag !== undefined && !appliedTags.has(tag);
+        })
+        .map(modifier => {
+            const insertText = completingTag
+                ? modifier.name.slice(modifier.name.indexOf('.') + 1)
+                : modifier.name;
+            return {
+                label: insertText,
+                insertText,
+                description: modifier.description || 'Datastar attribute modifier.',
+                references: completion?.references || [],
+                kind: 'modifier' as const,
+                start: offset - typedPart.length,
+                end: offset,
+            };
+        });
+}
+
 export function getCompletions(
     text: string,
     offset: number,
@@ -547,6 +591,9 @@ export function getCompletions(
 
     const prefixMatch = text.slice(tag.attributesStart, offset).match(/data-[a-zA-Z0-9:_*.-]*$/);
     if (!prefixMatch) return [];
+
+    const modifierCompletions = getModifierCompletions(prefixMatch[0], offset);
+    if (modifierCompletions !== undefined) return modifierCompletions;
 
     if (/^data-on:[a-zA-Z0-9-]*$/.test(prefixMatch[0])) {
         const genericEntry = snippetEntries.find(entry => entry.pluginName === 'on')!;

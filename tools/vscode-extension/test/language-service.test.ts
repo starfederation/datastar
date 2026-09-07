@@ -81,6 +81,27 @@ test('provides native event completions after data-on:', () => {
     assert.ok(completions.some(completion => completion.label === 'data-on:pointerdown'));
 });
 
+test('provides modifier and modifier tag completions', () => {
+    const modifierSource = '<button data-on:click__';
+    const modifiers = getCompletions(modifierSource, modifierSource.length);
+    const debounce = modifiers.find(completion => completion.label === 'debounce');
+
+    assert.ok(debounce);
+    assert.equal(debounce.insertText, 'debounce');
+    assert.equal(debounce.start, modifierSource.length);
+    assert.ok(modifiers.some(completion => completion.label === 'document'));
+    assert.equal(modifiers.some(completion => completion.label === 'debounce.500ms'), false);
+
+    const tagSource = '<button data-on:click__debounce.';
+    const tags = getCompletions(tagSource, tagSource.length);
+    assert.ok(tags.some(completion => completion.label === '500ms'));
+    assert.ok(tags.some(completion => completion.label === 'leading'));
+
+    const repeatedSource = '<button data-on:click__once__';
+    const remaining = getCompletions(repeatedSource, repeatedSource.length);
+    assert.equal(remaining.some(completion => completion.label === 'once'), false);
+});
+
 test('does not provide attribute completions inside values', () => {
     const source = '<div data-show="data-sh">';
     const offset = source.indexOf('data-sh', source.indexOf('=')) + 'data-sh'.length;

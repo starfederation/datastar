@@ -37,7 +37,7 @@ connection.onInitialize(params => {
         capabilities: {
             textDocumentSync: TextDocumentSyncKind.Incremental,
             completionProvider: {
-                triggerCharacters: ['-', ':', '$', '.'],
+                triggerCharacters: ['-', ':', '_', '$', '.'],
             },
             hoverProvider: true,
         },
@@ -104,6 +104,8 @@ connection.onCompletion(params => {
                 ? CompletionItemKind.Variable
                 : completion.kind === 'property'
                     ? CompletionItemKind.Property
+                    : completion.kind === 'modifier'
+                        ? CompletionItemKind.Keyword
                     : CompletionItemKind.Snippet,
             detail: 'Datastar',
             documentation: { kind: 'markdown', value: documentation },
