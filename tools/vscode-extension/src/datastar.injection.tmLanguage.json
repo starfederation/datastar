@@ -10,7 +10,7 @@
   "repository": {
     "datastar-attribute": {
       "comment": "Match Datastar attributes: data-[plugin]:[key]:[nested-key]__[modifier(s)]",
-      "begin": "\\b(data-)(attr|bind|class|computed|effect|ignore|ignore-morph|indicator|init|json-signals|on|on-intersect|on-interval|on-signal-patch|on-signal-patch-filter|preserve-attr|ref|show|signals|style|text|animate|custom-validity|match-media|on-raf|on-resize|persist|query-string|replace-url|scroll-into-view|view-transition)(?=__|:|[\\s>=])",
+      "begin": "\\b(data-)(animate|attr|bind|class|computed|custom-validity|effect|ignore|ignore-morph|indicator|init|json-signals|match-media|on|on-intersect|on-interval|on-raf|on-resize|on-signal-patch|on-signal-patch-filter|persist|preserve-attr|query-string|ref|replace-url|scroll-into-view|show|signals|style|text|view-transition)(?=__|:|[\\s>=])",
       "end": "(?<=[\"'])|(?=[\\s>])",
       "beginCaptures": {
         "1": {
@@ -23,7 +23,7 @@
       "patterns": [
         {
           "comment": "Match plugin-like keys: :data-[plugin]",
-          "match": "(:)(data-(?:attr|bind|class|computed|effect|ignore|ignore-morph|indicator|init|json-signals|on|on-intersect|on-interval|on-signal-patch|on-signal-patch-filter|preserve-attr|ref|show|signals|style|text|animate|custom-validity|match-media|on-raf|on-resize|persist|query-string|replace-url|scroll-into-view|view-transition))(?=__|:|[\\s>=])",
+          "match": "(:)(data-(?:animate|attr|bind|class|computed|custom-validity|effect|ignore|ignore-morph|indicator|init|json-signals|match-media|on|on-intersect|on-interval|on-raf|on-resize|on-signal-patch|on-signal-patch-filter|persist|preserve-attr|query-string|ref|replace-url|scroll-into-view|show|signals|style|text|view-transition))(?=__|:|[\\s>=])",
           "captures": {
             "1": {
               "name": "punctuation.separator.key.datastar"

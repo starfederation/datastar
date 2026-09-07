@@ -1,475 +1,707 @@
 {
-  "data-animate:*": {
-    "prefix": "data-animate:*",
-    "body": "data-animate:${1:name}=\"${2:expression}\"",
-    "description": "Animates element attributes over time.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-animate"
+  "animate": {
+    "requirement": {
+      "key": "must",
+      "value": "must"
+    },
+    "completions": {
+      "data-animate:*": {
+        "body": "data-animate:${1:name}=\"${2:expression}\"",
+        "description": "Animates element attributes over time.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-animate"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-attr": {
-    "prefix": "data-attr",
-    "body": "data-attr=\"{${1:attributeName}: ${2:expression}}\"",
-    "description": "Sets one or more attribute values using a set of key-value pairs that map to the attribute name and expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-attributes"
+  "attr": {
+    "requirement": {
+      "key": "allowed",
+      "value": "must"
+    },
+    "completions": {
+      "data-attr": {
+        "body": "data-attr=\"{${1:attributeName}: ${2:expression}}\"",
+        "description": "Sets one or more attribute values using a set of key-value pairs that map to the attribute name and expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-attributes"
+          }
+        ]
+      },
+      "data-attr:*": {
+        "body": "data-attr:${1:name}=\"${2:expression}\"",
+        "description": "Sets an element’s attribute value based on an expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-attributes"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-attr:*": {
-    "prefix": "data-attr:*",
-    "body": "data-attr:${1:name}=\"${2:expression}\"",
-    "description": "Sets an element’s attribute value based on an expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-attributes"
+  "bind": {
+    "requirement": {
+      "key": "exclusive",
+      "value": "exclusive"
+    },
+    "signals": "key-or-value",
+    "valueKind": "signal-name",
+    "completions": {
+      "data-bind": {
+        "body": "data-bind=\"${1:signalName}\"",
+        "description": "Creates a new signal and enables two-way binding between it and the element.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-bind"
+          }
+        ]
+      },
+      "data-bind:*": {
+        "body": "data-bind:${1:name}",
+        "description": "Creates a new signal and enables two-way binding between it and the element.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-bind"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-bind": {
-    "prefix": "data-bind",
-    "body": "data-bind=\"${1:signalName}\"",
-    "description": "Creates a new signal and enables two-way binding between it and the element.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-bind"
+  "class": {
+    "requirement": {
+      "key": "allowed",
+      "value": "must"
+    },
+    "completions": {
+      "data-class": {
+        "body": "data-class=\"{${1:className}: ${2:expression}}\"",
+        "description": "Adds or removes one or more classes from an element using a set of key-value pairs that map to the class name and expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-class"
+          }
+        ]
+      },
+      "data-class:*": {
+        "body": "data-class:${1:name}=\"${2:expression}\"",
+        "description": "Adds or removes a class from an element based on an expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-class"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-bind:*": {
-    "prefix": "data-bind:*",
-    "body": "data-bind:${1:name}",
-    "description": "Creates a new signal and enables two-way binding between it and the element.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-bind"
+  "computed": {
+    "requirement": {
+      "key": "allowed",
+      "value": "must"
+    },
+    "signals": "key-or-object",
+    "completions": {
+      "data-computed": {
+        "body": "data-computed=\"{${1:signalName}: ${2:expression}}\"",
+        "description": "Creates one or more signals that are computed based on a set of key-value pairs that map to the signal name and expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-computed"
+          }
+        ]
+      },
+      "data-computed:*": {
+        "body": "data-computed:${1:name}=\"${2:expression}\"",
+        "description": "Creates a signal that is computed based on an expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-computed"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-class": {
-    "prefix": "data-class",
-    "body": "data-class=\"{${1:className}: ${2:expression}}\"",
-    "description": "Adds or removes one or more classes from an element using a set of key-value pairs that map to the class name and expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-class"
+  "custom-validity": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-custom-validity": {
+        "body": "data-custom-validity=\"${1:expression}\"",
+        "description": "Adds custom validity to an element using an expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-custom-validity"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-class:*": {
-    "prefix": "data-class:*",
-    "body": "data-class:${1:name}=\"${2:expression}\"",
-    "description": "Adds or removes a class from an element based on an expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-class"
+  "effect": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-effect": {
+        "body": "data-effect=\"${1:expression}\"",
+        "description": "Executes an expression on page load and whenever any signals in the expression change.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-effect"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-computed": {
-    "prefix": "data-computed",
-    "body": "data-computed=\"{${1:signalName}: ${2:expression}}\"",
-    "description": "Creates one or more signals that are computed based on a set of key-value pairs that map to the signal name and expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-computed"
+  "ignore": {
+    "requirement": {
+      "key": "denied",
+      "value": "allowed"
+    },
+    "valueKind": "string",
+    "completions": {
+      "data-ignore": {
+        "body": "data-ignore",
+        "description": "Ignores an element and its descendants from being processed.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-ignore"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-computed:*": {
-    "prefix": "data-computed:*",
-    "body": "data-computed:${1:name}=\"${2:expression}\"",
-    "description": "Creates a signal that is computed based on an expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-computed"
+  "ignore-morph": {
+    "requirement": {
+      "key": "denied",
+      "value": "allowed"
+    },
+    "valueKind": "string",
+    "completions": {
+      "data-ignore-morph": {
+        "body": "data-ignore-morph",
+        "description": "Ignores an element when patching an element using the `morph` mode.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-ignore-morph"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-custom-validity": {
-    "prefix": "data-custom-validity",
-    "body": "data-custom-validity=\"${1:expression}\"",
-    "description": "Adds custom validity to an element using an expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-custom-validity"
+  "indicator": {
+    "requirement": {
+      "key": "exclusive",
+      "value": "exclusive"
+    },
+    "signals": "key-or-value",
+    "valueKind": "signal-name",
+    "completions": {
+      "data-indicator": {
+        "body": "data-indicator=\"${1:signalName}\"",
+        "description": "Creates a signal to track in-flight backend requests.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-indicator"
+          }
+        ]
+      },
+      "data-indicator:*": {
+        "body": "data-indicator:${1:name}",
+        "description": "Creates a signal to track in-flight backend requests.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-indicator"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-effect": {
-    "prefix": "data-effect",
-    "body": "data-effect=\"${1:expression}\"",
-    "description": "Executes an expression on page load and whenever any signals in the expression change.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-effect"
+  "init": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-init": {
+        "body": "data-init=\"${1:expression}\"",
+        "description": "Runs an expression whenever the attribute is initialised.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-init"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-ignore": {
-    "prefix": "data-ignore",
-    "body": "data-ignore",
-    "description": "Ignores an element and its descendants from being processed.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-ignore"
+  "json-signals": {
+    "requirement": {
+      "key": "denied",
+      "value": "allowed"
+    },
+    "completions": {
+      "data-json-signals": {
+        "body": "data-json-signals=\"${1:expression}\"",
+        "description": "Sets the text content of an element to a reactive JSON stringified version of signals.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-json-signals"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-ignore-morph": {
-    "prefix": "data-ignore-morph",
-    "body": "data-ignore-morph",
-    "description": "Ignores an element when patching an element using the `morph` mode.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-ignore-morph"
+  "match-media": {
+    "requirement": {
+      "key": "must",
+      "value": "must"
+    },
+    "signals": "key",
+    "completions": {
+      "data-match-media:*": {
+        "body": "data-match-media:${1:name}=\"${2:expression}\"",
+        "description": "Sets a signal to whether a media query matches and keeps it in sync whenever the query changes.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-match-media"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-indicator": {
-    "prefix": "data-indicator",
-    "body": "data-indicator=\"${1:signalName}\"",
-    "description": "Creates a signal to track in-flight backend requests.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-indicator"
+  "nonce": {
+    "element": "html",
+    "highlight": false,
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "valueKind": "string",
+    "completions": {
+      "data-nonce": {
+        "body": "data-nonce=\"${1}\"",
+        "description": "Enables Content Security Policy mode using a nonempty nonce. This attribute is only allowed on the `html` element.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/security#content-security-policy"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-indicator:*": {
-    "prefix": "data-indicator:*",
-    "body": "data-indicator:${1:name}",
-    "description": "Creates a signal to track in-flight backend requests.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-indicator"
+  "on": {
+    "requirement": {
+      "key": "must",
+      "value": "must"
+    },
+    "completions": {
+      "data-on": {
+        "body": "data-on:${1:name}=\"${2:expression}\"",
+        "description": "Runs an expression whenever an event is triggered on an element.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-on"
+          }
+        ]
+      },
+      "data-on:click": {
+        "body": "data-on:click=\"${1:expression}\"",
+        "description": "Runs an expression whenever the element is clicked.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-on"
+          }
+        ]
+      },
+      "data-on:keydown": {
+        "body": "data-on:keydown=\"${1:expression}\"",
+        "description": "Runs an expression whenever a key is pressed.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-on"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-init": {
-    "prefix": "data-init",
-    "body": "data-init=\"${1:expression}\"",
-    "description": "Runs an expression whenever the attribute is initialised.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-init"
+  "on-intersect": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-on-intersect": {
+        "body": "data-on-intersect=\"${1:expression}\"",
+        "description": "Runs an expression on intersection with the viewport.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-on-intersect"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-json-signals": {
-    "prefix": "data-json-signals",
-    "body": "data-json-signals=\"${1:expression}\"",
-    "description": "Sets the text content of an element to a reactive JSON stringified version of signals.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-json-signals"
+  "on-interval": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-on-interval": {
+        "body": "data-on-interval=\"${1:expression}\"",
+        "description": "Runs an expression at a regular interval.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-on-interval"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-match-media:*": {
-    "prefix": "data-match-media:*",
-    "body": "data-match-media:${1:name}=\"${2:expression}\"",
-    "description": "Sets a signal to whether a media query matches and keeps it in sync whenever the query changes.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-match-media"
+  "on-raf": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-on-raf": {
+        "body": "data-on-raf=\"${1:expression}\"",
+        "description": "Runs an expression on every `requestAnimationFrame` event.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-on-raf"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-nonce": {
-    "prefix": "data-nonce",
-    "body": "data-nonce=\"${1}\"",
-    "description": "Enables Content Security Policy mode using a nonempty nonce. This attribute is only allowed on the `html` element.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/security#content-security-policy"
+  "on-resize": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-on-resize": {
+        "body": "data-on-resize=\"${1:expression}\"",
+        "description": "Runs an expression whenever an element’s dimensions change.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-on-resize"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-on": {
-    "prefix": "data-on:*",
-    "body": "data-on:${1:name}=\"${2:expression}\"",
-    "description": "Runs an expression whenever an event is triggered on an element.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-on"
+  "on-signal-patch": {
+    "keys": [
+      "filter"
+    ],
+    "requirement": {
+      "key": "allowed",
+      "value": "must"
+    },
+    "completions": {
+      "data-on-signal-patch": {
+        "body": "data-on-signal-patch=\"${1:expression}\"",
+        "description": "Runs an expression whenever one or more signals are patched.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-on-signal-patch"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-on:click": {
-    "prefix": "data-on:click",
-    "body": "data-on:click=\"${1:expression}\"",
-    "description": "Runs an expression whenever the element is clicked.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-on"
+  "on-signal-patch-filter": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-on-signal-patch-filter": {
+        "body": "data-on-signal-patch-filter=\"${1:expression}\"",
+        "description": "Filters which signals to watch when using the `data-on-signal-patch` attribute.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-on-signal-change"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-on:keydown": {
-    "prefix": "data-on:keydown",
-    "body": "data-on:keydown=\"${1:expression}\"",
-    "description": "Runs an expression whenever a key is pressed.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-on"
+  "persist": {
+    "requirement": {
+      "key": "allowed",
+      "value": "allowed"
+    },
+    "completions": {
+      "data-persist": {
+        "body": "data-persist=\"\"",
+        "description": "Persists signals in local storage.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-persist"
+          }
+        ]
+      },
+      "data-persist:*": {
+        "body": "data-persist:${1:name}=\"${2:expression}\"",
+        "description": "Persists signals in local storage with a custom key.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-persist"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-on-intersect": {
-    "prefix": "data-on-intersect",
-    "body": "data-on-intersect=\"${1:expression}\"",
-    "description": "Runs an expression on intersection with the viewport.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-on-intersect"
+  "preserve-attr": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "valueKind": "string",
+    "completions": {
+      "data-preserve-attr": {
+        "body": "data-preserve-attr=\"\"",
+        "description": "Preserves the value of an attribute when patching elements using the `morph` mode.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-preserve-attr"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-on-interval": {
-    "prefix": "data-on-interval",
-    "body": "data-on-interval=\"${1:expression}\"",
-    "description": "Runs an expression at a regular interval.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-on-interval"
+  "query-string": {
+    "requirement": {
+      "key": "denied",
+      "value": "allowed"
+    },
+    "completions": {
+      "data-query-string": {
+        "body": "data-query-string=\"\"",
+        "description": "Syncs query string params to signal values on page load, and syncs signal values to query string params on change.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-query-string"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-on-raf": {
-    "prefix": "data-on-raf",
-    "body": "data-on-raf=\"${1:expression}\"",
-    "description": "Runs an expression on every `requestAnimationFrame` event.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-on-raf"
+  "ref": {
+    "requirement": {
+      "key": "exclusive",
+      "value": "exclusive"
+    },
+    "signals": "key-or-value",
+    "valueKind": "signal-name",
+    "completions": {
+      "data-ref": {
+        "body": "data-ref=\"${1:signalName}\"",
+        "description": "Creates a signal whose value references an element.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-ref"
+          }
+        ]
+      },
+      "data-ref:*": {
+        "body": "data-ref:${1:name}",
+        "description": "Creates a signal whose value references an element.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-ref"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-on-resize": {
-    "prefix": "data-on-resize",
-    "body": "data-on-resize=\"${1:expression}\"",
-    "description": "Runs an expression whenever an element’s dimensions change.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-on-resize"
+  "replace-url": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-replace-url": {
+        "body": "data-replace-url=\"${1:expression}\"",
+        "description": "Replaces the URL in the browser with an evaluated expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-replace-url"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-on-signal-patch": {
-    "prefix": "data-on-signal-patch",
-    "body": "data-on-signal-patch=\"${1:expression}\"",
-    "description": "Runs an expression whenever one or more signals are patched.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-on-signal-patch"
+  "scroll-into-view": {
+    "requirement": {
+      "key": "denied",
+      "value": "allowed"
+    },
+    "valueKind": "string",
+    "completions": {
+      "data-scroll-into-view": {
+        "body": "data-scroll-into-view",
+        "description": "Scrolls the element into view.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-scroll-into-view"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-on-signal-patch-filter": {
-    "prefix": "data-on-signal-patch-filter",
-    "body": "data-on-signal-patch-filter=\"${1:expression}\"",
-    "description": "Filters which signals to watch when using the `data-on-signal-patch` attribute.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-on-signal-change"
+  "show": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-show": {
+        "body": "data-show=\"${1:expression}\"",
+        "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-show"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-persist": {
-    "prefix": "data-persist",
-    "body": "data-persist=\"\"",
-    "description": "Persists signals in local storage.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-persist"
+  "signals": {
+    "requirement": {
+      "key": "allowed",
+      "value": "allowed"
+    },
+    "signals": "key-or-object",
+    "completions": {
+      "data-signals": {
+        "body": "data-signals=\"{${1:signalName}: ${2:expression}}\"",
+        "description": "Merges one or more signals into the existing signals using a set of key-value pairs that map to the signal name and expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-signals"
+          }
+        ]
+      },
+      "data-signals:*": {
+        "body": "data-signals:${1:name}=\"${2:expression}\"",
+        "description": "Merges a signal into the existing signals.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-signals"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-persist:*": {
-    "prefix": "data-persist:*",
-    "body": "data-persist:${1:name}=\"${2:expression}\"",
-    "description": "Persists signals in local storage with a custom key.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-persist"
+  "style": {
+    "requirement": {
+      "key": "allowed",
+      "value": "must"
+    },
+    "completions": {
+      "data-style": {
+        "body": "data-style=\"{${1:styleName}: ${2:expression}}\"",
+        "description": "Adds or removes one or more inline CSS styles from an element using a set of key-value pairs that map to the style name and expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-style"
+          }
+        ]
+      },
+      "data-style:*": {
+        "body": "data-style:${1:name}=\"${2:expression}\"",
+        "description": "Adds or removes an inline CSS style from an element based on an expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-style"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-preserve-attr": {
-    "prefix": "data-preserve-attr",
-    "body": "data-preserve-attr=\"\"",
-    "description": "Preserves the value of an attribute when patching elements using the `morph` mode.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-preserve-attr"
+  "text": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-text": {
+        "body": "data-text=\"${1:expression}\"",
+        "description": "Sets the text content of an element to the evaluated expression.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-text"
+          }
+        ]
       }
-    ]
+    }
   },
-  "data-query-string": {
-    "prefix": "data-query-string",
-    "body": "data-query-string=\"\"",
-    "description": "Syncs query string params to signal values on page load, and syncs signal values to query string params on change.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-query-string"
+  "view-transition": {
+    "requirement": {
+      "key": "denied",
+      "value": "must"
+    },
+    "completions": {
+      "data-view-transition": {
+        "body": "data-view-transition=\"${1:expression}\"",
+        "description": "Sets the value of `view-transition-name` for use with the View Transition API.",
+        "references": [
+          {
+            "name": "Documentation",
+            "url": "https://data-star.dev/reference/attributes#data-view-transition"
+          }
+        ]
       }
-    ]
-  },
-  "data-ref": {
-    "prefix": "data-ref",
-    "body": "data-ref=\"${1:signalName}\"",
-    "description": "Creates a signal whose value references an element.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-ref"
-      }
-    ]
-  },
-  "data-ref:*": {
-    "prefix": "data-ref:*",
-    "body": "data-ref:${1:name}",
-    "description": "Creates a signal whose value references an element.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-ref"
-      }
-    ]
-  },
-  "data-replace-url": {
-    "prefix": "data-replace-url",
-    "body": "data-replace-url=\"${1:expression}\"",
-    "description": "Replaces the URL in the browser with an evaluated expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-replace-url"
-      }
-    ]
-  },
-  "data-scroll-into-view": {
-    "prefix": "data-scroll-into-view",
-    "body": "data-scroll-into-view",
-    "description": "Scrolls the element into view.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-scroll-into-view"
-      }
-    ]
-  },
-  "data-show": {
-    "prefix": "data-show",
-    "body": "data-show=\"${1:expression}\"",
-    "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-show"
-      }
-    ]
-  },
-  "data-signals": {
-    "prefix": "data-signals",
-    "body": "data-signals=\"{${1:signalName}: ${2:expression}}\"",
-    "description": "Merges one or more signals into the existing signals using a set of key-value pairs that map to the signal name and expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-signals"
-      }
-    ]
-  },
-  "data-signals:*": {
-    "prefix": "data-signals:*",
-    "body": "data-signals:${1:name}=\"${2:expression}\"",
-    "description": "Merges a signal into the existing signals.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-signals"
-      }
-    ]
-  },
-  "data-style": {
-    "prefix": "data-style",
-    "body": "data-style=\"{${1:styleName}: ${2:expression}}\"",
-    "description": "Adds or removes one or more inline CSS styles from an element using a set of key-value pairs that map to the style name and expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-style"
-      }
-    ]
-  },
-  "data-style:*": {
-    "prefix": "data-style:*",
-    "body": "data-style:${1:name}=\"${2:expression}\"",
-    "description": "Adds or removes an inline CSS style from an element based on an expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-style"
-      }
-    ]
-  },
-  "data-text": {
-    "prefix": "data-text",
-    "body": "data-text=\"${1:expression}\"",
-    "description": "Sets the text content of an element to the evaluated expression.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-text"
-      }
-    ]
-  },
-  "data-view-transition": {
-    "prefix": "data-view-transition",
-    "body": "data-view-transition=\"${1:expression}\"",
-    "description": "Sets the value of `view-transition-name` for use with the View Transition API.",
-    "references": [
-      {
-        "name": "Documentation",
-        "url": "https://data-star.dev/reference/attributes#data-view-transition"
-      }
-    ]
+    }
   }
 }

@@ -1,0 +1,1573 @@
+{
+  "version": 1,
+  "attributes": [
+    {
+      "name": "animate",
+      "description": "Animates element attributes over time.",
+      "requirement": {
+        "key": "must",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "attr",
+      "description": "Sets one or more attribute values using a set of key-value pairs that map to the attribute name and expression.",
+      "requirement": {
+        "key": "allowed",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "bind",
+      "description": "Creates a new signal and enables two-way binding between it and the element.",
+      "requirement": {
+        "key": "exclusive",
+        "value": "exclusive"
+      },
+      "modifiers": [
+        {
+          "name": "case",
+          "description": "Converts the casing of the signal name."
+        },
+        {
+          "name": "case.camel",
+          "description": "Camel case: `mySignal` (default)"
+        },
+        {
+          "name": "case.kebab",
+          "description": "Kebab case: `my-signal`"
+        },
+        {
+          "name": "case.snake",
+          "description": "Snake case: `my_signal`"
+        },
+        {
+          "name": "case.pascal",
+          "description": "Pascal case: `MySignal`"
+        },
+        {
+          "name": "prop",
+          "description": "Binds to a specific property instead of the default binding. Must *not* be a read-only property."
+        },
+        {
+          "name": "event",
+          "description": "Defines which events sync the element property back to the signal."
+        }
+      ],
+      "signals": "key-or-value",
+      "valueKind": "signal-name",
+      "highlight": true
+    },
+    {
+      "name": "class",
+      "description": "Adds or removes one or more classes from an element using a set of key-value pairs that map to the class name and expression.",
+      "requirement": {
+        "key": "allowed",
+        "value": "must"
+      },
+      "modifiers": [
+        {
+          "name": "case",
+          "description": "Converts the casing of the class."
+        },
+        {
+          "name": "case.camel",
+          "description": "Camel case: `myClass`"
+        },
+        {
+          "name": "case.kebab",
+          "description": "Kebab case: `my-class` (default)"
+        },
+        {
+          "name": "case.snake",
+          "description": "Snake case: `my_class`"
+        },
+        {
+          "name": "case.pascal",
+          "description": "Pascal case: `MyClass`"
+        }
+      ],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "computed",
+      "description": "Creates one or more signals that are computed based on a set of key-value pairs that map to the signal name and expression.",
+      "requirement": {
+        "key": "allowed",
+        "value": "must"
+      },
+      "modifiers": [
+        {
+          "name": "case",
+          "description": "Converts the casing of the signal name."
+        },
+        {
+          "name": "case.camel",
+          "description": "Camel case: `mySignal` (default)"
+        },
+        {
+          "name": "case.kebab",
+          "description": "Kebab case: `my-signal`"
+        },
+        {
+          "name": "case.snake",
+          "description": "Snake case: `my_signal`"
+        },
+        {
+          "name": "case.pascal",
+          "description": "Pascal case: `MySignal`"
+        }
+      ],
+      "signals": "key-or-object",
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "custom-validity",
+      "description": "Adds custom validity to an element using an expression.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "effect",
+      "description": "Executes an expression on page load and whenever any signals in the expression change.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "ignore",
+      "description": "Ignores an element and its descendants from being processed.",
+      "requirement": {
+        "key": "denied",
+        "value": "allowed"
+      },
+      "modifiers": [
+        {
+          "name": "self",
+          "description": "Only ignore the element itself, not its descendants."
+        }
+      ],
+      "valueKind": "string",
+      "highlight": true
+    },
+    {
+      "name": "ignore-morph",
+      "description": "Ignores an element when patching an element using the `morph` mode.",
+      "requirement": {
+        "key": "denied",
+        "value": "allowed"
+      },
+      "modifiers": [],
+      "valueKind": "string",
+      "highlight": true
+    },
+    {
+      "name": "indicator",
+      "description": "Creates a signal to track in-flight backend requests.",
+      "requirement": {
+        "key": "exclusive",
+        "value": "exclusive"
+      },
+      "modifiers": [
+        {
+          "name": "case",
+          "description": "Converts the casing of the signal name."
+        },
+        {
+          "name": "case.camel",
+          "description": "Camel case: `mySignal` (default)"
+        },
+        {
+          "name": "case.kebab",
+          "description": "Kebab case: `my-signal`"
+        },
+        {
+          "name": "case.snake",
+          "description": "Snake case: `my_signal`"
+        },
+        {
+          "name": "case.pascal",
+          "description": "Pascal case: `MySignal`"
+        }
+      ],
+      "signals": "key-or-value",
+      "valueKind": "signal-name",
+      "highlight": true
+    },
+    {
+      "name": "init",
+      "description": "Runs an expression whenever the attribute is initialised.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [
+        {
+          "name": "delay",
+          "description": "Delay the event listener."
+        },
+        {
+          "name": "delay.500ms",
+          "description": "Delay for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "delay.1s",
+          "description": "Delay for 1 second (accepts any integer)."
+        },
+        {
+          "name": "viewtransition",
+          "description": "Wraps the expression in `document.startViewTransition()` when the View Transition API is available."
+        }
+      ],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "json-signals",
+      "description": "Sets the text content of an element to a reactive JSON stringified version of signals.",
+      "requirement": {
+        "key": "denied",
+        "value": "allowed"
+      },
+      "modifiers": [
+        {
+          "name": "terse",
+          "description": "Outputs a more compact JSON format without extra whitespace. Useful for displaying filtered data inline."
+        }
+      ],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "match-media",
+      "description": "Sets a signal to whether a media query matches and keeps it in sync whenever the query changes.",
+      "requirement": {
+        "key": "must",
+        "value": "must"
+      },
+      "modifiers": [
+        {
+          "name": "case",
+          "description": "Converts the casing of the signal name."
+        },
+        {
+          "name": "case.camel",
+          "description": "Camel case: `mySignal` (default)"
+        },
+        {
+          "name": "case.kebab",
+          "description": "Kebab case: `my-signal`"
+        },
+        {
+          "name": "case.snake",
+          "description": "Snake case: `my_signal`"
+        },
+        {
+          "name": "case.pascal",
+          "description": "Pascal case: `MySignal`"
+        }
+      ],
+      "signals": "key",
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "nonce",
+      "description": "Enables Content Security Policy mode using a nonempty nonce. This attribute is only allowed on the `html` element.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "string",
+      "element": "html",
+      "highlight": false
+    },
+    {
+      "name": "on",
+      "description": "Runs an expression whenever an event is triggered on an element.",
+      "requirement": {
+        "key": "must",
+        "value": "must"
+      },
+      "modifiers": [
+        {
+          "name": "once",
+          "description": "Only trigger the event listener once."
+        },
+        {
+          "name": "passive",
+          "description": "Do not call `preventDefault` on the event listener."
+        },
+        {
+          "name": "capture",
+          "description": "Use a capture event listener."
+        },
+        {
+          "name": "case",
+          "description": "Converts the casing of the event."
+        },
+        {
+          "name": "case.camel",
+          "description": "Camel case: `myEvent`"
+        },
+        {
+          "name": "case.kebab",
+          "description": "Kebab case: `my-event` (default)"
+        },
+        {
+          "name": "case.snake",
+          "description": "Snake case: `my_event`"
+        },
+        {
+          "name": "case.pascal",
+          "description": "Pascal case: `MyEvent`"
+        },
+        {
+          "name": "delay",
+          "description": "Delay the event listener."
+        },
+        {
+          "name": "delay.500ms",
+          "description": "Delay for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "delay.1s",
+          "description": "Delay for 1 second (accepts any integer)."
+        },
+        {
+          "name": "debounce",
+          "description": "Debounce the event listener."
+        },
+        {
+          "name": "debounce.500ms",
+          "description": "Debounce for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "debounce.1s",
+          "description": "Debounce for 1 second (accepts any integer)."
+        },
+        {
+          "name": "debounce.leading",
+          "description": "Debounce with leading edge (must come after timing)."
+        },
+        {
+          "name": "debounce.notrailing",
+          "description": "Debounce without trailing edge (must come after timing)."
+        },
+        {
+          "name": "throttle",
+          "description": "Throttle the event listener."
+        },
+        {
+          "name": "throttle.500ms",
+          "description": "Throttle for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "throttle.1s",
+          "description": "Throttle for 1 second (accepts any integer)."
+        },
+        {
+          "name": "throttle.noleading",
+          "description": "Throttle without leading edge (must come after timing)."
+        },
+        {
+          "name": "throttle.trailing",
+          "description": "Throttle with trailing edge (must come after timing)."
+        },
+        {
+          "name": "viewtransition",
+          "description": "Wraps the expression in `document.startViewTransition()` when the View Transition API is available."
+        },
+        {
+          "name": "window",
+          "description": "Attaches the event listener to the `window` element."
+        },
+        {
+          "name": "document",
+          "description": "Attaches the event listener to the `document` element. Useful for events that are only available on `document` and that do not bubble."
+        },
+        {
+          "name": "outside",
+          "description": "Triggers when the event is outside the element."
+        },
+        {
+          "name": "prevent",
+          "description": "Calls `preventDefault` on the event listener."
+        },
+        {
+          "name": "stop",
+          "description": "Calls `stopPropagation` on the event listener."
+        }
+      ],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "on-intersect",
+      "description": "Runs an expression on intersection with the viewport.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [
+        {
+          "name": "once",
+          "description": "Only triggers the event once."
+        },
+        {
+          "name": "exit",
+          "description": "Only triggers the event when the element exits the viewport."
+        },
+        {
+          "name": "half",
+          "description": "Triggers when half of the element is visible."
+        },
+        {
+          "name": "full",
+          "description": "Triggers when the full element is visible."
+        },
+        {
+          "name": "threshold",
+          "description": "Triggers when the element is visible by a certain percentage."
+        },
+        {
+          "name": "threshold.25",
+          "description": "Triggers when 25% of the element is visible."
+        },
+        {
+          "name": "threshold.75",
+          "description": "Triggers when 75% of the element is visible."
+        },
+        {
+          "name": "delay",
+          "description": "Delay the event listener."
+        },
+        {
+          "name": "delay.500ms",
+          "description": "Delay for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "delay.1s",
+          "description": "Delay for 1 second (accepts any integer)."
+        },
+        {
+          "name": "debounce",
+          "description": "Debounce the event listener."
+        },
+        {
+          "name": "debounce.500ms",
+          "description": "Debounce for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "debounce.1s",
+          "description": "Debounce for 1 second (accepts any integer)."
+        },
+        {
+          "name": "debounce.leading",
+          "description": "Debounce with leading edge (must come after timing)."
+        },
+        {
+          "name": "debounce.notrailing",
+          "description": "Debounce without trailing edge (must come after timing)."
+        },
+        {
+          "name": "throttle",
+          "description": "Throttle the event listener."
+        },
+        {
+          "name": "throttle.500ms",
+          "description": "Throttle for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "throttle.1s",
+          "description": "Throttle for 1 second (accepts any integer)."
+        },
+        {
+          "name": "throttle.noleading",
+          "description": "Throttle without leading edge (must come after timing)."
+        },
+        {
+          "name": "throttle.trailing",
+          "description": "Throttle with trailing edge (must come after timing)."
+        },
+        {
+          "name": "viewtransition",
+          "description": "Wraps the expression in `document.startViewTransition()` when the View Transition API is available."
+        }
+      ],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "on-interval",
+      "description": "Runs an expression at a regular interval.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [
+        {
+          "name": "duration",
+          "description": "Sets the interval duration."
+        },
+        {
+          "name": "duration.500ms",
+          "description": "Interval duration of 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "duration.1s",
+          "description": "Interval duration of 1 second (default)."
+        },
+        {
+          "name": "duration.leading",
+          "description": "Execute the first interval immediately."
+        },
+        {
+          "name": "viewtransition",
+          "description": "Wraps the expression in `document.startViewTransition()` when the View Transition API is available."
+        }
+      ],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "on-raf",
+      "description": "Runs an expression on every `requestAnimationFrame` event.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [
+        {
+          "name": "throttle",
+          "description": "Throttle the event listener."
+        },
+        {
+          "name": "throttle.500ms",
+          "description": "Throttle for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "throttle.1s",
+          "description": "Throttle for 1 second (accepts any integer)."
+        },
+        {
+          "name": "throttle.noleading",
+          "description": "Throttle without leading edge (must come after timing)."
+        },
+        {
+          "name": "throttle.trailing",
+          "description": "Throttle with trailing edge (must come after timing)."
+        }
+      ],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "on-resize",
+      "description": "Runs an expression whenever an element’s dimensions change.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [
+        {
+          "name": "debounce",
+          "description": "Debounce the event listener."
+        },
+        {
+          "name": "debounce.500ms",
+          "description": "Debounce for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "debounce.1s",
+          "description": "Debounce for 1 second (accepts any integer)."
+        },
+        {
+          "name": "debounce.leading",
+          "description": "Debounce with leading edge (must come after timing)."
+        },
+        {
+          "name": "debounce.notrailing",
+          "description": "Debounce without trailing edge (must come after timing)."
+        },
+        {
+          "name": "throttle",
+          "description": "Throttle the event listener."
+        },
+        {
+          "name": "throttle.500ms",
+          "description": "Throttle for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "throttle.1s",
+          "description": "Throttle for 1 second (accepts any integer)."
+        },
+        {
+          "name": "throttle.noleading",
+          "description": "Throttle without leading edge (must come after timing)."
+        },
+        {
+          "name": "throttle.trailing",
+          "description": "Throttle with trailing edge (must come after timing)."
+        }
+      ],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "on-signal-patch",
+      "description": "Runs an expression whenever one or more signals are patched.",
+      "requirement": {
+        "key": "allowed",
+        "value": "must"
+      },
+      "modifiers": [
+        {
+          "name": "delay",
+          "description": "Delay the event listener."
+        },
+        {
+          "name": "delay.500ms",
+          "description": "Delay for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "delay.1s",
+          "description": "Delay for 1 second (accepts any integer)."
+        },
+        {
+          "name": "debounce",
+          "description": "Debounce the event listener."
+        },
+        {
+          "name": "debounce.500ms",
+          "description": "Debounce for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "debounce.1s",
+          "description": "Debounce for 1 second (accepts any integer)."
+        },
+        {
+          "name": "debounce.leading",
+          "description": "Debounce with leading edge (must come after timing)."
+        },
+        {
+          "name": "debounce.notrailing",
+          "description": "Debounce without trailing edge (must come after timing)."
+        },
+        {
+          "name": "throttle",
+          "description": "Throttle the event listener."
+        },
+        {
+          "name": "throttle.500ms",
+          "description": "Throttle for 500 milliseconds (accepts any integer)."
+        },
+        {
+          "name": "throttle.1s",
+          "description": "Throttle for 1 second (accepts any integer)."
+        },
+        {
+          "name": "throttle.noleading",
+          "description": "Throttle without leading edge (must come after timing)."
+        },
+        {
+          "name": "throttle.trailing",
+          "description": "Throttle with trailing edge (must come after timing)."
+        }
+      ],
+      "valueKind": "expression",
+      "keys": [
+        "filter"
+      ],
+      "highlight": true
+    },
+    {
+      "name": "on-signal-patch-filter",
+      "description": "Filters which signals to watch when using the `data-on-signal-patch` attribute.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "persist",
+      "description": "Persists signals in local storage.",
+      "requirement": {
+        "key": "allowed",
+        "value": "allowed"
+      },
+      "modifiers": [
+        {
+          "name": "session",
+          "description": "Persists signals in [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) instead of local storage."
+        }
+      ],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "preserve-attr",
+      "description": "Preserves the value of an attribute when patching elements using the `morph` mode.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "string",
+      "highlight": true
+    },
+    {
+      "name": "query-string",
+      "description": "Syncs query string params to signal values on page load, and syncs signal values to query string params on change.",
+      "requirement": {
+        "key": "denied",
+        "value": "allowed"
+      },
+      "modifiers": [
+        {
+          "name": "filter",
+          "description": "Filters out empty values when syncing signal values to query string params."
+        },
+        {
+          "name": "history",
+          "description": "Enables history support – each time a matching signal changes, a new entry is added to the browser’s history stack. Signal values are restored from the query string params on popstate events."
+        }
+      ],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "ref",
+      "description": "Creates a signal whose value references an element.",
+      "requirement": {
+        "key": "exclusive",
+        "value": "exclusive"
+      },
+      "modifiers": [
+        {
+          "name": "case",
+          "description": "Converts the casing of the signal name."
+        },
+        {
+          "name": "case.camel",
+          "description": "Camel case: `mySignal` (default)"
+        },
+        {
+          "name": "case.kebab",
+          "description": "Kebab case: `my-signal`"
+        },
+        {
+          "name": "case.snake",
+          "description": "Snake case: `my_signal`"
+        },
+        {
+          "name": "case.pascal",
+          "description": "Pascal case: `MySignal`"
+        }
+      ],
+      "signals": "key-or-value",
+      "valueKind": "signal-name",
+      "highlight": true
+    },
+    {
+      "name": "replace-url",
+      "description": "Replaces the URL in the browser with an evaluated expression.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "scroll-into-view",
+      "description": "Scrolls the element into view.",
+      "requirement": {
+        "key": "denied",
+        "value": "allowed"
+      },
+      "modifiers": [
+        {
+          "name": "smooth",
+          "description": "Scrolling is animated smoothly."
+        },
+        {
+          "name": "instant",
+          "description": "Scrolling is instant."
+        },
+        {
+          "name": "auto",
+          "description": "Scrolling is determined by the computed `scroll-behavior` CSS property."
+        },
+        {
+          "name": "hstart",
+          "description": "Scrolls to the left of the element."
+        },
+        {
+          "name": "hcenter",
+          "description": "Scrolls to the horizontal center of the element."
+        },
+        {
+          "name": "hend",
+          "description": "Scrolls to the right of the element."
+        },
+        {
+          "name": "hnearest",
+          "description": "Scrolls to the nearest horizontal edge of the element."
+        },
+        {
+          "name": "vstart",
+          "description": "Scrolls to the top of the element."
+        },
+        {
+          "name": "vcenter",
+          "description": "Scrolls to the vertical center of the element."
+        },
+        {
+          "name": "vend",
+          "description": "Scrolls to the bottom of the element."
+        },
+        {
+          "name": "vnearest",
+          "description": "Scrolls to the nearest vertical edge of the element."
+        },
+        {
+          "name": "focus",
+          "description": "Focuses the element after scrolling."
+        }
+      ],
+      "valueKind": "string",
+      "highlight": true
+    },
+    {
+      "name": "show",
+      "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "signals",
+      "description": "Merges one or more signals into the existing signals using a set of key-value pairs that map to the signal name and expression.",
+      "requirement": {
+        "key": "allowed",
+        "value": "allowed"
+      },
+      "modifiers": [
+        {
+          "name": "case",
+          "description": "Converts the casing of the signal name."
+        },
+        {
+          "name": "case.camel",
+          "description": "Camel case: `mySignal` (default)"
+        },
+        {
+          "name": "case.kebab",
+          "description": "Kebab case: `my-signal`"
+        },
+        {
+          "name": "case.snake",
+          "description": "Snake case: `my_signal`"
+        },
+        {
+          "name": "case.pascal",
+          "description": "Pascal case: `MySignal`"
+        },
+        {
+          "name": "ifmissing",
+          "description": "Only patches signals if their keys do not already exist. This is useful for setting defaults without overwriting existing values."
+        }
+      ],
+      "signals": "key-or-object",
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "style",
+      "description": "Adds or removes one or more inline CSS styles from an element using a set of key-value pairs that map to the style name and expression.",
+      "requirement": {
+        "key": "allowed",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "text",
+      "description": "Sets the text content of an element to the evaluated expression.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "expression",
+      "highlight": true
+    },
+    {
+      "name": "view-transition",
+      "description": "Sets the value of `view-transition-name` for use with the View Transition API.",
+      "requirement": {
+        "key": "denied",
+        "value": "must"
+      },
+      "modifiers": [],
+      "valueKind": "expression",
+      "highlight": true
+    }
+  ],
+  "completions": [
+    {
+      "name": "data-animate:*",
+      "pluginName": "animate",
+      "insertText": "data-animate:${1:name}=\"${2:expression}\"",
+      "description": "Animates element attributes over time.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-animate"
+        }
+      ]
+    },
+    {
+      "name": "data-attr",
+      "pluginName": "attr",
+      "insertText": "data-attr=\"{${1:attributeName}: ${2:expression}}\"",
+      "description": "Sets one or more attribute values using a set of key-value pairs that map to the attribute name and expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-attributes"
+        }
+      ]
+    },
+    {
+      "name": "data-attr:*",
+      "pluginName": "attr",
+      "insertText": "data-attr:${1:name}=\"${2:expression}\"",
+      "description": "Sets an element’s attribute value based on an expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-attributes"
+        }
+      ]
+    },
+    {
+      "name": "data-bind",
+      "pluginName": "bind",
+      "insertText": "data-bind=\"${1:signalName}\"",
+      "description": "Creates a new signal and enables two-way binding between it and the element.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-bind"
+        }
+      ]
+    },
+    {
+      "name": "data-bind:*",
+      "pluginName": "bind",
+      "insertText": "data-bind:${1:name}",
+      "description": "Creates a new signal and enables two-way binding between it and the element.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-bind"
+        }
+      ]
+    },
+    {
+      "name": "data-class",
+      "pluginName": "class",
+      "insertText": "data-class=\"{${1:className}: ${2:expression}}\"",
+      "description": "Adds or removes one or more classes from an element using a set of key-value pairs that map to the class name and expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-class"
+        }
+      ]
+    },
+    {
+      "name": "data-class:*",
+      "pluginName": "class",
+      "insertText": "data-class:${1:name}=\"${2:expression}\"",
+      "description": "Adds or removes a class from an element based on an expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-class"
+        }
+      ]
+    },
+    {
+      "name": "data-computed",
+      "pluginName": "computed",
+      "insertText": "data-computed=\"{${1:signalName}: ${2:expression}}\"",
+      "description": "Creates one or more signals that are computed based on a set of key-value pairs that map to the signal name and expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-computed"
+        }
+      ]
+    },
+    {
+      "name": "data-computed:*",
+      "pluginName": "computed",
+      "insertText": "data-computed:${1:name}=\"${2:expression}\"",
+      "description": "Creates a signal that is computed based on an expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-computed"
+        }
+      ]
+    },
+    {
+      "name": "data-custom-validity",
+      "pluginName": "custom-validity",
+      "insertText": "data-custom-validity=\"${1:expression}\"",
+      "description": "Adds custom validity to an element using an expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-custom-validity"
+        }
+      ]
+    },
+    {
+      "name": "data-effect",
+      "pluginName": "effect",
+      "insertText": "data-effect=\"${1:expression}\"",
+      "description": "Executes an expression on page load and whenever any signals in the expression change.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-effect"
+        }
+      ]
+    },
+    {
+      "name": "data-ignore",
+      "pluginName": "ignore",
+      "insertText": "data-ignore",
+      "description": "Ignores an element and its descendants from being processed.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-ignore"
+        }
+      ]
+    },
+    {
+      "name": "data-ignore-morph",
+      "pluginName": "ignore-morph",
+      "insertText": "data-ignore-morph",
+      "description": "Ignores an element when patching an element using the `morph` mode.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-ignore-morph"
+        }
+      ]
+    },
+    {
+      "name": "data-indicator",
+      "pluginName": "indicator",
+      "insertText": "data-indicator=\"${1:signalName}\"",
+      "description": "Creates a signal to track in-flight backend requests.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-indicator"
+        }
+      ]
+    },
+    {
+      "name": "data-indicator:*",
+      "pluginName": "indicator",
+      "insertText": "data-indicator:${1:name}",
+      "description": "Creates a signal to track in-flight backend requests.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-indicator"
+        }
+      ]
+    },
+    {
+      "name": "data-init",
+      "pluginName": "init",
+      "insertText": "data-init=\"${1:expression}\"",
+      "description": "Runs an expression whenever the attribute is initialised.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-init"
+        }
+      ]
+    },
+    {
+      "name": "data-json-signals",
+      "pluginName": "json-signals",
+      "insertText": "data-json-signals=\"${1:expression}\"",
+      "description": "Sets the text content of an element to a reactive JSON stringified version of signals.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-json-signals"
+        }
+      ]
+    },
+    {
+      "name": "data-match-media:*",
+      "pluginName": "match-media",
+      "insertText": "data-match-media:${1:name}=\"${2:expression}\"",
+      "description": "Sets a signal to whether a media query matches and keeps it in sync whenever the query changes.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-match-media"
+        }
+      ]
+    },
+    {
+      "name": "data-nonce",
+      "pluginName": "nonce",
+      "insertText": "data-nonce=\"${1}\"",
+      "description": "Enables Content Security Policy mode using a nonempty nonce. This attribute is only allowed on the `html` element.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/security#content-security-policy"
+        }
+      ]
+    },
+    {
+      "name": "data-on",
+      "pluginName": "on",
+      "insertText": "data-on:${1:name}=\"${2:expression}\"",
+      "description": "Runs an expression whenever an event is triggered on an element.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-on"
+        }
+      ]
+    },
+    {
+      "name": "data-on:click",
+      "pluginName": "on",
+      "insertText": "data-on:click=\"${1:expression}\"",
+      "description": "Runs an expression whenever the element is clicked.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-on"
+        }
+      ]
+    },
+    {
+      "name": "data-on:keydown",
+      "pluginName": "on",
+      "insertText": "data-on:keydown=\"${1:expression}\"",
+      "description": "Runs an expression whenever a key is pressed.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-on"
+        }
+      ]
+    },
+    {
+      "name": "data-on-intersect",
+      "pluginName": "on-intersect",
+      "insertText": "data-on-intersect=\"${1:expression}\"",
+      "description": "Runs an expression on intersection with the viewport.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-on-intersect"
+        }
+      ]
+    },
+    {
+      "name": "data-on-interval",
+      "pluginName": "on-interval",
+      "insertText": "data-on-interval=\"${1:expression}\"",
+      "description": "Runs an expression at a regular interval.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-on-interval"
+        }
+      ]
+    },
+    {
+      "name": "data-on-raf",
+      "pluginName": "on-raf",
+      "insertText": "data-on-raf=\"${1:expression}\"",
+      "description": "Runs an expression on every `requestAnimationFrame` event.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-on-raf"
+        }
+      ]
+    },
+    {
+      "name": "data-on-resize",
+      "pluginName": "on-resize",
+      "insertText": "data-on-resize=\"${1:expression}\"",
+      "description": "Runs an expression whenever an element’s dimensions change.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-on-resize"
+        }
+      ]
+    },
+    {
+      "name": "data-on-signal-patch",
+      "pluginName": "on-signal-patch",
+      "insertText": "data-on-signal-patch=\"${1:expression}\"",
+      "description": "Runs an expression whenever one or more signals are patched.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-on-signal-patch"
+        }
+      ]
+    },
+    {
+      "name": "data-on-signal-patch-filter",
+      "pluginName": "on-signal-patch-filter",
+      "insertText": "data-on-signal-patch-filter=\"${1:expression}\"",
+      "description": "Filters which signals to watch when using the `data-on-signal-patch` attribute.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-on-signal-change"
+        }
+      ]
+    },
+    {
+      "name": "data-persist",
+      "pluginName": "persist",
+      "insertText": "data-persist=\"\"",
+      "description": "Persists signals in local storage.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-persist"
+        }
+      ]
+    },
+    {
+      "name": "data-persist:*",
+      "pluginName": "persist",
+      "insertText": "data-persist:${1:name}=\"${2:expression}\"",
+      "description": "Persists signals in local storage with a custom key.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-persist"
+        }
+      ]
+    },
+    {
+      "name": "data-preserve-attr",
+      "pluginName": "preserve-attr",
+      "insertText": "data-preserve-attr=\"\"",
+      "description": "Preserves the value of an attribute when patching elements using the `morph` mode.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-preserve-attr"
+        }
+      ]
+    },
+    {
+      "name": "data-query-string",
+      "pluginName": "query-string",
+      "insertText": "data-query-string=\"\"",
+      "description": "Syncs query string params to signal values on page load, and syncs signal values to query string params on change.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-query-string"
+        }
+      ]
+    },
+    {
+      "name": "data-ref",
+      "pluginName": "ref",
+      "insertText": "data-ref=\"${1:signalName}\"",
+      "description": "Creates a signal whose value references an element.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-ref"
+        }
+      ]
+    },
+    {
+      "name": "data-ref:*",
+      "pluginName": "ref",
+      "insertText": "data-ref:${1:name}",
+      "description": "Creates a signal whose value references an element.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-ref"
+        }
+      ]
+    },
+    {
+      "name": "data-replace-url",
+      "pluginName": "replace-url",
+      "insertText": "data-replace-url=\"${1:expression}\"",
+      "description": "Replaces the URL in the browser with an evaluated expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-replace-url"
+        }
+      ]
+    },
+    {
+      "name": "data-scroll-into-view",
+      "pluginName": "scroll-into-view",
+      "insertText": "data-scroll-into-view",
+      "description": "Scrolls the element into view.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-scroll-into-view"
+        }
+      ]
+    },
+    {
+      "name": "data-show",
+      "pluginName": "show",
+      "insertText": "data-show=\"${1:expression}\"",
+      "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-show"
+        }
+      ]
+    },
+    {
+      "name": "data-signals",
+      "pluginName": "signals",
+      "insertText": "data-signals=\"{${1:signalName}: ${2:expression}}\"",
+      "description": "Merges one or more signals into the existing signals using a set of key-value pairs that map to the signal name and expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-signals"
+        }
+      ]
+    },
+    {
+      "name": "data-signals:*",
+      "pluginName": "signals",
+      "insertText": "data-signals:${1:name}=\"${2:expression}\"",
+      "description": "Merges a signal into the existing signals.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-signals"
+        }
+      ]
+    },
+    {
+      "name": "data-style",
+      "pluginName": "style",
+      "insertText": "data-style=\"{${1:styleName}: ${2:expression}}\"",
+      "description": "Adds or removes one or more inline CSS styles from an element using a set of key-value pairs that map to the style name and expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-style"
+        }
+      ]
+    },
+    {
+      "name": "data-style:*",
+      "pluginName": "style",
+      "insertText": "data-style:${1:name}=\"${2:expression}\"",
+      "description": "Adds or removes an inline CSS style from an element based on an expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-style"
+        }
+      ]
+    },
+    {
+      "name": "data-text",
+      "pluginName": "text",
+      "insertText": "data-text=\"${1:expression}\"",
+      "description": "Sets the text content of an element to the evaluated expression.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-text"
+        }
+      ]
+    },
+    {
+      "name": "data-view-transition",
+      "pluginName": "view-transition",
+      "insertText": "data-view-transition=\"${1:expression}\"",
+      "description": "Sets the value of `view-transition-name` for use with the View Transition API.",
+      "references": [
+        {
+          "name": "Documentation",
+          "url": "https://data-star.dev/reference/attributes#data-view-transition"
+        }
+      ]
+    }
+  ],
+  "nativeEvents": [
+    "abort",
+    "animationcancel",
+    "animationend",
+    "animationiteration",
+    "animationstart",
+    "auxclick",
+    "beforeinput",
+    "beforematch",
+    "beforetoggle",
+    "blur",
+    "cancel",
+    "canplay",
+    "canplaythrough",
+    "change",
+    "click",
+    "close",
+    "compositionend",
+    "compositionstart",
+    "compositionupdate",
+    "contextlost",
+    "contextmenu",
+    "contextrestored",
+    "copy",
+    "cuechange",
+    "cut",
+    "dblclick",
+    "drag",
+    "dragend",
+    "dragenter",
+    "dragleave",
+    "dragover",
+    "dragstart",
+    "drop",
+    "durationchange",
+    "emptied",
+    "ended",
+    "error",
+    "focus",
+    "focusin",
+    "focusout",
+    "formdata",
+    "fullscreenchange",
+    "fullscreenerror",
+    "gotpointercapture",
+    "input",
+    "invalid",
+    "keydown",
+    "keypress",
+    "keyup",
+    "load",
+    "loadeddata",
+    "loadedmetadata",
+    "loadstart",
+    "lostpointercapture",
+    "mousedown",
+    "mouseenter",
+    "mouseleave",
+    "mousemove",
+    "mouseout",
+    "mouseover",
+    "mouseup",
+    "paste",
+    "pause",
+    "play",
+    "playing",
+    "pointercancel",
+    "pointerdown",
+    "pointerenter",
+    "pointerleave",
+    "pointermove",
+    "pointerout",
+    "pointerover",
+    "pointerrawupdate",
+    "pointerup",
+    "progress",
+    "ratechange",
+    "reset",
+    "resize",
+    "scroll",
+    "scrollend",
+    "securitypolicyviolation",
+    "seeked",
+    "seeking",
+    "select",
+    "selectionchange",
+    "selectstart",
+    "slotchange",
+    "stalled",
+    "submit",
+    "suspend",
+    "timeupdate",
+    "toggle",
+    "touchcancel",
+    "touchend",
+    "touchmove",
+    "touchstart",
+    "transitioncancel",
+    "transitionend",
+    "transitionrun",
+    "transitionstart",
+    "volumechange",
+    "waiting",
+    "webkitanimationend",
+    "webkitanimationiteration",
+    "webkitanimationstart",
+    "webkittransitionend",
+    "wheel"
+  ]
+}
