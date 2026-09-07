@@ -1,19 +1,29 @@
 # Datastar Extension for Visual Studio Code
 
-Adds autocomplete and syntax highlighting for [Datastar](https://data-star.dev/) to Visual Studio Code.
+Adds context-aware autocomplete, diagnostics, hover documentation, and syntax highlighting for [Datastar](https://data-star.dev/) to Visual Studio Code.
+
+The extension provides:
+
+- Datastar attribute, modifier, and native event completion
+- Attribute key and value validation
+- Hover documentation and links to the Datastar reference
+- Document-local signal and nested property completion
+- Syntax highlighting in HTML and common template languages
+
+Signals declared with attributes such as `data-signals`, `data-computed`, `data-bind`, `data-ref`, and `data-indicator` are suggested after typing `$` in a Datastar expression. Nested properties are suggested after typing a signal path followed by `.`.
 
 ![VSCode extension](https://data-star.dev/static/images/vscode-extension-120.png)
 
+## Installation
+
+Install the extension from the Visual Studio Code Marketplace or search for “Datastar” in the Extensions panel.
+
+Visual Studio Code 1.63.0 or later is required.
+
 ## Configuration
 
-By default, Datastar snippets work in HTML and most common template languages. You can customize which languages and file extensions have Datastar support by configuring the `datastar.enabledLanguages` setting.
+Datastar language support is enabled by default for HTML and common template languages. Use `datastar.enabledLanguages` to customize the supported language IDs and file extensions:
 
-**To configure:**
-1. Open VS Code Settings (Cmd/Ctrl + ,)
-2. Search for "datastar enabled languages"
-3. Add language IDs (e.g., `html`, `php`, `twig`) or file extensions (e.g., `.edge`, `.njk`, `.custom`)
-
-**Example:**
 ```json
 {
   "datastar.enabledLanguages": [
@@ -28,14 +38,8 @@ By default, Datastar snippets work in HTML and most common template languages. Y
 
 ### Custom Attributes
 
-You can add syntax highlighting support for custom Datastar plugins using the `datastar.customAttributes` setting.
+Use `datastar.customAttributes` to add completion and syntax highlighting for custom Datastar plugins. Specify plugin names without the `data-` prefix:
 
-**To configure:**
-1. Open VS Code Settings (Cmd/Ctrl + ,)
-2. Search for "datastar custom attributes"
-3. Add your custom plugin names (without the `data-` prefix)
-
-**Example:**
 ```json
 {
   "datastar.customAttributes": [
@@ -48,12 +52,4 @@ After adding custom attributes, reload VS Code to apply the changes.
 
 ## License
 
-This plugin is licensed for free under the MIT License.
-
-## Requirements
-
-This plugin requires Visual Studio Code version 1.63.0 or later.
-
-## Installation
-
-Install the extension from the Visual Studio Code Marketplace or from the extensions panel by searching for “Datastar”.
+This extension is licensed under the MIT License.
