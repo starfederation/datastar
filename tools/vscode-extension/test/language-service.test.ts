@@ -5,6 +5,7 @@ import {
     getCompletions,
     getDiagnostics,
     getHover,
+    getSignatureHelp,
     parseDocument,
 } from '../src/language-service'
 
@@ -67,6 +68,14 @@ test('provides data-nonce completion on html', () => {
     const completions = getCompletions(source, source.indexOf('>'));
 
     assert.equal(completions.some(completion => completion.label === 'data-nonce'), true);
+});
+
+test('identifies Pro attributes in completion details', () => {
+    const source = '<div data-an';
+    const animate = getCompletions(source, source.length)
+        .find(completion => completion.label === 'data-animate:*');
+
+    assert.equal(animate?.detail, 'Datastar Pro attribute');
 });
 
 test('provides native event completions after data-on:', () => {
@@ -147,6 +156,56 @@ test('completes nested signal properties', () => {
 
     assert.deepEqual(completions.map(completion => completion.label), ['name', 'address']);
     assert.equal(source.slice(completions[0].start, completions[0].end), 'n');
+});
+
+test('provides action completions inside Datastar expressions', () => {
+    const source = '<button data-on:click="@po">';
+    const offset = source.indexOf('@po') + '@po'.length;
+    const completions = getCompletions(source, offset);
+    const post = completions.find(completion => completion.label === '@post');
+
+    assert.ok(post);
+    assert.equal(post.insertText, '@post(');
+    assert.equal(post.kind, 'action');
+    assert.equal(post.snippet, undefined);
+    assert.equal(post.detail, 'Datastar action');
+    assert.equal(source.slice(post.start, post.end), '@po');
+});
+
+test('includes Pro actions and identifies them in completion details', () => {
+    const source = '<div data-text="@fi">';
+    const offset = source.indexOf('@fi') + '@fi'.length;
+    const fit = getCompletions(source, offset).find(completion => completion.label === '@fit');
+
+    assert.equal(fit?.detail, 'Datastar Pro action');
+    assert.equal(getSignatureHelp('<div data-text="@fit(">', '<div data-text="@fit('.length)?.pro, true);
+});
+
+test('does not provide action completions in plain signal-name values', () => {
+    const source = '<input data-bind="@">';
+    const offset = source.indexOf('@') + 1;
+
+    assert.deepEqual(getCompletions(source, offset), []);
+});
+
+test('provides action signature help and tracks the active argument', () => {
+    const firstArgument = '<button data-on:click="@post(\'/endpoint\'">';
+    const first = getSignatureHelp(firstArgument, firstArgument.indexOf("'/endpoint'") + "'/endpoint'".length);
+    assert.equal(first?.label, '@post(uri: string, options={ })');
+    assert.equal(first?.activeParameter, 0);
+
+    const secondArgument = '<button data-on:click="@post(\'/endpoint\', {payload: [$foo, $bar]}">';
+    const second = getSignatureHelp(secondArgument, secondArgument.indexOf('$bar') + '$bar'.length);
+    assert.equal(second?.activeParameter, 1);
+});
+
+test('provides signature help for a nested action call', () => {
+    const source = '<div data-text="@setAll(@peek(() => $count), {include: /count/})">';
+    const offset = source.indexOf('$count') + '$count'.length;
+    const signature = getSignatureHelp(source, offset);
+
+    assert.equal(signature?.label, '@peek(callable: () => any)');
+    assert.equal(signature?.activeParameter, 0);
 });
 
 test('does not offer signals in attributes that declare a plain signal name', () => {

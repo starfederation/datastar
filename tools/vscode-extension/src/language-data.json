@@ -10,7 +10,8 @@
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": true
     },
     {
       "name": "attr",
@@ -21,7 +22,8 @@
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "bind",
@@ -62,7 +64,8 @@
       ],
       "signals": "key-or-value",
       "valueKind": "signal-name",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "class",
@@ -94,7 +97,8 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "computed",
@@ -127,7 +131,8 @@
       ],
       "signals": "key-or-object",
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "custom-validity",
@@ -138,7 +143,8 @@
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": true
     },
     {
       "name": "effect",
@@ -149,7 +155,8 @@
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "ignore",
@@ -165,7 +172,8 @@
         }
       ],
       "valueKind": "string",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "ignore-morph",
@@ -176,7 +184,8 @@
       },
       "modifiers": [],
       "valueKind": "string",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "indicator",
@@ -209,7 +218,8 @@
       ],
       "signals": "key-or-value",
       "valueKind": "signal-name",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "init",
@@ -237,7 +247,8 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "json-signals",
@@ -253,7 +264,8 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "match-media",
@@ -286,7 +298,8 @@
       ],
       "signals": "key",
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": true
     },
     {
       "name": "nonce",
@@ -298,7 +311,8 @@
       "modifiers": [],
       "valueKind": "string",
       "element": "html",
-      "highlight": false
+      "highlight": false,
+      "pro": false
     },
     {
       "name": "on",
@@ -418,7 +432,8 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "on-intersect",
@@ -514,7 +529,8 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "on-interval",
@@ -546,7 +562,8 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "on-raf",
@@ -578,7 +595,8 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": true
     },
     {
       "name": "on-resize",
@@ -630,7 +648,8 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": true
     },
     {
       "name": "on-signal-patch",
@@ -697,7 +716,8 @@
       "keys": [
         "filter"
       ],
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "on-signal-patch-filter",
@@ -708,7 +728,8 @@
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "persist",
@@ -724,7 +745,8 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": true
     },
     {
       "name": "preserve-attr",
@@ -735,7 +757,8 @@
       },
       "modifiers": [],
       "valueKind": "string",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "query-string",
@@ -755,7 +778,8 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": true
     },
     {
       "name": "ref",
@@ -788,7 +812,8 @@
       ],
       "signals": "key-or-value",
       "valueKind": "signal-name",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "replace-url",
@@ -799,7 +824,8 @@
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": true
     },
     {
       "name": "scroll-into-view",
@@ -859,7 +885,8 @@
         }
       ],
       "valueKind": "string",
-      "highlight": true
+      "highlight": true,
+      "pro": true
     },
     {
       "name": "show",
@@ -870,7 +897,8 @@
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "signals",
@@ -907,7 +935,8 @@
       ],
       "signals": "key-or-object",
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "style",
@@ -918,7 +947,8 @@
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "text",
@@ -929,7 +959,8 @@
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": false
     },
     {
       "name": "view-transition",
@@ -940,7 +971,8 @@
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true
+      "highlight": true,
+      "pro": true
     }
   ],
   "completions": [
@@ -1569,5 +1601,176 @@
     "webkitanimationstart",
     "webkittransitionend",
     "wheel"
+  ],
+  "actions": [
+    {
+      "name": "peek",
+      "description": "Allows accessing signals without subscribing to their changes in expressions.",
+      "signature": "@peek(callable: () => any)",
+      "parameters": [
+        {
+          "label": "callable: () => any"
+        }
+      ],
+      "pro": false
+    },
+    {
+      "name": "setAll",
+      "description": "Sets the value of all matching signals (or all signals if no filter is used) to the expression provided in the first argument. The second argument is an optional filter object with an `include` property that accepts a regular expression to match signal paths. You can optionally provide an `exclude` property to exclude specific patterns.",
+      "signature": "@setAll(value: any, filter?: {include: RegExp, exclude?: RegExp})",
+      "parameters": [
+        {
+          "label": "value: any"
+        },
+        {
+          "label": "filter?: {include: RegExp, exclude?: RegExp}"
+        }
+      ],
+      "pro": false
+    },
+    {
+      "name": "toggleAll",
+      "description": "Toggles the boolean value of all matching signals (or all signals if no filter is used). The argument is an optional filter object with an `include` property that accepts a regular expression to match signal paths. You can optionally provide an `exclude` property to exclude specific patterns.",
+      "signature": "@toggleAll(filter?: {include: RegExp, exclude?: RegExp})",
+      "parameters": [
+        {
+          "label": "filter?: {include: RegExp, exclude?: RegExp}"
+        }
+      ],
+      "pro": false
+    },
+    {
+      "name": "get",
+      "description": "Sends a `GET` request to the backend using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). The URI can be any valid endpoint, and the response type any of the allowed [response types](#response-handling), or a `204 No Content` response if the response body is empty.",
+      "signature": "@get(uri: string, options={ })",
+      "parameters": [
+        {
+          "label": "uri: string"
+        },
+        {
+          "label": "options={ }"
+        }
+      ],
+      "pro": false
+    },
+    {
+      "name": "post",
+      "description": "Works the same as [`@get()`](#get) but sends a `POST` request to the backend.",
+      "signature": "@post(uri: string, options={ })",
+      "parameters": [
+        {
+          "label": "uri: string"
+        },
+        {
+          "label": "options={ }"
+        }
+      ],
+      "pro": false
+    },
+    {
+      "name": "put",
+      "description": "Works the same as [`@get()`](#get) but sends a `PUT` request to the backend.",
+      "signature": "@put(uri: string, options={ })",
+      "parameters": [
+        {
+          "label": "uri: string"
+        },
+        {
+          "label": "options={ }"
+        }
+      ],
+      "pro": false
+    },
+    {
+      "name": "patch",
+      "description": "Works the same as [`@get()`](#get) but sends a `PATCH` request to the backend.",
+      "signature": "@patch(uri: string, options={ })",
+      "parameters": [
+        {
+          "label": "uri: string"
+        },
+        {
+          "label": "options={ }"
+        }
+      ],
+      "pro": false
+    },
+    {
+      "name": "delete",
+      "description": "Works the same as [`@get()`](#get) but sends a `DELETE` request to the backend.",
+      "signature": "@delete(uri: string, options={ })",
+      "parameters": [
+        {
+          "label": "uri: string"
+        },
+        {
+          "label": "options={ }"
+        }
+      ],
+      "pro": false
+    },
+    {
+      "name": "clipboard",
+      "description": "Copies the provided text to the clipboard. If the second parameter is `true`, the text is treated as [Base64](https://developer.mozilla.org/en-US/docs/Glossary/Base64) encoded, and is decoded before copying.",
+      "signature": "@clipboard(text: string, isBase64?: boolean)",
+      "parameters": [
+        {
+          "label": "text: string"
+        },
+        {
+          "label": "isBase64?: boolean"
+        }
+      ],
+      "pro": true
+    },
+    {
+      "name": "fit",
+      "description": "Linearly interpolates a value from one range to another. This is useful for converting between different scales, such as mapping a slider value to a percentage or converting temperature units.",
+      "signature": "@fit(v: number, oldMin: number, oldMax: number, newMin: number, newMax: number, shouldClamp=false, shouldRound=false)",
+      "parameters": [
+        {
+          "label": "v: number"
+        },
+        {
+          "label": "oldMin: number"
+        },
+        {
+          "label": "oldMax: number"
+        },
+        {
+          "label": "newMin: number"
+        },
+        {
+          "label": "newMax: number"
+        },
+        {
+          "label": "shouldClamp=false"
+        },
+        {
+          "label": "shouldRound=false"
+        }
+      ],
+      "pro": true
+    },
+    {
+      "name": "intl",
+      "description": "Provides internationalized, locale-aware formatting for dates, numbers, and other values using the [Intl namespace object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl).",
+      "signature": "@intl(type: string, value: any, options?: Record<string, any>, locale?: string | string[])",
+      "parameters": [
+        {
+          "label": "type: string"
+        },
+        {
+          "label": "value: any"
+        },
+        {
+          "label": "options?: Record<string, any>"
+        },
+        {
+          "label": "locale?: string | string[]"
+        }
+      ],
+      "pro": true
+    }
   ]
 }

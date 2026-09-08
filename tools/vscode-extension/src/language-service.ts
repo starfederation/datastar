@@ -2,7 +2,7 @@ import languageDataJson from './language-data.json'
 
 type Requirement = 'allowed' | 'must' | 'denied' | 'exclusive'
 type SignalKind = 'signal' | 'property' | 'computed' | 'reference'
-type CompletionKind = 'signal' | 'property' | 'modifier'
+type CompletionKind = 'signal' | 'property' | 'modifier' | 'action'
 
 type Reference = {
     name: string
@@ -19,6 +19,7 @@ type AttributeMetadata = {
     keys?: string[]
     element?: string
     highlight: boolean
+    pro: boolean
 }
 
 type CompletionMetadata = {
@@ -33,6 +34,15 @@ type LanguageData = {
     attributes: AttributeMetadata[]
     completions: CompletionMetadata[]
     nativeEvents: string[]
+    actions: ActionMetadata[]
+}
+
+type ActionMetadata = {
+    name: string
+    description: string
+    signature: string
+    parameters: Array<{ label: string }>
+    pro: boolean
 }
 
 type AttributeRule = AttributeMetadata['requirement'] & {
@@ -77,8 +87,18 @@ export type LanguageCompletion = {
     description: string
     references: Reference[]
     kind?: CompletionKind
+    snippet?: boolean
+    detail?: string
     start: number
     end: number
+}
+
+export type LanguageSignature = {
+    label: string
+    description: string
+    parameters: Array<{ label: string }>
+    activeParameter: number
+    pro: boolean
 }
 
 export type SignalDeclaration = {
@@ -101,6 +121,7 @@ const languageData = languageDataJson as LanguageData
 
 const snippetEntries = languageData.completions;
 const nativeEvents = languageData.nativeEvents;
+const actionData = languageData.actions;
 const attributeMetadata = new Map<string, AttributeMetadata>(languageData.attributes.map(attribute => [attribute.name, attribute]));
 const knownPlugins = new Set(attributeMetadata.keys());
 const ATTRIBUTE_RULES: Record<string, AttributeRule> = Object.fromEntries(languageData.attributes.map(attribute => [
@@ -488,13 +509,20 @@ export function collectSignalDeclarations(text: string): SignalDeclaration[] {
     return [...declarations.values()];
 }
 
-function getSignalCompletions(text: string, offset: number): LanguageCompletion[] | undefined {
-    const attribute = parseDocument(text).find(candidate => (
+function expressionAttributeAt(text: string, offset: number): ParsedAttribute | undefined {
+    return parseDocument(text).find(candidate => (
         candidate.valueStart !== undefined
         && candidate.valueEnd !== undefined
         && candidate.valueStart <= offset
         && offset <= candidate.valueEnd
     ));
+}
+
+function getSignalCompletions(
+    text: string,
+    offset: number,
+    attribute: ParsedAttribute,
+): LanguageCompletion[] | undefined {
     if (!attribute || NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
 
     const beforeCursor = text.slice(attribute.valueStart, offset);
@@ -530,6 +558,76 @@ function getSignalCompletions(text: string, offset: number): LanguageCompletion[
         start,
         end: offset,
     }));
+}
+
+function getActionCompletions(
+    text: string,
+    offset: number,
+    attribute: ParsedAttribute,
+): LanguageCompletion[] | undefined {
+    if (NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
+
+    const beforeCursor = text.slice(attribute.valueStart, offset);
+    const match = beforeCursor.match(/@[A-Za-z_$][\w$]*$/) || beforeCursor.match(/@$/);
+    if (!match) return undefined;
+
+    return actionData.map(action => ({
+        label: `@${action.name}`,
+        insertText: `@${action.name}(`,
+        description: action.description,
+        references: [],
+        kind: 'action',
+        detail: action.pro ? 'Datastar Pro action' : 'Datastar action',
+        start: offset - match[0].length,
+        end: offset,
+    }));
+}
+
+export function getSignatureHelp(text: string, offset: number): LanguageSignature | undefined {
+    const attribute = expressionAttributeAt(text, offset);
+    if (!attribute || NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
+
+    const source = text.slice(attribute.valueStart, offset);
+    const stack: Array<{ close: string; action?: string; argument: number }> = [];
+    const pairs: Record<string, string> = { '(': ')', '[': ']', '{': '}' };
+
+    for (let index = 0; index < source.length; index++) {
+        const char = source[index];
+        if (char === '"' || char === "'" || char === '`') {
+            index = skipQuoted(source, index) - 1;
+            continue;
+        }
+
+        if (char === '@') {
+            const match = source.slice(index).match(/^@([A-Za-z_$][\w$]*)\s*\(/);
+            if (match) {
+                stack.push({ close: ')', action: match[1], argument: 0 });
+                index += match[0].length - 1;
+                continue;
+            }
+        }
+
+        if (pairs[char]) {
+            stack.push({ close: pairs[char], argument: 0 });
+        } else if (stack.at(-1)?.close === char) {
+            stack.pop();
+        } else if (char === ',' && stack.at(-1)?.action) {
+            stack.at(-1)!.argument++;
+        }
+    }
+
+    const call = [...stack].reverse().find(frame => frame.action);
+    if (!call) return undefined;
+    const action = actionData.find(candidate => candidate.name === call.action);
+    if (!action) return undefined;
+
+    return {
+        label: action.signature,
+        description: action.description,
+        parameters: action.parameters,
+        activeParameter: Math.min(call.argument, Math.max(0, action.parameters.length - 1)),
+        pro: action.pro,
+    };
 }
 
 function getModifierCompletions(prefix: string, offset: number): LanguageCompletion[] | undefined {
@@ -569,6 +667,7 @@ function getModifierCompletions(prefix: string, offset: number): LanguageComplet
                 description: modifier.description || 'Datastar attribute modifier.',
                 references: completion?.references || [],
                 kind: 'modifier' as const,
+                detail: metadata.pro ? 'Datastar Pro attribute modifier' : 'Datastar attribute modifier',
                 start: offset - typedPart.length,
                 end: offset,
             };
@@ -580,8 +679,14 @@ export function getCompletions(
     offset: number,
     customAttributes: string[] = [],
 ): LanguageCompletion[] {
-    const signalCompletions = getSignalCompletions(text, offset);
-    if (signalCompletions !== undefined) return signalCompletions;
+    const expressionAttribute = expressionAttributeAt(text, offset);
+    if (expressionAttribute) {
+        const actionCompletions = getActionCompletions(text, offset, expressionAttribute);
+        if (actionCompletions !== undefined) return actionCompletions;
+
+        const signalCompletions = getSignalCompletions(text, offset, expressionAttribute);
+        if (signalCompletions !== undefined) return signalCompletions;
+    }
 
     const tag = findTags(text).find(candidate => (
         candidate.start <= offset
@@ -619,6 +724,9 @@ export function getCompletions(
             insertText: entry.insertText,
             description: entry.description,
             references: entry.references || [],
+            detail: attributeMetadata.get(entry.pluginName)?.pro
+                ? 'Datastar Pro attribute'
+                : 'Datastar attribute',
             start: offset - prefixMatch[0].length,
             end: offset,
         }));
@@ -629,6 +737,7 @@ export function getCompletions(
             insertText: `data-${pluginName}="\${1:expression}"`,
             description: 'Custom Datastar attribute.',
             references: [],
+            detail: 'Custom Datastar attribute',
             start: offset - prefixMatch[0].length,
             end: offset,
         });

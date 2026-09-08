@@ -12,6 +12,7 @@ import {
     getCompletions,
     getDiagnostics,
     getHover,
+    getSignatureHelp,
 } from './language-service'
 
 type Settings = {
@@ -40,6 +41,10 @@ connection.onInitialize(params => {
                 triggerCharacters: ['-', ':', '_', '$', '.'],
             },
             hoverProvider: true,
+            signatureHelpProvider: {
+                triggerCharacters: ['(', ','],
+                retriggerCharacters: [','],
+            },
         },
     };
 });
@@ -106,10 +111,14 @@ connection.onCompletion(params => {
                     ? CompletionItemKind.Property
                     : completion.kind === 'modifier'
                         ? CompletionItemKind.Keyword
+                    : completion.kind === 'action'
+                        ? CompletionItemKind.Function
                     : CompletionItemKind.Snippet,
-            detail: 'Datastar',
+            detail: completion.detail || 'Datastar',
             documentation: { kind: 'markdown', value: documentation },
-            insertTextFormat: completion.kind ? InsertTextFormat.PlainText : InsertTextFormat.Snippet,
+            insertTextFormat: completion.snippet || !completion.kind
+                ? InsertTextFormat.Snippet
+                : InsertTextFormat.PlainText,
             textEdit: {
                 range: {
                     start: document.positionAt(completion.start),
@@ -119,6 +128,28 @@ connection.onCompletion(params => {
             },
         };
     });
+});
+
+connection.onSignatureHelp(params => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document || !isEnabled(document)) return undefined;
+
+    const signature = getSignatureHelp(document.getText(), document.offsetAt(params.position));
+    if (!signature) return undefined;
+
+    return {
+        signatures: [{
+            label: signature.label,
+            documentation: signature.pro
+                ? `${signature.description}\n\nRequires Datastar Pro.`
+                : signature.description,
+            parameters: signature.parameters.map(parameter => ({
+                label: parameter.label,
+            })),
+        }],
+        activeSignature: 0,
+        activeParameter: signature.activeParameter,
+    };
 });
 
 connection.onHover(params => {

@@ -5,6 +5,7 @@ Adds context-aware autocomplete, diagnostics, hover documentation, and syntax hi
 The extension provides:
 
 - Datastar attribute, modifier, and native event completion
+- Datastar action completion and signature help
 - Attribute key and value validation
 - Hover documentation and links to the Datastar reference
 - Document-local signal and nested property completion
