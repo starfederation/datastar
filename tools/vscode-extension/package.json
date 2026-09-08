@@ -1,6 +1,6 @@
 {
   "name": "datastar-vscode",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "displayName": "Datastar",
   "description": "Adds autocomplete, diagnostics, hover documentation, and syntax highlighting for Datastar to Visual Studio Code.",
   "author": "Ben Croker",
@@ -27,7 +27,7 @@
   "contributes": {
     "grammars": [
       {
-        "scopeName": "datastar.injection",
+        "scopeName": "source.datastar.injection",
         "path": "./src/datastar.injection.tmLanguage.json",
         "injectTo": [
           "text.html.basic",

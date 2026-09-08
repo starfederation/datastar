@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-  "scopeName": "datastar.injection",
+  "scopeName": "source.datastar.injection",
   "injectionSelector": "L:meta.tag -string -comment -expression.html-template -meta.function.echo.blade",
   "patterns": [
     {
@@ -34,8 +34,8 @@
           }
         },
         {
-          "comment": "Match regular keys: :key",
-          "match": "(:)([a-z][a-z0-9-]*)(?=__|:|[\\s>=])",
+          "comment": "Match regular and dot-separated signals (`:foo` or `:foo.bar`)",
+          "match": "(:)([a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*)(?=__|:|[\\s>=])",
           "captures": {
             "1": {
               "name": "punctuation.separator.key.datastar"
