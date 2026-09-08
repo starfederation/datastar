@@ -8,7 +8,7 @@ The extension provides:
 - Datastar action completion and signature help
 - Attribute key and value validation
 - Hover documentation and links to the Datastar reference
-- Signal completion
+- Signal completion and hover information
 - Go to definition for signals
 - Syntax highlighting in HTML and common template languages
 

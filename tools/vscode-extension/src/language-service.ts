@@ -523,38 +523,57 @@ function expressionAttributeAt(text: string, offset: number): ParsedAttribute | 
     ));
 }
 
-export function getDefinition(text: string, offset: number): LanguageDefinition | undefined {
-    const attribute = expressionAttributeAt(text, offset);
-    if (!attribute || NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
+type SignalReference = {
+    path: string
+    start: number
+    end: number
+}
 
+function signalReferenceAt(attribute: ParsedAttribute, offset: number): SignalReference | undefined {
     const referencePattern = /\$([A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*)/g;
     let match: RegExpExecArray | null;
+
     while ((match = referencePattern.exec(attribute.value))) {
         const start = attribute.valueStart! + match.index;
-        const end = start + match[0].length;
-        if (offset < start || offset > end) continue;
+        const matchEnd = start + match[0].length;
+        if (offset < start || offset > matchEnd) continue;
 
         const name = match[1];
         const nameOffset = Math.max(0, Math.min(name.length - 1, offset - start - 1));
         const nextDot = name.indexOf('.', nameOffset);
-        const requestedPath = nextDot === -1 ? name : name.slice(0, nextDot);
-        const declarations = collectSignalDeclarations(text);
-        const direct = declarations.find(candidate => (
-            candidate.name === requestedPath
-            || candidate.name.startsWith(`${requestedPath}.`)
-        ));
-        if (direct) return { start: direct.start, end: direct.end };
-
-        let path = requestedPath;
-        while (path.includes('.')) {
-            path = path.slice(0, path.lastIndexOf('.'));
-            const declaration = declarations.find(candidate => candidate.name === path);
-            if (declaration) return { start: declaration.start, end: declaration.end };
-        }
-        return undefined;
+        const path = nextDot === -1 ? name : name.slice(0, nextDot);
+        return { path, start, end: start + path.length + 1 };
     }
 
     return undefined;
+}
+
+function resolveSignalDeclaration(
+    declarations: SignalDeclaration[],
+    requestedPath: string,
+): SignalDeclaration | undefined {
+    const direct = declarations.find(candidate => (
+        candidate.name === requestedPath
+        || candidate.name.startsWith(`${requestedPath}.`)
+    ));
+    if (direct) return direct;
+
+    let path = requestedPath;
+    while (path.includes('.')) {
+        path = path.slice(0, path.lastIndexOf('.'));
+        const declaration = declarations.find(candidate => candidate.name === path);
+        if (declaration) return declaration;
+    }
+    return undefined;
+}
+
+export function getDefinition(text: string, offset: number): LanguageDefinition | undefined {
+    const attribute = expressionAttributeAt(text, offset);
+    if (!attribute || NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
+    const reference = signalReferenceAt(attribute, offset);
+    if (!reference) return undefined;
+    const declaration = resolveSignalDeclaration(collectSignalDeclarations(text), reference.path);
+    return declaration ? { start: declaration.start, end: declaration.end } : undefined;
 }
 
 function getSignalCompletions(
@@ -812,7 +831,26 @@ export function getHover(text: string, offset: number): LanguageHover | undefine
                 }],
             };
         }
-        return undefined;
+
+        const reference = signalReferenceAt(expressionAttribute, offset);
+        if (!reference) return undefined;
+        const declaration = resolveSignalDeclaration(collectSignalDeclarations(text), reference.path);
+        const descriptions: Record<SignalKind, string> = {
+            signal: 'Signal declared in this document.',
+            property: 'Signal property declared in this document.',
+            computed: 'Computed signal declared in this document.',
+            reference: 'Element reference signal declared in this document.',
+        };
+        return {
+            start: reference.start,
+            end: reference.end,
+            name: `$${reference.path}`,
+            description: declaration
+                ? descriptions[declaration.kind]
+                : 'Signal is not explicitly declared in this document.',
+            requirements: [],
+            references: [],
+        };
     }
 
     const entry = snippetEntries.find(candidate => candidate.name === attribute.name)

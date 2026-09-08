@@ -288,3 +288,24 @@ test('identifies Pro actions in hover documentation', () => {
     assert.match(hover!.name, /^@fit\(/);
     assert.deepEqual(hover?.requirements, ['Requires Datastar Pro.']);
 });
+
+test('returns hover information for signals and nested properties', () => {
+    const source = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$user.name">';
+    const root = getHover(source, source.indexOf('$user') + 2);
+    const property = getHover(source, source.indexOf('$user.name') + '$user.'.length + 1);
+
+    assert.equal(root?.name, '$user');
+    assert.equal(root?.description, 'Signal declared in this document.');
+    assert.equal(property?.name, '$user.name');
+    assert.equal(property?.description, 'Signal property declared in this document.');
+});
+
+test('identifies computed and undeclared signals in hover information', () => {
+    const computedSource = '<div data-computed:total="$price * 2" data-text="$total">';
+    const computed = getHover(computedSource, computedSource.lastIndexOf('$total') + 2);
+    assert.equal(computed?.description, 'Computed signal declared in this document.');
+
+    const undeclaredSource = '<div data-text="$missing">';
+    const undeclared = getHover(undeclaredSource, undeclaredSource.indexOf('$missing') + 2);
+    assert.equal(undeclared?.description, 'Signal is not explicitly declared in this document.');
+});

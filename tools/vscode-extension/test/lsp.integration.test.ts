@@ -131,6 +131,13 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
             end: { line: 0, character: signalText.indexOf('name:') + 'name'.length },
         });
 
+        const signalHover = await connection.sendRequest<Hover>('textDocument/hover', {
+            textDocument: { uri },
+            position: { line: 0, character: signalText.indexOf('$user.name') + '$user.'.length + 1 },
+        });
+        assert.match((signalHover.contents as { value: string }).value, /\$user\.name/);
+        assert.match((signalHover.contents as { value: string }).value, /Signal property declared/);
+
         const actionText = '<button data-on:click="@po">';
         connection.sendNotification('textDocument/didChange', {
             textDocument: { uri, version: 6 },
