@@ -4,6 +4,7 @@ import {
     collectSignalDeclarations,
     getCompletions,
     getDiagnostics,
+    getDefinition,
     getHover,
     getSignatureHelp,
     parseDocument,
@@ -158,6 +159,45 @@ test('completes nested signal properties', () => {
     assert.equal(source.slice(completions[0].start, completions[0].end), 'n');
 });
 
+test('finds definitions for root signals and nested properties', () => {
+    const source = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$user.name">';
+    const reference = source.indexOf('$user.name');
+    const root = getDefinition(source, reference + 2);
+    const property = getDefinition(source, reference + '$user.'.length + 1);
+
+    assert.equal(source.slice(root!.start, root!.end), 'user');
+    assert.equal(source.slice(property!.start, property!.end), 'name');
+});
+
+test('finds key-form signal definitions after case conversion', () => {
+    const source = '<div data-signals:full-name__case.snake="\'Ada\'" data-text="$full_name">';
+    const definition = getDefinition(source, source.indexOf('$full_name') + 2);
+
+    assert.equal(source.slice(definition!.start, definition!.end), 'full-name');
+});
+
+test('falls back to the nearest declared signal parent', () => {
+    const source = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$user.missing">';
+    const definition = getDefinition(source, source.indexOf('missing') + 2);
+
+    assert.equal(source.slice(definition!.start, definition!.end), 'user');
+});
+
+test('does not resolve an unknown property to a declared sibling', () => {
+    const source = '<div data-signals:user.name="\'Ada\'" data-text="$user.missing">';
+    const definition = getDefinition(source, source.indexOf('missing') + 2);
+
+    assert.equal(definition, undefined);
+});
+
+test('does not return definitions for undeclared signals or plain signal-name values', () => {
+    const undeclared = '<div data-text="$missing">';
+    assert.equal(getDefinition(undeclared, undeclared.indexOf('$missing') + 2), undefined);
+
+    const plainName = '<input data-bind="$query">';
+    assert.equal(getDefinition(plainName, plainName.indexOf('$query') + 2), undefined);
+});
+
 test('provides action completions inside Datastar expressions', () => {
     const source = '<button data-on:click="@po">';
     const offset = source.indexOf('@po') + '@po'.length;
@@ -222,4 +262,29 @@ test('returns hover documentation and requirements', () => {
     assert.ok(hover);
     assert.match(hover.description, /Shows or hides/);
     assert.deepEqual(hover.requirements, ['Key: not allowed', 'Value: required']);
+});
+
+test('identifies Pro attributes in hover documentation', () => {
+    const source = '<div data-animate:opacity="$opacity">';
+    const hover = getHover(source, source.indexOf('data-animate') + 2);
+
+    assert.ok(hover?.requirements.includes('Requires Datastar Pro.'));
+});
+
+test('returns hover documentation for actions', () => {
+    const source = '<button data-on:click="@post(\'/endpoint\')">';
+    const hover = getHover(source, source.indexOf('@post') + 2);
+
+    assert.equal(hover?.name, '@post(uri: string, options={ })');
+    assert.match(hover!.description, /POST/);
+    assert.deepEqual(hover?.requirements, []);
+    assert.equal(hover?.references[0].url, 'https://data-star.dev/reference/actions#post');
+});
+
+test('identifies Pro actions in hover documentation', () => {
+    const source = '<div data-text="@fit($value, 0, 1, 0, 100)">';
+    const hover = getHover(source, source.indexOf('@fit') + 2);
+
+    assert.match(hover!.name, /^@fit\(/);
+    assert.deepEqual(hover?.requirements, ['Requires Datastar Pro.']);
 });

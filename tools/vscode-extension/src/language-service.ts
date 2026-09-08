@@ -101,6 +101,11 @@ export type LanguageSignature = {
     pro: boolean
 }
 
+export type LanguageDefinition = {
+    start: number
+    end: number
+}
+
 export type SignalDeclaration = {
     name: string
     kind: SignalKind
@@ -518,6 +523,40 @@ function expressionAttributeAt(text: string, offset: number): ParsedAttribute | 
     ));
 }
 
+export function getDefinition(text: string, offset: number): LanguageDefinition | undefined {
+    const attribute = expressionAttributeAt(text, offset);
+    if (!attribute || NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
+
+    const referencePattern = /\$([A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*)/g;
+    let match: RegExpExecArray | null;
+    while ((match = referencePattern.exec(attribute.value))) {
+        const start = attribute.valueStart! + match.index;
+        const end = start + match[0].length;
+        if (offset < start || offset > end) continue;
+
+        const name = match[1];
+        const nameOffset = Math.max(0, Math.min(name.length - 1, offset - start - 1));
+        const nextDot = name.indexOf('.', nameOffset);
+        const requestedPath = nextDot === -1 ? name : name.slice(0, nextDot);
+        const declarations = collectSignalDeclarations(text);
+        const direct = declarations.find(candidate => (
+            candidate.name === requestedPath
+            || candidate.name.startsWith(`${requestedPath}.`)
+        ));
+        if (direct) return { start: direct.start, end: direct.end };
+
+        let path = requestedPath;
+        while (path.includes('.')) {
+            path = path.slice(0, path.lastIndexOf('.'));
+            const declaration = declarations.find(candidate => candidate.name === path);
+            if (declaration) return { start: declaration.start, end: declaration.end };
+        }
+        return undefined;
+    }
+
+    return undefined;
+}
+
 function getSignalCompletions(
     text: string,
     offset: number,
@@ -748,7 +787,33 @@ export function getCompletions(
 
 export function getHover(text: string, offset: number): LanguageHover | undefined {
     const attribute = parseDocument(text).find(candidate => candidate.start <= offset && offset <= candidate.nameEnd);
-    if (!attribute) return undefined;
+    if (!attribute) {
+        const expressionAttribute = expressionAttributeAt(text, offset);
+        if (!expressionAttribute || NON_EXPRESSION_VALUE_PLUGINS.has(expressionAttribute.pluginName)) return undefined;
+
+        const actionPattern = /@([A-Za-z_$][\w$]*)\s*\(/g;
+        let match: RegExpExecArray | null;
+        while ((match = actionPattern.exec(expressionAttribute.value))) {
+            const start = expressionAttribute.valueStart! + match.index;
+            const end = start + match[1].length + 1;
+            if (offset < start || offset > end) continue;
+
+            const action = actionData.find(candidate => candidate.name === match![1]);
+            if (!action) return undefined;
+            return {
+                start,
+                end,
+                name: action.signature,
+                description: action.description,
+                requirements: action.pro ? ['Requires Datastar Pro.'] : [],
+                references: [{
+                    name: 'Documentation',
+                    url: `https://data-star.dev/reference/actions#${action.name}`,
+                }],
+            };
+        }
+        return undefined;
+    }
 
     const entry = snippetEntries.find(candidate => candidate.name === attribute.name)
         || snippetEntries.find(candidate => candidate.pluginName === attribute.pluginName);
@@ -761,6 +826,7 @@ export function getHover(text: string, offset: number): LanguageHover | undefine
     if (rule?.key === 'denied') requirements.push('Key: not allowed');
     if (rule?.value === 'must') requirements.push('Value: required');
     if (rule?.value === 'denied') requirements.push('Value: not allowed');
+    if (attributeMetadata.get(attribute.pluginName)?.pro) requirements.push('Requires Datastar Pro.');
 
     return {
         start: attribute.start,

@@ -13,6 +13,7 @@ import type {
     Diagnostic,
     Hover,
     InitializeResult,
+    Location,
     PublishDiagnosticsParams,
     SignatureHelp,
 } from 'vscode-languageserver-protocol'
@@ -38,6 +39,7 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
             },
         });
         assert.equal(initialize.capabilities.hoverProvider, true);
+        assert.equal(initialize.capabilities.definitionProvider, true);
         assert.deepEqual(initialize.capabilities.signatureHelpProvider, {
             triggerCharacters: ['(', ','],
             retriggerCharacters: [','],
@@ -106,7 +108,7 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
             ? debounceCompletion.textEdit.newText
             : undefined, 'debounce');
 
-        const signalText = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$us">';
+        const signalText = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$us" data-show="$user.name">';
         connection.sendNotification('textDocument/didChange', {
             textDocument: { uri, version: 5 },
             contentChanges: [{ text: signalText }],
@@ -118,6 +120,16 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
         const userCompletion = signalCompletions.find(completion => completion.label === '$user');
         assert.ok(userCompletion);
         assert.equal(userCompletion.kind, 6);
+
+        const definition = await connection.sendRequest<Location>('textDocument/definition', {
+            textDocument: { uri },
+            position: { line: 0, character: signalText.indexOf('$user') + '$user.'.length + 1 },
+        });
+        assert.equal(definition.uri, uri);
+        assert.deepEqual(definition.range, {
+            start: { line: 0, character: signalText.indexOf('name:') },
+            end: { line: 0, character: signalText.indexOf('name:') + 'name'.length },
+        });
 
         const actionText = '<button data-on:click="@po">';
         connection.sendNotification('textDocument/didChange', {
@@ -170,6 +182,29 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
             position: { line: 0, character: changedText.indexOf('data-nonce') + 2 },
         });
         assert.match((hover.contents as { value: string }).value, /<html>/);
+
+        const actionHoverText = '<button data-on:click="@post(\'/endpoint\')">';
+        connection.sendNotification('textDocument/didChange', {
+            textDocument: { uri, version: 9 },
+            contentChanges: [{ text: actionHoverText }],
+        });
+        const actionHover = await connection.sendRequest<Hover>('textDocument/hover', {
+            textDocument: { uri },
+            position: { line: 0, character: actionHoverText.indexOf('@post') + 2 },
+        });
+        assert.match((actionHover.contents as { value: string }).value, /@post\(uri: string, options=\{ \}\)/);
+        assert.match((actionHover.contents as { value: string }).value, /POST/);
+
+        const proAttributeHoverText = '<div data-animate:opacity="$opacity">';
+        connection.sendNotification('textDocument/didChange', {
+            textDocument: { uri, version: 10 },
+            contentChanges: [{ text: proAttributeHoverText }],
+        });
+        const proAttributeHover = await connection.sendRequest<Hover>('textDocument/hover', {
+            textDocument: { uri },
+            position: { line: 0, character: proAttributeHoverText.indexOf('data-animate') + 2 },
+        });
+        assert.match((proAttributeHover.contents as { value: string }).value, /Requires Datastar Pro/);
 
         await connection.sendRequest('shutdown');
         connection.sendNotification('exit');

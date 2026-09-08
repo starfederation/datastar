@@ -67,3 +67,12 @@ test('TextMate grammar highlights dotted signal keys', () => {
 
     assert.equal(match?.[2], 'foo.bar');
 });
+
+test('TextMate grammar highlights underscore-prefixed signal keys', () => {
+    const grammarPath = path.join(__dirname, '..', 'src', 'datastar.injection.tmLanguage.json');
+    const grammar = JSON.parse(fs.readFileSync(grammarPath, 'utf8'));
+    const keyPattern = grammar.repository['datastar-attribute'].patterns[1].match;
+    const match = ':_foo.bar='.match(new RegExp(keyPattern));
+
+    assert.equal(match?.[2], '_foo.bar');
+});

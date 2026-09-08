@@ -11,6 +11,7 @@ import { TextDocument } from 'vscode-languageserver-textdocument'
 import {
     getCompletions,
     getDiagnostics,
+    getDefinition,
     getHover,
     getSignatureHelp,
 } from './language-service'
@@ -41,6 +42,7 @@ connection.onInitialize(params => {
                 triggerCharacters: ['-', ':', '_', '$', '.'],
             },
             hoverProvider: true,
+            definitionProvider: true,
             signatureHelpProvider: {
                 triggerCharacters: ['(', ','],
                 retriggerCharacters: [','],
@@ -128,6 +130,22 @@ connection.onCompletion(params => {
             },
         };
     });
+});
+
+connection.onDefinition(params => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document || !isEnabled(document)) return undefined;
+
+    const definition = getDefinition(document.getText(), document.offsetAt(params.position));
+    if (!definition) return undefined;
+
+    return {
+        uri: document.uri,
+        range: {
+            start: document.positionAt(definition.start),
+            end: document.positionAt(definition.end),
+        },
+    };
 });
 
 connection.onSignatureHelp(params => {

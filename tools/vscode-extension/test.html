@@ -1,9 +1,10 @@
 <html data-nonce="1234567890"> 
 <head></head>
 <body 
-    data-signals:foo.bar="0"
-    data-on:click__delay.500ms="@g"
-    data-on-
+    data-signals:_foo.bar="0"
+    data-on:click__delay.500ms="@get('') + $_foo.bar"
+    data-on-intersect="@clipboard('foo')"
+    data-query-string=""
 >
 </body>
 </html>
