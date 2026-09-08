@@ -13,6 +13,9 @@ import {
     getDiagnostics,
     getDefinition,
     getHover,
+    getReferences,
+    getRenameEdits,
+    getRenameTarget,
     getSignatureHelp,
 } from './language-service'
 
@@ -43,6 +46,8 @@ connection.onInitialize(params => {
             },
             hoverProvider: true,
             definitionProvider: true,
+            referencesProvider: true,
+            renameProvider: { prepareProvider: true },
             signatureHelpProvider: {
                 triggerCharacters: ['(', ','],
                 retriggerCharacters: [','],
@@ -144,6 +149,61 @@ connection.onDefinition(params => {
         range: {
             start: document.positionAt(definition.start),
             end: document.positionAt(definition.end),
+        },
+    };
+});
+
+connection.onReferences(params => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document || !isEnabled(document)) return [];
+
+    return getReferences(
+        document.getText(),
+        document.offsetAt(params.position),
+        params.context.includeDeclaration,
+    ).map(reference => ({
+        uri: document.uri,
+        range: {
+            start: document.positionAt(reference.start),
+            end: document.positionAt(reference.end),
+        },
+    }));
+});
+
+connection.onPrepareRename(params => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document || !isEnabled(document)) return undefined;
+    const target = getRenameTarget(document.getText(), document.offsetAt(params.position));
+    if (!target) return undefined;
+
+    return {
+        range: {
+            start: document.positionAt(target.start),
+            end: document.positionAt(target.end),
+        },
+        placeholder: target.placeholder,
+    };
+});
+
+connection.onRenameRequest(params => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document || !isEnabled(document)) return undefined;
+    const edits = getRenameEdits(
+        document.getText(),
+        document.offsetAt(params.position),
+        params.newName,
+    );
+    if (edits.length === 0) return undefined;
+
+    return {
+        changes: {
+            [document.uri]: edits.map(edit => ({
+                range: {
+                    start: document.positionAt(edit.start),
+                    end: document.positionAt(edit.end),
+                },
+                newText: edit.newText,
+            })),
         },
     };
 });

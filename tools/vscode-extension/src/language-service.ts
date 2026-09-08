@@ -106,6 +106,17 @@ export type LanguageDefinition = {
     end: number
 }
 
+export type LanguageReference = LanguageDefinition
+
+export type LanguageRenameEdit = LanguageDefinition & {
+    newText: string
+}
+
+export type LanguageRenameTarget = LanguageDefinition & {
+    path: string
+    placeholder: string
+}
+
 export type SignalDeclaration = {
     name: string
     kind: SignalKind
@@ -427,10 +438,12 @@ function collectObjectSignals(
         }
 
         const keyStart = index;
+        let keyContentStart = keyStart;
         let key: string;
         if (source[index] === '"' || source[index] === "'") {
             const keyEnd = skipQuoted(source, index);
             key = source.slice(index + 1, Math.max(index + 1, keyEnd - 1));
+            keyContentStart++;
             index = keyEnd;
         } else {
             const keyMatch = source.slice(index).match(/^[A-Za-z_$][\w$-]*/);
@@ -454,8 +467,8 @@ function collectObjectSignals(
         signals.push({
             name: path,
             kind: prefix.length === 0 ? 'signal' : 'property',
-            start: sourceOffset + keyStart,
-            end: sourceOffset + keyStart + key.length,
+            start: sourceOffset + keyContentStart,
+            end: sourceOffset + keyContentStart + key.length,
         });
 
         index = skipWhitespace(source, index + 1);
@@ -527,6 +540,8 @@ type SignalReference = {
     path: string
     start: number
     end: number
+    segmentStart: number
+    segmentEnd: number
 }
 
 function signalReferenceAt(attribute: ParsedAttribute, offset: number): SignalReference | undefined {
@@ -542,10 +557,160 @@ function signalReferenceAt(attribute: ParsedAttribute, offset: number): SignalRe
         const nameOffset = Math.max(0, Math.min(name.length - 1, offset - start - 1));
         const nextDot = name.indexOf('.', nameOffset);
         const path = nextDot === -1 ? name : name.slice(0, nextDot);
-        return { path, start, end: start + path.length + 1 };
+        const lastDot = path.lastIndexOf('.');
+        return {
+            path,
+            start,
+            end: start + path.length + 1,
+            segmentStart: start + lastDot + 2,
+            segmentEnd: start + path.length + 1,
+        };
     }
 
     return undefined;
+}
+
+function declarationTargetAt(text: string, offset: number): LanguageRenameTarget | undefined {
+    for (const attribute of parseDocument(text)) {
+        if (attribute.key && KEY_SIGNAL_PLUGINS.has(attribute.pluginName)) {
+            const rawSegments = attribute.key.split('.');
+            const transformedSegments = rawSegments.map(segment => applySignalCase(segment, attribute.modifiers));
+            let start = attribute.start + `data-${attribute.pluginName}:`.length;
+            for (let index = 0; index < rawSegments.length; index++) {
+                const end = start + rawSegments[index].length;
+                if (start <= offset && offset <= end) {
+                    return {
+                        path: transformedSegments.slice(0, index + 1).join('.'),
+                        placeholder: transformedSegments[index],
+                        start,
+                        end,
+                    };
+                }
+                start = end + 1;
+            }
+        }
+
+        if (VALUE_SIGNAL_PLUGINS.has(attribute.pluginName) && !attribute.key && attribute.valueStart !== undefined) {
+            const leadingWhitespace = attribute.value.length - attribute.value.trimStart().length;
+            const rawName = attribute.value.trim();
+            const rawSegments = rawName.split('.');
+            const transformedSegments = rawSegments.map(segment => applySignalCase(segment, attribute.modifiers));
+            let start = attribute.valueStart + leadingWhitespace;
+            for (let index = 0; index < rawSegments.length; index++) {
+                const end = start + rawSegments[index].length;
+                if (start <= offset && offset <= end) {
+                    return {
+                        path: transformedSegments.slice(0, index + 1).join('.'),
+                        placeholder: transformedSegments[index],
+                        start,
+                        end,
+                    };
+                }
+                start = end + 1;
+            }
+        }
+    }
+
+    const declaration = collectSignalDeclarations(text)
+        .find(candidate => candidate.start <= offset && offset <= candidate.end);
+    if (!declaration) return undefined;
+    return {
+        path: declaration.name,
+        placeholder: declaration.name.slice(declaration.name.lastIndexOf('.') + 1),
+        start: declaration.start,
+        end: declaration.end,
+    };
+}
+
+export function getRenameTarget(text: string, offset: number): LanguageRenameTarget | undefined {
+    const attribute = expressionAttributeAt(text, offset);
+    if (attribute && !NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) {
+        const reference = signalReferenceAt(attribute, offset);
+        if (reference) {
+            return {
+                path: reference.path,
+                placeholder: reference.path.slice(reference.path.lastIndexOf('.') + 1),
+                start: reference.segmentStart,
+                end: reference.segmentEnd,
+            };
+        }
+    }
+    return declarationTargetAt(text, offset);
+}
+
+function declarationReferences(text: string, path: string): LanguageReference[] {
+    const references: LanguageReference[] = [];
+
+    for (const attribute of parseDocument(text)) {
+        if (attribute.key && KEY_SIGNAL_PLUGINS.has(attribute.pluginName)) {
+            const rawSegments = attribute.key.split('.');
+            const transformedSegments = rawSegments.map(segment => applySignalCase(segment, attribute.modifiers));
+            const targetSegments = path.split('.');
+            if (targetSegments.every((segment, index) => transformedSegments[index] === segment)) {
+                const segmentIndex = targetSegments.length - 1;
+                const start = attribute.start
+                    + `data-${attribute.pluginName}:`.length
+                    + rawSegments.slice(0, segmentIndex).reduce((length, segment) => length + segment.length + 1, 0);
+                references.push({ start, end: start + rawSegments[segmentIndex].length });
+            }
+            continue;
+        }
+
+        if (VALUE_SIGNAL_PLUGINS.has(attribute.pluginName) && !attribute.key && attribute.valueStart !== undefined) {
+            const leadingWhitespace = attribute.value.length - attribute.value.trimStart().length;
+            const rawName = attribute.value.trim();
+            const rawSegments = rawName.split('.');
+            const transformedSegments = rawSegments.map(segment => applySignalCase(segment, attribute.modifiers));
+            const targetSegments = path.split('.');
+            if (targetSegments.every((segment, index) => transformedSegments[index] === segment)) {
+                const segmentIndex = targetSegments.length - 1;
+                const start = attribute.valueStart
+                    + leadingWhitespace
+                    + rawSegments.slice(0, segmentIndex).reduce((length, segment) => length + segment.length + 1, 0);
+                references.push({ start, end: start + rawSegments[segmentIndex].length });
+            }
+        }
+    }
+
+    for (const declaration of collectSignalDeclarations(text)) {
+        if (declaration.name !== path) continue;
+        if (!references.some(reference => (
+            reference.start < declaration.end && declaration.start < reference.end
+        ))) {
+            references.push({ start: declaration.start, end: declaration.end });
+        }
+    }
+    return references;
+}
+
+export function getReferences(text: string, offset: number, includeDeclaration = true): LanguageReference[] {
+    const target = getRenameTarget(text, offset);
+    if (!target) return [];
+    const references: LanguageReference[] = [];
+    const segmentOffset = target.path.lastIndexOf('.') + 1;
+
+    for (const attribute of parseDocument(text)) {
+        if (attribute.valueStart === undefined || NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) continue;
+        const pattern = /\$([A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*)/g;
+        let match: RegExpExecArray | null;
+        while ((match = pattern.exec(attribute.value))) {
+            if (match[1] !== target.path && !match[1].startsWith(`${target.path}.`)) continue;
+            const start = attribute.valueStart + match.index + 1 + segmentOffset;
+            references.push({ start, end: start + target.placeholder.length });
+        }
+    }
+
+    if (includeDeclaration) references.push(...declarationReferences(text, target.path));
+    return references
+        .filter((reference, index, all) => all.findIndex(candidate => (
+            candidate.start === reference.start && candidate.end === reference.end
+        )) === index)
+        .sort((left, right) => left.start - right.start);
+}
+
+export function getRenameEdits(text: string, offset: number, newName: string): LanguageRenameEdit[] {
+    if (!/^[A-Za-z_$][\w$-]*$/.test(newName)) return [];
+    return getReferences(text, offset).map(reference => ({ ...reference, newText: newName }));
 }
 
 function resolveSignalDeclaration(

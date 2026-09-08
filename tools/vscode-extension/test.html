@@ -2,8 +2,9 @@
 <head></head>
 <body 
     data-signals:_foo.bar="0"
-    data-on:click__delay.500ms="@get('') + $_foo.bar"
-    data-on-intersect="@clipboard('foo')"
+    data-signals="{_goo: {bar: 0}}"
+    data-on:click__delay.500ms="@get($_foo.bar + $_goo.bar)"
+    data-on-intersect="@clipboard($_foo)"
     data-query-string=""
 >
 </body>

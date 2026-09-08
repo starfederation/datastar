@@ -40,6 +40,8 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
         });
         assert.equal(initialize.capabilities.hoverProvider, true);
         assert.equal(initialize.capabilities.definitionProvider, true);
+        assert.equal(initialize.capabilities.referencesProvider, true);
+        assert.deepEqual(initialize.capabilities.renameProvider, { prepareProvider: true });
         assert.deepEqual(initialize.capabilities.signatureHelpProvider, {
             triggerCharacters: ['(', ','],
             retriggerCharacters: [','],
@@ -137,6 +139,32 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
         });
         assert.match((signalHover.contents as { value: string }).value, /\$user\.name/);
         assert.match((signalHover.contents as { value: string }).value, /Signal property declared/);
+
+        const references = await connection.sendRequest<Location[]>('textDocument/references', {
+            textDocument: { uri },
+            position: { line: 0, character: signalText.indexOf('$user.name') + '$user.'.length + 1 },
+            context: { includeDeclaration: true },
+        });
+        assert.equal(references.length, 2);
+
+        const prepareRename = await connection.sendRequest<{
+            range: { start: { line: number; character: number }; end: { line: number; character: number } }
+            placeholder: string
+        }>('textDocument/prepareRename', {
+            textDocument: { uri },
+            position: { line: 0, character: signalText.indexOf('$user.name') + '$user.'.length + 1 },
+        });
+        assert.equal(prepareRename.placeholder, 'name');
+
+        const rename = await connection.sendRequest<{
+            changes: Record<string, Array<{ newText: string }>>
+        }>('textDocument/rename', {
+            textDocument: { uri },
+            position: { line: 0, character: signalText.indexOf('$user.name') + '$user.'.length + 1 },
+            newName: 'fullName',
+        });
+        assert.equal(rename.changes[uri].length, 2);
+        assert.ok(rename.changes[uri].every(edit => edit.newText === 'fullName'));
 
         const actionText = '<button data-on:click="@po">';
         connection.sendNotification('textDocument/didChange', {

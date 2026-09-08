@@ -10,6 +10,7 @@ The extension provides:
 - Hover documentation and links to the Datastar reference
 - Signal completion and hover information
 - Go to definition for signals
+- Find references and rename signals
 - Syntax highlighting in HTML and common template languages
 
 Signals declared with attributes such as `data-signals`, `data-computed`, `data-bind`, `data-ref`, and `data-indicator` are suggested after typing `$` in a Datastar expression. Nested properties are suggested after typing a signal path followed by `.`.

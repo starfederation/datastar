@@ -6,6 +6,9 @@ import {
     getDiagnostics,
     getDefinition,
     getHover,
+    getReferences,
+    getRenameEdits,
+    getRenameTarget,
     getSignatureHelp,
     parseDocument,
 } from '../src/language-service'
@@ -196,6 +199,78 @@ test('does not return definitions for undeclared signals or plain signal-name va
 
     const plainName = '<input data-bind="$query">';
     assert.equal(getDefinition(plainName, plainName.indexOf('$query') + 2), undefined);
+});
+
+test('finds signal references with or without declarations', () => {
+    const source = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$user.name" data-show="$user.name != \'\'">';
+    const offset = source.indexOf('$user.name') + '$user.'.length + 1;
+
+    assert.deepEqual(
+        getReferences(source, offset).map(reference => source.slice(reference.start, reference.end)),
+        ['name', 'name', 'name'],
+    );
+    assert.equal(getReferences(source, offset, false).length, 2);
+});
+
+test('finds root signal references used in nested paths', () => {
+    const source = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$user.name">';
+    const offset = source.indexOf('$user') + 2;
+
+    assert.deepEqual(
+        getReferences(source, offset).map(reference => source.slice(reference.start, reference.end)),
+        ['user', 'user'],
+    );
+});
+
+test('prepares and applies a nested signal rename', () => {
+    const source = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$user.name" data-show="$user.name">';
+    const offset = source.indexOf('$user.name') + '$user.'.length + 1;
+    const target = getRenameTarget(source, offset);
+    const edits = getRenameEdits(source, offset, 'fullName');
+    let renamed = source;
+    for (const edit of [...edits].sort((left, right) => right.start - left.start)) {
+        renamed = renamed.slice(0, edit.start) + edit.newText + renamed.slice(edit.end);
+    }
+
+    assert.equal(target?.placeholder, 'name');
+    assert.equal(edits.length, 3);
+    assert.match(renamed, /user: \{fullName:/);
+    assert.equal(renamed.match(/\$user\.fullName/g)?.length, 2);
+});
+
+test('renames root segments in key-form signal declarations', () => {
+    const source = '<div data-signals:user.name="\'Ada\'" data-text="$user.name">';
+    const offset = source.indexOf('$user') + 2;
+    const edits = getRenameEdits(source, offset, 'account');
+
+    assert.deepEqual(
+        edits.map(edit => source.slice(edit.start, edit.end)),
+        ['user', 'user'],
+    );
+});
+
+test('renames nested segments in value-form signal declarations', () => {
+    const source = '<input data-bind="user.name"><div data-text="$user.name">';
+    const offset = source.indexOf('$user.name') + '$user.'.length + 1;
+
+    assert.deepEqual(
+        getRenameEdits(source, offset, 'fullName').map(edit => source.slice(edit.start, edit.end)),
+        ['name', 'name'],
+    );
+});
+
+test('renames quoted object declaration keys without replacing their quotes', () => {
+    const source = '<div data-signals="{\'full-name\': \'Ada\'}" data-text="$full-name">';
+    const offset = source.indexOf('$full-name') + 2;
+    const edits = getRenameEdits(source, offset, 'display-name');
+
+    assert.equal(source.slice(edits[0].start - 1, edits[0].end + 1), "'full-name'");
+    assert.equal(source.slice(edits[0].start, edits[0].end), 'full-name');
+});
+
+test('rejects invalid signal rename names', () => {
+    const source = '<div data-signals:count="0" data-text="$count">';
+    assert.deepEqual(getRenameEdits(source, source.indexOf('$count') + 2, 'not valid'), []);
 });
 
 test('provides action completions inside Datastar expressions', () => {
