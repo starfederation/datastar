@@ -1,6 +1,6 @@
 # Datastar Extension for Visual Studio Code Changelog
 
-## 1.7.0 - Unreleased
+## 1.7.0 - 2026-09-08
 
 - Added Datastar action completion, signature help, and hover documentation.
 - Added go to definition for signals.
@@ -10,7 +10,7 @@
 - Fixed syntax highlighting to recognise dot-separated signals in attribute keys.
 - Fixed syntax highlighting for underscore-prefixed signals in attribute keys.
 
-## 1.6.0 - 2026-09-08
+## 1.6.0 - 2026-09-07
 
 - Added modifier and native event completion.
 - Added attribute key and value validation.
