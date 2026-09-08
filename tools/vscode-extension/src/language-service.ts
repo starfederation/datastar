@@ -2,7 +2,7 @@ import languageDataJson from './language-data.json'
 
 type Requirement = 'allowed' | 'must' | 'denied' | 'exclusive'
 type SignalKind = 'signal' | 'property' | 'computed' | 'reference'
-type CompletionKind = 'signal' | 'property' | 'modifier'
+type CompletionKind = 'signal' | 'property' | 'modifier' | 'action'
 
 type Reference = {
     name: string
@@ -19,6 +19,7 @@ type AttributeMetadata = {
     keys?: string[]
     element?: string
     highlight: boolean
+    pro: boolean
 }
 
 type CompletionMetadata = {
@@ -33,6 +34,15 @@ type LanguageData = {
     attributes: AttributeMetadata[]
     completions: CompletionMetadata[]
     nativeEvents: string[]
+    actions: ActionMetadata[]
+}
+
+type ActionMetadata = {
+    name: string
+    description: string
+    signature: string
+    parameters: Array<{ label: string }>
+    pro: boolean
 }
 
 type AttributeRule = AttributeMetadata['requirement'] & {
@@ -77,8 +87,34 @@ export type LanguageCompletion = {
     description: string
     references: Reference[]
     kind?: CompletionKind
+    snippet?: boolean
+    detail?: string
     start: number
     end: number
+}
+
+export type LanguageSignature = {
+    label: string
+    description: string
+    parameters: Array<{ label: string }>
+    activeParameter: number
+    pro: boolean
+}
+
+export type LanguageDefinition = {
+    start: number
+    end: number
+}
+
+export type LanguageReference = LanguageDefinition
+
+export type LanguageRenameEdit = LanguageDefinition & {
+    newText: string
+}
+
+export type LanguageRenameTarget = LanguageDefinition & {
+    path: string
+    placeholder: string
 }
 
 export type SignalDeclaration = {
@@ -101,6 +137,7 @@ const languageData = languageDataJson as LanguageData
 
 const snippetEntries = languageData.completions;
 const nativeEvents = languageData.nativeEvents;
+const actionData = languageData.actions;
 const attributeMetadata = new Map<string, AttributeMetadata>(languageData.attributes.map(attribute => [attribute.name, attribute]));
 const knownPlugins = new Set(attributeMetadata.keys());
 const ATTRIBUTE_RULES: Record<string, AttributeRule> = Object.fromEntries(languageData.attributes.map(attribute => [
@@ -401,10 +438,12 @@ function collectObjectSignals(
         }
 
         const keyStart = index;
+        let keyContentStart = keyStart;
         let key: string;
         if (source[index] === '"' || source[index] === "'") {
             const keyEnd = skipQuoted(source, index);
             key = source.slice(index + 1, Math.max(index + 1, keyEnd - 1));
+            keyContentStart++;
             index = keyEnd;
         } else {
             const keyMatch = source.slice(index).match(/^[A-Za-z_$][\w$-]*/);
@@ -428,8 +467,8 @@ function collectObjectSignals(
         signals.push({
             name: path,
             kind: prefix.length === 0 ? 'signal' : 'property',
-            start: sourceOffset + keyStart,
-            end: sourceOffset + keyStart + key.length,
+            start: sourceOffset + keyContentStart,
+            end: sourceOffset + keyContentStart + key.length,
         });
 
         index = skipWhitespace(source, index + 1);
@@ -488,13 +527,225 @@ export function collectSignalDeclarations(text: string): SignalDeclaration[] {
     return [...declarations.values()];
 }
 
-function getSignalCompletions(text: string, offset: number): LanguageCompletion[] | undefined {
-    const attribute = parseDocument(text).find(candidate => (
+function expressionAttributeAt(text: string, offset: number): ParsedAttribute | undefined {
+    return parseDocument(text).find(candidate => (
         candidate.valueStart !== undefined
         && candidate.valueEnd !== undefined
         && candidate.valueStart <= offset
         && offset <= candidate.valueEnd
     ));
+}
+
+type SignalReference = {
+    path: string
+    start: number
+    end: number
+    segmentStart: number
+    segmentEnd: number
+}
+
+function signalReferenceAt(attribute: ParsedAttribute, offset: number): SignalReference | undefined {
+    const referencePattern = /\$([A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*)/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = referencePattern.exec(attribute.value))) {
+        const start = attribute.valueStart! + match.index;
+        const matchEnd = start + match[0].length;
+        if (offset < start || offset > matchEnd) continue;
+
+        const name = match[1];
+        const nameOffset = Math.max(0, Math.min(name.length - 1, offset - start - 1));
+        const nextDot = name.indexOf('.', nameOffset);
+        const path = nextDot === -1 ? name : name.slice(0, nextDot);
+        const lastDot = path.lastIndexOf('.');
+        return {
+            path,
+            start,
+            end: start + path.length + 1,
+            segmentStart: start + lastDot + 2,
+            segmentEnd: start + path.length + 1,
+        };
+    }
+
+    return undefined;
+}
+
+function declarationTargetAt(text: string, offset: number): LanguageRenameTarget | undefined {
+    for (const attribute of parseDocument(text)) {
+        if (attribute.key && KEY_SIGNAL_PLUGINS.has(attribute.pluginName)) {
+            const rawSegments = attribute.key.split('.');
+            const transformedSegments = rawSegments.map(segment => applySignalCase(segment, attribute.modifiers));
+            let start = attribute.start + `data-${attribute.pluginName}:`.length;
+            for (let index = 0; index < rawSegments.length; index++) {
+                const end = start + rawSegments[index].length;
+                if (start <= offset && offset <= end) {
+                    return {
+                        path: transformedSegments.slice(0, index + 1).join('.'),
+                        placeholder: transformedSegments[index],
+                        start,
+                        end,
+                    };
+                }
+                start = end + 1;
+            }
+        }
+
+        if (VALUE_SIGNAL_PLUGINS.has(attribute.pluginName) && !attribute.key && attribute.valueStart !== undefined) {
+            const leadingWhitespace = attribute.value.length - attribute.value.trimStart().length;
+            const rawName = attribute.value.trim();
+            const rawSegments = rawName.split('.');
+            const transformedSegments = rawSegments.map(segment => applySignalCase(segment, attribute.modifiers));
+            let start = attribute.valueStart + leadingWhitespace;
+            for (let index = 0; index < rawSegments.length; index++) {
+                const end = start + rawSegments[index].length;
+                if (start <= offset && offset <= end) {
+                    return {
+                        path: transformedSegments.slice(0, index + 1).join('.'),
+                        placeholder: transformedSegments[index],
+                        start,
+                        end,
+                    };
+                }
+                start = end + 1;
+            }
+        }
+    }
+
+    const declaration = collectSignalDeclarations(text)
+        .find(candidate => candidate.start <= offset && offset <= candidate.end);
+    if (!declaration) return undefined;
+    return {
+        path: declaration.name,
+        placeholder: declaration.name.slice(declaration.name.lastIndexOf('.') + 1),
+        start: declaration.start,
+        end: declaration.end,
+    };
+}
+
+export function getRenameTarget(text: string, offset: number): LanguageRenameTarget | undefined {
+    const attribute = expressionAttributeAt(text, offset);
+    if (attribute && !NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) {
+        const reference = signalReferenceAt(attribute, offset);
+        if (reference) {
+            return {
+                path: reference.path,
+                placeholder: reference.path.slice(reference.path.lastIndexOf('.') + 1),
+                start: reference.segmentStart,
+                end: reference.segmentEnd,
+            };
+        }
+    }
+    return declarationTargetAt(text, offset);
+}
+
+function declarationReferences(text: string, path: string): LanguageReference[] {
+    const references: LanguageReference[] = [];
+
+    for (const attribute of parseDocument(text)) {
+        if (attribute.key && KEY_SIGNAL_PLUGINS.has(attribute.pluginName)) {
+            const rawSegments = attribute.key.split('.');
+            const transformedSegments = rawSegments.map(segment => applySignalCase(segment, attribute.modifiers));
+            const targetSegments = path.split('.');
+            if (targetSegments.every((segment, index) => transformedSegments[index] === segment)) {
+                const segmentIndex = targetSegments.length - 1;
+                const start = attribute.start
+                    + `data-${attribute.pluginName}:`.length
+                    + rawSegments.slice(0, segmentIndex).reduce((length, segment) => length + segment.length + 1, 0);
+                references.push({ start, end: start + rawSegments[segmentIndex].length });
+            }
+            continue;
+        }
+
+        if (VALUE_SIGNAL_PLUGINS.has(attribute.pluginName) && !attribute.key && attribute.valueStart !== undefined) {
+            const leadingWhitespace = attribute.value.length - attribute.value.trimStart().length;
+            const rawName = attribute.value.trim();
+            const rawSegments = rawName.split('.');
+            const transformedSegments = rawSegments.map(segment => applySignalCase(segment, attribute.modifiers));
+            const targetSegments = path.split('.');
+            if (targetSegments.every((segment, index) => transformedSegments[index] === segment)) {
+                const segmentIndex = targetSegments.length - 1;
+                const start = attribute.valueStart
+                    + leadingWhitespace
+                    + rawSegments.slice(0, segmentIndex).reduce((length, segment) => length + segment.length + 1, 0);
+                references.push({ start, end: start + rawSegments[segmentIndex].length });
+            }
+        }
+    }
+
+    for (const declaration of collectSignalDeclarations(text)) {
+        if (declaration.name !== path) continue;
+        if (!references.some(reference => (
+            reference.start < declaration.end && declaration.start < reference.end
+        ))) {
+            references.push({ start: declaration.start, end: declaration.end });
+        }
+    }
+    return references;
+}
+
+export function getReferences(text: string, offset: number, includeDeclaration = true): LanguageReference[] {
+    const target = getRenameTarget(text, offset);
+    if (!target) return [];
+    const references: LanguageReference[] = [];
+    const segmentOffset = target.path.lastIndexOf('.') + 1;
+
+    for (const attribute of parseDocument(text)) {
+        if (attribute.valueStart === undefined || NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) continue;
+        const pattern = /\$([A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*)/g;
+        let match: RegExpExecArray | null;
+        while ((match = pattern.exec(attribute.value))) {
+            if (match[1] !== target.path && !match[1].startsWith(`${target.path}.`)) continue;
+            const start = attribute.valueStart + match.index + 1 + segmentOffset;
+            references.push({ start, end: start + target.placeholder.length });
+        }
+    }
+
+    if (includeDeclaration) references.push(...declarationReferences(text, target.path));
+    return references
+        .filter((reference, index, all) => all.findIndex(candidate => (
+            candidate.start === reference.start && candidate.end === reference.end
+        )) === index)
+        .sort((left, right) => left.start - right.start);
+}
+
+export function getRenameEdits(text: string, offset: number, newName: string): LanguageRenameEdit[] {
+    if (!/^[A-Za-z_$][\w$-]*$/.test(newName)) return [];
+    return getReferences(text, offset).map(reference => ({ ...reference, newText: newName }));
+}
+
+function resolveSignalDeclaration(
+    declarations: SignalDeclaration[],
+    requestedPath: string,
+): SignalDeclaration | undefined {
+    const direct = declarations.find(candidate => (
+        candidate.name === requestedPath
+        || candidate.name.startsWith(`${requestedPath}.`)
+    ));
+    if (direct) return direct;
+
+    let path = requestedPath;
+    while (path.includes('.')) {
+        path = path.slice(0, path.lastIndexOf('.'));
+        const declaration = declarations.find(candidate => candidate.name === path);
+        if (declaration) return declaration;
+    }
+    return undefined;
+}
+
+export function getDefinition(text: string, offset: number): LanguageDefinition | undefined {
+    const attribute = expressionAttributeAt(text, offset);
+    if (!attribute || NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
+    const reference = signalReferenceAt(attribute, offset);
+    if (!reference) return undefined;
+    const declaration = resolveSignalDeclaration(collectSignalDeclarations(text), reference.path);
+    return declaration ? { start: declaration.start, end: declaration.end } : undefined;
+}
+
+function getSignalCompletions(
+    text: string,
+    offset: number,
+    attribute: ParsedAttribute,
+): LanguageCompletion[] | undefined {
     if (!attribute || NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
 
     const beforeCursor = text.slice(attribute.valueStart, offset);
@@ -530,6 +781,76 @@ function getSignalCompletions(text: string, offset: number): LanguageCompletion[
         start,
         end: offset,
     }));
+}
+
+function getActionCompletions(
+    text: string,
+    offset: number,
+    attribute: ParsedAttribute,
+): LanguageCompletion[] | undefined {
+    if (NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
+
+    const beforeCursor = text.slice(attribute.valueStart, offset);
+    const match = beforeCursor.match(/@[A-Za-z_$][\w$]*$/) || beforeCursor.match(/@$/);
+    if (!match) return undefined;
+
+    return actionData.map(action => ({
+        label: `@${action.name}`,
+        insertText: `@${action.name}(`,
+        description: action.description,
+        references: [],
+        kind: 'action',
+        detail: action.pro ? 'Datastar Pro action' : 'Datastar action',
+        start: offset - match[0].length,
+        end: offset,
+    }));
+}
+
+export function getSignatureHelp(text: string, offset: number): LanguageSignature | undefined {
+    const attribute = expressionAttributeAt(text, offset);
+    if (!attribute || NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
+
+    const source = text.slice(attribute.valueStart, offset);
+    const stack: Array<{ close: string; action?: string; argument: number }> = [];
+    const pairs: Record<string, string> = { '(': ')', '[': ']', '{': '}' };
+
+    for (let index = 0; index < source.length; index++) {
+        const char = source[index];
+        if (char === '"' || char === "'" || char === '`') {
+            index = skipQuoted(source, index) - 1;
+            continue;
+        }
+
+        if (char === '@') {
+            const match = source.slice(index).match(/^@([A-Za-z_$][\w$]*)\s*\(/);
+            if (match) {
+                stack.push({ close: ')', action: match[1], argument: 0 });
+                index += match[0].length - 1;
+                continue;
+            }
+        }
+
+        if (pairs[char]) {
+            stack.push({ close: pairs[char], argument: 0 });
+        } else if (stack.at(-1)?.close === char) {
+            stack.pop();
+        } else if (char === ',' && stack.at(-1)?.action) {
+            stack.at(-1)!.argument++;
+        }
+    }
+
+    const call = [...stack].reverse().find(frame => frame.action);
+    if (!call) return undefined;
+    const action = actionData.find(candidate => candidate.name === call.action);
+    if (!action) return undefined;
+
+    return {
+        label: action.signature,
+        description: action.description,
+        parameters: action.parameters,
+        activeParameter: Math.min(call.argument, Math.max(0, action.parameters.length - 1)),
+        pro: action.pro,
+    };
 }
 
 function getModifierCompletions(prefix: string, offset: number): LanguageCompletion[] | undefined {
@@ -569,6 +890,7 @@ function getModifierCompletions(prefix: string, offset: number): LanguageComplet
                 description: modifier.description || 'Datastar attribute modifier.',
                 references: completion?.references || [],
                 kind: 'modifier' as const,
+                detail: metadata.pro ? 'Datastar Pro attribute modifier' : 'Datastar attribute modifier',
                 start: offset - typedPart.length,
                 end: offset,
             };
@@ -580,8 +902,14 @@ export function getCompletions(
     offset: number,
     customAttributes: string[] = [],
 ): LanguageCompletion[] {
-    const signalCompletions = getSignalCompletions(text, offset);
-    if (signalCompletions !== undefined) return signalCompletions;
+    const expressionAttribute = expressionAttributeAt(text, offset);
+    if (expressionAttribute) {
+        const actionCompletions = getActionCompletions(text, offset, expressionAttribute);
+        if (actionCompletions !== undefined) return actionCompletions;
+
+        const signalCompletions = getSignalCompletions(text, offset, expressionAttribute);
+        if (signalCompletions !== undefined) return signalCompletions;
+    }
 
     const tag = findTags(text).find(candidate => (
         candidate.start <= offset
@@ -619,6 +947,9 @@ export function getCompletions(
             insertText: entry.insertText,
             description: entry.description,
             references: entry.references || [],
+            detail: attributeMetadata.get(entry.pluginName)?.pro
+                ? 'Datastar Pro attribute'
+                : 'Datastar attribute',
             start: offset - prefixMatch[0].length,
             end: offset,
         }));
@@ -629,6 +960,7 @@ export function getCompletions(
             insertText: `data-${pluginName}="\${1:expression}"`,
             description: 'Custom Datastar attribute.',
             references: [],
+            detail: 'Custom Datastar attribute',
             start: offset - prefixMatch[0].length,
             end: offset,
         });
@@ -639,7 +971,52 @@ export function getCompletions(
 
 export function getHover(text: string, offset: number): LanguageHover | undefined {
     const attribute = parseDocument(text).find(candidate => candidate.start <= offset && offset <= candidate.nameEnd);
-    if (!attribute) return undefined;
+    if (!attribute) {
+        const expressionAttribute = expressionAttributeAt(text, offset);
+        if (!expressionAttribute || NON_EXPRESSION_VALUE_PLUGINS.has(expressionAttribute.pluginName)) return undefined;
+
+        const actionPattern = /@([A-Za-z_$][\w$]*)\s*\(/g;
+        let match: RegExpExecArray | null;
+        while ((match = actionPattern.exec(expressionAttribute.value))) {
+            const start = expressionAttribute.valueStart! + match.index;
+            const end = start + match[1].length + 1;
+            if (offset < start || offset > end) continue;
+
+            const action = actionData.find(candidate => candidate.name === match![1]);
+            if (!action) return undefined;
+            return {
+                start,
+                end,
+                name: action.signature,
+                description: action.description,
+                requirements: action.pro ? ['Requires Datastar Pro.'] : [],
+                references: [{
+                    name: 'Documentation',
+                    url: `https://data-star.dev/reference/actions#${action.name}`,
+                }],
+            };
+        }
+
+        const reference = signalReferenceAt(expressionAttribute, offset);
+        if (!reference) return undefined;
+        const declaration = resolveSignalDeclaration(collectSignalDeclarations(text), reference.path);
+        const descriptions: Record<SignalKind, string> = {
+            signal: 'Signal declared in this document.',
+            property: 'Signal property declared in this document.',
+            computed: 'Computed signal declared in this document.',
+            reference: 'Element reference signal declared in this document.',
+        };
+        return {
+            start: reference.start,
+            end: reference.end,
+            name: `$${reference.path}`,
+            description: declaration
+                ? descriptions[declaration.kind]
+                : 'Signal is not explicitly declared in this document.',
+            requirements: [],
+            references: [],
+        };
+    }
 
     const entry = snippetEntries.find(candidate => candidate.name === attribute.name)
         || snippetEntries.find(candidate => candidate.pluginName === attribute.pluginName);
@@ -652,6 +1029,7 @@ export function getHover(text: string, offset: number): LanguageHover | undefine
     if (rule?.key === 'denied') requirements.push('Key: not allowed');
     if (rule?.value === 'must') requirements.push('Value: required');
     if (rule?.value === 'denied') requirements.push('Value: not allowed');
+    if (attributeMetadata.get(attribute.pluginName)?.pro) requirements.push('Requires Datastar Pro.');
 
     return {
         start: attribute.start,

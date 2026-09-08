@@ -34,8 +34,8 @@
           }
         },
         {
-          "comment": "Match regular and dot-separated signals (`:foo` or `:foo.bar`)",
-          "match": "(:)([a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*)(?=__|:|[\\s>=])",
+          "comment": "Match regular and dot-separated signals (`:foo`, `:_foo`, or `:_foo.bar`)",
+          "match": "(:)([a-z_][a-z0-9_-]*(?:\\.[a-z_][a-z0-9_-]*)*)(?=__|:|[\\s>=])",
           "captures": {
             "1": {
               "name": "punctuation.separator.key.datastar"

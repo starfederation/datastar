@@ -13,7 +13,9 @@ import type {
     Diagnostic,
     Hover,
     InitializeResult,
+    Location,
     PublishDiagnosticsParams,
+    SignatureHelp,
 } from 'vscode-languageserver-protocol'
 
 test('language server completes, hovers, and publishes diagnostics over LSP', async () => {
@@ -37,6 +39,13 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
             },
         });
         assert.equal(initialize.capabilities.hoverProvider, true);
+        assert.equal(initialize.capabilities.definitionProvider, true);
+        assert.equal(initialize.capabilities.referencesProvider, true);
+        assert.deepEqual(initialize.capabilities.renameProvider, { prepareProvider: true });
+        assert.deepEqual(initialize.capabilities.signatureHelpProvider, {
+            triggerCharacters: ['(', ','],
+            retriggerCharacters: [','],
+        });
         connection.sendNotification('initialized', {});
 
         const uri = 'file:///datastar-lsp-test.html';
@@ -56,9 +65,23 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
         });
         assert.ok(completions.some(completion => completion.label === 'data-show'));
 
-        const eventText = '<button data-on:';
+        const proAttributeText = '<div data-an';
         connection.sendNotification('textDocument/didChange', {
             textDocument: { uri, version: 2 },
+            contentChanges: [{ text: proAttributeText }],
+        });
+        const proAttributeCompletions = await connection.sendRequest<CompletionItem[]>('textDocument/completion', {
+            textDocument: { uri },
+            position: { line: 0, character: proAttributeText.length },
+        });
+        assert.equal(
+            proAttributeCompletions.find(completion => completion.label === 'data-animate:*')?.detail,
+            'Datastar Pro attribute',
+        );
+
+        const eventText = '<button data-on:';
+        connection.sendNotification('textDocument/didChange', {
+            textDocument: { uri, version: 3 },
             contentChanges: [{ text: eventText }],
         });
         const eventCompletions = await connection.sendRequest<CompletionItem[]>('textDocument/completion', {
@@ -73,7 +96,7 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
 
         const modifierText = '<button data-on:click__';
         connection.sendNotification('textDocument/didChange', {
-            textDocument: { uri, version: 3 },
+            textDocument: { uri, version: 4 },
             contentChanges: [{ text: modifierText }],
         });
         const modifierCompletions = await connection.sendRequest<CompletionItem[]>('textDocument/completion', {
@@ -87,9 +110,9 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
             ? debounceCompletion.textEdit.newText
             : undefined, 'debounce');
 
-        const signalText = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$us">';
+        const signalText = '<div data-signals="{user: {name: \'Ada\'}}" data-text="$us" data-show="$user.name">';
         connection.sendNotification('textDocument/didChange', {
-            textDocument: { uri, version: 4 },
+            textDocument: { uri, version: 5 },
             contentChanges: [{ text: signalText }],
         });
         const signalCompletions = await connection.sendRequest<CompletionItem[]>('textDocument/completion', {
@@ -99,6 +122,78 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
         const userCompletion = signalCompletions.find(completion => completion.label === '$user');
         assert.ok(userCompletion);
         assert.equal(userCompletion.kind, 6);
+
+        const definition = await connection.sendRequest<Location>('textDocument/definition', {
+            textDocument: { uri },
+            position: { line: 0, character: signalText.indexOf('$user') + '$user.'.length + 1 },
+        });
+        assert.equal(definition.uri, uri);
+        assert.deepEqual(definition.range, {
+            start: { line: 0, character: signalText.indexOf('name:') },
+            end: { line: 0, character: signalText.indexOf('name:') + 'name'.length },
+        });
+
+        const signalHover = await connection.sendRequest<Hover>('textDocument/hover', {
+            textDocument: { uri },
+            position: { line: 0, character: signalText.indexOf('$user.name') + '$user.'.length + 1 },
+        });
+        assert.match((signalHover.contents as { value: string }).value, /\$user\.name/);
+        assert.match((signalHover.contents as { value: string }).value, /Signal property declared/);
+
+        const references = await connection.sendRequest<Location[]>('textDocument/references', {
+            textDocument: { uri },
+            position: { line: 0, character: signalText.indexOf('$user.name') + '$user.'.length + 1 },
+            context: { includeDeclaration: true },
+        });
+        assert.equal(references.length, 2);
+
+        const prepareRename = await connection.sendRequest<{
+            range: { start: { line: number; character: number }; end: { line: number; character: number } }
+            placeholder: string
+        }>('textDocument/prepareRename', {
+            textDocument: { uri },
+            position: { line: 0, character: signalText.indexOf('$user.name') + '$user.'.length + 1 },
+        });
+        assert.equal(prepareRename.placeholder, 'name');
+
+        const rename = await connection.sendRequest<{
+            changes: Record<string, Array<{ newText: string }>>
+        }>('textDocument/rename', {
+            textDocument: { uri },
+            position: { line: 0, character: signalText.indexOf('$user.name') + '$user.'.length + 1 },
+            newName: 'fullName',
+        });
+        assert.equal(rename.changes[uri].length, 2);
+        assert.ok(rename.changes[uri].every(edit => edit.newText === 'fullName'));
+
+        const actionText = '<button data-on:click="@po">';
+        connection.sendNotification('textDocument/didChange', {
+            textDocument: { uri, version: 6 },
+            contentChanges: [{ text: actionText }],
+        });
+        const actionCompletions = await connection.sendRequest<CompletionItem[]>('textDocument/completion', {
+            textDocument: { uri },
+            position: { line: 0, character: actionText.indexOf('@po') + '@po'.length },
+        });
+        const postCompletion = actionCompletions.find(completion => completion.label === '@post');
+        assert.ok(postCompletion);
+        assert.equal(postCompletion.kind, 3);
+        assert.equal(postCompletion.insertTextFormat, 1);
+
+        const fitCompletion = actionCompletions.find(completion => completion.label === '@fit');
+        assert.equal(fitCompletion?.detail, 'Datastar Pro action');
+
+        const signatureText = '<button data-on:click="@post(\'/endpoint\', ">';
+        connection.sendNotification('textDocument/didChange', {
+            textDocument: { uri, version: 7 },
+            contentChanges: [{ text: signatureText }],
+        });
+        const signature = await connection.sendRequest<SignatureHelp>('textDocument/signatureHelp', {
+            textDocument: { uri },
+            position: { line: 0, character: signatureText.indexOf(',') + 2 },
+        });
+        assert.equal(signature.signatures[0].label, '@post(uri: string, options={ })');
+        assert.equal(signature.activeParameter, 1);
 
         const diagnosticsPromise = new Promise<Diagnostic[]>(resolve => {
             const disposable = connection.onNotification(PublishDiagnosticsNotification.type, (params: PublishDiagnosticsParams) => {
@@ -110,7 +205,7 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
         });
         const changedText = '<main data-nonce="abc">';
         connection.sendNotification('textDocument/didChange', {
-            textDocument: { uri, version: 5 },
+            textDocument: { uri, version: 8 },
             contentChanges: [{ text: changedText }],
         });
 
@@ -122,6 +217,29 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
             position: { line: 0, character: changedText.indexOf('data-nonce') + 2 },
         });
         assert.match((hover.contents as { value: string }).value, /<html>/);
+
+        const actionHoverText = '<button data-on:click="@post(\'/endpoint\')">';
+        connection.sendNotification('textDocument/didChange', {
+            textDocument: { uri, version: 9 },
+            contentChanges: [{ text: actionHoverText }],
+        });
+        const actionHover = await connection.sendRequest<Hover>('textDocument/hover', {
+            textDocument: { uri },
+            position: { line: 0, character: actionHoverText.indexOf('@post') + 2 },
+        });
+        assert.match((actionHover.contents as { value: string }).value, /@post\(uri: string, options=\{ \}\)/);
+        assert.match((actionHover.contents as { value: string }).value, /POST/);
+
+        const proAttributeHoverText = '<div data-animate:opacity="$opacity">';
+        connection.sendNotification('textDocument/didChange', {
+            textDocument: { uri, version: 10 },
+            contentChanges: [{ text: proAttributeHoverText }],
+        });
+        const proAttributeHover = await connection.sendRequest<Hover>('textDocument/hover', {
+            textDocument: { uri },
+            position: { line: 0, character: proAttributeHoverText.indexOf('data-animate') + 2 },
+        });
+        assert.match((proAttributeHover.contents as { value: string }).value, /Requires Datastar Pro/);
 
         await connection.sendRequest('shutdown');
         connection.sendNotification('exit');

@@ -1,0 +1,12 @@
+[
+  "animate",
+  "custom-validity",
+  "match-media",
+  "on-raf",
+  "on-resize",
+  "persist",
+  "query-string",
+  "replace-url",
+  "scroll-into-view",
+  "view-transition"
+]

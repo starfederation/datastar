@@ -11,6 +11,14 @@ type Modifier = {
   description?: string
 }
 
+type Action = {
+  name: string
+  description: string
+  signature: string
+  parameters: Array<{ label: string }>
+  pro: boolean
+}
+
 type AttributeSemantics = {
   requirement: {
     key: Requirement
@@ -36,6 +44,8 @@ type AttributeDefinition = AttributeSemantics & {
 const extensionRoot = __dirname
 const snippetsPath = path.join(extensionRoot, 'src', 'data-attributes.json')
 const modifiersPath = path.join(extensionRoot, 'src', 'modifier-metadata.json')
+const actionsPath = path.join(extensionRoot, 'src', 'action-metadata.json')
+const proAttributesPath = path.join(extensionRoot, 'src', 'pro-attribute-metadata.json')
 const outputPath = path.join(extensionRoot, 'src', 'language-data.json')
 const grammarPath = path.join(
   extensionRoot,
@@ -44,6 +54,7 @@ const grammarPath = path.join(
 )
 const checkOnly = process.argv.includes('--check')
 const docsUrl = 'https://data-star.dev/docs.md'
+let docsPromise: Promise<string> | undefined
 
 const fetchText = (url: string, redirects = 0): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -75,6 +86,8 @@ const fetchText = (url: string, redirects = 0): Promise<string> =>
       })
       .on('error', reject)
   })
+
+const fetchDocs = (): Promise<string> => docsPromise ||= fetchText(docsUrl)
 
 const modifiersFromDocs = (markdown: string): Record<string, Modifier[]> => {
   const result = new Map<string, Map<string, Modifier>>()
@@ -151,9 +164,148 @@ const loadModifiers = async (): Promise<Record<string, Modifier[]>> => {
     >
   }
 
-  const modifiers = modifiersFromDocs(await fetchText(docsUrl))
+  const modifiers = modifiersFromDocs(await fetchDocs())
   fs.writeFileSync(modifiersPath, `${JSON.stringify(modifiers, null, 2)}\n`)
   return modifiers
+}
+
+const splitParameters = (source: string): string[] => {
+  const parameters: string[] = []
+  const closing: string[] = []
+  const pairs: Record<string, string> = { '(': ')', '[': ']', '{': '}', '<': '>' }
+  let quote: string | undefined
+  let start = 0
+
+  for (let index = 0; index < source.length; index++) {
+    const char = source[index]
+    if (quote) {
+      if (char === quote && source[index - 1] !== '\\') quote = undefined
+    } else if (char === '"' || char === "'" || char === '`') {
+      quote = char
+    } else if (pairs[char]) {
+      closing.push(pairs[char])
+    } else if (closing.at(-1) === char) {
+      closing.pop()
+    } else if (char === ',' && closing.length === 0) {
+      parameters.push(source.slice(start, index).trim())
+      start = index + 1
+    }
+  }
+
+  const last = source.slice(start).trim()
+  if (last) parameters.push(last)
+  return parameters
+}
+
+const actionsFromDocs = (markdown: string): Action[] => {
+  const lines = markdown.split(/\r?\n/)
+  const actions: Action[] = []
+  let inActions = false
+  let pro = false
+
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index]
+    if (line === '# Actions') {
+      inActions = true
+      continue
+    }
+    if (inActions && /^# [^#]/.test(line)) break
+    if (!inActions) continue
+    if (/^## Pro Actions\s*$/.test(line)) {
+      pro = true
+      continue
+    }
+
+    const heading = line.match(/^### `@([A-Za-z_$][\w$]*)\(\)`/)
+    if (!heading) continue
+
+    let signature: string | undefined
+    let description: string | undefined
+    for (index++; index < lines.length; index++) {
+      const detail = lines[index]
+      if (/^#{1,3} /.test(detail)) {
+        index--
+        break
+      }
+      const signatureMatch = detail.match(/^> `(@[^`]+)`$/)
+      if (signatureMatch) {
+        signature = signatureMatch[1]
+      } else if (signature && detail && !detail.startsWith('>') && !detail.startsWith('```')) {
+        description = detail
+        break
+      }
+    }
+
+    if (!signature || !description) {
+      throw new Error(`Could not parse @${heading[1]} action metadata from ${docsUrl}.`)
+    }
+    const open = signature.indexOf('(')
+    const close = signature.lastIndexOf(')')
+    if (open === -1 || close < open) {
+      throw new Error(`Could not parse @${heading[1]} signature from ${docsUrl}.`)
+    }
+
+    actions.push({
+      name: heading[1],
+      description,
+      signature,
+      parameters: splitParameters(signature.slice(open + 1, close)).map(label => ({ label })),
+      pro,
+    })
+  }
+
+  if (!actions.some(action => action.name === 'peek') || !actions.some(action => action.name === 'get')) {
+    throw new Error(`Could not parse Datastar actions from ${docsUrl}.`)
+  }
+  return actions
+}
+
+const loadActions = async (): Promise<Action[]> => {
+  if (checkOnly) {
+    if (!fs.existsSync(actionsPath)) {
+      throw new Error(`Missing ${path.relative(extensionRoot, actionsPath)}. Run npm run generate.`)
+    }
+    return JSON.parse(fs.readFileSync(actionsPath, 'utf8')) as Action[]
+  }
+
+  const actions = actionsFromDocs(await fetchDocs())
+  fs.writeFileSync(actionsPath, `${JSON.stringify(actions, null, 2)}\n`)
+  return actions
+}
+
+const proAttributesFromDocs = (markdown: string): string[] => {
+  const names: string[] = []
+  let inProAttributes = false
+
+  for (const line of markdown.split(/\r?\n/)) {
+    if (/^## Pro Attributes\s*$/.test(line)) {
+      inProAttributes = true
+      continue
+    }
+    if (inProAttributes && /^##? [^#]/.test(line)) break
+    if (!inProAttributes) continue
+
+    const heading = line.match(/^### `data-([^`]+)`/)
+    if (heading) names.push(pluginName(`data-${heading[1]}`))
+  }
+
+  if (names.length === 0) {
+    throw new Error(`Could not parse Datastar Pro attributes from ${docsUrl}.`)
+  }
+  return names
+}
+
+const loadProAttributes = async (): Promise<string[]> => {
+  if (checkOnly) {
+    if (!fs.existsSync(proAttributesPath)) {
+      throw new Error(`Missing ${path.relative(extensionRoot, proAttributesPath)}. Run npm run generate.`)
+    }
+    return JSON.parse(fs.readFileSync(proAttributesPath, 'utf8')) as string[]
+  }
+
+  const names = proAttributesFromDocs(await fetchDocs())
+  fs.writeFileSync(proAttributesPath, `${JSON.stringify(names, null, 2)}\n`)
+  return names
 }
 
 const nativeEventNames = (): string[] => {
@@ -189,7 +341,11 @@ const attributeDefinitions = JSON.parse(
 const pluginName = (attributeName: string): string =>
   attributeName.slice('data-'.length).split(':', 1)[0].split('__', 1)[0]
 
-const generateLanguageData = (modifiers: Record<string, Modifier[]>) => {
+const generateLanguageData = (
+  modifiers: Record<string, Modifier[]>,
+  actions: Action[],
+  proAttributes: string[],
+) => {
   const completions = Object.entries(attributeDefinitions).flatMap(
     ([declaredPluginName, definition]) =>
       Object.entries(definition.completions).map(([name, snippet]) => {
@@ -234,10 +390,11 @@ const generateLanguageData = (modifiers: Record<string, Modifier[]>) => {
       keys: definition.keys,
       element: definition.element,
       highlight: definition.highlight ?? true,
+      pro: proAttributes.includes(name),
     }
   })
 
-  return { version: 1, attributes, completions, nativeEvents: nativeEventNames() }
+  return { version: 1, attributes, completions, nativeEvents: nativeEventNames(), actions }
 }
 
 const grammarWithAttributes = (data: ReturnType<typeof generateLanguageData>) => {
@@ -259,7 +416,12 @@ const grammarWithAttributes = (data: ReturnType<typeof generateLanguageData>) =>
 }
 
 const main = async () => {
-  const data = generateLanguageData(await loadModifiers())
+  const [modifiers, actions, proAttributes] = await Promise.all([
+    loadModifiers(),
+    loadActions(),
+    loadProAttributes(),
+  ])
+  const data = generateLanguageData(modifiers, actions, proAttributes)
   const languageDataContent = `${JSON.stringify(data, null, 2)}\n`
   const grammarContent = grammarWithAttributes(data)
 
@@ -283,7 +445,7 @@ const main = async () => {
     fs.writeFileSync(outputPath, languageDataContent)
     fs.writeFileSync(grammarPath, grammarContent)
     console.log(
-      `Generated ${data.attributes.length} attributes and ${data.completions.length} completions from ${docsUrl}.`,
+      `Generated ${data.attributes.length} attributes, ${data.completions.length} completions, and ${data.actions.length} actions from ${docsUrl}.`,
     )
   }
 }

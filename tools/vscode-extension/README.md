@@ -5,9 +5,12 @@ Adds context-aware autocomplete, diagnostics, hover documentation, and syntax hi
 The extension provides:
 
 - Datastar attribute, modifier, and native event completion
+- Datastar action completion and signature help
 - Attribute key and value validation
 - Hover documentation and links to the Datastar reference
-- Document-local signal and nested property completion
+- Signal completion and hover information
+- Go to definition for signals
+- Find references and rename signals
 - Syntax highlighting in HTML and common template languages
 
 Signals declared with attributes such as `data-signals`, `data-computed`, `data-bind`, `data-ref`, and `data-indicator` are suggested after typing `$` in a Datastar expression. Nested properties are suggested after typing a signal path followed by `.`.
