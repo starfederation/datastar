@@ -7,6 +7,7 @@
   "publisher": "starfederation",
   "license": "MIT",
   "repository": "https://github.com/starfederation/datastar",
+  "homepage": "https://data-star.dev/",
   "icon": "src/icon.png",
   "galleryBanner": {
     "color": "#bee3f8",
