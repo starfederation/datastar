@@ -1,12 +1,13 @@
 {
   "name": "datastar-vscode",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "displayName": "Datastar",
   "description": "Adds autocomplete, diagnostics, hover documentation, and syntax highlighting for Datastar to Visual Studio Code.",
   "author": "Ben Croker",
   "publisher": "starfederation",
   "license": "MIT",
   "repository": "https://github.com/starfederation/datastar",
+  "homepage": "https://data-star.dev/",
   "icon": "src/icon.png",
   "galleryBanner": {
     "color": "#bee3f8",

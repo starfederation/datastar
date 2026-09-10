@@ -296,6 +296,41 @@ test('includes Pro actions and identifies them in completion details', () => {
     assert.equal(getSignatureHelp('<div data-text="@fit(">', '<div data-text="@fit('.length)?.pro, true);
 });
 
+test('provides docs-derived option completions for every backend action', () => {
+    for (const action of ['get', 'post', 'put', 'patch', 'delete']) {
+        const source = `<button data-on:click="@${action}('/endpoint', {re}">`;
+        const offset = source.indexOf('{re') + '{re'.length;
+        const completions = getCompletions(source, offset);
+        const retry = completions.find(completion => completion.label === 'retry');
+
+        assert.ok(retry, `Expected retry completion for @${action}`);
+        assert.equal(retry.insertText, 'retry: ');
+        assert.equal(retry.kind, 'property');
+        assert.equal(retry.detail, 'Datastar backend action option');
+        assert.equal(source.slice(retry.start, retry.end), 're');
+    }
+});
+
+test('does not repeat backend options or offer them inside nested objects', () => {
+    const source = '<button data-on:click="@get(\'/endpoint\', {payload: {foo: 1}, re}">';
+    const offset = source.indexOf(', re') + ', re'.length;
+    const completions = getCompletions(source, offset);
+
+    assert.equal(completions.some(completion => completion.label === 'payload'), false);
+    assert.equal(completions.some(completion => completion.label === 'retry'), true);
+
+    const nested = '<button data-on:click="@get(\'/endpoint\', {headers: {re}">';
+    const nestedOffset = nested.indexOf('{re') + '{re'.length;
+    assert.deepEqual(getCompletions(nested, nestedOffset), []);
+});
+
+test('does not provide backend options for other action object arguments', () => {
+    const source = '<button data-on:click="@setAll(true, {re}">';
+    const offset = source.indexOf('{re') + '{re'.length;
+
+    assert.deepEqual(getCompletions(source, offset), []);
+});
+
 test('does not provide action completions in plain signal-name values', () => {
     const source = '<input data-bind="@">';
     const offset = source.indexOf('@') + 1;
@@ -354,6 +389,24 @@ test('returns hover documentation for actions', () => {
     assert.match(hover!.description, /POST/);
     assert.deepEqual(hover?.requirements, []);
     assert.equal(hover?.references[0].url, 'https://data-star.dev/reference/actions#post');
+});
+
+test('returns docs-derived hover documentation for backend action options', () => {
+    const source = '<button data-on:click="@get(\'/endpoint\', {retry: \'always\'})">';
+    const hover = getHover(source, source.indexOf('retry') + 2);
+
+    assert.equal(hover?.name, 'retry');
+    assert.match(hover!.description, /Determines when to retry requests/);
+    assert.equal(source.slice(hover!.start, hover!.end), 'retry');
+    assert.equal(hover?.references[0].url, 'https://data-star.dev/reference/actions#options');
+});
+
+test('does not return backend option hover inside nested objects or other actions', () => {
+    const nested = '<button data-on:click="@get(\'/endpoint\', {headers: {retry: true}})">';
+    assert.equal(getHover(nested, nested.indexOf('retry') + 2), undefined);
+
+    const otherAction = '<button data-on:click="@setAll(true, {retry: true})">';
+    assert.equal(getHover(otherAction, otherAction.indexOf('retry') + 2), undefined);
 });
 
 test('identifies Pro actions in hover documentation', () => {

@@ -12,13 +12,13 @@ type Reference = {
 type AttributeMetadata = {
     name: string
     description: string
+    reference: string
     requirement: { key: Requirement; value: Requirement }
     modifiers: Array<{ name: string; description?: string }>
     signals?: 'key' | 'key-or-value' | 'key-or-object'
     valueKind: 'expression' | 'signal-name' | 'string'
     keys?: string[]
     element?: string
-    highlight: boolean
     pro: boolean
 }
 
@@ -26,8 +26,6 @@ type CompletionMetadata = {
     name: string
     pluginName: string
     insertText: string
-    description: string
-    references: Reference[]
 }
 
 type LanguageData = {
@@ -35,14 +33,26 @@ type LanguageData = {
     completions: CompletionMetadata[]
     nativeEvents: string[]
     actions: ActionMetadata[]
+    backendActionNames: string[]
+    backendActionParameters: ActionParameterMetadata[]
+    backendActionOptions: ActionOptionMetadata[]
 }
 
 type ActionMetadata = {
     name: string
     description: string
-    signature: string
-    parameters: Array<{ label: string }>
+    signature?: string
+    parameters?: ActionParameterMetadata[]
     pro: boolean
+}
+
+type ActionParameterMetadata = {
+    label: string
+}
+
+type ActionOptionMetadata = {
+    name: string
+    description: string
 }
 
 type AttributeRule = AttributeMetadata['requirement'] & {
@@ -138,6 +148,9 @@ const languageData = languageDataJson as LanguageData
 const snippetEntries = languageData.completions;
 const nativeEvents = languageData.nativeEvents;
 const actionData = languageData.actions;
+const backendActionNames = new Set(languageData.backendActionNames);
+const backendActionParameters = languageData.backendActionParameters;
+const backendActionOptions = languageData.backendActionOptions;
 const attributeMetadata = new Map<string, AttributeMetadata>(languageData.attributes.map(attribute => [attribute.name, attribute]));
 const knownPlugins = new Set(attributeMetadata.keys());
 const ATTRIBUTE_RULES: Record<string, AttributeRule> = Object.fromEntries(languageData.attributes.map(attribute => [
@@ -161,6 +174,17 @@ const OBJECT_SIGNAL_PLUGINS = new Set(languageData.attributes
 const NON_EXPRESSION_VALUE_PLUGINS = new Set(languageData.attributes
     .filter(attribute => attribute.valueKind !== 'expression')
     .map(attribute => attribute.name));
+
+const getActionParameters = (action: ActionMetadata): ActionParameterMetadata[] =>
+    backendActionNames.has(action.name) ? backendActionParameters : action.parameters || [];
+
+const getActionSignature = (action: ActionMetadata): string =>
+    action.signature || `@${action.name}(${getActionParameters(action).map(parameter => parameter.label).join(', ')})`;
+
+const getAttributeReferences = (metadata: AttributeMetadata): Reference[] => [{
+    name: 'Documentation',
+    url: metadata.reference,
+}];
 
 function getPluginName(attributeName: string): string {
     return attributeName.slice('data-'.length).split(':', 1)[0].split('__', 1)[0];
@@ -806,6 +830,131 @@ function getActionCompletions(
     }));
 }
 
+type ActionOptionContext = {
+    action: ActionMetadata
+    applied: Set<string>
+    typed: string
+    start: number
+}
+
+function getActionOptionContext(
+    text: string,
+    offset: number,
+    attribute: ParsedAttribute,
+): ActionOptionContext | undefined {
+    if (NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
+
+    const source = text.slice(attribute.valueStart, offset);
+    const stack: Array<{
+        close: string
+        action?: ActionMetadata
+        argument: number
+        optionsStart?: number
+    }> = [];
+    const pairs: Record<string, string> = { '(': ')', '[': ']', '{': '}' };
+
+    for (let index = 0; index < source.length; index++) {
+        const char = source[index];
+        if (char === '"' || char === "'" || char === '`') {
+            index = skipQuoted(source, index) - 1;
+            continue;
+        }
+
+        if (char === '@') {
+            const match = source.slice(index).match(/^@([A-Za-z_$][\w$]*)\s*\(/);
+            if (match) {
+                stack.push({
+                    close: ')',
+                    action: actionData.find(candidate => candidate.name === match[1]),
+                    argument: 0,
+                });
+                index += match[0].length - 1;
+                continue;
+            }
+        }
+
+        if (pairs[char]) {
+            const parent = stack.at(-1);
+            stack.push({
+                close: pairs[char],
+                argument: 0,
+                optionsStart: char === '{' && parent?.action && backendActionNames.has(parent.action.name) && parent.argument === 1
+                    ? index
+                    : undefined,
+                action: char === '{' && parent?.action && backendActionNames.has(parent.action.name) && parent.argument === 1
+                    ? parent.action
+                    : undefined,
+            });
+        } else if (stack.at(-1)?.close === char) {
+            stack.pop();
+        } else if (char === ',' && stack.at(-1)?.action && stack.at(-1)?.close === ')') {
+            stack.at(-1)!.argument++;
+        }
+    }
+
+    const frame = stack.at(-1);
+    if (!frame?.action || frame.optionsStart === undefined) return undefined;
+
+    const objectSource = source.slice(frame.optionsStart + 1);
+    const closing: string[] = [];
+    const applied = new Set<string>();
+    let entryStart = 0;
+
+    for (let index = 0; index < objectSource.length; index++) {
+        const char = objectSource[index];
+        if (char === '"' || char === "'" || char === '`') {
+            index = skipQuoted(objectSource, index) - 1;
+            continue;
+        }
+        if (pairs[char]) {
+            closing.push(pairs[char]);
+        } else if (closing.at(-1) === char) {
+            closing.pop();
+        } else if (char === ',' && closing.length === 0) {
+            const key = objectSource.slice(entryStart, index).match(/^\s*([A-Za-z_$][\w$]*)\s*:/)?.[1];
+            if (key) applied.add(key);
+            entryStart = index + 1;
+        }
+    }
+
+    const current = objectSource.slice(entryStart);
+    const keyMatch = current.match(/^\s*([A-Za-z_$][\w$]*)?$/);
+    if (!keyMatch) return undefined;
+    const typed = keyMatch[1] || '';
+
+    return {
+        action: frame.action,
+        applied,
+        typed,
+        start: offset - typed.length,
+    };
+}
+
+function getActionOptionCompletions(
+    text: string,
+    offset: number,
+    attribute: ParsedAttribute,
+): LanguageCompletion[] | undefined {
+    const context = getActionOptionContext(text, offset, attribute);
+    if (!context) return undefined;
+
+    return backendActionOptions
+        .filter(option => !context.applied.has(option.name))
+        .map(option => ({
+            label: option.name,
+            insertText: `${option.name}: `,
+            description: option.description,
+            references: [{
+                name: 'Backend action options',
+                url: 'https://data-star.dev/reference/actions#options',
+            }],
+            kind: 'property' as const,
+            detail: 'Datastar backend action option',
+            start: context.start,
+            end: offset,
+        }));
+}
+
 export function getSignatureHelp(text: string, offset: number): LanguageSignature | undefined {
     const attribute = expressionAttributeAt(text, offset);
     if (!attribute || NON_EXPRESSION_VALUE_PLUGINS.has(attribute.pluginName)) return undefined;
@@ -843,12 +992,13 @@ export function getSignatureHelp(text: string, offset: number): LanguageSignatur
     if (!call) return undefined;
     const action = actionData.find(candidate => candidate.name === call.action);
     if (!action) return undefined;
+    const parameters = getActionParameters(action);
 
     return {
-        label: action.signature,
+        label: getActionSignature(action),
         description: action.description,
-        parameters: action.parameters,
-        activeParameter: Math.min(call.argument, Math.max(0, action.parameters.length - 1)),
+        parameters,
+        activeParameter: Math.min(call.argument, Math.max(0, parameters.length - 1)),
         pro: action.pro,
     };
 }
@@ -866,7 +1016,6 @@ function getModifierCompletions(prefix: string, offset: number): LanguageComplet
     if (!metadata) return [];
 
     const appliedModifiers = new Set(parsed.modifiers.map(modifier => modifier.split('.')[0]));
-    const completion = snippetEntries.find(entry => entry.pluginName === parsed.pluginName);
     const parts = current.split('.');
     const modifierName = parts[0];
     const completingTag = parts.length > 1;
@@ -888,7 +1037,7 @@ function getModifierCompletions(prefix: string, offset: number): LanguageComplet
                 label: insertText,
                 insertText,
                 description: modifier.description || 'Datastar attribute modifier.',
-                references: completion?.references || [],
+                references: getAttributeReferences(metadata),
                 kind: 'modifier' as const,
                 detail: metadata.pro ? 'Datastar Pro attribute modifier' : 'Datastar attribute modifier',
                 start: offset - typedPart.length,
@@ -907,6 +1056,9 @@ export function getCompletions(
         const actionCompletions = getActionCompletions(text, offset, expressionAttribute);
         if (actionCompletions !== undefined) return actionCompletions;
 
+        const actionOptionCompletions = getActionOptionCompletions(text, offset, expressionAttribute);
+        if (actionOptionCompletions !== undefined) return actionOptionCompletions;
+
         const signalCompletions = getSignalCompletions(text, offset, expressionAttribute);
         if (signalCompletions !== undefined) return signalCompletions;
     }
@@ -924,16 +1076,15 @@ export function getCompletions(
     if (modifierCompletions !== undefined) return modifierCompletions;
 
     if (/^data-on:[a-zA-Z0-9-]*$/.test(prefixMatch[0])) {
-        const genericEntry = snippetEntries.find(entry => entry.pluginName === 'on')!;
+        const metadata = attributeMetadata.get('on')!;
         return nativeEvents.map(eventName => {
             const name = `data-on:${eventName}`;
             const explicitEntry = snippetEntries.find(entry => entry.name === name);
             return {
                 label: name,
                 insertText: explicitEntry?.insertText ?? `${name}="\${1:expression}"`,
-                description: explicitEntry?.description
-                    ?? `Runs an expression whenever the \`${eventName}\` event is triggered.`,
-                references: explicitEntry?.references ?? genericEntry.references,
+                description: metadata.description,
+                references: getAttributeReferences(metadata),
                 start: offset - prefixMatch[0].length,
                 end: offset,
             };
@@ -942,17 +1093,20 @@ export function getCompletions(
 
     const entries = snippetEntries
         .filter(entry => entry.pluginName !== 'nonce' || tag.name === 'html')
-        .map(entry => ({
-            label: entry.name,
-            insertText: entry.insertText,
-            description: entry.description,
-            references: entry.references || [],
-            detail: attributeMetadata.get(entry.pluginName)?.pro
-                ? 'Datastar Pro attribute'
-                : 'Datastar attribute',
-            start: offset - prefixMatch[0].length,
-            end: offset,
-        }));
+        .map(entry => {
+            const metadata = attributeMetadata.get(entry.pluginName)!;
+            return {
+                label: entry.name,
+                insertText: entry.insertText,
+                description: metadata.description,
+                references: getAttributeReferences(metadata),
+                detail: metadata.pro
+                    ? 'Datastar Pro attribute'
+                    : 'Datastar attribute',
+                start: offset - prefixMatch[0].length,
+                end: offset,
+            };
+        });
 
     for (const pluginName of customAttributes) {
         entries.push({
@@ -975,6 +1129,25 @@ export function getHover(text: string, offset: number): LanguageHover | undefine
         const expressionAttribute = expressionAttributeAt(text, offset);
         if (!expressionAttribute || NON_EXPRESSION_VALUE_PLUGINS.has(expressionAttribute.pluginName)) return undefined;
 
+        const optionContext = getActionOptionContext(text, offset, expressionAttribute);
+        if (optionContext) {
+            const keyMatch = text.slice(optionContext.start).match(/^[A-Za-z_$][\w$]*/);
+            const option = backendActionOptions.find(candidate => candidate.name === keyMatch?.[0]);
+            if (option) {
+                return {
+                    start: optionContext.start,
+                    end: optionContext.start + option.name.length,
+                    name: option.name,
+                    description: option.description,
+                    requirements: [],
+                    references: [{
+                        name: 'Backend action options',
+                        url: 'https://data-star.dev/reference/actions#options',
+                    }],
+                };
+            }
+        }
+
         const actionPattern = /@([A-Za-z_$][\w$]*)\s*\(/g;
         let match: RegExpExecArray | null;
         while ((match = actionPattern.exec(expressionAttribute.value))) {
@@ -987,7 +1160,7 @@ export function getHover(text: string, offset: number): LanguageHover | undefine
             return {
                 start,
                 end,
-                name: action.signature,
+                name: getActionSignature(action),
                 description: action.description,
                 requirements: action.pro ? ['Requires Datastar Pro.'] : [],
                 references: [{
@@ -1021,6 +1194,7 @@ export function getHover(text: string, offset: number): LanguageHover | undefine
     const entry = snippetEntries.find(candidate => candidate.name === attribute.name)
         || snippetEntries.find(candidate => candidate.pluginName === attribute.pluginName);
     if (!entry) return undefined;
+    const metadata = attributeMetadata.get(attribute.pluginName)!;
 
     const rule = ATTRIBUTE_RULES[attribute.pluginName];
     const requirements: string[] = [];
@@ -1029,14 +1203,14 @@ export function getHover(text: string, offset: number): LanguageHover | undefine
     if (rule?.key === 'denied') requirements.push('Key: not allowed');
     if (rule?.value === 'must') requirements.push('Value: required');
     if (rule?.value === 'denied') requirements.push('Value: not allowed');
-    if (attributeMetadata.get(attribute.pluginName)?.pro) requirements.push('Requires Datastar Pro.');
+    if (metadata.pro) requirements.push('Requires Datastar Pro.');
 
     return {
         start: attribute.start,
         end: attribute.nameEnd,
         name: attribute.name,
-        description: entry.description,
+        description: metadata.description,
         requirements,
-        references: entry.references,
+        references: getAttributeReferences(metadata),
     };
 }

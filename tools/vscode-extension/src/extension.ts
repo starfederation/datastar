@@ -4,9 +4,7 @@ import path from 'node:path'
 import { LanguageClient, TransportKind } from 'vscode-languageclient/node'
 import languageData from './language-data.json'
 
-const BUILTIN_ATTRIBUTES = languageData.attributes
-  .filter((attribute) => attribute.highlight)
-  .map((attribute) => attribute.name)
+const BUILTIN_ATTRIBUTES = languageData.attributes.map((attribute) => attribute.name)
 
 let grammarPath = ''
 let client: LanguageClient | undefined

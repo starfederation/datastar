@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import test from 'node:test'
+import attributeDefinitions from '../src/data-attributes.json'
 import languageData from '../src/language-data.json'
 
 const attributes = new Map(languageData.attributes.map(attribute => [attribute.name, attribute]));
@@ -15,9 +16,21 @@ test('generated language data overlays explicit signal semantics', () => {
     assert.equal(attributes.get('computed')!.signals, 'key-or-object');
     assert.equal(attributes.get('match-media')!.signals, 'key');
     assert.equal(attributes.get('nonce')!.element, 'html');
-    assert.equal(attributes.get('nonce')!.highlight, false);
     assert.equal(attributes.get('show')!.pro, false);
     assert.equal(attributes.get('animate')!.pro, true);
+});
+
+test('keeps docs-provided attribute metadata out of editor-specific definitions', () => {
+    assert.equal(attributeDefinitions.attr.completions['data-attr:*'], 'data-attr:${1:name}="${2:expression}"');
+    assert.equal('description' in attributeDefinitions.attr, false);
+    assert.equal('modifiers' in attributeDefinitions.attr, false);
+    assert.equal('pro' in attributeDefinitions.animate, false);
+
+    assert.equal(attributes.get('attr')!.description, 'Sets the value of any HTML attribute to an expression, and keeps it in sync.');
+    assert.equal(attributes.get('attr')!.reference, 'https://data-star.dev/reference/attributes#data-attr');
+    const completion = languageData.completions.find(candidate => candidate.name === 'data-attr:*')!;
+    assert.equal('description' in completion, false);
+    assert.equal('references' in completion, false);
 });
 
 test('generated language data includes modifier metadata from the docs', () => {
@@ -38,23 +51,29 @@ test('generated language data includes action metadata from the docs', () => {
     const actions = new Map(languageData.actions.map(action => [action.name, action]));
 
     assert.equal(actions.get('peek')!.signature, '@peek(callable: () => any)');
-    assert.equal(actions.get('post')!.signature, '@post(uri: string, options={ })');
+    assert.equal(actions.get('post')!.signature, undefined);
     assert.deepEqual(
-        actions.get('setAll')!.parameters.map(parameter => parameter.label),
+        actions.get('setAll')!.parameters!.map(parameter => parameter.label),
         ['value: any', 'filter?: {include: RegExp, exclude?: RegExp}'],
     );
     assert.equal(actions.get('get')!.pro, false);
+    assert.deepEqual(languageData.backendActionNames, ['get', 'post', 'put', 'patch', 'delete']);
+    assert.equal(actions.get('post')!.parameters, undefined);
+    assert.deepEqual(
+        languageData.backendActionParameters.map(parameter => parameter.label),
+        ['uri: string', 'options={ }'],
+    );
+    assert.ok(languageData.backendActionOptions.some(option => option.name === 'contentType'));
+    assert.ok(languageData.backendActionOptions.some(option => option.name === 'requestCancellation'));
     assert.equal(actions.get('clipboard')!.pro, true);
 });
 
-test('TextMate grammar attributes match generated highlighted attributes', () => {
+test('TextMate grammar attributes match generated attributes', () => {
     const grammarPath = path.join(__dirname, '..', 'src', 'datastar.injection.tmLanguage.json');
     const grammar = JSON.parse(fs.readFileSync(grammarPath, 'utf8'));
     const begin = grammar.repository['datastar-attribute'].begin;
     const grammarNames = begin.slice(begin.indexOf(')(') + 2, begin.indexOf(')(?=')).split('|');
-    const generatedNames = languageData.attributes
-        .filter(attribute => attribute.highlight)
-        .map(attribute => attribute.name);
+    const generatedNames = languageData.attributes.map(attribute => attribute.name);
 
     assert.deepEqual(grammarNames, generatedNames);
 });

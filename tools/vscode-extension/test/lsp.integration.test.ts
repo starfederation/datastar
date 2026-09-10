@@ -183,9 +183,33 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
         const fitCompletion = actionCompletions.find(completion => completion.label === '@fit');
         assert.equal(fitCompletion?.detail, 'Datastar Pro action');
 
-        const signatureText = '<button data-on:click="@post(\'/endpoint\', ">';
+        const actionOptionText = '<button data-on:click="@get(\'/endpoint\', {retry}">';
         connection.sendNotification('textDocument/didChange', {
             textDocument: { uri, version: 7 },
+            contentChanges: [{ text: actionOptionText }],
+        });
+        const actionOptionCompletions = await connection.sendRequest<CompletionItem[]>('textDocument/completion', {
+            textDocument: { uri },
+            position: { line: 0, character: actionOptionText.indexOf('{retry') + '{retry'.length },
+        });
+        const retryCompletion = actionOptionCompletions.find(completion => completion.label === 'retry');
+        assert.ok(retryCompletion);
+        assert.equal(retryCompletion.kind, 10);
+        assert.equal(retryCompletion.insertTextFormat, 1);
+        assert.equal(retryCompletion.textEdit && 'newText' in retryCompletion.textEdit
+            ? retryCompletion.textEdit.newText
+            : undefined, 'retry: ');
+
+        const actionOptionHover = await connection.sendRequest<Hover>('textDocument/hover', {
+            textDocument: { uri },
+            position: { line: 0, character: actionOptionText.indexOf('retry') + 2 },
+        });
+        assert.match((actionOptionHover.contents as { value: string }).value, /Determines when to retry requests/);
+        assert.match((actionOptionHover.contents as { value: string }).value, /Backend action options/);
+
+        const signatureText = '<button data-on:click="@post(\'/endpoint\', ">';
+        connection.sendNotification('textDocument/didChange', {
+            textDocument: { uri, version: 8 },
             contentChanges: [{ text: signatureText }],
         });
         const signature = await connection.sendRequest<SignatureHelp>('textDocument/signatureHelp', {
@@ -205,7 +229,7 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
         });
         const changedText = '<main data-nonce="abc">';
         connection.sendNotification('textDocument/didChange', {
-            textDocument: { uri, version: 8 },
+            textDocument: { uri, version: 9 },
             contentChanges: [{ text: changedText }],
         });
 
@@ -220,7 +244,7 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
 
         const actionHoverText = '<button data-on:click="@post(\'/endpoint\')">';
         connection.sendNotification('textDocument/didChange', {
-            textDocument: { uri, version: 9 },
+            textDocument: { uri, version: 10 },
             contentChanges: [{ text: actionHoverText }],
         });
         const actionHover = await connection.sendRequest<Hover>('textDocument/hover', {
@@ -232,7 +256,7 @@ test('language server completes, hovers, and publishes diagnostics over LSP', as
 
         const proAttributeHoverText = '<div data-animate:opacity="$opacity">';
         connection.sendNotification('textDocument/didChange', {
-            textDocument: { uri, version: 10 },
+            textDocument: { uri, version: 11 },
             contentChanges: [{ text: proAttributeHoverText }],
         });
         const proAttributeHover = await connection.sendRequest<Hover>('textDocument/hover', {

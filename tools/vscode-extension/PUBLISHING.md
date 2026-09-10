@@ -18,13 +18,13 @@ npm ci
 
 ## Update Generated Language Data
 
-Run this after changing attribute or completion metadata, or when refreshing modifier metadata from the Datastar docs:
+Run this after changing editor-specific attribute metadata, or when refreshing attribute and action metadata from the Datastar docs:
 
 ```sh
 npm run generate
 ```
 
-This command downloads modifier metadata from `https://data-star.dev/docs.md` and updates the checked-in generated files.
+This command downloads metadata from `https://data-star.dev/docs.md` and updates the checked-in generated language data.
 
 ## Validate
 

@@ -3,31 +3,32 @@
   "attributes": [
     {
       "name": "animate",
-      "description": "Animates element attributes over time.",
+      "description": "Allows you to animate element attributes over time. Animated attributes are updated reactively whenever signals used in the expression change.",
+      "reference": "https://data-star.dev/reference/attributes#data-animate",
       "requirement": {
         "key": "must",
         "value": "must"
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true,
       "pro": true
     },
     {
       "name": "attr",
-      "description": "Sets one or more attribute values using a set of key-value pairs that map to the attribute name and expression.",
+      "description": "Sets the value of any HTML attribute to an expression, and keeps it in sync.",
+      "reference": "https://data-star.dev/reference/attributes#data-attr",
       "requirement": {
         "key": "allowed",
         "value": "must"
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "bind",
-      "description": "Creates a new signal and enables two-way binding between it and the element.",
+      "description": "Creates a signal (if one doesn’t already exist) and sets up two-way data binding between it and an element’s current bound state. When the signal changes, Datastar writes that value to the element. When one of the bind events fires, Datastar reads the element’s current bound property/value and writes that back to the signal.",
+      "reference": "https://data-star.dev/reference/attributes#data-bind",
       "requirement": {
         "key": "exclusive",
         "value": "exclusive"
@@ -64,12 +65,12 @@
       ],
       "signals": "key-or-value",
       "valueKind": "signal-name",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "class",
-      "description": "Adds or removes one or more classes from an element using a set of key-value pairs that map to the class name and expression.",
+      "description": "Adds or removes a class to or from an element based on an expression.",
+      "reference": "https://data-star.dev/reference/attributes#data-class",
       "requirement": {
         "key": "allowed",
         "value": "must"
@@ -97,12 +98,12 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "computed",
-      "description": "Creates one or more signals that are computed based on a set of key-value pairs that map to the signal name and expression.",
+      "description": "Creates a signal that is computed based on an expression. The computed signal is read-only, and its value is automatically updated when any signals in the expression are updated.",
+      "reference": "https://data-star.dev/reference/attributes#data-computed",
       "requirement": {
         "key": "allowed",
         "value": "must"
@@ -131,36 +132,36 @@
       ],
       "signals": "key-or-object",
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "custom-validity",
-      "description": "Adds custom validity to an element using an expression.",
+      "description": "Allows you to add custom validity to an element using an expression. The expression must evaluate to a string that will be set as the custom validity message. If the string is empty, the input is considered valid. If the string is non-empty, the input is considered invalid and the string is used as the reported message.",
+      "reference": "https://data-star.dev/reference/attributes#data-custom-validity",
       "requirement": {
         "key": "denied",
         "value": "must"
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true,
       "pro": true
     },
     {
       "name": "effect",
-      "description": "Executes an expression on page load and whenever any signals in the expression change.",
+      "description": "Executes an expression on page load and whenever any signals in the expression change. This is useful for performing side effects, such as updating other signals, making requests to the backend, or manipulating the DOM.",
+      "reference": "https://data-star.dev/reference/attributes#data-effect",
       "requirement": {
         "key": "denied",
         "value": "must"
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "ignore",
-      "description": "Ignores an element and its descendants from being processed.",
+      "description": "Datastar walks the entire DOM and applies plugins to each element it encounters. It’s possible to tell Datastar to ignore an element and its descendants by placing a `data-ignore` attribute on it. This can be useful for preventing naming conflicts with third-party libraries, or when you are unable to [escape user input](https://data-star.dev/reference/security#escape-user-input).",
+      "reference": "https://data-star.dev/reference/attributes#data-ignore",
       "requirement": {
         "key": "denied",
         "value": "allowed"
@@ -172,24 +173,24 @@
         }
       ],
       "valueKind": "string",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "ignore-morph",
-      "description": "Ignores an element when patching an element using the `morph` mode.",
+      "description": "Similar to the `data-ignore` attribute, the `data-ignore-morph` attribute tells the `PatchElements` watcher to skip processing an element and its children when morphing elements.",
+      "reference": "https://data-star.dev/reference/attributes#data-ignore-morph",
       "requirement": {
         "key": "denied",
         "value": "allowed"
       },
       "modifiers": [],
       "valueKind": "string",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "indicator",
-      "description": "Creates a signal to track in-flight backend requests.",
+      "description": "Creates a signal and sets its value to `true` while a fetch request is in flight, otherwise `false`. The signal can be used to show a loading indicator.",
+      "reference": "https://data-star.dev/reference/attributes#data-indicator",
       "requirement": {
         "key": "exclusive",
         "value": "exclusive"
@@ -218,12 +219,12 @@
       ],
       "signals": "key-or-value",
       "valueKind": "signal-name",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "init",
-      "description": "Runs an expression whenever the attribute is initialised.",
+      "description": "Runs an expression when the attribute is initialized. This can happen on page load, when an element is patched into the DOM, and any time the attribute is modified (via a backend action or otherwise).",
+      "reference": "https://data-star.dev/reference/attributes#data-init",
       "requirement": {
         "key": "denied",
         "value": "must"
@@ -247,12 +248,12 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "json-signals",
-      "description": "Sets the text content of an element to a reactive JSON stringified version of signals.",
+      "description": "Sets the text content of an element to a reactive JSON stringified version of signals. Useful when troubleshooting an issue.",
+      "reference": "https://data-star.dev/reference/attributes#data-json-signals",
       "requirement": {
         "key": "denied",
         "value": "allowed"
@@ -264,12 +265,12 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "match-media",
       "description": "Sets a signal to whether a media query matches and keeps it in sync whenever the query changes.",
+      "reference": "https://data-star.dev/reference/attributes#data-match-media",
       "requirement": {
         "key": "must",
         "value": "must"
@@ -298,12 +299,12 @@
       ],
       "signals": "key",
       "valueKind": "expression",
-      "highlight": true,
       "pro": true
     },
     {
       "name": "nonce",
-      "description": "Enables Content Security Policy mode using a nonempty nonce. This attribute is only allowed on the `html` element.",
+      "description": "To enable CSP mode, add a `data-nonce` attribute to the `html` element. Its value must match the nonce in your CSP’s `script-src` directive. Generate a new cryptographically secure random nonce on the server for every full-page response.",
+      "reference": "https://data-star.dev/reference/security#content-security-policy",
       "requirement": {
         "key": "denied",
         "value": "must"
@@ -311,12 +312,12 @@
       "modifiers": [],
       "valueKind": "string",
       "element": "html",
-      "highlight": false,
       "pro": false
     },
     {
       "name": "on",
-      "description": "Runs an expression whenever an event is triggered on an element.",
+      "description": "Attaches an event listener to an element, executing an expression whenever the event is triggered.",
+      "reference": "https://data-star.dev/reference/attributes#data-on",
       "requirement": {
         "key": "must",
         "value": "must"
@@ -432,12 +433,12 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "on-intersect",
-      "description": "Runs an expression on intersection with the viewport.",
+      "description": "Runs an expression when the element intersects with the viewport.",
+      "reference": "https://data-star.dev/reference/attributes#data-on-intersect",
       "requirement": {
         "key": "denied",
         "value": "must"
@@ -529,12 +530,12 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "on-interval",
-      "description": "Runs an expression at a regular interval.",
+      "description": "Runs an expression at a regular interval. The interval duration defaults to one second and can be modified using the `__duration` modifier.",
+      "reference": "https://data-star.dev/reference/attributes#data-on-interval",
       "requirement": {
         "key": "denied",
         "value": "must"
@@ -562,12 +563,12 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "on-raf",
-      "description": "Runs an expression on every `requestAnimationFrame` event.",
+      "description": "Runs an expression on every [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame) event.",
+      "reference": "https://data-star.dev/reference/attributes#data-on-raf",
       "requirement": {
         "key": "denied",
         "value": "must"
@@ -595,12 +596,12 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true,
       "pro": true
     },
     {
       "name": "on-resize",
       "description": "Runs an expression whenever an element’s dimensions change.",
+      "reference": "https://data-star.dev/reference/attributes#data-on-resize",
       "requirement": {
         "key": "denied",
         "value": "must"
@@ -648,12 +649,12 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true,
       "pro": true
     },
     {
       "name": "on-signal-patch",
-      "description": "Runs an expression whenever one or more signals are patched.",
+      "description": "Runs an expression whenever any signals are patched. This is useful for tracking changes, updating computed values, or triggering side effects when data updates.",
+      "reference": "https://data-star.dev/reference/attributes#data-on-signal-patch",
       "requirement": {
         "key": "allowed",
         "value": "must"
@@ -716,24 +717,24 @@
       "keys": [
         "filter"
       ],
-      "highlight": true,
       "pro": false
     },
     {
       "name": "on-signal-patch-filter",
-      "description": "Filters which signals to watch when using the `data-on-signal-patch` attribute.",
+      "description": "Filters which signals to watch when using the [`data-on-signal-patch`](#data-on-signal-patch) attribute.",
+      "reference": "https://data-star.dev/reference/attributes#data-on-signal-patch-filter",
       "requirement": {
         "key": "denied",
         "value": "must"
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "persist",
-      "description": "Persists signals in local storage.",
+      "description": "Persists signals in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage). This is useful for storing values between page loads.",
+      "reference": "https://data-star.dev/reference/attributes#data-persist",
       "requirement": {
         "key": "allowed",
         "value": "allowed"
@@ -745,24 +746,24 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true,
       "pro": true
     },
     {
       "name": "preserve-attr",
-      "description": "Preserves the value of an attribute when patching elements using the `morph` mode.",
+      "description": "Preserves the value of an attribute when morphing DOM elements.",
+      "reference": "https://data-star.dev/reference/attributes#data-preserve-attr",
       "requirement": {
         "key": "denied",
         "value": "must"
       },
       "modifiers": [],
       "valueKind": "string",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "query-string",
       "description": "Syncs query string params to signal values on page load, and syncs signal values to query string params on change.",
+      "reference": "https://data-star.dev/reference/attributes#data-query-string",
       "requirement": {
         "key": "denied",
         "value": "allowed"
@@ -778,12 +779,12 @@
         }
       ],
       "valueKind": "expression",
-      "highlight": true,
       "pro": true
     },
     {
       "name": "ref",
-      "description": "Creates a signal whose value references an element.",
+      "description": "Creates a new signal that is a reference to the element on which the data attribute is placed.",
+      "reference": "https://data-star.dev/reference/attributes#data-ref",
       "requirement": {
         "key": "exclusive",
         "value": "exclusive"
@@ -812,24 +813,24 @@
       ],
       "signals": "key-or-value",
       "valueKind": "signal-name",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "replace-url",
-      "description": "Replaces the URL in the browser with an evaluated expression.",
+      "description": "Replaces the URL in the browser without reloading the page. The value can be a relative or absolute URL, and is an evaluated expression.",
+      "reference": "https://data-star.dev/reference/attributes#data-replace-url",
       "requirement": {
         "key": "denied",
         "value": "must"
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true,
       "pro": true
     },
     {
       "name": "scroll-into-view",
-      "description": "Scrolls the element into view.",
+      "description": "Scrolls the element into view. Useful when updating the DOM from the backend, and you want to scroll to the new content.",
+      "reference": "https://data-star.dev/reference/attributes#data-scroll-into-view",
       "requirement": {
         "key": "denied",
         "value": "allowed"
@@ -885,24 +886,24 @@
         }
       ],
       "valueKind": "string",
-      "highlight": true,
       "pro": true
     },
     {
       "name": "show",
-      "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
+      "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`. For anything with custom requirements, use [`data-class`](#data-class) instead.",
+      "reference": "https://data-star.dev/reference/attributes#data-show",
       "requirement": {
         "key": "denied",
         "value": "must"
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "signals",
-      "description": "Merges one or more signals into the existing signals using a set of key-value pairs that map to the signal name and expression.",
+      "description": "Patches (adds, updates or removes) one or more signals into the existing signals. Values defined later in the DOM tree override those defined earlier.",
+      "reference": "https://data-star.dev/reference/attributes#data-signals",
       "requirement": {
         "key": "allowed",
         "value": "allowed"
@@ -935,43 +936,42 @@
       ],
       "signals": "key-or-object",
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "style",
-      "description": "Adds or removes one or more inline CSS styles from an element using a set of key-value pairs that map to the style name and expression.",
+      "description": "Sets the value of inline CSS styles on an element based on an expression, and keeps them in sync.",
+      "reference": "https://data-star.dev/reference/attributes#data-style",
       "requirement": {
         "key": "allowed",
         "value": "must"
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "text",
-      "description": "Sets the text content of an element to the evaluated expression.",
+      "description": "Binds the text content of an element to an expression.",
+      "reference": "https://data-star.dev/reference/attributes#data-text",
       "requirement": {
         "key": "denied",
         "value": "must"
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true,
       "pro": false
     },
     {
       "name": "view-transition",
-      "description": "Sets the value of `view-transition-name` for use with the View Transition API.",
+      "description": "Sets the `view-transition-name` style attribute explicitly.",
+      "reference": "https://data-star.dev/reference/attributes#data-view-transition",
       "requirement": {
         "key": "denied",
         "value": "must"
       },
       "modifiers": [],
       "valueKind": "expression",
-      "highlight": true,
       "pro": true
     }
   ],
@@ -979,518 +979,217 @@
     {
       "name": "data-animate:*",
       "pluginName": "animate",
-      "insertText": "data-animate:${1:name}=\"${2:expression}\"",
-      "description": "Animates element attributes over time.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-animate"
-        }
-      ]
+      "insertText": "data-animate:${1:name}=\"${2:expression}\""
     },
     {
       "name": "data-attr",
       "pluginName": "attr",
-      "insertText": "data-attr=\"{${1:attributeName}: ${2:expression}}\"",
-      "description": "Sets one or more attribute values using a set of key-value pairs that map to the attribute name and expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-attributes"
-        }
-      ]
+      "insertText": "data-attr=\"{${1:attributeName}: ${2:expression}}\""
     },
     {
       "name": "data-attr:*",
       "pluginName": "attr",
-      "insertText": "data-attr:${1:name}=\"${2:expression}\"",
-      "description": "Sets an element’s attribute value based on an expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-attributes"
-        }
-      ]
+      "insertText": "data-attr:${1:name}=\"${2:expression}\""
     },
     {
       "name": "data-bind",
       "pluginName": "bind",
-      "insertText": "data-bind=\"${1:signalName}\"",
-      "description": "Creates a new signal and enables two-way binding between it and the element.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-bind"
-        }
-      ]
+      "insertText": "data-bind=\"${1:signalName}\""
     },
     {
       "name": "data-bind:*",
       "pluginName": "bind",
-      "insertText": "data-bind:${1:name}",
-      "description": "Creates a new signal and enables two-way binding between it and the element.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-bind"
-        }
-      ]
+      "insertText": "data-bind:${1:name}"
     },
     {
       "name": "data-class",
       "pluginName": "class",
-      "insertText": "data-class=\"{${1:className}: ${2:expression}}\"",
-      "description": "Adds or removes one or more classes from an element using a set of key-value pairs that map to the class name and expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-class"
-        }
-      ]
+      "insertText": "data-class=\"{${1:className}: ${2:expression}}\""
     },
     {
       "name": "data-class:*",
       "pluginName": "class",
-      "insertText": "data-class:${1:name}=\"${2:expression}\"",
-      "description": "Adds or removes a class from an element based on an expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-class"
-        }
-      ]
+      "insertText": "data-class:${1:name}=\"${2:expression}\""
     },
     {
       "name": "data-computed",
       "pluginName": "computed",
-      "insertText": "data-computed=\"{${1:signalName}: ${2:expression}}\"",
-      "description": "Creates one or more signals that are computed based on a set of key-value pairs that map to the signal name and expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-computed"
-        }
-      ]
+      "insertText": "data-computed=\"{${1:signalName}: ${2:expression}}\""
     },
     {
       "name": "data-computed:*",
       "pluginName": "computed",
-      "insertText": "data-computed:${1:name}=\"${2:expression}\"",
-      "description": "Creates a signal that is computed based on an expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-computed"
-        }
-      ]
+      "insertText": "data-computed:${1:name}=\"${2:expression}\""
     },
     {
       "name": "data-custom-validity",
       "pluginName": "custom-validity",
-      "insertText": "data-custom-validity=\"${1:expression}\"",
-      "description": "Adds custom validity to an element using an expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-custom-validity"
-        }
-      ]
+      "insertText": "data-custom-validity=\"${1:expression}\""
     },
     {
       "name": "data-effect",
       "pluginName": "effect",
-      "insertText": "data-effect=\"${1:expression}\"",
-      "description": "Executes an expression on page load and whenever any signals in the expression change.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-effect"
-        }
-      ]
+      "insertText": "data-effect=\"${1:expression}\""
     },
     {
       "name": "data-ignore",
       "pluginName": "ignore",
-      "insertText": "data-ignore",
-      "description": "Ignores an element and its descendants from being processed.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-ignore"
-        }
-      ]
+      "insertText": "data-ignore"
     },
     {
       "name": "data-ignore-morph",
       "pluginName": "ignore-morph",
-      "insertText": "data-ignore-morph",
-      "description": "Ignores an element when patching an element using the `morph` mode.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-ignore-morph"
-        }
-      ]
+      "insertText": "data-ignore-morph"
     },
     {
       "name": "data-indicator",
       "pluginName": "indicator",
-      "insertText": "data-indicator=\"${1:signalName}\"",
-      "description": "Creates a signal to track in-flight backend requests.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-indicator"
-        }
-      ]
+      "insertText": "data-indicator=\"${1:signalName}\""
     },
     {
       "name": "data-indicator:*",
       "pluginName": "indicator",
-      "insertText": "data-indicator:${1:name}",
-      "description": "Creates a signal to track in-flight backend requests.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-indicator"
-        }
-      ]
+      "insertText": "data-indicator:${1:name}"
     },
     {
       "name": "data-init",
       "pluginName": "init",
-      "insertText": "data-init=\"${1:expression}\"",
-      "description": "Runs an expression whenever the attribute is initialised.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-init"
-        }
-      ]
+      "insertText": "data-init=\"${1:expression}\""
     },
     {
       "name": "data-json-signals",
       "pluginName": "json-signals",
-      "insertText": "data-json-signals=\"${1:expression}\"",
-      "description": "Sets the text content of an element to a reactive JSON stringified version of signals.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-json-signals"
-        }
-      ]
+      "insertText": "data-json-signals=\"${1:expression}\""
     },
     {
       "name": "data-match-media:*",
       "pluginName": "match-media",
-      "insertText": "data-match-media:${1:name}=\"${2:expression}\"",
-      "description": "Sets a signal to whether a media query matches and keeps it in sync whenever the query changes.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-match-media"
-        }
-      ]
+      "insertText": "data-match-media:${1:name}=\"${2:expression}\""
     },
     {
       "name": "data-nonce",
       "pluginName": "nonce",
-      "insertText": "data-nonce=\"${1}\"",
-      "description": "Enables Content Security Policy mode using a nonempty nonce. This attribute is only allowed on the `html` element.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/security#content-security-policy"
-        }
-      ]
+      "insertText": "data-nonce=\"${1}\""
     },
     {
       "name": "data-on",
       "pluginName": "on",
-      "insertText": "data-on:${1:name}=\"${2:expression}\"",
-      "description": "Runs an expression whenever an event is triggered on an element.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-on"
-        }
-      ]
+      "insertText": "data-on:${1:name}=\"${2:expression}\""
     },
     {
       "name": "data-on:click",
       "pluginName": "on",
-      "insertText": "data-on:click=\"${1:expression}\"",
-      "description": "Runs an expression whenever the element is clicked.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-on"
-        }
-      ]
+      "insertText": "data-on:click=\"${1:expression}\""
     },
     {
       "name": "data-on:keydown",
       "pluginName": "on",
-      "insertText": "data-on:keydown=\"${1:expression}\"",
-      "description": "Runs an expression whenever a key is pressed.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-on"
-        }
-      ]
+      "insertText": "data-on:keydown=\"${1:expression}\""
     },
     {
       "name": "data-on-intersect",
       "pluginName": "on-intersect",
-      "insertText": "data-on-intersect=\"${1:expression}\"",
-      "description": "Runs an expression on intersection with the viewport.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-on-intersect"
-        }
-      ]
+      "insertText": "data-on-intersect=\"${1:expression}\""
     },
     {
       "name": "data-on-interval",
       "pluginName": "on-interval",
-      "insertText": "data-on-interval=\"${1:expression}\"",
-      "description": "Runs an expression at a regular interval.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-on-interval"
-        }
-      ]
+      "insertText": "data-on-interval=\"${1:expression}\""
     },
     {
       "name": "data-on-raf",
       "pluginName": "on-raf",
-      "insertText": "data-on-raf=\"${1:expression}\"",
-      "description": "Runs an expression on every `requestAnimationFrame` event.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-on-raf"
-        }
-      ]
+      "insertText": "data-on-raf=\"${1:expression}\""
     },
     {
       "name": "data-on-resize",
       "pluginName": "on-resize",
-      "insertText": "data-on-resize=\"${1:expression}\"",
-      "description": "Runs an expression whenever an element’s dimensions change.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-on-resize"
-        }
-      ]
+      "insertText": "data-on-resize=\"${1:expression}\""
     },
     {
       "name": "data-on-signal-patch",
       "pluginName": "on-signal-patch",
-      "insertText": "data-on-signal-patch=\"${1:expression}\"",
-      "description": "Runs an expression whenever one or more signals are patched.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-on-signal-patch"
-        }
-      ]
+      "insertText": "data-on-signal-patch=\"${1:expression}\""
     },
     {
       "name": "data-on-signal-patch-filter",
       "pluginName": "on-signal-patch-filter",
-      "insertText": "data-on-signal-patch-filter=\"${1:expression}\"",
-      "description": "Filters which signals to watch when using the `data-on-signal-patch` attribute.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-on-signal-change"
-        }
-      ]
+      "insertText": "data-on-signal-patch-filter=\"${1:expression}\""
     },
     {
       "name": "data-persist",
       "pluginName": "persist",
-      "insertText": "data-persist=\"\"",
-      "description": "Persists signals in local storage.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-persist"
-        }
-      ]
+      "insertText": "data-persist=\"\""
     },
     {
       "name": "data-persist:*",
       "pluginName": "persist",
-      "insertText": "data-persist:${1:name}=\"${2:expression}\"",
-      "description": "Persists signals in local storage with a custom key.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-persist"
-        }
-      ]
+      "insertText": "data-persist:${1:name}=\"${2:expression}\""
     },
     {
       "name": "data-preserve-attr",
       "pluginName": "preserve-attr",
-      "insertText": "data-preserve-attr=\"\"",
-      "description": "Preserves the value of an attribute when patching elements using the `morph` mode.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-preserve-attr"
-        }
-      ]
+      "insertText": "data-preserve-attr=\"\""
     },
     {
       "name": "data-query-string",
       "pluginName": "query-string",
-      "insertText": "data-query-string=\"\"",
-      "description": "Syncs query string params to signal values on page load, and syncs signal values to query string params on change.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-query-string"
-        }
-      ]
+      "insertText": "data-query-string=\"\""
     },
     {
       "name": "data-ref",
       "pluginName": "ref",
-      "insertText": "data-ref=\"${1:signalName}\"",
-      "description": "Creates a signal whose value references an element.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-ref"
-        }
-      ]
+      "insertText": "data-ref=\"${1:signalName}\""
     },
     {
       "name": "data-ref:*",
       "pluginName": "ref",
-      "insertText": "data-ref:${1:name}",
-      "description": "Creates a signal whose value references an element.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-ref"
-        }
-      ]
+      "insertText": "data-ref:${1:name}"
     },
     {
       "name": "data-replace-url",
       "pluginName": "replace-url",
-      "insertText": "data-replace-url=\"${1:expression}\"",
-      "description": "Replaces the URL in the browser with an evaluated expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-replace-url"
-        }
-      ]
+      "insertText": "data-replace-url=\"${1:expression}\""
     },
     {
       "name": "data-scroll-into-view",
       "pluginName": "scroll-into-view",
-      "insertText": "data-scroll-into-view",
-      "description": "Scrolls the element into view.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-scroll-into-view"
-        }
-      ]
+      "insertText": "data-scroll-into-view"
     },
     {
       "name": "data-show",
       "pluginName": "show",
-      "insertText": "data-show=\"${1:expression}\"",
-      "description": "Shows or hides an element based on whether an expression evaluates to `true` or `false`.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-show"
-        }
-      ]
+      "insertText": "data-show=\"${1:expression}\""
     },
     {
       "name": "data-signals",
       "pluginName": "signals",
-      "insertText": "data-signals=\"{${1:signalName}: ${2:expression}}\"",
-      "description": "Merges one or more signals into the existing signals using a set of key-value pairs that map to the signal name and expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-signals"
-        }
-      ]
+      "insertText": "data-signals=\"{${1:signalName}: ${2:expression}}\""
     },
     {
       "name": "data-signals:*",
       "pluginName": "signals",
-      "insertText": "data-signals:${1:name}=\"${2:expression}\"",
-      "description": "Merges a signal into the existing signals.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-signals"
-        }
-      ]
+      "insertText": "data-signals:${1:name}=\"${2:expression}\""
     },
     {
       "name": "data-style",
       "pluginName": "style",
-      "insertText": "data-style=\"{${1:styleName}: ${2:expression}}\"",
-      "description": "Adds or removes one or more inline CSS styles from an element using a set of key-value pairs that map to the style name and expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-style"
-        }
-      ]
+      "insertText": "data-style=\"{${1:styleName}: ${2:expression}}\""
     },
     {
       "name": "data-style:*",
       "pluginName": "style",
-      "insertText": "data-style:${1:name}=\"${2:expression}\"",
-      "description": "Adds or removes an inline CSS style from an element based on an expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-style"
-        }
-      ]
+      "insertText": "data-style:${1:name}=\"${2:expression}\""
     },
     {
       "name": "data-text",
       "pluginName": "text",
-      "insertText": "data-text=\"${1:expression}\"",
-      "description": "Sets the text content of an element to the evaluated expression.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-text"
-        }
-      ]
+      "insertText": "data-text=\"${1:expression}\""
     },
     {
       "name": "data-view-transition",
       "pluginName": "view-transition",
-      "insertText": "data-view-transition=\"${1:expression}\"",
-      "description": "Sets the value of `view-transition-name` for use with the View Transition API.",
-      "references": [
-        {
-          "name": "Documentation",
-          "url": "https://data-star.dev/reference/attributes#data-view-transition"
-        }
-      ]
+      "insertText": "data-view-transition=\"${1:expression}\""
     }
   ],
   "nativeEvents": [
@@ -1642,71 +1341,26 @@
     {
       "name": "get",
       "description": "Sends a `GET` request to the backend using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). The URI can be any valid endpoint, and the response type any of the allowed [response types](#response-handling), or a `204 No Content` response if the response body is empty.",
-      "signature": "@get(uri: string, options={ })",
-      "parameters": [
-        {
-          "label": "uri: string"
-        },
-        {
-          "label": "options={ }"
-        }
-      ],
       "pro": false
     },
     {
       "name": "post",
       "description": "Works the same as [`@get()`](#get) but sends a `POST` request to the backend.",
-      "signature": "@post(uri: string, options={ })",
-      "parameters": [
-        {
-          "label": "uri: string"
-        },
-        {
-          "label": "options={ }"
-        }
-      ],
       "pro": false
     },
     {
       "name": "put",
       "description": "Works the same as [`@get()`](#get) but sends a `PUT` request to the backend.",
-      "signature": "@put(uri: string, options={ })",
-      "parameters": [
-        {
-          "label": "uri: string"
-        },
-        {
-          "label": "options={ }"
-        }
-      ],
       "pro": false
     },
     {
       "name": "patch",
       "description": "Works the same as [`@get()`](#get) but sends a `PATCH` request to the backend.",
-      "signature": "@patch(uri: string, options={ })",
-      "parameters": [
-        {
-          "label": "uri: string"
-        },
-        {
-          "label": "options={ }"
-        }
-      ],
       "pro": false
     },
     {
       "name": "delete",
       "description": "Works the same as [`@get()`](#get) but sends a `DELETE` request to the backend.",
-      "signature": "@delete(uri: string, options={ })",
-      "parameters": [
-        {
-          "label": "uri: string"
-        },
-        {
-          "label": "options={ }"
-        }
-      ],
       "pro": false
     },
     {
@@ -1771,6 +1425,71 @@
         }
       ],
       "pro": true
+    }
+  ],
+  "backendActionNames": [
+    "get",
+    "post",
+    "put",
+    "patch",
+    "delete"
+  ],
+  "backendActionParameters": [
+    {
+      "label": "uri: string"
+    },
+    {
+      "label": "options={ }"
+    }
+  ],
+  "backendActionOptions": [
+    {
+      "name": "contentType",
+      "description": "The type of content to send. A value of `json` sends all signals in a JSON request. A value of `form` tells the action to look for the closest form to the element on which it is placed (unless a `selector` option is provided), perform validation on the form elements, and send them to the backend using a form request (no signals are sent). Defaults to `json`."
+    },
+    {
+      "name": "filterSignals",
+      "description": "A filter object with an `include` property that accepts a regular expression to match signal paths (defaults to all signals: `/.*/`), and an optional `exclude` property to exclude specific signal paths (defaults to all signals that do not have a `_` prefix: `/(^_|\\._).*/`)."
+    },
+    {
+      "name": "selector",
+      "description": "Optionally specifies a form to send when the `contentType` option is set to `form`. If the value is `null`, the closest form is used. Defaults to `null`."
+    },
+    {
+      "name": "headers",
+      "description": "An object containing headers to send with the request."
+    },
+    {
+      "name": "openWhenHidden",
+      "description": "Whether to keep the connection open when the page is hidden. Useful for dashboards but can cause a drain on battery life and other resources when enabled. Defaults to `false` for `get` requests, and `true` for all other HTTP methods."
+    },
+    {
+      "name": "payload",
+      "description": "Allows the fetch payload to be overridden with a custom object."
+    },
+    {
+      "name": "retry",
+      "description": "Determines when to retry requests. Can be `'auto'` (default, retries on network errors only), `'error'` (retries on `4xx` and `5xx` responses), `'always'` (retries on all non-`204` responses except redirects), or `'never'` (disables retries). Defaults to `'auto'`."
+    },
+    {
+      "name": "retryInterval",
+      "description": "The retry interval in milliseconds. Defaults to `1000` (one second)."
+    },
+    {
+      "name": "retryScaler",
+      "description": "A numeric multiplier applied to scale retry wait times. Defaults to `2`."
+    },
+    {
+      "name": "retryMaxWait",
+      "description": "The maximum allowable wait time in milliseconds between retries. Defaults to `30000` (30 seconds)."
+    },
+    {
+      "name": "retryMaxCount",
+      "description": "The maximum number of retry attempts. Defaults to `10`."
+    },
+    {
+      "name": "requestCancellation",
+      "description": "Controls request cancellation behavior. Can be `'auto'` (default, cancels in-flight requests to the same URL using the same HTTP method), `'cleanup'` (cancels requests on element or attribute cleanup, and cancels in-flight requests to the same URL using the same HTTP method), `'disabled'` (allows concurrent requests), or an `AbortController` instance for custom control. Defaults to `'auto'`."
     }
   ]
 }

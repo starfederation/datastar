@@ -1,5 +1,10 @@
 # Datastar Extension for Visual Studio Code Changelog
 
+## 1.7.1 - 2026-09-10
+
+- Added syntax highlighting for `data-nonce`.
+- Added completion and hover documentation for backend action options.
+
 ## 1.7.0 - 2026-09-08
 
 - Added Datastar action completion, signature help, and hover documentation.
