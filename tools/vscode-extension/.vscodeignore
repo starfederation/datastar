@@ -5,10 +5,7 @@ package-lock.json
 PUBLISHING.md
 generate-language-data.ts
 src/data-attributes.json
-src/action-metadata.json
 src/language-data.json
-src/modifier-metadata.json
-src/pro-attribute-metadata.json
 src/*.ts
 test/**
 test.html

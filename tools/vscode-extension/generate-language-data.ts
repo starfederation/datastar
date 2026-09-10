@@ -11,6 +11,14 @@ type Modifier = {
   description?: string
 }
 
+type AttributeDocumentation = {
+  name: string
+  description: string
+  modifiers: Modifier[]
+  pro: boolean
+  reference: string
+}
+
 type Action = {
   name: string
   description: string
@@ -35,6 +43,11 @@ type ActionData = {
   backendActionOptions: ActionOption[]
 }
 
+type DocsMetadata = {
+  attributes: AttributeDocumentation[]
+  actions: ActionData
+}
+
 type AttributeSemantics = {
   requirement: {
     key: Requirement
@@ -44,24 +57,14 @@ type AttributeSemantics = {
   valueKind?: 'expression' | 'signal-name' | 'string'
   keys?: string[]
   element?: string
-  highlight?: boolean
-}
-
-type Snippet = {
-  body: string
-  description: string
-  references?: Array<{ name: string; url: string }>
 }
 
 type AttributeDefinition = AttributeSemantics & {
-  completions: Record<string, Snippet>
+  completions: Record<string, string>
 }
 
 const extensionRoot = __dirname
-const snippetsPath = path.join(extensionRoot, 'src', 'data-attributes.json')
-const modifiersPath = path.join(extensionRoot, 'src', 'modifier-metadata.json')
-const actionsPath = path.join(extensionRoot, 'src', 'action-metadata.json')
-const proAttributesPath = path.join(extensionRoot, 'src', 'pro-attribute-metadata.json')
+const editorMetadataPath = path.join(extensionRoot, 'src', 'data-attributes.json')
 const outputPath = path.join(extensionRoot, 'src', 'language-data.json')
 const grammarPath = path.join(
   extensionRoot,
@@ -166,22 +169,6 @@ const modifiersFromDocs = (markdown: string): Record<string, Modifier[]> => {
   if (!modifiers.on?.some((modifier) => modifier.name === 'document')) {
     throw new Error(`Could not parse data-on modifiers from ${docsUrl}.`)
   }
-  return modifiers
-}
-
-const loadModifiers = async (): Promise<Record<string, Modifier[]>> => {
-  if (checkOnly) {
-    if (!fs.existsSync(modifiersPath)) {
-      throw new Error(`Missing ${path.relative(extensionRoot, modifiersPath)}. Run npm run generate.`)
-    }
-    return JSON.parse(fs.readFileSync(modifiersPath, 'utf8')) as Record<
-      string,
-      Modifier[]
-    >
-  }
-
-  const modifiers = modifiersFromDocs(await fetchDocs())
-  fs.writeFileSync(modifiersPath, `${JSON.stringify(modifiers, null, 2)}\n`)
   return modifiers
 }
 
@@ -324,52 +311,105 @@ const actionsFromDocs = (markdown: string): ActionData => {
   }
 }
 
-const loadActions = async (): Promise<ActionData> => {
-  if (checkOnly) {
-    if (!fs.existsSync(actionsPath)) {
-      throw new Error(`Missing ${path.relative(extensionRoot, actionsPath)}. Run npm run generate.`)
-    }
-    return JSON.parse(fs.readFileSync(actionsPath, 'utf8')) as ActionData
-  }
+const attributesFromDocs = (markdown: string): AttributeDocumentation[] => {
+  const lines = markdown.split(/\r?\n/)
+  const modifiers = modifiersFromDocs(markdown)
+  const attributes: AttributeDocumentation[] = []
+  let inAttributes = false
+  let pro = false
 
-  const actions = actionsFromDocs(await fetchDocs())
-  fs.writeFileSync(actionsPath, `${JSON.stringify(actions, null, 2)}\n`)
-  return actions
-}
-
-const proAttributesFromDocs = (markdown: string): string[] => {
-  const names: string[] = []
-  let inProAttributes = false
-
-  for (const line of markdown.split(/\r?\n/)) {
-    if (/^## Pro Attributes\s*$/.test(line)) {
-      inProAttributes = true
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index]
+    if (/^# Attributes\s*$/.test(line)) {
+      inAttributes = true
       continue
     }
-    if (inProAttributes && /^##? [^#]/.test(line)) break
-    if (!inProAttributes) continue
+    if (inAttributes && /^# [^#]/.test(line)) break
+    if (!inAttributes) continue
+    if (/^## Pro Attributes\s*$/.test(line)) {
+      pro = true
+      continue
+    }
+    if (/^## [^#]/.test(line)) break
 
     const heading = line.match(/^### `data-([^`]+)`/)
-    if (heading) names.push(pluginName(`data-${heading[1]}`))
+    if (!heading) continue
+    const name = pluginName(`data-${heading[1]}`)
+    const descriptionLines: string[] = []
+    for (index++; index < lines.length; index++) {
+      const detail = lines[index]
+      if (!detail.trim()) {
+        if (descriptionLines.length) break
+        continue
+      }
+      if (/^#{1,4} |^```|^> /.test(detail)) break
+      descriptionLines.push(detail.trim())
+    }
+    index--
+    if (!descriptionLines.length) {
+      throw new Error(`Could not parse data-${name} description from ${docsUrl}.`)
+    }
+    attributes.push({
+      name,
+      description: descriptionLines.join(' '),
+      modifiers: modifiers[name] || [],
+      pro,
+      reference: `https://data-star.dev/reference/attributes#data-${name}`,
+    })
   }
 
-  if (names.length === 0) {
-    throw new Error(`Could not parse Datastar Pro attributes from ${docsUrl}.`)
+  const nonceDescription = markdown.match(
+    /To enable CSP mode, add a `data-nonce` attribute to the `html` element\.[^\n]+/,
+  )?.[0]
+  if (!nonceDescription) {
+    throw new Error(`Could not parse data-nonce description from ${docsUrl}.`)
   }
-  return names
+  attributes.push({
+    name: 'nonce',
+    description: nonceDescription,
+    modifiers: [],
+    pro: false,
+    reference: 'https://data-star.dev/reference/security#content-security-policy',
+  })
+
+  if (!attributes.some(attribute => attribute.name === 'attr')
+    || !attributes.some(attribute => attribute.name === 'animate')) {
+    throw new Error(`Could not parse all Datastar attributes from ${docsUrl}.`)
+  }
+  return attributes
 }
 
-const loadProAttributes = async (): Promise<string[]> => {
+const docsMetadataFromDocs = (markdown: string): DocsMetadata => ({
+  attributes: attributesFromDocs(markdown),
+  actions: actionsFromDocs(markdown),
+})
+
+const loadDocsMetadata = async (): Promise<DocsMetadata> => {
   if (checkOnly) {
-    if (!fs.existsSync(proAttributesPath)) {
-      throw new Error(`Missing ${path.relative(extensionRoot, proAttributesPath)}. Run npm run generate.`)
+    if (!fs.existsSync(outputPath)) {
+      throw new Error(`Missing ${path.relative(extensionRoot, outputPath)}. Run npm run generate.`)
     }
-    return JSON.parse(fs.readFileSync(proAttributesPath, 'utf8')) as string[]
+    const cached = JSON.parse(fs.readFileSync(outputPath, 'utf8')) as {
+      attributes: AttributeDocumentation[]
+    } & ActionData
+    return {
+      attributes: cached.attributes.map(attribute => ({
+        name: attribute.name,
+        description: attribute.description,
+        modifiers: attribute.modifiers,
+        pro: attribute.pro,
+        reference: attribute.reference,
+      })),
+      actions: {
+        actions: cached.actions,
+        backendActionNames: cached.backendActionNames,
+        backendActionParameters: cached.backendActionParameters,
+        backendActionOptions: cached.backendActionOptions,
+      },
+    }
   }
 
-  const names = proAttributesFromDocs(await fetchDocs())
-  fs.writeFileSync(proAttributesPath, `${JSON.stringify(names, null, 2)}\n`)
-  return names
+  return docsMetadataFromDocs(await fetchDocs())
 }
 
 const nativeEventNames = (): string[] => {
@@ -399,17 +439,26 @@ const nativeEventNames = (): string[] => {
 }
 
 const attributeDefinitions = JSON.parse(
-  fs.readFileSync(snippetsPath, 'utf8'),
+  fs.readFileSync(editorMetadataPath, 'utf8'),
 ) as Record<string, AttributeDefinition>
 
 const pluginName = (attributeName: string): string =>
   attributeName.slice('data-'.length).split(':', 1)[0].split('__', 1)[0]
 
 const generateLanguageData = (
-  modifiers: Record<string, Modifier[]>,
-  actionData: ActionData,
-  proAttributes: string[],
+  docsMetadata: DocsMetadata,
 ) => {
+  const attributeDocumentation = new Map(
+    docsMetadata.attributes.map(attribute => [attribute.name, attribute]),
+  )
+  const missingDefinitions = docsMetadata.attributes
+    .filter(attribute => attributeDefinitions[attribute.name] === undefined)
+    .map(attribute => attribute.name)
+  if (missingDefinitions.length) {
+    throw new Error(
+      `Editor metadata is missing for docs attributes: ${missingDefinitions.join(', ')}.`,
+    )
+  }
   const completions = Object.entries(attributeDefinitions).flatMap(
     ([declaredPluginName, definition]) =>
       Object.entries(definition.completions).map(([name, snippet]) => {
@@ -419,12 +468,14 @@ const generateLanguageData = (
             `Completion ${name} belongs to ${completionPluginName}, not ${declaredPluginName}.`,
           )
         }
+        const documentation = attributeDocumentation.get(declaredPluginName)
+        if (!documentation) {
+          throw new Error(`Missing docs metadata for data-${declaredPluginName}.`)
+        }
         return {
           name,
           pluginName: declaredPluginName,
-          insertText: snippet.body,
-          description: snippet.description,
-          references: snippet.references || [],
+          insertText: snippet,
         }
       }),
   )
@@ -440,21 +491,22 @@ const generateLanguageData = (
   }
 
   const attributes = attributeNames.sort().map((name) => {
-    const completion = completions.find(
-      (candidate) => candidate.pluginName === name,
-    )!
     const definition = attributeDefinitions[name]
+    const documentation = attributeDocumentation.get(name)
+    if (!documentation) {
+      throw new Error(`Missing docs metadata for data-${name}.`)
+    }
     return {
       name,
-      description: completion.description,
+      description: documentation.description,
+      reference: documentation.reference,
       requirement: definition.requirement,
-      modifiers: modifiers[name] || [],
+      modifiers: documentation.modifiers,
       signals: definition.signals,
       valueKind: definition.valueKind || 'expression',
       keys: definition.keys,
       element: definition.element,
-      highlight: definition.highlight ?? true,
-      pro: proAttributes.includes(name),
+      pro: documentation.pro,
     }
   })
 
@@ -463,7 +515,7 @@ const generateLanguageData = (
     attributes,
     completions,
     nativeEvents: nativeEventNames(),
-    ...actionData,
+    ...docsMetadata.actions,
   }
 }
 
@@ -474,9 +526,7 @@ const grammarWithAttributes = (data: ReturnType<typeof generateLanguageData>) =>
       { begin: string; patterns: Array<{ match: string }> }
     >
   }
-  const names = data.attributes
-    .filter((attribute) => attribute.highlight)
-    .map((attribute) => attribute.name)
+  const names = data.attributes.map((attribute) => attribute.name)
   const attrList = names.join('|')
   grammar.repository['datastar-attribute'].begin =
     `\\b(data-)(${attrList})(?=__|:|[\\s>=])`
@@ -486,12 +536,8 @@ const grammarWithAttributes = (data: ReturnType<typeof generateLanguageData>) =>
 }
 
 const main = async () => {
-  const [modifiers, actions, proAttributes] = await Promise.all([
-    loadModifiers(),
-    loadActions(),
-    loadProAttributes(),
-  ])
-  const data = generateLanguageData(modifiers, actions, proAttributes)
+  const docsMetadata = await loadDocsMetadata()
+  const data = generateLanguageData(docsMetadata)
   const languageDataContent = `${JSON.stringify(data, null, 2)}\n`
   const grammarContent = grammarWithAttributes(data)
 

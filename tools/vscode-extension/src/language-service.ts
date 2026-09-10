@@ -12,13 +12,13 @@ type Reference = {
 type AttributeMetadata = {
     name: string
     description: string
+    reference: string
     requirement: { key: Requirement; value: Requirement }
     modifiers: Array<{ name: string; description?: string }>
     signals?: 'key' | 'key-or-value' | 'key-or-object'
     valueKind: 'expression' | 'signal-name' | 'string'
     keys?: string[]
     element?: string
-    highlight: boolean
     pro: boolean
 }
 
@@ -26,8 +26,6 @@ type CompletionMetadata = {
     name: string
     pluginName: string
     insertText: string
-    description: string
-    references: Reference[]
 }
 
 type LanguageData = {
@@ -182,6 +180,11 @@ const getActionParameters = (action: ActionMetadata): ActionParameterMetadata[] 
 
 const getActionSignature = (action: ActionMetadata): string =>
     action.signature || `@${action.name}(${getActionParameters(action).map(parameter => parameter.label).join(', ')})`;
+
+const getAttributeReferences = (metadata: AttributeMetadata): Reference[] => [{
+    name: 'Documentation',
+    url: metadata.reference,
+}];
 
 function getPluginName(attributeName: string): string {
     return attributeName.slice('data-'.length).split(':', 1)[0].split('__', 1)[0];
@@ -1013,7 +1016,6 @@ function getModifierCompletions(prefix: string, offset: number): LanguageComplet
     if (!metadata) return [];
 
     const appliedModifiers = new Set(parsed.modifiers.map(modifier => modifier.split('.')[0]));
-    const completion = snippetEntries.find(entry => entry.pluginName === parsed.pluginName);
     const parts = current.split('.');
     const modifierName = parts[0];
     const completingTag = parts.length > 1;
@@ -1035,7 +1037,7 @@ function getModifierCompletions(prefix: string, offset: number): LanguageComplet
                 label: insertText,
                 insertText,
                 description: modifier.description || 'Datastar attribute modifier.',
-                references: completion?.references || [],
+                references: getAttributeReferences(metadata),
                 kind: 'modifier' as const,
                 detail: metadata.pro ? 'Datastar Pro attribute modifier' : 'Datastar attribute modifier',
                 start: offset - typedPart.length,
@@ -1074,16 +1076,15 @@ export function getCompletions(
     if (modifierCompletions !== undefined) return modifierCompletions;
 
     if (/^data-on:[a-zA-Z0-9-]*$/.test(prefixMatch[0])) {
-        const genericEntry = snippetEntries.find(entry => entry.pluginName === 'on')!;
+        const metadata = attributeMetadata.get('on')!;
         return nativeEvents.map(eventName => {
             const name = `data-on:${eventName}`;
             const explicitEntry = snippetEntries.find(entry => entry.name === name);
             return {
                 label: name,
                 insertText: explicitEntry?.insertText ?? `${name}="\${1:expression}"`,
-                description: explicitEntry?.description
-                    ?? `Runs an expression whenever the \`${eventName}\` event is triggered.`,
-                references: explicitEntry?.references ?? genericEntry.references,
+                description: metadata.description,
+                references: getAttributeReferences(metadata),
                 start: offset - prefixMatch[0].length,
                 end: offset,
             };
@@ -1092,17 +1093,20 @@ export function getCompletions(
 
     const entries = snippetEntries
         .filter(entry => entry.pluginName !== 'nonce' || tag.name === 'html')
-        .map(entry => ({
-            label: entry.name,
-            insertText: entry.insertText,
-            description: entry.description,
-            references: entry.references || [],
-            detail: attributeMetadata.get(entry.pluginName)?.pro
-                ? 'Datastar Pro attribute'
-                : 'Datastar attribute',
-            start: offset - prefixMatch[0].length,
-            end: offset,
-        }));
+        .map(entry => {
+            const metadata = attributeMetadata.get(entry.pluginName)!;
+            return {
+                label: entry.name,
+                insertText: entry.insertText,
+                description: metadata.description,
+                references: getAttributeReferences(metadata),
+                detail: metadata.pro
+                    ? 'Datastar Pro attribute'
+                    : 'Datastar attribute',
+                start: offset - prefixMatch[0].length,
+                end: offset,
+            };
+        });
 
     for (const pluginName of customAttributes) {
         entries.push({
@@ -1190,6 +1194,7 @@ export function getHover(text: string, offset: number): LanguageHover | undefine
     const entry = snippetEntries.find(candidate => candidate.name === attribute.name)
         || snippetEntries.find(candidate => candidate.pluginName === attribute.pluginName);
     if (!entry) return undefined;
+    const metadata = attributeMetadata.get(attribute.pluginName)!;
 
     const rule = ATTRIBUTE_RULES[attribute.pluginName];
     const requirements: string[] = [];
@@ -1198,14 +1203,14 @@ export function getHover(text: string, offset: number): LanguageHover | undefine
     if (rule?.key === 'denied') requirements.push('Key: not allowed');
     if (rule?.value === 'must') requirements.push('Value: required');
     if (rule?.value === 'denied') requirements.push('Value: not allowed');
-    if (attributeMetadata.get(attribute.pluginName)?.pro) requirements.push('Requires Datastar Pro.');
+    if (metadata.pro) requirements.push('Requires Datastar Pro.');
 
     return {
         start: attribute.start,
         end: attribute.nameEnd,
         name: attribute.name,
-        description: entry.description,
+        description: metadata.description,
         requirements,
-        references: entry.references,
+        references: getAttributeReferences(metadata),
     };
 }
