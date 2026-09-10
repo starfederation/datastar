@@ -38,12 +38,20 @@ test('generated language data includes action metadata from the docs', () => {
     const actions = new Map(languageData.actions.map(action => [action.name, action]));
 
     assert.equal(actions.get('peek')!.signature, '@peek(callable: () => any)');
-    assert.equal(actions.get('post')!.signature, '@post(uri: string, options={ })');
+    assert.equal(actions.get('post')!.signature, undefined);
     assert.deepEqual(
-        actions.get('setAll')!.parameters.map(parameter => parameter.label),
+        actions.get('setAll')!.parameters!.map(parameter => parameter.label),
         ['value: any', 'filter?: {include: RegExp, exclude?: RegExp}'],
     );
     assert.equal(actions.get('get')!.pro, false);
+    assert.deepEqual(languageData.backendActionNames, ['get', 'post', 'put', 'patch', 'delete']);
+    assert.equal(actions.get('post')!.parameters, undefined);
+    assert.deepEqual(
+        languageData.backendActionParameters.map(parameter => parameter.label),
+        ['uri: string', 'options={ }'],
+    );
+    assert.ok(languageData.backendActionOptions.some(option => option.name === 'contentType'));
+    assert.ok(languageData.backendActionOptions.some(option => option.name === 'requestCancellation'));
     assert.equal(actions.get('clipboard')!.pro, true);
 });
 

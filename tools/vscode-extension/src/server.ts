@@ -42,7 +42,7 @@ connection.onInitialize(params => {
         capabilities: {
             textDocumentSync: TextDocumentSyncKind.Incremental,
             completionProvider: {
-                triggerCharacters: ['-', ':', '_', '$', '.'],
+                triggerCharacters: ['-', ':', '_', '$', '.', '{', ','],
             },
             hoverProvider: true,
             definitionProvider: true,

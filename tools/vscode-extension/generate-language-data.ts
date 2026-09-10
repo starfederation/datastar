@@ -14,9 +14,25 @@ type Modifier = {
 type Action = {
   name: string
   description: string
-  signature: string
-  parameters: Array<{ label: string }>
+  signature?: string
+  parameters?: ActionParameter[]
   pro: boolean
+}
+
+type ActionParameter = {
+  label: string
+}
+
+type ActionOption = {
+  name: string
+  description: string
+}
+
+type ActionData = {
+  actions: Action[]
+  backendActionNames: string[]
+  backendActionParameters: ActionParameter[]
+  backendActionOptions: ActionOption[]
 }
 
 type AttributeSemantics = {
@@ -197,10 +213,12 @@ const splitParameters = (source: string): string[] => {
   return parameters
 }
 
-const actionsFromDocs = (markdown: string): Action[] => {
+const actionsFromDocs = (markdown: string): ActionData => {
   const lines = markdown.split(/\r?\n/)
   const actions: Action[] = []
+  const backendActionNames = new Set<string>()
   let inActions = false
+  let inBackendActions = false
   let pro = false
 
   for (let index = 0; index < lines.length; index++) {
@@ -212,12 +230,21 @@ const actionsFromDocs = (markdown: string): Action[] => {
     if (inActions && /^# [^#]/.test(line)) break
     if (!inActions) continue
     if (/^## Pro Actions\s*$/.test(line)) {
+      inBackendActions = false
       pro = true
       continue
+    }
+    if (/^## Backend Actions\s*$/.test(line)) {
+      inBackendActions = true
+      continue
+    }
+    if (/^## [^#]/.test(line)) {
+      inBackendActions = false
     }
 
     const heading = line.match(/^### `@([A-Za-z_$][\w$]*)\(\)`/)
     if (!heading) continue
+    if (inBackendActions) backendActionNames.add(heading[1])
 
     let signature: string | undefined
     let description: string | undefined
@@ -257,15 +284,52 @@ const actionsFromDocs = (markdown: string): Action[] => {
   if (!actions.some(action => action.name === 'peek') || !actions.some(action => action.name === 'get')) {
     throw new Error(`Could not parse Datastar actions from ${docsUrl}.`)
   }
-  return actions
+
+  const options: ActionOption[] = []
+  const actionsStart = lines.findIndex(line => /^# Actions\s*$/.test(line))
+  const backendActionsStart = lines.findIndex((line, index) => (
+    index > actionsStart && /^## Backend Actions\s*$/.test(line)
+  ))
+  const optionsStart = lines.findIndex((line, index) => (
+    index > backendActionsStart && /^### Options\s*$/.test(line)
+  ))
+  if (optionsStart !== -1) {
+    for (let index = optionsStart + 1; index < lines.length; index++) {
+      const line = lines[index]
+      if (/^### /.test(line)) break
+      const option = line.match(/^- `([A-Za-z_$][\w$]*)`\s+[–-]\s+(.+)$/)
+      if (option) options.push({ name: option[1], description: option[2] })
+    }
+  }
+  if (!options.some(option => option.name === 'contentType')
+    || !options.some(option => option.name === 'requestCancellation')) {
+    throw new Error(`Could not parse backend action options from ${docsUrl}.`)
+  }
+
+  const backendActions = actions.filter(action => backendActionNames.has(action.name))
+  const backendActionParameters = backendActions[0]?.parameters
+  if (!backendActionParameters || !backendActions.every(action =>
+    JSON.stringify(action.parameters) === JSON.stringify(backendActionParameters)
+  )) {
+    throw new Error(`Backend action parameters differ in ${docsUrl}.`)
+  }
+
+  return {
+    actions: actions.map(action => backendActionNames.has(action.name)
+      ? { name: action.name, description: action.description, pro: action.pro }
+      : action),
+    backendActionNames: [...backendActionNames],
+    backendActionParameters,
+    backendActionOptions: options,
+  }
 }
 
-const loadActions = async (): Promise<Action[]> => {
+const loadActions = async (): Promise<ActionData> => {
   if (checkOnly) {
     if (!fs.existsSync(actionsPath)) {
       throw new Error(`Missing ${path.relative(extensionRoot, actionsPath)}. Run npm run generate.`)
     }
-    return JSON.parse(fs.readFileSync(actionsPath, 'utf8')) as Action[]
+    return JSON.parse(fs.readFileSync(actionsPath, 'utf8')) as ActionData
   }
 
   const actions = actionsFromDocs(await fetchDocs())
@@ -343,7 +407,7 @@ const pluginName = (attributeName: string): string =>
 
 const generateLanguageData = (
   modifiers: Record<string, Modifier[]>,
-  actions: Action[],
+  actionData: ActionData,
   proAttributes: string[],
 ) => {
   const completions = Object.entries(attributeDefinitions).flatMap(
@@ -394,7 +458,13 @@ const generateLanguageData = (
     }
   })
 
-  return { version: 1, attributes, completions, nativeEvents: nativeEventNames(), actions }
+  return {
+    version: 1,
+    attributes,
+    completions,
+    nativeEvents: nativeEventNames(),
+    ...actionData,
+  }
 }
 
 const grammarWithAttributes = (data: ReturnType<typeof generateLanguageData>) => {

@@ -1642,71 +1642,26 @@
     {
       "name": "get",
       "description": "Sends a `GET` request to the backend using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). The URI can be any valid endpoint, and the response type any of the allowed [response types](#response-handling), or a `204 No Content` response if the response body is empty.",
-      "signature": "@get(uri: string, options={ })",
-      "parameters": [
-        {
-          "label": "uri: string"
-        },
-        {
-          "label": "options={ }"
-        }
-      ],
       "pro": false
     },
     {
       "name": "post",
       "description": "Works the same as [`@get()`](#get) but sends a `POST` request to the backend.",
-      "signature": "@post(uri: string, options={ })",
-      "parameters": [
-        {
-          "label": "uri: string"
-        },
-        {
-          "label": "options={ }"
-        }
-      ],
       "pro": false
     },
     {
       "name": "put",
       "description": "Works the same as [`@get()`](#get) but sends a `PUT` request to the backend.",
-      "signature": "@put(uri: string, options={ })",
-      "parameters": [
-        {
-          "label": "uri: string"
-        },
-        {
-          "label": "options={ }"
-        }
-      ],
       "pro": false
     },
     {
       "name": "patch",
       "description": "Works the same as [`@get()`](#get) but sends a `PATCH` request to the backend.",
-      "signature": "@patch(uri: string, options={ })",
-      "parameters": [
-        {
-          "label": "uri: string"
-        },
-        {
-          "label": "options={ }"
-        }
-      ],
       "pro": false
     },
     {
       "name": "delete",
       "description": "Works the same as [`@get()`](#get) but sends a `DELETE` request to the backend.",
-      "signature": "@delete(uri: string, options={ })",
-      "parameters": [
-        {
-          "label": "uri: string"
-        },
-        {
-          "label": "options={ }"
-        }
-      ],
       "pro": false
     },
     {
@@ -1771,6 +1726,71 @@
         }
       ],
       "pro": true
+    }
+  ],
+  "backendActionNames": [
+    "get",
+    "post",
+    "put",
+    "patch",
+    "delete"
+  ],
+  "backendActionParameters": [
+    {
+      "label": "uri: string"
+    },
+    {
+      "label": "options={ }"
+    }
+  ],
+  "backendActionOptions": [
+    {
+      "name": "contentType",
+      "description": "The type of content to send. A value of `json` sends all signals in a JSON request. A value of `form` tells the action to look for the closest form to the element on which it is placed (unless a `selector` option is provided), perform validation on the form elements, and send them to the backend using a form request (no signals are sent). Defaults to `json`."
+    },
+    {
+      "name": "filterSignals",
+      "description": "A filter object with an `include` property that accepts a regular expression to match signal paths (defaults to all signals: `/.*/`), and an optional `exclude` property to exclude specific signal paths (defaults to all signals that do not have a `_` prefix: `/(^_|\\._).*/`)."
+    },
+    {
+      "name": "selector",
+      "description": "Optionally specifies a form to send when the `contentType` option is set to `form`. If the value is `null`, the closest form is used. Defaults to `null`."
+    },
+    {
+      "name": "headers",
+      "description": "An object containing headers to send with the request."
+    },
+    {
+      "name": "openWhenHidden",
+      "description": "Whether to keep the connection open when the page is hidden. Useful for dashboards but can cause a drain on battery life and other resources when enabled. Defaults to `false` for `get` requests, and `true` for all other HTTP methods."
+    },
+    {
+      "name": "payload",
+      "description": "Allows the fetch payload to be overridden with a custom object."
+    },
+    {
+      "name": "retry",
+      "description": "Determines when to retry requests. Can be `'auto'` (default, retries on network errors only), `'error'` (retries on `4xx` and `5xx` responses), `'always'` (retries on all non-`204` responses except redirects), or `'never'` (disables retries). Defaults to `'auto'`."
+    },
+    {
+      "name": "retryInterval",
+      "description": "The retry interval in milliseconds. Defaults to `1000` (one second)."
+    },
+    {
+      "name": "retryScaler",
+      "description": "A numeric multiplier applied to scale retry wait times. Defaults to `2`."
+    },
+    {
+      "name": "retryMaxWait",
+      "description": "The maximum allowable wait time in milliseconds between retries. Defaults to `30000` (30 seconds)."
+    },
+    {
+      "name": "retryMaxCount",
+      "description": "The maximum number of retry attempts. Defaults to `10`."
+    },
+    {
+      "name": "requestCancellation",
+      "description": "Controls request cancellation behavior. Can be `'auto'` (default, cancels in-flight requests to the same URL using the same HTTP method), `'cleanup'` (cancels requests on element or attribute cleanup, and cancels in-flight requests to the same URL using the same HTTP method), `'disabled'` (allows concurrent requests), or an `AbortController` instance for custom control. Defaults to `'auto'`."
     }
   ]
 }
