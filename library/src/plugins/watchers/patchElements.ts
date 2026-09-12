@@ -69,15 +69,9 @@ watcher({
     }
 
     if (useViewTransition) {
-<<<<<<< Updated upstream
-      let target: Document | Element = document
-      if (viewTransitionSelector) {
-        const el = document.querySelector(viewTransitionSelector)
-=======
       let target: Document | Element = DOCUMENT
       if (viewTransitionSelector) {
         const el = DOCUMENT.querySelector(viewTransitionSelector)
->>>>>>> Stashed changes
         if (el) {
           target = el
         }
