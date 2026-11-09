@@ -159,6 +159,40 @@ export const decodeCodec = <T>(codec: RuntimeCodec<T>, value: unknown): T => {
   }
 }
 
+type PropertyCodec<T> = {
+  normalize(value: unknown): T
+  encode(value: T): string
+}
+const propertyCodecs = new WeakMap<Codec<any>, PropertyCodec<any>>()
+const registerPropertyCodec = <C extends RuntimeCodec<any>>(
+  codec: C,
+  encode: (value: InferCodec<C>) => string,
+  normalize: (value: unknown) => InferCodec<C> = (value) =>
+    decodeCodec(codec, value),
+): C => {
+  propertyCodecs.set(codec, { normalize, encode })
+  return codec
+}
+const encodeNormalized = <T>(codec: RuntimeCodec<T>, value: T): string =>
+  (propertyCodecs.get(codec)?.encode ?? codec.encode)(value)
+
+// Normalize imperative input once, then serialize the normalized value without
+// running transforms such as number.fit a second time. Custom codecs retain
+// their encode/decode boundary for already-typed property values.
+export const normalizeProperty = <T>(codec: RuntimeCodec<T>, input: T) => {
+  if (input === undefined) {
+    const value = getCodecDefault(codec)
+    return { value, encoded: encodeNormalized(codec, value) }
+  }
+  const rules = propertyCodecs.get(codec)
+  if (rules) {
+    const value = rules.normalize(input) as T
+    return { value, encoded: rules.encode(value) }
+  }
+  const encoded = codec.encode(input)
+  return { value: decodeCodec(codec, encoded), encoded }
+}
+
 // Clone object defaults so component instances do not share mutable state through one codec.
 const cloneValue = <T>(value: T): T => {
   if (value == null || typeof value !== 'object') return value
@@ -339,7 +373,7 @@ const createStringCodec = (
     },
   })
 
-  return codec
+  return registerPropertyCodec(codec, (value) => String(value))
 }
 
 // Build composable clamp, round, and range-mapping rules for numeric props.
@@ -412,10 +446,11 @@ const createNumberCodec = (
     },
   })
 
-  return codec
+  return registerPropertyCodec(codec, (value) => `${value}`)
 }
 
-// Decode HTML-style truthy values because attribute presence and string forms both represent boolean props.
+// Decode boolean values for structured codecs. Direct HTML boolean props use
+// attribute presence in the runtime rather than parsing their attribute text.
 const createBoolCodec = (
   decode: (value: unknown) => boolean = (value) =>
     value === true ||
@@ -426,15 +461,19 @@ const createBoolCodec = (
   encode: (value: boolean) => string = (value) => (value ? 'true' : 'false'),
   defaultFactory?: () => boolean,
   manifestMeta: CodecManifest = { type: 'boolean' },
-): BoolCodec => ({
-  decode,
-  encode,
-  ...withDefault<boolean, BoolCodec>(
-    createBoolCodec.bind(null, decode, encode),
-    defaultFactory,
-    manifestMeta,
-  ),
-})
+): BoolCodec =>
+  registerPropertyCodec(
+    {
+      decode,
+      encode,
+      ...withDefault<boolean, BoolCodec>(
+        createBoolCodec.bind(null, decode, encode),
+        defaultFactory,
+        manifestMeta,
+      ),
+    },
+    encode,
+  )
 
 // Normalize date input and output through `Date` instances across attribute and imperative values.
 const createDateCodec = (
@@ -452,21 +491,25 @@ const createDateCodec = (
   },
   defaultFactory?: () => Date,
   manifestMeta: CodecManifest = { type: 'date' },
-): DateCodec => ({
-  decode,
-  encode,
-  ...withDefault<Date, DateCodec>(
-    (nextDefaultFactory, nextManifestMeta) =>
-      createDateCodec(
-        decode,
-        encode,
-        nextDefaultFactory,
-        nextManifestMeta ?? manifestMeta,
+): DateCodec =>
+  registerPropertyCodec(
+    {
+      decode,
+      encode,
+      ...withDefault<Date, DateCodec>(
+        (nextDefaultFactory, nextManifestMeta) =>
+          createDateCodec(
+            decode,
+            encode,
+            nextDefaultFactory,
+            nextManifestMeta ?? manifestMeta,
+          ),
+        defaultFactory,
+        manifestMeta,
       ),
-    defaultFactory,
-    manifestMeta,
-  ),
-})
+    },
+    encode,
+  )
 
 // Clone decoded JSON values so component instances cannot mutate one another's structured props.
 const createJsonCodec = <T = any>(
@@ -478,21 +521,25 @@ const createJsonCodec = <T = any>(
   encode: (value: T) => string = (value) => JSON.stringify(value),
   defaultFactory?: () => T,
   manifestMeta: CodecManifest = { type: 'json' },
-): JsonCodec<T> => ({
-  decode,
-  encode,
-  ...withDefault<T, JsonCodec<T>>(
-    (nextDefaultFactory, nextManifestMeta) =>
-      createJsonCodec(
-        decode,
-        encode,
-        nextDefaultFactory,
-        nextManifestMeta ?? manifestMeta,
+): JsonCodec<T> =>
+  registerPropertyCodec(
+    {
+      decode,
+      encode,
+      ...withDefault<T, JsonCodec<T>>(
+        (nextDefaultFactory, nextManifestMeta) =>
+          createJsonCodec(
+            decode,
+            encode,
+            nextDefaultFactory,
+            nextManifestMeta ?? manifestMeta,
+          ),
+        defaultFactory,
+        manifestMeta,
       ),
-    defaultFactory,
-    manifestMeta,
-  ),
-})
+    },
+    encode,
+  )
 
 // Revive functions in JS-like serialized objects for props that intentionally allow richer data than JSON.
 const createJsCodec = <T = any>(
@@ -510,21 +557,25 @@ const createJsCodec = <T = any>(
   encode: (value: T) => string = (value) => JSON.stringify(value),
   defaultFactory?: () => T,
   manifestMeta: CodecManifest = { type: 'js' },
-): JsCodec<T> => ({
-  decode,
-  encode,
-  ...withDefault<T, JsCodec<T>>(
-    (nextDefaultFactory, nextManifestMeta) =>
-      createJsCodec(
-        decode,
-        encode,
-        nextDefaultFactory,
-        nextManifestMeta ?? manifestMeta,
+): JsCodec<T> =>
+  registerPropertyCodec(
+    {
+      decode,
+      encode,
+      ...withDefault<T, JsCodec<T>>(
+        (nextDefaultFactory, nextManifestMeta) =>
+          createJsCodec(
+            decode,
+            encode,
+            nextDefaultFactory,
+            nextManifestMeta ?? manifestMeta,
+          ),
+        defaultFactory,
+        manifestMeta,
       ),
-    defaultFactory,
-    manifestMeta,
-  ),
-})
+    },
+    encode,
+  )
 
 // Encode binary props as base64 so byte arrays cross attribute boundaries without losing fidelity.
 const createBinCodec = (
@@ -539,129 +590,198 @@ const createBinCodec = (
     btoa(Array.from(value, (byte) => String.fromCharCode(byte)).join('')),
   defaultFactory?: () => Uint8Array,
   manifestMeta: CodecManifest = { type: 'binary' },
-): BinCodec => ({
-  decode,
-  encode,
-  ...withDefault<Uint8Array, BinCodec>(
-    (nextDefaultFactory, nextManifestMeta) =>
-      createBinCodec(
-        decode,
-        encode,
-        nextDefaultFactory,
-        nextManifestMeta ?? manifestMeta,
+): BinCodec =>
+  registerPropertyCodec(
+    {
+      decode,
+      encode,
+      ...withDefault<Uint8Array, BinCodec>(
+        (nextDefaultFactory, nextManifestMeta) =>
+          createBinCodec(
+            decode,
+            encode,
+            nextDefaultFactory,
+            nextManifestMeta ?? manifestMeta,
+          ),
+        defaultFactory,
+        manifestMeta,
       ),
-    defaultFactory,
-    manifestMeta,
-  ),
-})
+    },
+    encode,
+  )
 
 // Reuse one item codec's decode/default semantics across every value in a list prop.
 const createArrayCodec = <T>(
   codec: RuntimeCodec<T>,
   defaultFactory?: () => T[],
   manifestMeta: CodecManifest = { type: 'array' },
-): ArrayCodec<T> => ({
-  decode(value: unknown) {
-    const parsed = parseJSON(value)
-    const array = Array.isArray(parsed) ? parsed : []
-    return array.map((item) => decodeCodec(codec, item))
-  },
-  encode(value: T[]) {
-    return JSON.stringify(
-      value.map((item) => parseJSON(codec.encode(item)) ?? codec.encode(item)),
-    )
-  },
-  ...withDefault<T[], ArrayCodec<T>>(
-    (nextDefaultFactory, nextManifestMeta) =>
-      createArrayCodec(
-        codec,
-        nextDefaultFactory,
-        nextManifestMeta ?? manifestMeta,
+): ArrayCodec<T> =>
+  registerPropertyCodec(
+    {
+      decode(value: unknown) {
+        const parsed = parseJSON(value)
+        const array = Array.isArray(parsed) ? parsed : []
+        return array.map((item) => decodeCodec(codec, item))
+      },
+      encode(value: T[]) {
+        return JSON.stringify(
+          value.map(
+            (item) => parseJSON(codec.encode(item)) ?? codec.encode(item),
+          ),
+        )
+      },
+      ...withDefault<T[], ArrayCodec<T>>(
+        (nextDefaultFactory, nextManifestMeta) =>
+          createArrayCodec(
+            codec,
+            nextDefaultFactory,
+            nextManifestMeta ?? manifestMeta,
+          ),
+        defaultFactory,
+        manifestMeta,
       ),
-    defaultFactory,
-    manifestMeta,
-  ),
-})
+    },
+    (value) =>
+      JSON.stringify(
+        value.map((item) => {
+          const encoded = encodeNormalized(codec, item)
+          return parseJSON(encoded) ?? encoded
+        }),
+      ),
+    (value) => {
+      const parsed = parseJSON(value)
+      return (Array.isArray(parsed) ? parsed : []).map(
+        (item) => normalizeProperty(codec, item).value,
+      )
+    },
+  )
 
 // Preserve per-position codecs and defaults in heterogeneous tuple props.
 const createTupleCodec = <T extends readonly RuntimeCodec<any>[]>(
   codecs: T,
   defaultFactory?: () => { [K in keyof T]: InferCodec<T[K]> },
   manifestMeta: CodecManifest = { type: 'tuple' },
-): TupleCodec<{ [K in keyof T]: InferCodec<T[K]> }> => ({
-  decode(value: unknown) {
-    const parsed = parseJSON(value)
-    const array = Array.isArray(parsed) ? parsed : []
-    return codecs.map((codec, index) => {
-      if (index < array.length) return decodeCodec(codec, array[index])
-      return getCodecDefault(codec)
-    }) as { [K in keyof T]: InferCodec<T[K]> }
-  },
-  encode(value: { [K in keyof T]: InferCodec<T[K]> }) {
-    return JSON.stringify(
-      value.map((item, index) => {
-        const encoded = codecs[index]!.encode(item)
-        return parseJSON(encoded) ?? encoded
-      }),
-    )
-  },
-  ...withDefault<
-    { [K in keyof T]: InferCodec<T[K]> },
-    TupleCodec<{ [K in keyof T]: InferCodec<T[K]> }>
-  >(
-    (nextDefaultFactory, nextManifestMeta) =>
-      createTupleCodec(
-        codecs,
-        nextDefaultFactory,
-        nextManifestMeta ?? manifestMeta,
+): TupleCodec<{ [K in keyof T]: InferCodec<T[K]> }> =>
+  registerPropertyCodec(
+    {
+      decode(value: unknown) {
+        const parsed = parseJSON(value)
+        const array = Array.isArray(parsed) ? parsed : []
+        return codecs.map((codec, index) => {
+          if (index < array.length) return decodeCodec(codec, array[index])
+          return getCodecDefault(codec)
+        }) as { [K in keyof T]: InferCodec<T[K]> }
+      },
+      encode(value: { [K in keyof T]: InferCodec<T[K]> }) {
+        return JSON.stringify(
+          value.map((item, index) => {
+            const encoded = codecs[index]!.encode(item)
+            return parseJSON(encoded) ?? encoded
+          }),
+        )
+      },
+      ...withDefault<
+        { [K in keyof T]: InferCodec<T[K]> },
+        TupleCodec<{ [K in keyof T]: InferCodec<T[K]> }>
+      >(
+        (nextDefaultFactory, nextManifestMeta) =>
+          createTupleCodec(
+            codecs,
+            nextDefaultFactory,
+            nextManifestMeta ?? manifestMeta,
+          ),
+        defaultFactory,
+        manifestMeta,
       ),
-    defaultFactory,
-    manifestMeta,
-  ),
-})
+    },
+    (value) =>
+      JSON.stringify(
+        value.map((item, index) => {
+          const encoded = encodeNormalized(codecs[index]!, item)
+          return parseJSON(encoded) ?? encoded
+        }),
+      ),
+    (value) => {
+      const parsed = parseJSON(value)
+      const array = Array.isArray(parsed) ? parsed : []
+      return codecs.map((codec, index) =>
+        index < array.length
+          ? normalizeProperty(codec, array[index]).value
+          : getCodecDefault(codec),
+      ) as { [K in keyof T]: InferCodec<T[K]> }
+    },
+  )
 
 // Decode object props field by field through a fixed shape of child codecs and defaults.
 const createObjectCodec = <T extends Record<string, RuntimeCodec<any>>>(
   shape: T,
   defaultFactory?: () => { [K in keyof T]: InferCodec<T[K]> },
   manifestMeta: CodecManifest = { type: 'object' },
-): ObjectCodec<{ [K in keyof T]: InferCodec<T[K]> }> => ({
-  decode(value: unknown) {
-    const parsed = parseJSON(value)
-    const source = (
-      parsed && typeof parsed === 'object' && !Array.isArray(parsed)
-        ? parsed
-        : {}
-    ) as Record<string, unknown>
-    const next = {} as { [K in keyof T]: InferCodec<T[K]> }
-    for (const [key, codec] of Object.entries(shape)) {
-      next[key as keyof T] =
-        key in source ? decodeCodec(codec, source[key]) : getCodecDefault(codec)
-    }
-    return next
-  },
-  encode(value: { [K in keyof T]: InferCodec<T[K]> }) {
-    const next: Record<string, unknown> = {}
-    for (const [key, codec] of Object.entries(shape)) {
-      const encoded = codec.encode(value[key as keyof T])
-      next[key] = parseJSON(encoded) ?? encoded
-    }
-    return JSON.stringify(next)
-  },
-  ...withDefault<
-    { [K in keyof T]: InferCodec<T[K]> },
-    ObjectCodec<{ [K in keyof T]: InferCodec<T[K]> }>
-  >(
-    (nextDefaultFactory, nextManifestMeta) =>
-      createObjectCodec(
-        shape,
-        nextDefaultFactory,
-        nextManifestMeta ?? manifestMeta,
+): ObjectCodec<{ [K in keyof T]: InferCodec<T[K]> }> =>
+  registerPropertyCodec(
+    {
+      decode(value: unknown) {
+        const parsed = parseJSON(value)
+        const source = (
+          parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+            ? parsed
+            : {}
+        ) as Record<string, unknown>
+        const next = {} as { [K in keyof T]: InferCodec<T[K]> }
+        for (const [key, codec] of Object.entries(shape)) {
+          next[key as keyof T] =
+            key in source
+              ? decodeCodec(codec, source[key])
+              : getCodecDefault(codec)
+        }
+        return next
+      },
+      encode(value: { [K in keyof T]: InferCodec<T[K]> }) {
+        const next: Record<string, unknown> = {}
+        for (const [key, codec] of Object.entries(shape)) {
+          const encoded = codec.encode(value[key as keyof T])
+          next[key] = parseJSON(encoded) ?? encoded
+        }
+        return JSON.stringify(next)
+      },
+      ...withDefault<
+        { [K in keyof T]: InferCodec<T[K]> },
+        ObjectCodec<{ [K in keyof T]: InferCodec<T[K]> }>
+      >(
+        (nextDefaultFactory, nextManifestMeta) =>
+          createObjectCodec(
+            shape,
+            nextDefaultFactory,
+            nextManifestMeta ?? manifestMeta,
+          ),
+        defaultFactory,
+        manifestMeta,
       ),
-    defaultFactory,
-    manifestMeta,
-  ),
-})
+    },
+    (value) => {
+      const next: Record<string, unknown> = {}
+      for (const [key, codec] of Object.entries(shape)) {
+        const encoded = encodeNormalized(codec, value[key as keyof T])
+        next[key] = parseJSON(encoded) ?? encoded
+      }
+      return JSON.stringify(next)
+    },
+    (value) => {
+      const parsed = parseJSON(value)
+      const source =
+        parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+          ? parsed
+          : {}
+      const next = {} as { [K in keyof T]: InferCodec<T[K]> }
+      for (const [key, codec] of Object.entries(shape)) {
+        next[key as keyof T] =
+          key in source
+            ? normalizeProperty(codec, source[key]).value
+            : getCodecDefault(codec)
+      }
+      return next
+    },
+  )
 
 // Distinguish literal `oneOf(...)` entries from codec entries so one API can support both union styles.
 const isCodec = (value: unknown): value is RuntimeCodec<any> =>
@@ -759,52 +879,71 @@ const createOneOfCodec = <T>(
       isCodec(entry) ? getCodecManifest(entry) : entry,
     ),
   },
-): OneOfCodec<T> => ({
-  decode(value: unknown) {
-    let hadDecodeError = false
-    const parsedValue = parseJSON(value)
-    for (const entry of values) {
-      if (isCodec(entry) && codecMatchesInput(entry, value)) {
-        try {
-          return entry.decode(value) as T
-        } catch {
-          hadDecodeError = true
+): OneOfCodec<T> =>
+  registerPropertyCodec(
+    {
+      decode(value: unknown) {
+        let hadDecodeError = false
+        const parsedValue = parseJSON(value)
+        for (const entry of values) {
+          if (isCodec(entry) && codecMatchesInput(entry, value)) {
+            try {
+              return entry.decode(value) as T
+            } catch {
+              hadDecodeError = true
+            }
+          }
+          if (
+            entry === value ||
+            entry === parsedValue ||
+            `${entry}` === `${value}`
+          ) {
+            return entry as T
+          }
         }
-      }
-      if (
-        entry === value ||
-        entry === parsedValue ||
-        `${entry}` === `${value}`
-      ) {
-        return entry as T
-      }
-    }
-    if (hadDecodeError) {
-      console.warn('Rocket codec decode failed', { value })
-    }
-    if (defaultFactory) return defaultFactory()
-    return oneOfDefaultFactory<T>(values)()
-  },
-  encode(value: T) {
-    for (const entry of values) {
-      if (isCodec(entry) && codecMatchesValue(entry, value)) {
-        return entry.encode(value)
-      }
-      if (Object.is(entry, value)) return `${value}`
-    }
-    return `${value}`
-  },
-  ...withDefault<T, OneOfCodec<T>>(
-    (nextDefaultFactory, nextManifestMeta) =>
-      createOneOfCodec(
-        values,
-        nextDefaultFactory,
-        nextManifestMeta ?? manifestMeta,
+        if (hadDecodeError) {
+          console.warn('Rocket codec decode failed', { value })
+        }
+        if (defaultFactory) return defaultFactory()
+        return oneOfDefaultFactory<T>(values)()
+      },
+      encode(value: T) {
+        for (const entry of values) {
+          if (isCodec(entry) && codecMatchesValue(entry, value)) {
+            return entry.encode(value)
+          }
+          if (Object.is(entry, value)) return `${value}`
+        }
+        return `${value}`
+      },
+      ...withDefault<T, OneOfCodec<T>>(
+        (nextDefaultFactory, nextManifestMeta) =>
+          createOneOfCodec(
+            values,
+            nextDefaultFactory,
+            nextManifestMeta ?? manifestMeta,
+          ),
+        oneOfDefaultFactory(values, defaultFactory),
+        manifestMeta,
       ),
-    oneOfDefaultFactory(values, defaultFactory),
-    manifestMeta,
-  ),
-})
+    },
+    (value) => {
+      for (const entry of values) {
+        if (isCodec(entry) && codecMatchesValue(entry, value))
+          return encodeNormalized(entry, value)
+        if (Object.is(entry, value)) return `${value}`
+      }
+      return `${value}`
+    },
+    (value) => {
+      for (const entry of values) {
+        if (isCodec(entry) && codecMatchesValue(entry, value))
+          return normalizeProperty(entry, value).value as T
+        if (Object.is(entry, value)) return entry as T
+      }
+      return oneOfDefaultFactory<T>(values, defaultFactory)()
+    },
+  )
 
 function oneOf<const T extends readonly unknown[]>(
   ...values: T

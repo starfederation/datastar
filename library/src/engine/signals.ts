@@ -95,23 +95,51 @@ export const stopPeeking = (): void => {
   subStack = subStack?.prev_
 }
 
+const reactiveNode = Symbol('reactiveNode')
+
 export const signal = <T>(initialValue?: T): Signal<T> => {
-  return signalOper.bind(0, {
+  const node: AlienSignal<T | undefined> = {
     previousValue_: initialValue,
     value_: initialValue,
     flags_: 1 satisfies ReactiveFlags.Mutable,
-  }) as Signal<T>
+  }
+  return Object.assign(signalOper.bind(0, node), {
+    [reactiveNode]: node,
+  }) as unknown as Signal<T>
 }
 
 const computedSymbol = Symbol('computed')
 export const computed = <T>(getter: (previousValue?: T) => T): Computed<T> => {
-  const c = computedOper.bind(0, {
+  const node: AlienComputed<T> = {
     flags_: 17 as ReactiveFlags.Mutable | ReactiveFlags.Dirty,
     getter_: getter,
+  }
+  return Object.assign(computedOper.bind(0, node), {
+    [computedSymbol]: 1,
+    [reactiveNode]: node,
   }) as Computed<T>
-  // @ts-expect-error
-  c[computedSymbol] = 1
-  return c
+}
+
+// Replacing an accessor must wake its consumers so they subscribe to the new
+// accessor, even when its first value equals the previous value.
+const replaceAccessor = (
+  obj: Record<string, Signal<any>>,
+  prop: string,
+  value: Signal<any>,
+) => {
+  const previous = obj[prop]
+  obj[prop] = value
+  if (previous === value) return
+  const node = (previous as Signal<any> & { [reactiveNode]: ReactiveNode })[
+    reactiveNode
+  ]
+  const subs = node.subs_
+  if (!subs) return
+  propagate(subs)
+  for (let link: Link | undefined = subs; link; link = link.nextSub_) {
+    link.sub_.flags_ |= ReactiveFlags.Dirty
+  }
+  if (!batchDepth) flush()
 }
 
 export const effect = (fn: () => void): Effect => {
@@ -126,21 +154,45 @@ export const effect = (fn: () => void): Effect => {
   beginBatch()
   try {
     e.fn_()
+  } catch (error) {
+    // A failed initial run has no returned disposer; retire its subscriptions here.
+    effectOper(e)
+    throw error
   } finally {
-    endBatch()
-    stopPeeking()
+    try {
+      endBatch()
+    } finally {
+      stopPeeking()
+    }
   }
   return effectOper.bind(0, e)
 }
 
 const flush = () => {
-  while (notifyIndex < queuedEffectsLength) {
-    const effect = queuedEffects[notifyIndex]!
-    queuedEffects[notifyIndex++] = undefined
-    run(effect, (effect.flags_ &= ~EffectFlags.Queued))
+  let hasError = false
+  let firstError: unknown
+  // Keep each effect's endBatch() from recursively draining the queue.
+  beginBatch()
+  try {
+    while (notifyIndex < queuedEffectsLength) {
+      const effect = queuedEffects[notifyIndex]!
+      queuedEffects[notifyIndex++] = undefined
+      try {
+        run(effect, (effect.flags_ &= ~EffectFlags.Queued))
+      } catch (error) {
+        // Finish unrelated effects before propagating the first failure.
+        if (!hasError) {
+          hasError = true
+          firstError = error
+        }
+      }
+    }
+  } finally {
+    notifyIndex = 0
+    queuedEffectsLength = 0
+    batchDepth--
   }
-  notifyIndex = 0
-  queuedEffectsLength = 0
+  if (hasError) throw firstError
 }
 
 const update = (signal: AlienSignal | AlienComputed): boolean => {
@@ -621,7 +673,7 @@ const deep = (value: any, prefix = ''): any => {
             keys(keys() + 1)
             // if newValue is a computed set the computed directly instead of wrapping in signal
           } else if (hasOwn(newValue, computedSymbol)) {
-            deepObj[prop] = newValue
+            replaceAccessor(deepObj, prop, newValue)
             dispatch(path, '')
             // if prop changed after setting it then dispatch
           } else {

@@ -18,6 +18,7 @@ attribute({
   requirement: 'must',
   argNames: ['evt'],
   apply({ el, key, mods, rx }) {
+    let active = true
     let target: Element | Window | Document = el
     if (mods.has('window')) {
       target = window
@@ -25,6 +26,7 @@ attribute({
       target = DOCUMENT
     }
     let callback = (evt?: Event) => {
+      if (!active) return
       beginBatch()
       try {
         rx(evt)
@@ -62,12 +64,14 @@ attribute({
         if (mods.has('prevent')) evt.preventDefault()
         if (mods.has('stop')) evt.stopPropagation()
         // Keep data-on:submit from falling through to native form submission.
-        if (el instanceof HTMLFormElement && eventName === 'submit') evt.preventDefault()
+        if (el instanceof HTMLFormElement && eventName === 'submit')
+          evt.preventDefault()
       }
       callback(evt)
     }
     target.addEventListener(eventName, listener, evtListOpts)
     return () => {
+      active = false
       target.removeEventListener(eventName, listener, evtListOpts)
     }
   },

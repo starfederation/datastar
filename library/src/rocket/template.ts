@@ -1,6 +1,6 @@
+import { parseAttributeKey } from '@engine'
 import { createError } from '@engine/errors'
-import type { Modifiers } from '@engine/types'
-import { modifyCasing } from '@utils/text'
+import { aliasify, modifyCasing, unaliasify } from '@utils/text'
 
 // Carries the signal base and any loop-local aliases that a rewritten Rocket subtree should resolve against.
 //
@@ -87,6 +87,31 @@ export function hypertext(
   render: (string: string) => ParentNode,
   postprocess: (root: ParentNode) => DocumentFragment,
 ) {
+  // Only nodes produced by this literal have already been scoped for it.
+  const produced = new WeakSet<Node>()
+  const prepare = (value: unknown): { value: unknown; processed: boolean } => {
+    if (value instanceof DocumentFragment) {
+      return {
+        value,
+        processed: [...value.childNodes].every((node) => produced.has(node)),
+      }
+    }
+    if (value instanceof Node) return { value, processed: produced.has(value) }
+    if (value && typeof value === 'object' && Symbol.iterator in value) {
+      // Materialize once: probing a generator and then inserting it would consume
+      // it twice and silently lose its content.
+      const items = Array.from(value as Iterable<unknown>, prepare)
+      return {
+        value: items.map((item) => item.value),
+        processed: items.every((item) => item.processed),
+      }
+    }
+    return {
+      value,
+      processed:
+        value === null || typeof value !== 'object' || value instanceof Date,
+    }
+  }
   return ({ raw: strings }: TemplateStringsArray, ...values: unknown[]) => {
     const state: TemplateScanState = {
       context: 'data',
@@ -329,8 +354,13 @@ export function hypertext(
         if (!match) continue
         const index = +match[1]
         resolved[index] = true
+        const composed = prepare(values[index])
+        if (composed.processed) {
+          deferred.push([node, composed.value])
+          continue
+        }
         const fragment = document.createDocumentFragment()
-        appendComposedTemplateValue(fragment, values[index])
+        appendComposedTemplateValue(fragment, composed.value)
         node.replaceWith(fragment)
       }
 
@@ -353,6 +383,7 @@ export function hypertext(
         }
       }
     }
+    const deferred: Array<[Comment, unknown]> = []
     resolveMarkers(root)
 
     const unresolved = resolved.findIndex((value) => !value)
@@ -365,7 +396,14 @@ export function hypertext(
         'RocketTemplateInvalidComposition',
       )
     }
-    return postprocess(root as DocumentFragment)
+    const fragment = postprocess(root as DocumentFragment)
+    for (const [marker, value] of deferred) {
+      const composed = document.createDocumentFragment()
+      appendComposedTemplateValue(composed, value)
+      marker.replaceWith(composed)
+    }
+    for (const node of fragment.childNodes) produced.add(node)
+    return fragment
   }
 }
 
@@ -378,29 +416,20 @@ export const signalNameAttributes = new Set([
 ])
 
 const directSignalValuePlugins = new Set(['bind', 'indicator', 'ref'])
-const rootModifierPattern = /__root\b/g
 
 export const rocketDispatchActionName = 'dispatchRocket'
 export const rocketRefAttr = 'data-rocket-ref'
 
-const parseTemplateModifiers = (raw: string): Modifiers => {
-  const mods: Modifiers = new Map()
-  for (const rawModifier of raw.split('__').slice(1)) {
-    const [name, ...values] = rawModifier.split('.')
-    mods.set(name, new Set(values))
-  }
-  return mods
-}
-
 const toRocketRefName = (raw: string) => {
   const name = raw.split('__', 1)[0]
-  return modifyCasing(name, parseTemplateModifiers(raw))
+  return modifyCasing(name, parseAttributeKey(raw).mods)
 }
 
 // Convert Rocket-authored expressions into plain Datastar expressions so the engine can evaluate local `$$...` state, loop aliases, and local actions.
 const rewriteDatastarExpression = (
   value: string,
   scope: TaggedLiteralScope,
+  onScopedSignal?: () => void,
 ): string => {
   const { signalPathBase, localSignals = {} } = scope
   const aliases = Object.keys(localSignals).sort(
@@ -428,10 +457,13 @@ const rewriteDatastarExpression = (
         return template.replace(
           /\$\{((?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\/(?:\\.|[^/\\])+\/[dgimsuvy]*|\{(?:[^{}]|\{[^{}]*\})*\}|[^{}])*)\}/g,
           (_, expression: string) =>
-            `\${${rewriteDatastarExpression(expression, scope)}}`,
+            `\${${rewriteDatastarExpression(expression, scope, onScopedSignal)}}`,
         )
       }
-      if (signal) return `$.${signalPathBase}.${signal}`
+      if (signal) {
+        onScopedSignal?.()
+        return `$.${signalPathBase}.${signal}`
+      }
       if (action) {
         return action === rocketDispatchActionName
           ? match
@@ -442,6 +474,20 @@ const rewriteDatastarExpression = (
   )
 }
 
+// Use the same literal-aware rules for pre-upgrade guards and actual scoping.
+export const hasRocketScopedExpression = (value: string): boolean => {
+  let found = false
+  rewriteDatastarExpression(value, { signalPathBase: '' }, () => {
+    found = true
+  })
+  return found
+}
+
+// Attribute names are case-insensitive in HTML. Datastar's default camel casing
+// restores these escaped capitals without changing the logical Rocket path.
+export const encodeSignalKey = (path: string) =>
+  path.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+
 // Re-scope Rocket aliases like `$$count`, loop locals, and `@foo(...)` into the concrete signal/action paths Datastar executes for this subtree instance.
 export const rewriteDataAttributes = (
   root: ParentNode,
@@ -449,43 +495,38 @@ export const rewriteDataAttributes = (
 ) => {
   if (!scope) return
   const { signalPathBase, localSignals = {} } = scope
+  const scopedBase = encodeSignalKey(signalPathBase)
+  const signalsAttr = aliasify('signals')
   const nodes =
     root instanceof Element
       ? [root, ...root.querySelectorAll('*')]
       : [...root.children, ...root.querySelectorAll('*')]
   for (const node of nodes) {
     for (const attr of [...node.attributes]) {
-      if (attr.name === 'data-signals') {
-        if (node.hasAttribute(`data-signals:${signalPathBase}`)) {
+      if (!attr.name.startsWith('data-')) continue
+      const attrBody = unaliasify(attr.name.slice(5))
+      if (!attrBody) continue
+      const { pluginName, key: signalKey, mods } = parseAttributeKey(attrBody)
+      // Keep __root in the DOM so later scope passes and clones retain intent.
+      if (signalNameAttributes.has(pluginName) && mods.has('root')) {
+        if (
+          signalKey !== undefined ||
+          !directSignalValuePlugins.has(pluginName)
+        ) {
+          const nextValue = rewriteDatastarExpression(attr.value, scope)
+          if (nextValue !== attr.value) node.setAttribute(attr.name, nextValue)
+        }
+        continue
+      }
+      if (attr.name === signalsAttr) {
+        if (node.hasAttribute(`${signalsAttr}:${scopedBase}`)) {
           node.removeAttribute(attr.name)
           continue
         }
         node.removeAttribute(attr.name)
-        node.setAttribute(`data-signals:${signalPathBase}`, attr.value)
+        node.setAttribute(`${signalsAttr}:${scopedBase}`, attr.value)
         continue
       }
-      if (attr.name.startsWith('data-signals:')) {
-        const signalName = attr.name.slice('data-signals:'.length)
-        if (
-          signalName === signalPathBase ||
-          signalName.startsWith(`${signalPathBase}.`)
-        ) {
-          continue
-        }
-        node.removeAttribute(attr.name)
-        node.setAttribute(
-          `data-signals:${signalPathBase}.${signalName}`,
-          attr.value,
-        )
-        continue
-      }
-      if (!attr.name.startsWith('data-')) continue
-      const attrBody = attr.name.slice('data-'.length)
-      const colonIndexInBody = attrBody.indexOf(':')
-      const pluginSegment =
-        colonIndexInBody === -1 ? attrBody : attrBody.slice(0, colonIndexInBody)
-      const attrBodyWithoutMods = pluginSegment.split('__', 1)[0]
-      const pluginName = attrBodyWithoutMods.split(':', 1)[0]
       if (pluginName === 'ref') {
         const colonIndex = attr.name.indexOf(':')
         const refName =
@@ -503,43 +544,10 @@ export const rewriteDataAttributes = (
         if (colonIndex !== -1) {
           const keyWithMods = attr.name.slice(colonIndex + 1)
           const key = keyWithMods.split('__', 1)[0]
-          const usesRoot = keyWithMods.includes('__root')
-          if (usesRoot) {
-            const nextValue = rewriteDatastarExpression(attr.value, scope)
-            const nextName = `${attr.name
-              .slice(0, colonIndex + 1)
-              .replace(
-                rootModifierPattern,
-                '',
-              )}${keyWithMods.replace(rootModifierPattern, '')}`
-            if (nextName !== attr.name) {
-              node.removeAttribute(attr.name)
-              node.setAttribute(nextName, nextValue)
-            } else if (nextValue !== attr.value) {
-              node.setAttribute(attr.name, nextValue)
-            }
-            continue
-          }
-          const localSignal = localSignals[key]
-          if (localSignal) {
-            const nextValue = rewriteDatastarExpression(attr.value, scope)
-            if (
-              attr.name !==
-              `${attr.name.slice(0, colonIndex + 1)}${localSignal}`
-            ) {
-              node.removeAttribute(attr.name)
-              node.setAttribute(
-                `${attr.name.slice(0, colonIndex + 1)}${localSignal}${keyWithMods.slice(key.length)}`,
-                nextValue,
-              )
-            } else if (nextValue !== attr.value) {
-              node.setAttribute(attr.name, nextValue)
-            }
-            continue
-          }
-          const scopedKeyWithMods = key.startsWith(`${signalPathBase}.`)
+          const scoped = key === scopedBase || key.startsWith(`${scopedBase}.`)
+          const scopedKeyWithMods = scoped
             ? keyWithMods
-            : keyWithMods.replace(key, `${signalPathBase}.${key}`)
+            : `${encodeSignalKey(localSignals[key] ?? `${signalPathBase}.${modifyCasing(key, mods)}`)}${keyWithMods.slice(key.length).replace(/__case(?:\.[^_]+)*/g, '')}`
           const nextValue = rewriteDatastarExpression(attr.value, scope)
           if (scopedKeyWithMods !== keyWithMods) {
             node.removeAttribute(attr.name)
@@ -553,15 +561,6 @@ export const rewriteDataAttributes = (
           continue
         }
         if (directSignalValuePlugins.has(pluginName)) {
-          const usesRoot = attrBody.includes('__root')
-          if (usesRoot) {
-            const nextName = attr.name.replace(rootModifierPattern, '')
-            if (nextName !== attr.name) {
-              node.removeAttribute(attr.name)
-              node.setAttribute(nextName, attr.value)
-            }
-            continue
-          }
           if (pluginName === 'ref' && attr.value) {
             if (
               attr.value === signalPathBase ||

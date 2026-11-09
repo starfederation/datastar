@@ -266,6 +266,7 @@ type ResponseOverrides =
       mode?: string
       namespace?: string
       useViewTransition?: boolean
+      viewTransitionSelector?: string
     }
   | {
       onlyIfMissing?: boolean
@@ -504,6 +505,7 @@ const fetchEventSource = (
     }
 
     const onVisibilityChange = () => {
+      clearTimeout(retryTimer)
       curRequestController.abort()
       if (!DOCUMENT.hidden) {
         rebuildAndRetry()
@@ -604,10 +606,6 @@ const fetchEventSource = (
           return
         }
 
-        // on successful connection, reset the retry logic
-        retries = 0
-        retryInterval = baseRetryInterval
-
         const ct = response.headers.get('Content-Type')
         if (ct?.includes('text/html')) {
           return await dispatchNonSSE(
@@ -619,6 +617,7 @@ const fetchEventSource = (
             'mode',
             'namespace',
             'useViewTransition',
+            'viewTransitionSelector',
           )
         }
 
@@ -672,6 +671,11 @@ const fetchEventSource = (
             ),
           ),
         )
+        if (inputSignal!.aborted || curRequestSignal.aborted) return
+
+        // A completed SSE stream can restore the initial wait, but it does not
+        // start a new retry budget for this action.
+        retryInterval = baseRetryInterval
 
         if (retry === 'always' && !isRedirectStatus) {
           retryRequest()
@@ -680,8 +684,13 @@ const fetchEventSource = (
 
         dispose()
         resolve()
-      } catch {
+      } catch (err) {
         if (!curRequestSignal.aborted) {
+          if (retry === 'never') {
+            dispose()
+            reject(err)
+            return
+          }
           try {
             retryRequest()
           } catch (innerErr) {

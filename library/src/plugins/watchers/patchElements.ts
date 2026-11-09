@@ -15,6 +15,9 @@ import { isHTMLOrSVG } from '@utils/dom'
 import { aliasify, isStringTrue } from '@utils/text'
 import { supportsViewTransitions } from '@utils/view-transitions'
 
+// Use a dedicate function because named form controls can shadow the form’s `id` property.
+const getElementId = (el: Element): string => el.getAttribute('id') ?? ''
+
 const PATCH_MODES = [
   'remove',
   'outer',
@@ -46,7 +49,9 @@ watcher({
       typeof args.namespace === 'string' ? args.namespace : 'html'
     const useViewTransition = isStringTrue(args.useViewTransition)
     const viewTransitionSelector =
-      typeof args.viewTransitionSelector === 'string' ? args.viewTransitionSelector : ''
+      typeof args.viewTransitionSelector === 'string'
+        ? args.viewTransitionSelector
+        : ''
     const elements = args.elements
 
     if (!PATCH_MODES.includes(mode as PatchElementsMode)) {
@@ -77,7 +82,9 @@ watcher({
         }
       }
       if (supportsViewTransitions(target)) {
-        target.startViewTransition(() => onPatchElements(ctx, patchElementsArgs))
+        target.startViewTransition(() =>
+          onPatchElements(ctx, patchElementsArgs),
+        )
       } else {
         onPatchElements(ctx, patchElementsArgs)
       }
@@ -161,10 +168,10 @@ const onPatchElements = (
       } else if (child instanceof HTMLHeadElement) {
         target = DOCUMENT.head
       } else {
-        target = DOCUMENT.getElementById(child.id)!
+        target = DOCUMENT.getElementById(getElementId(child))!
         if (!target) {
           console.warn(error('PatchElementsNoTargetsFound'), {
-            element: { id: child.id },
+            element: { id: getElementId(child) },
           })
           continue
         }
@@ -253,7 +260,9 @@ const applyToTargets = (
           if (consume && used) {
             break
           }
-          const nextNode = consume ? element : (element.cloneNode(true) as Element)
+          const nextNode = consume
+            ? element
+            : (element.cloneNode(true) as Element)
           morph(target, nextNode, mode)
           execute(target)
           const scopeHost = target.closest('[data-scope-children]')
@@ -279,12 +288,40 @@ const applyToTargets = (
   }
 }
 
-const ctxIdMap = new Map<Node, Set<string>>()
-const ctxPersistentIds = new Set<string>()
-const oldIdTagNameMap = new Map<string, string>()
-const duplicateIds = new Set<string>()
-const ctxPantry = DOCUMENT.createElement('div')
-ctxPantry.hidden = true
+type MorphContext = {
+  idMap: Map<Node, Set<string>>
+  idElements: Map<string, Element>
+  persistentIds: Set<string>
+  pantry: HTMLDivElement
+  ownContentRoot?: Element | ShadowRoot
+}
+const morphOwnership = new WeakMap<Element, boolean | 'children'>()
+export const setMorphOwnership = (
+  host: Element,
+  ownership: boolean | 'children',
+) => {
+  if (ownership) morphOwnership.set(host, ownership)
+  else morphOwnership.delete(host)
+}
+// Morphing is synchronous, so helpers can share one active context without
+// passing it through every recursive call. A nested morph replaces the whole
+// context, then restores the outer morph's maps and pantry in `finally`.
+let ctx: MorphContext
+
+const hasOwnedAncestor = (
+  node: Element | ShadowRoot,
+  ownContentRoot?: Element | ShadowRoot,
+) => {
+  for (
+    let ancestor = node.parentElement;
+    ancestor;
+    ancestor = ancestor.parentElement
+  ) {
+    if (ancestor === ownContentRoot) return false
+    if (morphOwnership.get(ancestor)) return true
+  }
+  return false
+}
 
 const aliasedIgnoreMorph = aliasify('ignore-morph')
 const aliasedIgnoreMorphAttr = `[${aliasedIgnoreMorph}]`
@@ -292,68 +329,90 @@ export const morph = (
   oldElt: Element | ShadowRoot,
   newContent: DocumentFragment | Element,
   mode: 'outer' | 'inner' = 'outer',
+  ownContent = false,
 ): void => {
+  if (!ownContent) {
+    const ownership = morphOwnership.get(oldElt as Element)
+    if (ownership && mode === 'inner') return
+    if (hasOwnedAncestor(oldElt)) return
+  }
   if (
     (isHTMLOrSVG(oldElt) &&
       isHTMLOrSVG(newContent) &&
       oldElt.hasAttribute(aliasedIgnoreMorph) &&
       newContent.hasAttribute(aliasedIgnoreMorph)) ||
-    oldElt.parentElement?.closest(aliasedIgnoreMorphAttr)
+    (!ownContent && oldElt.parentElement?.closest(aliasedIgnoreMorphAttr))
   ) {
     return
   }
 
   const normalizedElt = DOCUMENT.createElement('div')
   normalizedElt.append(newContent)
-  DOCUMENT.body.insertAdjacentElement('afterend', ctxPantry)
+  const outerCtx = ctx
+  ctx = {
+    idMap: new Map(),
+    idElements: new Map(),
+    persistentIds: new Set(),
+    pantry: DOCUMENT.createElement('div'),
+    ownContentRoot: ownContent ? oldElt : undefined,
+  }
+  ctx.pantry.hidden = true
+  DOCUMENT.body.insertAdjacentElement('afterend', ctx.pantry)
 
-  // Computes the set of IDs that persist between the two contents excluding duplicates
-  const oldIdElements = oldElt.querySelectorAll('[id]')
-  for (const { id, tagName } of oldIdElements) {
-    if (oldIdTagNameMap.has(id)) {
-      duplicateIds.add(id)
-    } else {
-      oldIdTagNameMap.set(id, tagName)
+  try {
+    const duplicateIds = new Set<string>()
+
+    // Computes the set of IDs that persist between the two contents excluding duplicates
+    const oldIdElements = [...oldElt.querySelectorAll('[id]')].filter(
+      (el) => !hasOwnedAncestor(el, ctx.ownContentRoot),
+    )
+    for (const elt of oldIdElements) {
+      const id = getElementId(elt)
+      if (ctx.idElements.has(id)) {
+        duplicateIds.add(id)
+      } else if (id) {
+        ctx.idElements.set(id, elt)
+      }
     }
-  }
-  if (oldElt instanceof Element && oldElt.id) {
-    if (oldIdTagNameMap.has(oldElt.id)) {
-      duplicateIds.add(oldElt.id)
-    } else {
-      oldIdTagNameMap.set(oldElt.id, oldElt.tagName)
+    const oldId = oldElt instanceof Element ? getElementId(oldElt) : ''
+    if (oldId) {
+      if (ctx.idElements.has(oldId)) {
+        duplicateIds.add(oldId)
+      } else {
+        ctx.idElements.set(oldId, oldElt as Element)
+      }
     }
-  }
 
-  ctxPersistentIds.clear()
-  const newIdElements = normalizedElt.querySelectorAll('[id]')
-  for (const { id, tagName } of newIdElements) {
-    if (ctxPersistentIds.has(id)) {
-      duplicateIds.add(id)
-    } else if (oldIdTagNameMap.get(id) === tagName) {
-      ctxPersistentIds.add(id)
+    const newIdElements = [...normalizedElt.querySelectorAll('[id]')].filter(
+      (el) => !hasOwnedAncestor(el),
+    )
+    for (const elt of newIdElements) {
+      const id = getElementId(elt)
+      if (ctx.persistentIds.has(id)) {
+        duplicateIds.add(id)
+      } else if (ctx.idElements.get(id)?.tagName === elt.tagName) {
+        ctx.persistentIds.add(id)
+      }
     }
+
+    for (const id of duplicateIds) {
+      ctx.persistentIds.delete(id)
+    }
+
+    const parent = mode === 'outer' ? oldElt.parentElement! : oldElt
+    populateIdMapWithTree(parent, oldIdElements)
+    populateIdMapWithTree(normalizedElt, newIdElements)
+
+    morphChildren(
+      parent,
+      normalizedElt,
+      mode === 'outer' ? oldElt : null,
+      oldElt.nextSibling,
+    )
+  } finally {
+    ctx.pantry.remove()
+    ctx = outerCtx
   }
-
-  for (const id of duplicateIds) {
-    ctxPersistentIds.delete(id)
-  }
-
-  oldIdTagNameMap.clear()
-  duplicateIds.clear()
-  ctxIdMap.clear()
-
-  const parent = mode === 'outer' ? oldElt.parentElement! : oldElt
-  populateIdMapWithTree(parent, oldIdElements)
-  populateIdMapWithTree(normalizedElt, newIdElements)
-
-  morphChildren(
-    parent,
-    normalizedElt,
-    mode === 'outer' ? oldElt : null,
-    oldElt.nextSibling,
-  )
-
-  ctxPantry.remove()
 }
 
 // This is the core algorithm for matching up children.
@@ -400,10 +459,12 @@ const morphChildren = (
     }
 
     // if the matching node is elsewhere in the original content
-    if (newChild instanceof Element && ctxPersistentIds.has(newChild.id)) {
+    const newChildId = newChild instanceof Element ? getElementId(newChild) : ''
+    if (ctx.persistentIds.has(newChildId)) {
       // move it and all its children here and morph, will always be found
-      // Search for an element by ID within the document and pantry, and move it using moveBefore.
-      const movedChild = DOCUMENT.getElementById(newChild.id) as Element
+      // Use the element retained by this morph so a nested morph cannot take
+      // a node temporarily stored by another morph.
+      const movedChild = ctx.idElements.get(newChildId)!
 
       // Removes an element from its ancestors' ID maps.
       // This is needed when an element is moved from the "future" via `moveBeforeId`.
@@ -411,11 +472,11 @@ const morphChildren = (
       // preventing their removal hooks from being called.
       let current = movedChild
       while ((current = current.parentNode as Element)) {
-        const idSet = ctxIdMap.get(current)
+        const idSet = ctx.idMap.get(current)
         if (idSet) {
-          idSet.delete(newChild.id)
+          idSet.delete(newChildId)
           if (!idSet.size) {
-            ctxIdMap.delete(current)
+            ctx.idMap.delete(current)
           }
         }
       }
@@ -428,7 +489,7 @@ const morphChildren = (
 
     // This performs the action of inserting a new node while handling situations where the node contains
     // elements with persistent IDs and possible state info we can still preserve by moving in and then morphing
-    if (ctxIdMap.has(newChild)) {
+    if (ctx.idMap.has(newChild)) {
       // node has children with IDs with possible state so create a dummy elt of same type and apply full morph algorithm
       const namespaceURI = (newChild as Element).namespaceURI
       const tagName = (newChild as Element).tagName
@@ -469,15 +530,15 @@ const findBestMatch = (
   let displaceMatchCount = 0
 
   // Max ID matches we are willing to displace in our search
-  const nodeMatchCount = ctxIdMap.get(node)?.size || 0
+  const nodeMatchCount = ctx.idMap.get(node)?.size || 0
 
   let cursor = startPoint
   while (cursor && cursor !== endPoint) {
     // soft matching is a prerequisite for id set matching
     if (isSoftMatch(cursor, node)) {
       let isIdSetMatch = false
-      const oldSet = ctxIdMap.get(cursor)
-      const newSet = ctxIdMap.get(node)
+      const oldSet = ctx.idMap.get(cursor)
+      const newSet = ctx.idMap.get(node)
 
       if (newSet && oldSet) {
         for (const id of oldSet) {
@@ -498,7 +559,7 @@ const findBestMatch = (
 
       // we haven’t yet saved a soft match fallback
       // the current soft match will hard match something else in the future, leave it
-      if (!bestMatch && !ctxIdMap.has(cursor)) {
+      if (!bestMatch && !ctx.idMap.has(cursor)) {
         // optimization: if node can't id set match, we can just return the soft match immediately
         if (!nodeMatchCount) {
           return cursor
@@ -509,7 +570,7 @@ const findBestMatch = (
     }
 
     // check for IDs we may be displaced when matching
-    displaceMatchCount += ctxIdMap.get(cursor)?.size || 0
+    displaceMatchCount += ctx.idMap.get(cursor)?.size || 0
     if (displaceMatchCount > nodeMatchCount) {
       // if we are going to displace more IDs than the node contains then
       // we do not have a good candidate for an ID match, so return
@@ -536,24 +597,30 @@ const findBestMatch = (
   return bestMatch || null
 }
 
-// ok to cast: if one is not element, `id` and `tagName` will be null and we'll just compare that.
+// Non-element nodes have no `tagName`; only elements need an ID comparison.
 const isSoftMatch = (oldNode: Node, newNode: Node): boolean =>
   oldNode.nodeType === newNode.nodeType &&
   (oldNode as Element).tagName === (newNode as Element).tagName &&
-  // If oldElt has an `id` with possible state and it doesn’t match newElt.id then avoid morphing.
+  // If oldElt has an `id` with possible state and it doesn’t match newElt's ID then avoid morphing.
   // We'll still match an anonymous node with an IDed newElt, though, because if it got this far,
   // its not persistent, and new nodes can't have any hidden state.
-  (!(oldNode as Element).id ||
-    (oldNode as Element).id === (newNode as Element).id)
+  (oldNode.nodeType !== 1 ||
+    !getElementId(oldNode as Element) ||
+    getElementId(oldNode as Element) === getElementId(newNode as Element))
 
 // Gets rid of an unwanted DOM node; strategy depends on nature of its reuse:
 // - Persistent nodes will be moved to the pantry for later reuse
 // - Other nodes will have their hooks called, and then are removed
 const removeNode = (node: Node): void => {
+  // Don't morph the pantry out of existence when morphing the document root.
+  if (node === ctx.pantry) {
+    return
+  }
+
   // are we going to id set match this later?
-  ctxIdMap.has(node)
+  ctx.idMap.has(node)
     ? // skip callbacks and move to pantry
-      moveBefore(ctxPantry, node, null)
+      moveBefore(ctx.pantry, node, null)
     : // remove for realsies
       node.parentNode?.removeChild(node)
 }
@@ -566,8 +633,13 @@ const moveBefore = (parentNode: Node, node: Node, after: Node | null): void => {
     const moveableParent = parentNode as Node & {
       moveBefore: (node: Node, child: Node | null) => Node
     }
-    moveableParent.moveBefore(node, after)
-    return
+    try {
+      moveableParent.moveBefore(node, after)
+      return
+    } catch {
+      // moveBefore throws when the nodes do not share a root, such as when
+      // morphing a detached subtree. Fall back to the traditional move.
+    }
   }
   parentNode.insertBefore(node, after)
 }
@@ -587,7 +659,11 @@ const morphNode = (
   if (type === 1 /* element type */) {
     const oldElt = oldNode as Element
     const newElt = newNode as Element
+    const ownership =
+      oldElt === ctx.ownContentRoot ? false : morphOwnership.get(oldElt)
+    if (ownership === true) return oldNode
     const shouldScopeChildren = oldElt.hasAttribute('data-scope-children')
+    const rocketHost = oldElt.hasAttribute('data-rocket-host')
     if (
       oldElt.hasAttribute(aliasedIgnoreMorph) &&
       newElt.hasAttribute(aliasedIgnoreMorph)
@@ -692,6 +768,11 @@ const morphNode = (
       oldElt.setAttribute('data-scope-children', '')
     }
 
+    if (rocketHost && !oldElt.hasAttribute('data-rocket-host')) {
+      oldElt.setAttribute('data-rocket-host', '')
+    }
+    if (ownership === 'children') return oldNode
+
     if (
       oldElt instanceof HTMLTemplateElement &&
       newElt instanceof HTMLTemplateElement
@@ -726,17 +807,18 @@ const populateIdMapWithTree = (
   elements: Iterable<Element>,
 ): void => {
   for (const elt of elements) {
-    if (ctxPersistentIds.has(elt.id)) {
+    const id = getElementId(elt)
+    if (ctx.persistentIds.has(id)) {
       let current: Element | null = elt
       // walk up the parent hierarchy of that element, adding the ID of element to the parent's ID set
       while (current && current !== root) {
-        let idSet = ctxIdMap.get(current)
+        let idSet = ctx.idMap.get(current)
         // if the ID set doesn’t exist, create it and insert it in the map
         if (!idSet) {
           idSet = new Set()
-          ctxIdMap.set(current, idSet)
+          ctx.idMap.set(current, idSet)
         }
-        idSet.add(elt.id)
+        idSet.add(id)
         current = current.parentElement
       }
     }

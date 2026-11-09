@@ -264,6 +264,7 @@ export type SetupEmitCancellable = {
 export type PropObserver<Props extends Record<string, any>> = (() => void) | ((props: Props, changes: Partial<Props>) => void);
 export type SetupContext<Props extends Record<string, any>> = {
 	props: Props;
+	readonly internals: ElementInternals;
 	$: Record<string, any>;
 	$$: SetupSignal;
 	effect(fn: () => void): () => void;
@@ -310,6 +311,14 @@ export type RocketDefinition<Defs extends PropDefs = PropDefs, Refs extends RefC
 	onFirstRender?: (context: FirstUpdateContext<InferProps<Defs>, Refs>) => void;
 	render?: RocketRender<InferProps<Defs>>;
 	mode?: "open" | "closed" | "light";
+	ignoredByMorph?: boolean | "children";
+	formAssociated?: boolean;
+	delegatesFocus?: boolean;
+	formValue?: false | ((context: SetupContext<InferProps<Defs>>) => string | File | FormData | null);
+	onFormAssociated?: (context: SetupContext<InferProps<Defs>>, form: HTMLFormElement | null) => void;
+	onFormReset?: (context: SetupContext<InferProps<Defs>>) => void;
+	onFormDisabled?: (context: SetupContext<InferProps<Defs>>, disabled: boolean) => void;
+	onFormStateRestore?: (context: SetupContext<InferProps<Defs>>, state: string | File | FormData | null, mode: "restore" | "autocomplete") => void;
 	renderOnPropChange?: boolean | ((context: {
 		host: RocketHostWithProps<InferProps<Defs>>;
 		props: InferProps<Defs>;

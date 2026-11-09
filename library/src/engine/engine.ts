@@ -70,6 +70,19 @@ export const attribute = <R extends Requirement, B extends boolean>(
   }
 }
 
+// Rocket can inspect bindings before the queued plugins have been installed.
+export const hasAttributePlugin = (name: string): boolean =>
+  attributePlugins.has(name) ||
+  queuedAttributes.some((plugin) => plugin.name === name)
+
+// An optional integration can prepare a subtree before its bindings execute.
+let prepareBindings: ((root: ParentNode, deep: boolean) => void) | undefined
+export const setBindingPreprocessor = (
+  prepare: (root: ParentNode, deep: boolean) => void,
+): void => {
+  prepareBindings = prepare
+}
+
 export const action = <T>(plugin: ActionPlugin<T>): void => {
   actionPlugins.set(plugin.name, plugin)
 }
@@ -99,16 +112,32 @@ export const watcher = (plugin: WatcherPlugin): void => {
 }
 
 const cleanupEls = (els: Iterable<HTMLOrSVG>): void => {
+  const errors: unknown[] = []
   for (const el of els) {
     const elCleanups = removals.get(el)
     if (elCleanups && removals.delete(el)) {
       for (const attrCleanups of elCleanups.values()) {
         for (const cleanup of attrCleanups.values()) {
-          cleanup()
+          try {
+            cleanup()
+          } catch (error) {
+            errors.push(error)
+          }
         }
       }
     }
   }
+  if (errors.length) {
+    throw new AggregateError(errors, 'Datastar attribute cleanup failed')
+  }
+}
+
+// A document removal record cannot see the attributes inside a shadow root.
+export const cleanupTree = (root: HTMLOrSVG | ShadowRoot): void => {
+  cleanupEls([
+    ...(isHTMLOrSVG(root) ? [root] : []),
+    ...root.querySelectorAll<HTMLOrSVG>('*'),
+  ])
 }
 
 const aliasedIgnore = aliasify('ignore')
@@ -136,6 +165,13 @@ const applyEls = (els: Iterable<HTMLOrSVG>, onlyNew?: boolean): void => {
 }
 
 const observe = (mutations: MutationRecord[]) => {
+  // A descendant can appear in both its parent's addition and its own record.
+  const addedApplied = new Set<HTMLOrSVG>()
+  const applyAddedOnce = (el: HTMLOrSVG) => {
+    if (addedApplied.has(el)) return
+    addedApplied.add(el)
+    applyMissing(el, false)
+  }
   for (const {
     target,
     type,
@@ -143,25 +179,45 @@ const observe = (mutations: MutationRecord[]) => {
     addedNodes,
     removedNodes,
   } of mutations) {
+    // A forgotten component root can still have queued observer records. Do not
+    // recreate its bindings after teardown; explicitly observed detached roots
+    // continue to work until their owner releases them.
+    let activeRoot = target.isConnected
+    // An explicitly observed subtree can sit inside an unobserved detached
+    // parent, so its tree root alone does not identify the registration.
+    for (
+      let ancestor: Node | null = target;
+      !activeRoot && ancestor;
+      ancestor = ancestor.parentNode
+    ) {
+      activeRoot = observedRoots.has(ancestor as HTMLOrSVG | ShadowRoot)
+    }
     if (type === 'childList') {
       for (const node of removedNodes) {
         if (isHTMLOrSVG(node)) {
           cleanupEls([node])
           cleanupEls(node.querySelectorAll<HTMLOrSVG>('*'))
+          addedApplied.delete(node)
+          for (const child of node.querySelectorAll<HTMLOrSVG>('*')) {
+            addedApplied.delete(child)
+          }
         }
       }
 
+      if (!activeRoot) continue
       for (const node of addedNodes) {
         if (isHTMLOrSVG(node)) {
-          applyEls([node])
-          applyEls(node.querySelectorAll<HTMLOrSVG>('*'))
+          applyAddedOnce(node)
+          for (const child of node.querySelectorAll<HTMLOrSVG>('*')) {
+            applyAddedOnce(child)
+          }
         }
       }
     } else if (
+      activeRoot &&
       type === 'attributes' &&
       attributeName!.startsWith('data-') &&
-      isHTMLOrSVG(target) &&
-      !shouldIgnore(target)
+      isHTMLOrSVG(target)
     ) {
       // skip over 'data-'
       const rawAttrKey = attributeName!.slice(5)
@@ -173,13 +229,14 @@ const observe = (mutations: MutationRecord[]) => {
         if (elCleanups) {
           const attrCleanups = elCleanups.get(key)
           if (attrCleanups) {
-            for (const cleanup of attrCleanups.values()) {
-              cleanup()
-            }
             elCleanups.delete(key)
+            runAttributeCleanups(attrCleanups)
           }
         }
       } else {
+        if (shouldIgnore(target)) continue
+        prepareBindings?.(target, false)
+        if (shouldIgnore(target)) continue
         applyAttributePlugin(target, rawAttrKey, value)
       }
     }
@@ -221,6 +278,7 @@ const applyQueued = (
   root: HTMLOrSVG | ShadowRoot = DOCUMENT.documentElement,
   observeRoot = true,
 ): void => {
+  prepareBindings?.(root, true)
   if (isHTMLOrSVG(root)) {
     applyEls([root], true)
   }
@@ -241,6 +299,7 @@ export const apply = (
   root: HTMLOrSVG | ShadowRoot = DOCUMENT.documentElement,
   observeRoot = true,
 ): void => {
+  prepareBindings?.(root, true)
   if (isHTMLOrSVG(root)) {
     applyEls([root])
   }
@@ -257,8 +316,44 @@ export const apply = (
   }
 }
 
+// Root registration belongs to the component's connected lifetime.
+export const forgetRoot = (root: HTMLOrSVG | ShadowRoot): void => {
+  if (root !== DOCUMENT.documentElement) observedRoots.delete(root)
+}
+
+// Bind projected content that the initial document pass was asked to skip.
+// Scoping may already have queued attribute application; do not initialize it twice.
+export const applyMissing = (root: HTMLOrSVG, deep = true): void => {
+  prepareBindings?.(root, deep)
+  const elements = deep
+    ? [root, ...root.querySelectorAll<HTMLOrSVG>('*')]
+    : [root]
+  for (const el of elements) {
+    if (shouldIgnore(el)) continue
+    for (const attr of Array.from(el.attributes)) {
+      if (!attr.name.startsWith('data-')) continue
+      const rawKey = attr.name.slice(5)
+      const key = unaliasify(rawKey)
+      if (key && !removals.get(el)?.has(key)) {
+        applyAttributePlugin(el, rawKey, attr.value)
+      }
+    }
+  }
+}
+
 export const applyElement = (el: HTMLOrSVG, onlyNew = false): void => {
+  prepareBindings?.(el, false)
   applyEls([el], onlyNew)
+}
+
+const runAttributeCleanups = (cleanups: Map<string, () => void>): void => {
+  for (const cleanup of cleanups.values()) {
+    try {
+      cleanup()
+    } catch (error) {
+      reportError(error)
+    }
+  }
 }
 
 const applyAttributePlugin = (
@@ -267,105 +362,109 @@ const applyAttributePlugin = (
   value: string,
   onlyNew?: boolean,
 ): void => {
-  const rawKey = unaliasify(attrKey)
-  if (!rawKey) return
-  const { pluginName, key, mods } = parseAttributeKey(rawKey)
-  const plugin = attributePlugins.get(pluginName)
-  const shouldApply =
-    (!onlyNew || queuedAttributeNames.has(pluginName)) && !!plugin
-  if (shouldApply) {
-    const ctx = {
-      el,
-      rawKey,
-      mods,
-      error: createError.bind(0, {
-        plugin: { type: 'attribute', name: plugin.name },
-        element: { id: el.id, tag: el.tagName },
-        expression: { rawKey, key, value },
-      }),
-      key,
-      value,
-      loadedPluginNames: {
-        actions: new Set(actionPlugins.keys()),
-        attributes: new Set(attributePlugins.keys()),
-      },
-      rx: undefined,
-    } as AttributeContext
+  let pendingCleanups: Map<string, () => void> | undefined
+  try {
+    const rawKey = unaliasify(attrKey)
+    if (!rawKey) return
+    const { pluginName, key, mods } = parseAttributeKey(rawKey)
+    const plugin = attributePlugins.get(pluginName)
+    const shouldApply =
+      (!onlyNew || queuedAttributeNames.has(pluginName)) && !!plugin
+    if (shouldApply) {
+      const ctx = {
+        el,
+        rawKey,
+        mods,
+        error: createError.bind(0, {
+          plugin: { type: 'attribute', name: plugin.name },
+          element: { id: el.id, tag: el.tagName },
+          expression: { rawKey, key, value },
+        }),
+        key,
+        value,
+        loadedPluginNames: {
+          actions: new Set(actionPlugins.keys()),
+          attributes: new Set(attributePlugins.keys()),
+        },
+        rx: undefined,
+      } as AttributeContext
 
-    const keyReq =
-      (plugin.requirement &&
-        (typeof plugin.requirement === 'string'
-          ? plugin.requirement
-          : plugin.requirement.key)) ||
-      'allowed'
-    const valueReq =
-      (plugin.requirement &&
-        (typeof plugin.requirement === 'string'
-          ? plugin.requirement
-          : plugin.requirement.value)) ||
-      'allowed'
+      const keyReq =
+        (plugin.requirement &&
+          (typeof plugin.requirement === 'string'
+            ? plugin.requirement
+            : plugin.requirement.key)) ||
+        'allowed'
+      const valueReq =
+        (plugin.requirement &&
+          (typeof plugin.requirement === 'string'
+            ? plugin.requirement
+            : plugin.requirement.value)) ||
+        'allowed'
 
-    const keyProvided = key !== undefined && key !== null && key !== ''
-    const valueProvided = value !== undefined && value !== null && value !== ''
+      const keyProvided = key !== undefined && key !== null && key !== ''
+      const valueProvided =
+        value !== undefined && value !== null && value !== ''
 
-    if (keyProvided) {
-      if (keyReq === 'denied') {
-        throw ctx.error('KeyNotAllowed')
-      }
-    } else if (keyReq === 'must') {
-      throw ctx.error('KeyRequired')
-    }
-
-    if (valueProvided) {
-      if (valueReq === 'denied') {
-        throw ctx.error('ValueNotAllowed')
-      }
-    } else if (valueReq === 'must') {
-      throw ctx.error('ValueRequired')
-    }
-
-    if (keyReq === 'exclusive' || valueReq === 'exclusive') {
-      if (keyProvided && valueProvided) {
-        throw ctx.error('KeyAndValueProvided')
-      }
-      if (!keyProvided && !valueProvided) {
-        throw ctx.error('KeyOrValueRequired')
-      }
-    }
-
-    const cleanups = new Map<string, () => void>()
-    if (valueProvided) {
-      let cachedRx: GenRxFn
-      ctx.rx = (...args: any[]) => {
-        if (!cachedRx) {
-          cachedRx = genRx(value, {
-            returnsValue_: plugin.returnsValue,
-            argNames_: plugin.argNames,
-            cleanups_: cleanups,
-          })
+      if (keyProvided) {
+        if (keyReq === 'denied') {
+          throw ctx.error('KeyNotAllowed')
         }
-        return cachedRx(el, ...args)
+      } else if (keyReq === 'must') {
+        throw ctx.error('KeyRequired')
       }
-    }
 
-    const cleanup = plugin.apply(ctx)
-    if (cleanup) {
-      cleanups.set('attribute', cleanup)
-    }
+      if (valueProvided) {
+        if (valueReq === 'denied') {
+          throw ctx.error('ValueNotAllowed')
+        }
+      } else if (valueReq === 'must') {
+        throw ctx.error('ValueRequired')
+      }
 
-    let elCleanups = removals.get(el)
-    if (elCleanups) {
-      const attrCleanups = elCleanups.get(rawKey)
-      if (attrCleanups) {
-        for (const oldCleanup of attrCleanups.values()) {
-          oldCleanup()
+      if (keyReq === 'exclusive' || valueReq === 'exclusive') {
+        if (keyProvided && valueProvided) {
+          throw ctx.error('KeyAndValueProvided')
+        }
+        if (!keyProvided && !valueProvided) {
+          throw ctx.error('KeyOrValueRequired')
         }
       }
-    } else {
-      elCleanups = new Map()
-      removals.set(el, elCleanups)
+
+      const cleanups = new Map<string, () => void>()
+      pendingCleanups = cleanups
+      if (valueProvided) {
+        let cachedRx: GenRxFn
+        ctx.rx = (...args: any[]) => {
+          if (!cachedRx) {
+            cachedRx = genRx(value, {
+              returnsValue_: plugin.returnsValue,
+              argNames_: plugin.argNames,
+              cleanups_: cleanups,
+            })
+          }
+          return cachedRx(el, ...args)
+        }
+      }
+
+      const cleanup = plugin.apply(ctx)
+      if (cleanup) {
+        cleanups.set('attribute', cleanup)
+      }
+
+      let elCleanups = removals.get(el)
+      if (!elCleanups) {
+        elCleanups = new Map()
+        removals.set(el, elCleanups)
+      }
+      const previous = elCleanups.get(rawKey)
+      elCleanups.set(rawKey, cleanups)
+      pendingCleanups = undefined
+      if (previous) runAttributeCleanups(previous)
     }
-    elCleanups.set(rawKey, cleanups)
+  } catch (error) {
+    if (pendingCleanups) runAttributeCleanups(pendingCleanups)
+    reportError(error)
   }
 }
 
@@ -378,9 +477,7 @@ type GenRxOptions = {
 type GenRxFn = <T>(el: HTMLOrSVG, ...args: any[]) => T
 
 const signalPath = (name: string): string =>
-  name
-    .split('.')
-    .reduce((path, part) => `${path}['${part}']`, '$')
+  name.split('.').reduce((path, part) => `${path}['${part}']`, '$')
 
 export const genRx = (
   value: string,
@@ -390,8 +487,10 @@ export const genRx = (
     cleanups_: cleanups = new Map(),
   }: GenRxOptions = {},
 ): GenRxFn => {
-  let expr = ''
-  if (returnsValue) {
+  let expr = value.trim()
+  // A leading `return` marks an explicitly authored function body and bypasses
+  // statement splitting, allowing compiled expressions with nested constructs.
+  if (returnsValue && !/^return\s/.test(expr)) {
     // This regex allows Datastar expressions to support nested
     // regex and strings that contain ; without breaking.
     //
@@ -414,7 +513,7 @@ export const genRx = (
     // Optimized using non-capturing groups (?:...) to prevent unnecessary backtracking.
     const statementRe =
       /(?:\/(?:\\\/|[^/])*\/|"(?:\\"|[^"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|\(\s*(?:(?:function)\s*\(\s*\)|(?:\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm
-    const statements = value.trim().match(statementRe)
+    const statements = expr.match(statementRe)
     if (statements) {
       const lastIdx = statements.length - 1
       const last = statements[lastIdx].trim()
@@ -423,8 +522,6 @@ export const genRx = (
       }
       expr = statements.join(';\n')
     }
-  } else {
-    expr = value.trim()
   }
 
   // Replace signal references with bracket notation and action calls with the internal action dispatcher.
@@ -442,19 +539,22 @@ export const genRx = (
   //   $123            -> $['123']
   //   $foo.0.name     -> $['foo']['0']['name']
   //   @get('/foo')    -> __action("get",evt,'/foo')
-
-  // Skip replacements inside string/template literals.
-  // Template interpolation support rewrites `${...}` only when braces are non-nested.
+  // Match template literals whole so a closing backtick isn't mistaken for the
+  // start of another literal after processing an interpolation. Only rewrite
+  // references inside non-nested `${...}` expressions.
   expr = expr.replace(
-    /(?:"[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*'|`[^`\\$]*(?:(?:\\.|\$(?!\{))[^`\\$]*)*`)|\$\{([^{}]*)\}|\$(\w+(?:[.-]\w+)*)|@([A-Za-z_$][\w$]*)\(/g,
-    (match, interpolationExpr, signalName, actionName) => {
-      if (interpolationExpr !== undefined) {
-        return `\${${interpolationExpr
-          .replace(
-            /\$(\w+(?:[.-]\w+)*)/g,
-            (_: string, name: string) => signalPath(name),
-          )
-          .replace(/@([A-Za-z_$][\w$]*)\(/g, '__action("$1",evt,')}}`
+    /(?:"[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*'|`(?:\\.|[^`\\$]|\$(?!\{)|\$\{[^{}]*\})*`)|\$(\w+(?:[.-]\w+)*)|@([A-Za-z_$][\w$]*)\(/g,
+    (match, signalName, actionName) => {
+      if (match[0] === '`') {
+        return match.replace(
+          /\$\{([^{}]*)\}/g,
+          (_, expr) =>
+            `\${${expr
+              .replace(/\$(\w+(?:[.-]\w+)*)/g, (_: string, name: string) =>
+                signalPath(name),
+              )
+              .replace(/@([A-Za-z_$][\w$]*)\(/g, '__action("$1",evt,')}}`,
+        )
       }
       if (signalName) return signalPath(signalName)
       if (actionName) return `__action("${actionName}",evt,`

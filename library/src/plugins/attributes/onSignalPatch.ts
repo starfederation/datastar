@@ -37,30 +37,32 @@ attribute({
 
     let running = false
 
-    const callback: EventListener = modifyTiming(
-      (evt: CustomEvent<JSONPatch>) => {
+    const callback = modifyTiming(
+      (watched: JSONPatch) => {
         if (running) return
-        // Peek when getting the filtered signals because we don’t want to subscribe to them, we just want to know which ones are being patched.
-        startPeeking()
-        const watched = filtered(filters, evt.detail)
-        stopPeeking()
-        if (!isEmpty(watched)) {
-          running = true
-          beginBatch()
-          try {
-            rx(watched)
-          } finally {
-            endBatch()
-            running = false
-          }
+        running = true
+        beginBatch()
+        try {
+          rx(watched)
+        } finally {
+          endBatch()
+          running = false
         }
       },
       mods,
     )
 
-    DOCUMENT.addEventListener(DATASTAR_SIGNAL_PATCH_EVENT, callback)
+    const listener = ((evt: CustomEvent<JSONPatch>) => {
+      // Filter before timing so unrelated patches cannot reset the timer.
+      startPeeking()
+      const watched = filtered(filters, evt.detail)
+      stopPeeking()
+      if (!isEmpty(watched)) callback(watched)
+    }) as EventListener
+
+    DOCUMENT.addEventListener(DATASTAR_SIGNAL_PATCH_EVENT, listener)
     return () => {
-      DOCUMENT.removeEventListener(DATASTAR_SIGNAL_PATCH_EVENT, callback)
+      DOCUMENT.removeEventListener(DATASTAR_SIGNAL_PATCH_EVENT, listener)
     }
   },
 })

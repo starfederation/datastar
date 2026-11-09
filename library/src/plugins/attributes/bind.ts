@@ -46,12 +46,16 @@ const valueAdapter = (
   treatUndefinedAsString = false,
   ...events: string[]
 ): BindAdapter => ({
-  get_: (el: HTMLInputElement | HTMLSelectElement, type: string) =>
-    type === 'string' || (treatUndefinedAsString && type === 'undefined')
+  get_: (el: HTMLInputElement | HTMLSelectElement, type: string) => {
+    // Partial date and number edits can have no readable value yet.
+    if (el instanceof HTMLInput && el.validity.badInput) return empty
+    return type === 'string' || (treatUndefinedAsString && type === 'undefined')
       ? el.value
-      : +el.value,
+      : +el.value
+  },
   set_: (el: HTMLInputElement | HTMLSelectElement, value: string | number) => {
-    el.value = `${value}`
+    // Even writing the same date can reset the browser’s active segment.
+    if (el.value !== `${value}`) el.value = `${value}`
   },
   events_: events,
 })
@@ -99,10 +103,22 @@ const boundPath = (
   adapter: BindAdapter,
   initialValue: any,
 ) => {
-  const rawAttribute = aliasify(CSS.escape(rawKey))
-  const selector = key
-    ? `[${rawAttribute}]`
-    : `[${rawAttribute}="${CSS.escape(signalName)}"]`
+  // __root changes Rocket scoping, not the identity of a bound input group.
+  const parts = rawKey.split('__').filter((part) => part !== 'root')
+  const groupKeys = [
+    parts.join('__'),
+    ...parts.map((_, index) =>
+      [...parts.slice(0, index + 1), 'root', ...parts.slice(index + 1)].join(
+        '__',
+      ),
+    ),
+  ]
+  const selector = groupKeys
+    .map((groupKey) => {
+      const attr = aliasify(CSS.escape(groupKey))
+      return key ? `[${attr}]` : `[${attr}="${CSS.escape(signalName)}"]`
+    })
+    .join(',')
   if (
     initialValue === undefined &&
     el instanceof HTMLInput &&
@@ -158,7 +174,7 @@ attribute({
 
     const props = mods.get('prop')
     const events = mods.get('event')
-    let adapter: BindAdapter | null = null
+    let adapter: BindAdapter
 
     if (el instanceof HTMLInput) {
       switch (el.type) {
@@ -261,10 +277,6 @@ attribute({
     } else {
       adapter = attrAdapter('value', 'change')
     }
-    if (!adapter) {
-      throw error('InvalidBindAdapter')
-    }
-
     const firstProp = props && [...props][0]
     if (props && !firstProp) throw error('BindPropNameMissing')
     if (firstProp) {
